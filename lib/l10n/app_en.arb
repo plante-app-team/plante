@@ -11,5 +11,9 @@
       "user_params_page_i_eat_milk": "Milk",
       "user_params_page_i_eat_eggs": "Eggs",
       "user_params_page_i_eat_honey": "Honey",
-      "user_params_page_done_button_title": "Nice!"
+      "user_params_page_done_button_title": "Nice!",
+
+      "main_page_title": "Main screen",
+      "main_page_bottom_btn_feed": "News",
+      "main_page_bottom_btn_map": "Products map"
 }

@@ -8,5 +8,9 @@
     "user_params_page_i_eat_milk": "Молочку",
     "user_params_page_i_eat_eggs": "Яйца",
     "user_params_page_i_eat_honey": "Мёд",
-    "user_params_page_done_button_title": "Отлично!"
+    "user_params_page_done_button_title": "Отлично!",
+
+    "main_page_title": "Главный экран",
+    "main_page_bottom_btn_feed": "Новости",
+    "main_page_bottom_btn_map": "Карта продуктов"
 }

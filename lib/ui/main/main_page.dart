@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/model/user_params_controller.dart';
-
-typedef UserParamsCreatedCallback = void Function(UserParams userParams);
+import 'package:untitled_vegan_app/ui/main/feed/feed_page.dart';
+import 'package:untitled_vegan_app/ui/main/map/map_page.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key? key}) : super(key: key);
@@ -13,38 +10,42 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  UserParams? _userParams;
+  var _selectedPage = 0;
+  final _pageOptions = [
+    FeedPage(),
+    MapPage(),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _initUserParams();
-  }
-
-  void _initUserParams() async {
-    final userParams = await GetIt.I.get<UserParamsController>().getUserParams();
-    setState(() {
-      _userParams = userParams;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Main page'),
-      ),
-      body: Center(
-        child: Text(_greetingMessage()),
+      appBar: AppBar(title: Text(context.strings.main_page_title)),
+      body: _pageOptions[_selectedPage],
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: context.strings.main_page_bottom_btn_feed,
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: context.strings.main_page_bottom_btn_map,
+          ),
+        ],
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.green[900],
+        currentIndex: _selectedPage,
+        onTap: (index) {
+          setState(() {
+            _selectedPage = index;
+          });
+        },
       )
     );
-  }
-
-  String _greetingMessage() {
-    final yeehaa = 'Yeee haaaaaaa!';
-    if (_userParams == null) {
-      return yeehaa;
-    }
-    return yeehaa + '\nHello, ${_userParams!.name}!';
   }
 }
