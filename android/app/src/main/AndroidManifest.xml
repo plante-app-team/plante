@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="vegancheckteam.untitled_vegan_app">
-   <application
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <application
         android:label="untitled_vegan_app"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -37,5 +38,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="PLANTE_ANDROID_GOOGLE_MAPS_KEY"/>
     </application>
 </manifest>
