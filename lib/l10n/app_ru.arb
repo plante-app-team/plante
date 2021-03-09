@@ -12,5 +12,8 @@
 
     "main_page_title": "Главный экран",
     "main_page_bottom_btn_feed": "Новости",
-    "main_page_bottom_btn_map": "Карта продуктов"
+    "main_page_bottom_btn_map": "Карта продуктов",
+
+    "map_page_default_shop_type_name": "Магазин",
+    "map_page_btn_where_am_i": "Где я?"
 }

@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="vegancheckteam.untitled_vegan_app">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="untitled_vegan_app"
         android:icon="@mipmap/ic_launcher">

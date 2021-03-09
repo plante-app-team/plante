@@ -15,5 +15,8 @@
 
       "main_page_title": "Main screen",
       "main_page_bottom_btn_feed": "News",
-      "main_page_bottom_btn_map": "Products map"
+      "main_page_bottom_btn_map": "Products map",
+
+      "map_page_default_shop_type_name": "Shop",
+      "map_page_btn_where_am_i": "Where am I?"
 }
