@@ -15,5 +15,8 @@
     "main_page_bottom_btn_map": "Карта продуктов",
 
     "map_page_default_shop_type_name": "Магазин",
-    "map_page_btn_where_am_i": "Где я?"
+    "map_page_btn_where_am_i": "Где я?",
+
+    "qr_scan_page_btn_flash": "Вспышка",
+    "qr_scan_page_product_not_found": "Такой продукт не найден"
 }
