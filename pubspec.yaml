@@ -37,6 +37,7 @@ dependencies:
   geolocator: ^7.0.1
   http: ^0.13.0
   qr_code_scanner: ^0.3.5
+  openfoodfacts: ^1.0.1-beta
 
 dev_dependencies:
   flutter_test:

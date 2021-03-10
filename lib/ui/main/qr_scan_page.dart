@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:untitled_vegan_app/ui/product/product_page.dart';
 
 class QrScanPage extends StatefulWidget {
   @override
@@ -12,7 +14,9 @@ class QrScanPage extends StatefulWidget {
 }
 
 class _QrScanPageState extends State<QrScanPage> {
-  Barcode? result;
+  Barcode? _barcode;
+  off.Product? _foundProduct;
+
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
@@ -51,12 +55,15 @@ class _QrScanPageState extends State<QrScanPage> {
             child:  AnimatedContainer(
               duration: Duration(milliseconds: 250),
               width: MediaQuery.of(context).size.width,
-              height: result != null ? 100 : 0,
+              height: _barcode != null ? 100 : 0,
               color: Colors.white,
               child: Center(
-                child: Text(
-                    context.strings.qr_scan_page_product_not_found,
-                    style: TextStyle(fontSize: 20.0)),
+                child: InkWell(
+                  child: Text(
+                      _foundProduct?.productName ?? context.strings.qr_scan_page_product_not_found,
+                      style: TextStyle(fontSize: 20.0)),
+                  onTap: _foundProduct == null ? null : () { _openProductPage(_foundProduct!); },
+                )
               )
             ),
           )
@@ -88,9 +95,20 @@ class _QrScanPageState extends State<QrScanPage> {
       this.controller = controller;
     });
     controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
+      _onNewScanData(scanData);
+    });
+  }
+
+  void _onNewScanData(Barcode scanData) async {
+    // TODO(https://trello.com/c/LYzlAbXj): request only needed fields
+    final configuration = off.ProductQueryConfiguration(
+      scanData.code,
+      lc: Localizations.localeOf(context).languageCode,
+      fields: [off.ProductField.ALL]);
+    off.ProductResult foundProduct = await off.OpenFoodAPIClient.getProduct(configuration);
+    setState(() {
+      _barcode = scanData;
+      _foundProduct = foundProduct.product;
     });
   }
 
@@ -100,5 +118,12 @@ class _QrScanPageState extends State<QrScanPage> {
     } on CameraException {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
     }
+  }
+
+  void _openProductPage(off.Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ProductPage(product)),
+    );
   }
 }
