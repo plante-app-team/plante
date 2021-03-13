@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
 // ignore: import_of_legacy_library_into_null_safe
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:untitled_vegan_app/l10n/strings.dart';
 import 'package:untitled_vegan_app/ui/product/product_page.dart';
 
@@ -13,12 +14,19 @@ class QrScanPage extends StatefulWidget {
   _QrScanPageState createState() => _QrScanPageState();
 }
 
-class _QrScanPageState extends State<QrScanPage> {
-  Barcode? _barcode;
+class _QrScanPageState extends State<QrScanPage> with RouteAware {
+  String? _barcode;
   off.Product? _foundProduct;
 
-  QRViewController? controller;
+  qr.QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    GetIt.I.get<RouteObserver<ModalRoute>>()
+        .subscribe(this, ModalRoute.of(context)!);
+  }
 
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
@@ -35,7 +43,21 @@ class _QrScanPageState extends State<QrScanPage> {
   @override
   void dispose() {
     controller?.dispose();
+    GetIt.I.get<RouteObserver<ModalRoute>>()
+        .unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    if (ModalRoute.of(context)?.isActive == true) {
+      this.controller?.resumeCamera();
+    }
+  }
+
+  @override
+  void didPushNext() {
+    this.controller?.pauseCamera();
   }
 
   @override
@@ -52,24 +74,33 @@ class _QrScanPageState extends State<QrScanPage> {
           ),
           Align(
             alignment: AlignmentDirectional.bottomCenter,
-            child:  AnimatedContainer(
+            child: InkWell(child: AnimatedContainer(
               duration: Duration(milliseconds: 250),
               width: MediaQuery.of(context).size.width,
               height: _barcode != null ? 100 : 0,
               color: Colors.white,
               child: Center(
-                child: InkWell(
-                  child: Text(
-                      _foundProduct?.productName ?? context.strings.qr_scan_page_product_not_found,
-                      style: TextStyle(fontSize: 20.0)),
-                  onTap: _foundProduct == null ? null : () { _openProductPage(_foundProduct!); },
+                child: Text(
+                    _productName(_foundProduct),
+                    style: TextStyle(fontSize: 20.0)),
                 )
-              )
+              ),
+              onTap: _tryOpenProductPage,
             ),
           )
         ],
       ),
     );
+  }
+
+  String _productName(off.Product? product) {
+    if (product == null) {
+      return context.strings.qr_scan_page_product_not_found;
+    }
+    if (product.productName != null) {
+      return product.productName!;
+    }
+    return context.strings.qr_scan_page_product_without_name;
   }
 
   Widget _buildQrView(BuildContext context) {
@@ -78,10 +109,10 @@ class _QrScanPageState extends State<QrScanPage> {
         MediaQuery.of(context).size.height < 400)
         ? 150.0
         : 300.0;
-    return QRView(
+    return qr.QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
-      overlay: QrScannerOverlayShape(
+      overlay: qr.QrScannerOverlayShape(
           borderColor: Colors.red,
           borderRadius: 10,
           borderLength: 30,
@@ -90,7 +121,7 @@ class _QrScanPageState extends State<QrScanPage> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(qr.QRViewController controller) {
     setState(() {
       this.controller = controller;
     });
@@ -99,7 +130,7 @@ class _QrScanPageState extends State<QrScanPage> {
     });
   }
 
-  void _onNewScanData(Barcode scanData) async {
+  void _onNewScanData(qr.Barcode scanData) async {
     // TODO(https://trello.com/c/LYzlAbXj): request only needed fields
     final configuration = off.ProductQueryConfiguration(
       scanData.code,
@@ -107,7 +138,7 @@ class _QrScanPageState extends State<QrScanPage> {
       fields: [off.ProductField.ALL]);
     off.ProductResult foundProduct = await off.OpenFoodAPIClient.getProduct(configuration);
     setState(() {
-      _barcode = scanData;
+      _barcode = foundProduct.product?.barcode ?? scanData.code;
       _foundProduct = foundProduct.product;
     });
   }
@@ -115,15 +146,18 @@ class _QrScanPageState extends State<QrScanPage> {
   void _toggleFlash() async {
     try {
       await controller?.toggleFlash();
-    } on CameraException {
+    } on qr.CameraException {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
     }
   }
 
-  void _openProductPage(off.Product product) {
+  void _tryOpenProductPage() {
+    if (_barcode == null) {
+      return;
+    }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProductPage(product)),
+      MaterialPageRoute(builder: (context) => ProductPage(_foundProduct, _barcode!)),
     );
   }
 }

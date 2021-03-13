@@ -21,5 +21,15 @@
       "map_page_btn_where_am_i": "Where am I?",
 
       "qr_scan_page_btn_flash": "Flash",
-      "qr_scan_page_product_not_found": "Product not found"
+      "qr_scan_page_product_not_found": "Product not found",
+      "qr_scan_page_product_without_name": "Nameless product",
+
+      "product_page_title_display": "Product",
+      "product_page_title_creating": "Creating product",
+      "product_page_no_data": "No data",
+      "product_page_brand": "Brand: ",
+      "product_page_categories": "Categories: ",
+      "product_page_is_vegetarian": "Is vegetarian: ",
+      "product_page_is_vegan": "Is vegan: ",
+      "product_page_ingredients": "Ingredients: "
 }

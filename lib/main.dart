@@ -11,7 +11,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initDI();
   final initialUserParams = await GetIt.I.get<UserParamsController>().getUserParams();
-  runApp(MyApp(initialUserParams));
+  runApp(RootRestorationScope( // Register a restoration scope for the entire app!
+      restorationId: 'root',
+      child: MyApp(initialUserParams)));
 }
 
 class MyApp extends StatefulWidget {
@@ -46,6 +48,7 @@ class _MyAppState extends State<MyApp> {
       home: _initialUserParams != null
           ? MainPage()
           : UserParamsPage(_onUserParamsSpecified),
+      navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]
     );
   }
 }

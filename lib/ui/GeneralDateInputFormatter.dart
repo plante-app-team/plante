@@ -12,7 +12,7 @@ class GeneralDateInputFormatter extends TextInputFormatter {
   final int _endYear;
   var _lastValidText = TextEditingValue();
 
-  GeneralDateInputFormatter(this._startYear, this._endYear) {}
+  GeneralDateInputFormatter(this._startYear, this._endYear);
 
   @override
   TextEditingValue formatEditUpdate(

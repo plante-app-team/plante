@@ -18,5 +18,15 @@
     "map_page_btn_where_am_i": "Где я?",
 
     "qr_scan_page_btn_flash": "Вспышка",
-    "qr_scan_page_product_not_found": "Такой продукт не найден"
+    "qr_scan_page_product_not_found": "Такой продукт не найден",
+    "qr_scan_page_product_without_name": "Безымянный продукт",
+
+    "product_page_title_display": "Продукт",
+    "product_page_title_creating": "Создание продукта",
+    "product_page_no_data": "Нет данных",
+    "product_page_brand": "Бренд: ",
+    "product_page_categories": "Категории: ",
+    "product_page_is_vegetarian": "Вегетарианский ли: ",
+    "product_page_is_vegan": "Веганский ли: ",
+    "product_page_ingredients": "Состав: "
 }
