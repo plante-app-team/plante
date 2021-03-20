@@ -1,4 +1,9 @@
 {
+      "global_app_name": "Untitled Vegan App",
+      "global_something_went_wrong": "Oops, something went wrong",
+      "external_auth_page_search_products_with": "Look for ethical products with",
+      "external_auth_page_continue_with_google": "Continue with Google",
+
       "user_params_page_title": "Let's get acquainted!!",
       "@user_params_page_title": {
           "description": "User params page title"

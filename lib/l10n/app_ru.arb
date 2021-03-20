@@ -1,4 +1,8 @@
 {
+    "global_something_went_wrong": "Упс, что-то пошло не так",
+    "external_auth_page_search_products_with": "Ищите этичные продукты вместе с",
+    "external_auth_page_continue_with_google": "Продолжить с Google",
+
     "user_params_page_title": "Давайте знакомиться!",
     "user_params_page_name_field_title": "Имя",
     "user_params_page_name_field_hint": "Иван",
