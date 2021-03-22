@@ -53,10 +53,10 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
   }
 
   void _onGoogleAuthClicked() async {
-    final google_account = await GetIt.I.get<GoogleAuthorizer>().auth();
-    if (google_account != null) {
+    final googleAccount = await GetIt.I.get<GoogleAuthorizer>().auth();
+    if (googleAccount != null) {
       // TODO(https://trello.com/c/tpTEiZpc/): server auth/register
-      _callback.call(ExternalAuthResult(googleUser: google_account));
+      _callback.call(ExternalAuthResult(googleUser: googleAccount));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(context.strings.global_something_went_wrong)));

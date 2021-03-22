@@ -5,8 +5,8 @@ import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/di.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/ui/first_screen/external_auth_page.dart';
+import 'package:untitled_vegan_app/ui/first_screen/init_user_page.dart';
 import 'package:untitled_vegan_app/ui/main/main_page.dart';
-import 'package:untitled_vegan_app/ui/user_params/user_params_page.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
 void main() async {
@@ -71,11 +71,10 @@ class _MyAppState extends State<MyApp> {
     if (_initialUserParams != null) {
       return MainPage();
     }
-
     if (_externalAuthResult != null) {
-      return UserParamsPage(_onUserParamsSpecified);
+      final name = _externalAuthResult?.googleUser?.name ?? "";
+      return InitUserPage(UserParams(name), _onUserParamsSpecified);
     }
-
     return ExternalAuthPage(_onExternalAuthResult);
   }
 }
