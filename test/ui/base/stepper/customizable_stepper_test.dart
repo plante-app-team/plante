@@ -13,19 +13,19 @@ void main() {
     final controller = CustomizableStepperController();
 
     final page1 = StepperPage(
-        Expanded(child: Text("Page 1")),
+        Text("Page 1"),
         ElevatedButton(
             child: Text("Cool button 1"),
             onPressed: controller.stepForward)
     );
     final page2 = StepperPage(
-        Center(child: Text("Page 2")),
+        Text("Page 2"),
         ElevatedButton(
             child: Text("Cool button 2"),
             onPressed: controller.stepForward)
     );
     final page3 = StepperPage(
-        Center(child: Text("Page 3")),
+        Text("Page 3"),
         ElevatedButton(
             child: Text("Cool button 3"),
             onPressed: controller.stepForward)
@@ -128,4 +128,59 @@ void main() {
     expect(find.text("Cool button 2"), findsNothing);
     expect(find.text("Cool button 3"), findsOneWidget);
   });
+
+  testWidgets("Can dynamically update", (WidgetTester tester) async {
+    final swapper = ChildrenSwapperController();
+    await tester.pumpWidget(
+        Directionality(
+            textDirection: TextDirection.ltr,
+            child: StepperChildrenSwapper(
+                controller: swapper, child1: Text("Text1"), child2: Text("Text2")
+            )));
+
+    expect(find.text("Text1"), findsOneWidget);
+    expect(find.text("Text2"), findsNothing);
+    swapper.swap();
+    await tester.pumpAndSettle();
+    expect(find.text("Text1"), findsNothing);
+    expect(find.text("Text2"), findsOneWidget);
+  });
+}
+
+
+class ChildrenSwapperController {
+  void Function()? _swapFn;
+  void swap() {
+    _swapFn?.call();
+  }
+}
+class StepperChildrenSwapper extends StatefulWidget {
+  final ChildrenSwapperController controller;
+  final Widget child1;
+  final Widget child2;
+  StepperChildrenSwapper({required this.controller, required this.child1, required this.child2});
+  @override
+  _StepperChildrenSwapperState createState() => _StepperChildrenSwapperState(controller, child1, child2);
+}
+class _StepperChildrenSwapperState extends State<StepperChildrenSwapper> {
+  final ChildrenSwapperController controller;
+  final Widget child1;
+  final Widget child2;
+  bool showChild1 = true;
+  _StepperChildrenSwapperState(this.controller, this.child1, this.child2) {
+    controller._swapFn = () {
+      setState(() {
+        showChild1 = !showChild1;
+      });
+    };
+  }
+  @override
+  Widget build(BuildContext context) {
+    final controller = CustomizableStepperController();
+    final page1 = StepperPage(
+        showChild1 ? child1 : child2,
+        Placeholder()
+    );
+    return CustomizableStepper(pages: [page1], controller: controller);
+  }
 }

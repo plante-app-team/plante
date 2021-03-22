@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class StepperPage extends StatelessWidget {
-  final Widget _content;
-  final Widget? _bottomControls;
+  final Widget content;
+  final Widget? bottomControls;
 
-  StepperPage(this._content, this._bottomControls);
+  StepperPage(this.content, this.bottomControls);
 
   @override
   Widget build(BuildContext context) {
     return Column(
         verticalDirection: VerticalDirection.up,
         children: [
-          if (_bottomControls != null) _bottomControls!,
-          _content
+          if (bottomControls != null) bottomControls!,
+          Expanded(child: content)
         ]);
   }
 }

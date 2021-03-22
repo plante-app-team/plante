@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:untitled_vegan_app/ui/base/stepper/_indicators_top.dart';
+import 'package:untitled_vegan_app/ui/base/stepper/functions.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 
-typedef PageIndicatorMaker = Widget Function(int page, bool pageFinished);
-typedef DividerMaker = Widget Function(
-    int leftPage, int rightPage, bool leftFinished, bool rightFinished);
-
 class CustomizableStepperController {
+  CustomizableStepper2IndicatorsTopController _indicatorsController;
   _StepFunction? _stepForwardFn;
   _StepFunction? _stepBackwardFn;
   _SetPageFunction? _setPageFunction;
+  int _activePage = 0;
+
+  CustomizableStepperController({int initialPage = 0}):
+        _indicatorsController = CustomizableStepper2IndicatorsTopController(
+            initialPage: initialPage) {
+    _activePage = initialPage;
+  }
+
   void stepForward() {
     _stepForwardFn?.call();
   }
@@ -21,53 +28,36 @@ class CustomizableStepperController {
   }
 }
 
-class CustomizableStepper extends StatefulWidget {
-  final CustomizableStepperController controller;
-  final PageIndicatorMaker pageIndicatorMaker;
-  final List<StepperPage> pages;
-  final DividerMaker dividerMaker;
-  final EdgeInsetsGeometry contentPadding;
-
-  CustomizableStepper({
-    required this.pages,
-    required this.controller,
-    this.pageIndicatorMaker = defaultIndicatorMaker,
-    this.dividerMaker = defaultDividerMaker,
-    this.contentPadding = EdgeInsets.zero});
-
-  @override
-  _CustomizableStepperState createState() => _CustomizableStepperState(
-      this.controller,
-      this.pageIndicatorMaker,
-      this.pages,
-      this.dividerMaker,
-      this.contentPadding);
-}
-
-class _CustomizableStepperState extends State<CustomizableStepper> {
+class CustomizableStepper extends StatelessWidget {
   final CustomizableStepperController _controller;
   final PageIndicatorMaker _pageIndicatorMaker;
-  final List<StepperPage> _pages;
   final DividerMaker _dividerMaker;
+  final List<StepperPage> _pages;
 
-  final EdgeInsetsGeometry _contentPadding;
+  final EdgeInsets _contentPadding;
 
-  final PageController _pageViewController = PageController();
+  final PageController _pageViewController;
+  final CustomizableStepper2IndicatorsTopController _indicatorController;
 
-  int _activePage = 0;
-
-  _CustomizableStepperState(
-      this._controller,
-      this._pageIndicatorMaker,
-      this._pages,
-      this._dividerMaker,
-      this._contentPadding) {
-    _controller._stepForwardFn = () => setPage(_activePage + 1);
-    _controller._stepBackwardFn = () => setPage(_activePage - 1);
-    _controller._setPageFunction = (int page) => setPage(page);
+  CustomizableStepper({
+    required List<StepperPage> pages,
+    required CustomizableStepperController controller,
+    PageIndicatorMaker pageIndicatorMaker = defaultIndicatorMaker,
+    DividerMaker dividerMaker = defaultDividerMaker,
+    EdgeInsets contentPadding = EdgeInsets.zero}):
+      _controller = controller,
+      _pageIndicatorMaker = pageIndicatorMaker,
+      _dividerMaker = dividerMaker,
+      _pages = pages,
+      _contentPadding = contentPadding,
+      _pageViewController = PageController(initialPage: controller._activePage),
+      _indicatorController = controller._indicatorsController {
+    _controller._stepForwardFn = () => _setPage(_controller._activePage + 1);
+    _controller._stepBackwardFn = () => _setPage(_controller._activePage - 1);
+    _controller._setPageFunction = (int page) => _setPage(page);
   }
 
-  void setPage(int page) {
+  void _setPage(int page) {
     if (page < 0 || _pages.length <= page) {
       return;
     }
@@ -76,65 +66,53 @@ class _CustomizableStepperState extends State<CustomizableStepper> {
         page,
         duration: Duration(milliseconds: 250),
         curve: Curves.easeIn);
-    setState(() {
-      _activePage = page;
-    });
+    _indicatorController.setPage(page);
+    _controller._activePage = page;
   }
 
   @override
   Widget build(BuildContext context) {
+    final pagesPadding = EdgeInsets.only(
+        left: _contentPadding.left,
+        right: _contentPadding.right,
+        bottom: _contentPadding.bottom);
     final pages = _pages.map((page) =>
-        Container(child: page, padding: _contentPadding)).toList();
+        Container(child: page, padding: pagesPadding)).toList();
+    
+    final indicatorsPadding = EdgeInsets.only(
+      left: _contentPadding.left,
+      top: _contentPadding.top,
+      right: _contentPadding.right
+    );
     return WillPopScope(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        verticalDirection: VerticalDirection.down,
-        children: <Widget>[
-          _pageIndicators(),
-          Expanded(child:
-            PageView(
-              controller: _pageViewController,
-              physics: NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              children: pages,
-          )), // Container with a label
-        ],
-      ),
-      onWillPop: () async {
-        if (_activePage == 0) {
-          return true;
-        } else {
-          _controller.stepBackward();
-          return false;
-        }
-      });
-  }
-
-  Widget _pageIndicators() {
-    List<Widget> indicatorsWithDividers = [];
-    for (int index = 0; index < _pages.length; ++index) {
-      final pageFinished = index < _activePage;
-      final indicator = AnimatedCrossFade(
-        firstChild: _pageIndicatorMaker.call(index, false),
-        secondChild: _pageIndicatorMaker.call(index, true),
-        crossFadeState: !pageFinished ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-        duration: Duration(milliseconds: 250),
-      );
-
-      indicatorsWithDividers.add(indicator);
-      if (index < _pages.length - 1) {
-        final nextPageFinished = index + 1 < _activePage;
-        final divider = _dividerMaker.call(
-            index, index + 1, pageFinished, nextPageFinished);
-        indicatorsWithDividers.add(Expanded(child: divider));
-      }
-    }
-    return Container(
-      padding: EdgeInsets.only(top: 20),
-      child: Container(
-        padding: _contentPadding, child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: indicatorsWithDividers)));
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          verticalDirection: VerticalDirection.down,
+          children: <Widget>[
+            Container(
+              padding: indicatorsPadding,
+              child: CustomizableStepperIndicatorsTop(
+                  _indicatorController,
+                  _pageIndicatorMaker,
+                  _dividerMaker,
+                  _pages.length)),
+            Expanded(child:
+              PageView(
+                controller: _pageViewController,
+                physics: NeverScrollableScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: pages,
+              )), // Container with a label
+          ],
+        ),
+        onWillPop: () async {
+          if (_controller._activePage == 0) {
+            return true;
+          } else {
+            _controller.stepBackward();
+            return false;
+          }
+        });
   }
 }
 
@@ -145,11 +123,11 @@ Widget defaultDividerMaker(int leftPage, int rightPage, bool leftFinished, bool 
   return Container(child: Divider(), padding: EdgeInsets.only(left: 20, right: 20));
 }
 
-Widget defaultIndicatorMaker(int page, bool pageFinished) {
+Widget defaultIndicatorMaker(int page, bool pageReached) {
   return new Container(
       width: 30,
       height: 30,
       decoration: new BoxDecoration(
-        color: !pageFinished ? Colors.grey : Colors.green,
-        shape: BoxShape.circle));
+          color: !pageReached ? Colors.grey : Colors.green,
+          shape: BoxShape.circle));
 }
