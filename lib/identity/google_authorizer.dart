@@ -3,7 +3,9 @@ import 'package:untitled_vegan_app/identity/google_user.dart';
 
 class GoogleAuthorizer {
   Future<GoogleUser?> auth() async {
-    GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+    GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+        clientId: "PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID");
 
     try {
       final account = await googleSignIn.signIn();
@@ -27,6 +29,7 @@ class GoogleAuthorizer {
     } catch (error) {
       // TODO(https://trello.com/c/XWAE5UVB/): report an error
       print(error);
+      return null;
     }
   }
 }
