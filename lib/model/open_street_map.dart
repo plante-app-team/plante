@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:http/http.dart' as http;
+import 'package:get_it/get_it.dart';
+import 'package:untitled_vegan_app/base/http_client.dart';
 import 'package:untitled_vegan_app/model/shop.dart';
 
 class OpenStreetMap {
@@ -9,6 +10,8 @@ class OpenStreetMap {
       Point<double> northeast,
       Point<double> southwest,
       { String shopType = 'supermarket' }) async {
+    final http = GetIt.I.get<HttpClient>();
+
     final val1 = southwest.x;
     final val2 = southwest.y;
     final val3 = northeast.x;

@@ -8,36 +8,32 @@ import 'package:untitled_vegan_app/ui/base/general_date_Input_formatter.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/customizable_stepper.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 
-typedef UserParamsSpecifiedCallback = void Function(UserParams userParams);
+typedef UserParamsSpecifiedCallback = Future<bool> Function(UserParams userParams);
 
 class InitUserPage extends StatefulWidget {
-  final UserParams? initialUserParams;
+  static const minNameLength = 3;
+
+  final UserParams userParams;
   final UserParamsSpecifiedCallback callback;
 
-  InitUserPage(this.initialUserParams, this.callback);
+  InitUserPage(this.userParams, this.callback);
 
   @override
   _InitUserPageState createState() =>
-      _InitUserPageState(initialUserParams, callback);
+      _InitUserPageState(userParams, callback);
 }
 
 class _InitUserPageState extends State<InitUserPage> {
-  final UserParams? _initialUserParams;
+  bool _loading = false;
+
+  UserParams _userParams;
   final UserParamsSpecifiedCallback _resultCallback;
 
   final _stepperController = CustomizableStepperController();
 
   static const _minUserBirthYear = 1900;
   static const _minUserAge = 16;
-  static const _minNameLength = 3;
   static final _dateFormat = DateFormat('dd.MM.yyyy');
-  Gender? _selectedGender;
-  var _eatsMilk = false;
-  var _eatsEggs = false;
-  var _eatsHoney = false;
-  bool get _eatsVeggiesOnly {
-    return !_eatsMilk && !_eatsEggs && !_eatsHoney;
-  }
 
   final _nameController = TextEditingController();
   final _birthdayController = TextEditingController();
@@ -46,38 +42,44 @@ class _InitUserPageState extends State<InitUserPage> {
 
   var _firstPageHasData = false;
 
-  _InitUserPageState(this._initialUserParams, this._resultCallback);
+  _InitUserPageState(this._userParams, this._resultCallback);
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _initialUserParams?.name ?? "";
-    assert(_initialUserParams?.gender == null);
-    assert(_initialUserParams?.birthday == null);
-    assert(_initialUserParams?.eatsMilk == null);
-    assert(_initialUserParams?.eatsEggs == null);
-    assert(_initialUserParams?.eatsHoney == null);
+    _nameController.text = _userParams.name ?? "";
 
     _nameController.addListener(() {
-      _validateFirstPageInputs();
+      if (_validateFirstPageInputs()) {
+        _userParams = _userParams.rebuild((v) => v.name = _nameController.text);
+      }
     });
     _birthdayController.addListener(() {
+      if (_validateFirstPageInputs()) {
+        if (_birthdayController.text.isNotEmpty) {
+          _userParams = _userParams.rebuild((v) => v.birthdayStr = _birthdayController.text);
+        } else {
+          _userParams = _userParams.rebuild((v) => v.birthdayStr = null);
+        }
+      }
       _validateFirstPageInputs();
+      _userParams = _userParams.rebuild((v) => v.name = _nameController.text);
     });
     _validateFirstPageInputs();
   }
 
-  void _validateFirstPageInputs() {
+  bool _validateFirstPageInputs() {
     final firstPageHasData = _calcFirstPageHasData();
     if (firstPageHasData != _firstPageHasData) {
       setState(() {
         _firstPageHasData = firstPageHasData;
       });
     }
+    return firstPageHasData;
   }
 
   bool _calcFirstPageHasData() {
-    if (_nameController.text.trim().length < _minNameLength) {
+    if (_nameController.text.trim().length < InitUserPage.minNameLength) {
       return false;
     }
     // No birthday is allowed
@@ -98,11 +100,13 @@ class _InitUserPageState extends State<InitUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(child: CustomizableStepper(
-          pages: [_page1(), _page2()],
-          controller: _stepperController,
-          contentPadding: EdgeInsets.only(left: 50, right: 50),
-        ))
+        body: SafeArea(child: Stack(children: [
+          if (_loading) SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+          CustomizableStepper(
+            pages: [_page1(), _page2()],
+            controller: _stepperController,
+            contentPadding: EdgeInsets.only(left: 50, right: 50),
+          )]))
     );
   }
 
@@ -139,25 +143,33 @@ class _InitUserPageState extends State<InitUserPage> {
                   InkWell(
                     child: Text(context.strings.init_user_page_gender_short_male),
                     onTap: () {
-                      setState(() { _selectedGender = Gender.MALE; });
+                      setState(() {
+                        _userParams = _userParams.rebuild((v) => v.genderStr = Gender.MALE.name);
+                      });
                     }),
                   Radio<Gender>(
                     value: Gender.MALE,
-                    groupValue: _selectedGender,
+                    groupValue: _userParams.gender,
                     onChanged: (Gender? value) {
-                      setState(() { _selectedGender = value; });
+                      setState(() {
+                        _userParams = _userParams.rebuild((v) => v.genderStr = value?.name);
+                      });
                     },
                   ),
                   InkWell(
                       child: Text(context.strings.init_user_page_gender_short_female),
                       onTap: () {
-                        setState(() { _selectedGender = Gender.FEMALE; });
+                        setState(() {
+                          _userParams = _userParams.rebuild((v) => v.genderStr = Gender.FEMALE.name);
+                        });
                       }),
                   Radio<Gender>(
                     value: Gender.FEMALE,
-                    groupValue: _selectedGender,
+                    groupValue: _userParams.gender,
                     onChanged: (Gender? value) {
-                      setState(() { _selectedGender = value; });
+                      setState(() {
+                        _userParams = _userParams.rebuild((v) => v.genderStr = value?.name);
+                      });
                     },
                   )
                 ])
@@ -173,7 +185,7 @@ class _InitUserPageState extends State<InitUserPage> {
         width: double.infinity,
         child: OutlinedButton(
           child: Text(context.strings.init_user_page_next_button_title),
-          onPressed: _firstPageHasData ? onNextPressed : null));
+          onPressed: _firstPageHasData && !_loading ? onNextPressed : null));
 
     return StepperPage(content, buttonNext);
   }
@@ -181,19 +193,29 @@ class _InitUserPageState extends State<InitUserPage> {
   StepperPage _page2() {
     final onVegetablesCheckboxClick = (bool? value) {
       setState(() {
-        _eatsMilk = value != null ? !value : false;
-        _eatsEggs = value != null ? !value : false;
-        _eatsHoney = value != null ? !value : false;
+        _userParams = _userParams.rebuild((v) => v
+          ..eatsMilk = value != null ? !value : false
+          ..eatsEggs = value != null ? !value : false
+          ..eatsHoney = value != null ? !value : false);
       });
     };
     final onMilkCheckboxClick = (bool? value) {
-      setState(() { _eatsMilk = value ?? false; });
+      setState(() {
+        _userParams = _userParams.rebuild((v) => v
+          ..eatsMilk = value != null ? value : false);
+      });
     };
     final onEggsCheckboxClick = (bool? value) {
-      setState(() { _eatsEggs = value ?? false; });
+      setState(() {
+        _userParams = _userParams.rebuild((v) => v
+          ..eatsEggs = value != null ? value : false);
+      });
     };
     final onHoneyCheckboxClick = (bool? value) {
-      setState(() { _eatsHoney = value ?? false; });
+      setState(() {
+        _userParams = _userParams.rebuild((v) => v
+          ..eatsHoney = value != null ? value : false);
+      });
     };
 
     final content = Column(children: [
@@ -207,55 +229,54 @@ class _InitUserPageState extends State<InitUserPage> {
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Checkbox(
-                  value: _eatsVeggiesOnly,
+                  value: _userParams.eatsVeggiesOnly ?? true,
                   onChanged: onVegetablesCheckboxClick),
               InkWell(
                   child: Text(context.strings.init_user_page_i_eat_veggies_only),
-                  onTap: () { onVegetablesCheckboxClick(!_eatsVeggiesOnly); }),
+                  onTap: () {
+                    onVegetablesCheckboxClick(!(_userParams.eatsVeggiesOnly ?? true));
+                  }),
             ]),
             Divider(),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Checkbox(value: _eatsMilk, onChanged: onMilkCheckboxClick),
+              Checkbox(value: _userParams.eatsMilk ?? false, onChanged: onMilkCheckboxClick),
               InkWell(
                 child: Text(context.strings.init_user_page_i_eat_milk),
-                onTap: () { onMilkCheckboxClick(!_eatsMilk); }),
+                onTap: () { onMilkCheckboxClick(!(_userParams.eatsMilk ?? false)); }),
             ]),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Checkbox(value: _eatsEggs, onChanged: onEggsCheckboxClick),
+              Checkbox(value: _userParams.eatsEggs ?? false, onChanged: onEggsCheckboxClick),
               InkWell(
                 child: Text(context.strings.init_user_page_i_eat_eggs),
-                onTap: () { onEggsCheckboxClick(!_eatsEggs); }),
+                onTap: () { onEggsCheckboxClick(!(_userParams.eatsEggs ?? false)); }),
             ]),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Checkbox(value: _eatsHoney, onChanged: onHoneyCheckboxClick),
+              Checkbox(value: _userParams.eatsHoney ?? false, onChanged: onHoneyCheckboxClick),
               InkWell(
                   child: Text(context.strings.init_user_page_i_eat_honey),
-                  onTap: () { onHoneyCheckboxClick(!_eatsHoney); }),
+                  onTap: () { onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false)); }),
             ])
           ]))
     ]);
+
+    final onDoneClicked = () async {
+      _userParams = _userParams.rebuild((v) => v
+        ..eatsMilk = _userParams.eatsMilk ?? false
+        ..eatsEggs = _userParams.eatsEggs ?? false
+        ..eatsHoney = _userParams.eatsHoney ?? false);
+      try {
+        setState(() { _loading = true; });
+        await _resultCallback.call(_userParams);
+      } finally {
+        setState(() { _loading = false; });
+      }
+    };
 
     final buttonNext = SizedBox(
         width: double.infinity,
         child: OutlinedButton(
             child: Text(context.strings.init_user_page_done_button_title),
-            onPressed: () {
-              final name = _nameController.text;
-              DateTime? birthday;
-              try {
-                birthday = _dateFormat.parse(_birthdayController.text);
-              } catch (FormatException) {
-                // It's ok, birthday might be not specified
-              }
-              final params = UserParams(
-                  name,
-                  gender: _selectedGender,
-                  birthday: birthday,
-                  eatsMilk: _eatsMilk,
-                  eatsEggs: _eatsEggs,
-                  eatsHoney: _eatsHoney);
-              _resultCallback.call(params);
-            }));
+            onPressed: !_loading ? onDoneClicked : null));
 
     return StepperPage(content, buttonNext);
   }

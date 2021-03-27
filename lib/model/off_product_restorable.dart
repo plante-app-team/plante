@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 
 import 'package:openfoodfacts/openfoodfacts.dart' as off;

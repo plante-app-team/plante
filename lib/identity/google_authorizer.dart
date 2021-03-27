@@ -15,8 +15,8 @@ class GoogleAuthorizer {
       }
 
       final authentication = await account.authentication;
-      final accessToken = authentication.accessToken;
-      if (accessToken == null) {
+      final idToken = authentication.idToken;
+      if (idToken == null) {
         // TODO(https://trello.com/c/XWAE5UVB/): log warning
         return null;
       }
@@ -24,7 +24,7 @@ class GoogleAuthorizer {
       return GoogleUser(
           account.displayName ?? "",
           account.email,
-          accessToken,
+          idToken,
           DateTime.now().toUtc());
     } catch (error) {
       // TODO(https://trello.com/c/XWAE5UVB/): report an error

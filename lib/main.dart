@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
+import 'package:untitled_vegan_app/backend/backend.dart';
 import 'package:untitled_vegan_app/di.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/ui/first_screen/external_auth_page.dart';
@@ -35,23 +36,20 @@ class MyApp extends StatefulWidget {
   State<StatefulWidget> createState() => (_MyAppState(_initialUserParams));
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
   UserParams? _initialUserParams;
-  ExternalAuthResult? _externalAuthResult;
 
-  _MyAppState(this._initialUserParams);
-
-  void _onUserParamsSpecified(UserParams params) async {
-    await GetIt.I.get<UserParamsController>().setUserParams(params);
-    setState(() {
-      _initialUserParams = params;
-    });
+  _MyAppState(this._initialUserParams) {
+    GetIt.I.get<UserParamsController>().addObserver(this);
   }
 
-  void _onExternalAuthResult(ExternalAuthResult externalAuthResult) {
-    setState(() {
-      _externalAuthResult = externalAuthResult;
-    });
+  Future<bool> _onUserParamsSpecified(UserParams params) async {
+    final result = await GetIt.I.get<Backend>().updateUserParams(params);
+    if (result.isLeft) {
+      await GetIt.I.get<UserParamsController>().setUserParams(params);
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -68,13 +66,33 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _mainWidget() {
-    if (_initialUserParams != null) {
+    if (_allRequiredUserParamsFilled()) {
       return MainPage();
     }
-    if (_externalAuthResult != null) {
-      final name = _externalAuthResult?.googleUser?.name ?? "";
-      return InitUserPage(UserParams(name), _onUserParamsSpecified);
+    if (_initialUserParams != null) {
+      return InitUserPage(_initialUserParams!, _onUserParamsSpecified);
     }
-    return ExternalAuthPage(_onExternalAuthResult);
+    return ExternalAuthPage(_onUserParamsSpecified);
+  }
+
+  bool _allRequiredUserParamsFilled() {
+    if (_initialUserParams == null) {
+      return false;
+    }
+    if ((_initialUserParams?.name ?? "").length < InitUserPage.minNameLength
+        || _initialUserParams!.eatsMilk == null
+        || _initialUserParams!.eatsEggs == null
+        || _initialUserParams!.eatsHoney == null) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  void onUserParamsUpdate(UserParams? userParams) {
+    // Will reset screen to ExternalAuthPage if user params are wiped
+    setState(() {
+      _initialUserParams = userParams;
+    });
   }
 }

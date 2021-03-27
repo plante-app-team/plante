@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:untitled_vegan_app/model/gender.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
@@ -9,41 +11,50 @@ const PREF_USER_BIRTHDAY = 'PREF_USER_BIRTHDAY';
 const PREF_USER_EATS_MILK = 'PREF_USER_EATS_MILK';
 const PREF_USER_EATS_EGGS = 'PREF_USER_EATS_EGGS';
 const PREF_USER_EATS_HONEY = 'PREF_USER_EATS_HONEY';
+const PREF_USER_ID_ON_BACKEND = 'USER_ID_ON_BACKEND';
+const PREF_USER_CLIENT_TOKEN_FOR_BACKEND = 'PREF_USER_CLIENT_TOKEN_FOR_BACKEND';
+
+class UserParamsControllerObserver {
+  void onUserParamsUpdate(UserParams? userParams) {}
+}
 
 class UserParamsController {
+  final _observers = <UserParamsControllerObserver>[];
+
+  void addObserver(UserParamsControllerObserver observer) => _observers.add(observer);
+  void removeObserver(UserParamsControllerObserver observer) => _observers.remove(observer);
+
   Future<UserParams?> getUserParams() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString(PREF_USER_PARAMS_NAME);
     final genderStr = prefs.getString(PREF_USER_PARAMS_GENDER);
     final birthdayStr = prefs.getString(PREF_USER_BIRTHDAY);
     final eatsMilk = prefs.getBool(PREF_USER_EATS_MILK);
     final eatsEggs = prefs.getBool(PREF_USER_EATS_EGGS);
     final eatsHoney = prefs.getBool(PREF_USER_EATS_HONEY);
-    if (name == null) {
+    final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
+    final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+
+    if (name == null
+        && genderStr == null
+        && birthdayStr == null
+        && eatsMilk == null
+        && eatsEggs == null
+        && eatsHoney == null
+        && backendId == null
+        && clientToken == null) {
       return null;
     }
-    final DateTime? birthday;
-    if (birthdayStr != null) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning if parsing failed
-      birthday = DateTime.tryParse(birthdayStr) ?? DateTime.fromMillisecondsSinceEpoch(0);
-    } else {
-      birthday = null;
-    }
-    final Gender? gender;
-    if (genderStr == "M") {
-      gender = Gender.MALE;
-    } else if (genderStr == "F") {
-      gender = Gender.FEMALE;
-    } else {
-      gender = null;
-    }
-    return UserParams(
-        name,
-        gender: gender,
-        birthday: birthday,
-        eatsMilk: eatsMilk,
-        eatsEggs: eatsEggs,
-        eatsHoney: eatsHoney);
+
+    return UserParams((v) => v
+      ..name = name
+      ..backendId = backendId
+      ..backendClientToken = clientToken
+      ..genderStr = genderStr
+      ..birthdayStr = birthdayStr
+      ..eatsMilk = eatsMilk
+      ..eatsEggs = eatsEggs
+      ..eatsHoney = eatsHoney);
   }
 
   Future<void> setUserParams(UserParams? userParams) async {
@@ -55,33 +66,26 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_EATS_MILK);
       await prefs.safeRemove(PREF_USER_EATS_EGGS);
       await prefs.safeRemove(PREF_USER_EATS_HONEY);
+      await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
+      await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+      _observers.forEach((obs) { obs.onUserParamsUpdate(null); });
       return;
     }
 
-    await prefs.setString(PREF_USER_PARAMS_NAME, userParams.name);
-
     if (userParams.gender != null) {
-      final String? genderStr;
-      switch (userParams.gender) {
-        case Gender.MALE:
-          genderStr = "M";
-          break;
-        case Gender.FEMALE:
-          genderStr = "F";
-          break;
-        default:
-          // TODO(https://trello.com/c/XWAE5UVB/): report an error
-          genderStr = null;
-      }
-      if (genderStr != null) {
-        await prefs.setString(PREF_USER_PARAMS_GENDER, genderStr);
-      } else {
-        await prefs.safeRemove(PREF_USER_PARAMS_GENDER);
-      }
+      await prefs.setString(PREF_USER_PARAMS_GENDER, userParams.gender!.name);
+    } else {
+      await prefs.safeRemove(PREF_USER_PARAMS_GENDER);
+    }
+
+    if (userParams.name != null && userParams.name!.isNotEmpty) {
+      await prefs.setString(PREF_USER_PARAMS_NAME, userParams.name!);
+    } else {
+      await prefs.safeRemove(PREF_USER_PARAMS_NAME);
     }
 
     if (userParams.birthday != null) {
-      await prefs.setString(PREF_USER_BIRTHDAY, userParams.birthday.toString());
+      await prefs.setString(PREF_USER_BIRTHDAY, userParams.birthdayStr!);
     } else {
       await prefs.safeRemove(PREF_USER_BIRTHDAY);
     }
@@ -103,5 +107,18 @@ class UserParamsController {
     } else {
       await prefs.safeRemove(PREF_USER_EATS_HONEY);
     }
+
+    if (userParams.backendId != null) {
+      await prefs.setString(PREF_USER_ID_ON_BACKEND, userParams.backendId!);
+    } else {
+      await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
+    }
+
+    if (userParams.backendClientToken != null) {
+      await prefs.setString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND, userParams.backendClientToken!);
+    } else {
+      await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+    }
+    _observers.forEach((obs) { obs.onUserParamsUpdate(userParams); });
   }
 }

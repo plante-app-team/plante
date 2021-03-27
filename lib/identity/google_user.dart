@@ -1,12 +1,7 @@
-import 'package:equatable/equatable.dart';
-
-class GoogleUser extends Equatable {
+class GoogleUser {
   final String name;
   final String email;
-  final String accessToken;
+  final String idToken;
   final DateTime whenObtainedUtc;
-  GoogleUser(this.name, this.email, this.accessToken, this.whenObtainedUtc);
-
-  @override
-  List<Object?> get props => [name, email, accessToken, whenObtainedUtc];
+  GoogleUser(this.name, this.email, this.idToken, this.whenObtainedUtc);
 }

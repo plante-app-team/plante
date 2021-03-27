@@ -341,8 +341,8 @@ class _ProductPageState extends State<ProductPage> with RestorationMixin {
   }
 
   Image? _offProductImage() {
-    if (product.imgSmallUrl != null) {
-      return Image.network(product.imgSmallUrl!);
+    if (product.imageFrontSmallUrl != null) {
+      return Image.network(product.imageFrontSmallUrl!);
     }
     return null;
   }

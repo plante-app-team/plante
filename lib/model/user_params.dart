@@ -1,24 +1,67 @@
-import 'package:equatable/equatable.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+import 'package:intl/intl.dart';
+import 'package:untitled_vegan_app/base/build_value_helper.dart';
 import 'package:untitled_vegan_app/model/gender.dart';
 
-class UserParams extends Equatable {
-  final String name;
-  final Gender? gender;
-  final DateTime? birthday;
-  final bool? eatsMilk;
-  final bool? eatsEggs;
-  final bool? eatsHoney;
+part 'user_params.g.dart';
 
-  UserParams(
-      this.name,
-      {
-        this.gender,
-        this.birthday,
-        this.eatsMilk,
-        this.eatsEggs,
-        this.eatsHoney
-      });
+abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
+  @BuiltValueField(wireName: 'user_id')
+  String? get backendId;
+  @BuiltValueField(wireName: 'client_token')
+  String? get backendClientToken;
+  @BuiltValueField(wireName: 'name')
+  String? get name;
+  @BuiltValueField(wireName: 'gender')
+  String? get genderStr;
+  @BuiltValueField(wireName: 'birthday')
+  String? get birthdayStr;
+  @BuiltValueField(wireName: 'eats_milk')
+  bool? get eatsMilk;
+  @BuiltValueField(wireName: 'eats_eggs')
+  bool? get eatsEggs;
+  @BuiltValueField(wireName: 'eats_honey')
+  bool? get eatsHoney;
 
-  @override
-  List<Object?> get props => [name, gender, birthday, eatsMilk, eatsEggs, eatsHoney];
+  bool? get eatsVeggiesOnly {
+    if (eatsMilk == null && eatsEggs == null && eatsHoney == null) {
+      return null;
+    }
+    return !((eatsMilk == true) || (eatsEggs == true) || (eatsHoney == true));
+  }
+
+  Gender? get gender {
+    if (genderStr == null) {
+      return null;
+    }
+    return genderFromGenderName(genderStr!);
+  }
+
+  DateTime? get birthday {
+    if (birthdayStr == null) {
+      return null;
+    }
+    try {
+      return DateFormat('dd.MM.yyyy').parse(birthdayStr!);
+    } catch (FormatException) {
+      return null;
+    }
+  }
+
+  String requireBackendID() => backendId!;
+  String requireBackendClientToken() => backendClientToken!;
+
+  static UserParams? fromJson(Map<String, dynamic> json) {
+    return BuildValueHelper.jsonSerializers.deserializeWith(UserParams.serializer, json);
+  }
+
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(
+        UserParams.serializer, this) as Map<String, dynamic>;
+  }
+
+  factory UserParams([void Function(UserParamsBuilder) updates]) = _$UserParams;
+  UserParams._();
+  static Serializer<UserParams> get serializer => _$userParamsSerializer;
 }
