@@ -44,9 +44,18 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
   }
 
   Future<bool> _onUserParamsSpecified(UserParams params) async {
+    final paramsController = GetIt.I.get<UserParamsController>();
+
+    // Locally update token only
+    final oldParams = await paramsController.getUserParams() ?? UserParams();
+    await paramsController.setUserParams(oldParams.rebuild(
+            (v) => v.backendClientToken = params.backendClientToken));
+
+    // Update on backend
     final result = await GetIt.I.get<Backend>().updateUserParams(params);
     if (result.isLeft) {
-      await GetIt.I.get<UserParamsController>().setUserParams(params);
+      // Full local update if server said "ok"
+      await paramsController.setUserParams(params);
       return true;
     }
     return false;
