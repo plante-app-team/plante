@@ -1,9 +1,9 @@
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
-import 'package:untitled_vegan_app/backend/server_error.dart';
-import 'package:untitled_vegan_app/backend/user_params_auto_wiper.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
+import 'package:untitled_vegan_app/outside/backend/user_params_auto_wiper.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
 import 'user_params_auto_wiper_test.mocks.dart';
@@ -22,11 +22,11 @@ void main() {
     verifyNever(userParametersController.setUserParams(any));
 
     // Some other error
-    observer!.onServerError(ServerError(ServerErrorKind.OTHER));
+    observer!.onBackendError(BackendError(BackendErrorKind.OTHER));
     verifyNever(userParametersController.setUserParams(any));
 
     // Not authorized error
-    observer!.onServerError(ServerError(ServerErrorKind.NOT_AUTHORIZED));
+    observer!.onBackendError(BackendError(BackendErrorKind.NOT_AUTHORIZED));
     verify(userParametersController.setUserParams(null));
   });
 }

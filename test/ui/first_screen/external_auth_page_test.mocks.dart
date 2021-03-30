@@ -6,11 +6,12 @@ import 'dart:async' as _i5;
 
 import 'package:either_option/src/either.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:untitled_vegan_app/backend/backend.dart' as _i6;
-import 'package:untitled_vegan_app/backend/server_error.dart' as _i8;
-import 'package:untitled_vegan_app/identity/google_authorizer.dart' as _i4;
-import 'package:untitled_vegan_app/identity/google_user.dart' as _i2;
 import 'package:untitled_vegan_app/model/user_params.dart' as _i7;
+import 'package:untitled_vegan_app/outside/backend/backend.dart' as _i6;
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart' as _i8;
+import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart'
+    as _i4;
+import 'package:untitled_vegan_app/outside/identity/google_user.dart' as _i2;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -55,18 +56,18 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
       (super.noSuchMethod(Invocation.method(#isLoggedIn, []),
           returnValue: Future.value(false)) as _i5.Future<bool>);
   @override
-  _i5.Future<_i3.Either<_i7.UserParams, _i8.ServerError>> loginOrRegister(
+  _i5.Future<_i3.Either<_i7.UserParams, _i8.BackendError>> loginOrRegister(
           String? googleIdToken) =>
       (super.noSuchMethod(Invocation.method(#loginOrRegister, [googleIdToken]),
               returnValue:
-                  Future.value(_FakeEither<_i7.UserParams, _i8.ServerError>()))
-          as _i5.Future<_i3.Either<_i7.UserParams, _i8.ServerError>>);
+                  Future.value(_FakeEither<_i7.UserParams, _i8.BackendError>()))
+          as _i5.Future<_i3.Either<_i7.UserParams, _i8.BackendError>>);
   @override
-  _i5.Future<_i3.Either<bool, _i8.ServerError>> updateUserParams(
+  _i5.Future<_i3.Either<bool, _i8.BackendError>> updateUserParams(
           _i7.UserParams? userParams) =>
       (super.noSuchMethod(Invocation.method(#updateUserParams, [userParams]),
-              returnValue: Future.value(_FakeEither<bool, _i8.ServerError>()))
-          as _i5.Future<_i3.Either<bool, _i8.ServerError>>);
+              returnValue: Future.value(_FakeEither<bool, _i8.BackendError>()))
+          as _i5.Future<_i3.Either<bool, _i8.BackendError>>);
   @override
   bool isError(Map<String, dynamic>? json) => (super
           .noSuchMethod(Invocation.method(#isError, [json]), returnValue: false)

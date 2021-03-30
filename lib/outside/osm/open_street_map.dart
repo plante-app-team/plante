@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/base/http_client.dart';
+import 'package:untitled_vegan_app/outside/http_client.dart';
 import 'package:untitled_vegan_app/model/shop.dart';
 
 class OpenStreetMap {

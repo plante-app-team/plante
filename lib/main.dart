@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/di.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/ui/first_screen/external_auth_page.dart';

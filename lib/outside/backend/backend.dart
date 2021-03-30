@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:either_option/either_option.dart';
 import 'package:http/http.dart';
-import 'package:untitled_vegan_app/backend/server_error.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/base/device_info.dart';
-import 'package:untitled_vegan_app/base/http_client.dart';
+import 'package:untitled_vegan_app/outside/http_client.dart';
 import 'package:untitled_vegan_app/model/gender.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
@@ -14,7 +14,7 @@ const BACKEND_ADDRESS = '185.52.2.206:8080';
 const PREF_BACKEND_CLIENT_TOKEN = 'BACKEND_CLIENT_TOKEN';
 
 class BackendObserver {
-  void onServerError(ServerError error) {}
+  void onBackendError(BackendError error) {}
 }
 
 class Backend {
@@ -33,7 +33,7 @@ class Backend {
     return userParams?.backendClientToken != null;
   }
 
-  Future<Either<UserParams, ServerError>> loginOrRegister(String googleIdToken) async {
+  Future<Either<UserParams, BackendError>> loginOrRegister(String googleIdToken) async {
     if (await isLoggedIn()) {
       final userParams = await _userParamsController.getUserParams();
       return Left(userParams!);
@@ -46,20 +46,20 @@ class Backend {
         "register_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.statusCode != 200) {
-      return Right(ServerError(ServerErrorKind.OTHER));
+      return Right(BackendError(BackendErrorKind.OTHER));
     }
 
     var json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(ServerError.invalidJson(response.body));
+      return Right(BackendError.invalidJson(response.body));
     }
 
     if (!isError(json)) {
       final userParams = UserParams.fromJson(json)!;
       return Left(userParams);
     }
-    if (_errFromJson(json).errorKind != ServerErrorKind.ALREADY_REGISTERED) {
-      return Right(ServerError(ServerErrorKind.OTHER));
+    if (_errFromJson(json).errorKind != BackendErrorKind.ALREADY_REGISTERED) {
+      return Right(BackendError(BackendErrorKind.OTHER));
     }
 
     // Login
@@ -68,12 +68,12 @@ class Backend {
         "login_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.statusCode != 200) {
-      return Right(ServerError(ServerErrorKind.OTHER));
+      return Right(BackendError(BackendErrorKind.OTHER));
     }
 
     json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(ServerError.invalidJson(response.body));
+      return Right(BackendError.invalidJson(response.body));
     }
 
     if (!isError(json)) {
@@ -83,7 +83,7 @@ class Backend {
     }
   }
 
-  Future<Either<bool, ServerError>> updateUserParams(UserParams userParams) async {
+  Future<Either<bool, BackendError>> updateUserParams(UserParams userParams) async {
     final params = Map<String, String>();
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params["name"] = userParams.name!;
@@ -130,18 +130,18 @@ class Backend {
   }
 
   bool isError(Map<String, dynamic> json) {
-    return ServerError.isError(json);
+    return BackendError.isError(json);
   }
   
-  ServerError _errFromResp(Response response) {
-    final error = ServerError.fromResp(response);
-    _observers.forEach((obs) { obs.onServerError(error); });
+  BackendError _errFromResp(Response response) {
+    final error = BackendError.fromResp(response);
+    _observers.forEach((obs) { obs.onBackendError(error); });
     return error;
   }
 
-  ServerError _errFromJson(Map<String, dynamic> json) {
-    final error = ServerError.fromJson(json);
-    _observers.forEach((obs) { obs.onServerError(error); });
+  BackendError _errFromJson(Map<String, dynamic> json) {
+    final error = BackendError.fromJson(json);
+    _observers.forEach((obs) { obs.onBackendError(error); });
     return error;
   }
 }

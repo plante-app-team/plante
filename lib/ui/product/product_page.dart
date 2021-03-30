@@ -9,7 +9,7 @@ import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
 import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/model/off_product_restorable.dart';
+import 'package:untitled_vegan_app/outside/off/off_product_restorable.dart';
 
 class ProductPage extends StatefulWidget {
   final off.Product? _initialProduct;

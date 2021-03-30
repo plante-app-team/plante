@@ -2,15 +2,15 @@ import 'package:http/testing.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
-import 'package:untitled_vegan_app/backend/server_error.dart';
-import 'package:untitled_vegan_app/backend/user_params_auto_wiper.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
+import 'package:untitled_vegan_app/outside/backend/user_params_auto_wiper.dart';
 import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
-import '../fake_http_client.dart';
-import '../fake_user_params_controller.dart';
+import '../../fake_http_client.dart';
+import '../../fake_user_params_controller.dart';
 import 'backend_test.mocks.dart';
 
 @GenerateMocks([BackendObserver])
@@ -93,7 +93,7 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse(".*register_user.*", "", responseCode: 500);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.OTHER));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('registration request bad json', () async {
@@ -102,7 +102,7 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse(".*register_user.*", "{{{{bad bad bad}");
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.INVALID_JSON));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
   test('registration request json error', () async {
@@ -115,7 +115,7 @@ void main() {
       }
     """);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.OTHER));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('login request not 200', () async {
@@ -129,7 +129,7 @@ void main() {
     """);
     httpClient.setResponse(".*login_user.*", "", responseCode: 500);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.OTHER));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('login request bad json', () async {
@@ -143,7 +143,7 @@ void main() {
     """);
     httpClient.setResponse(".*login_user.*", "{{{{bad bad bad}");
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.INVALID_JSON));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
   test('login request json error', () async {
@@ -161,7 +161,7 @@ void main() {
       }
     """);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(ServerErrorKind.OTHER));
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('observer notified about server errors', () async {
@@ -177,9 +177,9 @@ void main() {
       }
     """);
 
-    verifyNever(observer.onServerError(any));
+    verifyNever(observer.onBackendError(any));
     await backend.loginOrRegister("google ID");
-    verify(observer.onServerError(any));
+    verify(observer.onBackendError(any));
   });
 
   test('update user params', () async {

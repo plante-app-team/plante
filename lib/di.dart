@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
-import 'package:untitled_vegan_app/backend/user_params_auto_wiper.dart';
-import 'package:untitled_vegan_app/identity/google_authorizer.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/user_params_auto_wiper.dart';
+import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
 import 'package:untitled_vegan_app/model/location_controller.dart';
-import 'package:untitled_vegan_app/model/open_street_map.dart';
+import 'package:untitled_vegan_app/outside/osm/open_street_map.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
-import 'base/http_client.dart';
+import 'outside/http_client.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(RouteObserver<ModalRoute>());

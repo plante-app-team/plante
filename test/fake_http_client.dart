@@ -1,6 +1,6 @@
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
-import 'package:untitled_vegan_app/base/http_client.dart';
+import 'package:untitled_vegan_app/outside/http_client.dart';
 
 class FakeHttpClient extends HttpClient {
   late final MockClient _impl;

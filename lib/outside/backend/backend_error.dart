@@ -1,61 +1,61 @@
 import 'package:http/http.dart';
 
-enum ServerErrorKind {
+enum BackendErrorKind {
   ALREADY_REGISTERED,
   NOT_AUTHORIZED,
   INVALID_JSON,
   OTHER
 }
 
-class ServerError {
-  ServerErrorKind errorKind;
+class BackendError {
+  BackendErrorKind errorKind;
   String? errorStr;
   String? errorDescr;
-  ServerError(this.errorKind, {this.errorStr, this.errorDescr});
+  BackendError(this.errorKind, {this.errorStr, this.errorDescr});
 
   static bool isError(Map<String, dynamic> json) {
     return json["error"] != null;
   }
 
-  static ServerError fromJson(Map<String, dynamic> json) {
+  static BackendError fromJson(Map<String, dynamic> json) {
     assert(isError(json));
 
-    final ServerErrorKind kind;
+    final BackendErrorKind kind;
     switch (json["error"]) {
       case "already_registered":
-        kind = ServerErrorKind.ALREADY_REGISTERED;
+        kind = BackendErrorKind.ALREADY_REGISTERED;
         break;
       default:
-        kind = ServerErrorKind.OTHER;
+        kind = BackendErrorKind.OTHER;
         break;
     }
 
     // TODO(https://trello.com/c/XWAE5UVB/): log warning with error
-    return ServerError(
+    return BackendError(
         kind,
         errorStr: json["error"],
         errorDescr: json["error_description"]);
   }
 
-  static ServerError fromResp(Response response) {
+  static BackendError fromResp(Response response) {
     // TODO(https://trello.com/c/XWAE5UVB/): log warning with error
     assert(response.statusCode != 200);
     if (response.statusCode == 401) {
-      return ServerError(
-          ServerErrorKind.NOT_AUTHORIZED,
+      return BackendError(
+          BackendErrorKind.NOT_AUTHORIZED,
           errorStr: null,
           errorDescr: response.reasonPhrase);
     } else {
-      return ServerError(
-          ServerErrorKind.OTHER,
+      return BackendError(
+          BackendErrorKind.OTHER,
           errorStr: null,
           errorDescr: response.reasonPhrase);
     }
   }
 
-  static ServerError invalidJson(String invalidJson) {
-    return ServerError(
-        ServerErrorKind.INVALID_JSON,
+  static BackendError invalidJson(String invalidJson) {
+    return BackendError(
+        BackendErrorKind.INVALID_JSON,
         errorDescr: invalidJson);
   }
 }

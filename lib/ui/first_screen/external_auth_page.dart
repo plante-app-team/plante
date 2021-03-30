@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/base/either_extension.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/identity/google_authorizer.dart';
+import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);

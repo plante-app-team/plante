@@ -1,5 +1,5 @@
-import 'package:untitled_vegan_app/backend/backend.dart';
-import 'package:untitled_vegan_app/backend/server_error.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
 class UserParamsAutoWiper implements BackendObserver {
@@ -11,8 +11,8 @@ class UserParamsAutoWiper implements BackendObserver {
   }
 
   @override
-  void onServerError(ServerError error) {
-    if (error.errorKind == ServerErrorKind.NOT_AUTHORIZED) {
+  void onBackendError(BackendError error) {
+    if (error.errorKind == BackendErrorKind.NOT_AUTHORIZED) {
       _userParamsController.setUserParams(null);
     }
   }

@@ -3,10 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:untitled_vegan_app/backend/backend.dart';
-
-import 'package:untitled_vegan_app/identity/google_authorizer.dart';
-import 'package:untitled_vegan_app/identity/google_user.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
+import 'package:untitled_vegan_app/outside/identity/google_user.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/ui/first_screen/external_auth_page.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
