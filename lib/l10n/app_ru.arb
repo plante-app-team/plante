@@ -1,5 +1,9 @@
 {
+    "global_app_name": "Untitled Vegan App",
     "global_something_went_wrong": "Упс, что-то пошло не так",
+
+    "image_cropper_title": "Давайте-ка обрежем!",
+
     "external_auth_page_search_products_with": "Ищите этичные продукты вместе с",
     "external_auth_page_continue_with_google": "Продолжить с Google",
 
@@ -29,12 +33,27 @@
     "qr_scan_page_product_not_found": "Такой продукт не найден",
     "qr_scan_page_product_without_name": "Безымянный продукт",
 
-    "product_page_title_display": "Продукт",
-    "product_page_title_creating": "Создание продукта",
-    "product_page_no_data": "Нет данных",
-    "product_page_brand": "Бренд: ",
-    "product_page_categories": "Категории: ",
-    "product_page_is_vegetarian": "Вегетарианский ли: ",
-    "product_page_is_vegan": "Веганский ли: ",
-    "product_page_ingredients": "Состав: "
+    "init_product_page_add_product_data": "Добавить данные о продукте",
+    "init_product_page_product_name": "Имя продукта",
+    "init_product_page_product_brand": "Бренд продукта",
+    "init_product_page_product_categories": "Категории продукта",
+    "init_product_page_btn_next": "Далее",
+    "init_product_page_packaging_photo": "Фото упаковки",
+    "init_product_page_ingredients": "Состав",
+    "init_product_page_ingredients_ocr": "Распознать состав на фото",
+    "init_product_page_ingredients_ocr_ok_q": "Состав распознан приемлимо?",
+    "init_product_page_yes": "Да",
+    "init_product_page_no": "Нет",
+    "init_product_page_please_edit_ingredients": "Пожалуста, подредактируйте его",
+    "init_product_page_veg_status_title": "Фрукты и овощи!",
+    "init_product_page_is_vegetarian_q": "Продукт вегетарианский?",
+    "init_product_page_is_vegan_q": "Продукт веганский?",
+    "init_product_page_definitely_yes": "Точно да",
+    "init_product_page_definitely_no": "Точно нет",
+    "init_product_page_possibly": "Возможно",
+    "init_product_page_not_sure": "Непонятно",
+    "init_product_page_done_thanks": "Готово! Спасибо <3",
+    "init_product_page_done": "Готово",
+    "init_product_page_possible_status_explanation": "Некоторые ингредиенты могут иметь веганский/вегетарианский/никакой статус в зависимости от способа их производства. Статус такого ингредиента в конкретном продукте можно понять только связавшись с производителем.",
+    "init_product_page_possible_status_explanation_ok": "Во как!"
 }

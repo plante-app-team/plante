@@ -37,7 +37,9 @@ dependencies:
   geolocator: ^7.0.1
   http: ^0.13.0
   qr_code_scanner: ^0.4.0
-  openfoodfacts: ^1.0.2-beta
+#  openfoodfacts: ^1.1.0-beta
+  openfoodfacts:
+    path: /home/blazern/git/openfoodfacts-dart/
   image_picker: ^0.7.2+1
   image_cropper: ^1.4.0
   flutter_svg: ^0.21.0-nullsafety.0
@@ -48,6 +50,7 @@ dependencies:
   json_annotation: ^4.0.1
   built_value: ^8.0.4
   either_option: ^2.0.1-dev.1
+  built_collection: ^5.0.0
 
 dev_dependencies:
   flutter_test:

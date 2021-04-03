@@ -1,13 +1,13 @@
-import 'package:http/testing.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+import 'package:untitled_vegan_app/model/veg_status.dart';
+import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
-import 'package:untitled_vegan_app/outside/backend/user_params_auto_wiper.dart';
 import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/model/user_params_controller.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
 
 import '../../fake_http_client.dart';
 import '../../fake_user_params_controller.dart';
@@ -249,5 +249,222 @@ void main() {
     final request = httpClient.getRequestsMatching(".*update_user_data.*")[0];
 
     expect(request.headers["Authorization"], equals(null));
+  });
+
+  test('request product', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*product_data.*", """
+     {
+       "barcode": "123",
+       "vegetarian_status": "${VegStatus.positive.name}",
+       "vegetarian_status_source": "${VegStatusSource.community.name}",
+       "vegan_status": "${VegStatus.negative.name}",
+       "vegan_status_source": "${VegStatusSource.moderator.name}"
+     }
+      """);
+
+    final result = await backend.requestProduct("123");
+    final expectedProduct = BackendProduct((v) => v
+      ..barcode = "123"
+      ..vegetarianStatus = VegStatus.positive.name
+      ..vegetarianStatusSource = VegStatusSource.community.name
+      ..veganStatus = VegStatus.negative.name
+      ..veganStatusSource = VegStatusSource.moderator.name);
+    expect(result, equals(expectedProduct));
+
+    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('request product http error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*product_data.*", "", responseCode: 500);
+
+    final result = await backend.requestProduct("123");
+    expect(result, isNull);
+
+    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('request product invalid JSON', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*product_data.*", """
+     {{{{{{{{{{{{
+       "barcode": "123",
+       "vegetarian_status": "${VegStatus.positive.name}",
+       "vegetarian_status_source": "${VegStatusSource.community.name}",
+       "vegan_status": "${VegStatus.negative.name}",
+       "vegan_status_source": "${VegStatusSource.moderator.name}"
+     }
+      """);
+
+    final result = await backend.requestProduct("123");
+    expect(result, isNull);
+
+    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('create update product', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(
+        ".*create_update_product.*",
+        """ { "result": "ok" } """);
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative);
+    expect(result.isLeft, isTrue);
+
+    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(
+        request.url.queryParameters["vegetarianStatus"],
+        equals(VegStatus.positive.name));
+    expect(
+        request.url.queryParameters["veganStatus"],
+        equals(VegStatus.negative.name));
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('create update product vegetarian status only', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(
+        ".*create_update_product.*",
+        """ { "result": "ok" } """);
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        vegetarianStatus: VegStatus.positive);
+    expect(result.isLeft, isTrue);
+
+    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(
+        request.url.queryParameters["vegetarianStatus"],
+        equals(VegStatus.positive.name));
+    expect(
+        request.url.queryParameters["veganStatus"],
+        isNull);
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('create update product vegan status only', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(
+        ".*create_update_product.*",
+        """ { "result": "ok" } """);
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        veganStatus: VegStatus.negative);
+    expect(result.isLeft, isTrue);
+
+    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(
+        request.url.queryParameters["vegetarianStatus"],
+        isNull);
+    expect(
+        request.url.queryParameters["veganStatus"],
+        equals(VegStatus.negative.name));
+    expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('create update product http error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*create_update_product.*", "", responseCode: 500);
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative);
+    expect(result.isRight, isTrue);
+  });
+
+  test('create update product invalid JSON response', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*create_update_product.*", "{{{{}");
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative);
+    expect(result.isRight, isTrue);
   });
 }

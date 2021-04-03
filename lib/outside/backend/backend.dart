@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:either_option/either_option.dart';
 import 'package:http/http.dart';
+import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/base/device_info.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
 import 'package:untitled_vegan_app/outside/http_client.dart';
 import 'package:untitled_vegan_app/model/gender.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
@@ -54,7 +56,7 @@ class Backend {
       return Right(BackendError.invalidJson(response.body));
     }
 
-    if (!isError(json)) {
+    if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
       return Left(userParams);
     }
@@ -76,7 +78,7 @@ class Backend {
       return Right(BackendError.invalidJson(response.body));
     }
 
-    if (!isError(json)) {
+    if (!_isError(json)) {
       return Left(UserParams.fromJson(json)!);
     } else {
       return Right(_errFromJson(json));
@@ -115,6 +117,41 @@ class Backend {
     }
   }
 
+  Future<BackendProduct?> requestProduct(String barcode) async {
+    var response = await _backendGet("product_data/", { "barcode": barcode });
+    if (response.statusCode != 200) {
+      return null;
+    }
+    final json = _jsonDecodeSafe(response.body);
+    if (json != null && !_isError(json)) {
+      return BackendProduct.fromJson(json)!;
+    } else {
+      return null;
+    }
+  }
+
+  Future<Either<None, BackendError>> createUpdateProduct(
+      String barcode, {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
+    final params = Map<String, String>();
+    params['barcode'] = barcode;
+    if (vegetarianStatus != null) {
+      params["vegetarianStatus"] = vegetarianStatus.name;
+    }
+    if (veganStatus != null) {
+      params["veganStatus"] = veganStatus.name;
+    }
+    var response = await _backendGet("create_update_product/", params);
+    if (response.statusCode != 200) {
+      return Right(_errFromResp(response));
+    }
+    final json = _jsonDecodeSafe(response.body);
+    if (json != null && !_isError(json)) {
+      return Left(None());
+    } else {
+      return Right(_errFromResp(response));
+    }
+  }
+
   Future<Response> _backendGet(
       String path,
       Map<String, String>? params,
@@ -129,7 +166,7 @@ class Backend {
         "$BACKEND_ADDRESS", path, params), headers: headersReally);
   }
 
-  bool isError(Map<String, dynamic> json) {
+  bool _isError(Map<String, dynamic> json) {
     return BackendError.isError(json);
   }
   

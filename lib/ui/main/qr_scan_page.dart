@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/ui/product/product_page.dart';
+import 'package:untitled_vegan_app/model/product.dart';
+import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';
 
 class QrScanPage extends StatefulWidget {
   @override
@@ -16,7 +16,8 @@ class QrScanPage extends StatefulWidget {
 
 class _QrScanPageState extends State<QrScanPage> with RouteAware {
   String? _barcode;
-  off.Product? _foundProduct;
+  Product? _foundProduct;
+  String? _searchedBarcode;
 
   qr.QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -93,12 +94,12 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     );
   }
 
-  String _productName(off.Product? product) {
+  String _productName(Product? product) {
     if (product == null) {
       return context.strings.qr_scan_page_product_not_found;
     }
-    if (product.productName != null) {
-      return product.productName!;
+    if (product.name != null) {
+      return product.name!;
     }
     return context.strings.qr_scan_page_product_without_name;
   }
@@ -131,16 +132,23 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    // TODO(https://trello.com/c/LYzlAbXj): request only needed fields
-    final configuration = off.ProductQueryConfiguration(
-      scanData.code,
-      lc: Localizations.localeOf(context).languageCode,
-      fields: [off.ProductField.ALL]);
-    off.ProductResult foundProduct = await off.OpenFoodAPIClient.getProduct(configuration);
-    setState(() {
-      _barcode = foundProduct.product?.barcode ?? scanData.code;
-      _foundProduct = foundProduct.product;
-    });
+    if (_foundProduct?.barcode == scanData.code
+        || _searchedBarcode == scanData.code) {
+      return;
+    }
+    try {
+      _searchedBarcode = scanData.code;
+
+      final foundProduct = await GetIt.I.get<ProductsManager>().getProduct(
+          scanData.code,
+          Localizations.localeOf(context).languageCode);
+      setState(() {
+        _barcode = foundProduct?.barcode ?? scanData.code;
+        _foundProduct = foundProduct;
+      });
+    } finally {
+      _searchedBarcode = null;
+    }
   }
 
   void _toggleFlash() async {
@@ -155,9 +163,15 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     if (_barcode == null) {
       return;
     }
+    final Product product;
+    if (_foundProduct != null) {
+      product = _foundProduct!;
+    } else {
+      product = Product((v) => v.barcode = _barcode);
+    }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProductPage(_foundProduct, _barcode!)),
+      MaterialPageRoute(builder: (context) => ProductPageWrapper(product)),
     );
   }
 }

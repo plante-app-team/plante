@@ -39,7 +39,6 @@ class BackendError {
 
   static BackendError fromResp(Response response) {
     // TODO(https://trello.com/c/XWAE5UVB/): log warning with error
-    assert(response.statusCode != 200);
     if (response.statusCode == 401) {
       return BackendError(
           BackendErrorKind.NOT_AUTHORIZED,

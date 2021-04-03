@@ -1,6 +1,9 @@
 {
       "global_app_name": "Untitled Vegan App",
       "global_something_went_wrong": "Oops, something went wrong",
+
+      "image_cropper_title": "Let's crop it!",
+
       "external_auth_page_search_products_with": "Look for ethical products with",
       "external_auth_page_continue_with_google": "Continue with Google",
 
@@ -33,12 +36,27 @@
       "qr_scan_page_product_not_found": "Product not found",
       "qr_scan_page_product_without_name": "Nameless product",
 
-      "product_page_title_display": "Product",
-      "product_page_title_creating": "Creating product",
-      "product_page_no_data": "No data",
-      "product_page_brand": "Brand: ",
-      "product_page_categories": "Categories: ",
-      "product_page_is_vegetarian": "Is vegetarian: ",
-      "product_page_is_vegan": "Is vegan: ",
-      "product_page_ingredients": "Ingredients: "
+      "init_product_page_add_product_data": "Add product data",
+      "init_product_page_product_name": "Product name",
+      "init_product_page_product_brand": "Product brand",
+      "init_product_page_product_categories": "Product categories",
+      "init_product_page_btn_next": "Add product data",
+      "init_product_page_packaging_photo": "Packaging photo",
+      "init_product_page_ingredients": "Ingredients",
+      "init_product_page_ingredients_ocr": "Extract ingredients from photo",
+      "init_product_page_ingredients_ocr_ok_q": "Were ingredients extracted properly?",
+      "init_product_page_yes": "Yes",
+      "init_product_page_no": "No",
+      "init_product_page_please_edit_ingredients": "Please edit ingredients manually",
+      "init_product_page_veg_status_title": "Fruits and vegetables!",
+      "init_product_page_is_vegetarian_q": "Is product vegetarian?",
+      "init_product_page_is_vegan_q": "Is product vegan?",
+      "init_product_page_definitely_yes": "Definitely yes",
+      "init_product_page_definitely_no": "Definitely no",
+      "init_product_page_possibly": "Possibly",
+      "init_product_page_not_sure": "Not sure",
+      "init_product_page_done_thanks": "Done! Thanks <3",
+      "init_product_page_done": "Done",
+      "init_product_page_possible_status_explanation": "Some ingredients might have vegan/vegetarian or neither status, depending on how exactly they were manufactured. Exact status of such an ingredients in a product can be figured out only if someone contacts product's producer.",
+      "init_product_page_possible_status_explanation_ok": "Alright!"
 }

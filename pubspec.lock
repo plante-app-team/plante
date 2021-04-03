@@ -86,7 +86,7 @@ packages:
     source: hosted
     version: "6.1.12"
   built_collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: built_collection
       url: "https://pub.dartlang.org"
@@ -500,10 +500,10 @@ packages:
   openfoodfacts:
     dependency: "direct main"
     description:
-      name: openfoodfacts
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2-beta"
+      path: "/home/blazern/git/openfoodfacts-dart/"
+      relative: false
+    source: path
+    version: "1.1.0-beta"
   package_config:
     dependency: transitive
     description:
