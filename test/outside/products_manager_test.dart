@@ -143,7 +143,7 @@ void main() {
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
 
-    await productsManager.updateProduct(product, "ru");
+    await productsManager.createUpdateProduct(product, "ru");
 
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
@@ -192,7 +192,7 @@ void main() {
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
 
-    await productsManager.updateProduct(product, "ru");
+    await productsManager.createUpdateProduct(product, "ru");
 
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
@@ -229,7 +229,7 @@ void main() {
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
 
-    await productsManager.updateProduct(product, "ru");
+    await productsManager.createUpdateProduct(product, "ru");
 
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
@@ -275,7 +275,7 @@ void main() {
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
 
-    await productsManager.updateProduct(product, "ru");
+    await productsManager.createUpdateProduct(product, "ru");
 
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
@@ -366,5 +366,18 @@ void main() {
     expect(product!.barcode, equals(goodBarcode));
     // Verify good barcode is asked from the backed
     verify(backend.requestProduct(goodBarcode)).called(1);
+  });
+
+  test('brands and categories are not sent when they are empty', () async {
+    final product = Product((v) => v
+      ..barcode = "123"
+      ..brands.addAll([])
+      ..categories.addAll([]));
+
+    await productsManager.createUpdateProduct(product, "ru");
+    final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
+        .captured.first as off.Product;
+    expect(capturedOffProduct.brands, isNull);
+    expect(capturedOffProduct.categories, isNull);
   });
 }

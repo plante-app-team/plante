@@ -67,14 +67,14 @@ class ProductsManager {
   }
 
   /// Returns updated product if update was successful
-  Future<Product?> updateProduct(Product product, String langCode) async {
+  Future<Product?> createUpdateProduct(Product product, String langCode) async {
     // OFF product
 
     final offProduct = off.Product(
       barcode: product.barcode,
       productName: product.name,
-      brands: product.brands?.join(", "),
-      categories: product.categories?.join(", "),
+      brands: _join(product.brands),
+      categories: _join(product.categories),
       ingredientsText: product.ingredients);
     final offResult = await _off.saveProduct(_offUser(), offProduct);
     if (offResult.error != null) {
@@ -128,8 +128,15 @@ class ProductsManager {
     return getProduct(product.barcode, langCode);
   }
 
+  String? _join(Iterable<String>? strs) {
+    if (strs != null && strs.isNotEmpty) {
+      return strs.join(", ");
+    }
+    return null;
+  }
+
   Future<ProductWithOCRIngredients?> updateProductAndExtractIngredients(Product product, String langCode) async {
-    final updatedProduct = await updateProduct(product, langCode);
+    final updatedProduct = await createUpdateProduct(product, langCode);
     if (updatedProduct == null) {
       return null;
     }

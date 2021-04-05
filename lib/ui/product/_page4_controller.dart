@@ -187,7 +187,7 @@ class Page4Controller extends PageControllerBase {
     final onNextPressed = () async {
       _longAction(() async {
         if (_initialProduct != _product) {
-          final updatedProduct = await _productsManager.updateProduct(
+          final updatedProduct = await _productsManager.createUpdateProduct(
               _product, langCode);
           if (updatedProduct == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -52,7 +52,7 @@ class Page2Controller extends PageControllerBase {
       _longAction(() async {
         if (_model.product != _initialProduct) {
           final updatedProduct =
-            await _productsManager.updateProduct(_model.product, langCode);
+            await _productsManager.createUpdateProduct(_model.product, langCode);
           if (updatedProduct == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(context.strings.global_something_went_wrong)));

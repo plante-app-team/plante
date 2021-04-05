@@ -34,7 +34,7 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
               returnValue: Future.value(_FakeProduct()))
           as _i4.Future<_i2.Product?>);
   @override
-  _i4.Future<_i2.Product?> updateProduct(
+  _i4.Future<_i2.Product?> createUpdateProduct(
           _i2.Product? product, String? langCode) =>
       (super.noSuchMethod(
               Invocation.method(#updateProduct, [product, langCode]),

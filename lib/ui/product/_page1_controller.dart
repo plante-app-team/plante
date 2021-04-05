@@ -118,7 +118,7 @@ class Page1Controller extends PageControllerBase {
       _longAction(() async {
         if (_initialProduct != _model.product) {
           final updatedProduct =
-            await _productsManager.updateProduct(_model.product, langCode);
+            await _productsManager.createUpdateProduct(_model.product, langCode);
           if (updatedProduct == null) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(context.strings.global_something_went_wrong)));

@@ -29,7 +29,7 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     productsManager = MockProductsManager();
-    when(productsManager.updateProduct(any, any)).thenAnswer(
+    when(productsManager.createUpdateProduct(any, any)).thenAnswer(
             (invoc) async => invoc.positionalArguments[0]);
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
@@ -55,11 +55,11 @@ void main() {
         'Lemon drink');
     await tester.pumpAndSettle();
 
-    verifyNever(productsManager.updateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any, any));
     await tester.tap(
         find.byKey(Key("page1_next_btn")));
     await tester.pumpAndSettle();
-    verify(productsManager.updateProduct(any, any)).called(1);
+    verify(productsManager.createUpdateProduct(any, any)).called(1);
 
     verifyNever(photosTaker.takeAndCropPhoto(any));
     await tester.tap(
@@ -67,11 +67,11 @@ void main() {
     verify(photosTaker.takeAndCropPhoto(any)).called(1);
     await tester.pumpAndSettle();
 
-    verifyNever(productsManager.updateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any, any));
     await tester.tap(
         find.byKey(Key("page2_next_btn")));
     await tester.pumpAndSettle();
-    verify(productsManager.updateProduct(any, any)).called(1);
+    verify(productsManager.createUpdateProduct(any, any)).called(1);
 
     verifyNever(photosTaker.takeAndCropPhoto(any));
     await tester.tap(
@@ -85,22 +85,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text("water, lemon"), findsOneWidget);
 
-    verifyNever(productsManager.updateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any, any));
     await tester.tap(
         find.byKey(Key("page3_next_btn")));
     await tester.pumpAndSettle();
-    verify(productsManager.updateProduct(any, any)).called(1);
+    verify(productsManager.createUpdateProduct(any, any)).called(1);
 
     await tester.tap(find.text(context.strings.init_product_page_possibly).first);
     await tester.tap(find.text(context.strings.init_product_page_possibly).last);
     await tester.pumpAndSettle();
 
     expect(done, isFalse);
-    verifyNever(productsManager.updateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any, any));
     await tester.tap(
         find.byKey(Key("page4_next_btn")));
     await tester.pumpAndSettle();
-    final finalProduct = verify(productsManager.updateProduct(captureAny, any)).captured.first;
+    final finalProduct = verify(productsManager.createUpdateProduct(captureAny, any)).captured.first;
     expect(done, isTrue);
 
     final expectedProduct = Product((v) => v
