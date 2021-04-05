@@ -1,0 +1,3 @@
+[submodule "submodules/openfoodfacts-dart"]
+	path = submodules/openfoodfacts-dart
+	url = git@github.com:blazern/openfoodfacts-dart.git
