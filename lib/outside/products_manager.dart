@@ -4,7 +4,6 @@ import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
 import 'package:untitled_vegan_app/outside/off/off_api.dart';
 import 'package:untitled_vegan_app/outside/off/off_user.dart';
 
@@ -27,24 +26,21 @@ class ProductsManager {
 
   ProductsManager(this._off, this._backend);
 
-  Future<Product?> getProduct(String barcode, String langCode) async {
+  Future<Product?> getProduct(String barcodeRaw, String langCode) async {
     final configuration = off.ProductQueryConfiguration(
-        barcode,
+        barcodeRaw,
         lc: langCode,
         language: off.LanguageHelper.fromJson(langCode),
         fields: _NEEDED_OFF_FIELDS.toList());
 
-    final offProductFuture = _off.getProduct(configuration);
-    final backendProductFuture = _backend.requestProduct(barcode);
-
-    final values = await Future.wait([offProductFuture, backendProductFuture]);
-    final offProductResult = values[0] as off.ProductResult?;
-    final backendProduct = values[1] as BackendProduct?;
-
-    if (offProductResult == null || offProductResult.product == null) {
+    final offProductResult = await _off.getProduct(configuration);
+    final offProduct = offProductResult.product;
+    if (offProduct == null) {
       return null;
     }
-    final offProduct = offProductResult.product!;
+
+    final barcode = offProduct.barcode!;
+    final backendProduct = await _backend.requestProduct(barcode);
 
     return Product((v) => v
       ..barcode = barcode

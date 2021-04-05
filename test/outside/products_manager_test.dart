@@ -30,7 +30,7 @@ void main() {
 
     when(offApi.saveProduct(any, any)).thenAnswer((_) async => off.Status());
     when(offApi.getProduct(any)).thenAnswer((_) async =>
-        off.ProductResult(product: off.Product()));
+        off.ProductResult(product: off.Product(barcode: "123")));
     when(offApi.addProductImage(any, any)).thenAnswer((_) async => off.Status());
     when(offApi.extractIngredients(any, any, any)).thenAnswer((_) async => off.OcrIngredientsResult());
 
@@ -44,7 +44,7 @@ void main() {
 
   test('get product when the product is on both OFF and backend', () async {
     final offProduct = off.Product.fromJson({
-      "barcode": "123",
+      "code": "123",
       "product_name": "name",
       "brands_tags": ["Brand name"],
       "categories_tags_translated": ["plant", "lemon"],
@@ -81,7 +81,7 @@ void main() {
 
   test('get product when the product is on OFF only', () async {
     final offProduct = off.Product.fromJson({
-      "barcode": "123",
+      "code": "123",
       "product_name": "name",
       "brands_tags": ["Brand name"],
       "categories_tags_translated": ["plant", "lemon"],
@@ -349,5 +349,22 @@ void main() {
     final result = await productsManager.updateProductAndExtractIngredients(product, "ru");
     expect(result!.product, isNotNull);
     expect(result.ingredients, isNull);
+  });
+
+  test('barcode from off is used', () async {
+    final badBarcode = "0000000000123";
+    final goodBarcode = "123";
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: off.Product.fromJson({
+          "code": goodBarcode,
+          "product_name": "name"
+        })));
+
+    final product = await productsManager.getProduct(badBarcode, "ru");
+
+    // Verify received product
+    expect(product!.barcode, equals(goodBarcode));
+    // Verify good barcode is asked from the backed
+    verify(backend.requestProduct(goodBarcode)).called(1);
   });
 }
