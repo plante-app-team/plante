@@ -11,14 +11,14 @@ class ProductsManager {
   static const _NEEDED_OFF_FIELDS = [
     off.ProductField.BARCODE,
     off.ProductField.NAME,
-    off.ProductField.BRANDS,
+    off.ProductField.NAME_TRANSLATED,
     off.ProductField.BRANDS_TAGS,
-    off.ProductField.CATEGORIES,
+    off.ProductField.CATEGORIES_TAGS,
     off.ProductField.CATEGORIES_TAGS_TRANSLATED,
     off.ProductField.INGREDIENTS,
     off.ProductField.INGREDIENTS_TEXT,
-    off.ProductField.IMAGE_FRONT_URL,
-    off.ProductField.IMAGE_INGREDIENTS_URL,
+    off.ProductField.INGREDIENTS_TEXT_TRANSLATED,
+    off.ProductField.IMAGES,
   ];
 
   final OffApi _off;
@@ -50,20 +50,37 @@ class ProductsManager {
       ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? "")
       ..veganStatusSource = VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "")
 
-      ..name = offProduct.productName
+      ..name = offProduct.productNameTranslated
       ..brands.addAll(offProduct.brandsTags ?? [])
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])
-      ..ingredients = offProduct.ingredientsText
-      ..imageFront = _extractUri(offProduct.imageFrontUrl)
-      ..imageIngredients = _extractUri(offProduct.imageIngredientsUrl)
+      ..ingredients = offProduct.ingredientsTextTranslated
+      ..imageFront = _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
+      ..imageIngredients = _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode)
     );
   }
 
-  Uri? _extractUri(String? uriStr) {
-    if (uriStr == null) {
+  Uri? _extractImageUri(off.Product offProduct, ProductImageType imageType, String langCode) {
+    final images = offProduct.images;
+    if (images == null) {
       return null;
     }
-    return Uri.parse(uriStr);
+    final lang = off.LanguageHelper.fromJson(langCode);
+    for (final image in images) {
+      if (image.language != lang
+          || image.size != off.ImageSize.DISPLAY
+          || image.url == null) {
+        continue;
+      }
+      if (image.field == off.ImageField.FRONT
+          && imageType == ProductImageType.FRONT) {
+        return Uri.parse(image.url!);
+      }
+      if (image.field == off.ImageField.INGREDIENTS
+          && imageType == ProductImageType.INGREDIENTS) {
+        return Uri.parse(image.url!);
+      }
+    }
+    return null;
   }
 
   /// Returns updated product if update was successful
@@ -71,11 +88,12 @@ class ProductsManager {
     // OFF product
 
     final offProduct = off.Product(
+      lang: off.LanguageHelper.fromJson(langCode),
       barcode: product.barcode,
-      productName: product.name,
-      brands: _join(product.brands),
-      categories: _join(product.categories),
-      ingredientsText: product.ingredients);
+      productNameTranslated: product.name,
+      brands: _join(product.brands, null),
+      categories: _join(product.categories, langCode),
+      ingredientsTextTranslated: product.ingredients);
     final offResult = await _off.saveProduct(_offUser(), offProduct);
     if (offResult.error != null) {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
@@ -128,9 +146,10 @@ class ProductsManager {
     return getProduct(product.barcode, langCode);
   }
 
-  String? _join(Iterable<String>? strs) {
+  String? _join(Iterable<String>? strs, String? langCode) {
     if (strs != null && strs.isNotEmpty) {
-      return strs.join(", ");
+      final langPrefix = langCode != null ? "$langCode:" : "";
+      return strs.map((e) => "$langPrefix$e").join(", ");
     }
     return null;
   }
