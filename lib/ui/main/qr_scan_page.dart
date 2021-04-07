@@ -15,7 +15,7 @@ class QrScanPage extends StatefulWidget {
 }
 
 class _QrScanPageState extends State<QrScanPage> with RouteAware {
-  String? _barcode;
+  qr.Barcode? _barcode;
   bool _searching = false;
   Product? _foundProduct;
 
@@ -53,6 +53,12 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void didPopNext() {
     if (ModalRoute.of(context)?.isActive == true) {
       this.controller?.resumeCamera();
+      if (_barcode != null) {
+        // Let's request the product again
+        final barcode = _barcode;
+        _barcode = null;
+        _onNewScanData(barcode!);
+      }
     }
   }
 
@@ -101,7 +107,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
 
   String _productName() {
     if (_searching && _barcode != null) {
-      return _barcode!;
+      return _barcode!.code;
     }
 
     if (_foundProduct != null) {
@@ -143,12 +149,12 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    if (_barcode == scanData.code) {
+    if (_barcode?.code == scanData.code) {
       return;
     }
     try {
       setState(() {
-        _barcode = scanData.code;
+        _barcode = scanData;
         _searching = true;
       });
 
@@ -181,7 +187,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     if (_foundProduct != null) {
       product = _foundProduct!;
     } else {
-      product = Product((v) => v.barcode = _barcode);
+      product = Product((v) => v.barcode = _barcode!.code);
     }
     Navigator.push(
       context,
