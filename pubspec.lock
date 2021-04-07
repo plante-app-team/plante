@@ -503,7 +503,7 @@ packages:
       path: "submodules/openfoodfacts-dart"
       relative: true
     source: path
-    version: "1.0.1-beta"
+    version: "1.1.0-beta"
   package_config:
     dependency: transitive
     description:
