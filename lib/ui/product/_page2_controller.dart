@@ -42,7 +42,8 @@ class Page2Controller extends PageControllerBase {
       Expanded(
         flex: 5,
         child: SingleChildScrollView(child: InkWell(
-            child: ProductImagesHelper.productImageWidget(_model.product, ProductImageType.FRONT),
+            child: ProductImagesHelper.productImageWidget(
+                _model.product, ProductImageType.FRONT, size: 150),
             onTap: () { _onProductImageTap(context); }),
         ),
       )

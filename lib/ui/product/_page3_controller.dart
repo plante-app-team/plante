@@ -75,7 +75,7 @@ class Page3Controller extends PageControllerBase {
                   width: double.infinity,
                   height: 200,
                   child: ProductImagesHelper.productImageWidget(
-                      _product, ProductImageType.INGREDIENTS)),
+                      _product, ProductImageType.INGREDIENTS, size: 150)),
               onTap: () async { _onProductImageTap(context); }),
           if (ingredientsTextWidget != null) ingredientsTextWidget
         ])),

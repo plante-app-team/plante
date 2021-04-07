@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled_vegan_app/model/product.dart';
+import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 
 class ProductPageWrapper extends StatefulWidget {
@@ -20,16 +21,12 @@ class _ProductPageWrapperState extends State<ProductPageWrapper> {
   Widget build(BuildContext context) {
     final Widget page;
     if (!_isProductFilledEnough()) {
-      page = InitProductPage(_initialProduct, _onDone, key: Key("init_product_page"));
+      page = InitProductPage(_initialProduct, key: Key("init_product_page"));
     } else {
-      page = Text("TODO: REAL PAGE");
+      page = DisplayProductPage(_initialProduct, key: Key("display_product_page"));
     }
     return Container(child: page);
   }
 
   bool _isProductFilledEnough() => InitProductPage.hasEnoughDataAlready(_initialProduct);
-
-  void _onDone() {
-    Navigator.of(context).pop();
-  }
 }

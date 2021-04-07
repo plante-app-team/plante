@@ -55,5 +55,17 @@
     "init_product_page_done_thanks": "Готово! Спасибо <3",
     "init_product_page_done": "Готово",
     "init_product_page_possible_status_explanation": "Некоторые ингредиенты могут иметь веганский/вегетарианский/никакой статус в зависимости от способа их производства. Статус такого ингредиента в конкретном продукте можно понять только связавшись с производителем.",
-    "init_product_page_possible_status_explanation_ok": "Во как!"
+    "init_product_page_possible_status_explanation_ok": "Во как!",
+
+    "display_product_page_whether_vegetarian": "Вегетарианский: ",
+    "display_product_page_whether_vegan": "Веганский: ",
+    "display_product_page_veg_status_positive": "Да",
+    "display_product_page_veg_status_negative": "Нет",
+    "display_product_page_veg_status_possible": "Возможно",
+    "display_product_page_veg_status_unknown": "Неизвестно",
+    "display_product_page_veg_status_source": "Источник: ",
+    "display_product_page_veg_status_source_community": "сообщество",
+    "display_product_page_veg_status_source_off": "автоматический анализ состава",
+    "display_product_page_veg_status_source_moderator": "модератор",
+    "display_product_page_ingredients": "Состав:"
 }

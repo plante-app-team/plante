@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 
 class ProductImagesHelper {
-  static Widget productImageWidget(Product product, ProductImageType imageType) {
+  static Widget productImageWidget(Product product, ProductImageType imageType, {double? size}) {
     final takenPhoto = _takenProductImageWidget(product, imageType);
     if (takenPhoto != null) {
       return takenPhoto;
@@ -14,7 +14,7 @@ class ProductImagesHelper {
     if (existingRemoteImage != null) {
       return existingRemoteImage;
     }
-    return Icon(Icons.photo_camera_outlined, size: 150, key: Key("take_photo_icon"));
+    return Icon(Icons.photo_camera_outlined, size: size, key: Key("take_photo_icon"));
   }
 
   static Image? _takenProductImageWidget(Product product, ProductImageType imageType) {

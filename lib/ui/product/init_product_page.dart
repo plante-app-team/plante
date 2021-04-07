@@ -82,6 +82,7 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(context.strings.init_product_page_done_thanks)));
         _callback.call();
+        Navigator.of(context).pop();
       };
       final productsManager = GetIt.I.get<ProductsManager>();
 

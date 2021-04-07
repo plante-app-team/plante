@@ -5,6 +5,7 @@ import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';
 
@@ -22,6 +23,7 @@ void main() {
     final initialProduct = Product((v) => v.barcode = "123");
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsOneWidget);
+    expect(find.byType(DisplayProductPage), findsNothing);
   });
 
   testWidgets("init page is not shown when product is filled", (WidgetTester tester) async {
@@ -38,5 +40,6 @@ void main() {
       ..imageFront = Uri.parse("https://ya.ru/2.jpg"));
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
+    expect(find.byType(DisplayProductPage), findsOneWidget);
   });
 }

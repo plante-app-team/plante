@@ -13,7 +13,7 @@ import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
-import 'init_user_page_test_test.mocks.dart';
+import 'init_user_page_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, PhotosTaker])
 void main() {
