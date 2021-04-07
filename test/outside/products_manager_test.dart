@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:either_option/either_option.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
@@ -19,6 +21,33 @@ import 'products_manager_test.mocks.dart';
 
 @GenerateMocks([OffApi, Backend])
 void main() {
+  final imagesJson = """
+  {
+   "front_ru":{
+      "rev":"16",
+      "sizes":{
+         "400":{
+            "h":400,
+            "w":289
+         }
+      },
+      "imgid":"1"
+   },
+   "ingredients_ru":{
+      "sizes":{
+         "400":{
+            "w":216,
+            "h":400
+         }
+      },
+      "rev":"19",
+      "imgid":"2"
+   }
+  }
+  """;
+  final expectedImageFront = "https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg";
+  final expectedImageIngredients = "https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.400.jpg";
+
   late MockOffApi offApi;
   late MockBackend backend;
   late ProductsManager productsManager;
@@ -45,13 +74,13 @@ void main() {
   test('get product when the product is on both OFF and backend', () async {
     final offProduct = off.Product.fromJson({
       "code": "123",
-      "product_name": "name",
+      "product_name_ru": "name",
       "brands_tags": ["Brand name"],
       "categories_tags_translated": ["plant", "lemon"],
-      "ingredients_text": "lemon, water",
-      "image_front_url": "https://example.com/1.jpg",
-      "image_ingredients_url": "https://example.com/2.jpg"
+      "ingredients_text_ru": "lemon, water",
+      "images": jsonDecode(imagesJson),
     });
+    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -74,21 +103,21 @@ void main() {
       ..brands.add("Brand name")
       ..categories.addAll(["plant", "lemon"])
       ..ingredients = "lemon, water"
-      ..imageFront = Uri.parse("https://example.com/1.jpg")
-      ..imageIngredients = Uri.parse("https://example.com/2.jpg"));
+      ..imageFront = Uri.parse(expectedImageFront)
+      ..imageIngredients = Uri.parse(expectedImageIngredients));
     expect(product, equals(expectedProduct));
   });
 
   test('get product when the product is on OFF only', () async {
     final offProduct = off.Product.fromJson({
       "code": "123",
-      "product_name": "name",
+      "product_name_ru": "name",
       "brands_tags": ["Brand name"],
       "categories_tags_translated": ["plant", "lemon"],
-      "ingredients_text": "lemon, water",
-      "image_front_url": "https://example.com/1.jpg",
-      "image_ingredients_url": "https://example.com/2.jpg"
+      "ingredients_text_ru": "lemon, water",
+      "images": jsonDecode(imagesJson),
     });
+    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -105,8 +134,8 @@ void main() {
       ..brands.add("Brand name")
       ..categories.addAll(["plant", "lemon"])
       ..ingredients = "lemon, water"
-      ..imageFront = Uri.parse("https://example.com/1.jpg")
-      ..imageIngredients = Uri.parse("https://example.com/2.jpg"));
+      ..imageFront = Uri.parse(expectedImageFront)
+      ..imageIngredients = Uri.parse(expectedImageIngredients));
     expect(product, equals(expectedProduct));
   });
 
@@ -149,10 +178,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals("123"));
-    expect(capturedOffProduct.productName, equals("name"));
+    expect(capturedOffProduct.productName, isNull);
+    expect(capturedOffProduct.productNameTranslated, equals("name"));
     expect(capturedOffProduct.brands, equals("Brand name"));
-    expect(capturedOffProduct.categories, equals("plant, lemon"));
-    expect(capturedOffProduct.ingredientsText, equals("lemon, water"));
+    expect(capturedOffProduct.categories, equals("ru:plant, ru:lemon"));
+    expect(capturedOffProduct.ingredientsText, isNull);
+    expect(capturedOffProduct.ingredientsTextTranslated, equals("lemon, water"));
 
     // Backend Product
     verify(backend.createUpdateProduct(
@@ -198,10 +229,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals("123"));
-    expect(capturedOffProduct.productName, equals("name"));
+    expect(capturedOffProduct.productName, isNull);
+    expect(capturedOffProduct.productNameTranslated, equals("name"));
     expect(capturedOffProduct.brands, equals("Brand name"));
-    expect(capturedOffProduct.categories, equals("plant, lemon"));
-    expect(capturedOffProduct.ingredientsText, equals("lemon, water"));
+    expect(capturedOffProduct.categories, equals("ru:plant, ru:lemon"));
+    expect(capturedOffProduct.ingredientsText, isNull);
+    expect(capturedOffProduct.ingredientsTextTranslated, equals("lemon, water"));
 
     // Backend Product
     verify(backend.createUpdateProduct(
@@ -235,10 +268,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals("123"));
-    expect(capturedOffProduct.productName, equals("name"));
+    expect(capturedOffProduct.productName, isNull);
+    expect(capturedOffProduct.productNameTranslated, equals("name"));
     expect(capturedOffProduct.brands, equals("Brand name"));
-    expect(capturedOffProduct.categories, equals("plant, lemon"));
-    expect(capturedOffProduct.ingredientsText, equals("lemon, water"));
+    expect(capturedOffProduct.categories, equals("ru:plant, ru:lemon"));
+    expect(capturedOffProduct.ingredientsText, isNull);
+    expect(capturedOffProduct.ingredientsTextTranslated, equals("lemon, water"));
 
     // Backend Product
     verify(backend.createUpdateProduct(
@@ -281,10 +316,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals("123"));
-    expect(capturedOffProduct.productName, equals("name"));
+    expect(capturedOffProduct.productName, isNull);
+    expect(capturedOffProduct.productNameTranslated, equals("name"));
     expect(capturedOffProduct.brands, equals("Brand name"));
-    expect(capturedOffProduct.categories, equals("plant, lemon"));
-    expect(capturedOffProduct.ingredientsText, equals("lemon, water"));
+    expect(capturedOffProduct.categories, equals("ru:plant, ru:lemon"));
+    expect(capturedOffProduct.ingredientsText, isNull);
+    expect(capturedOffProduct.ingredientsTextTranslated, equals("lemon, water"));
 
     // Backend Product
     verify(backend.createUpdateProduct(
@@ -357,7 +394,7 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: off.Product.fromJson({
           "code": goodBarcode,
-          "product_name": "name"
+          "product_name_ru": "name"
         })));
 
     final product = await productsManager.getProduct(badBarcode, "ru");
@@ -379,5 +416,27 @@ void main() {
         .captured.first as off.Product;
     expect(capturedOffProduct.brands, isNull);
     expect(capturedOffProduct.categories, isNull);
+  });
+
+  test('international OFF product fields are not used', () async {
+    final offProduct = off.Product.fromJson({
+      "code": "123",
+      "product_name": "name",
+      "categories_tags": ["plant", "lemon"],
+      "ingredients_text": "lemon, water"
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    when(backend.requestProduct(any)).thenAnswer((_) async => null);
+
+    final product = await productsManager.getProduct("123", "ru");
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = null
+      ..brands.addAll([])
+      ..categories.addAll([])
+      ..ingredients = null);
+    expect(product, equals(expectedProduct));
   });
 }
