@@ -16,8 +16,8 @@ class QrScanPage extends StatefulWidget {
 
 class _QrScanPageState extends State<QrScanPage> with RouteAware {
   String? _barcode;
+  bool _searching = false;
   Product? _foundProduct;
-  String? _searchedBarcode;
 
   qr.QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -80,11 +80,16 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
               width: MediaQuery.of(context).size.width,
               height: _barcode != null ? 100 : 0,
               color: Colors.white,
-              child: Center(
-                child: Text(
-                    _productName(_foundProduct),
-                    style: TextStyle(fontSize: 20.0)),
-                )
+              child:
+                Row(children: [
+                  SizedBox(width: 10),
+                  if (_searching) CircularProgressIndicator(),
+                  SizedBox(width: 10),
+                  Expanded(child:
+                  Text(
+                      _productName(),
+                      style: TextStyle(fontSize: 20.0)))
+                ])
               ),
               onTap: _tryOpenProductPage,
             ),
@@ -94,14 +99,20 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     );
   }
 
-  String _productName(Product? product) {
-    if (product == null) {
-      return context.strings.qr_scan_page_product_not_found;
+  String _productName() {
+    if (_searching && _barcode != null) {
+      return _barcode!;
     }
-    if (product.name != null) {
-      return product.name!;
+
+    if (_foundProduct != null) {
+      if (_foundProduct!.name != null) {
+        return _foundProduct!.name!;
+      } else {
+        return context.strings.qr_scan_page_product_without_name;
+      }
     }
-    return context.strings.qr_scan_page_product_without_name;
+
+    return context.strings.qr_scan_page_product_not_found;
   }
 
   Widget _buildQrView(BuildContext context) {
@@ -132,22 +143,25 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    if (_foundProduct?.barcode == scanData.code
-        || _searchedBarcode == scanData.code) {
+    if (_barcode == scanData.code) {
       return;
     }
     try {
-      _searchedBarcode = scanData.code;
+      setState(() {
+        _barcode = scanData.code;
+        _searching = true;
+      });
 
       final foundProduct = await GetIt.I.get<ProductsManager>().getProduct(
           scanData.code,
           Localizations.localeOf(context).languageCode);
       setState(() {
-        _barcode = foundProduct?.barcode ?? scanData.code;
         _foundProduct = foundProduct;
       });
     } finally {
-      _searchedBarcode = null;
+      setState(() {
+        _searching = false;
+      });
     }
   }
 
@@ -160,7 +174,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   }
 
   void _tryOpenProductPage() {
-    if (_barcode == null) {
+    if (_searching || _barcode == null) {
       return;
     }
     final Product product;

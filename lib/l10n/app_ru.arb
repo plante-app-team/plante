@@ -30,7 +30,7 @@
     "map_page_btn_where_am_i": "Где я?",
 
     "qr_scan_page_btn_flash": "Вспышка",
-    "qr_scan_page_product_not_found": "Такой продукт не найден",
+    "qr_scan_page_product_not_found": "Такой продукт не найден. Нажмите чтобы добавить!",
     "qr_scan_page_product_without_name": "Безымянный продукт",
 
     "init_product_page_add_product_data": "Добавить данные о продукте",

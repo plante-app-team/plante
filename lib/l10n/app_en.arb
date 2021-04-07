@@ -33,7 +33,7 @@
       "map_page_btn_where_am_i": "Where am I?",
 
       "qr_scan_page_btn_flash": "Flash",
-      "qr_scan_page_product_not_found": "Product not found",
+      "qr_scan_page_product_not_found": "Product not found. Tap to add!",
       "qr_scan_page_product_without_name": "Nameless product",
 
       "init_product_page_add_product_data": "Add product data",
