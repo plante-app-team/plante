@@ -439,4 +439,118 @@ void main() {
       ..ingredients = null);
     expect(product, equals(expectedProduct));
   });
+
+  test('not translated OFF tags get and save behaviour', () async {
+    final offProduct = off.Product.fromJson({
+      "code": "123",
+      "brands_tags": ["brand1", "en:brand2"],
+      "categories_tags_ru": ["category1", "en:category2"],
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    when(backend.requestProduct(any)).thenAnswer((_) async => null);
+
+    final product = await productsManager.getProduct("123", "ru");
+    // We expect the 'en' values to be excluded
+    final expectedInitialProduct = Product((v) => v
+      ..barcode = "123"
+      ..brands.addAll(["brand1"])
+      ..categories.addAll(["category1"])
+      ..ingredients = null);
+    expect(product, equals(expectedInitialProduct));
+
+    final updatedProduct = product!.rebuild((v) => v
+      ..brands.add("brand3")
+      ..categories.add("category3"));
+    productsManager.createUpdateProduct(updatedProduct, "ru");
+
+    final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
+        .captured.first as off.Product;
+    // We expected the 'en' value to be included back
+    expect(capturedOffProduct.brands, equals("brand1, brand3, en:brand2"));
+    expect(capturedOffProduct.categories, equals("ru:category1, ru:category3, en:category2"));
+  });
+
+  test('translated OFF tags order on re-save does not matter', () async {
+    final offProduct1 = off.Product.fromJson({
+      "code": "123",
+      "brands_tags": ["brand1", "en:brand2"],
+      "categories_tags_ru": ["category1", "en:category2"],
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct1));
+    when(backend.requestProduct(any)).thenAnswer((_) async => null);
+
+    final product = await productsManager.getProduct("123", "ru");
+
+    // Order 1
+    productsManager.createUpdateProduct(
+        product!.rebuild((v) => v
+          ..brands.addAll(["brand3", "brand4"])
+          ..categories.addAll(["category3", "category4"])),
+        "ru");
+    var capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
+        .captured.first as off.Product;
+    expect(capturedOffProduct.brands, equals("brand1, brand3, brand4, en:brand2"));
+    expect(capturedOffProduct.categories, equals("ru:category1, ru:category3, ru:category4, en:category2"));
+
+    // Order 2, still expected same brands and products
+    productsManager.createUpdateProduct(
+        product.rebuild((v) => v
+          ..brands.addAll(["brand4", "brand3"])
+          ..categories.addAll(["category4", "category3"])),
+        "ru");
+    capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
+        .captured.first as off.Product;
+    expect(capturedOffProduct.brands, equals("brand1, brand3, brand4, en:brand2"));
+    expect(capturedOffProduct.categories, equals("ru:category1, ru:category3, ru:category4, en:category2"));
+  });
+
+  test('unchanged product is not sent to OFF or backend on re-save', () async {
+    final offProduct = off.Product.fromJson({
+      "code": "123",
+      "brands_tags": ["brand1", "en:brand2"],
+      "categories_tags_ru": ["category1", "en:category2"],
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    when(backend.requestProduct(any)).thenAnswer((_) async => null);
+
+    final product = await productsManager.getProduct("123", "ru");
+
+    // Send the product back without changing it
+    productsManager.createUpdateProduct(product!, "ru");
+
+    // Ensure the product was not sent anywhere because it's not changed
+    verifyNever(offApi.saveProduct(any, captureAny));
+    verifyNever(backend.createUpdateProduct(any));
+  });
+
+  test('product considered unchanged even on OFF tags field reordering', () async {
+    final offProduct = off.Product.fromJson({
+      "code": "123",
+      "brands_tags": ["brand1", "brand2"],
+      "categories_tags_ru": ["category1", "category2"],
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    when(backend.requestProduct(any)).thenAnswer((_) async => null);
+
+    final product = await productsManager.getProduct("123", "ru");
+    expect(product!.brands!.length, equals(2));
+    expect(product.categories!.length, equals(2));
+
+    // Send the product back with reordered tags
+    final productReordered = product.rebuild((v) => v
+      ..brands.replace(product.brands!.reversed)
+      ..categories.replace(product.categories!.reversed));
+    productsManager.createUpdateProduct(productReordered, "ru");
+
+    // Ensure the product was not sent anywhere because it's actually same
+    verifyNever(offApi.saveProduct(any, captureAny));
+    verifyNever(backend.createUpdateProduct(any));
+  });
 }

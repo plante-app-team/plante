@@ -20,9 +20,11 @@ class ProductsManager {
     off.ProductField.INGREDIENTS_TEXT_TRANSLATED,
     off.ProductField.IMAGES,
   ];
+  static final _notTranslatedRegex = RegExp(r"^\w\w:.*");
 
   final OffApi _off;
   final Backend _backend;
+  final _productsCache = <String, Product>{};
 
   ProductsManager(this._off, this._backend);
 
@@ -42,7 +44,7 @@ class ProductsManager {
     final barcode = offProduct.barcode!;
     final backendProduct = await _backend.requestProduct(barcode);
 
-    return Product((v) => v
+    var result = Product((v) => v
       ..barcode = barcode
 
       ..vegetarianStatus = VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "")
@@ -57,6 +59,18 @@ class ProductsManager {
       ..imageFront = _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
       ..imageIngredients = _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode)
     );
+
+    // First store the original product into cache
+    _productsCache[barcode] = result;
+
+    // Now filter out not translated values
+    final brandsFiltered = result.brands!.where((e) => !_notTranslatedRegex.hasMatch(e));
+    result = result.rebuild((v) => v.brands.replace(brandsFiltered));
+
+    final categoriesFiltered = result.categories!.where((e) => !_notTranslatedRegex.hasMatch(e));
+    result = result.rebuild((v) => v.categories.replace(categoriesFiltered));
+
+    return result;
   }
 
   Uri? _extractImageUri(off.Product offProduct, ProductImageType imageType, String langCode) {
@@ -83,17 +97,57 @@ class ProductsManager {
     return null;
   }
 
+  List<String> _connectDifferentlyTranslated(
+      Iterable<String>? withNotTranslated, Iterable<String>? translatedOnly) {
+    final notTranslated = withNotTranslated?.where(
+            (e) => _notTranslatedRegex.hasMatch(e))
+        .toList() ?? [];
+    final allStrings = (translatedOnly?.toList() ?? []) + notTranslated;
+    allStrings.sort();
+    return allStrings;
+  }
+
+  List<String> _sortedNotNull(Iterable<String>? input) {
+    final result = input?.toList() ?? [];
+    result.sort();
+    return result;
+  }
+
   /// Returns updated product if update was successful
   Future<Product?> createUpdateProduct(Product product, String langCode) async {
+    final cachedProduct = _productsCache[product.barcode];
+    if (cachedProduct != null) {
+      final allBrands = _connectDifferentlyTranslated(
+          cachedProduct.brands, product.brands);
+      final allCategories = _connectDifferentlyTranslated(
+          cachedProduct.categories, product.categories);
+
+      final productWithNotTranslatedFields = product.rebuild((v) => v
+        ..brands.replace(allBrands)
+        ..categories.replace(allCategories));
+      final cachedProductNormalized = cachedProduct.rebuild((v) => v
+        ..brands.replace(_sortedNotNull(cachedProduct.brands))
+        ..categories.replace(_sortedNotNull(cachedProduct.categories)));
+      if (productWithNotTranslatedFields == cachedProductNormalized) {
+        // Input product is same as it was when it was cached
+        return product;
+      } else {
+        // Let's insert back the not translated fields before sending product to OFF.
+        // If we won't do that, that would mean we are to erase existing values
+        // from the OFF product which is not very nice.
+        product = productWithNotTranslatedFields;
+      }
+    }
+
     // OFF product
 
     final offProduct = off.Product(
-      lang: off.LanguageHelper.fromJson(langCode),
-      barcode: product.barcode,
-      productNameTranslated: product.name,
-      brands: _join(product.brands, null),
-      categories: _join(product.categories, langCode),
-      ingredientsTextTranslated: product.ingredients);
+        lang: off.LanguageHelper.fromJson(langCode),
+        barcode: product.barcode,
+        productNameTranslated: product.name,
+        brands: _join(product.brands, null),
+        categories: _join(product.categories, langCode),
+        ingredientsTextTranslated: product.ingredients);
     final offResult = await _off.saveProduct(_offUser(), offProduct);
     if (offResult.error != null) {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
@@ -135,9 +189,9 @@ class ProductsManager {
     // Backend product
 
     final backendResult = await _backend.createUpdateProduct(
-      product.barcode,
-      vegetarianStatus: product.vegetarianStatus,
-      veganStatus: product.veganStatus);
+        product.barcode,
+        vegetarianStatus: product.vegetarianStatus,
+        veganStatus: product.veganStatus);
     if (backendResult.isRight) {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
       return null;
@@ -149,7 +203,9 @@ class ProductsManager {
   String? _join(Iterable<String>? strs, String? langCode) {
     if (strs != null && strs.isNotEmpty) {
       final langPrefix = langCode != null ? "$langCode:" : "";
-      return strs.map((e) => "$langPrefix$e").join(", ");
+      return strs.map((e) =>
+        _notTranslatedRegex.hasMatch(e) ? e : "$langPrefix$e")
+        .join(", ");
     }
     return null;
   }
