@@ -14,7 +14,7 @@ void main() {
   setUp(() {
   });
 
-  testWidgets("produt is displayed", (WidgetTester tester) async {
+  testWidgets("product is displayed", (WidgetTester tester) async {
     final product = Product((v) => v
       ..barcode = "123"
       ..name = "My product"
@@ -27,7 +27,7 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.text(product.name!), findsOneWidget);
-    expect(find.text(product.ingredients!), findsOneWidget);
+    expect(find.text(product.ingredients!), findsWidgets);
 
     expect(find.text(
             "${context.strings.display_product_page_whether_vegetarian}"

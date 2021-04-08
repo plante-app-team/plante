@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -80,7 +81,6 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 child: Column(children: [
                   Text(
                       _product.name!,
-                      // textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headline5),
 
                   SizedBox(height: 20),
@@ -101,14 +101,29 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
                   SizedBox(height: 10),
 
-                  _wideStartText(context.strings.display_product_page_ingredients),
-                  _wideStartText(_product.ingredients.toString()),
+                  ExpandablePanel(
+                    header: Column(children: [
+                      SizedBox(height: 10),
+                      _wideStartText(
+                          context.strings.display_product_page_ingredients,
+                          style: Theme.of(context).textTheme.headline6)
+                    ]),
+                    collapsed: Text(_product.ingredients.toString(), softWrap: true, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    expanded: Column(children: [
+                      ProductImagesHelper.productImageWidget(
+                          _product, ProductImageType.INGREDIENTS),
+                      _wideStartText(_product.ingredients.toString())
+                    ]),
+                  )
                 ]))
           ]))));
   }
 
-  Widget _wideStartText(String str, {String? key}) =>
+  Widget _wideStartText(String str, {String? key, TextStyle? style}) =>
       Container(
         alignment: AlignmentDirectional.centerStart,
-        child: Text(str, key: key != null ? Key(key) : null));
+        child: Text(
+            str,
+            key: key != null ? Key(key) : null,
+            style: style));
 }

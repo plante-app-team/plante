@@ -50,6 +50,7 @@ dependencies:
   built_value: ^8.0.4
   either_option: ^2.0.1-dev.1
   built_collection: ^5.0.0
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:

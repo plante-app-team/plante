@@ -21,7 +21,7 @@ class _ProductPageWrapperState extends State<ProductPageWrapper> {
   Widget build(BuildContext context) {
     final Widget page;
     if (!_isProductFilledEnough()) {
-      page = InitProductPage(_initialProduct, key: Key("init_product_page"));
+      page = InitProductPage(_initialProduct, (){}, key: Key("init_product_page"));
     } else {
       page = DisplayProductPage(_initialProduct, key: Key("display_product_page"));
     }

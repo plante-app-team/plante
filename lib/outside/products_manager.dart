@@ -81,10 +81,18 @@ class ProductsManager {
     final lang = off.LanguageHelper.fromJson(langCode);
     for (final image in images) {
       if (image.language != lang
-          || image.size != off.ImageSize.DISPLAY
           || image.url == null) {
         continue;
       }
+      if (imageType == ProductImageType.FRONT
+          && image.size != off.ImageSize.DISPLAY) {
+        continue;
+      }
+      if (imageType == ProductImageType.INGREDIENTS
+          && image.size != off.ImageSize.ORIGINAL) {
+        continue;
+      }
+
       if (image.field == off.ImageField.FRONT
           && imageType == ProductImageType.FRONT) {
         return Uri.parse(image.url!);

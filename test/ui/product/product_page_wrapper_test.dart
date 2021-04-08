@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
@@ -36,8 +38,8 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
       ..ingredients = "1, 2, 3"
-      ..imageIngredients = Uri.parse("https://ya.ru/1.jpg")
-      ..imageFront = Uri.parse("https://ya.ru/2.jpg"));
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
