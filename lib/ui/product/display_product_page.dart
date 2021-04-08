@@ -22,15 +22,22 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   final Key? _key;
   final Product _product;
 
-  String get _vegetarianStatus =>
+  String _vegetarianStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegetarian}"
-          "${vegStatusToStr(_product.vegetarianStatus ?? VegStatus.unknown)}";
+          "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
 
-  String get _veganStatus =>
+  String _veganStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegan}"
-          "${vegStatusToStr(_product.veganStatus ?? VegStatus.unknown)}";
+          "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
 
-  String vegStatusToStr(VegStatus vegStatus) {
+  String _vegStatusToStr(VegStatus? vegStatus, bool nullIsUnknown) {
+    if (vegStatus == null) {
+      if (nullIsUnknown) {
+        vegStatus = VegStatus.unknown;
+      } else {
+        return "-";
+      }
+    }
     switch (vegStatus) {
       case VegStatus.positive:
         return context.strings.display_product_page_veg_status_positive;
@@ -85,7 +92,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
                   SizedBox(height: 20),
 
-                  _wideStartText(_vegetarianStatus),
+                  _wideStartText(
+                      _vegetarianStatusStr(_product.vegetarianStatus),
+                      key: "vegetarian_status"),
                   if (_product.vegetarianStatusSource != null)
                     _wideStartText(
                         _vegStatusSource(_product.vegetarianStatusSource!),
@@ -93,7 +102,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
                   SizedBox(height: 10),
 
-                  _wideStartText(_veganStatus),
+                  _wideStartText(
+                      _veganStatusStr(_product.veganStatus),
+                      key: "vegan_status"),
                   if (_product.veganStatusSource != null)
                     _wideStartText(
                         _vegStatusSource(_product.veganStatusSource!),
@@ -116,7 +127,16 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                     ]),
                   ),
 
-
+                  if (_hasIngredientsAnalysis()) ExpandablePanel(
+                    header: Column(children: [
+                      SizedBox(height: 10),
+                      _wideStartText(
+                          context.strings.display_product_page_ingredients_analysis,
+                          style: Theme.of(context).textTheme.headline6)
+                    ]),
+                    collapsed: Text("..."),
+                    expanded: _ingredientsAnalysisTable(key: "ingredients_analysis_table"),
+                  ),
                 ]))
           ]))));
   }
@@ -128,4 +148,31 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
             str,
             key: key != null ? Key(key) : null,
             style: style));
+
+  bool _hasIngredientsAnalysis() =>
+      _product.ingredientsAnalyzed != null
+          && _product.ingredientsAnalyzed!.isNotEmpty;
+
+  Widget _ingredientsAnalysisTable({String? key}) {
+    final rows = <TableRow>[];
+    final ingredients = _product.ingredientsAnalyzed!;
+    for (final ingredient in ingredients) {
+      rows.add(TableRow(
+        children: <Widget>[
+          Text(ingredient.name),
+          Text(_vegetarianStatusStr(ingredient.vegetarianStatus, nullIsUnknown: false)),
+          Text(_veganStatusStr(ingredient.veganStatus, nullIsUnknown: false)),
+        ],
+      ));
+    }
+    return Table(
+        key: key != null ? Key(key) : null,
+        children: rows,
+        border: TableBorder.all(),
+        columnWidths: const <int, TableColumnWidth>{
+          0: FlexColumnWidth(1),
+          1: FlexColumnWidth(2),
+          2: FlexColumnWidth(2),
+        });
+  }
 }

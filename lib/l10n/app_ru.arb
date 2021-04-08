@@ -67,5 +67,6 @@
     "display_product_page_veg_status_source_community": "сообщество",
     "display_product_page_veg_status_source_off": "автоматический анализ состава",
     "display_product_page_veg_status_source_moderator": "модератор",
-    "display_product_page_ingredients": "Состав:"
+    "display_product_page_ingredients": "Состав:",
+    "display_product_page_ingredients_analysis": "Автоматический анализ состава:"
 }
