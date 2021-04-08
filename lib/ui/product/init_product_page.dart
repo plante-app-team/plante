@@ -20,9 +20,6 @@ class InitProductPage extends StatefulWidget {
   final DoneCallback callback;
   final Key? key;
 
-  static bool hasEnoughDataAlready(Product product) =>
-      _InitProductPageState._hasEnoughDataAlready(product);
-
   InitProductPage(this.initialProduct, this.callback, {this.key});
 
   @override
@@ -40,13 +37,6 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
 
   bool _controllersInited = false;
   final _pagesControllers = <PageControllerBase>[];
-
-  static bool _hasEnoughDataAlready(Product product) {
-    return Page1Controller.productHasAllDataForPage(product)
-        && Page2Controller.productHasAllDataForPage(product)
-        && Page3Controller.productHasAllDataForPage(product)
-        && Page4Controller.productHasAllDataForPage(product);
-  }
 
   _InitProductPageState(Product initialProduct, this._callback, this.key)
       : _model = InitProductPageModel(initialProduct);

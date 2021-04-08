@@ -28,5 +28,13 @@ class _ProductPageWrapperState extends State<ProductPageWrapper> {
     return Container(child: page);
   }
 
-  bool _isProductFilledEnough() => InitProductPage.hasEnoughDataAlready(_initialProduct);
+  bool _isProductFilledEnough() =>
+      _initialProduct.name != null
+          && _initialProduct.name!.trim().isNotEmpty
+          && _initialProduct.vegetarianStatus != null
+          && _initialProduct.veganStatus != null
+          && _initialProduct.imageFront != null
+          && _initialProduct.imageIngredients != null
+          && _initialProduct.ingredientsText != null
+          && _initialProduct.ingredientsText!.isNotEmpty;
 }

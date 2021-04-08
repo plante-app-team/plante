@@ -22,12 +22,12 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..ingredients = "Water, salt, sugar");
+      ..ingredientsText = "Water, salt, sugar");
 
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.text(product.name!), findsOneWidget);
-    expect(find.text(product.ingredients!), findsWidgets);
+    expect(find.text(product.ingredientsText!), findsWidgets);
 
     expect(find.text(
             "${context.strings.display_product_page_whether_vegetarian}"

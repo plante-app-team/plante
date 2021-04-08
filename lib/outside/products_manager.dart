@@ -1,4 +1,6 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:untitled_vegan_app/model/ingredient.dart';
 
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
@@ -6,6 +8,12 @@ import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/off/off_api.dart';
 import 'package:untitled_vegan_app/outside/off/off_user.dart';
+
+class ProductWithOCRIngredients {
+  Product product;
+  String? ingredients;
+  ProductWithOCRIngredients(this.product, this.ingredients);
+}
 
 class ProductsManager {
   static const _NEEDED_OFF_FIELDS = [
@@ -55,10 +63,50 @@ class ProductsManager {
       ..name = offProduct.productNameTranslated
       ..brands.addAll(offProduct.brandsTags ?? [])
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])
-      ..ingredients = offProduct.ingredientsTextTranslated
+      ..ingredientsText = offProduct.ingredientsTextTranslated
+      ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
       ..imageFront = _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
       ..imageIngredients = _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode)
     );
+
+    if (backendProduct?.vegetarianStatus != null) {
+      final vegetarianStatus = VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "");
+      var vegetarianStatusSource = VegStatusSource.safeValueOf(backendProduct?.vegetarianStatusSource ?? "");
+      if (vegetarianStatusSource == null && vegetarianStatus != null) {
+        vegetarianStatusSource = VegStatusSource.community;
+        // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      }
+      result = result.rebuild((v) => v
+        ..vegetarianStatus = vegetarianStatus
+        ..vegetarianStatusSource = vegetarianStatusSource);
+    }
+    if (backendProduct?.veganStatus != null) {
+      final veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? "");
+      var veganStatusSource = VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "");
+      if (veganStatusSource == null && veganStatus != null) {
+        veganStatusSource = VegStatusSource.community;
+        // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      }
+      result = result.rebuild((v) => v
+        ..veganStatus = veganStatus
+        ..veganStatusSource = veganStatusSource);
+    }
+
+    // NOTE: server veg-status parsing could fail (and server could have no veg-status).
+    if (result.vegetarianStatus == null) {
+      if (result.vegetarianStatusAnalysis != null) {
+        result = result.rebuild((v) => v
+          ..vegetarianStatus = result.vegetarianStatusAnalysis
+          ..vegetarianStatusSource = VegStatusSource.open_food_facts);
+      }
+    }
+    if (result.veganStatus == null) {
+      if (result.veganStatusAnalysis != null) {
+        result = result.rebuild((v) => v
+          ..veganStatus = result.veganStatusAnalysis
+          ..veganStatusSource = VegStatusSource.open_food_facts);
+      }
+    }
 
     // First store the original product into cache
     _productsCache[barcode] = result;
@@ -105,20 +153,18 @@ class ProductsManager {
     return null;
   }
 
-  List<String> _connectDifferentlyTranslated(
-      Iterable<String>? withNotTranslated, Iterable<String>? translatedOnly) {
-    final notTranslated = withNotTranslated?.where(
-            (e) => _notTranslatedRegex.hasMatch(e))
-        .toList() ?? [];
-    final allStrings = (translatedOnly?.toList() ?? []) + notTranslated;
-    allStrings.sort();
-    return allStrings;
-  }
-
-  List<String> _sortedNotNull(Iterable<String>? input) {
-    final result = input?.toList() ?? [];
-    result.sort();
-    return result;
+  Iterable<Ingredient> _extractIngredientsAnalyzed(off.Product offProduct) {
+    if (offProduct.ingredientsTextTranslated == null) {
+      // If ingredients text is not translated then analysis is done
+      // for some international ingredients and most likely is not
+      // translated.
+      return [];
+    }
+    final offIngredients = offProduct.ingredients;
+    if (offIngredients == null) {
+      return [];
+    }
+    return offIngredients.map((ingr) => ingr.convert());
   }
 
   /// Returns updated product if update was successful
@@ -155,7 +201,7 @@ class ProductsManager {
         productNameTranslated: product.name,
         brands: _join(product.brands, null),
         categories: _join(product.categories, langCode),
-        ingredientsTextTranslated: product.ingredients);
+        ingredientsTextTranslated: product.ingredientsText);
     final offResult = await _off.saveProduct(_offUser(), offProduct);
     if (offResult.error != null) {
       // TODO(https://trello.com/c/XWAE5UVB/): log warning
@@ -208,6 +254,22 @@ class ProductsManager {
     return getProduct(product.barcode, langCode);
   }
 
+  List<String> _connectDifferentlyTranslated(
+      Iterable<String>? withNotTranslated, Iterable<String>? translatedOnly) {
+    final notTranslated = withNotTranslated?.where(
+            (e) => _notTranslatedRegex.hasMatch(e))
+        .toList() ?? [];
+    final allStrings = (translatedOnly?.toList() ?? []) + notTranslated;
+    allStrings.sort();
+    return allStrings;
+  }
+
+  List<String> _sortedNotNull(Iterable<String>? input) {
+    final result = input?.toList() ?? [];
+    result.sort();
+    return result;
+  }
+
   String? _join(Iterable<String>? strs, String? langCode) {
     if (strs != null && strs.isNotEmpty) {
       final langPrefix = langCode != null ? "$langCode:" : "";
@@ -238,8 +300,27 @@ class ProductsManager {
   off.User _offUser() => off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
 }
 
-class ProductWithOCRIngredients {
-  Product product;
-  String? ingredients;
-  ProductWithOCRIngredients(this.product, this.ingredients);
+extension _OffIngredientExtension on off.Ingredient {
+  Ingredient convert() => Ingredient((v) => v
+    ..name = text
+    ..vegetarianStatus = _convertVegStatus(vegetarian)
+    ..veganStatus = _convertVegStatus(vegan));
+
+  VegStatus? _convertVegStatus(off.IngredientSpecialPropertyStatus? offVegStatus) {
+    if (offVegStatus == null) {
+      return VegStatus.unknown;
+    }
+    switch (offVegStatus) {
+      case off.IngredientSpecialPropertyStatus.POSITIVE:
+        return VegStatus.positive;
+      case off.IngredientSpecialPropertyStatus.NEGATIVE:
+        return VegStatus.negative;
+      case off.IngredientSpecialPropertyStatus.MAYBE:
+        return VegStatus.possible;
+      case off.IngredientSpecialPropertyStatus.IGNORE:
+        return null;
+      default:
+        throw StateError("Unhandled item: $offVegStatus");
+    }
+  }
 }

@@ -27,7 +27,7 @@ class Page3Controller extends PageControllerBase {
 
   bool get pageHasData => productHasAllDataForPage(_product);
   static bool productHasAllDataForPage(Product product) =>
-      product.imageIngredients != null && (product.ingredients ?? "").isNotEmpty;
+      product.imageIngredients != null && (product.ingredientsText ?? "").isNotEmpty;
 
   Page3Controller(
       this._model,
@@ -43,7 +43,7 @@ class Page3Controller extends PageControllerBase {
 
     _ingredientsController.addListener(() {
       _model.updateProduct(updater: "third_page_controllers", fn: (v) {
-        v.ingredients = _ingredientsController.text;
+        v.ingredientsText = _ingredientsController.text;
       });
     });
     _updateController(_product);
@@ -52,7 +52,7 @@ class Page3Controller extends PageControllerBase {
   }
 
   void _updateController(Product product) {
-    _ingredientsController.text = product.ingredients ?? "";
+    _ingredientsController.text = product.ingredientsText ?? "";
   }
 
   void _longAction(dynamic Function() action) => _model.longAction(action);
@@ -126,7 +126,7 @@ class Page3Controller extends PageControllerBase {
                 content: Text(context.strings.global_something_went_wrong)));
             return;
           }
-          _model.updateProduct(fn: (v) => v.ingredients = ocrIngredients);
+          _model.updateProduct(fn: (v) => v.ingredientsText = ocrIngredients);
           _model.ocrAllowed = false;
           _model.ocrNeedsVerification = true;
         });

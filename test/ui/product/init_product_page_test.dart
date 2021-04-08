@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -7,13 +8,14 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
+import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/products_manager.dart';
 import 'package:untitled_vegan_app/ui/photos_taker.dart';
 import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
-import 'init_user_page_test.mocks.dart';
+import 'init_product_page_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, PhotosTaker])
 void main() {
@@ -108,7 +110,7 @@ void main() {
       ..name = "Lemon drink"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredients = "water, lemon"
+      ..ingredientsText = "water, lemon"
       ..vegetarianStatus = VegStatus.possible
       ..veganStatus = VegStatus.possible);
     expect(finalProduct, equals(expectedProduct));
@@ -142,7 +144,7 @@ void main() {
       ..name = "Hello there"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredients = "water");
+      ..ingredientsText = "water");
     await tester.superPump(InitProductPage(initialProduct, (){}));
 
     expect(find.byKey(Key("page1")), findsNothing);
@@ -157,7 +159,7 @@ void main() {
       ..barcode = "123"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredients = "water"
+      ..ingredientsText = "water"
       ..vegetarianStatus = VegStatus.possible
       ..veganStatus = VegStatus.possible);
     bool done = false;
@@ -185,6 +187,40 @@ void main() {
 
     // Done after page1
     expect(done, isTrue);
+  });
+
+  testWidgets("page 4 is NOT skipped when veg statuses filled by OFF", (WidgetTester tester) async {
+    // Product has everything except for name, veg-statuses source is OFF
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.open_food_facts);
+    await tester.superPump(InitProductPage(initialProduct, (){}));
+
+    // At start at page1
+    expect(find.byKey(Key("page1")), findsWidgets);
+    expect(find.byKey(Key("page2")), findsNothing);
+    expect(find.byKey(Key("page3")), findsNothing);
+    expect(find.byKey(Key("page4")), findsNothing);
+
+    await tester.enterText(
+        find.byKey(Key("name")),
+        'Lemon drink');
+    await tester.pumpAndSettle();
+    await tester.tap(
+        find.byKey(Key("page1_next_btn")));
+    await tester.pumpAndSettle();
+
+    // At page 4
+    expect(find.byKey(Key("page1")), findsNothing);
+    expect(find.byKey(Key("page2")), findsNothing);
+    expect(find.byKey(Key("page3")), findsNothing);
+    expect(find.byKey(Key("page4")), findsWidgets);
   });
 
   testWidgets("can't leave page 1 without product name", (WidgetTester tester) async {
@@ -260,7 +296,7 @@ void main() {
       ..name = "Hello there"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredients = "water");
+      ..ingredientsText = "water");
     bool done = false;
     final callback = () {
       done = true;
@@ -320,5 +356,32 @@ void main() {
 
     expect(find.text("brand1, brand2"), findsOneWidget);
     expect(find.text("category1, category2"), findsOneWidget);
+  });
+
+  testWidgets("veg statuses radio buttons not selected when "
+              "statuses filled by OFF", (WidgetTester tester) async {
+    // Product has everything except for name, veg-statuses source is OFF
+    final initialProduct = Product((v) => v
+      ..name = "name"
+      ..barcode = "123"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.open_food_facts);
+    await tester.superPump(InitProductPage(initialProduct, (){}));
+
+    // At page 4
+    expect(find.byKey(Key("page1")), findsNothing);
+    expect(find.byKey(Key("page2")), findsNothing);
+    expect(find.byKey(Key("page3")), findsNothing);
+    expect(find.byKey(Key("page4")), findsWidgets);
+
+    final buttons = find.byType(Radio).evaluate().map((e) => e.widget as Radio);
+    expect(
+        buttons.where((button) => button.groupValue != null).isEmpty,
+        isTrue);
   });
 }

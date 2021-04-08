@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:untitled_vegan_app/base/build_value_helper.dart';
+import 'package:untitled_vegan_app/model/ingredient.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 
@@ -17,10 +18,50 @@ abstract class Product implements Built<Product, ProductBuilder> {
   String? get name;
   BuiltList<String>? get brands;
   BuiltList<String>? get categories;
-  String? get ingredients;
+  String? get ingredientsText;
+  /// NOTE: the field is NOT send to any backend, only obtained from them.
+  BuiltList<Ingredient>? get ingredientsAnalyzed;
 
   Uri? get imageFront;
   Uri? get imageIngredients;
+
+  VegStatus? get vegetarianStatusAnalysis {
+    final ingredientsAnalyzed = this.ingredientsAnalyzed;
+    if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
+      return null;
+    }
+    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.negative).isNotEmpty) {
+      return VegStatus.negative;
+    }
+    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.unknown).isNotEmpty) {
+      return VegStatus.unknown;
+    }
+    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.possible).isNotEmpty) {
+      return VegStatus.possible;
+    }
+    // NOTE: a veg status of an ingredient can also be null, that means that
+    // the status of the ingredient shoud be ignored
+    return VegStatus.positive;
+  }
+
+  VegStatus? get veganStatusAnalysis {
+    final ingredientsAnalyzed = this.ingredientsAnalyzed;
+    if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
+      return null;
+    }
+    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.negative).isNotEmpty) {
+      return VegStatus.negative;
+    }
+    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.unknown).isNotEmpty) {
+      return VegStatus.unknown;
+    }
+    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.possible).isNotEmpty) {
+      return VegStatus.possible;
+    }
+    // NOTE: a veg status of an ingredient can also be null, that means that
+    // the status of the ingredient shoud be ignored
+    return VegStatus.positive;
+  }
 
   bool isFrontImageFile() => isImageFile(ProductImageType.FRONT);
   bool isFrontImageRemote() => isImageRemote(ProductImageType.FRONT);

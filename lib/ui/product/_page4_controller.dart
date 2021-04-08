@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
+import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/products_manager.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
@@ -20,11 +21,25 @@ class Page4Controller extends PageControllerBase {
   Product get _product => _model.product;
   bool get _loading => _model.loading;
   bool get pageHasData => productHasAllDataForPage(_product);
-  static bool productHasAllDataForPage(Product product) =>
-      product.vegetarianStatus != null && product.veganStatus != null;
 
-  VegStatus? get vegetarianStatus => _product.vegetarianStatus;
-  VegStatus? get veganStatus => _product.veganStatus;
+  static bool productHasAllDataForPage(Product product) =>
+      product.vegetarianStatus != null
+          && product.veganStatus != null
+          && product.vegetarianStatusSource != VegStatusSource.open_food_facts
+          && product.veganStatusSource != VegStatusSource.open_food_facts;
+
+  VegStatus? get vegetarianStatus {
+    if (_product.vegetarianStatusSource == VegStatusSource.open_food_facts) {
+      return null;
+    }
+    return _product.vegetarianStatus;
+  }
+  VegStatus? get veganStatus {
+    if (_product.veganStatusSource == VegStatusSource.open_food_facts) {
+      return null;
+    }
+    return _product.veganStatus;
+  }
   set vegetarianStatus(VegStatus? val) {
     _model.updateProduct(fn: (v) => v.vegetarianStatus = val);
     if (val == VegStatus.negative

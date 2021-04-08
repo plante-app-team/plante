@@ -37,7 +37,25 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..ingredients = "1, 2, 3"
+      ..ingredientsText = "1, 2, 3"
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
+    await tester.superPump(ProductPageWrapper(initialProduct));
+    expect(find.byType(InitProductPage), findsNothing);
+    expect(find.byType(DisplayProductPage), findsOneWidget);
+  });
+
+  testWidgets("init_product_page is not shown when "
+              "veg-statuses are filled by OFF", (WidgetTester tester) async {
+    GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "name"
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts // OFF!
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
+      ..ingredientsText = "1, 2, 3"
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
     await tester.superPump(ProductPageWrapper(initialProduct));

@@ -74,12 +74,20 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
             specifiedType:
                 const FullType(BuiltList, const [const FullType(String)])));
     }
-    value = object.ingredients;
+    value = object.ingredientsText;
     if (value != null) {
       result
-        ..add('ingredients')
+        ..add('ingredientsText')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
+    }
+    value = object.ingredientsAnalyzed;
+    if (value != null) {
+      result
+        ..add('ingredientsAnalyzed')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(Ingredient)])));
     }
     value = object.imageFront;
     if (value != null) {
@@ -145,9 +153,15 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
                       BuiltList, const [const FullType(String)]))!
               as BuiltList<Object>);
           break;
-        case 'ingredients':
-          result.ingredients = serializers.deserialize(value,
+        case 'ingredientsText':
+          result.ingredientsText = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
+          break;
+        case 'ingredientsAnalyzed':
+          result.ingredientsAnalyzed.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(Ingredient)]))!
+              as BuiltList<Object>);
           break;
         case 'imageFront':
           result.imageFront = serializers.deserialize(value,
@@ -182,7 +196,9 @@ class _$Product extends Product {
   @override
   final BuiltList<String>? categories;
   @override
-  final String? ingredients;
+  final String? ingredientsText;
+  @override
+  final BuiltList<Ingredient>? ingredientsAnalyzed;
   @override
   final Uri? imageFront;
   @override
@@ -200,7 +216,8 @@ class _$Product extends Product {
       this.name,
       this.brands,
       this.categories,
-      this.ingredients,
+      this.ingredientsText,
+      this.ingredientsAnalyzed,
       this.imageFront,
       this.imageIngredients})
       : super._() {
@@ -226,7 +243,8 @@ class _$Product extends Product {
         name == other.name &&
         brands == other.brands &&
         categories == other.categories &&
-        ingredients == other.ingredients &&
+        ingredientsText == other.ingredientsText &&
+        ingredientsAnalyzed == other.ingredientsAnalyzed &&
         imageFront == other.imageFront &&
         imageIngredients == other.imageIngredients;
   }
@@ -242,15 +260,17 @@ class _$Product extends Product {
                             $jc(
                                 $jc(
                                     $jc(
-                                        $jc($jc(0, barcode.hashCode),
-                                            vegetarianStatus.hashCode),
-                                        vegetarianStatusSource.hashCode),
-                                    veganStatus.hashCode),
-                                veganStatusSource.hashCode),
-                            name.hashCode),
-                        brands.hashCode),
-                    categories.hashCode),
-                ingredients.hashCode),
+                                        $jc(
+                                            $jc($jc(0, barcode.hashCode),
+                                                vegetarianStatus.hashCode),
+                                            vegetarianStatusSource.hashCode),
+                                        veganStatus.hashCode),
+                                    veganStatusSource.hashCode),
+                                name.hashCode),
+                            brands.hashCode),
+                        categories.hashCode),
+                    ingredientsText.hashCode),
+                ingredientsAnalyzed.hashCode),
             imageFront.hashCode),
         imageIngredients.hashCode));
   }
@@ -266,7 +286,8 @@ class _$Product extends Product {
           ..add('name', name)
           ..add('brands', brands)
           ..add('categories', categories)
-          ..add('ingredients', ingredients)
+          ..add('ingredientsText', ingredientsText)
+          ..add('ingredientsAnalyzed', ingredientsAnalyzed)
           ..add('imageFront', imageFront)
           ..add('imageIngredients', imageIngredients))
         .toString();
@@ -314,9 +335,16 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   set categories(ListBuilder<String>? categories) =>
       _$this._categories = categories;
 
-  String? _ingredients;
-  String? get ingredients => _$this._ingredients;
-  set ingredients(String? ingredients) => _$this._ingredients = ingredients;
+  String? _ingredientsText;
+  String? get ingredientsText => _$this._ingredientsText;
+  set ingredientsText(String? ingredientsText) =>
+      _$this._ingredientsText = ingredientsText;
+
+  ListBuilder<Ingredient>? _ingredientsAnalyzed;
+  ListBuilder<Ingredient> get ingredientsAnalyzed =>
+      _$this._ingredientsAnalyzed ??= new ListBuilder<Ingredient>();
+  set ingredientsAnalyzed(ListBuilder<Ingredient>? ingredientsAnalyzed) =>
+      _$this._ingredientsAnalyzed = ingredientsAnalyzed;
 
   Uri? _imageFront;
   Uri? get imageFront => _$this._imageFront;
@@ -340,7 +368,8 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _name = $v.name;
       _brands = $v.brands?.toBuilder();
       _categories = $v.categories?.toBuilder();
-      _ingredients = $v.ingredients;
+      _ingredientsText = $v.ingredientsText;
+      _ingredientsAnalyzed = $v.ingredientsAnalyzed?.toBuilder();
       _imageFront = $v.imageFront;
       _imageIngredients = $v.imageIngredients;
       _$v = null;
@@ -374,7 +403,8 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               name: name,
               brands: _brands?.build(),
               categories: _categories?.build(),
-              ingredients: ingredients,
+              ingredientsText: ingredientsText,
+              ingredientsAnalyzed: _ingredientsAnalyzed?.build(),
               imageFront: imageFront,
               imageIngredients: imageIngredients);
     } catch (_) {
@@ -384,6 +414,9 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
         _brands?.build();
         _$failedField = 'categories';
         _categories?.build();
+
+        _$failedField = 'ingredientsAnalyzed';
+        _ingredientsAnalyzed?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Product', _$failedField, e.toString());

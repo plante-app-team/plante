@@ -108,13 +108,15 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           context.strings.display_product_page_ingredients,
                           style: Theme.of(context).textTheme.headline6)
                     ]),
-                    collapsed: Text(_product.ingredients.toString(), softWrap: true, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    collapsed: Text(_product.ingredientsText.toString(), softWrap: true, maxLines: 1, overflow: TextOverflow.ellipsis),
                     expanded: Column(children: [
                       ProductImagesHelper.productImageWidget(
                           _product, ProductImageType.INGREDIENTS),
-                      _wideStartText(_product.ingredients.toString())
+                      _wideStartText(_product.ingredientsText.toString())
                     ]),
-                  )
+                  ),
+
+
                 ]))
           ]))));
   }
