@@ -16,8 +16,8 @@ import 'product_page_wrapper_test.mocks.dart';
 
 @GenerateMocks([ProductsManager])
 void main() {
-  setUp(() {
-    GetIt.I.reset();
+  setUp(() async {
+    await GetIt.I.reset();
   });
 
   testWidgets("init page is shown when product is not filled", (WidgetTester tester) async {

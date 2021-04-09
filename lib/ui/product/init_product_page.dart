@@ -14,22 +14,43 @@ import '_page4_controller.dart';
 import '_page_controller_base.dart';
 
 typedef DoneCallback = void Function();
+typedef ProductUpdatedCallback = void Function(Product updatedProduct);
+
+enum InitProductSubpage {
+  PAGE1,
+  PAGE2,
+  PAGE3,
+  PAGE4
+}
 
 class InitProductPage extends StatefulWidget {
   final Product initialProduct;
-  final DoneCallback callback;
+  final DoneCallback? doneCallback;
+  final ProductUpdatedCallback? productUpdatedCallback;
+  final List<InitProductSubpage>? requiredPages;
   final Key? key;
 
-  InitProductPage(this.initialProduct, this.callback, {this.key});
+  InitProductPage(
+      this.initialProduct,
+      {this.doneCallback,
+       this.productUpdatedCallback,
+       this.key,
+       this.requiredPages});
 
   @override
-  _InitProductPageState createState() =>
-      _InitProductPageState(initialProduct, callback, this.key);
+  _InitProductPageState createState() => _InitProductPageState(
+      initialProduct,
+      doneCallback,
+      productUpdatedCallback,
+      key,
+      requiredPages);
 }
 
 class _InitProductPageState extends State<InitProductPage> with RestorationMixin {
-  final Key? key;
-  final DoneCallback _callback;
+  final Key? _key;
+  final DoneCallback? _doneCallback;
+  final ProductUpdatedCallback? _productUpdatedCallback;
+  final List<InitProductSubpage>? _requiredPages;
 
   final InitProductPageModel _model;
 
@@ -38,8 +59,15 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
   bool _controllersInited = false;
   final _pagesControllers = <PageControllerBase>[];
 
-  _InitProductPageState(Product initialProduct, this._callback, this.key)
-      : _model = InitProductPageModel(initialProduct);
+  _InitProductPageState(
+      Product initialProduct,
+      this._doneCallback,
+      this._productUpdatedCallback,
+      this._key,
+      this._requiredPages)
+      : _model = InitProductPageModel(initialProduct) {
+    assert(_requiredPages == null || _requiredPages!.isNotEmpty);
+  }
 
   /// NOTE: multiple product pages are not supported
   @override
@@ -57,6 +85,7 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
     });
     _model.productChanges.listen((event) {
       setState(() {
+        _productUpdatedCallback?.call(event.product);
         // Boom! Widgets update started
       });
     });
@@ -71,23 +100,48 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
       final finish = () {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(context.strings.init_product_page_done_thanks)));
-        _callback.call();
+        _doneCallback?.call();
         Navigator.of(context).pop();
       };
       final productsManager = GetIt.I.get<ProductsManager>();
 
+      final allPagesMakers = <_PageControllerMaker>[];
+      allPagesMakers.add((btnText, btnAction) =>
+          Page1Controller(_model, productsManager, btnText, btnAction));
+      allPagesMakers.add((btnText, btnAction) =>
+          Page2Controller(_model, productsManager, btnText, btnAction));
+      allPagesMakers.add((btnText, btnAction) =>
+          Page3Controller(_model, productsManager, btnText, btnAction));
+      allPagesMakers.add((btnText, btnAction) =>
+          Page4Controller(_model, productsManager, btnText, btnAction));
+
       final pagesMakers = <_PageControllerMaker>[];
-      if (!Page1Controller.productHasAllDataForPage(_model.product)) {
-        pagesMakers.add((btnText, btnAction) => Page1Controller(_model, productsManager, btnText, btnAction));
-      }
-      if (!Page2Controller.productHasAllDataForPage(_model.product)) {
-        pagesMakers.add((btnText, btnAction) => Page2Controller(_model, productsManager, btnText, btnAction));
-      }
-      if (!Page3Controller.productHasAllDataForPage(_model.product)) {
-        pagesMakers.add((btnText, btnAction) => Page3Controller(_model, productsManager, btnText, btnAction));
-      }
-      if (!Page4Controller.productHasAllDataForPage(_model.product)) {
-        pagesMakers.add((btnText, btnAction) => Page4Controller(_model, productsManager, btnText, btnAction));
+      if (_requiredPages != null) {
+        if (_requiredPages!.contains(InitProductSubpage.PAGE1)) {
+          pagesMakers.add(allPagesMakers[0]);
+        }
+        if (_requiredPages!.contains(InitProductSubpage.PAGE2)) {
+          pagesMakers.add(allPagesMakers[1]);
+        }
+        if (_requiredPages!.contains(InitProductSubpage.PAGE3)) {
+          pagesMakers.add(allPagesMakers[2]);
+        }
+        if (_requiredPages!.contains(InitProductSubpage.PAGE4)) {
+          pagesMakers.add(allPagesMakers[3]);
+        }
+      } else {
+        if (!Page1Controller.productHasAllDataForPage(_model.product)) {
+          pagesMakers.add(allPagesMakers[0]);
+        }
+        if (!Page2Controller.productHasAllDataForPage(_model.product)) {
+          pagesMakers.add(allPagesMakers[1]);
+        }
+        if (!Page3Controller.productHasAllDataForPage(_model.product)) {
+          pagesMakers.add(allPagesMakers[2]);
+        }
+        if (!Page4Controller.productHasAllDataForPage(_model.product)) {
+          pagesMakers.add(allPagesMakers[3]);
+        }
       }
 
       final lastIndex = pagesMakers.length - 1;
@@ -109,7 +163,7 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
     }
 
     return Scaffold(
-        key: key,
+        key: _key,
         body: SafeArea(child: Stack(children: [
           if (_model.loading) SizedBox(width: double.infinity, child: LinearProgressIndicator()),
           CustomizableStepper(

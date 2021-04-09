@@ -3,27 +3,39 @@ import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 
+typedef ProductUpdatedCallback = void Function(Product updatedProduct);
+
 class ProductPageWrapper extends StatefulWidget {
   final Product initialProduct;
+  final ProductUpdatedCallback? productUpdatedCallback;
 
-  ProductPageWrapper(this.initialProduct);
+  ProductPageWrapper(this.initialProduct, {this.productUpdatedCallback});
 
   @override
-  _ProductPageWrapperState createState() => _ProductPageWrapperState(this.initialProduct);
+  _ProductPageWrapperState createState() => _ProductPageWrapperState(
+      this.initialProduct,
+      this.productUpdatedCallback);
 }
 
 class _ProductPageWrapperState extends State<ProductPageWrapper> {
   final Product _initialProduct;
+  final ProductUpdatedCallback? _productUpdatedCallback;
 
-  _ProductPageWrapperState(this._initialProduct);
+  _ProductPageWrapperState(this._initialProduct, this._productUpdatedCallback);
 
   @override
   Widget build(BuildContext context) {
     final Widget page;
     if (!_isProductFilledEnough()) {
-      page = InitProductPage(_initialProduct, (){}, key: Key("init_product_page"));
+      page = InitProductPage(
+          _initialProduct,
+          key: Key("init_product_page"),
+          productUpdatedCallback: _productUpdatedCallback);
     } else {
-      page = DisplayProductPage(_initialProduct, key: Key("display_product_page"));
+      page = DisplayProductPage(
+          _initialProduct,
+          key: Key("display_product_page"),
+          productUpdatedCallback: _productUpdatedCallback);
     }
     return Container(child: page);
   }

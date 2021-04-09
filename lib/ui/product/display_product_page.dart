@@ -6,21 +6,31 @@ import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 
 import '_product_images_helper.dart';
+import 'init_product_page.dart';
+
+typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
 class DisplayProductPage extends StatefulWidget {
   final Key? key;
   final Product _initialProduct;
+  final ProductUpdatedCallback? productUpdatedCallback;
 
-  DisplayProductPage(this._initialProduct, {this.key});
+  DisplayProductPage(
+      this._initialProduct,
+      {this.key,
+       this.productUpdatedCallback});
 
   @override
-  _DisplayProductPageState createState() =>
-      _DisplayProductPageState(this._initialProduct, this.key);
+  _DisplayProductPageState createState() => _DisplayProductPageState(
+      this._initialProduct,
+      this.key,
+      this.productUpdatedCallback);
 }
 
 class _DisplayProductPageState extends State<DisplayProductPage> {
   final Key? _key;
-  final Product _product;
+  Product _product;
+  final ProductUpdatedCallback? _productUpdatedCallback;
 
   String _vegetarianStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegetarian}"
@@ -70,7 +80,10 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     }
   }
 
-  _DisplayProductPageState(this._product, this._key);
+  _DisplayProductPageState(
+      this._product,
+      this._key,
+      this._productUpdatedCallback);
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +122,28 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                     _wideStartText(
                         _vegStatusSource(_product.veganStatusSource!),
                         key: "vegan_status_source"),
+
+                  SizedBox(height: 10),
+
+                  if (_product.vegetarianStatusSource == VegStatusSource.open_food_facts
+                      || _product.veganStatusSource == VegStatusSource.open_food_facts)
+                    OutlinedButton(
+                        child: Text(context.strings.display_product_page_help_with_veg_statuses),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => InitProductPage(
+                                _product,
+                                key: Key("init_product_page"),
+                                requiredPages: [InitProductSubpage.PAGE4],
+                                productUpdatedCallback: (product) {
+                                  _productUpdatedCallback?.call(_product);
+                                  setState(() {
+                                    _product = product;
+                                  });
+                                })),
+                          );
+                        }),
 
                   SizedBox(height: 10),
 

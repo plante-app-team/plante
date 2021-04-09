@@ -53,12 +53,6 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void didPopNext() {
     if (ModalRoute.of(context)?.isActive == true) {
       this.controller?.resumeCamera();
-      if (_barcode != null) {
-        // Let's request the product again
-        final barcode = _barcode;
-        _barcode = null;
-        _onNewScanData(barcode!);
-      }
     }
   }
 
@@ -191,7 +185,12 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ProductPageWrapper(product)),
+      MaterialPageRoute(builder: (context) =>
+          ProductPageWrapper(product, productUpdatedCallback: (product) {
+            setState(() {
+              _foundProduct = product;
+            });
+      })),
     );
   }
 }

@@ -41,17 +41,21 @@ class Page4Controller extends PageControllerBase {
     return _product.veganStatus;
   }
   set vegetarianStatus(VegStatus? val) {
-    _model.updateProduct(fn: (v) => v.vegetarianStatus = val);
+    _model.updateProduct(fn: (v) => v
+      ..vegetarianStatus = val
+      ..vegetarianStatusSource = VegStatusSource.community);
     if (val == VegStatus.negative
         || val == VegStatus.possible
         || val == VegStatus.unknown) {
       // 100% of not-vegetarian products are also not-vegan,
-      // same goes for possibly vegetarian and uknown.
+      // same goes for possibly vegetarian and unknown.
       veganStatus = val;
     }
   }
   set veganStatus(VegStatus? val) {
-    _model.updateProduct(fn: (v) => v.veganStatus = val);
+    _model.updateProduct(fn: (v) => v
+      ..veganStatus = val
+      ..veganStatusSource = VegStatusSource.community);
     if (val == VegStatus.positive) {
       // 100% of vegan products are also vegetarian
       vegetarianStatus = val;
@@ -91,7 +95,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   vegetarianStatus = VegStatus.positive;
                 }),
-          ]),
+          ], key: Key("vegetarian_positive")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.negative,
@@ -104,7 +108,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   vegetarianStatus = VegStatus.negative;
                 }),
-          ]),
+          ], key: Key("vegetarian_negative")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.possible,
@@ -121,7 +125,7 @@ class Page4Controller extends PageControllerBase {
                 child: Icon(Icons.zoom_out_map_outlined),
                 onTap: () { _showPossibleVegStatusTooltip(context); },
             ),
-          ]),
+          ], key: Key("vegetarian_possibly")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.unknown,
@@ -134,7 +138,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   vegetarianStatus = VegStatus.unknown;
                 }),
-          ]),
+          ], key: Key("vegetarian_unknown")),
 
           SizedBox(height: 50),
 
@@ -151,7 +155,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   veganStatus = VegStatus.positive;
                 }),
-          ]),
+          ], key: Key("vegan_positive")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.negative,
@@ -164,7 +168,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   veganStatus = VegStatus.negative;
                 }),
-          ]),
+          ], key: Key("vegan_negative")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.possible,
@@ -181,7 +185,7 @@ class Page4Controller extends PageControllerBase {
               child: Icon(Icons.zoom_out_map_outlined),
               onTap: () { _showPossibleVegStatusTooltip(context); },
             ),
-          ]),
+          ], key: Key("vegan_possible")),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.unknown,
@@ -194,7 +198,7 @@ class Page4Controller extends PageControllerBase {
                 onTap: () {
                   veganStatus = VegStatus.unknown;
                 }),
-          ]),
+          ], key: Key("vegan_unknown")),
         ])),
       )
     ]);

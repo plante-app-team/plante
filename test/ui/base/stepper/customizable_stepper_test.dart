@@ -5,8 +5,8 @@ import 'package:untitled_vegan_app/ui/base/stepper/customizable_stepper.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 
 void main() {
-  setUp(() {
-    GetIt.I.reset();
+  setUp(() async {
+    await GetIt.I.reset();
   });
 
   Future<CustomizableStepperController> init(WidgetTester tester) async {

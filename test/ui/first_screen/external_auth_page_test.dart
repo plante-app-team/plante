@@ -15,8 +15,8 @@ import 'external_auth_page_test.mocks.dart';
 
 @GenerateMocks([GoogleAuthorizer, Backend])
 void main() {
-  setUp(() {
-    GetIt.I.reset();
+  setUp(() async {
+    await GetIt.I.reset();
   });
 
   testWidgets("App name is concatenated with greeting", (WidgetTester tester) async {

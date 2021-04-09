@@ -22,8 +22,8 @@ void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
 
-  setUp(() {
-    GetIt.I.reset();
+  setUp(() async {
+    await GetIt.I.reset();
 
     photosTaker = MockPhotosTaker();
     when(photosTaker.takeAndCropPhoto(any)).thenAnswer((_) async =>
@@ -51,7 +51,7 @@ void main() {
     };
     final context = await tester.superPump(InitProductPage(
         Product((v) => v.barcode = "123"),
-        callback));
+        doneCallback: callback));
     await tester.enterText(
         find.byKey(Key("name")),
         'Lemon drink');
@@ -112,7 +112,9 @@ void main() {
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..ingredientsText = "water, lemon"
       ..vegetarianStatus = VegStatus.possible
-      ..veganStatus = VegStatus.possible);
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.community);
     expect(finalProduct, equals(expectedProduct));
   });
 
@@ -120,7 +122,7 @@ void main() {
     final initialProduct = Product((v) => v
       ..barcode = "123"
       ..name = "Hello there");
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(Key("page1")), findsNothing);
     expect(find.byKey(Key("page2")), findsWidgets);
@@ -131,7 +133,7 @@ void main() {
       ..barcode = "123"
       ..name = "Hello there"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(Key("page1")), findsNothing);
     expect(find.byKey(Key("page2")), findsNothing);
@@ -145,7 +147,7 @@ void main() {
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..ingredientsText = "water");
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(Key("page1")), findsNothing);
     expect(find.byKey(Key("page2")), findsNothing);
@@ -166,7 +168,7 @@ void main() {
     final callback = () {
       done = true;
     };
-    await tester.superPump(InitProductPage(initialProduct, callback));
+    await tester.superPump(InitProductPage(initialProduct, doneCallback: callback));
 
     // At start at page1
     expect(find.byKey(Key("page1")), findsWidgets);
@@ -200,7 +202,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts);
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     // At start at page1
     expect(find.byKey(Key("page1")), findsWidgets);
@@ -225,8 +227,7 @@ void main() {
 
   testWidgets("can't leave page 1 without product name", (WidgetTester tester) async {
     await tester.superPump(InitProductPage(
-        Product((v) => v.barcode = "123"),
-        () {}));
+        Product((v) => v.barcode = "123")));
 
     await tester.tap(
         find.byKey(Key("page1_next_btn")));
@@ -241,7 +242,7 @@ void main() {
     final initialProduct = Product((v) => v
       ..barcode = "123"
       ..name = "Hello there");
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     await tester.tap(
         find.byKey(Key("page2_next_btn")));
@@ -257,7 +258,7 @@ void main() {
       ..barcode = "123"
       ..name = "Hello there"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     await tester.tap(
         find.byKey(Key("page3_next_btn")));
@@ -301,7 +302,8 @@ void main() {
     final callback = () {
       done = true;
     };
-    final context = await tester.superPump(InitProductPage(initialProduct, callback));
+    final context = await tester.superPump(InitProductPage(
+        initialProduct, doneCallback: callback));
 
     await tester.tap(
         find.byKey(Key("page4_next_btn")));
@@ -334,7 +336,7 @@ void main() {
       ..barcode = "123"
       ..name = "Hello there"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     // If there's no photo, then there's no ingredients TextField
     expect(find.byKey(Key("ingredients")), findsNothing);
@@ -352,14 +354,14 @@ void main() {
       ..barcode = "123"
       ..brands.addAll(["brand1", "brand2"])
       ..categories.addAll(["category1", "category2"]));
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.text("brand1, brand2"), findsOneWidget);
     expect(find.text("category1, category2"), findsOneWidget);
   });
 
   testWidgets("veg statuses radio buttons not selected when "
-              "statuses filled by OFF", (WidgetTester tester) async {
+      "statuses filled by OFF", (WidgetTester tester) async {
     // Product has everything except for name, veg-statuses source is OFF
     final initialProduct = Product((v) => v
       ..name = "name"
@@ -371,7 +373,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts);
-    await tester.superPump(InitProductPage(initialProduct, (){}));
+    await tester.superPump(InitProductPage(initialProduct));
 
     // At page 4
     expect(find.byKey(Key("page1")), findsNothing);
@@ -384,4 +386,33 @@ void main() {
         buttons.where((button) => button.groupValue != null).isEmpty,
         isTrue);
   });
+
+  testWidgets("required pages shown even when product already has page's data",
+          (WidgetTester tester) async {
+    // Product already has name
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Hello there");
+    await tester.superPump(
+        InitProductPage(initialProduct, requiredPages: [InitProductSubpage.PAGE1]));
+
+    expect(find.byKey(Key("page1")), findsWidgets);
+    expect(find.byKey(Key("page2")), findsNothing);
+    expect(find.byKey(Key("page3")), findsNothing);
+    expect(find.byKey(Key("page4")), findsNothing);
+  });
+
+  testWidgets("only required pages shown even when product doesn't have data of other pages",
+          (WidgetTester tester) async {
+        // Product doesn't have a name
+        final initialProduct = Product((v) => v
+          ..barcode = "123");
+        await tester.superPump(
+            InitProductPage(initialProduct, requiredPages: [InitProductSubpage.PAGE2]));
+
+        expect(find.byKey(Key("page1")), findsNothing);
+        expect(find.byKey(Key("page2")), findsWidgets);
+        expect(find.byKey(Key("page3")), findsNothing);
+        expect(find.byKey(Key("page4")), findsNothing);
+      });
 }

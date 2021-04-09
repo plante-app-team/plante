@@ -71,5 +71,6 @@
       "display_product_page_veg_status_source_off": "automatic ingredients analysis",
       "display_product_page_veg_status_source_moderator": "moderator",
       "display_product_page_ingredients": "Ingredients:",
-      "display_product_page_ingredients_analysis": "Automatic ingredients analysis:"
+      "display_product_page_ingredients_analysis": "Automatic ingredients analysis:",
+      "display_product_page_help_with_veg_statuses": "Help with veg-statuses"
 }
