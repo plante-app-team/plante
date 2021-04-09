@@ -467,4 +467,24 @@ void main() {
         veganStatus: VegStatus.negative);
     expect(result.isRight, isTrue);
   });
+
+  test('send report', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(
+        ".*make_report.*",
+        """ { "result": "ok" } """);
+
+    final result = await backend.sendReport(
+        "123",
+        "that's a baaaad product");
+    expect(result.isLeft, isTrue);
+  });
 }

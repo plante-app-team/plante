@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:either_option/either_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,7 @@ import 'package:untitled_vegan_app/model/ingredient.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/products_manager.dart';
 import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -17,9 +19,10 @@ import 'package:untitled_vegan_app/l10n/strings.dart';
 import '../../widget_tester_extension.dart';
 import 'display_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager])
+@GenerateMocks([ProductsManager, Backend])
 void main() {
   late MockProductsManager productsManager;
+  late MockBackend backend;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -29,6 +32,10 @@ void main() {
             (invoc) async => invoc.positionalArguments[0]);
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
+
+    backend = MockBackend();
+    when(backend.sendReport(any, any)).thenAnswer((_) async => Left(None()));
+    GetIt.I.registerSingleton<Backend>(backend);
   });
 
   testWidgets("product is displayed", (WidgetTester tester) async {
@@ -210,5 +217,30 @@ void main() {
     expect(veganStatusSource.data, equals(
         "${context.strings.display_product_page_veg_status_source}"
             "${context.strings.display_product_page_veg_status_source_community}"));
+  });
+
+  testWidgets("send report", (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = "123"
+      ..name = "My product"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = "Water, salt, sugar");
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.tap(find.text(context.strings.display_product_page_report));
+    await tester.pumpAndSettle();
+
+    verifyNever(backend.sendReport("123", "Bad, bad product!"));
+
+    await tester.enterText(find.byKey(Key("report_text")), "Bad, bad product!");
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(context.strings.display_product_page_report_send));
+    await tester.pumpAndSettle();
+
+    verify(backend.sendReport("123", "Bad, bad product!")).called(1);
   });
 }

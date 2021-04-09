@@ -69,5 +69,8 @@
     "display_product_page_veg_status_source_moderator": "модератор",
     "display_product_page_ingredients": "Состав:",
     "display_product_page_ingredients_analysis": "Автоматический анализ состава:",
-    "display_product_page_help_with_veg_statuses": "Помочь понять вег-статус"
+    "display_product_page_help_with_veg_statuses": "Помочь понять вег-статус",
+    "display_product_page_report": "Пожаловаться",
+    "display_product_page_report_send": "Отправить",
+    "display_product_page_report_sent": "Жалоба отправлена"
 }

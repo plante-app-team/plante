@@ -121,4 +121,11 @@ class MockBackend extends _i1.Mock implements _i14.Backend {
               returnValue: Future.value(
                   _FakeEither<_i17.None<dynamic>, _i16.BackendError>()))
           as _i8.Future<_i5.Either<_i17.None<dynamic>, _i16.BackendError>>);
+  @override
+  _i8.Future<_i5.Either<_i17.None<dynamic>, _i16.BackendError>> sendReport(
+          String? barcode, String? reportText) =>
+      (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
+              returnValue: Future.value(
+                  _FakeEither<_i17.None<dynamic>, _i16.BackendError>()))
+          as _i8.Future<_i5.Either<_i17.None<dynamic>, _i16.BackendError>>);
 }

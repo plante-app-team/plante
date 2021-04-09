@@ -1,9 +1,11 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
 
 import '_product_images_helper.dart';
 import 'init_product_page.dart';
@@ -31,6 +33,15 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   final Key? _key;
   Product _product;
   final ProductUpdatedCallback? _productUpdatedCallback;
+
+  final _reportTextController = TextEditingController();
+  bool _reportSendAllowed = false;
+  bool _loading = false;
+
+  _DisplayProductPageState(
+      this._product,
+      this._key,
+      this._productUpdatedCallback);
 
   String _vegetarianStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegetarian}"
@@ -80,11 +91,6 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     }
   }
 
-  _DisplayProductPageState(
-      this._product,
-      this._key,
-      this._productUpdatedCallback);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +133,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
                   if (_product.vegetarianStatusSource == VegStatusSource.open_food_facts
                       || _product.veganStatusSource == VegStatusSource.open_food_facts)
-                    OutlinedButton(
+                    _atStart(OutlinedButton(
                         child: Text(context.strings.display_product_page_help_with_veg_statuses),
                         onPressed: () {
                           Navigator.push(
@@ -143,7 +149,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                                   });
                                 })),
                           );
-                        }),
+                        })),
 
                   SizedBox(height: 10),
 
@@ -172,17 +178,29 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                     collapsed: Text("..."),
                     expanded: _ingredientsAnalysisTable(key: "ingredients_analysis_table"),
                   ),
+
+                  OutlinedButton(
+                      child: Text(context.strings.display_product_page_report),
+                      onPressed: _onReportClick),
                 ]))
           ]))));
   }
 
   Widget _wideStartText(String str, {String? key, TextStyle? style}) =>
+      _atStart(Text(
+          str,
+          key: key != null ? Key(key) : null,
+          style: style));
+
+  Widget _atStart(Widget child) =>
       Container(
-        alignment: AlignmentDirectional.centerStart,
-        child: Text(
-            str,
-            key: key != null ? Key(key) : null,
-            style: style));
+          alignment: AlignmentDirectional.centerStart,
+          child: child);
+
+  Widget _atEnd(Widget child) =>
+      Container(
+          alignment: AlignmentDirectional.centerEnd,
+          child: child);
 
   bool _hasIngredientsAnalysis() =>
       _product.ingredientsAnalyzed != null
@@ -209,5 +227,63 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           1: FlexColumnWidth(2),
           2: FlexColumnWidth(2),
         });
+  }
+
+  void _onReportClick() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            _reportTextController.addListener(() {
+              setState(() {
+                _reportSendAllowed = _reportTextController.text.trim().length > 3;
+              });
+            });
+
+            final onSendClick = () async {
+              setState(() {
+                _loading = true;
+              });
+              try {
+                final result = await GetIt.I.get<Backend>()
+                    .sendReport(_product.barcode, _reportTextController.text);
+                if (result.isLeft) {
+                  _reportTextController.clear();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          context.strings.display_product_page_report_sent)));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          context.strings.global_something_went_wrong)));
+                }
+              } finally {
+                setState(() {
+                  _loading = false;
+                });
+              }
+            };
+
+            return AlertDialog(
+              title: Row(children: [
+                if (_loading) CircularProgressIndicator(),
+                Text(context.strings.display_product_page_report)
+              ]),
+              content: TextField(
+                key: Key("report_text"),
+                maxLines: null,
+                controller: _reportTextController),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(context.strings.display_product_page_report_send),
+                  onPressed: _reportSendAllowed && !_loading ? onSendClick : null),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

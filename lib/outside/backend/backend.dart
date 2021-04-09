@@ -141,6 +141,19 @@ class Backend {
       params["veganStatus"] = veganStatus.name;
     }
     var response = await _backendGet("create_update_product/", params);
+    return _noneOrErrorFrom(response);
+  }
+
+  Future<Either<None, BackendError>> sendReport(
+      String barcode, String reportText) async {
+    final params = Map<String, String>();
+    params['barcode'] = barcode;
+    params['text'] = reportText;
+    var response = await _backendGet("make_report/", params);
+    return _noneOrErrorFrom(response);
+  }
+
+  Either<None, BackendError> _noneOrErrorFrom(Response response) {
     if (response.statusCode != 200) {
       return Right(_errFromResp(response));
     }
