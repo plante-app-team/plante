@@ -26,7 +26,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(title: Text(context.strings.main_page_title)),
       body: _pageOptions[_selectedPage],
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
@@ -45,7 +45,7 @@ class _MainPageState extends State<MainPage> {
             _selectedPage = index;
           });
         },
-      )
+      )*/
     );
   }
 }
