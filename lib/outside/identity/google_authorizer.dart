@@ -1,4 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/identity/google_user.dart';
 
 class GoogleAuthorizer {
@@ -10,14 +11,14 @@ class GoogleAuthorizer {
     try {
       final account = await googleSignIn.signIn();
       if (account == null) {
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
+        Log.w("GoogleAuthorizer: googleSignIn.signIn returned null");
         return null;
       }
 
       final authentication = await account.authentication;
       final idToken = authentication.idToken;
       if (idToken == null) {
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
+        Log.w("GoogleAuthorizer: authentication.idToken returned null");
         return null;
       }
 
@@ -27,8 +28,7 @@ class GoogleAuthorizer {
           idToken,
           DateTime.now().toUtc());
     } catch (error) {
-      // TODO(https://trello.com/c/XWAE5UVB/): report an error
-      print(error);
+      Log.e("GoogleAuthorizer: exception occurred", ex: error);
       return null;
     }
   }

@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/outside/products_manager.dart';
 import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';
@@ -168,8 +169,8 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void _toggleFlash() async {
     try {
       await controller?.toggleFlash();
-    } on qr.CameraException {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+    } on qr.CameraException catch (e) {
+      Log.w("QrScanPage._toggleFlash error", ex: e);
     }
   }
 

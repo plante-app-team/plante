@@ -1,4 +1,5 @@
 import 'package:http/http.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 
 class HttpClient extends BaseClient {
   final Client _realClient;
@@ -14,6 +15,6 @@ class HttpClient extends BaseClient {
   void close() => _realClient.close();
 
   void _logRequest(BaseRequest request) {
-    // TODO(https://trello.com/c/XWAE5UVB/): log info
+    Log.i("HttpClient request: ${request.url.toString()}");
   }
 }

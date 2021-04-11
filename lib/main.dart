@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/base/base.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/di.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
@@ -13,6 +14,8 @@ import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Log.init();
+  Log.i("App start");
   initDI();
   final initialUserParams = await GetIt.I.get<UserParamsController>().getUserParams();
 

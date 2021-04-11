@@ -1,6 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 
 part 'veg_status_source.g.dart';
 
@@ -21,8 +22,8 @@ class VegStatusSource extends EnumClass {
   static VegStatusSource? safeValueOf(String name) {
     try {
       return valueOf(name);
-    } catch (ArgumentError) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+    } on ArgumentError catch (e) {
+      Log.w("Unknown VegStatusSource name: $name", ex: e);
       return null;
     }
   }

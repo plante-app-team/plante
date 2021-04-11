@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:untitled_vegan_app/model/ingredient.dart';
 
@@ -74,7 +73,6 @@ class ProductsManager {
       var vegetarianStatusSource = VegStatusSource.safeValueOf(backendProduct?.vegetarianStatusSource ?? "");
       if (vegetarianStatusSource == null && vegetarianStatus != null) {
         vegetarianStatusSource = VegStatusSource.community;
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
       }
       result = result.rebuild((v) => v
         ..vegetarianStatus = vegetarianStatus
@@ -85,7 +83,6 @@ class ProductsManager {
       var veganStatusSource = VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "");
       if (veganStatusSource == null && veganStatus != null) {
         veganStatusSource = VegStatusSource.community;
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
       }
       result = result.rebuild((v) => v
         ..veganStatus = veganStatus
@@ -204,7 +201,6 @@ class ProductsManager {
         ingredientsTextTranslated: product.ingredientsText);
     final offResult = await _off.saveProduct(_offUser(), offProduct);
     if (offResult.error != null) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
       return null;
     }
 
@@ -219,7 +215,6 @@ class ProductsManager {
       );
       final status = await _off.addProductImage(_offUser(), image);
       if (status.error != null) {
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
         return null;
       }
     }
@@ -235,7 +230,6 @@ class ProductsManager {
       );
       final status = await _off.addProductImage(_offUser(), image);
       if (status.error != null) {
-        // TODO(https://trello.com/c/XWAE5UVB/): log warning
         return null;
       }
     }
@@ -247,7 +241,6 @@ class ProductsManager {
         vegetarianStatus: product.vegetarianStatus,
         veganStatus: product.veganStatus);
     if (backendResult.isRight) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
       return null;
     }
 

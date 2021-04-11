@@ -1,3 +1,5 @@
+import 'package:untitled_vegan_app/base/log.dart';
+
 enum Gender {
   MALE,
   FEMALE
@@ -23,7 +25,7 @@ Gender? genderFromGenderName(String genderName) {
     case "female":
       return Gender.FEMALE;
     default:
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      Log.w("Unknown gender name: $genderName");
       return null;
   }
 }

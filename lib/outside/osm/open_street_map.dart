@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:get_it/get_it.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/http_client.dart';
 import 'package:untitled_vegan_app/model/shop.dart';
 
@@ -25,13 +26,13 @@ class OpenStreetMap {
         {'data': cmd}));
 
     if (r.statusCode != 200) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      Log.w("OSM.fetchShops: ${r.statusCode}, body: ${r.body}");
       return [];
     }
 
     final shopsJson = json.decode(utf8.decode(r.bodyBytes));
     if (!shopsJson.containsKey('elements')) {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      Log.w("OSM.fetchShops: doesn't have 'elements'. JSON: $shopsJson");
       return [];
     }
 

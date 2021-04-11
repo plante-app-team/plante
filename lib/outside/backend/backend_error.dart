@@ -1,4 +1,5 @@
 import 'package:http/http.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 
 enum BackendErrorKind {
   ALREADY_REGISTERED,
@@ -30,7 +31,7 @@ class BackendError {
         break;
     }
 
-    // TODO(https://trello.com/c/XWAE5UVB/): log warning with error
+    Log.w("BackendError from JSON: $json");
     return BackendError(
         kind,
         errorStr: json["error"],
@@ -38,7 +39,10 @@ class BackendError {
   }
 
   static BackendError fromResp(Response response) {
-    // TODO(https://trello.com/c/XWAE5UVB/): log warning with error
+    Log.w("BackendError from HTTP response. "
+          "Code: ${response.statusCode}, "
+          "body: ${response.body}. "
+          "Request URL was: ${response.request?.url.toString()}");
     if (response.statusCode == 401) {
       return BackendError(
           BackendErrorKind.NOT_AUTHORIZED,

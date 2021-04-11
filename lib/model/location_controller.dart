@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 
 const PREF_LAST_KNOWN_POS = 'PREF_LAST_KNOWN_POS';
 
@@ -24,9 +25,9 @@ class LocationController {
     if (posString != null) {
       try {
         _lastKnownPosition = Position.fromMap(json.decode(posString));
-      } on FormatException {
+      } on FormatException catch (e) {
         _lastKnownPosition = null;
-        // TODO(https://trello.com/c/XWAE5UVB/): report an error
+        Log.e("LocationController exception while parsing $posString", ex: e);
       }
     }
   }

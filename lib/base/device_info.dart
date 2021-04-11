@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 
 class DeviceInfo {
   final String deviceID;
@@ -19,7 +20,7 @@ class DeviceInfo {
       return DeviceInfo(
           data.identifierForVendor, data.name, data.systemVersion);
     } else {
-      // TODO(https://trello.com/c/XWAE5UVB/): log warning
+      Log.w("DeviceInfo: platform not supported");
       return DeviceInfo("not supported", "not supported", "not supported");
     }
   }

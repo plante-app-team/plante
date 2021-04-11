@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:either_option/either_option.dart';
 import 'package:http/http.dart';
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/base/device_info.dart';
@@ -199,8 +200,8 @@ class Backend {
 Map<String, dynamic>? _jsonDecodeSafe(String str) {
   try {
     return jsonDecode(str);
-  } on FormatException {
-    // TODO(https://trello.com/c/XWAE5UVB/): log warning
+  } on FormatException catch(e) {
+    Log.w("Backend: couldn't decode safe: %str", ex: e);
     return null;
   }
 }
