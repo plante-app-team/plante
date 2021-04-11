@@ -49,7 +49,7 @@ class Backend {
         "register_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.statusCode != 200) {
-      return Right(BackendError(BackendErrorKind.OTHER));
+      return Right(BackendError.fromResp(response));
     }
 
     var json = _jsonDecodeSafe(response.body);
@@ -59,10 +59,11 @@ class Backend {
 
     if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
+      Log.i("Backend: user registered: ${userParams.toString()}");
       return Left(userParams);
     }
     if (_errFromJson(json).errorKind != BackendErrorKind.ALREADY_REGISTERED) {
-      return Right(BackendError(BackendErrorKind.OTHER));
+      return Right(_errFromJson(json));
     }
 
     // Login
@@ -71,7 +72,7 @@ class Backend {
         "login_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.statusCode != 200) {
-      return Right(BackendError(BackendErrorKind.OTHER));
+      return Right(BackendError.fromResp(response));
     }
 
     json = _jsonDecodeSafe(response.body);
@@ -80,7 +81,9 @@ class Backend {
     }
 
     if (!_isError(json)) {
-      return Left(UserParams.fromJson(json)!);
+      final userParams = UserParams.fromJson(json)!;
+      Log.i("Backend: user logged in: ${userParams.toString()}");
+      return Left(userParams);
     } else {
       return Right(_errFromJson(json));
     }

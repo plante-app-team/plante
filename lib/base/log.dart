@@ -94,22 +94,42 @@ class Log {
   }
 
   static void v(String message, {dynamic? ex, StackTrace? stacktrace}) {
-    Fimber.v(message, ex: ex, stacktrace: stacktrace);
+    if (ex == null) {
+      Fimber.v(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.v("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
   }
 
   static void d(String message, {dynamic? ex, StackTrace? stacktrace}) {
-    Fimber.d(message, ex: ex, stacktrace: stacktrace);
+    if (ex == null) {
+      Fimber.d(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.d("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
   }
 
   static void i(String message, {dynamic? ex, StackTrace? stacktrace}) {
-    Fimber.i(message, ex: ex, stacktrace: stacktrace);
+    if (ex == null) {
+      Fimber.i(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.i("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
   }
 
   static void w(String message, {dynamic? ex, StackTrace? stacktrace}) {
-    Fimber.w(message, ex: ex, stacktrace: stacktrace);
+    if (ex == null) {
+      Fimber.w(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.w("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
   }
 
   static void e(String message, {dynamic ex, StackTrace? stacktrace}) {
-    Fimber.e(message, ex: ex, stacktrace: stacktrace);
+    if (ex == null) {
+      Fimber.e(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.e("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
   }
 }

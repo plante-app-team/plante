@@ -43,6 +43,7 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
   }
 
   Future<bool> _onUserParamsSpecified(UserParams params) async {
+    Log.i("MyApp._onUserParamsSpecified: $params");
     final paramsController = GetIt.I.get<UserParamsController>();
 
     // Locally update token only

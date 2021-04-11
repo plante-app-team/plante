@@ -41,6 +41,8 @@ class BackendError {
   static BackendError fromResp(Response response) {
     Log.w("BackendError from HTTP response. "
           "Code: ${response.statusCode}, "
+          "Reason: ${response.reasonPhrase}, "
+          "Headers: ${response.headers}, "
           "body: ${response.body}. "
           "Request URL was: ${response.request?.url.toString()}");
     if (response.statusCode == 401) {
