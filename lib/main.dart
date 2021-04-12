@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
@@ -11,11 +14,25 @@ import 'package:untitled_vegan_app/ui/first_screen/init_user_page.dart';
 import 'package:untitled_vegan_app/ui/main/main_page.dart';
 import 'package:untitled_vegan_app/model/user_params_controller.dart';
 
+void main() {
+  runZonedGuarded(
+        mainImpl,
+        (Object error, StackTrace stack) {
+          onError(error.toString(), error, stack);
+        });
+}
 
-void main() async {
+void mainImpl() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.dumpErrorToConsole(details);
+    onError(details.toString(), details.exception, details.stack);
+  };
+
   Log.init();
   Log.i("App start");
+
   initDI();
   final initialUserParams = await GetIt.I.get<UserParamsController>().getUserParams();
 
@@ -25,6 +42,16 @@ void main() async {
       restorationId: 'root',
       child: MyApp(initialUserParams)));
 }
+
+void onError(String text, dynamic? exception, StackTrace? stack) {
+  Log.e(
+      text,
+      ex: exception,
+      stacktrace: stack,
+      crashAllowed: false /* We'll crash ourselves */);
+  exit(1);
+}
+
 
 class MyApp extends StatefulWidget {
   final UserParams? _initialUserParams;

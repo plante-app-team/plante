@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fimber/fimber.dart';
 import 'package:fimber_io/fimber_io.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
@@ -125,11 +126,14 @@ class Log {
     }
   }
 
-  static void e(String message, {dynamic ex, StackTrace? stacktrace}) {
+  static void e(String message, {dynamic ex, StackTrace? stacktrace, bool crashAllowed = true}) {
     if (ex == null) {
       Fimber.e(message, ex: ex, stacktrace: stacktrace);
     } else {
       Fimber.e("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+    }
+    if (crashAllowed && !kReleaseMode) {
+      throw Exception(message);
     }
   }
 }

@@ -79,8 +79,6 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
       }
 
       _callback.call(loginResult.requireLeft());
-    } catch (e) {
-      Log.e("ExternalAuthPage._onGoogleAuthClicked error", ex: e);
     } finally {
       setState(() { _loading = false; });
     }
