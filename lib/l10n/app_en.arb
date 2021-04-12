@@ -6,6 +6,7 @@
 
       "external_auth_page_search_products_with": "Look for ethical products with",
       "external_auth_page_continue_with_google": "Continue with Google",
+      "external_auth_page_google_email_not_verified": "Error: Google email is not verified",
 
       "init_user_page_title": "Let's get acquainted!!",
       "@init_user_page_title": {

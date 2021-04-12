@@ -3,6 +3,7 @@ import 'package:untitled_vegan_app/base/log.dart';
 
 enum BackendErrorKind {
   ALREADY_REGISTERED,
+  GOOGLE_EMAIL_NOT_VERIFIED,
   NOT_AUTHORIZED,
   INVALID_JSON,
   OTHER
@@ -25,6 +26,9 @@ class BackendError {
     switch (json["error"]) {
       case "already_registered":
         kind = BackendErrorKind.ALREADY_REGISTERED;
+        break;
+      case "google_email_not_verified":
+        kind = BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED;
         break;
       default:
         kind = BackendErrorKind.OTHER;

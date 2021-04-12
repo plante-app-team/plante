@@ -87,6 +87,23 @@ void main() {
     expect(result.requireLeft(), equals(existingParams));
   });
 
+  test('registration failure - email not verified', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final backend = Backend(userParamsController, httpClient);
+
+    httpClient.setResponse(".*register_user.*", """
+      {
+        "error": "google_email_not_verified"
+      }
+    """);
+
+    final result = await backend.loginOrRegister("google ID");
+    expect(
+        result.requireRight().errorKind, equals(
+        BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED));
+  });
+
   test('registration request not 200', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();

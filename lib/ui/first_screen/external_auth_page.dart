@@ -5,6 +5,7 @@ import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 
@@ -72,9 +73,14 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
       final backend = GetIt.I.get<Backend>();
       final loginResult = await backend.loginOrRegister(googleAccount.idToken);
       if (loginResult.isRight) {
-        Log.w("ExternalAuthPage: backend loginResult is error");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.strings.global_something_went_wrong)));
+        final error = loginResult.requireRight();
+        if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(context.strings.external_auth_page_google_email_not_verified)));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(context.strings.global_something_went_wrong)));
+        }
         return;
       }
 
