@@ -9,6 +9,7 @@ import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/di.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
+import 'package:untitled_vegan_app/ui/app_foreground_detector.dart';
 import 'package:untitled_vegan_app/ui/first_screen/external_auth_page.dart';
 import 'package:untitled_vegan_app/ui/first_screen/init_user_page.dart';
 import 'package:untitled_vegan_app/ui/main/main_page.dart';
@@ -67,6 +68,14 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
 
   _MyAppState(this._initialUserParams) {
     GetIt.I.get<UserParamsController>().addObserver(this);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(AppForegroundDetector(() {
+      setSystemUIOverlayStyle();
+    }));
   }
 
   Future<bool> _onUserParamsSpecified(UserParams params) async {
