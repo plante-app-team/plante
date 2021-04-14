@@ -7,6 +7,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 import 'package:untitled_vegan_app/model/product.dart';
+import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
 import 'package:untitled_vegan_app/ui/base/ui_utils.dart';
@@ -149,6 +150,10 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     if (_barcode?.code == scanData.code) {
       return;
     }
+
+    // Note: no await because we don't care about result
+    GetIt.I.get<Backend>().sendProductScan(scanData.code);
+
     setState(() {
       _barcode = scanData;
       _searching = true;

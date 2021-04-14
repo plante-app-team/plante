@@ -171,6 +171,13 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
+  Future<Result<None, BackendError>> sendProductScan(String barcode) async {
+    final params = Map<String, String>();
+    params['barcode'] = barcode;
+    var response = await _backendGet("product_scan/", params);
+    return _noneOrErrorFrom(response);
+  }
+
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
       return Err(_errFromResp(response));
