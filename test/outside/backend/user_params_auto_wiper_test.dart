@@ -22,11 +22,11 @@ void main() {
     verifyNever(userParametersController.setUserParams(any));
 
     // Some other error
-    observer!.onBackendError(BackendError(BackendErrorKind.OTHER));
+    observer!.onBackendError(BackendErrorKind.OTHER.toErrorForTesting());
     verifyNever(userParametersController.setUserParams(any));
 
     // Not authorized error
-    observer!.onBackendError(BackendError(BackendErrorKind.NOT_AUTHORIZED));
+    observer!.onBackendError(BackendErrorKind.NOT_AUTHORIZED.toErrorForTesting());
     verify(userParametersController.setUserParams(null));
   });
 }

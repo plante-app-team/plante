@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:either_option/either_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,7 +10,8 @@ import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
 import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 
@@ -29,8 +28,9 @@ void main() {
 
     productsManager = MockProductsManager();
     when(productsManager.createUpdateProduct(any, any)).thenAnswer(
-            (invoc) async => invoc.positionalArguments[0]);
-    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer((_) async => null);
+            (invoc) async => Left(invoc.positionalArguments[0]));
+    when(productsManager.updateProductAndExtractIngredients(any, any))
+        .thenAnswer((_) async => Right(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
 
     backend = MockBackend();

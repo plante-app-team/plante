@@ -2,17 +2,17 @@
 // in untitled_vegan_app/test/outside/backend/user_params_auto_wiper_test.dart.
 // Do not manually edit this file.
 
-import 'dart:async' as _i6;
+import 'dart:async' as _i5;
 
 import 'package:either_option/src/either.dart' as _i3;
 import 'package:either_option/src/option.dart' as _i9;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:untitled_vegan_app/model/user_params.dart' as _i2;
-import 'package:untitled_vegan_app/model/user_params_controller.dart' as _i5;
+import 'package:untitled_vegan_app/model/user_params_controller.dart' as _i4;
 import 'package:untitled_vegan_app/model/veg_status.dart' as _i10;
-import 'package:untitled_vegan_app/outside/backend/backend.dart' as _i7;
-import 'package:untitled_vegan_app/outside/backend/backend_error.dart' as _i8;
-import 'package:untitled_vegan_app/outside/backend/backend_product.dart' as _i4;
+import 'package:untitled_vegan_app/outside/backend/backend.dart' as _i6;
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart' as _i7;
+import 'package:untitled_vegan_app/outside/backend/backend_product.dart' as _i8;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -21,77 +21,77 @@ class _FakeUserParams extends _i1.Fake implements _i2.UserParams {}
 
 class _FakeEither<L, R> extends _i1.Fake implements _i3.Either<L, R> {}
 
-class _FakeBackendProduct extends _i1.Fake implements _i4.BackendProduct {}
-
 /// A class which mocks [UserParamsController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserParamsController extends _i1.Mock
-    implements _i5.UserParamsController {
+    implements _i4.UserParamsController {
   MockUserParamsController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i5.UserParamsControllerObserver? observer) =>
+  void addObserver(_i4.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i5.UserParamsControllerObserver? observer) =>
+  void removeObserver(_i4.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i6.Future<_i2.UserParams?> getUserParams() =>
+  _i5.Future<_i2.UserParams?> getUserParams() =>
       (super.noSuchMethod(Invocation.method(#getUserParams, []),
               returnValue: Future.value(_FakeUserParams()))
-          as _i6.Future<_i2.UserParams?>);
+          as _i5.Future<_i2.UserParams?>);
   @override
-  _i6.Future<void> setUserParams(_i2.UserParams? userParams) =>
+  _i5.Future<void> setUserParams(_i2.UserParams? userParams) =>
       (super.noSuchMethod(Invocation.method(#setUserParams, [userParams]),
           returnValue: Future.value(null),
-          returnValueForMissingStub: Future.value()) as _i6.Future<void>);
+          returnValueForMissingStub: Future.value()) as _i5.Future<void>);
 }
 
 /// A class which mocks [Backend].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBackend extends _i1.Mock implements _i7.Backend {
+class MockBackend extends _i1.Mock implements _i6.Backend {
   MockBackend() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i7.BackendObserver? observer) =>
+  void addObserver(_i6.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i7.BackendObserver? observer) =>
+  void removeObserver(_i6.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i6.Future<bool> isLoggedIn() =>
+  _i5.Future<bool> isLoggedIn() =>
       (super.noSuchMethod(Invocation.method(#isLoggedIn, []),
-          returnValue: Future.value(false)) as _i6.Future<bool>);
+          returnValue: Future.value(false)) as _i5.Future<bool>);
   @override
-  _i6.Future<_i3.Either<_i2.UserParams, _i8.BackendError>> loginOrRegister(
+  _i5.Future<_i3.Either<_i2.UserParams, _i7.BackendError>> loginOrRegister(
           String? googleIdToken) =>
       (super.noSuchMethod(Invocation.method(#loginOrRegister, [googleIdToken]),
               returnValue:
-                  Future.value(_FakeEither<_i2.UserParams, _i8.BackendError>()))
-          as _i6.Future<_i3.Either<_i2.UserParams, _i8.BackendError>>);
+                  Future.value(_FakeEither<_i2.UserParams, _i7.BackendError>()))
+          as _i5.Future<_i3.Either<_i2.UserParams, _i7.BackendError>>);
   @override
-  _i6.Future<_i3.Either<bool, _i8.BackendError>> updateUserParams(
+  _i5.Future<_i3.Either<bool, _i7.BackendError>> updateUserParams(
           _i2.UserParams? userParams) =>
       (super.noSuchMethod(Invocation.method(#updateUserParams, [userParams]),
-              returnValue: Future.value(_FakeEither<bool, _i8.BackendError>()))
-          as _i6.Future<_i3.Either<bool, _i8.BackendError>>);
+              returnValue: Future.value(_FakeEither<bool, _i7.BackendError>()))
+          as _i5.Future<_i3.Either<bool, _i7.BackendError>>);
   @override
-  _i6.Future<_i4.BackendProduct?> requestProduct(String? barcode) =>
+  _i5.Future<_i3.Either<_i8.BackendProduct?, _i7.BackendError>> requestProduct(
+          String? barcode) =>
       (super.noSuchMethod(Invocation.method(#requestProduct, [barcode]),
-              returnValue: Future.value(_FakeBackendProduct()))
-          as _i6.Future<_i4.BackendProduct?>);
+              returnValue: Future.value(
+                  _FakeEither<_i8.BackendProduct?, _i7.BackendError>()))
+          as _i5.Future<_i3.Either<_i8.BackendProduct?, _i7.BackendError>>);
   @override
-  _i6.Future<_i3.Either<_i9.None<dynamic>, _i8.BackendError>>
+  _i5.Future<_i3.Either<_i9.None<dynamic>, _i7.BackendError>>
       createUpdateProduct(String? barcode,
               {_i10.VegStatus? vegetarianStatus,
               _i10.VegStatus? veganStatus}) =>
@@ -103,13 +103,13 @@ class MockBackend extends _i1.Mock implements _i7.Backend {
                     #veganStatus: veganStatus
                   }),
                   returnValue: Future.value(
-                      _FakeEither<_i9.None<dynamic>, _i8.BackendError>()))
-              as _i6.Future<_i3.Either<_i9.None<dynamic>, _i8.BackendError>>);
+                      _FakeEither<_i9.None<dynamic>, _i7.BackendError>()))
+              as _i5.Future<_i3.Either<_i9.None<dynamic>, _i7.BackendError>>);
   @override
-  _i6.Future<_i3.Either<_i9.None<dynamic>, _i8.BackendError>> sendReport(
+  _i5.Future<_i3.Either<_i9.None<dynamic>, _i7.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
               returnValue: Future.value(
-                  _FakeEither<_i9.None<dynamic>, _i8.BackendError>()))
-          as _i6.Future<_i3.Either<_i9.None<dynamic>, _i8.BackendError>>);
+                  _FakeEither<_i9.None<dynamic>, _i7.BackendError>()))
+          as _i5.Future<_i3.Either<_i9.None<dynamic>, _i7.BackendError>>);
 }

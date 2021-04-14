@@ -6,7 +6,7 @@ import 'package:mockito/annotations.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
 import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';

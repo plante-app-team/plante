@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
-import 'package:untitled_vegan_app/l10n/strings.dart';
 import 'package:untitled_vegan_app/base/log.dart';
+import 'package:untitled_vegan_app/l10n/strings.dart';
 import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
+import 'package:untitled_vegan_app/ui/base/ui_utils.dart';
 import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';
 
 class QrScanPage extends StatefulWidget {
@@ -147,23 +150,27 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     if (_barcode?.code == scanData.code) {
       return;
     }
-    try {
-      setState(() {
-        _barcode = scanData;
-        _searching = true;
-      });
+    setState(() {
+      _barcode = scanData;
+      _searching = true;
+    });
 
-      final foundProduct = await GetIt.I.get<ProductsManager>().getProduct(
-          scanData.code,
-          Localizations.localeOf(context).languageCode);
-      setState(() {
-        _foundProduct = foundProduct;
-      });
-    } finally {
-      setState(() {
-        _searching = false;
-      });
+    final foundProductResult = await GetIt.I.get<ProductsManager>().getProduct(
+        scanData.code,
+        Localizations.localeOf(context).languageCode);
+    if (foundProductResult.isRight) {
+      if (foundProductResult.requireRight() == ProductsManagerError.NETWORK_ERROR) {
+        showSnackBar(context.strings.global_network_error, context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
     }
+    final foundProduct = foundProductResult.maybeLeft();
+    setState(() {
+      _foundProduct = foundProduct;
+      _searching = false;
+      _barcode = foundProductResult.isLeft ? _barcode : null;
+    });
   }
 
   void _toggleFlash() async {

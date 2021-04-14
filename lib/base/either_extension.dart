@@ -6,9 +6,22 @@ extension EitherExtension<L, R> on Either<L, R> {
       throw AssertionError("Left was expected");
     });
   }
+
   R requireRight() {
     return fold((_) {
       throw AssertionError("Right was expected");
+    }, (value) => value);
+  }
+
+  L? maybeLeft() {
+    return fold((value) => value, (_) {
+      return null;
+    });
+  }
+
+  R? maybeRight() {
+    return fold((_) {
+      return null;
     }, (value) => value);
   }
 }

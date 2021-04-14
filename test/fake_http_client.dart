@@ -1,28 +1,37 @@
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:untitled_vegan_app/outside/http_client.dart';
 
 class FakeHttpClient extends HttpClient {
   late final MockClient _impl;
-  final _responses = Map<RegExp, Response>();
-  final _requests = <BaseRequest>[];
+  final _responses = Map<RegExp, _Response>();
+  final _requests = <http.BaseRequest>[];
 
   FakeHttpClient() {
     _impl = MockClient((request) async {
       for (final response in _responses.entries) {
         if (response.key.hasMatch(request.url.toString())) {
-          return response.value;
+          if (response.value.httpResponse != null) {
+            return response.value.httpResponse!;
+          } else {
+            throw response.value.exception;
+          }
         }
       }
-      return Response("", 404);
+      return http.Response("", 404);
     });
   }
 
   void setResponse(String regex, String response, {int responseCode = 200}) {
-    _responses[RegExp(regex)] = Response(response, responseCode);
+    _responses[RegExp(regex)] =
+        _Response.ok(http.Response(response, responseCode));
   }
 
-  List<BaseRequest> getRequestsMatching(String regex) {
+  void setResponseException(String regex, dynamic exception) {
+    _responses[RegExp(regex)] = _Response.err(exception);
+  }
+
+  List<http.BaseRequest> getRequestsMatching(String regex) {
     final regexpr = RegExp(regex);
     return _requests.where(
             (element) => regexpr.hasMatch(element.url.toString()))
@@ -34,8 +43,15 @@ class FakeHttpClient extends HttpClient {
   }
 
   @override
-  Future<StreamedResponse> send(BaseRequest request) {
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
     _requests.add(request);
     return _impl.send(request);
   }
+}
+
+class _Response {
+  final http.Response? httpResponse;
+  final dynamic? exception;
+  _Response.ok(this.httpResponse): exception = null;
+  _Response.err(this.exception): httpResponse = null;
 }

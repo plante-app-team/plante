@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -10,11 +10,7 @@ import '_page_controller_base.dart';
 
 class Page1Controller extends PageControllerBase {
   final InitProductPageModel _model;
-  final ProductsManager _productsManager;
   final String _doneText;
-  final Function() _doneFn;
-  
-  final Product _initialProduct;
 
   final _nameController = TextEditingController();
   final _brandController = TextEditingController();
@@ -25,10 +21,12 @@ class Page1Controller extends PageControllerBase {
       (product.name ?? "").length >= 3;
 
   Page1Controller(
-      this._model,
-      this._productsManager,
+      InitProductPageModel model,
+      ProductsManager productsManager,
       this._doneText,
-      this._doneFn): _initialProduct = _model.product {
+      Function() doneFn):
+        _model = model,
+        super(doneFn, productsManager, model) {
     _model.productChanges.listen((event) {
       if (event.updater == "first_page_controllers") {
         return;
@@ -72,8 +70,6 @@ class Page1Controller extends PageControllerBase {
   void _longAction(dynamic Function() action) => _model.longAction(action);
 
   StepperPage build(BuildContext context) {
-    final langCode = Localizations.localeOf(context).languageCode;
-
     final content = Column(children: [
       Expanded(
           flex: 1,
@@ -114,20 +110,9 @@ class Page1Controller extends PageControllerBase {
       )
     ]);
 
-    final onNextPressed = () async {
+    final onNextPressed = () {
       _longAction(() async {
-        if (_initialProduct != _model.product) {
-          final updatedProduct =
-            await _productsManager.createUpdateProduct(_model.product, langCode);
-          if (updatedProduct == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(context.strings.global_something_went_wrong)));
-            return;
-          }
-          _model.setProduct(updatedProduct);
-        }
-        FocusScope.of(context).unfocus();
-        _doneFn.call();
+        await onDoneClick(context);
       });
     };
     final buttonNext = SizedBox(

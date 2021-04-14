@@ -5,8 +5,8 @@ import 'package:untitled_vegan_app/base/log.dart';
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
   Future<off.ProductResult> getProduct(
-      off.ProductQueryConfiguration configuration) {
-    return off.OpenFoodAPIClient.getProduct(configuration);
+      off.ProductQueryConfiguration configuration) async {
+    return await off.OpenFoodAPIClient.getProduct(configuration);
   }
 
   Future<off.Status> saveProduct(off.User user, off.Product product) async {

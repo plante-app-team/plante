@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -181,6 +183,29 @@ void main() {
     expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
   });
 
+  test('registration network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponseException(".*register_user.*", SocketException(""));
+    final result = await backend.loginOrRegister("google ID");
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+  });
+
+  test('login network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*register_user.*", """
+      {
+        "error": "already_registered"
+      }
+    """);
+    httpClient.setResponseException(".*register_user.*", SocketException(""));
+    final result = await backend.loginOrRegister("google ID");
+    expect(result.requireRight().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+  });
+
   test('observer notified about server errors', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
@@ -268,6 +293,26 @@ void main() {
     expect(request.headers["Authorization"], equals(null));
   });
 
+  test('update user params network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponseException(".*update_user_data.*", HttpException(""));
+
+    final updatedParams = initialParams.rebuild((v) => v
+      ..name = "Jack"
+      ..genderStr = "male"
+      ..birthdayStr = "20.07.1993");
+    final result = await backend.updateUserParams(updatedParams);
+    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+  });
+
   test('request product', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
@@ -289,18 +334,40 @@ void main() {
       """);
 
     final result = await backend.requestProduct("123");
+    final product = result.requireLeft();
     final expectedProduct = BackendProduct((v) => v
       ..barcode = "123"
       ..vegetarianStatus = VegStatus.positive.name
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    expect(result, equals(expectedProduct));
+    expect(product, equals(expectedProduct));
 
     final requests = httpClient.getRequestsMatching(".*product_data.*");
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('request product not found', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponse(".*product_data.*", """
+     {
+       "error": "product_not_found"
+     }
+      """);
+
+    final result = await backend.requestProduct("123");
+    final product = result.requireLeft();
+    expect(product, isNull);
   });
 
   test('request product http error', () async {
@@ -316,7 +383,7 @@ void main() {
     httpClient.setResponse(".*product_data.*", "", responseCode: 500);
 
     final result = await backend.requestProduct("123");
-    expect(result, isNull);
+    expect(result.isRight, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*product_data.*");
     expect(requests.length, equals(1));
@@ -345,12 +412,28 @@ void main() {
       """);
 
     final result = await backend.requestProduct("123");
-    expect(result, isNull);
+    expect(result.requireRight().errorKind, BackendErrorKind.INVALID_JSON);
 
     final requests = httpClient.getRequestsMatching(".*product_data.*");
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(request.headers["Authorization"], equals("Bearer aaa"));
+  });
+
+  test('request product network exception', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponseException(".*product_data.*", SocketException(""));
+
+    final result = await backend.requestProduct("123");
+    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
   test('create update product', () async {
@@ -485,6 +568,26 @@ void main() {
     expect(result.isRight, isTrue);
   });
 
+  test('create update product network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponseException(
+        ".*create_update_product.*", SocketException(""));
+
+    final result = await backend.createUpdateProduct(
+        "123",
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative);
+    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+  });
+
   test('send report', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
@@ -503,5 +606,23 @@ void main() {
         "123",
         "that's a baaaad product");
     expect(result.isLeft, isTrue);
+  });
+
+  test('send report network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = "123"
+      ..name = "Bob"
+      ..backendClientToken = "aaa");
+    userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient);
+    httpClient.setResponseException(".*make_report.*", SocketException(""));
+
+    final result = await backend.sendReport(
+        "123",
+        "that's a baaaad product");
+    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/customizable_stepper.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
 

@@ -1,12 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:either_option/either_option.dart';
-import 'package:http/http.dart';
 import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/base/device_info.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_response.dart';
 import 'package:untitled_vegan_app/outside/http_client.dart';
 import 'package:untitled_vegan_app/model/gender.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
@@ -48,13 +49,13 @@ class Backend {
     var response = await _backendGet(
         "register_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
-    if (response.statusCode != 200) {
-      return Right(BackendError.fromResp(response));
+    if (response.isError) {
+      return Right(_errFromResp(response));
     }
 
     var json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(BackendError.invalidJson(response.body));
+      return Right(_errInvalidJson(response.body));
     }
 
     if (!_isError(json)) {
@@ -71,13 +72,13 @@ class Backend {
     response = await _backendGet(
         "login_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
-    if (response.statusCode != 200) {
-      return Right(BackendError.fromResp(response));
+    if (response.isError) {
+      return Right(_errFromResp(response));
     }
 
     json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(BackendError.invalidJson(response.body));
+      return Right(_errInvalidJson(response.body));
     }
 
     if (!_isError(json)) {
@@ -114,24 +115,32 @@ class Backend {
     }
 
     var response = await _backendGet("update_user_data/", params);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       return Left(true);
     } else {
       return Right(_errFromResp(response));
     }
   }
 
-  Future<BackendProduct?> requestProduct(String barcode) async {
+  Future<Either<BackendProduct?, BackendError>> requestProduct(String barcode) async {
     var response = await _backendGet("product_data/", { "barcode": barcode });
-    if (response.statusCode != 200) {
-      return null;
+    if (response.isError) {
+      return Right(_errFromResp(response));
     }
     final json = _jsonDecodeSafe(response.body);
-    if (json != null && !_isError(json)) {
-      return BackendProduct.fromJson(json)!;
-    } else {
-      return null;
+    if (json == null) {
+      return Right(_errInvalidJson(response.body));
     }
+
+    if (_isError(json)) {
+      final error = _errFromJson(json);
+      if (error.errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
+        return Left(null);
+      } else {
+        return Right(error);
+      }
+    }
+    return Left(BackendProduct.fromJson(json)!);
   }
 
   Future<Either<None, BackendError>> createUpdateProduct(
@@ -157,19 +166,19 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Either<None, BackendError> _noneOrErrorFrom(Response response) {
-    if (response.statusCode != 200) {
+  Either<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
+    if (response.isError) {
       return Right(_errFromResp(response));
     }
     final json = _jsonDecodeSafe(response.body);
     if (json != null && !_isError(json)) {
       return Left(None());
     } else {
-      return Right(_errFromResp(response));
+      return Right(_errOther());
     }
   }
 
-  Future<Response> _backendGet(
+  Future<BackendResponse> _backendGet(
       String path,
       Map<String, String>? params,
       {Map<String, String>? headers}) async {
@@ -179,15 +188,20 @@ class Backend {
     if (userParams != null && userParams.backendClientToken != null) {
       headersReally["Authorization"] = "Bearer ${userParams.backendClientToken!}";
     }
-    return _http.get(Uri.http(
-        "$BACKEND_ADDRESS", path, params), headers: headersReally);
+    final url = Uri.http("$BACKEND_ADDRESS", path, params);
+    try {
+      final httpResponse = await _http.get(url, headers: headersReally);
+      return BackendResponse.fromHttpResponse(httpResponse);
+    } on IOException catch (e) {
+      return BackendResponse.fromError(e, url);
+    }
   }
 
   bool _isError(Map<String, dynamic> json) {
     return BackendError.isError(json);
   }
   
-  BackendError _errFromResp(Response response) {
+  BackendError _errFromResp(BackendResponse response) {
     final error = BackendError.fromResp(response);
     _observers.forEach((obs) { obs.onBackendError(error); });
     return error;
@@ -195,6 +209,18 @@ class Backend {
 
   BackendError _errFromJson(Map<String, dynamic> json) {
     final error = BackendError.fromJson(json);
+    _observers.forEach((obs) { obs.onBackendError(error); });
+    return error;
+  }
+
+  BackendError _errInvalidJson(String invalidJson) {
+    final error = BackendError.invalidJson(invalidJson);
+    _observers.forEach((obs) { obs.onBackendError(error); });
+    return error;
+  }
+
+  BackendError _errOther() {
+    final error = BackendError.other();
     _observers.forEach((obs) { obs.onBackendError(error); });
     return error;
   }

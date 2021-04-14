@@ -1,12 +1,20 @@
+import 'dart:io';
+
+import 'package:either_option/either_option.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/model/ingredient.dart';
 
+import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
+import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/outside/off/off_api.dart';
 import 'package:untitled_vegan_app/outside/off/off_user.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
+
 
 class ProductWithOCRIngredients {
   Product product;
@@ -35,21 +43,31 @@ class ProductsManager {
 
   ProductsManager(this._off, this._backend);
 
-  Future<Product?> getProduct(String barcodeRaw, String langCode) async {
+  Future<Either<Product?, ProductsManagerError>> getProduct(String barcodeRaw, String langCode) async {
     final configuration = off.ProductQueryConfiguration(
         barcodeRaw,
         lc: langCode,
         language: off.LanguageHelper.fromJson(langCode),
         fields: _NEEDED_OFF_FIELDS.toList());
 
-    final offProductResult = await _off.getProduct(configuration);
+    final offProductResult;
+    try {
+      offProductResult = await _off.getProduct(configuration);
+    } on IOException catch (e) {
+      Log.w("Network error in ProductsManager.getProduct", ex: e);
+      return Right(ProductsManagerError.NETWORK_ERROR);
+    }
     final offProduct = offProductResult.product;
     if (offProduct == null) {
-      return null;
+      return Left(null);
     }
 
     final barcode = offProduct.barcode!;
-    final backendProduct = await _backend.requestProduct(barcode);
+    final backendProductResult = await _backend.requestProduct(barcode);
+    if (backendProductResult.isRight) {
+      return _convertBackendError(backendProductResult);
+    }
+    final backendProduct = backendProductResult.requireLeft();
 
     var result = Product((v) => v
       ..barcode = barcode
@@ -115,7 +133,7 @@ class ProductsManager {
     final categoriesFiltered = result.categories!.where((e) => !_notTranslatedRegex.hasMatch(e));
     result = result.rebuild((v) => v.categories.replace(categoriesFiltered));
 
-    return result;
+    return Left(result);
   }
 
   Uri? _extractImageUri(off.Product offProduct, ProductImageType imageType, String langCode) {
@@ -165,7 +183,7 @@ class ProductsManager {
   }
 
   /// Returns updated product if update was successful
-  Future<Product?> createUpdateProduct(Product product, String langCode) async {
+  Future<Either<Product, ProductsManagerError>> createUpdateProduct(Product product, String langCode) async {
     final cachedProduct = _productsCache[product.barcode];
     if (cachedProduct != null) {
       final allBrands = _connectDifferentlyTranslated(
@@ -181,7 +199,7 @@ class ProductsManager {
         ..categories.replace(_sortedNotNull(cachedProduct.categories)));
       if (productWithNotTranslatedFields == cachedProductNormalized) {
         // Input product is same as it was when it was cached
-        return product;
+        return Left(product);
       } else {
         // Let's insert back the not translated fields before sending product to OFF.
         // If we won't do that, that would mean we are to erase existing values
@@ -199,9 +217,15 @@ class ProductsManager {
         brands: _join(product.brands, null),
         categories: _join(product.categories, langCode),
         ingredientsTextTranslated: product.ingredientsText);
-    final offResult = await _off.saveProduct(_offUser(), offProduct);
+    final offResult;
+    try {
+      offResult = await _off.saveProduct(_offUser(), offProduct);
+    } on IOException catch(e) {
+      Log.w("ProductsManager.createUpdateProduct 1, e", ex: e);
+      return Right(ProductsManagerError.NETWORK_ERROR);
+    }
     if (offResult.error != null) {
-      return null;
+      return Right(ProductsManagerError.OTHER);
     }
 
     // OFF front image
@@ -213,9 +237,15 @@ class ProductsManager {
         imageField: off.ImageField.FRONT,
         imageUri: product.imageFront!,
       );
-      final status = await _off.addProductImage(_offUser(), image);
+      final status;
+      try {
+        status = await _off.addProductImage(_offUser(), image);
+      } on IOException catch(e) {
+        Log.w("ProductsManager.createUpdateProduct 2, e", ex: e);
+        return Right(ProductsManagerError.NETWORK_ERROR);
+      }
       if (status.error != null) {
-        return null;
+        return Right(ProductsManagerError.OTHER);
       }
     }
 
@@ -228,9 +258,15 @@ class ProductsManager {
         imageField: off.ImageField.INGREDIENTS,
         imageUri: product.imageIngredients!,
       );
-      final status = await _off.addProductImage(_offUser(), image);
+      final status;
+      try {
+        status = await _off.addProductImage(_offUser(), image);
+      } on IOException catch(e) {
+        Log.w("ProductsManager.createUpdateProduct 3, e", ex: e);
+        return Right(ProductsManagerError.NETWORK_ERROR);
+      }
       if (status.error != null) {
-        return null;
+        return Right(ProductsManagerError.OTHER);
       }
     }
 
@@ -241,10 +277,18 @@ class ProductsManager {
         vegetarianStatus: product.vegetarianStatus,
         veganStatus: product.veganStatus);
     if (backendResult.isRight) {
-      return null;
+      return _convertBackendError(backendResult);
     }
 
-    return getProduct(product.barcode, langCode);
+    final result = await getProduct(product.barcode, langCode);
+    if (result.isRight) {
+      return Right(result.requireRight());
+    } else if (result.requireLeft() == null) {
+      Log.w("Product was saved but couldn't be obtained back");
+      return Right(ProductsManagerError.OTHER);
+    } else {
+      return Left(result.requireLeft()!);
+    }
   }
 
   List<String> _connectDifferentlyTranslated(
@@ -273,20 +317,27 @@ class ProductsManager {
     return null;
   }
 
-  Future<ProductWithOCRIngredients?> updateProductAndExtractIngredients(Product product, String langCode) async {
-    final updatedProduct = await createUpdateProduct(product, langCode);
-    if (updatedProduct == null) {
-      return null;
+  Future<Either<ProductWithOCRIngredients, ProductsManagerError>>
+      updateProductAndExtractIngredients(Product product, String langCode) async {
+    final productUpdateResult = await createUpdateProduct(product, langCode);
+    if (productUpdateResult.isRight) {
+      return Right(productUpdateResult.requireRight());
     }
+    final updatedProduct = productUpdateResult.requireLeft();
 
     final offLang = off.LanguageHelper.fromJson(langCode);
 
-    final response = await _off.extractIngredients(
-        _offUser(), product.barcode, offLang);
+    final response;
+    try {
+      response = await _off.extractIngredients(_offUser(), product.barcode, offLang);
+    } on IOException catch(e) {
+      Log.w("ProductsManager.updateProductAndExtractIngredients, e", ex: e);
+      return Right(ProductsManagerError.NETWORK_ERROR);
+    }
     if (response.status == 0) {
-      return ProductWithOCRIngredients(updatedProduct, response.ingredientsTextFromImage);
+      return Left(ProductWithOCRIngredients(updatedProduct, response.ingredientsTextFromImage));
     } else {
-      return ProductWithOCRIngredients(updatedProduct, null);
+      return Left(ProductWithOCRIngredients(updatedProduct, null));
     }
   }
 
@@ -315,5 +366,14 @@ extension _OffIngredientExtension on off.Ingredient {
       default:
         throw StateError("Unhandled item: $offVegStatus");
     }
+  }
+}
+
+Either<T1, ProductsManagerError> _convertBackendError<T1, T2>(
+    Either<T2, BackendError> backendResult) {
+  if (backendResult.requireRight().errorKind == BackendErrorKind.NETWORK_ERROR) {
+    return Right(ProductsManagerError.NETWORK_ERROR);
+  } else {
+    return Right(ProductsManagerError.OTHER);
   }
 }

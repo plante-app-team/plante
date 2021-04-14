@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
 import 'package:untitled_vegan_app/ui/photos_taker.dart';
 import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
@@ -13,26 +13,22 @@ import '_product_images_helper.dart';
 
 class Page2Controller extends PageControllerBase {
   final InitProductPageModel _model;
-  final ProductsManager _productsManager;
   final String _doneText;
-  final Function() _doneFn;
-  
-  final Product _initialProduct;
 
   bool get pageHasData => productHasAllDataForPage(_model.product);
   static bool productHasAllDataForPage(Product product) => product.imageFront != null;
 
   Page2Controller(
-      this._model,
-      this._productsManager,
+      InitProductPageModel model,
+      ProductsManager productsManager,
       this._doneText,
-      this._doneFn): _initialProduct = _model.product;
+      Function() doneFn):
+        _model = model,
+        super(doneFn, productsManager, model);
 
   void _longAction(dynamic Function() action) => _model.longAction(action);
 
   StepperPage build(BuildContext context) {
-    final langCode = Localizations.localeOf(context).languageCode;
-
     final content = Column(children: [
       Expanded(
           flex: 1,
@@ -49,20 +45,9 @@ class Page2Controller extends PageControllerBase {
       )
     ]);
 
-    final onNextPressed = () async {
+    final onNextPressed = () {
       _longAction(() async {
-        if (_model.product != _initialProduct) {
-          final updatedProduct =
-            await _productsManager.createUpdateProduct(_model.product, langCode);
-          if (updatedProduct == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(context.strings.global_something_went_wrong)));
-            return;
-          }
-          _model.setProduct(updatedProduct);
-        }
-        FocusScope.of(context).unfocus();
-        _doneFn.call();
+        await onDoneClick(context);
       });
     };
     final buttonNext = SizedBox(

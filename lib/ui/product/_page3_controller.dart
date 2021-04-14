@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager.dart';
+import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
+import 'package:untitled_vegan_app/ui/base/ui_utils.dart';
 import 'package:untitled_vegan_app/ui/photos_taker.dart';
 import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -15,9 +18,6 @@ class Page3Controller extends PageControllerBase {
   final InitProductPageModel _model;
   final ProductsManager _productsManager;
   final String _doneText;
-  final Function() _doneFn;
-  
-  final Product _initialProduct;
 
   final _ingredientsController = TextEditingController();
   final _ingredientsFocusNode = FocusNode();
@@ -30,10 +30,13 @@ class Page3Controller extends PageControllerBase {
       product.imageIngredients != null && (product.ingredientsText ?? "").isNotEmpty;
 
   Page3Controller(
-      this._model,
-      this._productsManager,
+      InitProductPageModel model,
+      ProductsManager productsManager,
       this._doneText,
-      this._doneFn): _initialProduct = _model.product {
+      Function() doneFn):
+        _model = model,
+        _productsManager = productsManager,
+        super(doneFn, productsManager, model) {
     _model.productChanges.listen((event) {
       if (event.updater == "third_page_controllers") {
         return;
@@ -82,19 +85,10 @@ class Page3Controller extends PageControllerBase {
       )
     ]);
 
-    final onNextPressed = () async {
-      if (_initialProduct != _product) {
-        final updatedProduct = await _productsManager.createUpdateProduct(
-            _product, langCode);
-        if (updatedProduct == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(context.strings.global_something_went_wrong)));
-          return;
-        }
-        _model.setProduct(updatedProduct);
-      }
-      FocusScope.of(context).unfocus();
-      _doneFn.call();
+    final onNextPressed = () {
+      _longAction(() async {
+        await onDoneClick(context);
+      });
     };
     final buttonNext = SizedBox(
         width: double.infinity,
@@ -113,17 +107,19 @@ class Page3Controller extends PageControllerBase {
         _longAction(() async {
           final result = await _productsManager
               .updateProductAndExtractIngredients(_product, langCode);
-          if (result == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(context.strings.global_something_went_wrong)));
+          if (result.isRight) {
+            if (result.requireRight() == ProductsManagerError.NETWORK_ERROR) {
+              showSnackBar(context.strings.global_network_error, context);
+            } else {
+              showSnackBar(context.strings.global_something_went_wrong, context);
+            }
             return;
           }
-          _model.setProduct(result.product);
+          _model.setProduct(result.requireLeft().product);
 
-          final ocrIngredients = result.ingredients;
+          final ocrIngredients = result.requireLeft().ingredients;
           if (ocrIngredients == null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(context.strings.global_something_went_wrong)));
+            showSnackBar(context.strings.global_something_went_wrong, context);
             return;
           }
           _model.updateProduct(fn: (v) => v.ingredientsText = ocrIngredients);

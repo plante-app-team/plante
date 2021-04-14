@@ -1,6 +1,7 @@
 {
       "global_app_name": "Untitled Vegan App",
       "global_something_went_wrong": "Oops, something went wrong",
+      "global_network_error": "Network error - please check your internet connection",
 
       "image_cropper_title": "Let's crop it!",
 
