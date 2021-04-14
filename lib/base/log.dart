@@ -14,7 +14,6 @@ class Log {
   static DebugTree? _debugTree;
   static TimedRollingFileTree? _fileTree;
 
-  // TODO: test proper logs deletion when max is reached
   static void init({
       Directory? logsDir,
       int maxSizeBytes = LOGS_DIR_MAX_SIZE}) async {
@@ -127,6 +126,9 @@ class Log {
   }
 
   static void e(String message, {dynamic ex, StackTrace? stacktrace, bool crashAllowed = true}) {
+    if (ex is FlutterError && ex.message.contains("RenderFlex")) {
+      return;
+    }
     if (ex == null) {
       Fimber.e(message, ex: ex, stacktrace: stacktrace);
     } else {
