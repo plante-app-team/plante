@@ -78,8 +78,11 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
           as _i5.Future<_i3.Result<_i2.UserParams, _i7.BackendError>>);
   @override
   _i5.Future<_i3.Result<bool, _i7.BackendError>> updateUserParams(
-          _i2.UserParams? userParams) =>
-      (super.noSuchMethod(Invocation.method(#updateUserParams, [userParams]),
+          _i2.UserParams? userParams,
+          {String? backendClientTokenOverride}) =>
+      (super.noSuchMethod(
+              Invocation.method(#updateUserParams, [userParams],
+                  {#backendClientTokenOverride: backendClientTokenOverride}),
               returnValue: Future.value(_FakeResult<bool, _i7.BackendError>()))
           as _i5.Future<_i3.Result<bool, _i7.BackendError>>);
   @override

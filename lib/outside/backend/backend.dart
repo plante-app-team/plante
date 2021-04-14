@@ -90,7 +90,9 @@ class Backend {
     }
   }
 
-  Future<Result<bool, BackendError>> updateUserParams(UserParams userParams) async {
+  Future<Result<bool, BackendError>> updateUserParams(
+      UserParams userParams,
+      {String? backendClientTokenOverride}) async {
     final params = Map<String, String>();
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params["name"] = userParams.name!;
@@ -114,7 +116,10 @@ class Backend {
       return Ok(false);
     }
 
-    var response = await _backendGet("update_user_data/", params);
+    var response = await _backendGet(
+        "update_user_data/",
+        params,
+        backendClientTokenOverride: backendClientTokenOverride);
     if (response.isOk) {
       return Ok(true);
     } else {
@@ -181,12 +186,14 @@ class Backend {
   Future<BackendResponse> _backendGet(
       String path,
       Map<String, String>? params,
-      {Map<String, String>? headers}) async {
+      {Map<String, String>? headers,
+       String? backendClientTokenOverride}) async {
     final userParams = await _userParamsController.getUserParams();
+    final backendClientToken = backendClientTokenOverride ?? userParams?.backendClientToken;
 
     final headersReally = Map<String, String>.from(headers ?? Map<String, String>());
-    if (userParams != null && userParams.backendClientToken != null) {
-      headersReally["Authorization"] = "Bearer ${userParams.backendClientToken!}";
+    if (backendClientToken != null) {
+      headersReally["Authorization"] = "Bearer $backendClientToken";
     }
     final url = Uri.http("$BACKEND_ADDRESS", path, params);
     try {
