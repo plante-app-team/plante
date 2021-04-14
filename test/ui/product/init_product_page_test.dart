@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:either_option/either_option.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:untitled_vegan_app/base/result.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
@@ -34,15 +34,15 @@ void main() {
 
     productsManager = MockProductsManager();
     when(productsManager.createUpdateProduct(any, any)).thenAnswer(
-            (invoc) async => Left(invoc.positionalArguments[0]));
+            (invoc) async => Ok(invoc.positionalArguments[0]));
     when(productsManager.updateProductAndExtractIngredients(any, any))
-        .thenAnswer((_) async => Right(ProductsManagerError.OTHER));
+        .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
   });
 
   testWidgets("good flow", (WidgetTester tester) async {
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async => Left(ProductWithOCRIngredients(
+            (invoc) async => Ok(ProductWithOCRIngredients(
                 invoc.positionalArguments[0],
                 "water, lemon")));
 

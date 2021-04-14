@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
-import 'package:either_option/either_option.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
@@ -10,7 +9,7 @@ import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/base/either_extension.dart';
+import 'package:untitled_vegan_app/base/result.dart';
 import 'package:untitled_vegan_app/model/ingredient.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
@@ -71,9 +70,9 @@ void main() {
     when(backend.createUpdateProduct(
         any,
         vegetarianStatus: anyNamed("vegetarianStatus"),
-        veganStatus: anyNamed("veganStatus"))).thenAnswer((_) async => Left(None()));
+        veganStatus: anyNamed("veganStatus"))).thenAnswer((_) async => Ok(None()));
     when(backend.requestProduct(any)).thenAnswer((invc) async =>
-        Left(BackendProduct((v) => v.barcode = invc.positionalArguments[0])));
+        Ok(BackendProduct((v) => v.barcode = invc.positionalArguments[0])));
   });
 
   test('get product when the product is on both OFF and backend', () async {
@@ -95,10 +94,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     final expectedProduct = Product((v) => v
       ..barcode = "123"
       ..vegetarianStatus = VegStatus.positive
@@ -128,10 +127,10 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     final expectedProduct = Product((v) => v
       ..barcode = "123"
       ..vegetarianStatus = null
@@ -158,10 +157,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product, equals(null));
   });
 
@@ -179,7 +178,7 @@ void main() {
         throw SocketException(""));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    expect(productRes.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(productRes.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('get product when backend returns network error', () async {
@@ -196,10 +195,10 @@ void main() {
         off.ProductResult(product: offProduct));
 
     when(backend.requestProduct(any)).thenAnswer(
-            (_) async => Right(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
+            (_) async => Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    expect(productRes.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(productRes.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('update product with both front and ingredients images', () async {
@@ -407,7 +406,7 @@ void main() {
             (_) async => throw SocketException(""));
 
     final result = await productsManager.createUpdateProduct(product, "ru");
-    expect(result.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('update product OFF throws network error at image safe call', () async {
@@ -428,7 +427,7 @@ void main() {
             (_) async => throw SocketException(""));
 
     final result = await productsManager.createUpdateProduct(product, "ru");
-    expect(result.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('update product network error in backend', () async {
@@ -449,10 +448,10 @@ void main() {
         any,
         vegetarianStatus: anyNamed("vegetarianStatus"),
         veganStatus: anyNamed("veganStatus"))).thenAnswer(
-            (_) async => Right(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
+            (_) async => Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
 
     final result = await productsManager.createUpdateProduct(product, "ru");
-    expect(result.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('ingredients extraction successful', () async {
@@ -467,7 +466,7 @@ void main() {
           ingredientsTextFromImage: "lemon, water"));
 
     final result = await productsManager.updateProductAndExtractIngredients(product, "ru");
-    expect(result.requireLeft().ingredients, equals("lemon, water"));
+    expect(result.unwrap().ingredients, equals("lemon, water"));
   });
 
   test('ingredients extraction with product update fail', () async {
@@ -484,7 +483,7 @@ void main() {
       ..imageIngredients = Uri.file("/tmp/img2.jpg"));
 
     final result = await productsManager.updateProductAndExtractIngredients(product, "ru");
-    expect(result.isRight, isTrue);
+    expect(result.isErr, isTrue);
   });
 
   test('ingredients extraction fail', () async {
@@ -497,8 +496,8 @@ void main() {
         off.OcrIngredientsResult(status: 1));
 
     final result = await productsManager.updateProductAndExtractIngredients(product, "ru");
-    expect(result.requireLeft().product, isNotNull);
-    expect(result.requireLeft().ingredients, isNull);
+    expect(result.unwrap().product, isNotNull);
+    expect(result.unwrap().ingredients, isNull);
   });
 
   test('ingredients extraction network error', () async {
@@ -511,7 +510,7 @@ void main() {
             (_) async => throw SocketException(""));
 
     final result = await productsManager.updateProductAndExtractIngredients(product, "ru");
-    expect(result.requireRight(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
   });
 
   test('barcode from off is used', () async {
@@ -524,7 +523,7 @@ void main() {
         })));
 
     final productRes = await productsManager.getProduct(badBarcode, "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
 
     // Verify received product
     expect(product!.barcode, equals(goodBarcode));
@@ -555,10 +554,10 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     final expectedProduct = Product((v) => v
       ..barcode = "123"
       ..name = null
@@ -578,10 +577,10 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     // We expect the 'en' values to be excluded
     final expectedInitialProduct = Product((v) => v
       ..barcode = "123"
@@ -611,10 +610,10 @@ void main() {
     });
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct1));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
 
     // Order 1
     productsManager.createUpdateProduct(
@@ -648,10 +647,10 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
 
     // Send the product back without changing it
     productsManager.createUpdateProduct(product!, "ru");
@@ -670,10 +669,10 @@ void main() {
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(null));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.brands!.length, equals(2));
     expect(product.categories!.length, equals(2));
 
@@ -705,7 +704,7 @@ void main() {
         off.ProductResult(product: offProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.ingredientsAnalyzed, equals(BuiltList<Ingredient>([Ingredient((v) => v
       ..name = "water"
       ..vegetarianStatus = VegStatus.positive
@@ -729,7 +728,7 @@ void main() {
         off.ProductResult(product: offProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.ingredientsAnalyzed, BuiltList<Ingredient>());
   });
 
@@ -754,10 +753,10 @@ void main() {
       ..barcode = "123"
       ..vegetarianStatus = VegStatus.unknown.name
       ..vegetarianStatusSource = VegStatusSource.community.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, equals(VegStatus.unknown));
     expect(product.vegetarianStatusSource, equals(VegStatusSource.community));
     expect(product.veganStatus, equals(VegStatus.possible));
@@ -785,10 +784,10 @@ void main() {
       ..barcode = "123"
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, equals(VegStatus.positive));
     expect(product.vegetarianStatusSource, equals(VegStatusSource.open_food_facts));
     expect(product.veganStatus, equals(VegStatus.negative));
@@ -807,10 +806,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name + "woop"
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name + "woop");
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, equals(VegStatus.negative));
     expect(product.vegetarianStatusSource, equals(VegStatusSource.community));
     expect(product.veganStatus, equals(VegStatus.negative));
@@ -829,10 +828,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = VegStatus.negative.name + "woop"
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, isNull);
     expect(product.veganStatus, isNull);
   });
@@ -849,10 +848,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = VegStatus.negative.name + "woop"
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, isNull);
     expect(product.veganStatus, isNull);
   });
@@ -879,10 +878,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = VegStatus.negative.name + "woop"
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any)).thenAnswer((_) async => Left(backendProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(backendProduct));
 
     final productRes = await productsManager.getProduct("123", "ru");
-    final product = productRes.requireLeft();
+    final product = productRes.unwrap();
     expect(product!.vegetarianStatus, VegStatus.positive);
     expect(product.vegetarianStatusSource, VegStatusSource.open_food_facts);
     expect(product.veganStatus, VegStatus.possible);

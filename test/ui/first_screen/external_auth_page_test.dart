@@ -1,8 +1,8 @@
-import 'package:either_option/either_option.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:untitled_vegan_app/base/result.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
 import 'package:untitled_vegan_app/outside/identity/google_user.dart';
@@ -34,7 +34,7 @@ void main() {
 
     final googleUser = GoogleUser("bob", "bob@bo.net", "123", DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(any)).thenAnswer((_) async => Left(UserParams()));
+    when(backend.loginOrRegister(any)).thenAnswer((_) async => Ok(UserParams()));
 
     UserParams? obtainedParams;
     final context = await tester.superPump(

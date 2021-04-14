@@ -204,13 +204,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
-  either_option:
-    dependency: "direct main"
-    description:
-      name: either_option
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.1-dev.1"
   expandable:
     dependency: "direct main"
     description:

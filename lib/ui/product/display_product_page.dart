@@ -248,7 +248,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
               try {
                 final result = await GetIt.I.get<Backend>()
                     .sendReport(_product.barcode, _reportTextController.text);
-                if (result.isLeft) {
+                if (result.isOk) {
                   _reportTextController.clear();
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(

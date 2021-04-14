@@ -7,7 +7,6 @@ import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/user_params.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
 
@@ -36,7 +35,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..backendId = "123"
       ..backendClientToken = "321");
-    expect(result.requireLeft(), equals(expectedParams));
+    expect(result.unwrap(), equals(expectedParams));
   });
 
   test('successful login', () async {
@@ -60,7 +59,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..backendId = "123"
       ..backendClientToken = "321");
-    expect(result.requireLeft(), equals(expectedParams));
+    expect(result.unwrap(), equals(expectedParams));
   });
 
   test('check whether logged in', () async {
@@ -86,7 +85,7 @@ void main() {
 
     final backend = Backend(userParamsController, httpClient);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireLeft(), equals(existingParams));
+    expect(result.unwrap(), equals(existingParams));
   });
 
   test('registration failure - email not verified', () async {
@@ -102,7 +101,7 @@ void main() {
 
     final result = await backend.loginOrRegister("google ID");
     expect(
-        result.requireRight().errorKind, equals(
+        result.unwrapErr().errorKind, equals(
         BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED));
   });
 
@@ -112,7 +111,7 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse(".*register_user.*", "", responseCode: 500);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('registration request bad json', () async {
@@ -121,7 +120,7 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse(".*register_user.*", "{{{{bad bad bad}");
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.INVALID_JSON));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
   test('registration request json error', () async {
@@ -134,7 +133,7 @@ void main() {
       }
     """);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('login request not 200', () async {
@@ -148,7 +147,7 @@ void main() {
     """);
     httpClient.setResponse(".*login_user.*", "", responseCode: 500);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('login request bad json', () async {
@@ -162,7 +161,7 @@ void main() {
     """);
     httpClient.setResponse(".*login_user.*", "{{{{bad bad bad}");
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.INVALID_JSON));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
   test('login request json error', () async {
@@ -180,7 +179,7 @@ void main() {
       }
     """);
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.OTHER));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
   test('registration network error', () async {
@@ -189,7 +188,7 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponseException(".*register_user.*", SocketException(""));
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
   test('login network error', () async {
@@ -203,7 +202,7 @@ void main() {
     """);
     httpClient.setResponseException(".*register_user.*", SocketException(""));
     final result = await backend.loginOrRegister("google ID");
-    expect(result.requireRight().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
   test('observer notified about server errors', () async {
@@ -244,7 +243,7 @@ void main() {
       ..eatsEggs = false
       ..eatsHoney = true);
     final result = await backend.updateUserParams(updatedParams);
-    expect(result.isLeft, isTrue);
+    expect(result.isOk, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*update_user_data.*");
     expect(requests.length, equals(1));
@@ -310,7 +309,7 @@ void main() {
       ..genderStr = "male"
       ..birthdayStr = "20.07.1993");
     final result = await backend.updateUserParams(updatedParams);
-    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
   test('request product', () async {
@@ -334,7 +333,7 @@ void main() {
       """);
 
     final result = await backend.requestProduct("123");
-    final product = result.requireLeft();
+    final product = result.unwrap();
     final expectedProduct = BackendProduct((v) => v
       ..barcode = "123"
       ..vegetarianStatus = VegStatus.positive.name
@@ -366,7 +365,7 @@ void main() {
       """);
 
     final result = await backend.requestProduct("123");
-    final product = result.requireLeft();
+    final product = result.unwrap();
     expect(product, isNull);
   });
 
@@ -383,7 +382,7 @@ void main() {
     httpClient.setResponse(".*product_data.*", "", responseCode: 500);
 
     final result = await backend.requestProduct("123");
-    expect(result.isRight, isTrue);
+    expect(result.isErr, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*product_data.*");
     expect(requests.length, equals(1));
@@ -412,7 +411,7 @@ void main() {
       """);
 
     final result = await backend.requestProduct("123");
-    expect(result.requireRight().errorKind, BackendErrorKind.INVALID_JSON);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
 
     final requests = httpClient.getRequestsMatching(".*product_data.*");
     expect(requests.length, equals(1));
@@ -433,7 +432,7 @@ void main() {
     httpClient.setResponseException(".*product_data.*", SocketException(""));
 
     final result = await backend.requestProduct("123");
-    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
   test('create update product', () async {
@@ -454,7 +453,7 @@ void main() {
         "123",
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
-    expect(result.isLeft, isTrue);
+    expect(result.isOk, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*create_update_product.*");
     expect(requests.length, equals(1));
@@ -485,7 +484,7 @@ void main() {
     final result = await backend.createUpdateProduct(
         "123",
         vegetarianStatus: VegStatus.positive);
-    expect(result.isLeft, isTrue);
+    expect(result.isOk, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*create_update_product.*");
     expect(requests.length, equals(1));
@@ -516,7 +515,7 @@ void main() {
     final result = await backend.createUpdateProduct(
         "123",
         veganStatus: VegStatus.negative);
-    expect(result.isLeft, isTrue);
+    expect(result.isOk, isTrue);
 
     final requests = httpClient.getRequestsMatching(".*create_update_product.*");
     expect(requests.length, equals(1));
@@ -546,7 +545,7 @@ void main() {
         "123",
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
-    expect(result.isRight, isTrue);
+    expect(result.isErr, isTrue);
   });
 
   test('create update product invalid JSON response', () async {
@@ -565,7 +564,7 @@ void main() {
         "123",
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
-    expect(result.isRight, isTrue);
+    expect(result.isErr, isTrue);
   });
 
   test('create update product network error', () async {
@@ -585,7 +584,7 @@ void main() {
         "123",
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
-    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
   test('send report', () async {
@@ -605,7 +604,7 @@ void main() {
     final result = await backend.sendReport(
         "123",
         "that's a baaaad product");
-    expect(result.isLeft, isTrue);
+    expect(result.isOk, isTrue);
   });
 
   test('send report network error', () async {
@@ -623,6 +622,6 @@ void main() {
     final result = await backend.sendReport(
         "123",
         "that's a baaaad product");
-    expect(result.requireRight().errorKind, BackendErrorKind.NETWORK_ERROR);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
@@ -107,17 +106,17 @@ class Page3Controller extends PageControllerBase {
         _longAction(() async {
           final result = await _productsManager
               .updateProductAndExtractIngredients(_product, langCode);
-          if (result.isRight) {
-            if (result.requireRight() == ProductsManagerError.NETWORK_ERROR) {
+          if (result.isErr) {
+            if (result.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
               showSnackBar(context.strings.global_network_error, context);
             } else {
               showSnackBar(context.strings.global_something_went_wrong, context);
             }
             return;
           }
-          _model.setProduct(result.requireLeft().product);
+          _model.setProduct(result.unwrap().product);
 
-          final ocrIngredients = result.requireLeft().ingredients;
+          final ocrIngredients = result.unwrap().ingredients;
           if (ocrIngredients == null) {
             showSnackBar(context.strings.global_something_went_wrong, context);
             return;

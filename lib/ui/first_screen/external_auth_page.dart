@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/outside/backend/backend.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -72,8 +71,8 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
 
       final backend = GetIt.I.get<Backend>();
       final loginResult = await backend.loginOrRegister(googleAccount.idToken);
-      if (loginResult.isRight) {
-        final error = loginResult.requireRight();
+      if (loginResult.isErr) {
+        final error = loginResult.unwrapErr();
         if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(context.strings.external_auth_page_google_email_not_verified)));
@@ -84,7 +83,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
         return;
       }
 
-      _callback.call(loginResult.requireLeft());
+      _callback.call(loginResult.unwrap());
     } finally {
       setState(() { _loading = false; });
     }

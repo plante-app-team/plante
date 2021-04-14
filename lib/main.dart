@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
 
     // Update on backend
     final result = await GetIt.I.get<Backend>().updateUserParams(params);
-    if (result.isLeft) {
+    if (result.isOk) {
       // Full local update if server said "ok"
       await paramsController.setUserParams(params);
       return true;

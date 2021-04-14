@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:either_option/either_option.dart';
 import 'package:untitled_vegan_app/base/log.dart';
+import 'package:untitled_vegan_app/base/result.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
 import 'package:untitled_vegan_app/base/device_info.dart';
@@ -37,10 +37,10 @@ class Backend {
     return userParams?.backendClientToken != null;
   }
 
-  Future<Either<UserParams, BackendError>> loginOrRegister(String googleIdToken) async {
+  Future<Result<UserParams, BackendError>> loginOrRegister(String googleIdToken) async {
     if (await isLoggedIn()) {
       final userParams = await _userParamsController.getUserParams();
-      return Left(userParams!);
+      return Ok(userParams!);
     }
 
     // Register
@@ -50,21 +50,21 @@ class Backend {
         "register_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.isError) {
-      return Right(_errFromResp(response));
+      return Err(_errFromResp(response));
     }
 
     var json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(_errInvalidJson(response.body));
+      return Err(_errInvalidJson(response.body));
     }
 
     if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
       Log.i("Backend: user registered: ${userParams.toString()}");
-      return Left(userParams);
+      return Ok(userParams);
     }
     if (_errFromJson(json).errorKind != BackendErrorKind.ALREADY_REGISTERED) {
-      return Right(_errFromJson(json));
+      return Err(_errFromJson(json));
     }
 
     // Login
@@ -73,24 +73,24 @@ class Backend {
         "login_user/",
         {"googleIdToken": googleIdToken, "deviceId": deviceId});
     if (response.isError) {
-      return Right(_errFromResp(response));
+      return Err(_errFromResp(response));
     }
 
     json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(_errInvalidJson(response.body));
+      return Err(_errInvalidJson(response.body));
     }
 
     if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
       Log.i("Backend: user logged in: ${userParams.toString()}");
-      return Left(userParams);
+      return Ok(userParams);
     } else {
-      return Right(_errFromJson(json));
+      return Err(_errFromJson(json));
     }
   }
 
-  Future<Either<bool, BackendError>> updateUserParams(UserParams userParams) async {
+  Future<Result<bool, BackendError>> updateUserParams(UserParams userParams) async {
     final params = Map<String, String>();
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params["name"] = userParams.name!;
@@ -111,39 +111,39 @@ class Backend {
       params["eatsHoney"] = userParams.eatsHoney!.toString();
     }
     if (params.isEmpty) {
-      return Left(false);
+      return Ok(false);
     }
 
     var response = await _backendGet("update_user_data/", params);
     if (response.isOk) {
-      return Left(true);
+      return Ok(true);
     } else {
-      return Right(_errFromResp(response));
+      return Err(_errFromResp(response));
     }
   }
 
-  Future<Either<BackendProduct?, BackendError>> requestProduct(String barcode) async {
+  Future<Result<BackendProduct?, BackendError>> requestProduct(String barcode) async {
     var response = await _backendGet("product_data/", { "barcode": barcode });
     if (response.isError) {
-      return Right(_errFromResp(response));
+      return Err(_errFromResp(response));
     }
     final json = _jsonDecodeSafe(response.body);
     if (json == null) {
-      return Right(_errInvalidJson(response.body));
+      return Err(_errInvalidJson(response.body));
     }
 
     if (_isError(json)) {
       final error = _errFromJson(json);
       if (error.errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
-        return Left(null);
+        return Ok(null);
       } else {
-        return Right(error);
+        return Err(error);
       }
     }
-    return Left(BackendProduct.fromJson(json)!);
+    return Ok(BackendProduct.fromJson(json)!);
   }
 
-  Future<Either<None, BackendError>> createUpdateProduct(
+  Future<Result<None, BackendError>> createUpdateProduct(
       String barcode, {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
     final params = Map<String, String>();
     params['barcode'] = barcode;
@@ -157,7 +157,7 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Future<Either<None, BackendError>> sendReport(
+  Future<Result<None, BackendError>> sendReport(
       String barcode, String reportText) async {
     final params = Map<String, String>();
     params['barcode'] = barcode;
@@ -166,15 +166,15 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Either<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
+  Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
-      return Right(_errFromResp(response));
+      return Err(_errFromResp(response));
     }
     final json = _jsonDecodeSafe(response.body);
     if (json != null && !_isError(json)) {
-      return Left(None());
+      return Ok(None());
     } else {
-      return Right(_errOther());
+      return Err(_errOther());
     }
   }
 

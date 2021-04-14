@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:untitled_vegan_app/base/log.dart';
 import 'package:untitled_vegan_app/l10n/strings.dart';
@@ -158,18 +157,18 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     final foundProductResult = await GetIt.I.get<ProductsManager>().getProduct(
         scanData.code,
         Localizations.localeOf(context).languageCode);
-    if (foundProductResult.isRight) {
-      if (foundProductResult.requireRight() == ProductsManagerError.NETWORK_ERROR) {
+    if (foundProductResult.isErr) {
+      if (foundProductResult.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
       } else {
         showSnackBar(context.strings.global_something_went_wrong, context);
       }
     }
-    final foundProduct = foundProductResult.maybeLeft();
+    final foundProduct = foundProductResult.maybeOk();
     setState(() {
       _foundProduct = foundProduct;
       _searching = false;
-      _barcode = foundProductResult.isLeft ? _barcode : null;
+      _barcode = foundProductResult.isOk ? _barcode : null;
     });
   }
 

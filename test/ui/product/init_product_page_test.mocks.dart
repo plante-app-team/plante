@@ -4,9 +4,9 @@
 
 import 'dart:async' as _i4;
 
-import 'package:either_option/src/either.dart' as _i2;
 import 'package:flutter/src/widgets/framework.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:untitled_vegan_app/base/result.dart' as _i2;
 import 'package:untitled_vegan_app/model/product.dart' as _i5;
 import 'package:untitled_vegan_app/outside/products/products_manager.dart'
     as _i3;
@@ -17,7 +17,7 @@ import 'package:untitled_vegan_app/ui/photos_taker.dart' as _i7;
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
 
-class _FakeEither<L, R> extends _i1.Fake implements _i2.Either<L, R> {}
+class _FakeResult<OK, ERR> extends _i1.Fake implements _i2.Result<OK, ERR> {}
 
 class _FakeUri extends _i1.Fake implements Uri {}
 
@@ -30,31 +30,31 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Product?, _i6.ProductsManagerError>> getProduct(
+  _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>> getProduct(
           String? barcodeRaw, String? langCode) =>
       (super.noSuchMethod(
               Invocation.method(#getProduct, [barcodeRaw, langCode]),
               returnValue: Future.value(
-                  _FakeEither<_i5.Product?, _i6.ProductsManagerError>()))
-          as _i4.Future<_i2.Either<_i5.Product?, _i6.ProductsManagerError>>);
+                  _FakeResult<_i5.Product?, _i6.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
   @override
-  _i4.Future<_i2.Either<_i5.Product, _i6.ProductsManagerError>>
+  _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>
       createUpdateProduct(_i5.Product? product, String? langCode) => (super
               .noSuchMethod(
                   Invocation.method(#createUpdateProduct, [product, langCode]),
                   returnValue: Future.value(
-                      _FakeEither<_i5.Product, _i6.ProductsManagerError>()))
-          as _i4.Future<_i2.Either<_i5.Product, _i6.ProductsManagerError>>);
+                      _FakeResult<_i5.Product, _i6.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>);
   @override
-  _i4.Future<_i2.Either<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>
+  _i4.Future<_i2.Result<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>
       updateProductAndExtractIngredients(
               _i5.Product? product, String? langCode) =>
           (super.noSuchMethod(
               Invocation.method(
                   #updateProductAndExtractIngredients, [product, langCode]),
               returnValue: Future.value(
-                  _FakeEither<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>())) as _i4
-              .Future<_i2.Either<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>);
+                  _FakeResult<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>())) as _i4
+              .Future<_i2.Result<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>);
 }
 
 /// A class which mocks [PhotosTaker].

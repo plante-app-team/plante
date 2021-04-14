@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager.dart';
 import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
 import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
@@ -21,15 +20,15 @@ abstract class PageControllerBase {
 
     final updatedProductResult =
         await _productsManager.createUpdateProduct(_model.product, langCode);
-    if (updatedProductResult.isRight) {
-      if (updatedProductResult.requireRight() == ProductsManagerError.NETWORK_ERROR) {
+    if (updatedProductResult.isErr) {
+      if (updatedProductResult.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
       } else {
         showSnackBar(context.strings.global_something_went_wrong, context);
       }
       return;
     }
-    _model.setProduct(updatedProductResult.requireLeft());
+    _model.setProduct(updatedProductResult.unwrap());
     FocusScope.of(context).unfocus();
     _doneFn.call();
   }

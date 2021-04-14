@@ -4,8 +4,6 @@
 
 import 'dart:async' as _i7;
 
-import 'package:either_option/src/either.dart' as _i5;
-import 'package:either_option/src/option.dart' as _i17;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as _i4;
 import 'package:openfoodfacts/model/Product.dart' as _i10;
@@ -15,8 +13,9 @@ import 'package:openfoodfacts/model/Status.dart' as _i3;
 import 'package:openfoodfacts/model/User.dart' as _i9;
 import 'package:openfoodfacts/utils/LanguageHelper.dart' as _i12;
 import 'package:openfoodfacts/utils/ProductQueryConfigurations.dart' as _i8;
+import 'package:untitled_vegan_app/base/result.dart' as _i5;
 import 'package:untitled_vegan_app/model/user_params.dart' as _i14;
-import 'package:untitled_vegan_app/model/veg_status.dart' as _i18;
+import 'package:untitled_vegan_app/model/veg_status.dart' as _i17;
 import 'package:untitled_vegan_app/outside/backend/backend.dart' as _i13;
 import 'package:untitled_vegan_app/outside/backend/backend_error.dart' as _i15;
 import 'package:untitled_vegan_app/outside/backend/backend_product.dart'
@@ -33,7 +32,7 @@ class _FakeStatus extends _i1.Fake implements _i3.Status {}
 class _FakeOcrIngredientsResult extends _i1.Fake
     implements _i4.OcrIngredientsResult {}
 
-class _FakeEither<L, R> extends _i1.Fake implements _i5.Either<L, R> {}
+class _FakeResult<OK, ERR> extends _i1.Fake implements _i5.Result<OK, ERR> {}
 
 /// A class which mocks [OffApi].
 ///
@@ -88,30 +87,30 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
       (super.noSuchMethod(Invocation.method(#isLoggedIn, []),
           returnValue: Future.value(false)) as _i7.Future<bool>);
   @override
-  _i7.Future<_i5.Either<_i14.UserParams, _i15.BackendError>> loginOrRegister(
+  _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>> loginOrRegister(
           String? googleIdToken) =>
       (super.noSuchMethod(Invocation.method(#loginOrRegister, [googleIdToken]),
               returnValue: Future.value(
-                  _FakeEither<_i14.UserParams, _i15.BackendError>()))
-          as _i7.Future<_i5.Either<_i14.UserParams, _i15.BackendError>>);
+                  _FakeResult<_i14.UserParams, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>>);
   @override
-  _i7.Future<_i5.Either<bool, _i15.BackendError>> updateUserParams(
+  _i7.Future<_i5.Result<bool, _i15.BackendError>> updateUserParams(
           _i14.UserParams? userParams) =>
       (super.noSuchMethod(Invocation.method(#updateUserParams, [userParams]),
-              returnValue: Future.value(_FakeEither<bool, _i15.BackendError>()))
-          as _i7.Future<_i5.Either<bool, _i15.BackendError>>);
+              returnValue: Future.value(_FakeResult<bool, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<bool, _i15.BackendError>>);
   @override
-  _i7.Future<_i5.Either<_i16.BackendProduct?, _i15.BackendError>>
+  _i7.Future<_i5.Result<_i16.BackendProduct?, _i15.BackendError>>
       requestProduct(String? barcode) => (super.noSuchMethod(
               Invocation.method(#requestProduct, [barcode]),
               returnValue: Future.value(
-                  _FakeEither<_i16.BackendProduct?, _i15.BackendError>()))
-          as _i7.Future<_i5.Either<_i16.BackendProduct?, _i15.BackendError>>);
+                  _FakeResult<_i16.BackendProduct?, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i16.BackendProduct?, _i15.BackendError>>);
   @override
-  _i7.Future<_i5.Either<_i17.None<dynamic>, _i15.BackendError>> createUpdateProduct(
+  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> createUpdateProduct(
           String? barcode,
-          {_i18.VegStatus? vegetarianStatus,
-          _i18.VegStatus? veganStatus}) =>
+          {_i17.VegStatus? vegetarianStatus,
+          _i17.VegStatus? veganStatus}) =>
       (super.noSuchMethod(
               Invocation.method(#createUpdateProduct, [
                 barcode
@@ -119,14 +118,14 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
                 #vegetarianStatus: vegetarianStatus,
                 #veganStatus: veganStatus
               }),
-              returnValue: Future.value(
-                  _FakeEither<_i17.None<dynamic>, _i15.BackendError>()))
-          as _i7.Future<_i5.Either<_i17.None<dynamic>, _i15.BackendError>>);
+              returnValue:
+                  Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);
   @override
-  _i7.Future<_i5.Either<_i17.None<dynamic>, _i15.BackendError>> sendReport(
+  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
-              returnValue: Future.value(
-                  _FakeEither<_i17.None<dynamic>, _i15.BackendError>()))
-          as _i7.Future<_i5.Either<_i17.None<dynamic>, _i15.BackendError>>);
+              returnValue:
+                  Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);
 }

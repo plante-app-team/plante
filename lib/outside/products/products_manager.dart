@@ -1,11 +1,10 @@
 import 'dart:io';
 
-import 'package:either_option/either_option.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:untitled_vegan_app/base/log.dart';
+import 'package:untitled_vegan_app/base/result.dart';
 import 'package:untitled_vegan_app/model/ingredient.dart';
 
-import 'package:untitled_vegan_app/base/either_extension.dart';
 import 'package:untitled_vegan_app/model/product.dart';
 import 'package:untitled_vegan_app/model/veg_status.dart';
 import 'package:untitled_vegan_app/model/veg_status_source.dart';
@@ -43,7 +42,7 @@ class ProductsManager {
 
   ProductsManager(this._off, this._backend);
 
-  Future<Either<Product?, ProductsManagerError>> getProduct(String barcodeRaw, String langCode) async {
+  Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw, String langCode) async {
     final configuration = off.ProductQueryConfiguration(
         barcodeRaw,
         lc: langCode,
@@ -55,19 +54,19 @@ class ProductsManager {
       offProductResult = await _off.getProduct(configuration);
     } on IOException catch (e) {
       Log.w("Network error in ProductsManager.getProduct", ex: e);
-      return Right(ProductsManagerError.NETWORK_ERROR);
+      return Err(ProductsManagerError.NETWORK_ERROR);
     }
     final offProduct = offProductResult.product;
     if (offProduct == null) {
-      return Left(null);
+      return Ok(null);
     }
 
     final barcode = offProduct.barcode!;
     final backendProductResult = await _backend.requestProduct(barcode);
-    if (backendProductResult.isRight) {
+    if (backendProductResult.isErr) {
       return _convertBackendError(backendProductResult);
     }
-    final backendProduct = backendProductResult.requireLeft();
+    final backendProduct = backendProductResult.unwrap();
 
     var result = Product((v) => v
       ..barcode = barcode
@@ -133,7 +132,7 @@ class ProductsManager {
     final categoriesFiltered = result.categories!.where((e) => !_notTranslatedRegex.hasMatch(e));
     result = result.rebuild((v) => v.categories.replace(categoriesFiltered));
 
-    return Left(result);
+    return Ok(result);
   }
 
   Uri? _extractImageUri(off.Product offProduct, ProductImageType imageType, String langCode) {
@@ -183,7 +182,7 @@ class ProductsManager {
   }
 
   /// Returns updated product if update was successful
-  Future<Either<Product, ProductsManagerError>> createUpdateProduct(Product product, String langCode) async {
+  Future<Result<Product, ProductsManagerError>> createUpdateProduct(Product product, String langCode) async {
     final cachedProduct = _productsCache[product.barcode];
     if (cachedProduct != null) {
       final allBrands = _connectDifferentlyTranslated(
@@ -199,7 +198,7 @@ class ProductsManager {
         ..categories.replace(_sortedNotNull(cachedProduct.categories)));
       if (productWithNotTranslatedFields == cachedProductNormalized) {
         // Input product is same as it was when it was cached
-        return Left(product);
+        return Ok(product);
       } else {
         // Let's insert back the not translated fields before sending product to OFF.
         // If we won't do that, that would mean we are to erase existing values
@@ -222,10 +221,10 @@ class ProductsManager {
       offResult = await _off.saveProduct(_offUser(), offProduct);
     } on IOException catch(e) {
       Log.w("ProductsManager.createUpdateProduct 1, e", ex: e);
-      return Right(ProductsManagerError.NETWORK_ERROR);
+      return Err(ProductsManagerError.NETWORK_ERROR);
     }
     if (offResult.error != null) {
-      return Right(ProductsManagerError.OTHER);
+      return Err(ProductsManagerError.OTHER);
     }
 
     // OFF front image
@@ -242,10 +241,10 @@ class ProductsManager {
         status = await _off.addProductImage(_offUser(), image);
       } on IOException catch(e) {
         Log.w("ProductsManager.createUpdateProduct 2, e", ex: e);
-        return Right(ProductsManagerError.NETWORK_ERROR);
+        return Err(ProductsManagerError.NETWORK_ERROR);
       }
       if (status.error != null) {
-        return Right(ProductsManagerError.OTHER);
+        return Err(ProductsManagerError.OTHER);
       }
     }
 
@@ -263,10 +262,10 @@ class ProductsManager {
         status = await _off.addProductImage(_offUser(), image);
       } on IOException catch(e) {
         Log.w("ProductsManager.createUpdateProduct 3, e", ex: e);
-        return Right(ProductsManagerError.NETWORK_ERROR);
+        return Err(ProductsManagerError.NETWORK_ERROR);
       }
       if (status.error != null) {
-        return Right(ProductsManagerError.OTHER);
+        return Err(ProductsManagerError.OTHER);
       }
     }
 
@@ -276,18 +275,18 @@ class ProductsManager {
         product.barcode,
         vegetarianStatus: product.vegetarianStatus,
         veganStatus: product.veganStatus);
-    if (backendResult.isRight) {
+    if (backendResult.isErr) {
       return _convertBackendError(backendResult);
     }
 
     final result = await getProduct(product.barcode, langCode);
-    if (result.isRight) {
-      return Right(result.requireRight());
-    } else if (result.requireLeft() == null) {
+    if (result.isErr) {
+      return Err(result.unwrapErr());
+    } else if (result.unwrap() == null) {
       Log.w("Product was saved but couldn't be obtained back");
-      return Right(ProductsManagerError.OTHER);
+      return Err(ProductsManagerError.OTHER);
     } else {
-      return Left(result.requireLeft()!);
+      return Ok(result.unwrap()!);
     }
   }
 
@@ -317,13 +316,13 @@ class ProductsManager {
     return null;
   }
 
-  Future<Either<ProductWithOCRIngredients, ProductsManagerError>>
+  Future<Result<ProductWithOCRIngredients, ProductsManagerError>>
       updateProductAndExtractIngredients(Product product, String langCode) async {
     final productUpdateResult = await createUpdateProduct(product, langCode);
-    if (productUpdateResult.isRight) {
-      return Right(productUpdateResult.requireRight());
+    if (productUpdateResult.isErr) {
+      return Err(productUpdateResult.unwrapErr());
     }
-    final updatedProduct = productUpdateResult.requireLeft();
+    final updatedProduct = productUpdateResult.unwrap();
 
     final offLang = off.LanguageHelper.fromJson(langCode);
 
@@ -332,12 +331,12 @@ class ProductsManager {
       response = await _off.extractIngredients(_offUser(), product.barcode, offLang);
     } on IOException catch(e) {
       Log.w("ProductsManager.updateProductAndExtractIngredients, e", ex: e);
-      return Right(ProductsManagerError.NETWORK_ERROR);
+      return Err(ProductsManagerError.NETWORK_ERROR);
     }
     if (response.status == 0) {
-      return Left(ProductWithOCRIngredients(updatedProduct, response.ingredientsTextFromImage));
+      return Ok(ProductWithOCRIngredients(updatedProduct, response.ingredientsTextFromImage));
     } else {
-      return Left(ProductWithOCRIngredients(updatedProduct, null));
+      return Ok(ProductWithOCRIngredients(updatedProduct, null));
     }
   }
 
@@ -369,11 +368,11 @@ extension _OffIngredientExtension on off.Ingredient {
   }
 }
 
-Either<T1, ProductsManagerError> _convertBackendError<T1, T2>(
-    Either<T2, BackendError> backendResult) {
-  if (backendResult.requireRight().errorKind == BackendErrorKind.NETWORK_ERROR) {
-    return Right(ProductsManagerError.NETWORK_ERROR);
+Result<T1, ProductsManagerError> _convertBackendError<T1, T2>(
+    Result<T2, BackendError> backendResult) {
+  if (backendResult.unwrapErr().errorKind == BackendErrorKind.NETWORK_ERROR) {
+    return Err(ProductsManagerError.NETWORK_ERROR);
   } else {
-    return Right(ProductsManagerError.OTHER);
+    return Err(ProductsManagerError.OTHER);
   }
 }
