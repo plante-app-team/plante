@@ -1,4 +1,4 @@
-package vegancheckteam.untitled_vegan_app
+package vegancheckteam.plante
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

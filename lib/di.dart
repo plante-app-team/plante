@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/backend/user_params_auto_wiper.dart';
-import 'package:untitled_vegan_app/outside/identity/google_authorizer.dart';
-import 'package:untitled_vegan_app/model/location_controller.dart';
-import 'package:untitled_vegan_app/outside/off/off_api.dart';
-import 'package:untitled_vegan_app/outside/osm/open_street_map.dart';
-import 'package:untitled_vegan_app/model/user_params_controller.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/ui/photos_taker.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_params_auto_wiper.dart';
+import 'package:plante/outside/identity/google_authorizer.dart';
+import 'package:plante/model/location_controller.dart';
+import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/osm/open_street_map.dart';
+import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/photos_taker.dart';
 
 import 'outside/http_client.dart';
 

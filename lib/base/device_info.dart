@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
-import 'package:untitled_vegan_app/base/log.dart';
+import 'package:plante/base/log.dart';
 
 class DeviceInfo {
   final String deviceID;

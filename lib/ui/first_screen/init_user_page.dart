@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:untitled_vegan_app/base/date_time_extensions.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/model/gender.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/ui/base/general_date_Input_formatter.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/customizable_stepper.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
+import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/gender.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/ui/base/general_date_Input_formatter.dart';
+import 'package:plante/ui/base/stepper/customizable_stepper.dart';
+import 'package:plante/ui/base/stepper/stepper_page.dart';
 
 typedef UserParamsSpecifiedCallback = Future<bool> Function(UserParams userParams);
 

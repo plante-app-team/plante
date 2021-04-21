@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/base/log.dart';
-import 'package:untitled_vegan_app/ui/main/qr_scan_page.dart';
+import 'package:plante/base/log.dart';
+import 'package:plante/ui/main/qr_scan_page.dart';
 
 class FeedPage extends StatefulWidget {
   @override

@@ -1,5 +1,5 @@
 import 'package:http/http.dart';
-import 'package:untitled_vegan_app/base/log.dart';
+import 'package:plante/base/log.dart';
 
 class HttpClient extends BaseClient {
   final Client _realClient;

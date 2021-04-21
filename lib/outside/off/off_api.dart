@@ -1,6 +1,6 @@
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
-import 'package:untitled_vegan_app/base/log.dart';
+import 'package:plante/base/log.dart';
 
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {

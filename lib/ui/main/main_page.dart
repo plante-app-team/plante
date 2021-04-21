@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/ui/main/feed/feed_page.dart';
-import 'package:untitled_vegan_app/ui/main/map/map_page.dart';
+import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/main/feed/feed_page.dart';
+import 'package:plante/ui/main/map/map_page.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key? key}) : super(key: key);

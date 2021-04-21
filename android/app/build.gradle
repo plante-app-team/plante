@@ -34,7 +34,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "vegancheckteam.untitled_vegan_app"
+        applicationId "vegancheckteam.plante"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()

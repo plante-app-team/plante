@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/customizable_stepper.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/base/stepper/customizable_stepper.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '_init_product_page_model.dart';
 import '_page1_controller.dart';

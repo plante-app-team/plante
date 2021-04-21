@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/model/product_restorable.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/model/product_restorable.dart';
 
 typedef ProductBuilderFunction = void Function(ProductBuilder product);
 class ProductUpdate {

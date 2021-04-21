@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled_vegan_app/model/gender.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/ui/base/shared_preferences_extensions.dart';
+import 'package:plante/model/gender.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/ui/base/shared_preferences_extensions.dart';
 
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 const PREF_USER_PARAMS_NAME = 'USER_PARAMS_NAME2';

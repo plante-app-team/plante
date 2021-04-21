@@ -1,4 +1,4 @@
-import 'package:untitled_vegan_app/base/log.dart';
+import 'package:plante/base/log.dart';
 
 enum Gender {
   MALE,

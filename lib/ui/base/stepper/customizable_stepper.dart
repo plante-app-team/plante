@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/_indicators_top.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/functions.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
+import 'package:plante/ui/base/stepper/_indicators_top.dart';
+import 'package:plante/ui/base/stepper/functions.dart';
+import 'package:plante/ui/base/stepper/stepper_page.dart';
 
 class CustomizableStepperController {
   CustomizableStepper2IndicatorsTopController _indicatorsController;

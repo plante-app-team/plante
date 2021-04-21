@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
-import 'package:untitled_vegan_app/ui/base/ui_utils.dart';
-import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/base/stepper/stepper_page.dart';
+import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/product/_init_product_page_model.dart';
+import 'package:plante/l10n/strings.dart';
 
 abstract class PageControllerBase {
   final Function() _doneFn;

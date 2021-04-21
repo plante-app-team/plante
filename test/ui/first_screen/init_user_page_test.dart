@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:untitled_vegan_app/model/gender.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/ui/first_screen/init_user_page.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/model/gender.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/ui/first_screen/init_user_page.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
 

@@ -1,10 +1,10 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:untitled_vegan_app/base/build_value_helper.dart';
-import 'package:untitled_vegan_app/model/ingredient.dart';
-import 'package:untitled_vegan_app/model/veg_status.dart';
-import 'package:untitled_vegan_app/model/veg_status_source.dart';
+import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
 
 part 'product.g.dart';
 

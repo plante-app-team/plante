@@ -1,8 +1,8 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:intl/intl.dart';
-import 'package:untitled_vegan_app/base/build_value_helper.dart';
-import 'package:untitled_vegan_app/model/gender.dart';
+import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/model/gender.dart';
 
 part 'user_params.g.dart';
 

@@ -1,6 +1,6 @@
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:untitled_vegan_app/base/log.dart';
-import 'package:untitled_vegan_app/outside/identity/google_user.dart';
+import 'package:plante/base/log.dart';
+import 'package:plante/outside/identity/google_user.dart';
 
 class GoogleAuthorizer {
   Future<GoogleUser?> auth() async {

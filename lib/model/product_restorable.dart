@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:untitled_vegan_app/model/product.dart';
+import 'package:plante/model/product.dart';
 
 class ProductRestorable extends RestorableValue<Product> {
   final Product _defaultValue;

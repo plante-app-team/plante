@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
-import 'package:untitled_vegan_app/base/pair.dart';
+import 'package:plante/base/pair.dart';
 
 const LOGS_DIR_MAX_SIZE = 1024 * 1024 * 10;
 

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:untitled_vegan_app/model/location_controller.dart';
-import 'package:untitled_vegan_app/outside/osm/open_street_map.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/model/location_controller.dart';
+import 'package:plante/outside/osm/open_street_map.dart';
+import 'package:plante/l10n/strings.dart';
 
 class MapPage extends StatefulWidget {
   @override

@@ -1,9 +1,9 @@
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/model/gender.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/model/user_params_controller.dart';
+import 'package:plante/model/gender.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 
 import 'user_params_controller_test.mocks.dart';
 

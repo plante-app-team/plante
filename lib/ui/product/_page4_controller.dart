@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/model/veg_status.dart';
-import 'package:untitled_vegan_app/model/veg_status_source.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/stepper_page.dart';
-import 'package:untitled_vegan_app/ui/product/_init_product_page_model.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/base/stepper/stepper_page.dart';
+import 'package:plante/ui/product/_init_product_page_model.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '_page_controller_base.dart';
 

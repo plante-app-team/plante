@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/model/ingredient.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/model/veg_status.dart';
+import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/model/veg_status.dart';
 
 void main() {
   setUp(() {

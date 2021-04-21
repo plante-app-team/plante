@@ -1,5 +1,5 @@
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/model/user_params_controller.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 
 class FakeUserParamsController implements UserParamsController {
   final _observers = <UserParamsControllerObserver>[];

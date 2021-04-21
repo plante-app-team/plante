@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:get_it/get_it.dart';
-import 'package:untitled_vegan_app/base/log.dart';
-import 'package:untitled_vegan_app/outside/http_client.dart';
-import 'package:untitled_vegan_app/model/shop.dart';
+import 'package:plante/base/log.dart';
+import 'package:plante/outside/http_client.dart';
+import 'package:plante/model/shop.dart';
 
 class OpenStreetMap {
   Future<List<Shop>> fetchShops(

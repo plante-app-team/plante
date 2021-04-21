@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/base/log.dart';
+import 'package:plante/base/log.dart';
 
 void main() {
   setUp(() {

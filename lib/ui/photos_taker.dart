@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:untitled_vegan_app/base/base.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
+import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 
 class PhotosTaker {
   // TODO: files are big and other apps and activities are opened here - we need

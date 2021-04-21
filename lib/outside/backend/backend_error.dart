@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:untitled_vegan_app/base/base.dart';
-import 'package:untitled_vegan_app/base/log.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_response.dart';
+import 'package:plante/base/base.dart';
+import 'package:plante/base/log.dart';
+import 'package:plante/outside/backend/backend_response.dart';
 
 enum BackendErrorKind {
   ALREADY_REGISTERED,

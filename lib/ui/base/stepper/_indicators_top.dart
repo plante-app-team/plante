@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:untitled_vegan_app/ui/base/stepper/functions.dart';
+import 'package:plante/ui/base/stepper/functions.dart';
 
 typedef _SetPageFunction = void Function(int page);
 

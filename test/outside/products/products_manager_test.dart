@@ -9,17 +9,17 @@ import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/base/result.dart';
-import 'package:untitled_vegan_app/model/ingredient.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/model/veg_status.dart';
-import 'package:untitled_vegan_app/model/veg_status_source.dart';
-import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
-import 'package:untitled_vegan_app/outside/off/off_api.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
+import 'package:plante/base/result.dart';
+import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/backend_product.dart';
+import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_manager_error.dart';
 
 import 'products_manager_test.mocks.dart';
 

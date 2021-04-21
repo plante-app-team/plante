@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
-import 'package:untitled_vegan_app/model/veg_status.dart';
-import 'package:untitled_vegan_app/model/veg_status_source.dart';
-import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_error.dart';
-import 'package:untitled_vegan_app/model/user_params.dart';
-import 'package:untitled_vegan_app/outside/backend/backend_product.dart';
+import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/outside/backend/backend_product.dart';
 
 import '../../fake_http_client.dart';
 import '../../fake_user_params_controller.dart';

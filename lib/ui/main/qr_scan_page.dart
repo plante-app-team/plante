@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
-import 'package:untitled_vegan_app/base/log.dart';
-import 'package:untitled_vegan_app/l10n/strings.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/outside/backend/backend.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager.dart';
-import 'package:untitled_vegan_app/outside/products/products_manager_error.dart';
-import 'package:untitled_vegan_app/ui/base/ui_utils.dart';
-import 'package:untitled_vegan_app/ui/product/product_page_wrapper.dart';
+import 'package:plante/base/log.dart';
+import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class QrScanPage extends StatefulWidget {
   @override

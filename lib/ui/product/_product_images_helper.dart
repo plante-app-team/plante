@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:untitled_vegan_app/model/product.dart';
+import 'package:plante/model/product.dart';
 
 class ProductImagesHelper {
   static Widget productImageWidget(Product product, ProductImageType imageType, {double? size}) {

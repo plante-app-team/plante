@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:untitled_vegan_app/model/product.dart';
-import 'package:untitled_vegan_app/ui/product/display_product_page.dart';
-import 'package:untitled_vegan_app/ui/product/init_product_page.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/ui/product/display_product_page.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
