@@ -210,7 +210,7 @@ class ProductsManager {
     // OFF product
 
     final offProduct = off.Product(
-        lang: off.LanguageHelper.fromJson(langCode),
+        translatedLang: off.LanguageHelper.fromJson(langCode),
         barcode: product.barcode,
         productNameTranslated: product.name,
         brands: _join(product.brands, null),
