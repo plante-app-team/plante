@@ -13,7 +13,7 @@ import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 
-const BACKEND_ADDRESS = '185.52.2.206:8080';
+const BACKEND_ADDRESS = 'planteapp.com';
 
 const PREF_BACKEND_CLIENT_TOKEN = 'BACKEND_CLIENT_TOKEN';
 
@@ -202,7 +202,7 @@ class Backend {
     if (backendClientToken != null) {
       headersReally["Authorization"] = "Bearer $backendClientToken";
     }
-    final url = Uri.http("$BACKEND_ADDRESS", path, params);
+    final url = Uri.https("$BACKEND_ADDRESS", "/backend/$path", params);
     try {
       final httpResponse = await _http.get(url, headers: headersReally);
       return BackendResponse.fromHttpResponse(httpResponse);
