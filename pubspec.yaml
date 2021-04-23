@@ -43,8 +43,9 @@ dependencies:
   image_cropper: ^1.4.0
   flutter_svg: ^0.21.0-nullsafety.0
   google_sign_in: ^5.0.1
-  firebase_core: ^0.4.0+9
-  firebase_auth: ^0.14.0+5
+  firebase_core: ^1.0.4
+  firebase_auth: ^1.1.1
+  firebase_crashlytics: ^2.0.1
   device_info: ^2.0.0
   json_annotation: ^4.0.1
   built_value: ^8.0.4

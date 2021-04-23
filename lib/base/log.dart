@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fimber/fimber.dart';
 import 'package:fimber_io/fimber_io.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +14,7 @@ const LOGS_DIR_MAX_SIZE = 1024 * 1024 * 10;
 class Log {
   static DebugTree? _debugTree;
   static TimedRollingFileTree? _fileTree;
+  static _CrashlyticsFimberTree? _crashlyticsTree;
 
   static void init({
       Directory? logsDir,
@@ -22,6 +24,9 @@ class Log {
     }
     if (_fileTree != null) {
       Fimber.unplantTree(_fileTree!);
+    }
+    if (_crashlyticsTree != null) {
+      Fimber.unplantTree(_crashlyticsTree!);
     }
 
     _debugTree = DebugTree();
@@ -33,6 +38,11 @@ class Log {
     _fileTree = TimedRollingFileTree(
         filenamePrefix: logsDir.absolute.path + "/log");
     Fimber.plantTree(_fileTree!);
+
+    if (kReleaseMode) {
+      _crashlyticsTree = _CrashlyticsFimberTree();
+      Fimber.plantTree(_crashlyticsTree!);
+    }
 
     // NOTE: it's async but we don't wait for it
     maybeCleanUpLogs(logsDir, maxSizeBytes);
@@ -125,17 +135,55 @@ class Log {
     }
   }
 
-  static void e(String message, {dynamic ex, StackTrace? stacktrace, bool crashAllowed = true}) {
+  static void e(
+      String message,
+      {dynamic ex,
+        StackTrace? stacktrace,
+        bool crashAllowed = true,
+        bool crashlyticsAllowed = true}) {
     if (ex is FlutterError && ex.message.contains("RenderFlex")) {
       return;
     }
-    if (ex == null) {
-      Fimber.e(message, ex: ex, stacktrace: stacktrace);
-    } else {
-      Fimber.e("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
-    }
     if (crashAllowed && !kReleaseMode) {
       throw Exception(message);
+    }
+
+    if (!crashlyticsAllowed && _crashlyticsTree != null) {
+      Fimber.unplantTree(_crashlyticsTree!);
+    }
+    try {
+      if (ex == null) {
+        Fimber.e(message, ex: ex, stacktrace: stacktrace);
+      } else {
+        Fimber.e("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+      }
+    } finally {
+      if (!crashlyticsAllowed && _crashlyticsTree != null) {
+        Fimber.plantTree(_crashlyticsTree!);
+      }
+    }
+  }
+}
+
+class _CrashlyticsFimberTree extends LogTree {
+  @override
+  List<String> getLevels() => ["D", "I", "W", "E", "V"];
+
+  @override
+  void log(String level, String message, {String? tag, ex, StackTrace? stacktrace}) {
+    logImpl(level, message, tag: tag, ex: ex, stacktrace: stacktrace);
+  }
+
+  Future<void> logImpl(String level, String message,
+      {String? tag, ex, StackTrace? stacktrace}) async {
+    if (level == "E") {
+      await FirebaseCrashlytics.instance.recordError(
+          ex,
+          stacktrace,
+          reason: message,
+          fatal: false);
+    } else {
+      await FirebaseCrashlytics.instance.log("Msg: $message, ex: $ex");
     }
   }
 }

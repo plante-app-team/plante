@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -21,6 +23,7 @@ class UserParamsControllerObserver {
 }
 
 class UserParamsController {
+  bool _crashlyticsInited = false;
   final _observers = <UserParamsControllerObserver>[];
 
   void addObserver(UserParamsControllerObserver observer) => _observers.add(observer);
@@ -46,6 +49,11 @@ class UserParamsController {
         && backendId == null
         && clientToken == null) {
       return null;
+    }
+
+    if (kReleaseMode && backendId != null && !_crashlyticsInited) {
+      FirebaseCrashlytics.instance.setUserIdentifier(backendId);
+      _crashlyticsInited = true;
     }
 
     return UserParams((v) => v

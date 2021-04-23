@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
@@ -31,6 +34,10 @@ void mainImpl() async {
     onError(details.toString(), details.exception, details.stack);
   };
 
+  if (kReleaseMode) {
+    await Firebase.initializeApp();
+  }
+
   Log.init();
   Log.i("App start");
 
@@ -44,12 +51,20 @@ void mainImpl() async {
       child: MyApp(initialUserParams)));
 }
 
-void onError(String text, dynamic? exception, StackTrace? stack) {
+void onError(String text, dynamic? exception, StackTrace? stack) async {
   Log.e(
       text,
       ex: exception,
       stacktrace: stack,
-      crashAllowed: false /* We'll crash ourselves */);
+      crashAllowed: false /* We'll crash ourselves */,
+      crashlyticsAllowed: false /* We'll send the error ourselves */);
+  if (kReleaseMode) {
+    await FirebaseCrashlytics.instance.recordError(
+        exception,
+        stack,
+        reason: text,
+        fatal: true);
+  }
   exit(1);
 }
 
