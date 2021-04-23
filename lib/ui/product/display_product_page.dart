@@ -6,6 +6,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/ui/base/my_stateful_builder.dart';
 
 import '_product_images_helper.dart';
 import 'init_product_page.dart';
@@ -35,7 +36,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   final ProductUpdatedCallback? _productUpdatedCallback;
 
   final _reportTextController = TextEditingController();
-  bool _reportSendAllowed = false;
+  bool get _reportSendAllowed => _reportTextController.text.trim().length > 3;
   bool _loading = false;
 
   _DisplayProductPageState(
@@ -230,16 +231,27 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   }
 
   void _onReportClick() {
+    Function()? reportTextListener;
+
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
+        return MyStatefulBuilder(
+          disposer: () {
+            if (reportTextListener != null) {
+              _reportTextController.removeListener(reportTextListener!);
+            }
+          },
           builder: (context, setState) {
-            _reportTextController.addListener(() {
+            if (reportTextListener != null) {
+              _reportTextController.removeListener(reportTextListener!);
+            }
+            reportTextListener = () {
               setState(() {
-                _reportSendAllowed = _reportTextController.text.trim().length > 3;
+                // UI update
               });
-            });
+            };
+            _reportTextController.addListener(reportTextListener!);
 
             final onSendClick = () async {
               setState(() {
