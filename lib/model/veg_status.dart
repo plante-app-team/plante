@@ -20,6 +20,9 @@ class VegStatus extends EnumClass {
   static Serializer<VegStatus> get serializer => _$vegStatusSerializer;
 
   static VegStatus? safeValueOf(String name) {
+    if (name.trim().isEmpty) {
+      return null;
+    }
     try {
       return valueOf(name);
     } on ArgumentError catch(e) {
