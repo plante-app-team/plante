@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
 
@@ -36,6 +38,20 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
                 OutlinedButton(
                   child: Text("Send logs"),
                   onPressed: Log.startLogsSending),
+                Column(
+                  verticalDirection: VerticalDirection.up,
+                  children: [
+                    Center(child:
+                      InkWell(
+                        child: Text(
+                          context.strings.external_auth_page_privacy_policy,
+                          style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline)),
+                        onTap: () {
+                          launch(PRIVACY_POLICY_URL);
+                        }))
+                ]),
                 Container(padding: EdgeInsets.only(left: 10, right: 10), child: Column(children: [
                   Expanded(child: Center(child: Text(
                       context.strings.external_auth_page_search_products_with + " " +
