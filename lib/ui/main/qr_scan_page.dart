@@ -121,10 +121,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
 
   Widget _buildQrView(BuildContext context) {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
-        MediaQuery.of(context).size.height < 400)
-        ? 150.0
-        : 300.0;
+    var scanArea = 300.0;
     return qr.QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
