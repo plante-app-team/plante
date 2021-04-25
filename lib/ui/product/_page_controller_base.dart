@@ -21,7 +21,8 @@ abstract class PageControllerBase {
     final updatedProductResult =
         await _productsManager.createUpdateProduct(_model.product, langCode);
     if (updatedProductResult.isErr) {
-      if (updatedProductResult.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
+      if (updatedProductResult.unwrapErr() ==
+          ProductsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
       } else {
         showSnackBar(context.strings.global_something_went_wrong, context);

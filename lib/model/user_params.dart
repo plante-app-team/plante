@@ -53,12 +53,13 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String requireBackendClientToken() => backendClientToken!;
 
   static UserParams? fromJson(Map<String, dynamic> json) {
-    return BuildValueHelper.jsonSerializers.deserializeWith(UserParams.serializer, json);
+    return BuildValueHelper.jsonSerializers
+        .deserializeWith(UserParams.serializer, json);
   }
 
   Map<String, dynamic> toJson() {
-    return BuildValueHelper.jsonSerializers.serializeWith(
-        UserParams.serializer, this) as Map<String, dynamic>;
+    return BuildValueHelper.jsonSerializers
+        .serializeWith(UserParams.serializer, this) as Map<String, dynamic>;
   }
 
   factory UserParams([void Function(UserParamsBuilder) updates]) = _$UserParams;

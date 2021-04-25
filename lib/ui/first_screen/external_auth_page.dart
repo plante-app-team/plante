@@ -29,46 +29,56 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
 
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(body:
-        SafeArea(child:
-            Stack(children: [
-              if (_loading) SizedBox(width: double.infinity, child: LinearProgressIndicator()),
-              Stack(children: [
-                OutlinedButton(
-                  child: Text("Send logs"),
-                  onPressed: Log.startLogsSending),
-                Column(
-                  verticalDirection: VerticalDirection.up,
-                  children: [
-                    Center(child:
-                      InkWell(
-                        child: Text(
-                          context.strings.external_auth_page_privacy_policy,
-                          style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline)),
-                        onTap: () {
-                          launch(PRIVACY_POLICY_URL);
-                        }))
-                ]),
-                Container(padding: EdgeInsets.only(left: 10, right: 10), child: Column(children: [
-                  Expanded(child: Center(child: Text(
-                      context.strings.external_auth_page_search_products_with + " " +
-                          context.strings.global_app_name,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline5))),
-                  Expanded(child: Center(child: SizedBox(
-                      height: 40,
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        label: Text(context.strings.external_auth_page_continue_with_google),
-                        // icon: Icon(Icons.golf_course_outlined),
-                        icon: SizedBox(width: 30, height: 30, child: SvgPicture.asset("assets/google_icon.svg")),
-                        onPressed: !_loading ? _onGoogleAuthClicked : null)))),
-              ]))])])
-        )
-      );
+    return Scaffold(
+        body: SafeArea(
+            child: Stack(children: [
+      if (_loading)
+        SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+      Stack(children: [
+        OutlinedButton(
+            child: Text("Send logs"), onPressed: Log.startLogsSending),
+        Column(verticalDirection: VerticalDirection.up, children: [
+          Center(
+              child: InkWell(
+                  child: Text(context.strings.external_auth_page_privacy_policy,
+                      style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline)),
+                  onTap: () {
+                    launch(PRIVACY_POLICY_URL);
+                  }))
+        ]),
+        Container(
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Column(children: [
+              Expanded(
+                  child: Center(
+                      child: Text(
+                          context.strings
+                                  .external_auth_page_search_products_with +
+                              " " +
+                              context.strings.global_app_name,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.headline5))),
+              Expanded(
+                  child: Center(
+                      child: SizedBox(
+                          height: 40,
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                              label: Text(context.strings
+                                  .external_auth_page_continue_with_google),
+                              // icon: Icon(Icons.golf_course_outlined),
+                              icon: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child: SvgPicture.asset(
+                                      "assets/google_icon.svg")),
+                              onPressed:
+                                  !_loading ? _onGoogleAuthClicked : null)))),
+            ]))
+      ])
+    ])));
   }
 
   void _onGoogleAuthClicked() async {
@@ -91,7 +101,8 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
         final error = loginResult.unwrapErr();
         if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(context.strings.external_auth_page_google_email_not_verified)));
+              content: Text(context
+                  .strings.external_auth_page_google_email_not_verified)));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(context.strings.global_something_went_wrong)));
@@ -101,7 +112,9 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
 
       _callback.call(loginResult.unwrap());
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 }

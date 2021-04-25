@@ -20,7 +20,7 @@ part 'build_value_helper.g.dart';
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers =
-(_serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();
+    (_serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();
 
 class BuildValueHelper {
   static final Serializers serializers = _serializers;

@@ -12,22 +12,23 @@ class BackendResponse {
   bool get isOk => statusCode == 200;
   bool get isError => !isOk;
 
-  BackendResponse.fromHttpResponse(Response response):
-      requestUrl = response.request?.url,
-      statusCode = response.statusCode,
-      reasonPhrase = response.reasonPhrase,
-      body = response.body,
-      headers = response.headers,
-      exception = null;
-  BackendResponse.fromError(dynamic exception, Uri requestUrl):
-        requestUrl = requestUrl,
+  BackendResponse.fromHttpResponse(Response response)
+      : requestUrl = response.request?.url,
+        statusCode = response.statusCode,
+        reasonPhrase = response.reasonPhrase,
+        body = response.body,
+        headers = response.headers,
+        exception = null;
+  BackendResponse.fromError(dynamic exception, Uri requestUrl)
+      : requestUrl = requestUrl,
         statusCode = null,
         reasonPhrase = null,
         body = "",
         headers = {},
         exception = exception {
-    Log.w("BackendResponse.fromError, url: ${requestUrl.toString()}, "
-          "e: $exception",
-           ex:exception);
+    Log.w(
+        "BackendResponse.fromError, url: ${requestUrl.toString()}, "
+        "e: $exception",
+        ex: exception);
   }
 }

@@ -19,11 +19,9 @@ import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/model/user_params_controller.dart';
 
 void main() {
-  runZonedGuarded(
-        mainImpl,
-        (Object error, StackTrace stack) {
-          onError(error.toString(), error, stack);
-        });
+  runZonedGuarded(mainImpl, (Object error, StackTrace stack) {
+    onError(error.toString(), error, stack);
+  });
 }
 
 void mainImpl() async {
@@ -42,32 +40,27 @@ void mainImpl() async {
   Log.i("App start");
 
   initDI();
-  final initialUserParams = await GetIt.I.get<UserParamsController>().getUserParams();
+  final initialUserParams =
+      await GetIt.I.get<UserParamsController>().getUserParams();
 
   setSystemUIOverlayStyle();
 
   runApp(RootRestorationScope(
-      restorationId: 'root',
-      child: MyApp(initialUserParams)));
+      restorationId: 'root', child: MyApp(initialUserParams)));
 }
 
 void onError(String text, dynamic? exception, StackTrace? stack) async {
-  Log.e(
-      text,
+  Log.e(text,
       ex: exception,
       stacktrace: stack,
       crashAllowed: false /* We'll crash ourselves */,
       crashlyticsAllowed: false /* We'll send the error ourselves */);
   if (kReleaseMode) {
-    await FirebaseCrashlytics.instance.recordError(
-        exception,
-        stack,
-        reason: text,
-        fatal: true);
+    await FirebaseCrashlytics.instance
+        .recordError(exception, stack, reason: text, fatal: true);
   }
   exit(1);
 }
-
 
 class MyApp extends StatefulWidget {
   final UserParams? _initialUserParams;
@@ -98,8 +91,8 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
     final paramsController = GetIt.I.get<UserParamsController>();
 
     // Update on backend
-    final result = await GetIt.I.get<Backend>().updateUserParams(
-        params, backendClientTokenOverride: params.backendClientToken);
+    final result = await GetIt.I.get<Backend>().updateUserParams(params,
+        backendClientTokenOverride: params.backendClientToken);
     if (result.isOk) {
       // Full local update if server said "ok"
       await paramsController.setUserParams(params);
@@ -111,14 +104,13 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: _mainWidget(),
-      navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]
-    );
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+        ),
+        home: _mainWidget(),
+        navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
   }
 
   Widget _mainWidget() {
@@ -135,10 +127,10 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
     if (_initialUserParams == null) {
       return false;
     }
-    if ((_initialUserParams?.name ?? "").length < InitUserPage.minNameLength
-        || _initialUserParams!.eatsMilk == null
-        || _initialUserParams!.eatsEggs == null
-        || _initialUserParams!.eatsHoney == null) {
+    if ((_initialUserParams?.name ?? "").length < InitUserPage.minNameLength ||
+        _initialUserParams!.eatsMilk == null ||
+        _initialUserParams!.eatsEggs == null ||
+        _initialUserParams!.eatsHoney == null) {
       return false;
     }
     return true;

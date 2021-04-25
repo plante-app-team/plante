@@ -31,8 +31,8 @@ class _MapPageState extends State<MapPage> {
     final lastKnownPosition = await _locationController.lastKnownPosition();
     if (lastKnownPosition != null && !_initialRealPositionSet) {
       _moveCameraTo(CameraPosition(
-          target: LatLng(
-              lastKnownPosition.latitude, lastKnownPosition.longitude),
+          target:
+              LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
           zoom: 15));
       _initialRealPositionSet = true;
     }
@@ -63,13 +63,11 @@ class _MapPageState extends State<MapPage> {
     if (lastKnownPosition != null) {
       _initialRealPositionSet = true;
       return CameraPosition(
-        target: LatLng(
-          lastKnownPosition.latitude, lastKnownPosition.longitude),
-        zoom: 15);
+          target:
+              LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
+          zoom: 15);
     } else {
-      return CameraPosition(
-        target: LatLng(44.4192543, 38.2052612),
-        zoom: 15);
+      return CameraPosition(target: LatLng(44.4192543, 38.2052612), zoom: 15);
     }
   }
 
@@ -115,8 +113,7 @@ class _MapPageState extends State<MapPage> {
     }
 
     await _moveCameraTo(CameraPosition(
-        target: LatLng(position.latitude, position.longitude),
-        zoom: 15));
+        target: LatLng(position.latitude, position.longitude), zoom: 15));
   }
 
   void _obtainSupermarketsMarkers() async {
@@ -124,8 +121,8 @@ class _MapPageState extends State<MapPage> {
     final viewBounds = await mapController.getVisibleRegion();
 
     final supermarkets = await _osm.fetchShops(
-      Point(viewBounds.northeast.latitude, viewBounds.northeast.longitude),
-      Point(viewBounds.southwest.latitude, viewBounds.southwest.longitude));
+        Point(viewBounds.northeast.latitude, viewBounds.northeast.longitude),
+        Point(viewBounds.southwest.latitude, viewBounds.southwest.longitude));
 
     final newMarkers = Set<Marker>();
     for (final supermarket in supermarkets) {
@@ -134,7 +131,8 @@ class _MapPageState extends State<MapPage> {
         position: LatLng(supermarket.latitude, supermarket.longitude),
         infoWindow: InfoWindow(
             title: supermarket.name,
-            snippet: supermarket.type ?? context.strings.map_page_default_shop_type_name),
+            snippet: supermarket.type ??
+                context.strings.map_page_default_shop_type_name),
       ));
     }
 

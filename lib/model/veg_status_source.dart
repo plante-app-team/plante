@@ -17,7 +17,8 @@ class VegStatusSource extends EnumClass {
 
   static BuiltSet<VegStatusSource> get values => _$values;
   static VegStatusSource valueOf(String name) => _$valueOf(name);
-  static Serializer<VegStatusSource> get serializer => _$vegStatusSourceSerializer;
+  static Serializer<VegStatusSource> get serializer =>
+      _$vegStatusSourceSerializer;
 
   static VegStatusSource? safeValueOf(String name) {
     if (name.trim().isEmpty) {

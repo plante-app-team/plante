@@ -16,8 +16,7 @@ class GeneralDateInputFormatter extends TextInputFormatter {
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue) {
+      TextEditingValue oldValue, TextEditingValue newValue) {
     if (_isValid(oldValue.text)) {
       _lastValidText = oldValue;
     }
@@ -66,7 +65,8 @@ class GeneralDateInputFormatter extends TextInputFormatter {
     } else {
       monthEndIndex = text.length;
     }
-    if (!_isSectionValid(text, dayEndIndex + 1, monthEndIndex, 1, 12, divider)) {
+    if (!_isSectionValid(
+        text, dayEndIndex + 1, monthEndIndex, 1, 12, divider)) {
       return false;
     }
 
@@ -76,10 +76,7 @@ class GeneralDateInputFormatter extends TextInputFormatter {
       return true;
     }
     if (!_isSectionValid(
-        text,
-        monthEndIndex + 1, text.length,
-        _startYear, _endYear,
-        divider)) {
+        text, monthEndIndex + 1, text.length, _startYear, _endYear, divider)) {
       return false;
     }
 
@@ -88,13 +85,14 @@ class GeneralDateInputFormatter extends TextInputFormatter {
 
   bool _isLastSection(int sectionEndIndex, String divider, String text) {
     // If we're at the end of
-    return sectionEndIndex == text.length
-        || (text[sectionEndIndex] == divider
-            && sectionEndIndex + 1 == text.length);
+    return sectionEndIndex == text.length ||
+        (text[sectionEndIndex] == divider &&
+            sectionEndIndex + 1 == text.length);
   }
 
-  bool _isSectionValid(String str, int start, int end, int min, int max, String divider) {
-     // Empty
+  bool _isSectionValid(
+      String str, int start, int end, int min, int max, String divider) {
+    // Empty
     if (end == start) {
       // Valid if there's no divider yet
       return end == str.length;
@@ -138,7 +136,8 @@ class GeneralDateInputFormatter extends TextInputFormatter {
     if (possibleMinValue != 0) {
       var possibleMinValueStr = possibleMinValue.toString();
       final minStr = min.toString();
-      while (possibleMinValue! < min && possibleMinValueStr.length < minStr.length) {
+      while (possibleMinValue! < min &&
+          possibleMinValueStr.length < minStr.length) {
         possibleMinValue = int.parse(possibleMinValue.toString() + "0");
         possibleMinValueStr = possibleMinValue.toString();
       }

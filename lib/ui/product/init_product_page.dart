@@ -16,12 +16,7 @@ import '_page_controller_base.dart';
 typedef DoneCallback = void Function();
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-enum InitProductSubpage {
-  PAGE1,
-  PAGE2,
-  PAGE3,
-  PAGE4
-}
+enum InitProductSubpage { PAGE1, PAGE2, PAGE3, PAGE4 }
 
 class InitProductPage extends StatefulWidget {
   final Product initialProduct;
@@ -30,23 +25,19 @@ class InitProductPage extends StatefulWidget {
   final List<InitProductSubpage>? requiredPages;
   final Key? key;
 
-  InitProductPage(
-      this.initialProduct,
+  InitProductPage(this.initialProduct,
       {this.doneCallback,
-       this.productUpdatedCallback,
-       this.key,
-       this.requiredPages});
+      this.productUpdatedCallback,
+      this.key,
+      this.requiredPages});
 
   @override
   _InitProductPageState createState() => _InitProductPageState(
-      initialProduct,
-      doneCallback,
-      productUpdatedCallback,
-      key,
-      requiredPages);
+      initialProduct, doneCallback, productUpdatedCallback, key, requiredPages);
 }
 
-class _InitProductPageState extends State<InitProductPage> with RestorationMixin {
+class _InitProductPageState extends State<InitProductPage>
+    with RestorationMixin {
   final Key? _key;
   final DoneCallback? _doneCallback;
   final ProductUpdatedCallback? _productUpdatedCallback;
@@ -59,12 +50,8 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
   bool _controllersInited = false;
   final _pagesControllers = <PageControllerBase>[];
 
-  _InitProductPageState(
-      Product initialProduct,
-      this._doneCallback,
-      this._productUpdatedCallback,
-      this._key,
-      this._requiredPages)
+  _InitProductPageState(Product initialProduct, this._doneCallback,
+      this._productUpdatedCallback, this._key, this._requiredPages)
       : _model = InitProductPageModel(initialProduct) {
     assert(_requiredPages == null || _requiredPages!.isNotEmpty);
   }
@@ -164,15 +151,18 @@ class _InitProductPageState extends State<InitProductPage> with RestorationMixin
 
     return Scaffold(
         key: _key,
-        body: SafeArea(child: Stack(children: [
-          if (_model.loading) SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+        body: SafeArea(
+            child: Stack(children: [
+          if (_model.loading)
+            SizedBox(width: double.infinity, child: LinearProgressIndicator()),
           CustomizableStepper(
             pages: _pagesControllers.map((c) => c.build(context)).toList(),
             controller: _stepperController,
             contentPadding: EdgeInsets.only(left: 50, right: 50),
-          )]))
-    );
+          )
+        ])));
   }
 }
 
-typedef _PageControllerMaker = PageControllerBase Function(String, void Function());
+typedef _PageControllerMaker = PageControllerBase Function(
+    String, void Function());

@@ -14,7 +14,6 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 
-
 class ProductWithOCRIngredients {
   Product product;
   String? ingredients;
@@ -42,9 +41,9 @@ class ProductsManager {
 
   ProductsManager(this._off, this._backend);
 
-  Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw, String langCode) async {
-    final configuration = off.ProductQueryConfiguration(
-        barcodeRaw,
+  Future<Result<Product?, ProductsManagerError>> getProduct(
+      String barcodeRaw, String langCode) async {
+    final configuration = off.ProductQueryConfiguration(barcodeRaw,
         lc: langCode,
         language: off.LanguageHelper.fromJson(langCode),
         fields: _NEEDED_OFF_FIELDS.toList());
@@ -70,24 +69,28 @@ class ProductsManager {
 
     var result = Product((v) => v
       ..barcode = barcode
-
-      ..vegetarianStatus = VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "")
-      ..vegetarianStatusSource = VegStatusSource.safeValueOf(backendProduct?.vegetarianStatusSource ?? "")
+      ..vegetarianStatus =
+          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "")
+      ..vegetarianStatusSource = VegStatusSource.safeValueOf(
+          backendProduct?.vegetarianStatusSource ?? "")
       ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? "")
-      ..veganStatusSource = VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "")
-
+      ..veganStatusSource =
+          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "")
       ..name = offProduct.productNameTranslated
       ..brands.addAll(offProduct.brandsTags ?? [])
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])
       ..ingredientsText = offProduct.ingredientsTextTranslated
       ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
-      ..imageFront = _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
-      ..imageIngredients = _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode)
-    );
+      ..imageFront =
+          _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
+      ..imageIngredients =
+          _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode));
 
     if (backendProduct?.vegetarianStatus != null) {
-      final vegetarianStatus = VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "");
-      var vegetarianStatusSource = VegStatusSource.safeValueOf(backendProduct?.vegetarianStatusSource ?? "");
+      final vegetarianStatus =
+          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "");
+      var vegetarianStatusSource = VegStatusSource.safeValueOf(
+          backendProduct?.vegetarianStatusSource ?? "");
       if (vegetarianStatusSource == null && vegetarianStatus != null) {
         vegetarianStatusSource = VegStatusSource.community;
       }
@@ -96,8 +99,10 @@ class ProductsManager {
         ..vegetarianStatusSource = vegetarianStatusSource);
     }
     if (backendProduct?.veganStatus != null) {
-      final veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? "");
-      var veganStatusSource = VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "");
+      final veganStatus =
+          VegStatus.safeValueOf(backendProduct?.veganStatus ?? "");
+      var veganStatusSource =
+          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "");
       if (veganStatusSource == null && veganStatus != null) {
         veganStatusSource = VegStatusSource.community;
       }
@@ -126,41 +131,43 @@ class ProductsManager {
     _productsCache[barcode] = result;
 
     // Now filter out not translated values
-    final brandsFiltered = result.brands!.where((e) => !_notTranslatedRegex.hasMatch(e));
+    final brandsFiltered =
+        result.brands!.where((e) => !_notTranslatedRegex.hasMatch(e));
     result = result.rebuild((v) => v.brands.replace(brandsFiltered));
 
-    final categoriesFiltered = result.categories!.where((e) => !_notTranslatedRegex.hasMatch(e));
+    final categoriesFiltered =
+        result.categories!.where((e) => !_notTranslatedRegex.hasMatch(e));
     result = result.rebuild((v) => v.categories.replace(categoriesFiltered));
 
     return Ok(result);
   }
 
-  Uri? _extractImageUri(off.Product offProduct, ProductImageType imageType, String langCode) {
+  Uri? _extractImageUri(
+      off.Product offProduct, ProductImageType imageType, String langCode) {
     final images = offProduct.images;
     if (images == null) {
       return null;
     }
     final lang = off.LanguageHelper.fromJson(langCode);
     for (final image in images) {
-      if (image.language != lang
-          || image.url == null) {
+      if (image.language != lang || image.url == null) {
         continue;
       }
-      if (imageType == ProductImageType.FRONT
-          && image.size != off.ImageSize.DISPLAY) {
+      if (imageType == ProductImageType.FRONT &&
+          image.size != off.ImageSize.DISPLAY) {
         continue;
       }
-      if (imageType == ProductImageType.INGREDIENTS
-          && image.size != off.ImageSize.ORIGINAL) {
+      if (imageType == ProductImageType.INGREDIENTS &&
+          image.size != off.ImageSize.ORIGINAL) {
         continue;
       }
 
-      if (image.field == off.ImageField.FRONT
-          && imageType == ProductImageType.FRONT) {
+      if (image.field == off.ImageField.FRONT &&
+          imageType == ProductImageType.FRONT) {
         return Uri.parse(image.url!);
       }
-      if (image.field == off.ImageField.INGREDIENTS
-          && imageType == ProductImageType.INGREDIENTS) {
+      if (image.field == off.ImageField.INGREDIENTS &&
+          imageType == ProductImageType.INGREDIENTS) {
         return Uri.parse(image.url!);
       }
     }
@@ -182,17 +189,17 @@ class ProductsManager {
   }
 
   /// Returns updated product if update was successful
-  Future<Result<Product, ProductsManagerError>> createUpdateProduct(Product product, String langCode) async {
+  Future<Result<Product, ProductsManagerError>> createUpdateProduct(
+      Product product, String langCode) async {
     final cachedProduct = _productsCache[product.barcode];
     if (cachedProduct != null) {
-      final allBrands = _connectDifferentlyTranslated(
-          cachedProduct.brands, product.brands);
+      final allBrands =
+          _connectDifferentlyTranslated(cachedProduct.brands, product.brands);
       final allCategories = _connectDifferentlyTranslated(
           cachedProduct.categories, product.categories);
 
-      final productWithNotTranslatedFields = product.rebuild((v) => v
-        ..brands.replace(allBrands)
-        ..categories.replace(allCategories));
+      final productWithNotTranslatedFields = product.rebuild((v) =>
+          v..brands.replace(allBrands)..categories.replace(allCategories));
       final cachedProductNormalized = cachedProduct.rebuild((v) => v
         ..brands.replace(_sortedNotNull(cachedProduct.brands))
         ..categories.replace(_sortedNotNull(cachedProduct.categories)));
@@ -219,7 +226,7 @@ class ProductsManager {
     final offResult;
     try {
       offResult = await _off.saveProduct(_offUser(), offProduct);
-    } on IOException catch(e) {
+    } on IOException catch (e) {
       Log.w("ProductsManager.createUpdateProduct 1, e", ex: e);
       return Err(ProductsManagerError.NETWORK_ERROR);
     }
@@ -239,7 +246,7 @@ class ProductsManager {
       final status;
       try {
         status = await _off.addProductImage(_offUser(), image);
-      } on IOException catch(e) {
+      } on IOException catch (e) {
         Log.w("ProductsManager.createUpdateProduct 2, e", ex: e);
         return Err(ProductsManagerError.NETWORK_ERROR);
       }
@@ -260,7 +267,7 @@ class ProductsManager {
       final status;
       try {
         status = await _off.addProductImage(_offUser(), image);
-      } on IOException catch(e) {
+      } on IOException catch (e) {
         Log.w("ProductsManager.createUpdateProduct 3, e", ex: e);
         return Err(ProductsManagerError.NETWORK_ERROR);
       }
@@ -271,8 +278,7 @@ class ProductsManager {
 
     // Backend product
 
-    final backendResult = await _backend.createUpdateProduct(
-        product.barcode,
+    final backendResult = await _backend.createUpdateProduct(product.barcode,
         vegetarianStatus: product.vegetarianStatus,
         veganStatus: product.veganStatus);
     if (backendResult.isErr) {
@@ -292,9 +298,10 @@ class ProductsManager {
 
   List<String> _connectDifferentlyTranslated(
       Iterable<String>? withNotTranslated, Iterable<String>? translatedOnly) {
-    final notTranslated = withNotTranslated?.where(
-            (e) => _notTranslatedRegex.hasMatch(e))
-        .toList() ?? [];
+    final notTranslated = withNotTranslated
+            ?.where((e) => _notTranslatedRegex.hasMatch(e))
+            .toList() ??
+        [];
     final allStrings = (translatedOnly?.toList() ?? []) + notTranslated;
     allStrings.sort();
     return allStrings;
@@ -309,15 +316,16 @@ class ProductsManager {
   String? _join(Iterable<String>? strs, String? langCode) {
     if (strs != null && strs.isNotEmpty) {
       final langPrefix = langCode != null ? "$langCode:" : "";
-      return strs.map((e) =>
-        _notTranslatedRegex.hasMatch(e) ? e : "$langPrefix$e")
-        .join(", ");
+      return strs
+          .map((e) => _notTranslatedRegex.hasMatch(e) ? e : "$langPrefix$e")
+          .join(", ");
     }
     return null;
   }
 
   Future<Result<ProductWithOCRIngredients, ProductsManagerError>>
-      updateProductAndExtractIngredients(Product product, String langCode) async {
+      updateProductAndExtractIngredients(
+          Product product, String langCode) async {
     final productUpdateResult = await createUpdateProduct(product, langCode);
     if (productUpdateResult.isErr) {
       return Err(productUpdateResult.unwrapErr());
@@ -328,19 +336,22 @@ class ProductsManager {
 
     final response;
     try {
-      response = await _off.extractIngredients(_offUser(), product.barcode, offLang);
-    } on IOException catch(e) {
+      response =
+          await _off.extractIngredients(_offUser(), product.barcode, offLang);
+    } on IOException catch (e) {
       Log.w("ProductsManager.updateProductAndExtractIngredients, e", ex: e);
       return Err(ProductsManagerError.NETWORK_ERROR);
     }
     if (response.status == 0) {
-      return Ok(ProductWithOCRIngredients(updatedProduct, response.ingredientsTextFromImage));
+      return Ok(ProductWithOCRIngredients(
+          updatedProduct, response.ingredientsTextFromImage));
     } else {
       return Ok(ProductWithOCRIngredients(updatedProduct, null));
     }
   }
 
-  off.User _offUser() => off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
+  off.User _offUser() =>
+      off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
 }
 
 extension _OffIngredientExtension on off.Ingredient {
@@ -349,7 +360,8 @@ extension _OffIngredientExtension on off.Ingredient {
     ..vegetarianStatus = _convertVegStatus(vegetarian)
     ..veganStatus = _convertVegStatus(vegan));
 
-  VegStatus? _convertVegStatus(off.IngredientSpecialPropertyStatus? offVegStatus) {
+  VegStatus? _convertVegStatus(
+      off.IngredientSpecialPropertyStatus? offVegStatus) {
     if (offVegStatus == null) {
       return VegStatus.unknown;
     }

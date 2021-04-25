@@ -19,10 +19,10 @@ class Page4Controller extends PageControllerBase {
   bool get pageHasData => productHasAllDataForPage(_product);
 
   static bool productHasAllDataForPage(Product product) =>
-      product.vegetarianStatus != null
-          && product.veganStatus != null
-          && product.vegetarianStatusSource != VegStatusSource.open_food_facts
-          && product.veganStatusSource != VegStatusSource.open_food_facts;
+      product.vegetarianStatus != null &&
+      product.veganStatus != null &&
+      product.vegetarianStatusSource != VegStatusSource.open_food_facts &&
+      product.veganStatusSource != VegStatusSource.open_food_facts;
 
   VegStatus? get vegetarianStatus {
     if (_product.vegetarianStatusSource == VegStatusSource.open_food_facts) {
@@ -30,40 +30,42 @@ class Page4Controller extends PageControllerBase {
     }
     return _product.vegetarianStatus;
   }
+
   VegStatus? get veganStatus {
     if (_product.veganStatusSource == VegStatusSource.open_food_facts) {
       return null;
     }
     return _product.veganStatus;
   }
+
   set vegetarianStatus(VegStatus? val) {
-    _model.updateProduct(fn: (v) => v
-      ..vegetarianStatus = val
-      ..vegetarianStatusSource = VegStatusSource.community);
-    if (val == VegStatus.negative
-        || val == VegStatus.possible
-        || val == VegStatus.unknown) {
+    _model.updateProduct(
+        fn: (v) => v
+          ..vegetarianStatus = val
+          ..vegetarianStatusSource = VegStatusSource.community);
+    if (val == VegStatus.negative ||
+        val == VegStatus.possible ||
+        val == VegStatus.unknown) {
       // 100% of not-vegetarian products are also not-vegan,
       // same goes for possibly vegetarian and unknown.
       veganStatus = val;
     }
   }
+
   set veganStatus(VegStatus? val) {
-    _model.updateProduct(fn: (v) => v
-      ..veganStatus = val
-      ..veganStatusSource = VegStatusSource.community);
+    _model.updateProduct(
+        fn: (v) => v
+          ..veganStatus = val
+          ..veganStatusSource = VegStatusSource.community);
     if (val == VegStatus.positive) {
       // 100% of vegan products are also vegetarian
       vegetarianStatus = val;
     }
   }
 
-  Page4Controller(
-      InitProductPageModel model,
-      ProductsManager productsManager,
-      this._doneText,
-      Function() doneFn):
-        _model = model,
+  Page4Controller(InitProductPageModel model, ProductsManager productsManager,
+      this._doneText, Function() doneFn)
+      : _model = model,
         super(doneFn, productsManager, model);
 
   void _longAction(dynamic Function() action) => _model.longAction(action);
@@ -72,13 +74,16 @@ class Page4Controller extends PageControllerBase {
     final content = Column(children: [
       Expanded(
           flex: 1,
-          child: Center(child: Text(
-              context.strings.init_product_page_veg_status_title,
-              style: Theme.of(context).textTheme.headline5))),
+          child: Center(
+              child: Text(context.strings.init_product_page_veg_status_title,
+                  style: Theme.of(context).textTheme.headline5))),
       Expanded(
         flex: 5,
-        child: SingleChildScrollView(child: Column(children: [
-          SizedBox(width: double.infinity, child: Text(context.strings.init_product_page_is_vegetarian_q)),
+        child: SingleChildScrollView(
+            child: Column(children: [
+          SizedBox(
+              width: double.infinity,
+              child: Text(context.strings.init_product_page_is_vegetarian_q)),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.positive,
@@ -118,8 +123,10 @@ class Page4Controller extends PageControllerBase {
                   vegetarianStatus = VegStatus.possible;
                 }),
             InkWell(
-                child: Icon(Icons.zoom_out_map_outlined),
-                onTap: () { _showPossibleVegStatusTooltip(context); },
+              child: Icon(Icons.zoom_out_map_outlined),
+              onTap: () {
+                _showPossibleVegStatusTooltip(context);
+              },
             ),
           ], key: Key("vegetarian_possibly")),
           Row(children: [
@@ -135,10 +142,10 @@ class Page4Controller extends PageControllerBase {
                   vegetarianStatus = VegStatus.unknown;
                 }),
           ], key: Key("vegetarian_unknown")),
-
           SizedBox(height: 50),
-
-          SizedBox(width: double.infinity, child: Text(context.strings.init_product_page_is_vegan_q)),
+          SizedBox(
+              width: double.infinity,
+              child: Text(context.strings.init_product_page_is_vegan_q)),
           Row(children: [
             Radio<VegStatus>(
                 value: VegStatus.positive,
@@ -179,7 +186,9 @@ class Page4Controller extends PageControllerBase {
                 }),
             InkWell(
               child: Icon(Icons.zoom_out_map_outlined),
-              onTap: () { _showPossibleVegStatusTooltip(context); },
+              onTap: () {
+                _showPossibleVegStatusTooltip(context);
+              },
             ),
           ], key: Key("vegan_possible")),
           Row(children: [
@@ -224,13 +233,15 @@ class Page4Controller extends PageControllerBase {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(context.strings.init_product_page_possible_status_explanation),
+                Text(context
+                    .strings.init_product_page_possible_status_explanation),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(context.strings.init_product_page_possible_status_explanation_ok),
+              child: Text(context
+                  .strings.init_product_page_possible_status_explanation_ok),
               onPressed: () {
                 Navigator.of(context).pop();
               },

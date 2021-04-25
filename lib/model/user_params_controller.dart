@@ -15,7 +15,8 @@ const PREF_USER_EATS_MILK = 'PREF_USER_EATS_MILK2';
 const PREF_USER_EATS_EGGS = 'PREF_USER_EATS_EGGS2';
 const PREF_USER_EATS_HONEY = 'PREF_USER_EATS_HONEY2';
 const PREF_USER_ID_ON_BACKEND = 'USER_ID_ON_BACKEND2';
-const PREF_USER_CLIENT_TOKEN_FOR_BACKEND = 'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
+const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
+    'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 
 class UserParamsControllerObserver {
@@ -26,8 +27,10 @@ class UserParamsController {
   bool _crashlyticsInited = false;
   final _observers = <UserParamsControllerObserver>[];
 
-  void addObserver(UserParamsControllerObserver observer) => _observers.add(observer);
-  void removeObserver(UserParamsControllerObserver observer) => _observers.remove(observer);
+  void addObserver(UserParamsControllerObserver observer) =>
+      _observers.add(observer);
+  void removeObserver(UserParamsControllerObserver observer) =>
+      _observers.remove(observer);
 
   Future<UserParams?> getUserParams() async {
     final prefs = await SharedPreferences.getInstance();
@@ -40,14 +43,14 @@ class UserParamsController {
     final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
     final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
 
-    if (name == null
-        && genderStr == null
-        && birthdayStr == null
-        && eatsMilk == null
-        && eatsEggs == null
-        && eatsHoney == null
-        && backendId == null
-        && clientToken == null) {
+    if (name == null &&
+        genderStr == null &&
+        birthdayStr == null &&
+        eatsMilk == null &&
+        eatsEggs == null &&
+        eatsHoney == null &&
+        backendId == null &&
+        clientToken == null) {
       return null;
     }
 
@@ -78,7 +81,9 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_EATS_HONEY);
       await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
-      _observers.forEach((obs) { obs.onUserParamsUpdate(null); });
+      _observers.forEach((obs) {
+        obs.onUserParamsUpdate(null);
+      });
       return;
     }
 
@@ -125,10 +130,13 @@ class UserParamsController {
     }
 
     if (userParams.backendClientToken != null) {
-      await prefs.setString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND, userParams.backendClientToken!);
+      await prefs.setString(
+          PREF_USER_CLIENT_TOKEN_FOR_BACKEND, userParams.backendClientToken!);
     } else {
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
     }
-    _observers.forEach((obs) { obs.onUserParamsUpdate(userParams); });
+    _observers.forEach((obs) {
+      obs.onUserParamsUpdate(userParams);
+    });
   }
 }

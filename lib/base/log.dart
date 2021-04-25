@@ -16,9 +16,8 @@ class Log {
   static TimedRollingFileTree? _fileTree;
   static _CrashlyticsFimberTree? _crashlyticsTree;
 
-  static void init({
-      Directory? logsDir,
-      int maxSizeBytes = LOGS_DIR_MAX_SIZE}) async {
+  static void init(
+      {Directory? logsDir, int maxSizeBytes = LOGS_DIR_MAX_SIZE}) async {
     if (_debugTree != null) {
       Fimber.unplantTree(_debugTree!);
     }
@@ -35,8 +34,8 @@ class Log {
     if (logsDir == null) {
       logsDir = await logsDirectory();
     }
-    _fileTree = TimedRollingFileTree(
-        filenamePrefix: logsDir.absolute.path + "/log");
+    _fileTree =
+        TimedRollingFileTree(filenamePrefix: logsDir.absolute.path + "/log");
     Fimber.plantTree(_fileTree!);
 
     if (kReleaseMode) {
@@ -55,9 +54,8 @@ class Log {
     }
 
     int totalSize = 0;
-    final entries = await logsDir
-        .list(recursive: true, followLinks: false)
-        .toList();
+    final entries =
+        await logsDir.list(recursive: true, followLinks: false).toList();
     final files = entries
         .where((element) => element is File)
         .map((e) => e as File)
@@ -69,7 +67,7 @@ class Log {
     }
     // Newest first, oldest last
     filesModified.sort((a, b) =>
-      b.second.millisecondsSinceEpoch - a.second.millisecondsSinceEpoch);
+        b.second.millisecondsSinceEpoch - a.second.millisecondsSinceEpoch);
     for (final fileModified in filesModified) {
       final file = fileModified.first;
       totalSize += await file.length();
@@ -135,12 +133,11 @@ class Log {
     }
   }
 
-  static void e(
-      String message,
+  static void e(String message,
       {dynamic ex,
-        StackTrace? stacktrace,
-        bool crashAllowed = true,
-        bool crashlyticsAllowed = true}) {
+      StackTrace? stacktrace,
+      bool crashAllowed = true,
+      bool crashlyticsAllowed = true}) {
     if (ex is FlutterError && ex.message.contains("RenderFlex")) {
       return;
     }
@@ -170,18 +167,16 @@ class _CrashlyticsFimberTree extends LogTree {
   List<String> getLevels() => ["D", "I", "W", "E", "V"];
 
   @override
-  void log(String level, String message, {String? tag, ex, StackTrace? stacktrace}) {
+  void log(String level, String message,
+      {String? tag, ex, StackTrace? stacktrace}) {
     logImpl(level, message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   Future<void> logImpl(String level, String message,
       {String? tag, ex, StackTrace? stacktrace}) async {
     if (level == "E") {
-      await FirebaseCrashlytics.instance.recordError(
-          ex,
-          stacktrace,
-          reason: message,
-          fatal: false);
+      await FirebaseCrashlytics.instance
+          .recordError(ex, stacktrace, reason: message, fatal: false);
     } else {
       await FirebaseCrashlytics.instance.log("Msg: $message, ex: $ex");
     }

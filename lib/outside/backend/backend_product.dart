@@ -4,7 +4,8 @@ import 'package:plante/base/build_value_helper.dart';
 
 part 'backend_product.g.dart';
 
-abstract class BackendProduct implements Built<BackendProduct, BackendProductBuilder> {
+abstract class BackendProduct
+    implements Built<BackendProduct, BackendProductBuilder> {
   @BuiltValueField(wireName: 'server_id')
   int? get serverId;
   @BuiltValueField(wireName: 'barcode')
@@ -19,10 +20,13 @@ abstract class BackendProduct implements Built<BackendProduct, BackendProductBui
   String? get veganStatusSource;
 
   static BackendProduct? fromJson(Map<String, dynamic> json) {
-    return BuildValueHelper.jsonSerializers.deserializeWith(BackendProduct.serializer, json);
+    return BuildValueHelper.jsonSerializers
+        .deserializeWith(BackendProduct.serializer, json);
   }
 
-  factory BackendProduct([void Function(BackendProductBuilder) updates]) = _$BackendProduct;
+  factory BackendProduct([void Function(BackendProductBuilder) updates]) =
+      _$BackendProduct;
   BackendProduct._();
-  static Serializer<BackendProduct> get serializer => _$backendProductSerializer;
+  static Serializer<BackendProduct> get serializer =>
+      _$backendProductSerializer;
 }

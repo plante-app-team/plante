@@ -25,7 +25,7 @@ class VegStatus extends EnumClass {
     }
     try {
       return valueOf(name);
-    } on ArgumentError catch(e) {
+    } on ArgumentError catch (e) {
       Log.w("VegStatus unknown name: $name", ex: e);
       return null;
     }

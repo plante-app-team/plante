@@ -19,6 +19,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
   BuiltList<String>? get brands;
   BuiltList<String>? get categories;
   String? get ingredientsText;
+
   /// NOTE: the field is NOT send to any backend, only obtained from them.
   BuiltList<Ingredient>? get ingredientsAnalyzed;
 
@@ -30,13 +31,19 @@ abstract class Product implements Built<Product, ProductBuilder> {
     if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
       return null;
     }
-    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.negative).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.vegetarianStatus == VegStatus.negative)
+        .isNotEmpty) {
       return VegStatus.negative;
     }
-    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.unknown).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.vegetarianStatus == VegStatus.unknown)
+        .isNotEmpty) {
       return VegStatus.unknown;
     }
-    if (ingredientsAnalyzed.where((v) => v.vegetarianStatus == VegStatus.possible).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.vegetarianStatus == VegStatus.possible)
+        .isNotEmpty) {
       return VegStatus.possible;
     }
     // NOTE: a veg status of an ingredient can also be null, that means that
@@ -49,13 +56,19 @@ abstract class Product implements Built<Product, ProductBuilder> {
     if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
       return null;
     }
-    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.negative).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.veganStatus == VegStatus.negative)
+        .isNotEmpty) {
       return VegStatus.negative;
     }
-    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.unknown).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.veganStatus == VegStatus.unknown)
+        .isNotEmpty) {
       return VegStatus.unknown;
     }
-    if (ingredientsAnalyzed.where((v) => v.veganStatus == VegStatus.possible).isNotEmpty) {
+    if (ingredientsAnalyzed
+        .where((v) => v.veganStatus == VegStatus.possible)
+        .isNotEmpty) {
       return VegStatus.possible;
     }
     // NOTE: a veg status of an ingredient can also be null, that means that
@@ -66,10 +79,13 @@ abstract class Product implements Built<Product, ProductBuilder> {
   bool isFrontImageFile() => isImageFile(ProductImageType.FRONT);
   bool isFrontImageRemote() => isImageRemote(ProductImageType.FRONT);
   bool isIngredientsImageFile() => isImageFile(ProductImageType.INGREDIENTS);
-  bool isIngredientsImageRemote() => isImageRemote(ProductImageType.INGREDIENTS);
+  bool isIngredientsImageRemote() =>
+      isImageRemote(ProductImageType.INGREDIENTS);
 
-  bool isImageFile(ProductImageType imageType) => _isImageFile(imageUri(imageType));
-  bool isImageRemote(ProductImageType imageType) => _isImageRemote(imageUri(imageType));
+  bool isImageFile(ProductImageType imageType) =>
+      _isImageFile(imageUri(imageType));
+  bool isImageRemote(ProductImageType imageType) =>
+      _isImageRemote(imageUri(imageType));
 
   Uri? imageUri(ProductImageType imageType) {
     switch (imageType) {
@@ -112,8 +128,8 @@ abstract class Product implements Built<Product, ProductBuilder> {
   }
 
   Map<String, dynamic> toJson() {
-    return BuildValueHelper.jsonSerializers.serializeWith(
-        serializer, this) as Map<String, dynamic>;
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)
+        as Map<String, dynamic>;
   }
 
   factory Product([void Function(ProductBuilder) updates]) = _$Product;

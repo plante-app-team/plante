@@ -44,42 +44,33 @@ class BackendError {
     }
 
     Log.w("BackendError from JSON: $json");
-    return BackendError._(
-        kind,
-        errorStr: json["error"],
-        errorDescr: json["error_description"]);
+    return BackendError._(kind,
+        errorStr: json["error"], errorDescr: json["error_description"]);
   }
 
   static BackendError fromResp(BackendResponse response) {
     assert(response.statusCode != 200);
     Log.w("BackendError from HTTP response. "
-          "Code: ${response.statusCode}, "
-          "Reason: ${response.reasonPhrase}, "
-          "Headers: ${response.headers}, "
-          "body: ${response.body}. "
-          "Request URL was: ${response.requestUrl?.toString()}");
+        "Code: ${response.statusCode}, "
+        "Reason: ${response.reasonPhrase}, "
+        "Headers: ${response.headers}, "
+        "body: ${response.body}. "
+        "Request URL was: ${response.requestUrl?.toString()}");
     if (response.statusCode == 401) {
-      return BackendError._(
-          BackendErrorKind.NOT_AUTHORIZED,
-          errorStr: null,
-          errorDescr: response.reasonPhrase);
+      return BackendError._(BackendErrorKind.NOT_AUTHORIZED,
+          errorStr: null, errorDescr: response.reasonPhrase);
     } else if (response.exception != null) {
-      return BackendError._(
-          exceptionToErrorKind(response.exception),
-          errorStr: response.exception.toString(),
-          errorDescr: null);
+      return BackendError._(exceptionToErrorKind(response.exception),
+          errorStr: response.exception.toString(), errorDescr: null);
     } else {
-      return BackendError._(
-          BackendErrorKind.OTHER,
-          errorStr: null,
-          errorDescr: response.reasonPhrase);
+      return BackendError._(BackendErrorKind.OTHER,
+          errorStr: null, errorDescr: response.reasonPhrase);
     }
   }
 
   static BackendError invalidJson(String invalidJson) {
     Log.w("BackendError from invalid JSON: $invalidJson");
-    return BackendError._(
-        BackendErrorKind.INVALID_JSON,
+    return BackendError._(BackendErrorKind.INVALID_JSON,
         errorDescr: invalidJson);
   }
 

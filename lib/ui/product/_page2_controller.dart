@@ -16,14 +16,12 @@ class Page2Controller extends PageControllerBase {
   final String _doneText;
 
   bool get pageHasData => productHasAllDataForPage(_model.product);
-  static bool productHasAllDataForPage(Product product) => product.imageFront != null;
+  static bool productHasAllDataForPage(Product product) =>
+      product.imageFront != null;
 
-  Page2Controller(
-      InitProductPageModel model,
-      ProductsManager productsManager,
-      this._doneText,
-      Function() doneFn):
-        _model = model,
+  Page2Controller(InitProductPageModel model, ProductsManager productsManager,
+      this._doneText, Function() doneFn)
+      : _model = model,
         super(doneFn, productsManager, model);
 
   void _longAction(dynamic Function() action) => _model.longAction(action);
@@ -32,15 +30,19 @@ class Page2Controller extends PageControllerBase {
     final content = Column(children: [
       Expanded(
           flex: 1,
-          child: Center(child: Text(
-              context.strings.init_product_page_packaging_photo,
-              style: Theme.of(context).textTheme.headline5))),
+          child: Center(
+              child: Text(context.strings.init_product_page_packaging_photo,
+                  style: Theme.of(context).textTheme.headline5))),
       Expanded(
         flex: 5,
-        child: SingleChildScrollView(child: InkWell(
-            child: ProductImagesHelper.productImageWidget(
-                _model.product, ProductImageType.FRONT, size: 150),
-            onTap: () { _onProductImageTap(context); }),
+        child: SingleChildScrollView(
+          child: InkWell(
+              child: ProductImagesHelper.productImageWidget(
+                  _model.product, ProductImageType.FRONT,
+                  size: 150),
+              onTap: () {
+                _onProductImageTap(context);
+              }),
         ),
       )
     ]);
@@ -65,7 +67,7 @@ class Page2Controller extends PageControllerBase {
     if (path == null) {
       return;
     }
-    _model.setProduct(_model.product.rebuildWithImage(
-        ProductImageType.FRONT, path));
+    _model.setProduct(
+        _model.product.rebuildWithImage(ProductImageType.FRONT, path));
   }
 }

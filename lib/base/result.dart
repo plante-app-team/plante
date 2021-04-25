@@ -54,5 +54,4 @@ class Err<OK, ERR> extends Result<OK, ERR> {
   int get hashCode => _value.hashCode;
 }
 
-class None {
-}
+class None {}

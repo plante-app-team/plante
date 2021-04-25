@@ -20,11 +20,8 @@ class CustomizableStepperIndicatorsTop extends StatefulWidget {
   final DividerMaker dividerMaker;
   final int pagesCount;
 
-  CustomizableStepperIndicatorsTop(
-      this.controller,
-      this.pageIndicatorMaker,
-      this.dividerMaker,
-      this.pagesCount);
+  CustomizableStepperIndicatorsTop(this.controller, this.pageIndicatorMaker,
+      this.dividerMaker, this.pagesCount);
 
   @override
   _CustomizableStepperIndicatorsTopState createState() =>
@@ -32,19 +29,17 @@ class CustomizableStepperIndicatorsTop extends StatefulWidget {
           controller, pageIndicatorMaker, dividerMaker, pagesCount);
 }
 
-class _CustomizableStepperIndicatorsTopState extends State<CustomizableStepperIndicatorsTop> {
+class _CustomizableStepperIndicatorsTopState
+    extends State<CustomizableStepperIndicatorsTop> {
   final CustomizableStepper2IndicatorsTopController controller;
   final PageIndicatorMaker pageIndicatorMaker;
   final DividerMaker dividerMaker;
   final int pagesCount;
   int activePage;
 
-  _CustomizableStepperIndicatorsTopState(
-      this.controller,
-      this.pageIndicatorMaker,
-      this.dividerMaker,
-      this.pagesCount):
-        activePage = controller.initialPage {
+  _CustomizableStepperIndicatorsTopState(this.controller,
+      this.pageIndicatorMaker, this.dividerMaker, this.pagesCount)
+      : activePage = controller.initialPage {
     controller.setPageFn = (int page) {
       if (page < 0 && pagesCount <= page) {
         return;
@@ -63,15 +58,16 @@ class _CustomizableStepperIndicatorsTopState extends State<CustomizableStepperIn
       final indicator = AnimatedCrossFade(
         firstChild: pageIndicatorMaker.call(index, false),
         secondChild: pageIndicatorMaker.call(index, true),
-        crossFadeState: !pageReached ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+        crossFadeState:
+            !pageReached ? CrossFadeState.showFirst : CrossFadeState.showSecond,
         duration: Duration(milliseconds: 250),
       );
 
       indicatorsWithDividers.add(indicator);
       if (index < pagesCount - 1) {
         final nextPageReached = index + 1 <= activePage;
-        final divider = dividerMaker.call(
-            index, index + 1, pageReached, nextPageReached);
+        final divider =
+            dividerMaker.call(index, index + 1, pageReached, nextPageReached);
         indicatorsWithDividers.add(Expanded(child: divider));
       }
     }

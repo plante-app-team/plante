@@ -18,16 +18,12 @@ class DisplayProductPage extends StatefulWidget {
   final Product _initialProduct;
   final ProductUpdatedCallback? productUpdatedCallback;
 
-  DisplayProductPage(
-      this._initialProduct,
-      {this.key,
-       this.productUpdatedCallback});
+  DisplayProductPage(this._initialProduct,
+      {this.key, this.productUpdatedCallback});
 
   @override
   _DisplayProductPageState createState() => _DisplayProductPageState(
-      this._initialProduct,
-      this.key,
-      this.productUpdatedCallback);
+      this._initialProduct, this.key, this.productUpdatedCallback);
 }
 
 class _DisplayProductPageState extends State<DisplayProductPage> {
@@ -40,17 +36,16 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   bool _loading = false;
 
   _DisplayProductPageState(
-      this._product,
-      this._key,
-      this._productUpdatedCallback);
+      this._product, this._key, this._productUpdatedCallback);
 
-  String _vegetarianStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
+  String _vegetarianStatusStr(VegStatus? vegStatus,
+          {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegetarian}"
-          "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
+      "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
 
   String _veganStatusStr(VegStatus? vegStatus, {bool nullIsUnknown = true}) =>
       "${context.strings.display_product_page_whether_vegan}"
-          "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
+      "${_vegStatusToStr(vegStatus, nullIsUnknown)}";
 
   String _vegStatusToStr(VegStatus? vegStatus, bool nullIsUnknown) {
     if (vegStatus == null) {
@@ -96,116 +91,105 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _key,
-        body: SafeArea(child: SingleChildScrollView(child: Column(
-          children: [
-            SizedBox(
-                width: double.infinity,
-                height: 200,
-                child: ProductImagesHelper.productImageWidget(
-                    _product, ProductImageType.FRONT)),
-            Padding(
-                padding: EdgeInsets.only(left: 20, right: 20, top: 10),
+        body: SafeArea(
+            child: SingleChildScrollView(
                 child: Column(children: [
-                  Text(
-                      _product.name!,
-                      style: Theme.of(context).textTheme.headline5),
-
-                  SizedBox(height: 20),
-
+          SizedBox(
+              width: double.infinity,
+              height: 200,
+              child: ProductImagesHelper.productImageWidget(
+                  _product, ProductImageType.FRONT)),
+          Padding(
+              padding: EdgeInsets.only(left: 20, right: 20, top: 10),
+              child: Column(children: [
+                Text(_product.name!,
+                    style: Theme.of(context).textTheme.headline5),
+                SizedBox(height: 20),
+                _wideStartText(_vegetarianStatusStr(_product.vegetarianStatus),
+                    key: "vegetarian_status"),
+                if (_product.vegetarianStatusSource != null)
                   _wideStartText(
-                      _vegetarianStatusStr(_product.vegetarianStatus),
-                      key: "vegetarian_status"),
-                  if (_product.vegetarianStatusSource != null)
+                      _vegStatusSource(_product.vegetarianStatusSource!),
+                      key: "vegetarian_status_source"),
+                SizedBox(height: 10),
+                _wideStartText(_veganStatusStr(_product.veganStatus),
+                    key: "vegan_status"),
+                if (_product.veganStatusSource != null)
+                  _wideStartText(_vegStatusSource(_product.veganStatusSource!),
+                      key: "vegan_status_source"),
+                SizedBox(height: 10),
+                if (_product.vegetarianStatusSource ==
+                        VegStatusSource.open_food_facts ||
+                    _product.veganStatusSource ==
+                        VegStatusSource.open_food_facts)
+                  _atStart(OutlinedButton(
+                      child: Text(context
+                          .strings.display_product_page_help_with_veg_statuses),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => InitProductPage(_product,
+                                      key: Key("init_product_page"),
+                                      requiredPages: [InitProductSubpage.PAGE4],
+                                      productUpdatedCallback: (product) {
+                                    _productUpdatedCallback?.call(_product);
+                                    setState(() {
+                                      _product = product;
+                                    });
+                                  })),
+                        );
+                      })),
+                SizedBox(height: 10),
+                ExpandablePanel(
+                  header: Column(children: [
+                    SizedBox(height: 10),
                     _wideStartText(
-                        _vegStatusSource(_product.vegetarianStatusSource!),
-                        key: "vegetarian_status_source"),
-
-                  SizedBox(height: 10),
-
-                  _wideStartText(
-                      _veganStatusStr(_product.veganStatus),
-                      key: "vegan_status"),
-                  if (_product.veganStatusSource != null)
-                    _wideStartText(
-                        _vegStatusSource(_product.veganStatusSource!),
-                        key: "vegan_status_source"),
-
-                  SizedBox(height: 10),
-
-                  if (_product.vegetarianStatusSource == VegStatusSource.open_food_facts
-                      || _product.veganStatusSource == VegStatusSource.open_food_facts)
-                    _atStart(OutlinedButton(
-                        child: Text(context.strings.display_product_page_help_with_veg_statuses),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => InitProductPage(
-                                _product,
-                                key: Key("init_product_page"),
-                                requiredPages: [InitProductSubpage.PAGE4],
-                                productUpdatedCallback: (product) {
-                                  _productUpdatedCallback?.call(_product);
-                                  setState(() {
-                                    _product = product;
-                                  });
-                                })),
-                          );
-                        })),
-
-                  SizedBox(height: 10),
-
+                        context.strings.display_product_page_ingredients,
+                        style: Theme.of(context).textTheme.headline6)
+                  ]),
+                  collapsed: Text(_product.ingredientsText.toString(),
+                      softWrap: true,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
+                  expanded: Column(children: [
+                    ProductImagesHelper.productImageWidget(
+                        _product, ProductImageType.INGREDIENTS),
+                    _wideStartText(_product.ingredientsText.toString())
+                  ]),
+                ),
+                if (_hasIngredientsAnalysis())
                   ExpandablePanel(
                     header: Column(children: [
                       SizedBox(height: 10),
                       _wideStartText(
-                          context.strings.display_product_page_ingredients,
-                          style: Theme.of(context).textTheme.headline6)
-                    ]),
-                    collapsed: Text(_product.ingredientsText.toString(), softWrap: true, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    expanded: Column(children: [
-                      ProductImagesHelper.productImageWidget(
-                          _product, ProductImageType.INGREDIENTS),
-                      _wideStartText(_product.ingredientsText.toString())
-                    ]),
-                  ),
-
-                  if (_hasIngredientsAnalysis()) ExpandablePanel(
-                    header: Column(children: [
-                      SizedBox(height: 10),
-                      _wideStartText(
-                          context.strings.display_product_page_ingredients_analysis,
+                          context.strings
+                              .display_product_page_ingredients_analysis,
                           style: Theme.of(context).textTheme.headline6)
                     ]),
                     collapsed: Text("..."),
-                    expanded: _ingredientsAnalysisTable(key: "ingredients_analysis_table"),
+                    expanded: _ingredientsAnalysisTable(
+                        key: "ingredients_analysis_table"),
                   ),
-
-                  OutlinedButton(
-                      child: Text(context.strings.display_product_page_report),
-                      onPressed: _onReportClick),
-                ]))
-          ]))));
+                OutlinedButton(
+                    child: Text(context.strings.display_product_page_report),
+                    onPressed: _onReportClick),
+              ]))
+        ]))));
   }
 
   Widget _wideStartText(String str, {String? key, TextStyle? style}) =>
-      _atStart(Text(
-          str,
-          key: key != null ? Key(key) : null,
-          style: style));
+      _atStart(Text(str, key: key != null ? Key(key) : null, style: style));
 
   Widget _atStart(Widget child) =>
-      Container(
-          alignment: AlignmentDirectional.centerStart,
-          child: child);
+      Container(alignment: AlignmentDirectional.centerStart, child: child);
 
   Widget _atEnd(Widget child) =>
-      Container(
-          alignment: AlignmentDirectional.centerEnd,
-          child: child);
+      Container(alignment: AlignmentDirectional.centerEnd, child: child);
 
   bool _hasIngredientsAnalysis() =>
-      _product.ingredientsAnalyzed != null
-          && _product.ingredientsAnalyzed!.isNotEmpty;
+      _product.ingredientsAnalyzed != null &&
+      _product.ingredientsAnalyzed!.isNotEmpty;
 
   Widget _ingredientsAnalysisTable({String? key}) {
     final rows = <TableRow>[];
@@ -214,7 +198,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       rows.add(TableRow(
         children: <Widget>[
           Text(ingredient.name),
-          Text(_vegetarianStatusStr(ingredient.vegetarianStatus, nullIsUnknown: false)),
+          Text(_vegetarianStatusStr(ingredient.vegetarianStatus,
+              nullIsUnknown: false)),
           Text(_veganStatusStr(ingredient.veganStatus, nullIsUnknown: false)),
         ],
       ));
@@ -258,7 +243,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 _loading = true;
               });
               try {
-                final result = await GetIt.I.get<Backend>()
+                final result = await GetIt.I
+                    .get<Backend>()
                     .sendReport(_product.barcode, _reportTextController.text);
                 if (result.isOk) {
                   _reportTextController.clear();
@@ -268,8 +254,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           context.strings.display_product_page_report_sent)));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          context.strings.global_something_went_wrong)));
+                      content:
+                          Text(context.strings.global_something_went_wrong)));
                 }
               } finally {
                 setState(() {
@@ -284,13 +270,15 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 Text(context.strings.display_product_page_report)
               ]),
               content: TextField(
-                key: Key("report_text"),
-                maxLines: null,
-                controller: _reportTextController),
+                  key: Key("report_text"),
+                  maxLines: null,
+                  controller: _reportTextController),
               actions: <Widget>[
                 TextButton(
-                  child: Text(context.strings.display_product_page_report_send),
-                  onPressed: _reportSendAllowed && !_loading ? onSendClick : null),
+                    child:
+                        Text(context.strings.display_product_page_report_send),
+                    onPressed:
+                        _reportSendAllowed && !_loading ? onSendClick : null),
               ],
             );
           },

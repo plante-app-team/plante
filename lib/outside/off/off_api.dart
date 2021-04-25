@@ -27,8 +27,8 @@ class OffApi {
 
   Future<off.OcrIngredientsResult> extractIngredients(
       off.User user, String barcode, off.OpenFoodFactsLanguage language) async {
-    final result = await off.OpenFoodAPIClient
-        .extractIngredients(user, barcode, language);
+    final result =
+        await off.OpenFoodAPIClient.extractIngredients(user, barcode, language);
     if (result.status != 0) {
       Log.w("OffApi.extractIngredients error: ${result.toJson()}");
     }

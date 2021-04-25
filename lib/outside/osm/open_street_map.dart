@@ -8,9 +8,8 @@ import 'package:plante/model/shop.dart';
 
 class OpenStreetMap {
   Future<List<Shop>> fetchShops(
-      Point<double> northeast,
-      Point<double> southwest,
-      { String shopType = 'supermarket' }) async {
+      Point<double> northeast, Point<double> southwest,
+      {String shopType = 'supermarket'}) async {
     final http = GetIt.I.get<HttpClient>();
 
     final val1 = southwest.x;
@@ -21,9 +20,7 @@ class OpenStreetMap {
 
     // TODO(https://trello.com/c/3Byaz2fk/): ru-domen is ok only for Russia
     final r = await http.get(Uri.https(
-        'overpass.openstreetmap.ru',
-        'api/interpreter',
-        {'data': cmd}));
+        'overpass.openstreetmap.ru', 'api/interpreter', {'data': cmd}));
 
     if (r.statusCode != 200) {
       Log.w("OSM.fetchShops: ${r.statusCode}, body: ${r.body}");
@@ -51,8 +48,7 @@ class OpenStreetMap {
         continue;
       }
 
-      result.add(Shop(
-        id, shopName, shopType, lat, lon));
+      result.add(Shop(id, shopName, shopType, lat, lon));
     }
     return result;
   }

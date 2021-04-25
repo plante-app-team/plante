@@ -1,9 +1,6 @@
 import 'package:plante/base/log.dart';
 
-enum Gender {
-  MALE,
-  FEMALE
-}
+enum Gender { MALE, FEMALE }
 
 extension GenderExtension on Gender {
   String get name {

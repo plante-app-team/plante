@@ -26,14 +26,12 @@ class Page3Controller extends PageControllerBase {
 
   bool get pageHasData => productHasAllDataForPage(_product);
   static bool productHasAllDataForPage(Product product) =>
-      product.imageIngredients != null && (product.ingredientsText ?? "").isNotEmpty;
+      product.imageIngredients != null &&
+      (product.ingredientsText ?? "").isNotEmpty;
 
-  Page3Controller(
-      InitProductPageModel model,
-      ProductsManager productsManager,
-      this._doneText,
-      Function() doneFn):
-        _model = model,
+  Page3Controller(InitProductPageModel model, ProductsManager productsManager,
+      this._doneText, Function() doneFn)
+      : _model = model,
         _productsManager = productsManager,
         super(doneFn, productsManager, model) {
     _model.productChanges.listen((event) {
@@ -44,9 +42,11 @@ class Page3Controller extends PageControllerBase {
     });
 
     _ingredientsController.addListener(() {
-      _model.updateProduct(updater: "third_page_controllers", fn: (v) {
-        v.ingredientsText = _ingredientsController.text;
-      });
+      _model.updateProduct(
+          updater: "third_page_controllers",
+          fn: (v) {
+            v.ingredientsText = _ingredientsController.text;
+          });
     });
     _updateController(_product);
 
@@ -66,19 +66,23 @@ class Page3Controller extends PageControllerBase {
     final content = Column(children: [
       Expanded(
           flex: 1,
-          child: Center(child: Text(
-              context.strings.init_product_page_ingredients,
-              style: Theme.of(context).textTheme.headline5))),
+          child: Center(
+              child: Text(context.strings.init_product_page_ingredients,
+                  style: Theme.of(context).textTheme.headline5))),
       Expanded(
         flex: 5,
-        child: SingleChildScrollView(child: Column(children: [
+        child: SingleChildScrollView(
+            child: Column(children: [
           InkWell(
               child: SizedBox(
                   width: double.infinity,
                   height: 200,
                   child: ProductImagesHelper.productImageWidget(
-                      _product, ProductImageType.INGREDIENTS, size: 150)),
-              onTap: () async { _onProductImageTap(context); }),
+                      _product, ProductImageType.INGREDIENTS,
+                      size: 150)),
+              onTap: () async {
+                _onProductImageTap(context);
+              }),
           if (ingredientsTextWidget != null) ingredientsTextWidget
         ])),
       )
@@ -110,7 +114,8 @@ class Page3Controller extends PageControllerBase {
             if (result.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
               showSnackBar(context.strings.global_network_error, context);
             } else {
-              showSnackBar(context.strings.global_something_went_wrong, context);
+              showSnackBar(
+                  context.strings.global_something_went_wrong, context);
             }
             return;
           }
@@ -131,7 +136,10 @@ class Page3Controller extends PageControllerBase {
           onPressed: performOcr);
     } else if (_model.ocrNeedsVerification) {
       ocrWidget = Column(children: [
-        SizedBox(width: double.infinity, child: Text(context.strings.init_product_page_ingredients_ocr_ok_q)),
+        SizedBox(
+            width: double.infinity,
+            child:
+                Text(context.strings.init_product_page_ingredients_ocr_ok_q)),
         Row(children: [
           OutlinedButton(
               child: Text(context.strings.init_product_page_yes),
@@ -144,7 +152,8 @@ class Page3Controller extends PageControllerBase {
                 _model.ocrNeedsVerification = false;
                 FocusScope.of(context).requestFocus(_ingredientsFocusNode);
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(context.strings.init_product_page_please_edit_ingredients)));
+                    content: Text(context
+                        .strings.init_product_page_please_edit_ingredients)));
               })
         ])
       ]);
@@ -179,8 +188,8 @@ class Page3Controller extends PageControllerBase {
     if (path == null) {
       return;
     }
-    _model.setProduct(_product.rebuildWithImage(
-        ProductImageType.INGREDIENTS, path));
+    _model.setProduct(
+        _product.rebuildWithImage(ProductImageType.INGREDIENTS, path));
     _model.ocrAllowed = true;
   }
 }

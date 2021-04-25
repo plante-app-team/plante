@@ -1,4 +1,1 @@
-enum ProductsManagerError {
-  NETWORK_ERROR,
-  OTHER
-}
+enum ProductsManagerError { NETWORK_ERROR, OTHER }

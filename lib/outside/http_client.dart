@@ -4,7 +4,7 @@ import 'package:plante/base/log.dart';
 class HttpClient extends BaseClient {
   final Client _realClient;
 
-  HttpClient(): _realClient = Client();
+  HttpClient() : _realClient = Client();
 
   @override
   Future<StreamedResponse> send(BaseRequest request) {

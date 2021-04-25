@@ -6,7 +6,8 @@ class GoogleAuthorizer {
   Future<GoogleUser?> auth() async {
     GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
-        clientId: "PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID");
+        clientId:
+            "PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID");
 
     try {
       final account = await googleSignIn.signIn();
@@ -22,10 +23,7 @@ class GoogleAuthorizer {
         return null;
       }
 
-      return GoogleUser(
-          account.displayName ?? "",
-          account.email,
-          idToken,
+      return GoogleUser(account.displayName ?? "", account.email, idToken,
           DateTime.now().toUtc());
     } catch (error) {
       Log.e("GoogleAuthorizer: exception occurred", ex: error);

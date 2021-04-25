@@ -10,12 +10,9 @@ class StepperPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-        key: key,
-        verticalDirection: VerticalDirection.up,
-        children: [
-          if (bottomControls != null) bottomControls!,
-          Expanded(child: content)
-        ]);
+    return Column(key: key, verticalDirection: VerticalDirection.up, children: [
+      if (bottomControls != null) bottomControls!,
+      Expanded(child: content)
+    ]);
   }
 }

@@ -5,6 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
 
 typedef ProductBuilderFunction = void Function(ProductBuilder product);
+
 class ProductUpdate {
   final Product product;
   final String? updater;
@@ -24,10 +25,10 @@ class InitProductPageModel {
   Product get product => _productRestorable.value;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties => {
-    "product": _productRestorable,
-    "ocr_needs_verification": _ocrNeedsVerification,
-    "ocr_allowed": _ocrAllowed
-  };
+        "product": _productRestorable,
+        "ocr_needs_verification": _ocrNeedsVerification,
+        "ocr_allowed": _ocrAllowed
+      };
 
   Stream<ProductUpdate> get productChanges => _productStreamController.stream;
   Stream<bool> get loadingChanges => _loadingStreamController.stream;
@@ -46,9 +47,8 @@ class InitProductPageModel {
     _productStreamController.add(ProductUpdate(product, null));
   }
 
-  InitProductPageModel(Product initialProduct):
-      _productRestorable = ProductRestorable(initialProduct);
-
+  InitProductPageModel(Product initialProduct)
+      : _productRestorable = ProductRestorable(initialProduct);
 
   void updateProduct({required ProductBuilderFunction fn, String? updater}) {
     final updatedProduct = product.rebuild((builder) => fn.call(builder));

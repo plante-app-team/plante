@@ -29,7 +29,8 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    GetIt.I.get<RouteObserver<ModalRoute>>()
+    GetIt.I
+        .get<RouteObserver<ModalRoute>>()
         .subscribe(this, ModalRoute.of(context)!);
   }
 
@@ -48,8 +49,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   @override
   void dispose() {
     controller?.dispose();
-    GetIt.I.get<RouteObserver<ModalRoute>>()
-        .unsubscribe(this);
+    GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
     super.dispose();
   }
 
@@ -79,22 +79,20 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
           ),
           Align(
             alignment: AlignmentDirectional.bottomCenter,
-            child: InkWell(child: AnimatedContainer(
-              duration: Duration(milliseconds: 250),
-              width: MediaQuery.of(context).size.width,
-              height: _barcode != null ? 100 : 0,
-              color: Colors.white,
-              child:
-                Row(children: [
-                  SizedBox(width: 10),
-                  if (_searching) CircularProgressIndicator(),
-                  SizedBox(width: 10),
-                  Expanded(child:
-                  Text(
-                      _productName(),
-                      style: TextStyle(fontSize: 20.0)))
-                ])
-              ),
+            child: InkWell(
+              child: AnimatedContainer(
+                  duration: Duration(milliseconds: 250),
+                  width: MediaQuery.of(context).size.width,
+                  height: _barcode != null ? 100 : 0,
+                  color: Colors.white,
+                  child: Row(children: [
+                    SizedBox(width: 10),
+                    if (_searching) CircularProgressIndicator(),
+                    SizedBox(width: 10),
+                    Expanded(
+                        child: Text(_productName(),
+                            style: TextStyle(fontSize: 20.0)))
+                  ])),
               onTap: _tryOpenProductPage,
             ),
           )
@@ -157,10 +155,10 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     });
 
     final foundProductResult = await GetIt.I.get<ProductsManager>().getProduct(
-        scanData.code,
-        Localizations.localeOf(context).languageCode);
+        scanData.code, Localizations.localeOf(context).languageCode);
     if (foundProductResult.isErr) {
-      if (foundProductResult.unwrapErr() == ProductsManagerError.NETWORK_ERROR) {
+      if (foundProductResult.unwrapErr() ==
+          ProductsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
       } else {
         showSnackBar(context.strings.global_something_went_wrong, context);
@@ -194,12 +192,13 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>
-          ProductPageWrapper(product, productUpdatedCallback: (product) {
-            setState(() {
-              _foundProduct = product;
-            });
-      })),
+      MaterialPageRoute(
+          builder: (context) =>
+              ProductPageWrapper(product, productUpdatedCallback: (product) {
+                setState(() {
+                  _foundProduct = product;
+                });
+              })),
     );
   }
 }

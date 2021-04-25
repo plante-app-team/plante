@@ -13,8 +13,7 @@ class DeviceInfo {
     final deviceInfoPlugin = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       var build = await deviceInfoPlugin.androidInfo;
-      return DeviceInfo(
-          build.androidId, build.model, build.version.toString());
+      return DeviceInfo(build.androidId, build.model, build.version.toString());
     } else if (Platform.isIOS) {
       var data = await deviceInfoPlugin.iosInfo;
       return DeviceInfo(
