@@ -277,7 +277,7 @@ class _InitUserPageState extends State<InitUserPage> {
         width: double.infinity,
         child: ButtonFilledPlante.withText(
             context.strings.init_user_page_done_button_title,
-            onPressed: !_loading ? onDoneClicked : null));
+            onPressed: !_loading && isVegan != null ? onDoneClicked : null));
 
     final bottomControls =
         Padding(child: buttonDone, padding: EdgeInsets.only(bottom: 38));
