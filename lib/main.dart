@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/di.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/app_foreground_detector.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/ui/main/main_page.dart';
@@ -58,6 +59,9 @@ void onError(String text, dynamic? exception, StackTrace? stack) async {
   if (kReleaseMode) {
     await FirebaseCrashlytics.instance
         .recordError(exception, stack, reason: text, fatal: true);
+  }
+  if (exception is FlutterError && exception.message.contains("RenderFlex")) {
+    return;
   }
   exit(1);
 }
@@ -107,7 +111,9 @@ class _MyAppState extends State<MyApp> implements UserParamsControllerObserver {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
-          primarySwatch: Colors.green,
+          primarySwatch: ColorsPlante.primaryMaterial,
+          accentColor: ColorsPlante.primary,
+          unselectedWidgetColor: Color(0xFFB5B7C3),
         ),
         home: _mainWidget(),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);

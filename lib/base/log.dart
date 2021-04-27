@@ -138,9 +138,6 @@ class Log {
       StackTrace? stacktrace,
       bool crashAllowed = true,
       bool crashlyticsAllowed = true}) {
-    if (ex is FlutterError && ex.message.contains("RenderFlex")) {
-      return;
-    }
     if (crashAllowed && !kReleaseMode) {
       throw Exception(message);
     }

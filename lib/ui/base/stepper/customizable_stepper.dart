@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:plante/ui/base/stepper/_back_button_wrapper.dart';
 import 'package:plante/ui/base/stepper/_indicators_top.dart';
 import 'package:plante/ui/base/stepper/functions.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 
+import '_default_subwidgets.dart';
+
 class CustomizableStepperController {
-  CustomizableStepper2IndicatorsTopController _indicatorsController;
+  final CustomizableStepper2IndicatorsTopController _indicatorsController;
+  final BackButtonWrapperController _backButtonController;
   _StepFunction? _stepForwardFn;
   _StepFunction? _stepBackwardFn;
   _SetPageFunction? _setPageFunction;
@@ -13,7 +17,8 @@ class CustomizableStepperController {
 
   CustomizableStepperController({int initialPage = 0})
       : _indicatorsController = CustomizableStepper2IndicatorsTopController(
-            initialPage: initialPage) {
+            initialPage: initialPage),
+        _backButtonController = BackButtonWrapperController() {
     _activePage = initialPage;
   }
 
@@ -33,6 +38,7 @@ class CustomizableStepperController {
 class CustomizableStepper extends StatelessWidget {
   final CustomizableStepperController _controller;
   final PageIndicatorMaker _pageIndicatorMaker;
+  late final Widget _backButton;
   final DividerMaker _dividerMaker;
   final List<StepperPage> _pages;
 
@@ -40,12 +46,14 @@ class CustomizableStepper extends StatelessWidget {
 
   final PageController _pageViewController;
   final CustomizableStepper2IndicatorsTopController _indicatorController;
+  final BackButtonWrapperController _backButtonController;
 
   CustomizableStepper(
       {required List<StepperPage> pages,
       required CustomizableStepperController controller,
       PageIndicatorMaker pageIndicatorMaker = defaultIndicatorMaker,
       DividerMaker dividerMaker = defaultDividerMaker,
+      BackButtonMaker backButtonMaker = defaultBackButtonMaker,
       EdgeInsets contentPadding = EdgeInsets.zero})
       : _controller = controller,
         _pageIndicatorMaker = pageIndicatorMaker,
@@ -54,10 +62,16 @@ class CustomizableStepper extends StatelessWidget {
         _contentPadding = contentPadding,
         _pageViewController =
             PageController(initialPage: controller._activePage),
-        _indicatorController = controller._indicatorsController {
+        _indicatorController = controller._indicatorsController,
+        _backButtonController = controller._backButtonController {
     _controller._stepForwardFn = () => _setPage(_controller._activePage + 1);
     _controller._stepBackwardFn = () => _setPage(_controller._activePage - 1);
     _controller._setPageFunction = (int page) => _setPage(page);
+    final backButton = backButtonMaker.call(() {
+      controller.stepBackward();
+    });
+    _backButton = backButton ?? SizedBox.shrink();
+    _backButtonController.setButtonShown(_controller._activePage > 0);
   }
 
   void _setPage(int page) {
@@ -68,6 +82,7 @@ class CustomizableStepper extends StatelessWidget {
     _pageViewController.animateToPage(page,
         duration: Duration(milliseconds: 250), curve: Curves.easeIn);
     _indicatorController.setPage(page);
+    _backButtonController.setButtonShown(page > 0);
     _controller._activePage = page;
   }
 
@@ -92,8 +107,16 @@ class CustomizableStepper extends StatelessWidget {
           children: <Widget>[
             Container(
                 padding: indicatorsPadding,
-                child: CustomizableStepperIndicatorsTop(_indicatorController,
-                    _pageIndicatorMaker, _dividerMaker, _pages.length)),
+                child: IntrinsicHeight(
+                    child: Stack(children: [
+                  Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        BackButtonWrapper(_backButton, _backButtonController)
+                      ]),
+                  CustomizableStepperIndicatorsTop(_indicatorController,
+                      _pageIndicatorMaker, _dividerMaker, _pages.length),
+                ]))),
             Expanded(
                 child: PageView(
               controller: _pageViewController,
@@ -116,18 +139,3 @@ class CustomizableStepper extends StatelessWidget {
 
 typedef _StepFunction = void Function();
 typedef _SetPageFunction = void Function(int page);
-
-Widget defaultDividerMaker(
-    int leftPage, int rightPage, bool leftFinished, bool rightFinished) {
-  return Container(
-      child: Divider(), padding: EdgeInsets.only(left: 20, right: 20));
-}
-
-Widget defaultIndicatorMaker(int page, bool pageReached) {
-  return new Container(
-      width: 30,
-      height: 30,
-      decoration: new BoxDecoration(
-          color: !pageReached ? Colors.grey : Colors.green,
-          shape: BoxShape.circle));
-}

@@ -229,7 +229,6 @@ class Page4Controller extends PageControllerBase {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          // title: Text(''),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[

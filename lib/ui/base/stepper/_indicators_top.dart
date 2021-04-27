@@ -54,27 +54,27 @@ class _CustomizableStepperIndicatorsTopState
   Widget build(BuildContext context) {
     List<Widget> indicatorsWithDividers = [];
     for (int index = 0; index < pagesCount; ++index) {
-      final pageReached = index <= activePage;
-      final indicator = AnimatedCrossFade(
-        firstChild: pageIndicatorMaker.call(index, false),
-        secondChild: pageIndicatorMaker.call(index, true),
-        crossFadeState:
-            !pageReached ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-        duration: Duration(milliseconds: 250),
-      );
+      final indicatorState;
+      if (index < activePage) {
+        indicatorState = PageIndicatorState.PASSED;
+      } else if (index == activePage) {
+        indicatorState = PageIndicatorState.CURRENT;
+      } else {
+        indicatorState = PageIndicatorState.NOT_REACHED;
+      }
+      final indicator = pageIndicatorMaker.call(index, indicatorState);
 
       indicatorsWithDividers.add(indicator);
       if (index < pagesCount - 1) {
+        final pageReached = index <= activePage;
         final nextPageReached = index + 1 <= activePage;
         final divider =
             dividerMaker.call(index, index + 1, pageReached, nextPageReached);
-        indicatorsWithDividers.add(Expanded(child: divider));
+        indicatorsWithDividers.add(divider);
       }
     }
-    return Container(
-        padding: EdgeInsets.only(top: 20),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: indicatorsWithDividers));
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: indicatorsWithDividers);
   }
 }

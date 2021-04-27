@@ -16,7 +16,7 @@ extension WidgetTesterExtension on WidgetTester {
           home: Builder(
             builder: (BuildContext context) {
               _context = context;
-              return widget;
+              return Scaffold(body: widget);
             },
           ),
         )

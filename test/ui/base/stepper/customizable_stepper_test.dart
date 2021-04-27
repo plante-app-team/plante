@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 
+import '../../../widget_tester_extension.dart';
+
 void main() {
   setUp(() async {
     await GetIt.I.reset();
@@ -31,12 +33,9 @@ void main() {
             onPressed: controller.stepForward)
     );
 
-    await tester.pumpWidget(
-        Directionality(
-            textDirection: TextDirection.ltr,
-            child: CustomizableStepper(
-                pages: [page1, page2, page3],
-                controller: controller)));
+    await tester.superPump(CustomizableStepper(
+        pages: [page1, page2, page3],
+        controller: controller));
 
     return controller;
   }
@@ -131,12 +130,8 @@ void main() {
 
   testWidgets("Can dynamically update", (WidgetTester tester) async {
     final swapper = ChildrenSwapperController();
-    await tester.pumpWidget(
-        Directionality(
-            textDirection: TextDirection.ltr,
-            child: StepperChildrenSwapper(
-                controller: swapper, child1: Text("Text1"), child2: Text("Text2")
-            )));
+    await tester.superPump(StepperChildrenSwapper(
+        controller: swapper, child1: Text("Text1"), child2: Text("Text2")));
 
     expect(find.text("Text1"), findsOneWidget);
     expect(find.text("Text2"), findsNothing);
@@ -144,6 +139,35 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text("Text1"), findsNothing);
     expect(find.text("Text2"), findsOneWidget);
+  });
+
+  testWidgets("Back button", (WidgetTester tester) async {
+    await init(tester);
+
+    // On page 1
+    expect(find.text("Page 1"), findsOneWidget);
+    expect(find.text("Page 2"), findsNothing);
+    // No back button on page 1
+    expect(find.byKey(Key("default_stepper_back_button")), findsNothing);
+
+    await tester.tap(find.text("Cool button 1"));
+    await tester.pumpAndSettle();
+
+    // On page 2
+    expect(find.text("Page 1"), findsNothing);
+    expect(find.text("Page 2"), findsOneWidget);
+
+    // A back button on second page
+    expect(find.byKey(Key("default_stepper_back_button")), findsOneWidget);
+
+    await tester.tap(find.byKey(Key("default_stepper_back_button")));
+    await tester.pumpAndSettle();
+
+    // On page 1 again
+    expect(find.text("Page 1"), findsOneWidget);
+    expect(find.text("Page 2"), findsNothing);
+    // No back button on page 1
+    expect(find.byKey(Key("default_stepper_back_button")), findsNothing);
   });
 }
 
