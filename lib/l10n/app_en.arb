@@ -1,5 +1,5 @@
 {
-      "global_app_name": "Plante",
+      "global_app_name": "plante",
       "global_something_went_wrong": "Oops, something went wrong",
       "global_network_error": "Network error - please check your internet connection",
 
@@ -24,16 +24,17 @@
       "init_user_page_next_button_title": "Next",
       "init_user_page_done_button_title": "Done",
 
-      "main_page_title": "Main screen",
       "main_page_bottom_btn_feed": "News",
       "main_page_bottom_btn_map": "Products map",
 
       "map_page_default_shop_type_name": "Shop",
       "map_page_btn_where_am_i": "Where am I?",
 
-      "qr_scan_page_btn_flash": "Flash",
-      "qr_scan_page_product_not_found": "Product not found. Tap to add!",
-      "qr_scan_page_product_without_name": "Nameless product",
+      "qr_scan_page_product_not_found": "We don't have enough data for this product yet - but you can help the community by adding it",
+      "qr_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",
+      "qr_scan_page_searching_product": "Searching product ",
+      "qr_scan_page_show_product": "Show product",
+      "qr_scan_page_add_product": "Add",
 
       "init_product_page_add_product_data": "Add product data",
       "init_product_page_product_name": "Product name",
@@ -74,5 +75,9 @@
       "display_product_page_help_with_veg_statuses": "Help with veg-statuses",
       "display_product_page_report": "Report",
       "display_product_page_report_send": "Send",
-      "display_product_page_report_sent": "Report sent"
+      "display_product_page_report_sent": "Report sent",
+
+      "settings_page_general": "General",
+      "settings_page_send_logs": "Send logs",
+      "settings_page_erase_user_data": "Clear local user data and exit"
 }

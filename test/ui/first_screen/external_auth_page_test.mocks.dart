@@ -11,8 +11,7 @@ import 'package:plante/model/veg_status.dart' as _i10;
 import 'package:plante/outside/backend/backend.dart' as _i6;
 import 'package:plante/outside/backend/backend_error.dart' as _i8;
 import 'package:plante/outside/backend/backend_product.dart' as _i9;
-import 'package:plante/outside/identity/google_authorizer.dart'
-    as _i4;
+import 'package:plante/outside/identity/google_authorizer.dart' as _i4;
 import 'package:plante/outside/identity/google_user.dart' as _i2;
 
 // ignore_for_file: comment_references
@@ -99,6 +98,13 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
   _i5.Future<_i3.Result<_i3.None, _i8.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
+              returnValue:
+                  Future.value(_FakeResult<_i3.None, _i8.BackendError>()))
+          as _i5.Future<_i3.Result<_i3.None, _i8.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<_i3.None, _i8.BackendError>> sendProductScan(
+          String? barcode) =>
+      (super.noSuchMethod(Invocation.method(#sendProductScan, [barcode]),
               returnValue:
                   Future.value(_FakeResult<_i3.None, _i8.BackendError>()))
           as _i5.Future<_i3.Result<_i3.None, _i8.BackendError>>);

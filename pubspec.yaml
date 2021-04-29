@@ -58,6 +58,8 @@ dependencies:
   share: ^2.0.1
   url_launcher: ^6.0.3
   google_fonts: ^2.0.0
+  assorted_layout_widgets: ^4.0.7
+  settings_ui: ^1.0.0
 
 dev_dependencies:
   flutter_test:

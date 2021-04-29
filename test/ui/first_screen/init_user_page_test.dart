@@ -59,6 +59,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(
+        find.text(context.strings.init_user_page_im_vegan));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
         find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
 
@@ -83,6 +87,11 @@ void main() {
     await tester.tap(
         find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
+
+    await tester.tap(
+        find.text(context.strings.init_user_page_im_vegan));
+    await tester.pumpAndSettle();
+
     await tester.tap(
         find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
@@ -111,5 +120,26 @@ void main() {
     // Expect next screen to not be open even after
     // "Next" tap (because name is too short)
     expect(find.text(context.strings.init_user_page_i_eat_honey), findsNothing);
+  });
+
+  testWidgets("Does not finish without vegan or vegetarian selection", (WidgetTester tester) async {
+    bool done = false;
+    final resultParamsCallback = (UserParams params) async {
+      done = true;
+      return true;
+    };
+    final initialParams = UserParams((v) => v.name = "Nora");
+    final context = await tester.superPump(InitUserPage(initialParams, resultParamsCallback));
+
+    await tester.pumpAndSettle();
+    await tester.tap(
+        find.text(context.strings.init_user_page_next_button_title));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+        find.text(context.strings.init_user_page_done_button_title));
+    await tester.pumpAndSettle();
+
+    expect(done, isFalse);
   });
 }

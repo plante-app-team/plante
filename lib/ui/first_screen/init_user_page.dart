@@ -87,12 +87,13 @@ class _InitUserPageState extends State<InitUserPage> {
     return Scaffold(
         body: SafeArea(
             child: Stack(children: [
-      if (_loading)
-        SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+      AnimatedSwitcher(
+          duration: Duration(milliseconds: 250),
+          child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
       CustomizableStepper(
         pages: [_page1(), _page2()],
         controller: _stepperController,
-        contentPadding: EdgeInsets.only(left: 26, right: 26, top: 45),
+        contentPadding: EdgeInsets.only(left: 24, right: 24, top: 45),
       )
     ])));
   }

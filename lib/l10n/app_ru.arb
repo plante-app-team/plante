@@ -1,5 +1,5 @@
 {
-    "global_app_name": "Plante",
+    "global_app_name": "plante",
     "global_something_went_wrong": "Упс, что-то пошло не так",
     "global_network_error": "Сетевая ошибка - пожалуйста проверьте подключение к интернету",
 
@@ -24,16 +24,17 @@
     "init_user_page_next_button_title": "Далее",
     "init_user_page_done_button_title": "Готово",
 
-    "main_page_title": "Главный экран",
     "main_page_bottom_btn_feed": "Новости",
     "main_page_bottom_btn_map": "Карта продуктов",
 
     "map_page_default_shop_type_name": "Магазин",
     "map_page_btn_where_am_i": "Где я?",
 
-    "qr_scan_page_btn_flash": "Вспышка",
-    "qr_scan_page_product_not_found": "Такой продукт не найден. Нажмите чтобы добавить!",
-    "qr_scan_page_product_without_name": "Безымянный продукт",
+    "qr_scan_page_product_not_found": "У нас пока недостаточно данных об этом продукте, но вы можете помочь сообществу и добавить их",
+    "qr_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
+    "qr_scan_page_searching_product": "Ищем продукт ",
+    "qr_scan_page_show_product": "Показать продукт",
+    "qr_scan_page_add_product": "Добавить",
 
     "init_product_page_add_product_data": "Добавить данные о продукте",
     "init_product_page_product_name": "Имя продукта",
@@ -74,5 +75,9 @@
     "display_product_page_help_with_veg_statuses": "Помочь понять вег-статус",
     "display_product_page_report": "Пожаловаться",
     "display_product_page_report_send": "Отправить",
-    "display_product_page_report_sent": "Жалоба отправлена"
+    "display_product_page_report_sent": "Жалоба отправлена",
+
+    "settings_page_general": "Общее",
+    "settings_page_send_logs": "Отправить логи",
+    "settings_page_erase_user_data": "Очистить данные пользователя и выйти"
 }

@@ -153,8 +153,11 @@ class _InitProductPageState extends State<InitProductPage>
         key: _key,
         body: SafeArea(
             child: Stack(children: [
-          if (_model.loading)
-            SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+          AnimatedSwitcher(
+              duration: Duration(milliseconds: 250),
+              child: _model.loading
+                  ? LinearProgressIndicator()
+                  : SizedBox.shrink()),
           CustomizableStepper(
             pages: _pagesControllers.map((c) => c.build(context)).toList(),
             controller: _stepperController,

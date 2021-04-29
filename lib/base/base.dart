@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,4 +17,8 @@ void setSystemUIOverlayStyle() {
       systemNavigationBarIconBrightness: Brightness.dark,
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark));
+}
+
+double degreesToRads(double deg) {
+  return (deg * pi) / 180.0;
 }

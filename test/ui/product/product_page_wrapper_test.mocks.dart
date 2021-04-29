@@ -7,10 +7,8 @@ import 'dart:async' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/model/product.dart' as _i5;
-import 'package:plante/outside/products/products_manager.dart'
-    as _i3;
-import 'package:plante/outside/products/products_manager_error.dart'
-    as _i6;
+import 'package:plante/outside/products/products_manager.dart' as _i3;
+import 'package:plante/outside/products/products_manager_error.dart' as _i6;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis

@@ -114,4 +114,11 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
               returnValue:
                   Future.value(_FakeResult<_i3.None, _i7.BackendError>()))
           as _i5.Future<_i3.Result<_i3.None, _i7.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<_i3.None, _i7.BackendError>> sendProductScan(
+          String? barcode) =>
+      (super.noSuchMethod(Invocation.method(#sendProductScan, [barcode]),
+              returnValue:
+                  Future.value(_FakeResult<_i3.None, _i7.BackendError>()))
+          as _i5.Future<_i3.Result<_i3.None, _i7.BackendError>>);
 }

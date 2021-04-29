@@ -18,8 +18,7 @@ import 'package:plante/model/user_params.dart' as _i14;
 import 'package:plante/model/veg_status.dart' as _i17;
 import 'package:plante/outside/backend/backend.dart' as _i13;
 import 'package:plante/outside/backend/backend_error.dart' as _i15;
-import 'package:plante/outside/backend/backend_product.dart'
-    as _i16;
+import 'package:plante/outside/backend/backend_product.dart' as _i16;
 import 'package:plante/outside/off/off_api.dart' as _i6;
 
 // ignore_for_file: comment_references
@@ -128,6 +127,13 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
   _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
+              returnValue:
+                  Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);
+  @override
+  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> sendProductScan(
+          String? barcode) =>
+      (super.noSuchMethod(Invocation.method(#sendProductScan, [barcode]),
               returnValue:
                   Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
           as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);

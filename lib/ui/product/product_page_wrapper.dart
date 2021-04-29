@@ -14,6 +14,16 @@ class ProductPageWrapper extends StatefulWidget {
   @override
   _ProductPageWrapperState createState() => _ProductPageWrapperState(
       this.initialProduct, this.productUpdatedCallback);
+
+  static bool isProductFilledEnoughForDisplay(Product product) =>
+      product.name != null &&
+      product.name!.trim().isNotEmpty &&
+      product.vegetarianStatus != null &&
+      product.veganStatus != null &&
+      product.imageFront != null &&
+      product.imageIngredients != null &&
+      product.ingredientsText != null &&
+      product.ingredientsText!.isNotEmpty;
 }
 
 class _ProductPageWrapperState extends State<ProductPageWrapper> {
@@ -38,12 +48,5 @@ class _ProductPageWrapperState extends State<ProductPageWrapper> {
   }
 
   bool _isProductFilledEnough() =>
-      _initialProduct.name != null &&
-      _initialProduct.name!.trim().isNotEmpty &&
-      _initialProduct.vegetarianStatus != null &&
-      _initialProduct.veganStatus != null &&
-      _initialProduct.imageFront != null &&
-      _initialProduct.imageIngredients != null &&
-      _initialProduct.ingredientsText != null &&
-      _initialProduct.ingredientsText!.isNotEmpty;
+      ProductPageWrapper.isProductFilledEnoughForDisplay(_initialProduct);
 }

@@ -32,8 +32,9 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
     return Scaffold(
         body: SafeArea(
             child: Stack(children: [
-      if (_loading)
-        SizedBox(width: double.infinity, child: LinearProgressIndicator()),
+      AnimatedSwitcher(
+          duration: Duration(milliseconds: 250),
+          child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
       Stack(children: [
         OutlinedButton(
             child: Text("Send logs"), onPressed: Log.startLogsSending),

@@ -13,6 +13,7 @@ import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/ui/main/qr_scan_page.dart';
 
 class MyAppWidget extends StatefulWidget {
   final UserParams? _initialUserParams;
@@ -20,10 +21,12 @@ class MyAppWidget extends StatefulWidget {
   MyAppWidget(this._initialUserParams);
 
   @override
-  State<StatefulWidget> createState() => (_MyAppWidgetState(_initialUserParams));
+  State<StatefulWidget> createState() =>
+      (_MyAppWidgetState(_initialUserParams));
 }
 
-class _MyAppWidgetState extends State<MyAppWidget> implements UserParamsControllerObserver {
+class _MyAppWidgetState extends State<MyAppWidget>
+    implements UserParamsControllerObserver {
   UserParams? _initialUserParams;
 
   _MyAppWidgetState(this._initialUserParams) {
@@ -63,13 +66,14 @@ class _MyAppWidgetState extends State<MyAppWidget> implements UserParamsControll
           accentColor: ColorsPlante.primary,
           unselectedWidgetColor: Color(0xFFB5B7C3),
         ),
-        home: _mainWidget(),
+        home: AnimatedSwitcher(
+            duration: Duration(milliseconds: 250), child: _mainWidget()),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
   }
 
   Widget _mainWidget() {
     if (_allRequiredUserParamsFilled()) {
-      return MainPage();
+      return QrScanPage();
     }
     if (_initialUserParams != null) {
       return InitUserPage(_initialUserParams!, _onUserParamsSpecified);

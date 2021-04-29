@@ -24,7 +24,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.strings.main_page_title)),
       body: _pageOptions[_selectedPage],
       /*bottomNavigationBar: BottomNavigationBar(
         items: [
