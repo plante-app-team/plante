@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:plante/base/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/base/device_info.dart';
@@ -24,10 +25,11 @@ class BackendObserver {
 class Backend {
   final UserParamsController _userParamsController;
   final HttpClient _http;
+  final Settings _settings;
 
   final _observers = <BackendObserver>[];
 
-  Backend(this._userParamsController, this._http);
+  Backend(this._userParamsController, this._http, this._settings);
 
   void addObserver(BackendObserver observer) => _observers.add(observer);
   void removeObserver(BackendObserver observer) => _observers.remove(observer);
@@ -125,6 +127,11 @@ class Backend {
 
   Future<Result<BackendProduct?, BackendError>> requestProduct(
       String barcode) async {
+    if (await _settings.fakeOffApi()) {
+      // Sure, that's the requested product (lie)
+      return Ok(BackendProduct((e) => e.barcode = barcode));
+    }
+
     var response = await _backendGet("product_data/", {"barcode": barcode});
     if (response.isError) {
       return Err(_errFromResp(response));
@@ -147,6 +154,11 @@ class Backend {
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
       {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
+    if (await _settings.fakeOffApi()) {
+      // Sure, the update was ok (lie)
+      return Ok(None());
+    }
+
     final params = Map<String, String>();
     params['barcode'] = barcode;
     if (vegetarianStatus != null) {
@@ -173,6 +185,31 @@ class Backend {
     params['barcode'] = barcode;
     var response = await _backendGet("product_scan/", params);
     return _noneOrErrorFrom(response);
+  }
+
+  Future<Result<UserParams, BackendError>> userData() async {
+    final response = await _backendGet("user_data/", {});
+    if (response.isError) {
+      return Err(_errFromResp(response));
+    }
+
+    final json = _jsonDecodeSafe(response.body);
+    if (json == null) {
+      return Err(_errInvalidJson(response.body));
+    }
+
+    if (!_isError(json)) {
+      final backendUserParams = UserParams.fromJson(json)!;
+      // NOTE: client token is not present in the response, but
+      // the Backend class knows the token and can set it.
+      // If it wouldn't set it, the `userData()` method clients would get
+      // not fully set params.
+      final storedUserParams = await _userParamsController.getUserParams();
+      return Ok(backendUserParams.rebuild(
+          (e) => e..backendClientToken = storedUserParams?.backendClientToken));
+    } else {
+      return Err(_errFromJson(json));
+    }
   }
 
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {

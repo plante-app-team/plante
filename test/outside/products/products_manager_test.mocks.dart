@@ -137,4 +137,10 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
               returnValue:
                   Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
           as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);
+  @override
+  _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>> userData() =>
+      (super.noSuchMethod(Invocation.method(#userData, []),
+              returnValue: Future.value(
+                  _FakeResult<_i14.UserParams, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>>);
 }

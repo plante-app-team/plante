@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -133,10 +135,12 @@ void main() {
     final product = Product((v) => v
       ..barcode = "123"
       ..name = "My product"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..vegetarianStatus = VegStatus.possible
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..ingredientsText = "Water, salt, sugar");
 
     final context = await tester.superPump(DisplayProductPage(product));
@@ -178,15 +182,12 @@ void main() {
     expect(
         find.byKey(Key("init_product_page")),
         findsWidgets);
-    expect(
-        find.byKey(Key("page4")),
-        findsWidgets);
 
-    await tester.tap(find.descendant(
-        of: find.byKey(Key("vegetarian_unknown")),
-        matching: find.text(context.strings.init_product_page_not_sure)));
+    await tester.tap(find.byKey(Key("vegetarian_unknown_btn")));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(Key("page4_next_btn")));
+    await tester.drag(find.byKey(Key('content')), Offset(0.0, -3000));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
     expect(
@@ -206,7 +207,7 @@ void main() {
       find.byKey(Key("vegan_status")).evaluate().single.widget as Text;
     expect(veganStatus.data, equals(
         "${context.strings.display_product_page_whether_vegan}"
-            "${context.strings.display_product_page_veg_status_unknown}"));
+            "${context.strings.display_product_page_veg_status_negative}"));
     vegetarianStatusSource =
       find.byKey(Key("vegetarian_status_source")).evaluate().single.widget as Text;
     expect(vegetarianStatusSource.data, equals(

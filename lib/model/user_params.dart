@@ -23,6 +23,8 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   bool? get eatsEggs;
   @BuiltValueField(wireName: 'eats_honey')
   bool? get eatsHoney;
+  @BuiltValueField(wireName: 'rights_group')
+  int? get userGroup;
 
   bool? get eatsVeggiesOnly {
     if (eatsMilk == null && eatsEggs == null && eatsHoney == null) {

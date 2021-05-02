@@ -17,6 +17,7 @@ const PREF_USER_EATS_HONEY = 'PREF_USER_EATS_HONEY2';
 const PREF_USER_ID_ON_BACKEND = 'USER_ID_ON_BACKEND2';
 const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
     'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
+const PREF_USER_CLIENT_USER_GROUP = 'PREF_USER_CLIENT_USER_GROUP2';
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 
 class UserParamsControllerObserver {
@@ -42,6 +43,7 @@ class UserParamsController {
     final eatsHoney = prefs.getBool(PREF_USER_EATS_HONEY);
     final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
     final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+    final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
 
     if (name == null &&
         genderStr == null &&
@@ -67,7 +69,8 @@ class UserParamsController {
       ..birthdayStr = birthdayStr
       ..eatsMilk = eatsMilk
       ..eatsEggs = eatsEggs
-      ..eatsHoney = eatsHoney);
+      ..eatsHoney = eatsHoney
+      ..userGroup = userGroup);
   }
 
   Future<void> setUserParams(UserParams? userParams) async {
@@ -81,6 +84,7 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_EATS_HONEY);
       await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+      await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
       _observers.forEach((obs) {
         obs.onUserParamsUpdate(null);
       });
@@ -134,6 +138,12 @@ class UserParamsController {
           PREF_USER_CLIENT_TOKEN_FOR_BACKEND, userParams.backendClientToken!);
     } else {
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
+    }
+
+    if (userParams.userGroup != null) {
+      await prefs.setInt(PREF_USER_CLIENT_USER_GROUP, userParams.userGroup!);
+    } else {
+      await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
     }
     _observers.forEach((obs) {
       obs.onUserParamsUpdate(userParams);

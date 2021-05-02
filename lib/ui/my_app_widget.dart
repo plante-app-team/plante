@@ -11,7 +11,6 @@ import 'package:plante/ui/app_foreground_detector.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
-import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/main/qr_scan_page.dart';
 

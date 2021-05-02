@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,7 +15,6 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
 import 'init_product_page_test.mocks.dart';
@@ -40,11 +40,26 @@ void main() {
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
   });
 
-  testWidgets("good flow", (WidgetTester tester) async {
+  Future<void> scrollToBottom(WidgetTester tester) async {
+    await tester.drag(find.byKey(Key('content')), Offset(0.0, -3000));
+    await tester.pumpAndSettle();
+  }
+
+  Future<bool> generalTest(
+      WidgetTester tester,
+      {Product? expectedProductResult,
+        String? nameInput = "Lemon drink",
+        String? brandInput = "Nice brand",
+        String? categoriesInput = "Nice, category",
+        bool takeImageFront = true,
+        bool takeImageIngredients = true,
+        String? ingredientsTextOverride,
+        VegStatus? veganStatusInput = VegStatus.possible,
+        VegStatus? vegetarianStatusInput = VegStatus.possible}) async {
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
             (invoc) async => Ok(ProductWithOCRIngredients(
-                invoc.positionalArguments[0],
-                "water, lemon")));
+            invoc.positionalArguments[0],
+            "water, lemon")));
 
     verifyZeroInteractions(productsManager);
 
@@ -52,62 +67,490 @@ void main() {
     final callback = () {
       done = true;
     };
-    final context = await tester.superPump(InitProductPage(
+    await tester.superPump(InitProductPage(
         Product((v) => v.barcode = "123"),
         doneCallback: callback));
-    await tester.enterText(
-        find.byKey(Key("name")),
-        'Lemon drink');
-    await tester.pumpAndSettle();
 
-    verifyNever(productsManager.createUpdateProduct(any, any));
-    await tester.tap(
-        find.byKey(Key("page1_next_btn")));
-    await tester.pumpAndSettle();
-    verify(productsManager.createUpdateProduct(any, any)).called(1);
+    if (nameInput != null) {
+      await tester.enterText(
+          find.byKey(Key("name")),
+          nameInput);
+      await tester.pumpAndSettle();
+    }
 
-    verifyNever(photosTaker.takeAndCropPhoto(any));
-    await tester.tap(
-        find.byKey(Key("take_photo_icon")));
-    verify(photosTaker.takeAndCropPhoto(any)).called(1);
-    await tester.pumpAndSettle();
+    if (brandInput != null) {
+      await tester.enterText(
+          find.byKey(Key("brand")),
+          brandInput);
+      await tester.pumpAndSettle();
+    }
 
-    verifyNever(productsManager.createUpdateProduct(any, any));
-    await tester.tap(
-        find.byKey(Key("page2_next_btn")));
-    await tester.pumpAndSettle();
-    verify(productsManager.createUpdateProduct(any, any)).called(1);
+    if (categoriesInput != null) {
+      await tester.enterText(
+          find.byKey(Key("categories")),
+          categoriesInput);
+      await tester.pumpAndSettle();
+    }
 
-    verifyNever(photosTaker.takeAndCropPhoto(any));
-    await tester.tap(
-        find.byKey(Key("take_photo_icon")));
-    verify(photosTaker.takeAndCropPhoto(any)).called(1);
-    await tester.pumpAndSettle();
+    if (takeImageFront) {
+      verifyNever(photosTaker.takeAndCropPhoto(any));
+      await tester.tap(
+          find.byKey(Key("front_photo")));
+      verify(photosTaker.takeAndCropPhoto(any)).called(1);
+      await tester.pumpAndSettle();
+    }
 
-    expect(find.text("water, lemon"), findsNothing);
-    await tester.tap(
-        find.text(context.strings.init_product_page_ingredients_ocr));
-    await tester.pumpAndSettle();
-    expect(find.text("water, lemon"), findsOneWidget);
+    if (takeImageIngredients) {
+      expect(find.text("water, lemon"), findsNothing);
+      verifyNever(photosTaker.takeAndCropPhoto(any));
+      await tester.tap(
+          find.byKey(Key("ingredients_photo")));
+      await tester.pumpAndSettle();
+      expect(find.text("water, lemon"), findsOneWidget);
+      verify(photosTaker.takeAndCropPhoto(any)).called(1);
+    }
 
-    verifyNever(productsManager.createUpdateProduct(any, any));
-    await tester.tap(
-        find.byKey(Key("page3_next_btn")));
-    await tester.pumpAndSettle();
-    verify(productsManager.createUpdateProduct(any, any)).called(1);
+    if (ingredientsTextOverride != null) {
+      await tester.enterText(
+          find.byKey(Key("ingredients_text")),
+          ingredientsTextOverride);
+      await tester.pumpAndSettle();
+    }
 
-    await tester.tap(find.text(context.strings.init_product_page_possibly).first);
-    await tester.tap(find.text(context.strings.init_product_page_possibly).last);
-    await tester.pumpAndSettle();
+    await scrollToBottom(tester);
+
+    if (veganStatusInput != null) {
+      switch (veganStatusInput) {
+        case VegStatus.positive:
+          await tester.tap(find.byKey(Key("vegan_positive_btn")));
+          break;
+        case VegStatus.negative:
+          await tester.tap(find.byKey(Key("vegan_negative_btn")));
+          break;
+        case VegStatus.possible:
+          await tester.tap(find.byKey(Key("vegan_possible_btn")));
+          break;
+        case VegStatus.unknown:
+          await tester.tap(find.byKey(Key("vegan_unknown_btn")));
+          break;
+        default:
+          throw Error();
+      }
+      await tester.pumpAndSettle();
+    }
+    if (vegetarianStatusInput != null) {
+      switch (vegetarianStatusInput) {
+        case VegStatus.positive:
+          await tester.tap(find.byKey(Key("vegetarian_positive_btn")));
+          break;
+        case VegStatus.negative:
+          await tester.tap(find.byKey(Key("vegetarian_negative_btn")));
+          break;
+        case VegStatus.possible:
+          await tester.tap(find.byKey(Key("vegetarian_possible_btn")));
+          break;
+        case VegStatus.unknown:
+          await tester.tap(find.byKey(Key("vegetarian_unknown_btn")));
+          break;
+        default:
+          throw Error();
+      }
+      await tester.pumpAndSettle();
+    }
 
     expect(done, isFalse);
     verifyNever(productsManager.createUpdateProduct(any, any));
-    await tester.tap(
-        find.byKey(Key("page4_next_btn")));
+    await tester.tap(find.byKey(Key("done_btn")));
     await tester.pumpAndSettle();
-    final finalProduct = verify(productsManager.createUpdateProduct(captureAny, any)).captured.first;
-    expect(done, isTrue);
+    if (expectedProductResult != null) {
+      final finalProduct = verify(
+          productsManager.createUpdateProduct(captureAny, any)).captured.first;
+      expect(finalProduct, equals(expectedProductResult));
+    } else {
+      verifyNever(productsManager.createUpdateProduct(captureAny, any));
+    }
 
+    return done;
+  }
+
+  testWidgets("good flow", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..brands = ListBuilder<String>(["Nice brand"])
+      ..categories = ListBuilder<String>(["Nice", "category"])
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: expectedProduct,
+      nameInput: expectedProduct.name,
+      brandInput: expectedProduct.brands!.join(", "),
+      categoriesInput: expectedProduct.categories!.join(", "),
+      takeImageFront: expectedProduct.imageFront != null,
+      takeImageIngredients: expectedProduct.imageIngredients != null,
+      veganStatusInput: expectedProduct.veganStatus,
+      vegetarianStatusInput: expectedProduct.vegetarianStatus
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("front photo not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsNothing);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("name input field not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Hello there");
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsNothing);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("brand input field not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..brands = ListBuilder<String>(["Cool brand"]));
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsNothing);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("categories input field not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..categories = ListBuilder<String>(["Cool category"]));
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsNothing);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("ingredients group not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "Tomato");
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsNothing);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("ingredients group present when product has no ingredients image but has text", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..ingredientsText = "Tomato");
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("ingredients group present when product has no ingredients text but has image", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path));
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("vegan group not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsNothing);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("vegan group present when product has vegan data from OFF", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.open_food_facts);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("vegan group present when product has vegan data without source", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..veganStatus = VegStatus.positive);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("vegetarian group not present when product has data", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsNothing);
+  });
+
+  testWidgets("vegetarian group present when product has vegetarian data from OFF", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("vegetarian group present when product has vegetarian data without source", (WidgetTester tester) async {
+    final initialProduct = Product((v) => v
+      ..barcode = "123"
+      ..vegetarianStatus = VegStatus.positive);
+    await tester.superPump(InitProductPage(initialProduct));
+
+    expect(find.byKey(Key("front_photo_group")), findsWidgets);
+    expect(find.byKey(Key("name_group")), findsWidgets);
+    expect(find.byKey(Key("brand_group")), findsWidgets);
+    expect(find.byKey(Key("categories_group")), findsWidgets);
+    expect(find.byKey(Key("ingredients_group")), findsWidgets);
+    expect(find.byKey(Key("vegan_status_group")), findsWidgets);
+    expect(find.byKey(Key("vegetarian_status_group")), findsWidgets);
+  });
+
+  testWidgets("cannot save product without name", (WidgetTester tester) async {
+    final done = await generalTest(tester, nameInput: null, expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("can save product without brand", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..brands = null
+      ..categories = ListBuilder<String>(["Nice", "category"])
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        brandInput: null,
+        categoriesInput: expectedProduct.categories!.join(", "),
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: expectedProduct.veganStatus,
+        vegetarianStatusInput: expectedProduct.vegetarianStatus
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("can save product without categories", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..brands = ListBuilder<String>(["Nice brand"])
+      ..categories = null
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        brandInput: expectedProduct.brands!.join(", "),
+        categoriesInput: null,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: expectedProduct.veganStatus,
+        vegetarianStatusInput: expectedProduct.vegetarianStatus
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("cannot save product without front image", (WidgetTester tester) async {
+    final done = await generalTest(tester, takeImageFront: false, expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("cannot save product without ingredients image", (WidgetTester tester) async {
+    final done = await generalTest(tester, takeImageIngredients: false, expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("cannot save product without ingredients text", (WidgetTester tester) async {
+    final done = await generalTest(tester, ingredientsTextOverride: "", expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("cannot save product without vegan status", (WidgetTester tester) async {
+    final done = await generalTest(
+        tester,
+        vegetarianStatusInput: VegStatus.positive,
+        veganStatusInput: null,
+        expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("cannot save product without vegetarian status", (WidgetTester tester) async {
+    final done = await generalTest(tester, vegetarianStatusInput: null, expectedProductResult: null);
+    expect(done, isFalse);
+  });
+
+  testWidgets("vegan positive makes vegetarian positive", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community
+      ..vegetarianStatus = VegStatus.positive // !!!!!!
+      ..vegetarianStatusSource = VegStatusSource.community
+      );
+
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.positive,
+        vegetarianStatusInput: null // !!!!!!
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("vegetarian negative makes vegan negative", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
+
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: null, // !!!!!!
+        vegetarianStatusInput: VegStatus.negative
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("vegetarian possible makes vegan possible if it was positive", (WidgetTester tester) async {
     final expectedProduct = Product((v) => v
       ..barcode = "123"
       ..name = "Lemon drink"
@@ -116,306 +559,162 @@ void main() {
       ..ingredientsText = "water, lemon"
       ..vegetarianStatus = VegStatus.possible
       ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.possible
-      ..veganStatusSource = VegStatusSource.community);
-    expect(finalProduct, equals(expectedProduct));
-  });
+      ..veganStatus = VegStatus.possible // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
 
-  testWidgets("page 1 is skipped when product has data", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there");
-    await tester.superPump(InitProductPage(initialProduct));
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.positive, // !!!!!! positive input
+        vegetarianStatusInput: VegStatus.possible
+    );
 
-    expect(find.byKey(Key("page1")), findsNothing);
-    expect(find.byKey(Key("page2")), findsWidgets);
-  });
-
-  testWidgets("page 2 is skipped when product has data", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct));
-
-    expect(find.byKey(Key("page1")), findsNothing);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsWidgets);
-  });
-
-  testWidgets("page 3 is skipped when product has data", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredientsText = "water");
-    await tester.superPump(InitProductPage(initialProduct));
-
-    expect(find.byKey(Key("page1")), findsNothing);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsWidgets);
-  });
-
-  testWidgets("page 4 is skipped when product has data", (WidgetTester tester) async {
-    // Product has everything except for name
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredientsText = "water"
-      ..vegetarianStatus = VegStatus.possible
-      ..veganStatus = VegStatus.possible);
-    bool done = false;
-    final callback = () {
-      done = true;
-    };
-    await tester.superPump(InitProductPage(initialProduct, doneCallback: callback));
-
-    // At start at page1
-    expect(find.byKey(Key("page1")), findsWidgets);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsNothing);
-
-    await tester.enterText(
-        find.byKey(Key("name")),
-        'Lemon drink');
-    await tester.pumpAndSettle();
-
-    expect(done, isFalse);
-
-    await tester.tap(
-        find.byKey(Key("page1_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Done after page1
     expect(done, isTrue);
   });
 
-  testWidgets("page 4 is NOT skipped when veg statuses filled by OFF", (WidgetTester tester) async {
-    // Product has everything except for name, veg-statuses source is OFF
-    final initialProduct = Product((v) => v
+  testWidgets("vegetarian possible doesn't change vegan if was negative", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
       ..barcode = "123"
+      ..name = "Lemon drink"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredientsText = "water"
+      ..ingredientsText = "water, lemon"
       ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
-      ..veganStatus = VegStatus.possible
-      ..veganStatusSource = VegStatusSource.open_food_facts);
-    await tester.superPump(InitProductPage(initialProduct));
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
 
-    // At start at page1
-    expect(find.byKey(Key("page1")), findsWidgets);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsNothing);
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.negative, // !!!!!! negative input
+        vegetarianStatusInput: VegStatus.possible
+    );
 
-    await tester.enterText(
-        find.byKey(Key("name")),
-        'Lemon drink');
-    await tester.pumpAndSettle();
-    await tester.tap(
-        find.byKey(Key("page1_next_btn")));
-    await tester.pumpAndSettle();
-
-    // At page 4
-    expect(find.byKey(Key("page1")), findsNothing);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsWidgets);
-  });
-
-  testWidgets("can't leave page 1 without product name", (WidgetTester tester) async {
-    await tester.superPump(InitProductPage(
-        Product((v) => v.barcode = "123")));
-
-    await tester.tap(
-        find.byKey(Key("page1_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Still at page 1
-    expect(find.byKey(Key("page1")), findsWidgets);
-    expect(find.byKey(Key("page2")), findsNothing);
-  });
-
-  testWidgets("can't leave page 2 without front photo", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there");
-    await tester.superPump(InitProductPage(initialProduct));
-
-    await tester.tap(
-        find.byKey(Key("page2_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Still at page 2
-    expect(find.byKey(Key("page2")), findsWidgets);
-    expect(find.byKey(Key("page3")), findsNothing);
-  });
-
-  testWidgets("can't leave page 3 without both ingredients photo and text", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct));
-
-    await tester.tap(
-        find.byKey(Key("page3_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Still at page 3
-    expect(find.byKey(Key("page3")), findsWidgets);
-    expect(find.byKey(Key("page4")), findsNothing);
-
-    await tester.tap(
-        find.byKey(Key("take_photo_icon")));
-    await tester.pumpAndSettle();
-    await tester.tap(
-        find.byKey(Key("page3_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Still at page 3!
-    expect(find.byKey(Key("page3")), findsWidgets);
-    expect(find.byKey(Key("page4")), findsNothing);
-
-    await tester.enterText(find.byKey(Key("ingredients")), "water");
-    await tester.pumpAndSettle();
-
-    await tester.tap(
-        find.byKey(Key("page3_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Only now at page 4
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsWidgets);
-  });
-
-  testWidgets("can't leave page 4 without veg-status data", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "Hello there"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredientsText = "water");
-    bool done = false;
-    final callback = () {
-      done = true;
-    };
-    final context = await tester.superPump(InitProductPage(
-        initialProduct, doneCallback: callback));
-
-    await tester.tap(
-        find.byKey(Key("page4_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Not done yet
-    expect(done, isFalse);
-
-    await tester.tap(find.text(context.strings.init_product_page_definitely_yes).first);
-    await tester.pumpAndSettle();
-    await tester.tap(
-        find.byKey(Key("page4_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Not done yet
-    expect(done, isFalse);
-
-    await tester.tap(find.text(context.strings.init_product_page_definitely_yes).last);
-    await tester.pumpAndSettle();
-    await tester.tap(
-        find.byKey(Key("page4_next_btn")));
-    await tester.pumpAndSettle();
-
-    // Now done
     expect(done, isTrue);
   });
 
-  testWidgets("cannot write ingredients text without ingredients photo", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+  testWidgets("vegetarian possible doesn't change vegan if was unknown", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
       ..barcode = "123"
-      ..name = "Hello there"
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
-    await tester.superPump(InitProductPage(initialProduct));
-
-    // If there's no photo, then there's no ingredients TextField
-    expect(find.byKey(Key("ingredients")), findsNothing);
-
-    await tester.tap(
-        find.byKey(Key("take_photo_icon")));
-    await tester.pumpAndSettle();
-
-    // And now that there are photos ingredients text can be written
-    expect(find.byKey(Key("ingredients")), findsWidgets);
-  });
-
-  testWidgets("brand and categories are filled when product has them", (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..brands.addAll(["brand1", "brand2"])
-      ..categories.addAll(["category1", "category2"]));
-    await tester.superPump(InitProductPage(initialProduct));
-
-    expect(find.text("brand1, brand2"), findsOneWidget);
-    expect(find.text("category1, category2"), findsOneWidget);
-  });
-
-  testWidgets("veg statuses radio buttons not selected when "
-      "statuses filled by OFF", (WidgetTester tester) async {
-    // Product has everything except for name, veg-statuses source is OFF
-    final initialProduct = Product((v) => v
-      ..name = "name"
-      ..barcode = "123"
+      ..name = "Lemon drink"
       ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
       ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..ingredientsText = "water"
+      ..ingredientsText = "water, lemon"
       ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
-      ..veganStatus = VegStatus.possible
-      ..veganStatusSource = VegStatusSource.open_food_facts);
-    await tester.superPump(InitProductPage(initialProduct));
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.unknown // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
 
-    // At page 4
-    expect(find.byKey(Key("page1")), findsNothing);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsWidgets);
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.unknown, // !!!!!! negative input
+        vegetarianStatusInput: VegStatus.possible
+    );
 
-    final buttons = find.byType(Radio).evaluate().map((e) => e.widget as Radio);
-    expect(
-        buttons.where((button) => button.groupValue != null).isEmpty,
-        isTrue);
+    expect(done, isTrue);
   });
 
-  testWidgets("required pages shown even when product already has page's data",
-          (WidgetTester tester) async {
-    // Product already has name
-    final initialProduct = Product((v) => v
+  testWidgets("vegetarian unknown makes vegan unknown if it was positive", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
       ..barcode = "123"
-      ..name = "Hello there");
-    await tester.superPump(
-        InitProductPage(initialProduct, requiredPages: [InitProductSubpage.PAGE1]));
+      ..name = "Lemon drink"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.unknown
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.unknown // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
 
-    expect(find.byKey(Key("page1")), findsWidgets);
-    expect(find.byKey(Key("page2")), findsNothing);
-    expect(find.byKey(Key("page3")), findsNothing);
-    expect(find.byKey(Key("page4")), findsNothing);
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.positive, // !!!!!! positive input
+        vegetarianStatusInput: VegStatus.unknown
+    );
+
+    expect(done, isTrue);
   });
 
-  testWidgets("only required pages shown even when product doesn't have data of other pages",
-          (WidgetTester tester) async {
-        // Product doesn't have a name
-        final initialProduct = Product((v) => v
-          ..barcode = "123");
-        await tester.superPump(
-            InitProductPage(initialProduct, requiredPages: [InitProductSubpage.PAGE2]));
+  testWidgets("vegetarian unknown makes vegan unknown if it was possible", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.unknown
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.unknown // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
 
-        expect(find.byKey(Key("page1")), findsNothing);
-        expect(find.byKey(Key("page2")), findsWidgets);
-        expect(find.byKey(Key("page3")), findsNothing);
-        expect(find.byKey(Key("page4")), findsNothing);
-      });
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.possible, // !!!!!! positive input
+        vegetarianStatusInput: VegStatus.unknown
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets("vegetarian unknown doesn't change vegan if was negative", (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = "123"
+      ..name = "Lemon drink"
+      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
+      ..ingredientsText = "water, lemon"
+      ..vegetarianStatus = VegStatus.unknown
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative // !!!!!!
+      ..veganStatusSource = VegStatusSource.community
+    );
+
+    final done = await generalTest(
+        tester,
+        brandInput: null,
+        categoriesInput: null,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: VegStatus.negative, // !!!!!! negative input
+        vegetarianStatusInput: VegStatus.unknown
+    );
+
+    expect(done, isTrue);
+  });
 }

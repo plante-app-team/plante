@@ -75,6 +75,12 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add(
             serializers.serialize(value, specifiedType: const FullType(bool)));
     }
+    value = object.userGroup;
+    if (value != null) {
+      result
+        ..add('rights_group')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     return result;
   }
 
@@ -121,6 +127,10 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.eatsHoney = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
+        case 'rights_group':
+          result.userGroup = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
+          break;
       }
     }
 
@@ -145,6 +155,8 @@ class _$UserParams extends UserParams {
   final bool? eatsEggs;
   @override
   final bool? eatsHoney;
+  @override
+  final int? userGroup;
 
   factory _$UserParams([void Function(UserParamsBuilder)? updates]) =>
       (new UserParamsBuilder()..update(updates)).build();
@@ -157,7 +169,8 @@ class _$UserParams extends UserParams {
       this.birthdayStr,
       this.eatsMilk,
       this.eatsEggs,
-      this.eatsHoney})
+      this.eatsHoney,
+      this.userGroup})
       : super._();
 
   @override
@@ -178,7 +191,8 @@ class _$UserParams extends UserParams {
         birthdayStr == other.birthdayStr &&
         eatsMilk == other.eatsMilk &&
         eatsEggs == other.eatsEggs &&
-        eatsHoney == other.eatsHoney;
+        eatsHoney == other.eatsHoney &&
+        userGroup == other.userGroup;
   }
 
   @override
@@ -189,14 +203,16 @@ class _$UserParams extends UserParams {
                 $jc(
                     $jc(
                         $jc(
-                            $jc($jc(0, backendId.hashCode),
-                                backendClientToken.hashCode),
-                            name.hashCode),
-                        genderStr.hashCode),
-                    birthdayStr.hashCode),
-                eatsMilk.hashCode),
-            eatsEggs.hashCode),
-        eatsHoney.hashCode));
+                            $jc(
+                                $jc($jc(0, backendId.hashCode),
+                                    backendClientToken.hashCode),
+                                name.hashCode),
+                            genderStr.hashCode),
+                        birthdayStr.hashCode),
+                    eatsMilk.hashCode),
+                eatsEggs.hashCode),
+            eatsHoney.hashCode),
+        userGroup.hashCode));
   }
 
   @override
@@ -209,7 +225,8 @@ class _$UserParams extends UserParams {
           ..add('birthdayStr', birthdayStr)
           ..add('eatsMilk', eatsMilk)
           ..add('eatsEggs', eatsEggs)
-          ..add('eatsHoney', eatsHoney))
+          ..add('eatsHoney', eatsHoney)
+          ..add('userGroup', userGroup))
         .toString();
   }
 }
@@ -250,6 +267,10 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   bool? get eatsHoney => _$this._eatsHoney;
   set eatsHoney(bool? eatsHoney) => _$this._eatsHoney = eatsHoney;
 
+  int? _userGroup;
+  int? get userGroup => _$this._userGroup;
+  set userGroup(int? userGroup) => _$this._userGroup = userGroup;
+
   UserParamsBuilder();
 
   UserParamsBuilder get _$this {
@@ -263,6 +284,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _eatsMilk = $v.eatsMilk;
       _eatsEggs = $v.eatsEggs;
       _eatsHoney = $v.eatsHoney;
+      _userGroup = $v.userGroup;
       _$v = null;
     }
     return this;
@@ -290,7 +312,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
             birthdayStr: birthdayStr,
             eatsMilk: eatsMilk,
             eatsEggs: eatsEggs,
-            eatsHoney: eatsHoney);
+            eatsHoney: eatsHoney,
+            userGroup: userGroup);
     replace(_$result);
     return _$result;
   }

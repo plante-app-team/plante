@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/main/feed/feed_page.dart';
 import 'package:plante/ui/main/map/map_page.dart';
 

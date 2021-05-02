@@ -19,6 +19,8 @@ import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
+// mutation is used for testing only
+// ignore: must_be_immutable
 class QrScanPage extends StatefulWidget {
   _QrScanPageState? _lastState;
 
@@ -124,13 +126,6 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
               )
             ]),
           ),
-          Container(
-              width: double.infinity,
-              child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 250),
-                  child: _searching && !isInTests()
-                      ? LinearProgressIndicator()
-                      : SizedBox.shrink())),
           Material(
               color: Colors.white,
               child: IconButton(
@@ -145,6 +140,13 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
                       color: Colors.grey,
                       icon: Icon(Icons.settings),
                       onPressed: _openSettings))),
+          Container(
+              width: double.infinity,
+              child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 250),
+                  child: _searching && !isInTests()
+                      ? LinearProgressIndicator()
+                      : SizedBox.shrink())),
         ],
       ),
     ));
@@ -198,8 +200,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(context.strings.qr_scan_page_product_not_found,
-                textAlign: TextAlign.center,
-                style: !isInTests() ? TextStyles.headline2 : null),
+                textAlign: TextAlign.center, style: TextStyles.headline2),
             SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -222,7 +223,12 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
         ? screenSizeTotal.width
         : screenSizeTotal.height;
     final circleSizeRation = 0.62;
-    final circleSize = screenSize * circleSizeRation;
+    final circleSize;
+    if (!isInTests()) {
+      circleSize = screenSize * circleSizeRation;
+    } else {
+      circleSize = 60.0;
+    }
 
     return Container(
       width: double.infinity,

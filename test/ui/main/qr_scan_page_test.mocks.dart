@@ -130,6 +130,12 @@ class MockBackend extends _i1.Mock implements _i7.Backend {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i9.BackendError>()))
           as _i4.Future<_i2.Result<_i2.None, _i9.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i8.UserParams, _i9.BackendError>> userData() =>
+      (super.noSuchMethod(Invocation.method(#userData, []),
+              returnValue:
+                  Future.value(_FakeResult<_i8.UserParams, _i9.BackendError>()))
+          as _i4.Future<_i2.Result<_i8.UserParams, _i9.BackendError>>);
 }
 
 /// A class which mocks [RouteObserver].

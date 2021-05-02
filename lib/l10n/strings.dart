@@ -5,4 +5,6 @@ extension Strings on BuildContext {
   AppLocalizations get strings {
     return AppLocalizations.of(this)!;
   }
+
+  String get langCode => Localizations.localeOf(this).languageCode;
 }

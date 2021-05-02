@@ -27,7 +27,8 @@ void main() {
         ..birthdayStr = "20.07.1993"
         ..eatsMilk = true
         ..eatsEggs = false
-        ..eatsHoney = true);
+        ..eatsHoney = true
+        ..userGroup = 321);
     await controller.setUserParams(params);
 
     final finalParams = await controller.getUserParams();
@@ -77,6 +78,10 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.userGroup = 123);
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     final expectedParams = UserParams((v) => v
       ..name = "Bob"
       ..genderStr = Gender.FEMALE.name
@@ -85,7 +90,8 @@ void main() {
       ..eatsEggs = false
       ..eatsHoney = false
       ..backendId = "123"
-      ..backendClientToken = "321");
+      ..backendClientToken = "321"
+      ..userGroup = 123);
     expect(params, equals(expectedParams));
   });
 

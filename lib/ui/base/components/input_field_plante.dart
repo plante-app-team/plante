@@ -6,12 +6,14 @@ import 'package:plante/ui/base/text_styles.dart';
 class InputFieldPlante extends StatelessWidget {
   final Key? key;
   final String? label;
+  final String? hint;
   final TextCapitalization textCapitalization;
   final TextEditingController? controller;
 
   InputFieldPlante(
       {this.key,
       this.label,
+      this.hint,
       this.textCapitalization = TextCapitalization.sentences,
       this.controller});
 
@@ -26,6 +28,7 @@ class InputFieldPlante extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyles.inputLabel,
+            hintText: hint,
             contentPadding: EdgeInsets.only(left: 22),
             enabledBorder: OutlineInputBorder(
               gapPadding: 2,

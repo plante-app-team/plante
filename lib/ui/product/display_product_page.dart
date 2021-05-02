@@ -7,9 +7,9 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 
 import '_product_images_helper.dart';
-import 'init_product_page.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
@@ -131,7 +131,6 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           MaterialPageRoute(
                               builder: (context) => InitProductPage(_product,
                                       key: Key("init_product_page"),
-                                      requiredPages: [InitProductSubpage.PAGE4],
                                       productUpdatedCallback: (product) {
                                     _productUpdatedCallback?.call(_product);
                                     setState(() {

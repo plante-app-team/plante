@@ -1,45 +1,187 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/base/settings.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:settings_ui/settings_ui.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool loading = true;
+  bool developer = false;
+  bool fakeOffApi = false;
+  bool offScannedProductEmpty = false;
+
+  late Settings settings;
+  late UserParams user;
+
+  @override
+  void initState() {
+    super.initState();
+    settings = GetIt.I.get<Settings>();
+    initStateImpl();
+  }
+
+  void initStateImpl() async {
+    final userNullable =
+        await GetIt.I.get<UserParamsController>().getUserParams();
+    user = userNullable!;
+    if (user.userGroup == null || user.userGroup == 1) {
+      setState(() {
+        loading = false;
+      });
+      return;
+    }
+
+    developer = true;
+    fakeOffApi = await settings.fakeOffApi();
+    offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
+    setState(() {
+      loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: SettingsList(
-      sections: [
-        SettingsSection(
-          title: context.strings.settings_page_general,
-          tiles: [
-            SettingsTile(
-              title: context.strings.settings_page_send_logs,
-              leading: Icon(Icons.notes),
-              onPressed: (BuildContext context) {
-                Log.startLogsSending();
-              },
-            ),
-            SettingsTile(
-              title: context.strings.settings_page_erase_user_data,
-              leading: Icon(Icons.phonelink_erase),
-              onPressed: (BuildContext context) async {
-                final controller = GetIt.I.get<UserParamsController>();
-                final params = await controller.getUserParams();
-                await controller.setUserParams(params!.rebuild((e) => e
-                  ..name = ""
-                  ..eatsHoney = null
-                  ..eatsEggs = null
-                  ..eatsMilk = null));
-                exit(0);
-              },
-            ),
-          ],
-        ),
-      ],
-    ));
+    if (loading) {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Scaffold(
+        body: SafeArea(
+            child: Container(
+                padding: EdgeInsets.only(left: 24, right: 24),
+                child: Column(children: [
+                  SizedBox(height: 45),
+                  SizedBox(
+                      width: double.infinity,
+                      child: Text(context.strings.settings_page_title,
+                          style: TextStyles.headline1)),
+                  SizedBox(height: 12),
+                  Row(children: [
+                    InkWell(
+                        child: Text(
+                            context.strings.settings_page_your_id +
+                                (user.backendId ?? ""),
+                            style: TextStyles.normal),
+                        onTap: () {
+                          Clipboard.setData(
+                              ClipboardData(text: user.backendId ?? ""));
+                          showSnackBar(
+                              context.strings.global_copied_to_clipboard,
+                              context);
+                        }),
+                  ]),
+                  SizedBox(height: 24),
+                  SizedBox(
+                      width: double.infinity,
+                      child: Text(context.strings.settings_page_general,
+                          style: TextStyles.headline2)),
+                  SizedBox(height: 12),
+                  SizedBox(
+                      width: double.infinity,
+                      child: ButtonFilledPlante.withText(
+                          context.strings.settings_page_send_logs,
+                          onPressed: () {
+                        Log.startLogsSending();
+                      })),
+                  if (developer) SizedBox(height: 24),
+                  if (developer)
+                    SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                            context.strings.settings_page_developer_options,
+                            style: TextStyles.headline2)),
+                  if (developer) SizedBox(height: 12),
+                  if (developer)
+                    SizedBox(
+                        width: double.infinity,
+                        child: ButtonFilledPlante.withText(
+                            context.strings.settings_page_erase_user_data,
+                            onPressed: () async {
+                          final controller =
+                              GetIt.I.get<UserParamsController>();
+                          final params = await controller.getUserParams();
+                          await controller
+                              .setUserParams(params!.rebuild((e) => e
+                                ..name = ""
+                                ..eatsHoney = null
+                                ..eatsEggs = null
+                                ..eatsMilk = null));
+                          exit(0);
+                        })),
+                  if (developer)
+                    _CheckboxSettings(
+                        text: context.strings.settings_page_fake_off,
+                        value: fakeOffApi,
+                        onChanged: (value) {
+                          setState(() {
+                            fakeOffApi = value;
+                            settings.setFakeOffApi(fakeOffApi);
+                          });
+                        }),
+                  if (developer)
+                    AnimatedSwitcher(
+                        duration: Duration(milliseconds: 250),
+                        child: !fakeOffApi
+                            ? SizedBox.shrink()
+                            : _CheckboxSettings(
+                                text: context.strings
+                                    .settings_page_fake_off_scanned_product_empty,
+                                value: offScannedProductEmpty,
+                                onChanged: (value) {
+                                  setState(() {
+                                    offScannedProductEmpty = value;
+                                    settings.setFakeOffApiProductNotFound(
+                                        offScannedProductEmpty);
+                                  });
+                                }))
+                ]))));
+  }
+}
+
+class _CheckboxSettings extends StatelessWidget {
+  final String text;
+  final bool value;
+  final dynamic Function(bool value) onChanged;
+
+  _CheckboxSettings(
+      {required this.text, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: SizedBox(
+        width: double.infinity,
+        height: 46,
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(text, style: TextStyles.normal),
+          Checkbox(
+              value: value,
+              onChanged: (value) {
+                onChanged.call(value ?? false);
+              })
+        ]),
+      ),
+      onTap: () {
+        onChanged.call(!value);
+      },
+    );
   }
 }

@@ -59,7 +59,6 @@ dependencies:
   url_launcher: ^6.0.3
   google_fonts: ^2.0.0
   assorted_layout_widgets: ^4.0.7
-  settings_ui: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -85,3 +84,7 @@ flutter:
   assets:
     - assets/google_icon.svg
     - assets/stepper_back.svg
+    - assets/camera.svg
+    - assets/camera_frame.svg
+    - assets/camera_cancel.svg
+    - assets/info_icon.svg
