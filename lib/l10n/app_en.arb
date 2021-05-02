@@ -75,6 +75,7 @@
       "settings_page_developer_options": "Developer options",
       "settings_page_fake_off": "Use fake Open Food Facts",
       "settings_page_fake_off_scanned_product_empty": "Scanned product is empty",
+      "settings_page_fake_off_forced_scanned_barcode": "Scanned barcode override",
 
       "init_product_page_title": "New product",
       "init_product_page_take_front_photo": "Packaging front photo",

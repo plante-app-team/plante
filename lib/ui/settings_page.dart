@@ -11,6 +11,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,6 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool developer = false;
   bool fakeOffApi = false;
   bool offScannedProductEmpty = false;
+
+  final barcodeOverrideController = TextEditingController();
 
   late Settings settings;
   late UserParams user;
@@ -50,6 +53,11 @@ class _SettingsPageState extends State<SettingsPage> {
     developer = true;
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
+    barcodeOverrideController.text = await settings.fakeScannedProductBarcode();
+    barcodeOverrideController.addListener(() {
+      settings.setFakeScannedProductBarcode(barcodeOverrideController.text);
+    });
+
     setState(() {
       loading = false;
     });
@@ -139,12 +147,12 @@ class _SettingsPageState extends State<SettingsPage> {
                             settings.setFakeOffApi(fakeOffApi);
                           });
                         }),
-                  if (developer)
-                    AnimatedSwitcher(
-                        duration: Duration(milliseconds: 250),
-                        child: !fakeOffApi
-                            ? SizedBox.shrink()
-                            : _CheckboxSettings(
+                      if (developer)
+                        AnimatedSwitcher(
+                            duration: Duration(milliseconds: 250),
+                            child: !fakeOffApi
+                                ? SizedBox.shrink()
+                                : _CheckboxSettings(
                                 text: context.strings
                                     .settings_page_fake_off_scanned_product_empty,
                                 value: offScannedProductEmpty,
@@ -155,6 +163,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                         offScannedProductEmpty);
                                   });
                                 })),
+                      if (developer)
+                        InputFieldPlante(
+                              label: context.strings.settings_page_fake_off_forced_scanned_barcode,
+                              controller: barcodeOverrideController,
+                            ),
                   SizedBox(height: 10),
                   Center(
                       child: InkWell(

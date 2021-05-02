@@ -4,6 +4,7 @@ import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -43,9 +44,25 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   bool _searching = false;
   Product? _foundProduct;
 
+  String fakeScannedBarcode = "";
+  
   qr.QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
+  @override
+  void initState() {
+    super.initState();
+    updateFakeScannedBarcode();
+  }
+
+  void updateFakeScannedBarcode() async {
+    final settings = GetIt.I.get<Settings>();
+    final result = await settings.fakeScannedProductBarcode();
+    setState(() {
+      fakeScannedBarcode = result;
+    });
+  }
+  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -77,6 +94,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void didPopNext() {
     if (ModalRoute.of(context)?.isActive == true) {
       this.controller?.resumeCamera();
+      updateFakeScannedBarcode();
     }
   }
 
@@ -126,12 +144,23 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
               )
             ]),
           ),
-          Material(
-              color: Colors.white,
-              child: IconButton(
-                  color: Colors.yellow,
-                  icon: Icon(Icons.flash_on),
-                  onPressed: _toggleFlash)),
+          Row(children: [
+            Material(
+                color: Colors.white,
+                child: IconButton(
+                    color: Colors.yellow,
+                    icon: Icon(Icons.flash_on),
+                    onPressed: _toggleFlash)),
+            if (fakeScannedBarcode.isNotEmpty) Material(
+                color: Colors.white,
+                child: IconButton(
+                    color: Colors.grey,
+                    icon: Icon(Icons.tag_faces),
+                    onPressed: () {
+                      _onNewScanData(qr.Barcode(fakeScannedBarcode, qr.BarcodeFormat.unknown, []));
+                    })),
+          ]),
+
           Align(
               alignment: Alignment.topRight,
               child: Material(
@@ -256,8 +285,10 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
       return;
     }
 
-    // Note: no await because we don't care about result
-    GetIt.I.get<Backend>().sendProductScan(scanData.code);
+    if (scanData.code != fakeScannedBarcode) {
+      // Note: no await because we don't care about result
+      GetIt.I.get<Backend>().sendProductScan(scanData.code);
+    }
 
     setState(() {
       _barcode = scanData;
