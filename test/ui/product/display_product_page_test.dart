@@ -172,8 +172,11 @@ void main() {
       find.text(context.strings.display_product_page_help_with_veg_statuses),
       findsOneWidget);
     expect(
-      find.byKey(Key("init_product_page")),
-      findsNothing);
+        find.byKey(Key("init_product_page")),
+        findsNothing);
+    expect(
+        find.text(context.strings.display_product_page_title_for_veg_status_change),
+        findsNothing);
 
     await tester.tap(
         find.text(context.strings.display_product_page_help_with_veg_statuses));
@@ -181,6 +184,9 @@ void main() {
 
     expect(
         find.byKey(Key("init_product_page")),
+        findsWidgets);
+    expect(
+        find.text(context.strings.display_product_page_title_for_veg_status_change),
         findsWidgets);
 
     await tester.tap(find.byKey(Key("vegetarian_unknown_btn")));
@@ -195,6 +201,9 @@ void main() {
         findsNothing);
     expect(
         find.text(context.strings.display_product_page_help_with_veg_statuses),
+        findsNothing);
+    expect(
+        find.text(context.strings.display_product_page_title_for_veg_status_change),
         findsNothing);
 
     // Final veg statuses are changed and are from community

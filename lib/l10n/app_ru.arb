@@ -58,6 +58,7 @@
     "display_product_page_report": "Пожаловаться",
     "display_product_page_report_send": "Отправить",
     "display_product_page_report_sent": "Жалоба отправлена",
+    "display_product_page_title_for_veg_status_change": "Вег-статусы",
 
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",

@@ -58,6 +58,7 @@
       "display_product_page_report": "Report",
       "display_product_page_report_send": "Send",
       "display_product_page_report_sent": "Report sent",
+      "display_product_page_title_for_veg_status_change": "Veg-statuses",
 
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",

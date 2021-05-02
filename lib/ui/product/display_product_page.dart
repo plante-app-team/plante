@@ -131,6 +131,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           MaterialPageRoute(
                               builder: (context) => InitProductPage(_product,
                                       key: Key("init_product_page"),
+                                      title: context.strings
+                                          .display_product_page_title_for_veg_status_change,
                                       productUpdatedCallback: (product) {
                                     _productUpdatedCallback?.call(_product);
                                     setState(() {

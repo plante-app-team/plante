@@ -20,11 +20,12 @@ typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
 class InitProductPage extends StatefulWidget {
   final Product initialProduct;
+  final String? title;
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
 
   const InitProductPage(this.initialProduct,
-      {Key? key, this.productUpdatedCallback, this.doneCallback})
+      {Key? key, this.title, this.productUpdatedCallback, this.doneCallback})
       : super(key: key);
 
   @override
@@ -116,7 +117,7 @@ class _InitProductPageState extends State<InitProductPage>
                   SizedBox(
                       width: double.infinity,
                       child: Text(
-                        context.strings.init_product_page_title,
+                        widget.title ?? context.strings.init_product_page_title,
                         style: TextStyles.headline1,
                         textAlign: TextAlign.left,
                       )),
