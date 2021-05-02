@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -165,23 +166,11 @@ class _CheckboxSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: SizedBox(
-        width: double.infinity,
-        height: 46,
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(text, style: TextStyles.normal),
-          Checkbox(
-              value: value,
-              onChanged: (value) {
-                onChanged.call(value ?? false);
-              })
-        ]),
-      ),
-      onTap: () {
-        onChanged.call(!value);
-      },
+    return CheckboxListTile(
+      value: value,
+      onChanged: (value) { onChanged.call(value ?? false); },
+      title: Text(text, style: TextStyles.normal),
+      contentPadding: EdgeInsets.zero,
     );
   }
 }
