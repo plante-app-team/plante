@@ -10,6 +10,7 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -24,6 +25,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool loading = true;
   bool developer = false;
+  bool crashOnErrors = false;
   bool fakeOffApi = false;
   bool offScannedProductEmpty = false;
 
@@ -51,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     developer = true;
+    crashOnErrors = await settings.crashOnErrors();
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
     barcodeOverrideController.text = await settings.fakeScannedProductBarcode();
@@ -126,17 +129,29 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: ButtonFilledPlante.withText(
                             context.strings.settings_page_erase_user_data,
                             onPressed: () async {
-                          final controller =
+                          final paramsController =
                               GetIt.I.get<UserParamsController>();
-                          final params = await controller.getUserParams();
-                          await controller
-                              .setUserParams(params!.rebuild((e) => e
-                                ..name = ""
-                                ..eatsHoney = null
-                                ..eatsEggs = null
-                                ..eatsMilk = null));
+                          final params = await paramsController.getUserParams();
+                          final newParams = params!.rebuild(
+                              (e) => e..name = "😁" // s for "too short"
+                              );
+                          await paramsController.setUserParams(newParams);
+
+                          final backend = GetIt.I.get<Backend>();
+                          await backend.updateUserParams(newParams);
+
                           exit(0);
                         })),
+                  if (developer)
+                    _CheckboxSettings(
+                        text: context.strings.settings_page_crash_on_errors,
+                        value: crashOnErrors,
+                        onChanged: (value) {
+                          setState(() {
+                            crashOnErrors = value;
+                            settings.setCrashOnErrors(crashOnErrors);
+                          });
+                        }),
                   if (developer)
                     _CheckboxSettings(
                         text: context.strings.settings_page_fake_off,
@@ -147,12 +162,12 @@ class _SettingsPageState extends State<SettingsPage> {
                             settings.setFakeOffApi(fakeOffApi);
                           });
                         }),
-                      if (developer)
-                        AnimatedSwitcher(
-                            duration: Duration(milliseconds: 250),
-                            child: !fakeOffApi
-                                ? SizedBox.shrink()
-                                : _CheckboxSettings(
+                  if (developer)
+                    AnimatedSwitcher(
+                        duration: Duration(milliseconds: 250),
+                        child: !fakeOffApi
+                            ? SizedBox.shrink()
+                            : _CheckboxSettings(
                                 text: context.strings
                                     .settings_page_fake_off_scanned_product_empty,
                                 value: offScannedProductEmpty,
@@ -163,11 +178,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                         offScannedProductEmpty);
                                   });
                                 })),
-                      if (developer)
-                        InputFieldPlante(
-                              label: context.strings.settings_page_fake_off_forced_scanned_barcode,
-                              controller: barcodeOverrideController,
-                            ),
+                  if (developer)
+                    InputFieldPlante(
+                      label: context.strings
+                          .settings_page_fake_off_forced_scanned_barcode,
+                      controller: barcodeOverrideController,
+                    ),
                   SizedBox(height: 10),
                   Center(
                       child: InkWell(

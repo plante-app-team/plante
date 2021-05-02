@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/di.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/my_app_widget.dart';
+
+bool? _crashOnErrors;
 
 void main() {
   runZonedGuarded(mainImpl, (Object error, StackTrace stack) {
@@ -39,6 +42,11 @@ void mainImpl() async {
 
   setSystemUIOverlayStyle();
 
+  // NOTE: we don't await for the function to complete.
+  () async {
+    _crashOnErrors = await GetIt.I.get<Settings>().crashOnErrors();
+  }.call();
+
   runApp(RootRestorationScope(
       restorationId: 'root', child: MyAppWidget(initialUserParams)));
 }
@@ -56,5 +64,7 @@ void onError(String text, dynamic? exception, StackTrace? stack) async {
   if (exception is FlutterError && exception.message.contains("RenderFlex")) {
     return;
   }
-  exit(1);
+  if (_crashOnErrors ?? true) {
+    exit(1);
+  }
 }

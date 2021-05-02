@@ -11,14 +11,17 @@ class FakeSettings implements Settings {
   Future<String> fakeScannedProductBarcode() async => "";
 
   @override
-  Future<void> setFakeOffApi(bool value) async {
-  }
+  Future<void> setFakeOffApi(bool value) async {}
 
   @override
-  Future<void> setFakeOffApiProductNotFound(bool value) async {
-  }
+  Future<void> setFakeOffApiProductNotFound(bool value) async {}
 
   @override
-  Future<void> setFakeScannedProductBarcode(String value) async {
-  }
+  Future<void> setFakeScannedProductBarcode(String value) async {}
+
+  @override
+  Future<bool> crashOnErrors() async => true;
+
+  @override
+  Future<void> setCrashOnErrors(bool value) async {}
 }
