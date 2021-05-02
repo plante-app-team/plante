@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/user_params.dart';
@@ -12,6 +13,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -67,7 +69,8 @@ class _SettingsPageState extends State<SettingsPage> {
         body: SafeArea(
             child: Container(
                 padding: EdgeInsets.only(left: 24, right: 24),
-                child: Column(children: [
+                child: SingleChildScrollView(
+                    child: Column(children: [
                   SizedBox(height: 45),
                   SizedBox(
                       width: double.infinity,
@@ -151,8 +154,19 @@ class _SettingsPageState extends State<SettingsPage> {
                                     settings.setFakeOffApiProductNotFound(
                                         offScannedProductEmpty);
                                   });
-                                }))
-                ]))));
+                                })),
+                  SizedBox(height: 10),
+                  Center(
+                      child: InkWell(
+                          child: Text(
+                              context.strings.external_auth_page_privacy_policy,
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline)),
+                          onTap: () {
+                            launch(PRIVACY_POLICY_URL);
+                          }))
+                ])))));
   }
 }
 
@@ -168,7 +182,9 @@ class _CheckboxSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return CheckboxListTile(
       value: value,
-      onChanged: (value) { onChanged.call(value ?? false); },
+      onChanged: (value) {
+        onChanged.call(value ?? false);
+      },
       title: Text(text, style: TextStyles.normal),
       contentPadding: EdgeInsets.zero,
     );
