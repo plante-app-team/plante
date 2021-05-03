@@ -1,10 +1,12 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
@@ -309,24 +311,26 @@ class _InitProductPageState extends State<InitProductPage>
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: Text(warning),
-          actions: <Widget>[
-            TextButton(
-              child: Text(context.strings.global_no),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(context.strings.global_yes),
-              onPressed: () {
-                Navigator.of(context).pop();
-                positiveClicked.call();
-              },
-            ),
-          ],
-        );
+        return DialogPlante(
+            content: Text(warning, style: TextStyles.headline1),
+            actions: Row(children: [
+              Expanded(
+                  child: ButtonOutlinedPlante.withText(
+                context.strings.global_yes,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  positiveClicked.call();
+                },
+              )),
+              SizedBox(width: 16),
+              Expanded(
+                  child: ButtonFilledPlante.withText(
+                context.strings.global_no,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )),
+            ]));
       },
     );
   }

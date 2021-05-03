@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
@@ -16,6 +17,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
+import '../../fake_settings.dart';
 import '../../widget_tester_extension.dart';
 import 'qr_scan_page_test.mocks.dart';
 
@@ -28,6 +30,7 @@ void main() {
   setUp(() async {
     await GetIt.I.reset();
 
+    GetIt.I.registerSingleton<Settings>(FakeSettings());
     productsManager = MockProductsManager();
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
     backend = MockBackend();

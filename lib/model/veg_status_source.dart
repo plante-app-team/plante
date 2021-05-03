@@ -32,3 +32,23 @@ class VegStatusSource extends EnumClass {
     }
   }
 }
+
+extension VegStatusSourcePriority on VegStatusSource? {
+  /// The higher the better
+  int get priority {
+    switch (this) {
+      case null:
+        return 0;
+      case VegStatusSource.unknown:
+        return 0;
+      case VegStatusSource.open_food_facts:
+        return 1;
+      case VegStatusSource.community:
+        return 2;
+      case VegStatusSource.moderator:
+        return 3;
+      default:
+        throw Exception("Unknown value: $this");
+    }
+  }
+}

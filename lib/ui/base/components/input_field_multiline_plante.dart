@@ -8,12 +8,14 @@ class InputFieldMultilinePlante extends StatelessWidget {
   final String? label;
   final TextCapitalization textCapitalization;
   final TextEditingController? controller;
+  final int? maxLines;
 
   InputFieldMultilinePlante(
       {this.key,
       this.label,
       this.textCapitalization = TextCapitalization.sentences,
-      this.controller});
+      this.controller,
+      this.maxLines});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class InputFieldMultilinePlante extends StatelessWidget {
       key: key,
       style: TextStyles.normal,
       textCapitalization: textCapitalization,
-      maxLines: null,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
         contentPadding: EdgeInsets.only(left: 12, right: 12, top: 24),

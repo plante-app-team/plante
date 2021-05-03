@@ -45,7 +45,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   Product? _foundProduct;
 
   String fakeScannedBarcode = "";
-  
+
   qr.QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
@@ -62,7 +62,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
       fakeScannedBarcode = result;
     });
   }
-  
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -151,16 +151,17 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
                     color: Colors.yellow,
                     icon: Icon(Icons.flash_on),
                     onPressed: _toggleFlash)),
-            if (fakeScannedBarcode.isNotEmpty) Material(
-                color: Colors.white,
-                child: IconButton(
-                    color: Colors.grey,
-                    icon: Icon(Icons.tag_faces),
-                    onPressed: () {
-                      _onNewScanData(qr.Barcode(fakeScannedBarcode, qr.BarcodeFormat.unknown, []));
-                    })),
+            if (fakeScannedBarcode.isNotEmpty)
+              Material(
+                  color: Colors.white,
+                  child: IconButton(
+                      color: Colors.grey,
+                      icon: Icon(Icons.tag_faces),
+                      onPressed: () {
+                        _onNewScanData(qr.Barcode(
+                            fakeScannedBarcode, qr.BarcodeFormat.unknown, []));
+                      })),
           ]),
-
           Align(
               alignment: Alignment.topRight,
               child: Material(

@@ -7,6 +7,11 @@ class TextStyles {
   static TextStyle get normal =>
       GoogleFonts.exo2(color: Color.fromARGB(255, 38, 50, 56), fontSize: 14);
 
+  static TextStyle get normalBold => GoogleFonts.exo2(
+      color: Color.fromARGB(255, 38, 50, 56),
+      fontSize: 14,
+      fontWeight: FontWeight.bold);
+
   static TextStyle get normalColored =>
       GoogleFonts.exo2(color: ColorsPlante.primary, fontSize: 14);
 

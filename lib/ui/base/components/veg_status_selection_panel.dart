@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -89,20 +91,15 @@ class VegStatusSelectionPanel extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: Text(context.strings.veg_status_selection_panel_explanation,
-              style: TextStyles.normal),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                  context.strings.veg_status_selection_panel_explanation_ok,
-                  style: TextStyles.normal),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return DialogPlante(
+            content: Text(
+                context.strings.veg_status_selection_panel_explanation,
+                style: TextStyles.normal),
+            actions: ButtonFilledPlante.withText(
+                context.strings.veg_status_selection_panel_explanation_ok,
+                onPressed: () {
+              Navigator.of(context).pop();
+            }));
       },
     );
   }

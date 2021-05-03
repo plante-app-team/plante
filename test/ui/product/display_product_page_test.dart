@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
@@ -40,12 +42,38 @@ void main() {
     GetIt.I.registerSingleton<Backend>(backend);
   });
 
+  /// See DisplayProductPage.ingredientsAnalysisTable
+  Text ingredientsTableColumn1(TableRow row) {
+    final box1 = row.children![1] as SizedBox;
+    final center = box1.child as Center;
+    final box2 = center.child as SizedBox;
+    return box2.child as Text;
+  }
+
+  /// See DisplayProductPage.ingredientsAnalysisTable
+  String ingredientsTableColumnSVG(TableRow row, int column) {
+    if (column == 3) {
+      column = 4;
+    } else if (column == 2) {
+      column = 2;
+    } else {
+      // See DisplayProductPage.ingredientsAnalysisTable
+      throw Exception("Column $column is not expected to have SVG");
+    }
+    final box1 = row.children![column] as SizedBox;
+    final center = box1.child as Center;
+    final box2 = center.child as SizedBox;
+    final box3 = box2.child as SizedBox;
+    final svg = box3.child as SvgPicture;
+    return (svg.pictureProvider as ExactAssetPicture).assetName;
+  }
+
   testWidgets("product is displayed", (WidgetTester tester) async {
     final product = Product((v) => v
       ..barcode = "123"
       ..name = "My product"
       ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.community
+      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..ingredientsText = "Water, salt, sugar"
@@ -68,50 +96,36 @@ void main() {
     final vegetarianStatus =
     find.byKey(Key("vegetarian_status")).evaluate().single.widget as Text;
     expect(vegetarianStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegetarian}"
-            "${context.strings.display_product_page_veg_status_possible}"));
+        "${context.strings.display_product_page_veg_status_possible}"));
 
     final veganStatus =
     find.byKey(Key("vegan_status")).evaluate().single.widget as Text;
     expect(veganStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegan}"
             "${context.strings.display_product_page_veg_status_negative}"));
 
-    final vegetarianStatusSource =
-    find.byKey(Key("vegetarian_status_source")).evaluate().single.widget as Text;
-    expect(vegetarianStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
-            "${context.strings.display_product_page_veg_status_source_community}"));
-
-    final veganStatusSource =
-    find.byKey(Key("vegan_status_source")).evaluate().single.widget as Text;
-    expect(veganStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
+    final vegStatusSource =
+    find.byKey(Key("veg_status_source")).evaluate().single.widget as Text;
+    expect(vegStatusSource.data, equals(
             "${context.strings.display_product_page_veg_status_source_moderator}"));
 
     final ingredientsAnalysisTable =
     find.byKey(Key("ingredients_analysis_table")).evaluate().single.widget as Table;
-    expect(ingredientsAnalysisTable.children.length, equals(2));
+    // 2 + header
+    expect(ingredientsAnalysisTable.children.length, equals(3));
 
-    final row1 = ingredientsAnalysisTable.children[0];
-    expect((row1.children![0] as Text).data, equals(
+    final row1 = ingredientsAnalysisTable.children[1];
+    expect(ingredientsTableColumn1(row1).data, equals(
         "ingredient1"
     ));
-    expect((row1.children![1] as Text).data, equals(
-        "${context.strings.display_product_page_whether_vegetarian}"
-            "${context.strings.display_product_page_veg_status_positive}"));
-    expect((row1.children![2] as Text).data, equals(
-        "${context.strings.display_product_page_whether_vegan}"
-            "${context.strings.display_product_page_veg_status_unknown}"));
+    expect(ingredientsTableColumnSVG(row1, 2), equals("assets/veg_status_positive.svg"));
+    expect(ingredientsTableColumnSVG(row1, 3), equals("assets/veg_status_unknown.svg"));
 
-    final row2 = ingredientsAnalysisTable.children[1];
-    expect((row2.children![0] as Text).data, equals(
+    final row2 = ingredientsAnalysisTable.children[2];
+    expect(ingredientsTableColumn1(row2).data, equals(
         "ingredient2"
     ));
-    expect((row2.children![1] as Text).data, equals(
-        "${context.strings.display_product_page_whether_vegetarian}-"));
-    expect((row2.children![2] as Text).data, equals(
-        "${context.strings.display_product_page_whether_vegan}-"));
+    expect(ingredientsTableColumnSVG(row2, 2), equals("assets/veg_status_unknown.svg"));
+    expect(ingredientsTableColumnSVG(row2, 3), equals("assets/veg_status_unknown.svg"));
   });
 
   testWidgets("veg-statuses help button not displayed when sources are not OFF", (WidgetTester tester) async {
@@ -149,44 +163,30 @@ void main() {
     var vegetarianStatus =
       find.byKey(Key("vegetarian_status")).evaluate().single.widget as Text;
     expect(vegetarianStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegetarian}"
             "${context.strings.display_product_page_veg_status_possible}"));
     var veganStatus =
       find.byKey(Key("vegan_status")).evaluate().single.widget as Text;
     expect(veganStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegan}"
             "${context.strings.display_product_page_veg_status_negative}"));
-    var vegetarianStatusSource =
-      find.byKey(Key("vegetarian_status_source")).evaluate().single.widget as Text;
-    expect(vegetarianStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
-            "${context.strings.display_product_page_veg_status_source_off}"));
-    var veganStatusSource =
-      find.byKey(Key("vegan_status_source")).evaluate().single.widget as Text;
-    expect(veganStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
+    var vegStatusSource =
+      find.byKey(Key("veg_status_source")).evaluate().single.widget as Text;
+    expect(vegStatusSource.data, equals(
             "${context.strings.display_product_page_veg_status_source_off}"));
 
     // Help button initially exists and init_product_page doesn't
     expect(
-      find.text(context.strings.display_product_page_help_with_veg_statuses),
+      find.text(context.strings.display_product_page_click_to_help_with_veg_statuses),
       findsOneWidget);
     expect(
         find.byKey(Key("init_product_page")),
         findsNothing);
-    expect(
-        find.text(context.strings.display_product_page_title_for_veg_status_change),
-        findsNothing);
 
     await tester.tap(
-        find.text(context.strings.display_product_page_help_with_veg_statuses));
+        find.text(context.strings.display_product_page_click_to_help_with_veg_statuses));
     await tester.pumpAndSettle();
 
     expect(
         find.byKey(Key("init_product_page")),
-        findsWidgets);
-    expect(
-        find.text(context.strings.display_product_page_title_for_veg_status_change),
         findsWidgets);
 
     await tester.tap(find.byKey(Key("vegetarian_unknown_btn")));
@@ -202,30 +202,19 @@ void main() {
     expect(
         find.text(context.strings.display_product_page_help_with_veg_statuses),
         findsNothing);
-    expect(
-        find.text(context.strings.display_product_page_title_for_veg_status_change),
-        findsNothing);
 
     // Final veg statuses are changed and are from community
     vegetarianStatus =
       find.byKey(Key("vegetarian_status")).evaluate().single.widget as Text;
     expect(vegetarianStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegetarian}"
             "${context.strings.display_product_page_veg_status_unknown}"));
     veganStatus =
       find.byKey(Key("vegan_status")).evaluate().single.widget as Text;
     expect(veganStatus.data, equals(
-        "${context.strings.display_product_page_whether_vegan}"
             "${context.strings.display_product_page_veg_status_negative}"));
-    vegetarianStatusSource =
-      find.byKey(Key("vegetarian_status_source")).evaluate().single.widget as Text;
-    expect(vegetarianStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
-            "${context.strings.display_product_page_veg_status_source_community}"));
-    veganStatusSource =
-      find.byKey(Key("vegan_status_source")).evaluate().single.widget as Text;
-    expect(veganStatusSource.data, equals(
-        "${context.strings.display_product_page_veg_status_source}"
+    vegStatusSource =
+      find.byKey(Key("veg_status_source")).evaluate().single.widget as Text;
+    expect(vegStatusSource.data, equals(
             "${context.strings.display_product_page_veg_status_source_community}"));
   });
 
@@ -241,7 +230,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.display_product_page_report));
+    await tester.tap(find.text(context.strings.display_product_page_report_btn));
     await tester.pumpAndSettle();
 
     verifyNever(backend.sendReport("123", "Bad, bad product!"));
@@ -252,5 +241,28 @@ void main() {
     await tester.pumpAndSettle();
 
     verify(backend.sendReport("123", "Bad, bad product!")).called(1);
+  });
+
+  testWidgets("when vegan and vegetarian status sources differ, the worst one is used", (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = "123"
+      ..name = "My product"
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.community
+      ..ingredientsText = "Water, salt, sugar",
+      );
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    final vegStatusSource =
+    find.byKey(Key("veg_status_source")).evaluate().single.widget as Text;
+    // Vegetarian status was determined by a moderator, but
+    // vegan status was determined by community. Community is less reliable and
+    // since only 1 status source is displayed, the less reliable should be
+    // displayed.
+    expect(vegStatusSource.data, equals(
+        "${context.strings.display_product_page_veg_status_source_community}"));
   });
 }
