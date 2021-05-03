@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -8,6 +9,10 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/input_field_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
@@ -31,54 +36,65 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-            child: Stack(children: [
-      AnimatedSwitcher(
-          duration: Duration(milliseconds: 250),
-          child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
-      Stack(children: [
-        OutlinedButton(
-            child: Text("Send logs"), onPressed: Log.startLogsSending),
-        Column(verticalDirection: VerticalDirection.up, children: [
-          Center(
-              child: InkWell(
-                  child: Text(context.strings.external_auth_page_privacy_policy,
-                      style: TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline)),
-                  onTap: () {
-                    launch(PRIVACY_POLICY_URL);
-                  }))
-        ]),
-        Container(
-            padding: EdgeInsets.only(left: 10, right: 10),
             child: Column(children: [
-              Expanded(
-                  child: Center(
+      Expanded(
+        child: Stack(children: [
+          Center(
+              child: SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                      padding:
+                          EdgeInsets.only(left: 24, right: 24, bottom: 132),
                       child: Text(
-                          context.strings
-                                  .external_auth_page_search_products_with +
-                              " " +
-                              context.strings.global_app_name,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline5))),
-              Expanded(
-                  child: Center(
-                      child: SizedBox(
-                          height: 40,
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                              label: Text(context.strings
-                                  .external_auth_page_continue_with_google),
-                              // icon: Icon(Icons.golf_course_outlined),
-                              icon: SizedBox(
-                                  width: 30,
-                                  height: 30,
-                                  child: SvgPicture.asset(
-                                      "assets/google_icon.svg")),
-                              onPressed:
-                                  !_loading ? _onGoogleAuthClicked : null)))),
-            ]))
-      ])
+                          context.strings.external_auth_page_continue_with,
+                          style: TextStyles.headline1)))),
+          Center(
+              child: Padding(
+                  padding: EdgeInsets.only(left: 24, right: 24),
+                  child: ButtonOutlinedPlante(
+                      child: Stack(children: [
+                        Container(
+                            padding: EdgeInsets.only(left: 8),
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: SvgPicture.asset(
+                                          "assets/google_icon.svg")),
+                                ])),
+                        SizedBox(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Center(
+                                child: Text("Google",
+                                    style: GoogleFonts.exo2(
+                                        color: ColorsPlante.primary,
+                                        fontSize: 18))))
+                      ]),
+                      onPressed: !_loading ? _onGoogleAuthClicked : null))),
+          Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                  padding: EdgeInsets.only(bottom: 108),
+                  child: InkWell(
+                      child: Text(
+                          context.strings.external_auth_page_privacy_policy,
+                          style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline)),
+                      onTap: () {
+                        launch(PRIVACY_POLICY_URL);
+                      }))),
+          AnimatedSwitcher(
+              duration: Duration(milliseconds: 250),
+              child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
+          InkWell(
+              child: SizedBox(width: 50, height: 50),
+              onTap: Log.startLogsSending)
+        ]),
+      )
     ])));
   }
 
