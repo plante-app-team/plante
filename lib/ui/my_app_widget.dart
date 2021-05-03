@@ -7,7 +7,6 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/ui/app_foreground_detector.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
@@ -35,7 +34,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(AppForegroundDetector(() {
+    WidgetsBinding.instance!.addObserver(_AppForegroundDetector(() {
       setSystemUIOverlayStyle();
     }));
   }
@@ -99,5 +98,18 @@ class _MyAppWidgetState extends State<MyAppWidget>
     setState(() {
       _initialUserParams = userParams;
     });
+  }
+}
+
+class _AppForegroundDetector extends WidgetsBindingObserver {
+  final Function() foregroundCallback;
+
+  _AppForegroundDetector(this.foregroundCallback);
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      await foregroundCallback.call();
+    }
   }
 }

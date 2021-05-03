@@ -39,7 +39,8 @@ class QrScanPage extends StatefulWidget {
   }
 }
 
-class _QrScanPageState extends State<QrScanPage> with RouteAware {
+class _QrScanPageState extends State<QrScanPage>
+    with RouteAware, WidgetsBindingObserver {
   qr.Barcode? _barcode;
   bool _searching = false;
   Product? _foundProduct;
@@ -53,6 +54,18 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void initState() {
     super.initState();
     updateFakeScannedBarcode();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      if (ModalRoute.of(context)?.isActive == true) {
+        this.controller?.resumeCamera();
+      }
+    } else if (state == AppLifecycleState.paused) {
+      controller?.pauseCamera();
+    }
   }
 
   void updateFakeScannedBarcode() async {
@@ -87,6 +100,7 @@ class _QrScanPageState extends State<QrScanPage> with RouteAware {
   void dispose() {
     controller?.dispose();
     GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
   }
 
