@@ -100,164 +100,194 @@ class _InitProductPageState extends State<InitProductPage>
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-            child: Stack(children: [
-      SingleChildScrollView(
-          key: Key("content"),
-          child: Stack(children: [
-            Container(
-                padding: EdgeInsets.only(left: 24, right: 24),
-                child: Column(children: [
-                  SizedBox(height: 45),
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        context.strings.global_app_name,
-                        style: TextStyles.branding,
-                        textAlign: TextAlign.center,
-                      )),
-                  SizedBox(height: 36),
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        widget.title ?? context.strings.init_product_page_title,
-                        style: TextStyles.headline1,
-                        textAlign: TextAlign.left,
-                      )),
-                  SizedBox(height: 24),
-                  if (model.askForFrontPhoto())
-                    Column(key: Key("front_photo_group"), children: [
-                      SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            context.strings.init_product_page_take_front_photo,
-                            style: TextStyles.headline4,
-                            textAlign: TextAlign.left,
-                          )),
-                      SizedBox(height: 16),
-                      SizedBox(
-                          width: double.infinity,
-                          child: AddPhotoButtonPlante(
-                            keyButton: Key("front_photo"),
-                            onAddTap: takeFrontPhoto,
-                            onCancelTap: removeFrontPhoto,
-                            existingPhoto: model.product.imageFront,
-                          )),
-                      SizedBox(height: 24),
-                    ]),
-                  if (model.askForName())
-                    Column(key: Key("name_group"), children: [
-                      InputFieldPlante(
-                        key: Key("name"),
-                        label: context.strings.init_product_page_product_name,
-                        controller: nameTextController,
-                      ),
-                      SizedBox(height: 10),
-                    ]),
-                  if (model.askForBrand())
-                    Column(key: Key("brand_group"), children: [
-                      InputFieldPlante(
-                        key: Key("brand"),
-                        label: context.strings.init_product_page_brand_optional,
-                        controller: brandTextController,
-                      ),
-                      SizedBox(height: 10),
-                    ]),
-                  if (model.askForCategories())
-                    Column(key: Key("categories_group"), children: [
-                      InputFieldPlante(
-                        key: Key("categories"),
-                        label: context
-                            .strings.init_product_page_categories_optional,
-                        hint: context.strings.init_product_page_categories_hint,
-                        controller: categoriesTextController,
-                      ),
-                      SizedBox(height: 24),
-                    ]),
-                  if (model.askForIngredientsData())
-                    Column(key: Key("ingredients_group"), children: [
-                      SizedBox(
-                          width: double.infinity,
-                          child: Text(
-                            context.strings
-                                .init_product_page_take_ingredients_photo,
-                            style: TextStyles.headline4,
-                            textAlign: TextAlign.left,
-                          )),
-                      SizedBox(height: 16),
-                      SizedBox(
-                          width: double.infinity,
-                          child: AddPhotoButtonPlante(
-                            keyButton: Key("ingredients_photo"),
-                            onAddTap: takeIngredientsPhoto,
-                            onCancelTap: removeIngredientsPhoto,
-                            existingPhoto: model.product.imageIngredients,
-                          )),
-                      SizedBox(height: 16),
-                      ingredientsTextGroup(),
-                    ]),
-                  if (model.askForVeganStatus())
-                    Column(key: Key("vegan_status_group"), children: [
-                      VegStatusSelectionPanel(
-                        keyPositive: Key("vegan_positive_btn"),
-                        keyNegative: Key("vegan_negative_btn"),
-                        keyPossible: Key("vegan_possible_btn"),
-                        keyUnknown: Key("vegan_unknown_btn"),
-                        title: context.strings.init_product_page_is_it_vegan,
-                        vegStatus: model.product.veganStatus,
-                        onChanged: (value) {
-                          setState(() {
-                            model.product = model.product
-                                .rebuild((e) => e.veganStatus = value);
-                          });
-                        },
-                      ),
-                      SizedBox(height: 24),
-                    ]),
-                  if (model.askForVegetarianStatus())
-                    Column(key: Key("vegetarian_status_group"), children: [
-                      VegStatusSelectionPanel(
-                        keyPositive: Key("vegetarian_positive_btn"),
-                        keyNegative: Key("vegetarian_negative_btn"),
-                        keyPossible: Key("vegetarian_possible_btn"),
-                        keyUnknown: Key("vegetarian_unknown_btn"),
-                        title:
-                            context.strings.init_product_page_is_it_vegetarian,
-                        vegStatus: model.product.vegetarianStatus,
-                        onChanged: (value) {
-                          setState(() {
-                            model.product = model.product
-                                .rebuild((e) => e.vegetarianStatus = value);
-                          });
-                        },
-                      ),
-                    ]),
-                  SizedBox(height: 36),
-                  SizedBox(
-                      width: double.infinity,
-                      child: ButtonOutlinedPlante.withText(
-                        context.strings.global_done,
-                        key: Key("done_btn"),
-                        onPressed: model.canSaveProduct() && !model.loading
-                            ? saveProduct
-                            : null,
-                      )),
-                ])),
-            Container(
-                padding: EdgeInsets.only(top: 38, right: 12),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                      child: Container(
-                          padding: EdgeInsets.all(12),
-                          child: Text(context.strings.global_cancel,
-                              style: TextStyles.headline3)),
-                      onTap: cancel),
-                )),
-          ])),
-      AnimatedSwitcher(
-          duration: Duration(milliseconds: 250),
-          child: model.loading ? LinearProgressIndicator() : SizedBox.shrink())
-    ])));
+            child: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Stack(children: [
+                  SingleChildScrollView(
+                      key: Key("content"),
+                      child: Stack(children: [
+                        Container(
+                            padding: EdgeInsets.only(left: 24, right: 24),
+                            child: Column(children: [
+                              SizedBox(height: 45),
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: Text(
+                                    context.strings.global_app_name,
+                                    style: TextStyles.branding,
+                                    textAlign: TextAlign.center,
+                                  )),
+                              SizedBox(height: 36),
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: Text(
+                                    widget.title ??
+                                        context.strings.init_product_page_title,
+                                    style: TextStyles.headline1,
+                                    textAlign: TextAlign.left,
+                                  )),
+                              SizedBox(height: 24),
+                              if (model.askForFrontPhoto())
+                                Column(
+                                    key: Key("front_photo_group"),
+                                    children: [
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: Text(
+                                            context.strings
+                                                .init_product_page_take_front_photo,
+                                            style: TextStyles.headline4,
+                                            textAlign: TextAlign.left,
+                                          )),
+                                      SizedBox(height: 16),
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: AddPhotoButtonPlante(
+                                            keyButton: Key("front_photo"),
+                                            onAddTap: takeFrontPhoto,
+                                            onCancelTap: removeFrontPhoto,
+                                            existingPhoto:
+                                                model.product.imageFront,
+                                          )),
+                                      SizedBox(height: 24),
+                                    ]),
+                              if (model.askForName())
+                                Column(key: Key("name_group"), children: [
+                                  InputFieldPlante(
+                                    key: Key("name"),
+                                    label: context
+                                        .strings.init_product_page_product_name,
+                                    controller: nameTextController,
+                                  ),
+                                  SizedBox(height: 10),
+                                ]),
+                              if (model.askForBrand())
+                                Column(key: Key("brand_group"), children: [
+                                  InputFieldPlante(
+                                    key: Key("brand"),
+                                    label: context.strings
+                                        .init_product_page_brand_optional,
+                                    controller: brandTextController,
+                                  ),
+                                  SizedBox(height: 10),
+                                ]),
+                              if (model.askForCategories())
+                                Column(key: Key("categories_group"), children: [
+                                  InputFieldPlante(
+                                    key: Key("categories"),
+                                    label: context.strings
+                                        .init_product_page_categories_optional,
+                                    hint: context.strings
+                                        .init_product_page_categories_hint,
+                                    controller: categoriesTextController,
+                                  ),
+                                  SizedBox(height: 24),
+                                ]),
+                              if (model.askForIngredientsData())
+                                Column(
+                                    key: Key("ingredients_group"),
+                                    children: [
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: Text(
+                                            context.strings
+                                                .init_product_page_take_ingredients_photo,
+                                            style: TextStyles.headline4,
+                                            textAlign: TextAlign.left,
+                                          )),
+                                      SizedBox(height: 16),
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: AddPhotoButtonPlante(
+                                            keyButton: Key("ingredients_photo"),
+                                            onAddTap: takeIngredientsPhoto,
+                                            onCancelTap: removeIngredientsPhoto,
+                                            existingPhoto:
+                                                model.product.imageIngredients,
+                                          )),
+                                      SizedBox(height: 16),
+                                      ingredientsTextGroup(),
+                                    ]),
+                              if (model.askForVeganStatus())
+                                Column(
+                                    key: Key("vegan_status_group"),
+                                    children: [
+                                      VegStatusSelectionPanel(
+                                        keyPositive: Key("vegan_positive_btn"),
+                                        keyNegative: Key("vegan_negative_btn"),
+                                        keyPossible: Key("vegan_possible_btn"),
+                                        keyUnknown: Key("vegan_unknown_btn"),
+                                        title: context.strings
+                                            .init_product_page_is_it_vegan,
+                                        vegStatus: model.product.veganStatus,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            model.product = model.product
+                                                .rebuild((e) =>
+                                                    e.veganStatus = value);
+                                          });
+                                        },
+                                      ),
+                                      SizedBox(height: 24),
+                                    ]),
+                              if (model.askForVegetarianStatus())
+                                Column(
+                                    key: Key("vegetarian_status_group"),
+                                    children: [
+                                      VegStatusSelectionPanel(
+                                        keyPositive:
+                                            Key("vegetarian_positive_btn"),
+                                        keyNegative:
+                                            Key("vegetarian_negative_btn"),
+                                        keyPossible:
+                                            Key("vegetarian_possible_btn"),
+                                        keyUnknown:
+                                            Key("vegetarian_unknown_btn"),
+                                        title: context.strings
+                                            .init_product_page_is_it_vegetarian,
+                                        vegStatus:
+                                            model.product.vegetarianStatus,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            model.product = model.product
+                                                .rebuild((e) =>
+                                                    e.vegetarianStatus = value);
+                                          });
+                                        },
+                                      ),
+                                    ]),
+                              SizedBox(height: 36),
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: ButtonOutlinedPlante.withText(
+                                    context.strings.global_done,
+                                    key: Key("done_btn"),
+                                    onPressed:
+                                        model.canSaveProduct() && !model.loading
+                                            ? saveProduct
+                                            : null,
+                                  )),
+                            ])),
+                        Container(
+                            padding: EdgeInsets.only(top: 38, right: 12),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                  child: Container(
+                                      padding: EdgeInsets.all(12),
+                                      child: Text(context.strings.global_cancel,
+                                          style: TextStyles.headline3)),
+                                  onTap: cancel),
+                            )),
+                      ])),
+                  AnimatedSwitcher(
+                      duration: Duration(milliseconds: 250),
+                      child: model.loading
+                          ? LinearProgressIndicator()
+                          : SizedBox.shrink())
+                ]))));
   }
 
   Widget ingredientsTextGroup() {
