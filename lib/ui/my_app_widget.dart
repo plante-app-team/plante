@@ -57,6 +57,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        title: "Plante",
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
