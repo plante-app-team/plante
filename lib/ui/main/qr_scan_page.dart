@@ -60,7 +60,7 @@ class _QrScanPageState extends State<QrScanPage>
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      if (ModalRoute.of(context)?.isActive == true) {
+      if (ModalRoute.of(context)?.isCurrent == true) {
         this.controller?.resumeCamera();
       }
     } else if (state == AppLifecycleState.paused) {
@@ -106,7 +106,7 @@ class _QrScanPageState extends State<QrScanPage>
 
   @override
   void didPopNext() {
-    if (ModalRoute.of(context)?.isActive == true) {
+    if (ModalRoute.of(context)?.isCurrent == true) {
       this.controller?.resumeCamera();
       updateFakeScannedBarcode();
     }
