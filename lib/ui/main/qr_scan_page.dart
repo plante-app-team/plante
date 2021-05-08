@@ -128,7 +128,7 @@ class _QrScanPageState extends State<QrScanPage>
             child:
                 // ColumnSuper is used for innerDistance
                 // Inner distance is needed to fix https://github.com/flutter/flutter/issues/14288
-                ColumnSuper(innerDistance: -3, children: [
+                ColumnSuper(innerDistance: -2, children: [
               Container(
                 padding: EdgeInsets.only(left: 24, right: 24),
                 width: double.infinity,
@@ -276,15 +276,18 @@ class _QrScanPageState extends State<QrScanPage>
     return Container(
         width: double.infinity,
         padding: EdgeInsets.only(top: 1, bottom: 1),
-        child: Stack(children: [
-          Positioned.fill(child: qrWidget()),
-          BoxWithCircleCutout(
-            width: double.infinity,
-            // +8 and 4 are to fix https://github.com/flutter/flutter/issues/14288
-            height: circleSize + 8,
-            cutoutPadding: 4,
-            color: color,
-          ),
+        child: ColumnSuper(invert: true, innerDistance: -1, children: [
+          Container(color: color, height: 2),
+          Stack(children: [
+            Positioned.fill(child: qrWidget()),
+            BoxWithCircleCutout(
+              width: double.infinity,
+              // +4 and 2 are to fix https://github.com/flutter/flutter/issues/14288
+              height: circleSize + 4,
+              cutoutPadding: 2,
+              color: color,
+            ),
+          ]),
         ]));
   }
 
