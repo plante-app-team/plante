@@ -10,6 +10,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
@@ -63,15 +64,12 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
             child: SingleChildScrollView(
                 child: Stack(children: [
           Column(children: [
-            SizedBox(height: 45),
-            SizedBox(
-                width: double.infinity,
-                child: Text(
-                  context.strings.global_app_name,
-                  style: TextStyles.branding,
-                  textAlign: TextAlign.center,
-                )),
-            SizedBox(height: 24),
+            HeaderPlante(
+                leftAction: _IconButton(
+                    svg: "assets/stepper_back.svg",
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    })),
             SizedBox(
                 child: ProductImagesHelper.productImageWidget(
                     product, ProductImageType.FRONT)),
@@ -188,17 +186,6 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
               onTap: onReportClick,
             )
           ]),
-          Column(children: [
-            SizedBox(height: 37),
-            Row(children: [
-              SizedBox(width: 20),
-              _IconButton(
-                  svg: "assets/stepper_back.svg",
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  })
-            ])
-          ])
         ]))));
   }
 

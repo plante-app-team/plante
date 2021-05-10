@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/stepper/_back_button_wrapper.dart';
 import 'package:plante/ui/base/stepper/_indicators_top.dart';
 import 'package:plante/ui/base/stepper/functions.dart';
@@ -96,27 +97,16 @@ class CustomizableStepper extends StatelessWidget {
         .map((page) => Container(child: page, padding: pagesPadding))
         .toList();
 
-    final indicatorsPadding = EdgeInsets.only(
-        left: _contentPadding.left,
-        top: _contentPadding.top,
-        right: _contentPadding.right);
     return WillPopScope(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           verticalDirection: VerticalDirection.down,
           children: <Widget>[
-            Container(
-                padding: indicatorsPadding,
-                child: IntrinsicHeight(
-                    child: Stack(children: [
-                  Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        BackButtonWrapper(_backButton, _backButtonController)
-                      ]),
-                  CustomizableStepperIndicatorsTop(_indicatorController,
-                      _pageIndicatorMaker, _dividerMaker, _pages.length),
-                ]))),
+            HeaderPlante(
+              title: CustomizableStepperIndicatorsTop(_indicatorController,
+                  _pageIndicatorMaker, _dividerMaker, _pages.length),
+              leftAction: BackButtonWrapper(_backButton, _backButtonController),
+            ),
             Expanded(
                 child: PageView(
               controller: _pageViewController,

@@ -7,6 +7,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/settings_page.dart';
 
@@ -129,19 +130,7 @@ class _QrScanPageState extends State<QrScanPage>
                 // ColumnSuper is used for innerDistance
                 // Inner distance is needed to fix https://github.com/flutter/flutter/issues/14288
                 ColumnSuper(innerDistance: -2, children: [
-              Container(
-                padding: EdgeInsets.only(left: 24, right: 24),
-                width: double.infinity,
-                color: Colors.white,
-                child: Column(children: [
-                  SizedBox(height: 55),
-                  Text(
-                    context.strings.global_app_name,
-                    style: TextStyles.branding,
-                  ),
-                  SizedBox(height: 36),
-                ]),
-              ),
+              HeaderPlante(spacingBottom: 25),
               boxWithCutout(context, color: Colors.white),
               Container(
                 padding: EdgeInsets.only(left: 24, right: 24),

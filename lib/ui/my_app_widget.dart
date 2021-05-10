@@ -64,6 +64,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
           primarySwatch: ColorsPlante.primaryMaterial,
           accentColor: ColorsPlante.primary,
           unselectedWidgetColor: Color(0xFFB5B7C3),
+          fontFamily: 'Poppins',
         ),
         home: AnimatedSwitcher(
             duration: Duration(milliseconds: 250), child: _mainWidget()),

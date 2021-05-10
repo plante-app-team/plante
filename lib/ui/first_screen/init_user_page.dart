@@ -85,17 +85,18 @@ class _InitUserPageState extends State<InitUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
             child: Stack(children: [
-      AnimatedSwitcher(
-          duration: Duration(milliseconds: 250),
-          child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
-      CustomizableStepper(
-        pages: [_page1(), _page2()],
-        controller: _stepperController,
-        contentPadding: EdgeInsets.only(left: 24, right: 24, top: 45),
-      )
-    ])));
+          AnimatedSwitcher(
+              duration: Duration(milliseconds: 250),
+              child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
+          CustomizableStepper(
+            pages: [_page1(), _page2()],
+            controller: _stepperController,
+            contentPadding: EdgeInsets.only(left: 24, right: 24, top: 45),
+          )
+        ])));
   }
 
   StepperPage _page1() {
@@ -158,7 +159,6 @@ class _InitUserPageState extends State<InitUserPage> {
     };
 
     final content = Column(mainAxisSize: MainAxisSize.max, children: [
-      SizedBox(height: 35),
       SizedBox(
           width: double.infinity,
           child: Text(

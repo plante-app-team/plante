@@ -44,6 +44,9 @@ class TextStyles {
       fontSize: 18,
       fontWeight: FontWeight.bold);
 
-  static TextStyle get branding => GoogleFonts.exo2(
-      color: ColorsPlante.primary, fontSize: 24, fontWeight: FontWeight.bold);
+  static TextStyle get branding => TextStyle(
+      fontFamily: "Poppins",
+      fontWeight: FontWeight.w500,
+      fontSize: 24,
+      color: ColorsPlante.primary);
 }

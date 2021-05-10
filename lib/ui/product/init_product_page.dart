@@ -8,6 +8,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/veg_status_selection_panel.dart';
@@ -99,6 +100,7 @@ class _InitProductPageState extends State<InitProductPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
             child: GestureDetector(
                 onTap: () {
@@ -107,19 +109,17 @@ class _InitProductPageState extends State<InitProductPage>
                 child: Stack(children: [
                   SingleChildScrollView(
                       key: Key("content"),
-                      child: Stack(children: [
+                      child: Column(children: [
+                        HeaderPlante(
+                            rightAction: InkWell(
+                                child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    child: Text(context.strings.global_cancel,
+                                        style: TextStyles.headline3)),
+                                onTap: cancel)),
                         Container(
                             padding: EdgeInsets.only(left: 24, right: 24),
                             child: Column(children: [
-                              SizedBox(height: 45),
-                              SizedBox(
-                                  width: double.infinity,
-                                  child: Text(
-                                    context.strings.global_app_name,
-                                    style: TextStyles.branding,
-                                    textAlign: TextAlign.center,
-                                  )),
-                              SizedBox(height: 36),
                               SizedBox(
                                   width: double.infinity,
                                   child: Text(
@@ -270,17 +270,6 @@ class _InitProductPageState extends State<InitProductPage>
                                             : null,
                                   )),
                             ])),
-                        Container(
-                            padding: EdgeInsets.only(top: 38, right: 12),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: InkWell(
-                                  child: Container(
-                                      padding: EdgeInsets.all(12),
-                                      child: Text(context.strings.global_cancel,
-                                          style: TextStyles.headline3)),
-                                  onTap: cancel),
-                            )),
                       ])),
                   AnimatedSwitcher(
                       duration: Duration(milliseconds: 250),
