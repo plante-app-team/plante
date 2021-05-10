@@ -9,6 +9,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/ui/base/components/back_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
@@ -65,11 +66,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 child: Stack(children: [
           Column(children: [
             HeaderPlante(
-                leftAction: _IconButton(
-                    svg: "assets/stepper_back.svg",
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    })),
+                leftAction: BackButtonPlante.popOnClick(),
+            ),
             SizedBox(
                 child: ProductImagesHelper.productImageWidget(
                     product, ProductImageType.FRONT)),

@@ -139,7 +139,7 @@ flutter:
 
   assets:
     - assets/google_icon.svg
-    - assets/stepper_back.svg
+    - assets/back_arrow.svg
     - assets/camera.svg
     - assets/camera_frame.svg
     - assets/camera_cancel.svg

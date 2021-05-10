@@ -40,6 +40,7 @@ class CustomizableStepper extends StatelessWidget {
   final CustomizableStepperController _controller;
   final PageIndicatorMaker _pageIndicatorMaker;
   late final Widget _backButton;
+  late final double _backButtonHeaderPadding;
   final DividerMaker _dividerMaker;
   final List<StepperPage> _pages;
 
@@ -71,7 +72,25 @@ class CustomizableStepper extends StatelessWidget {
     final backButton = backButtonMaker.call(() {
       controller.stepBackward();
     });
-    _backButton = backButton ?? SizedBox.shrink();
+
+    if (backButton != null) {
+      // Back button is embedded into an AnimatedCrossFade, and
+      // AnimatedCrossFade cuts its widget when they are bigger than its bounds.
+      // Default BackButtonPlante is bigger than its size because it's elevated
+      // and it has a shadow.
+      // To avoid BackButtonPlante being cut, we add paddings around it.
+      _backButton = Padding(
+          padding: EdgeInsets.only(
+              left: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS,
+              right: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS),
+          child: Center(child:
+            Wrap(children: [ backButton ])
+          )
+      );
+    } else {
+      _backButton = SizedBox.shrink();
+    }
+    _backButtonHeaderPadding = 0;
     _backButtonController.setButtonShown(_controller._activePage > 0);
   }
 
@@ -106,6 +125,7 @@ class CustomizableStepper extends StatelessWidget {
               title: CustomizableStepperIndicatorsTop(_indicatorController,
                   _pageIndicatorMaker, _dividerMaker, _pages.length),
               leftAction: BackButtonWrapper(_backButton, _backButtonController),
+              leftActionPadding: _backButtonHeaderPadding,
             ),
             Expanded(
                 child: PageView(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/back_button_plante.dart';
 
 import 'functions.dart';
 
@@ -46,8 +47,5 @@ Widget defaultIndicatorMaker(int page, PageIndicatorState pageState) {
 }
 
 Widget? defaultBackButtonMaker(Function() back) {
-  return InkWell(
-      key: Key("default_stepper_back_button"),
-      child: SvgPicture.asset("assets/stepper_back.svg"),
-      onTap: back);
+  return BackButtonPlante(onPressed: back);
 }
