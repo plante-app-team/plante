@@ -19,13 +19,6 @@ void main() {
     await GetIt.I.reset();
   });
 
-  testWidgets("App name is concatenated with greeting", (WidgetTester tester) async {
-    final context = await tester.superPump(ExternalAuthPage((unused) async { return true; }));
-    final str = context.strings.external_auth_page_search_products_with + " " + context.strings.global_app_name;
-    final titleFinder = find.text(str);
-    expect(titleFinder, findsOneWidget);
-  });
-
   testWidgets("Successful Google Sign in", (WidgetTester tester) async {
     final googleAuthorizer = MockGoogleAuthorizer();
     final backend = MockBackend();
@@ -43,7 +36,7 @@ void main() {
           return true;
         }));
 
-    await tester.tap(find.text(context.strings.external_auth_page_continue_with_google));
+    await tester.tap(find.text("Google"));
 
     expect(obtainedParams, isNot(equals(null)));
   });
@@ -60,7 +53,7 @@ void main() {
           return true;
         }));
 
-    await tester.tap(find.text(context.strings.external_auth_page_continue_with_google));
+    await tester.tap(find.text("Google"));
 
     expect(obtainedResult, equals(null));
   });
