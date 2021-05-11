@@ -23,14 +23,14 @@ import 'package:plante/ui/product/product_page_wrapper.dart';
 
 // mutation is used for testing only
 // ignore: must_be_immutable
-class QrScanPage extends StatefulWidget {
-  _QrScanPageState? _lastState;
+class BarcodeScanPage extends StatefulWidget {
+  _BarcodeScanPageState? _lastState;
 
-  QrScanPage({Key? key}) : super(key: key);
+  BarcodeScanPage({Key? key}) : super(key: key);
 
   @override
-  _QrScanPageState createState() {
-    _lastState = _QrScanPageState();
+  _BarcodeScanPageState createState() {
+    _lastState = _BarcodeScanPageState();
     return _lastState!;
   }
 
@@ -40,7 +40,7 @@ class QrScanPage extends StatefulWidget {
   }
 }
 
-class _QrScanPageState extends State<QrScanPage>
+class _BarcodeScanPageState extends State<BarcodeScanPage>
     with RouteAware, WidgetsBindingObserver {
   qr.Barcode? _barcode;
   bool _searching = false;
@@ -198,7 +198,7 @@ class _QrScanPageState extends State<QrScanPage>
           key: Key("product_description1"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
-            Text(context.strings.qr_scan_page_point_camera_at_barcode,
+            Text(context.strings.barcode_scan_page_point_camera_at_barcode,
                 textAlign: TextAlign.center, style: TextStyles.normal)
           ]));
     } else if (_searching && _barcode != null) {
@@ -207,7 +207,7 @@ class _QrScanPageState extends State<QrScanPage>
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(
-                "${context.strings.qr_scan_page_searching_product} ${_barcode!.code}",
+                "${context.strings.barcode_scan_page_searching_product} ${_barcode!.code}",
                 textAlign: TextAlign.center,
                 style: TextStyles.normal)
           ]));
@@ -223,7 +223,7 @@ class _QrScanPageState extends State<QrScanPage>
             SizedBox(
                 width: double.infinity,
                 child: ButtonFilledPlante.withText(
-                    context.strings.qr_scan_page_show_product,
+                    context.strings.barcode_scan_page_show_product,
                     onPressed: _tryOpenProductPage)),
           ]));
     } else {
@@ -231,13 +231,13 @@ class _QrScanPageState extends State<QrScanPage>
           key: Key("product_description4"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
-            Text(context.strings.qr_scan_page_product_not_found,
+            Text(context.strings.barcode_scan_page_product_not_found,
                 textAlign: TextAlign.center, style: TextStyles.headline2),
             SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ButtonFilledPlante.withText(
-                  context.strings.qr_scan_page_add_product,
+                  context.strings.barcode_scan_page_add_product,
                   onPressed: _tryOpenProductPage),
             ),
           ]));

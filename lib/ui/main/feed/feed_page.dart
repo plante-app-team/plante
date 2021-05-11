@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/ui/main/qr_scan_page.dart';
+import 'package:plante/ui/main/barcode_scan_page.dart';
 
 class FeedPage extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _FeedPageState extends State<FeedPage> {
             Log.i("Scan clicked");
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => QrScanPage()),
+              MaterialPageRoute(builder: (context) => BarcodeScanPage()),
             );
           }),
       ElevatedButton(

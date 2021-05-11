@@ -66,7 +66,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 child: Stack(children: [
           Column(children: [
             HeaderPlante(
-                leftAction: BackButtonPlante.popOnClick(),
+              leftAction: BackButtonPlante.popOnClick(),
             ),
             SizedBox(
                 child: ProductImagesHelper.productImageWidget(

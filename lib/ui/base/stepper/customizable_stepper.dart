@@ -83,10 +83,7 @@ class CustomizableStepper extends StatelessWidget {
           padding: EdgeInsets.only(
               left: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS,
               right: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS),
-          child: Center(child:
-            Wrap(children: [ backButton ])
-          )
-      );
+          child: Center(child: Wrap(children: [backButton])));
     } else {
       _backButton = SizedBox.shrink();
     }

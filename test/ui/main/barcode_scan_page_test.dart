@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,14 +11,14 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/ui/main/qr_scan_page.dart';
+import 'package:plante/ui/main/barcode_scan_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../fake_settings.dart';
 import '../../widget_tester_extension.dart';
-import 'qr_scan_page_test.mocks.dart';
+import 'barcode_scan_page_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, Backend, RouteObserver])
 void main() {
@@ -52,36 +51,36 @@ void main() {
           ..veganStatus = VegStatus.positive
           ..vegetarianStatus = VegStatus.positive)));
 
-    final widget = QrScanPage();
+    final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
     expect(
-        find.text(context.strings.qr_scan_page_point_camera_at_barcode),
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
         findsOneWidget);
     expect(
         find.text("Product name"),
         findsNothing);
     expect(
-        find.text(context.strings.qr_scan_page_show_product),
+        find.text(context.strings.barcode_scan_page_show_product),
         findsNothing);
 
     widget.newScanDataForTesting(_barcode("12345"));
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.qr_scan_page_point_camera_at_barcode),
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
         findsNothing);
     expect(
         find.text("Product name"),
         findsOneWidget);
     expect(
-        find.text(context.strings.qr_scan_page_show_product),
+        find.text(context.strings.barcode_scan_page_show_product),
         findsOneWidget);
 
     expect(
         find.byType(DisplayProductPage),
         findsNothing);
-    await tester.tap(find.text(context.strings.qr_scan_page_show_product));
+    await tester.tap(find.text(context.strings.barcode_scan_page_show_product));
     await tester.pumpAndSettle();
     expect(
         find.byType(DisplayProductPage),
@@ -91,32 +90,32 @@ void main() {
   testWidgets("product not found", (WidgetTester tester) async {
     when(productsManager.getProduct(any, any)).thenAnswer((invc) async => Ok(null));
 
-    final widget = QrScanPage();
+    final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
     final barcode = "12345";
 
     expect(
-        find.text(context.strings.qr_scan_page_point_camera_at_barcode),
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
         findsOneWidget);
     expect(
-        find.text(context.strings.qr_scan_page_product_not_found),
+        find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
 
     widget.newScanDataForTesting(_barcode(barcode));
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.qr_scan_page_point_camera_at_barcode),
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
         findsNothing);
     expect(
-        find.text(context.strings.qr_scan_page_product_not_found),
+        find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
 
     expect(
         find.byType(InitProductPage),
         findsNothing);
-    await tester.tap(find.text(context.strings.qr_scan_page_add_product));
+    await tester.tap(find.text(context.strings.barcode_scan_page_add_product));
     await tester.pumpAndSettle();
     expect(
         find.byType(InitProductPage),
@@ -128,7 +127,7 @@ void main() {
         Ok(Product((e) => e
           ..barcode = invc.positionalArguments[0] as String)));
 
-    final widget = QrScanPage();
+    final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
 

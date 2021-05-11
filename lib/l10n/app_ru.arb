@@ -35,11 +35,11 @@
     "map_page_default_shop_type_name": "Магазин",
     "map_page_btn_where_am_i": "Где я?",
 
-    "qr_scan_page_product_not_found": "У нас пока недостаточно данных об этом продукте, но вы можете помочь сообществу и добавить их",
-    "qr_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
-    "qr_scan_page_searching_product": "Ищем продукт ",
-    "qr_scan_page_show_product": "Показать продукт",
-    "qr_scan_page_add_product": "Добавить",
+    "barcode_scan_page_product_not_found": "У нас пока недостаточно данных об этом продукте, но вы можете помочь сообществу и добавить их",
+    "barcode_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
+    "barcode_scan_page_searching_product": "Ищем продукт ",
+    "barcode_scan_page_show_product": "Показать продукт",
+    "barcode_scan_page_add_product": "Добавить",
 
     "display_product_page_whether_vegetarian": "Вегетарианский: ",
     "display_product_page_whether_vegan": "Веганский: ",

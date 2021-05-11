@@ -15,7 +15,9 @@ class HeaderPlante extends StatelessWidget {
       this.title,
       this.leftAction,
       this.rightAction,
-      this.spacingBottom = 0, this.leftActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS, this.rightActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS})
+      this.spacingBottom = 0,
+      this.leftActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS,
+      this.rightActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS})
       : super(key: key);
 
   @override
