@@ -4,6 +4,7 @@ import 'package:plante/ui/base/text_styles.dart';
 
 class HeaderPlante extends StatelessWidget {
   static const DEFAULT_ACTIONS_SIDE_PADDINGS = 24.0;
+  final Color color;
   final Widget? title;
   final Widget? leftAction;
   final Widget? rightAction;
@@ -13,6 +14,7 @@ class HeaderPlante extends StatelessWidget {
   const HeaderPlante(
       {Key? key,
       this.title,
+      this.color = Colors.white,
       this.leftAction,
       this.rightAction,
       this.spacingBottom = 0,
@@ -23,7 +25,7 @@ class HeaderPlante extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        color: Colors.white,
+        color: color,
         child: Container(
           width: double.infinity,
           height: 104 + spacingBottom,

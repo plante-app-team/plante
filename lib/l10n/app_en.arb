@@ -8,6 +8,8 @@
       "global_cancel": "Cancel",
       "global_no": "No",
       "global_yes": "Yes",
+      "global_give_permission": "Give permission",
+      "global_open_app_settings": "Open app settings",
 
       "image_cropper_title": "Let's crop it!",
 
@@ -87,6 +89,8 @@
       "settings_page_fake_off": "Use fake Open Food Facts",
       "settings_page_fake_off_scanned_product_empty": "Scanned product is empty",
       "settings_page_fake_off_forced_scanned_barcode": "Scanned barcode override",
+      "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
+      "barcode_scan_page_camera_permission_reasoning_settings": "To use the barcodes scanner please give the camera permission to the app in the app settings",
 
       "init_product_page_title": "New product",
       "init_product_page_take_front_photo": "Packaging front photo",

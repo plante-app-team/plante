@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -9,21 +10,50 @@ import 'barcode_scan_page_content_state.dart';
 
 enum BarcodeScanPageSearchResult { OK, ERROR_NETWORK, ERROR_OTHER }
 
-class BarcodeScanPageModel {
+class BarcodeScanPageModel with WidgetsBindingObserver {
   final VoidCallback _onStateChangeCallback;
   final ProductsManager _productsManager;
   final LangCodeHolder _langCodeHolder;
+  final PermissionsManager _permissionsManager;
 
   String? _barcode;
   bool _searching = false;
   Product? _foundProduct;
   String get _langCode => _langCodeHolder.langCode;
-
-  BarcodeScanPageModel(
-      this._onStateChangeCallback, this._productsManager, this._langCodeHolder);
+  PermissionState? _cameraPermission;
 
   String? get barcode => _barcode;
   bool get searching => _searching;
+  bool get cameraAvailable => _cameraPermission == PermissionState.granted;
+
+  BarcodeScanPageModel(this._onStateChangeCallback, this._productsManager,
+      this._langCodeHolder, this._permissionsManager) {
+    _updateCameraPermission();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  void _updateCameraPermission() async {
+    final permission = await _permissionsManager.status(PermissionKind.CAMERA);
+    if (permission == PermissionState.denied &&
+        _cameraPermission == PermissionState.permanentlyDenied) {
+      // That's a trick the OS plays on us!
+      // In the reality camera permission is still permanently denied.
+      return;
+    }
+    _cameraPermission = permission;
+    _onStateChangeCallback.call();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _updateCameraPermission();
+    }
+  }
+
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+  }
 
   void onProductExternalUpdate(Product updatedProduct) {
     _foundProduct = updatedProduct;
@@ -31,7 +61,20 @@ class BarcodeScanPageModel {
   }
 
   BarcodeScanPageContentState get contentState {
-    if (_barcode == null) {
+    if (_cameraPermission != null &&
+        _cameraPermission != PermissionState.granted) {
+      if (_cameraPermission == PermissionState.denied) {
+        final requestPermission = () async {
+          _cameraPermission =
+              await _permissionsManager.request(PermissionKind.CAMERA);
+          _onStateChangeCallback.call();
+        };
+        return BarcodeScanPageContentState.noPermission(requestPermission);
+      } else {
+        return BarcodeScanPageContentState.cannotAskPermission(
+            _permissionsManager.openAppSettings);
+      }
+    } else if (_barcode == null) {
       return BarcodeScanPageContentState.nothingScanned();
     } else if (_searching && _barcode != null) {
       return BarcodeScanPageContentState.searchingProduct(_barcode!);

@@ -4,6 +4,7 @@ import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -18,6 +19,8 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 import 'barcode_scan_page_model.dart';
+
+const _BACKGROUND_COLOR = Color(0xfff5f7fa);
 
 // mutation is used for testing only
 // ignore: must_be_immutable
@@ -60,8 +63,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
         });
       }
     };
-    model = BarcodeScanPageModel(stateChangeCallback,
-        GetIt.I.get<ProductsManager>(), GetIt.I.get<LangCodeHolder>());
+    model = BarcodeScanPageModel(
+        stateChangeCallback,
+        GetIt.I.get<ProductsManager>(),
+        GetIt.I.get<LangCodeHolder>(),
+        GetIt.I.get<PermissionsManager>());
   }
 
   @override
@@ -105,6 +111,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
 
   @override
   void dispose() {
+    model.dispose();
     qrController?.dispose();
     GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
     WidgetsBinding.instance!.removeObserver(this);
@@ -138,12 +145,12 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                 // ColumnSuper is used for innerDistance
                 // Inner distance is needed to fix https://github.com/flutter/flutter/issues/14288
                 ColumnSuper(innerDistance: -2, children: [
-              HeaderPlante(spacingBottom: 25),
-              boxWithCutout(context, color: Colors.white),
+              HeaderPlante(color: _BACKGROUND_COLOR, spacingBottom: 25),
+              boxWithCutout(context, color: _BACKGROUND_COLOR),
               Container(
                 padding: EdgeInsets.only(left: 24, right: 24),
                 width: double.infinity,
-                color: Colors.white,
+                color: _BACKGROUND_COLOR,
                 child: Column(children: [
                   SizedBox(height: 18),
                   contentWidget(),
@@ -156,14 +163,14 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           ),
           Row(children: [
             Material(
-                color: Colors.white,
+                color: _BACKGROUND_COLOR,
                 child: IconButton(
                     color: Colors.yellow,
                     icon: Icon(Icons.flash_on),
                     onPressed: _toggleFlash)),
             if (fakeScannedBarcode.isNotEmpty)
               Material(
-                  color: Colors.white,
+                  color: _BACKGROUND_COLOR,
                   child: IconButton(
                       color: Colors.grey,
                       icon: Icon(Icons.tag_faces),
@@ -175,7 +182,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           Align(
               alignment: Alignment.topRight,
               child: Material(
-                  color: Colors.white,
+                  color: _BACKGROUND_COLOR,
                   child: IconButton(
                       color: Colors.grey,
                       icon: Icon(Icons.settings),
@@ -224,13 +231,25 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
       circleSize = 60.0;
     }
 
+    final cameraWidget;
+    if (isInTests()) {
+      cameraWidget =
+          model.cameraAvailable ? qrWidget() : Container(color: Colors.white);
+    } else {
+      cameraWidget = AnimatedSwitcher(
+          duration: Duration(milliseconds: 250),
+          child: model.cameraAvailable
+              ? qrWidget()
+              : Container(color: Colors.white));
+    }
+
     return Container(
         width: double.infinity,
         padding: EdgeInsets.only(top: 1, bottom: 1),
         child: ColumnSuper(invert: true, innerDistance: -1, children: [
           Container(color: color, height: 2),
           Stack(children: [
-            Positioned.fill(child: qrWidget()),
+            Positioned.fill(child: cameraWidget),
             BoxWithCircleCutout(
               width: double.infinity,
               // +4 and 2 are to fix https://github.com/flutter/flutter/issues/14288

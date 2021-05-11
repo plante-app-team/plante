@@ -23,6 +23,11 @@ abstract class BarcodeScanPageContentState {
   factory BarcodeScanPageContentState.productNotFound(
           Product product, ProductUpdatedCallback callback) =
       BarcodeScanPageContentStateProductNotFound;
+  factory BarcodeScanPageContentState.noPermission(VoidCallback callback) =
+      BarcodeScanPageContentStateNoPermission;
+  factory BarcodeScanPageContentState.cannotAskPermission(
+          VoidCallback openAppSettingsCallback) =
+      BarcodeScanPageContentStateCannotAskPermission;
 }
 
 class BarcodeScanPageContentStateNothingScanned
@@ -122,6 +127,57 @@ class BarcodeScanPageContentStateProductNotFound
         child: ButtonFilledPlante.withText(
             context.strings.barcode_scan_page_add_product, onPressed: () {
           tryOpenProductPage(context);
+        }),
+      ),
+    ]);
+  }
+}
+
+class BarcodeScanPageContentStateNoPermission
+    extends BarcodeScanPageContentState {
+  final VoidCallback requestPermission;
+
+  BarcodeScanPageContentStateNoPermission(this.requestPermission);
+  @override
+  String get id => "no_permission";
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    return Column(children: [
+      Text(context.strings.barcode_scan_page_camera_permission_reasoning,
+          textAlign: TextAlign.center, style: TextStyles.headline2),
+      SizedBox(height: 24),
+      SizedBox(
+        width: double.infinity,
+        child: ButtonFilledPlante.withText(
+            context.strings.global_give_permission,
+            onPressed: requestPermission),
+      ),
+    ]);
+  }
+}
+
+class BarcodeScanPageContentStateCannotAskPermission
+    extends BarcodeScanPageContentState {
+  final VoidCallback openAppSettingsCallback;
+  BarcodeScanPageContentStateCannotAskPermission(this.openAppSettingsCallback);
+  @override
+  String get id => "cannot_ask_permission";
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    return Column(children: [
+      Text(
+          context
+              .strings.barcode_scan_page_camera_permission_reasoning_settings,
+          textAlign: TextAlign.center,
+          style: TextStyles.headline2),
+      SizedBox(height: 24),
+      SizedBox(
+        width: double.infinity,
+        child: ButtonFilledPlante.withText(
+            context.strings.global_open_app_settings, onPressed: () async {
+          openAppSettingsCallback.call();
         }),
       ),
     ]);

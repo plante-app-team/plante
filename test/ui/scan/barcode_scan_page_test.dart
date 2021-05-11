@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
@@ -21,11 +22,12 @@ import '../../fake_settings.dart';
 import '../../widget_tester_extension.dart';
 import 'barcode_scan_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend, RouteObserver])
+@GenerateMocks([ProductsManager, Backend, RouteObserver, PermissionsManager])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
   late MockRouteObserver<ModalRoute> routesObserver;
+  late MockPermissionsManager permissionsManager;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -38,8 +40,13 @@ void main() {
     GetIt.I.registerSingleton<Backend>(backend);
     routesObserver = MockRouteObserver();
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
-
+    permissionsManager = MockPermissionsManager();
+    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
+    
     when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
+    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.request(any)).thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
   });
 
   testWidgets("product found", (WidgetTester tester) async {
@@ -132,11 +139,67 @@ void main() {
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-
     verifyNever(backend.sendProductScan(any));
     widget.newScanDataForTesting(_barcode("12345"));
     await tester.pumpAndSettle();
     verify(backend.sendProductScan(any));
+  });
+
+  testWidgets("permission message not shown by default", (WidgetTester tester) async {
+    final context = await tester.superPump(BarcodeScanPage());
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        findsNothing);
+  });
+
+  testWidgets("permission request", (WidgetTester tester) async {
+    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.denied);
+    when(permissionsManager.request(any)).thenAnswer((_) async {
+      when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
+      return PermissionState.granted;
+    });
+
+    final context = await tester.superPump(BarcodeScanPage());
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.global_give_permission));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        findsNothing);
+    expect(
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
+        findsOneWidget);
+  });
+
+  testWidgets("permission request through settings", (WidgetTester tester) async {
+    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.permanentlyDenied);
+
+    final context = await tester.superPump(BarcodeScanPage());
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        findsNothing);
+    expect(
+        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
+        findsNothing);
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
+        findsOneWidget);
+
+    verifyNever(permissionsManager.openAppSettings());
+    await tester.tap(find.text(context.strings.global_open_app_settings));
+    await tester.pumpAndSettle();
+    verify(permissionsManager.openAppSettings());
   });
 }
 

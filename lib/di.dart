@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
@@ -17,6 +18,7 @@ import 'outside/http_client.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
+  GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
       RouteObserver<ModalRoute>());
   GetIt.I.registerSingleton<UserParamsController>(UserParamsController());

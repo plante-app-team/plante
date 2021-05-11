@@ -8,6 +8,8 @@
     "global_cancel": "Отмена",
     "global_no": "Нет",
     "global_yes": "Да",
+    "global_give_permission": "Дать разрешение",
+    "global_open_app_settings": "Открыть настройки",
 
     "image_cropper_title": "Давайте-ка обрежем!",
 
@@ -40,6 +42,8 @@
     "barcode_scan_page_searching_product": "Ищем продукт ",
     "barcode_scan_page_show_product": "Показать продукт",
     "barcode_scan_page_add_product": "Добавить",
+    "barcode_scan_page_camera_permission_reasoning": "Для включения сканера, приложению необходимо разрешение на использование камеры",
+    "barcode_scan_page_camera_permission_reasoning_settings": "Для включения сканера нужно дать разрешение на использование камеры, перейдя в настройки",
 
     "display_product_page_whether_vegetarian": "Вегетарианский: ",
     "display_product_page_whether_vegan": "Веганский: ",
