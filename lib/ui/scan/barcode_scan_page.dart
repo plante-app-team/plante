@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
@@ -138,7 +139,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                 color: Colors.white,
                 child: Column(children: [
                   SizedBox(height: 18),
-                  displayedProductWidget(),
+                  contentWidget(),
                   // ColumnSuper doesn't support Expanded, but we need white
                   // color to fill everything
                   SizedBox(height: 10000)
@@ -191,11 +192,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     return qr.QRView(key: qrKey, onQRViewCreated: _onQRViewCreated);
   }
 
-  Widget displayedProductWidget() {
+  Widget contentWidget() {
     final widget;
     if (_barcode == null) {
       widget = Container(
-          key: Key("product_description1"),
+          key: Key("content1"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(context.strings.barcode_scan_page_point_camera_at_barcode,
@@ -203,7 +204,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           ]));
     } else if (_searching && _barcode != null) {
       widget = Container(
-          key: Key("product_description2"),
+          key: Key("content2"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(
@@ -214,7 +215,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     } else if (_foundProduct != null &&
         ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
       widget = Container(
-          key: Key("product_description3"),
+          key: Key("content3"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(_foundProduct!.name!,
@@ -228,7 +229,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           ]));
     } else {
       widget = Container(
-          key: Key("product_description4"),
+          key: Key("content4"),
           height: 1000, // To fix animation jerk
           child: Column(children: [
             Text(context.strings.barcode_scan_page_product_not_found,

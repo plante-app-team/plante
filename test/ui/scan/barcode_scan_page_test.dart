@@ -11,7 +11,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/ui/main/barcode_scan_page.dart';
+import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
