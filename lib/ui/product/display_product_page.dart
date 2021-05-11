@@ -505,18 +505,3 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     );
   }
 }
-
-class _IconButton extends StatelessWidget {
-  final String svg;
-  final dynamic Function() onPressed;
-
-  const _IconButton({Key? key, required this.svg, required this.onPressed})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-        color: Colors.white,
-        child: IconButton(icon: SvgPicture.asset(svg), onPressed: onPressed));
-  }
-}

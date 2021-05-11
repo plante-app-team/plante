@@ -8,7 +8,6 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/identity/google_user.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
 import 'external_auth_page_test.mocks.dart';
@@ -30,7 +29,7 @@ void main() {
     when(backend.loginOrRegister(any)).thenAnswer((_) async => Ok(UserParams()));
 
     UserParams? obtainedParams;
-    final context = await tester.superPump(
+    await tester.superPump(
         ExternalAuthPage((params) async {
           obtainedParams = params;
           return true;
@@ -47,7 +46,7 @@ void main() {
     when(mock.auth()).thenAnswer((_) async => null);
 
     UserParams? obtainedResult;
-    final context = await tester.superPump(
+    await tester.superPump(
         ExternalAuthPage((params) async {
           obtainedResult = params;
           return true;

@@ -3,24 +3,21 @@ import 'dart:io';
 import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
-import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/settings_page.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:plante/base/log.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/product/product_page_wrapper.dart';
+
+import 'barcode_scan_page_model.dart';
 
 // mutation is used for testing only
 // ignore: must_be_immutable
@@ -43,13 +40,11 @@ class BarcodeScanPage extends StatefulWidget {
 
 class _BarcodeScanPageState extends State<BarcodeScanPage>
     with RouteAware, WidgetsBindingObserver {
-  qr.Barcode? _barcode;
-  bool _searching = false;
-  Product? _foundProduct;
+  late final BarcodeScanPageModel model;
 
   String fakeScannedBarcode = "";
 
-  qr.QRViewController? controller;
+  qr.QRViewController? qrController;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   @override
@@ -57,16 +52,26 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     super.initState();
     updateFakeScannedBarcode();
     WidgetsBinding.instance!.addObserver(this);
+
+    final stateChangeCallback = () {
+      if (mounted) {
+        setState(() {
+          // Update!
+        });
+      }
+    };
+    model = BarcodeScanPageModel(stateChangeCallback,
+        GetIt.I.get<ProductsManager>(), GetIt.I.get<LangCodeHolder>());
   }
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
       if (ModalRoute.of(context)?.isCurrent == true) {
-        this.controller?.resumeCamera();
+        this.qrController?.resumeCamera();
       }
     } else if (state == AppLifecycleState.paused) {
-      controller?.pauseCamera();
+      qrController?.pauseCamera();
     }
   }
 
@@ -92,15 +97,15 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      controller?.pauseCamera();
+      qrController?.pauseCamera();
     } else if (Platform.isIOS) {
-      controller?.resumeCamera();
+      qrController?.resumeCamera();
     }
   }
 
   @override
   void dispose() {
-    controller?.dispose();
+    qrController?.dispose();
     GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
@@ -109,18 +114,20 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   @override
   void didPopNext() {
     if (ModalRoute.of(context)?.isCurrent == true) {
-      this.controller?.resumeCamera();
+      this.qrController?.resumeCamera();
       updateFakeScannedBarcode();
     }
   }
 
   @override
   void didPushNext() {
-    this.controller?.pauseCamera();
+    this.qrController?.pauseCamera();
   }
 
   @override
   Widget build(BuildContext context) {
+    GetIt.I.get<LangCodeHolder>().langCode =
+        Localizations.localeOf(context).languageCode;
     return Scaffold(
         body: SafeArea(
       child: Stack(
@@ -177,7 +184,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
               width: double.infinity,
               child: AnimatedSwitcher(
                   duration: Duration(milliseconds: 250),
-                  child: _searching && !isInTests()
+                  child: model.searching && !isInTests()
                       ? LinearProgressIndicator()
                       : SizedBox.shrink())),
         ],
@@ -193,57 +200,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   }
 
   Widget contentWidget() {
-    final widget;
-    if (_barcode == null) {
-      widget = Container(
-          key: Key("content1"),
-          height: 1000, // To fix animation jerk
-          child: Column(children: [
-            Text(context.strings.barcode_scan_page_point_camera_at_barcode,
-                textAlign: TextAlign.center, style: TextStyles.normal)
-          ]));
-    } else if (_searching && _barcode != null) {
-      widget = Container(
-          key: Key("content2"),
-          height: 1000, // To fix animation jerk
-          child: Column(children: [
-            Text(
-                "${context.strings.barcode_scan_page_searching_product} ${_barcode!.code}",
-                textAlign: TextAlign.center,
-                style: TextStyles.normal)
-          ]));
-    } else if (_foundProduct != null &&
-        ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
-      widget = Container(
-          key: Key("content3"),
-          height: 1000, // To fix animation jerk
-          child: Column(children: [
-            Text(_foundProduct!.name!,
-                textAlign: TextAlign.center, style: TextStyles.headline2),
-            SizedBox(height: 24),
-            SizedBox(
-                width: double.infinity,
-                child: ButtonFilledPlante.withText(
-                    context.strings.barcode_scan_page_show_product,
-                    onPressed: _tryOpenProductPage)),
-          ]));
-    } else {
-      widget = Container(
-          key: Key("content4"),
-          height: 1000, // To fix animation jerk
-          child: Column(children: [
-            Text(context.strings.barcode_scan_page_product_not_found,
-                textAlign: TextAlign.center, style: TextStyles.headline2),
-            SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ButtonFilledPlante.withText(
-                  context.strings.barcode_scan_page_add_product,
-                  onPressed: _tryOpenProductPage),
-            ),
-          ]));
-    }
-
+    final state = model.contentState;
+    final widget = Container(
+        key: Key(state.id),
+        height: 1000, // To fix animation jerk
+        child: state.buildWidget(context));
     return AnimatedContainer(
         duration: Duration(milliseconds: 250),
         child: AnimatedSwitcher(
@@ -283,7 +244,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
 
   void _onQRViewCreated(qr.QRViewController controller) {
     setState(() {
-      this.controller = controller;
+      this.qrController = controller;
     });
     controller.scannedDataStream.listen((scanData) {
       _onNewScanData(scanData);
@@ -291,66 +252,34 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    if (_barcode?.code == scanData.code) {
+    if (model.barcode == scanData.code) {
       return;
     }
-
     if (scanData.code != fakeScannedBarcode) {
       // Note: no await because we don't care about result
       GetIt.I.get<Backend>().sendProductScan(scanData.code);
     }
 
-    setState(() {
-      _barcode = scanData;
-      _searching = true;
-    });
-
-    final foundProductResult = await GetIt.I.get<ProductsManager>().getProduct(
-        scanData.code, Localizations.localeOf(context).languageCode);
-    if (foundProductResult.isErr) {
-      if (foundProductResult.unwrapErr() ==
-          ProductsManagerError.NETWORK_ERROR) {
+    final searchResult = await model.searchProduct(scanData.code);
+    switch (searchResult) {
+      case BarcodeScanPageSearchResult.OK:
+        // Nice
+        break;
+      case BarcodeScanPageSearchResult.ERROR_NETWORK:
         showSnackBar(context.strings.global_network_error, context);
-      } else {
+        break;
+      case BarcodeScanPageSearchResult.ERROR_OTHER:
         showSnackBar(context.strings.global_something_went_wrong, context);
-      }
+        break;
     }
-    final foundProduct = foundProductResult.maybeOk();
-    setState(() {
-      _foundProduct = foundProduct;
-      _searching = false;
-      _barcode = foundProductResult.isOk ? _barcode : null;
-    });
   }
 
   void _toggleFlash() async {
     try {
-      await controller?.toggleFlash();
+      await qrController?.toggleFlash();
     } on qr.CameraException catch (e) {
       Log.w("QrScanPage._toggleFlash error", ex: e);
     }
-  }
-
-  void _tryOpenProductPage() {
-    if (_searching || _barcode == null) {
-      return;
-    }
-    final Product product;
-    if (_foundProduct != null) {
-      product = _foundProduct!;
-    } else {
-      product = Product((v) => v.barcode = _barcode!.code);
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) =>
-              ProductPageWrapper(product, productUpdatedCallback: (product) {
-                setState(() {
-                  _foundProduct = product;
-                });
-              })),
-    );
   }
 
   void _openSettings() {

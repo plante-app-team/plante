@@ -11,7 +11,6 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
-import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 

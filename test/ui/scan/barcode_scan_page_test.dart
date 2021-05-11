@@ -11,6 +11,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -29,6 +30,7 @@ void main() {
   setUp(() async {
     await GetIt.I.reset();
 
+    GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited("en"));
     GetIt.I.registerSingleton<Settings>(FakeSettings());
     productsManager = MockProductsManager();
     GetIt.I.registerSingleton<ProductsManager>(productsManager);

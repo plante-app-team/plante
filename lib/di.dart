@@ -9,12 +9,14 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/osm/open_street_map.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/user_params_fetcher.dart';
 
 import 'outside/http_client.dart';
 
 void initDI() {
+  GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
       RouteObserver<ModalRoute>());
   GetIt.I.registerSingleton<UserParamsController>(UserParamsController());
