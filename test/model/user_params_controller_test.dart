@@ -118,4 +118,49 @@ void main() {
     await controller.setUserParams(null);
     verify(observer.onUserParamsUpdate(null));
   });
+
+  test('Cached user params throw if obtained immediately after controller creation', () async {
+    final controller = UserParamsController();
+    bool threw = false;
+    try {
+      controller.cachedUserParams;
+    } catch (e) {
+      threw = true;
+    }
+    expect(threw, isTrue);
+  });
+
+  test('Cached user params do not throw if obtained some time after controller creation', () async {
+    final controller = UserParamsController();
+
+    // Some time!
+    await Future.delayed(Duration(milliseconds: 10));
+
+    bool threw = false;
+    try {
+      controller.cachedUserParams;
+    } catch (e) {
+      threw = true;
+    }
+    expect(threw, isFalse);
+  });
+
+  test('Cached user params are updated', () async {
+    final controller = UserParamsController();
+    // Some time!
+    await Future.delayed(Duration(milliseconds: 10));
+
+    expect(controller.cachedUserParams, isNull);
+
+    final params = UserParams((v) => v
+      ..name = "Bob"
+      ..genderStr = Gender.MALE.name
+      ..birthdayStr = "20.07.1993"
+      ..eatsMilk = true
+      ..eatsEggs = false
+      ..eatsHoney = true);
+    await controller.setUserParams(params);
+
+    expect(controller.cachedUserParams, equals(params));
+  });
 }

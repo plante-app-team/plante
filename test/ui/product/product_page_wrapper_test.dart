@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -11,6 +13,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
+import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
 
@@ -18,6 +21,17 @@ import 'product_page_wrapper_test.mocks.dart';
 void main() {
   setUp(() async {
     await GetIt.I.reset();
+
+    final userParamsController = FakeUserParamsController();
+    final user = UserParams((v) => v
+      ..backendClientToken = "123"
+      ..backendId = "321"
+      ..name = "Bob"
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    userParamsController.setUserParams(user);
+    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
   });
 
   testWidgets("init page is shown when product is not filled", (WidgetTester tester) async {

@@ -9,7 +9,10 @@ import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
@@ -19,6 +22,7 @@ import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../fake_settings.dart';
+import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'barcode_scan_page_test.mocks.dart';
 
@@ -42,6 +46,17 @@ void main() {
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
+
+    final userParamsController = FakeUserParamsController();
+    final user = UserParams((v) => v
+      ..backendClientToken = "123"
+      ..backendId = "321"
+      ..name = "Bob"
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    userParamsController.setUserParams(user);
+    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     
     when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
     when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
@@ -58,7 +73,9 @@ void main() {
           ..imageIngredients = Uri.file("/tmp/asd")
           ..ingredientsText = "beans"
           ..veganStatus = VegStatus.positive
-          ..vegetarianStatus = VegStatus.positive)));
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community
+          ..vegetarianStatusSource = VegStatusSource.community)));
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);

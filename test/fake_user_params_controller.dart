@@ -22,4 +22,7 @@ class FakeUserParamsController implements UserParamsController {
   Future<void> setUserParams(UserParams? userParams) async {
     _userParams = userParams;
   }
+
+  @override
+  UserParams? get cachedUserParams => _userParams;
 }

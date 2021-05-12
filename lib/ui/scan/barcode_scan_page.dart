@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
@@ -67,7 +68,8 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
         stateChangeCallback,
         GetIt.I.get<ProductsManager>(),
         GetIt.I.get<LangCodeHolder>(),
-        GetIt.I.get<PermissionsManager>());
+        GetIt.I.get<PermissionsManager>(),
+        GetIt.I.get<UserParamsController>());
   }
 
   @override

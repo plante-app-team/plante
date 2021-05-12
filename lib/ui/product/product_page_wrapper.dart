@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 

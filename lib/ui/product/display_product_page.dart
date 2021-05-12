@@ -6,6 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/dialog_plante.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -14,6 +16,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
+import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -37,6 +40,7 @@ class DisplayProductPage extends StatefulWidget {
 
 class _DisplayProductPageState extends State<DisplayProductPage> {
   Product product;
+  late final UserParams user;
   final ProductUpdatedCallback? productUpdatedCallback;
 
   final reportTextController = TextEditingController();
@@ -45,7 +49,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   bool get reportSendAllowed => reportTextController.text.trim().length > 3;
   bool loading = false;
 
-  _DisplayProductPageState(this.product, this.productUpdatedCallback);
+  _DisplayProductPageState(this.product, this.productUpdatedCallback) {
+    user = GetIt.I.get<UserParamsController>().cachedUserParams!;
+  }
 
   @override
   void initState() {
@@ -89,52 +95,16 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                       ]),
                       SizedBox(height: 21),
                     ]),
-                  Row(children: [
-                    Text(context.strings.display_product_page_veg_status,
-                        style: TextStyles.normalBold),
-                    InfoButtonPlante(onTap: showVegStatusesExplanation)
-                  ]),
-                  // SizedBox(height: 8),
-                  Row(children: [
-                    Text(context.strings.display_product_page_whether_vegan,
-                        style: TextStyles.normal),
-                    vegStatusIcon(product.veganStatus),
-                    Text(" ", style: TextStyles.normal),
-                    Text(vegStatusToStr(product.veganStatus),
-                        key: Key("vegan_status"), style: TextStyles.normal),
-                  ]),
-                  Row(children: [
-                    Text(
-                        context.strings.display_product_page_whether_vegetarian,
-                        style: TextStyles.normal),
-                    vegStatusIcon(product.vegetarianStatus),
-                    Text(" ", style: TextStyles.normal),
-                    Text(vegStatusToStr(product.vegetarianStatus),
-                        key: Key("vegetarian_status"),
-                        style: TextStyles.normal),
-                  ]),
                   InkWell(
                     child: Column(children: [
-                      Row(children: [
-                        Text(
-                            context
-                                .strings.display_product_page_veg_status_source,
-                            style: TextStyles.normal),
-                        vegStatusSourceIcon(vegStatusSourceOf(product)),
-                        Text(" ", style: TextStyles.normal),
-                        Text(vegStatusSourceToStr(vegStatusSourceOf(product)),
-                            key: Key("veg_status_source"),
-                            style: TextStyles.normal),
-                      ]),
-                      if (askForVegStatusHelp(product))
+                      VegStatusDisplayed(product: product, user: user),
+                      if (vegStatusSource() == VegStatusSource.open_food_facts)
                         SizedBox(
                             width: double.infinity,
-                            child: Text(
-                                context.strings
-                                    .display_product_page_click_to_help_with_veg_statuses,
-                                style: TextStyles.normal))
+                            child: Text(context.strings
+                                .display_product_page_click_to_help_with_veg_statuses)),
                     ]),
-                    onTap: askForVegStatusHelp(product)
+                    onTap: vegStatusSource() == VegStatusSource.open_food_facts
                         ? onVegStatusHelpClick
                         : null,
                   ),
@@ -187,67 +157,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
         ]))));
   }
 
-  String vegStatusToStr(VegStatus? vegStatus, [bool nullIsUnknown = true]) {
-    if (vegStatus == null) {
-      if (nullIsUnknown) {
-        vegStatus = VegStatus.unknown;
-      } else {
-        return "-";
-      }
-    }
-    switch (vegStatus) {
-      case VegStatus.positive:
-        return context.strings.display_product_page_veg_status_positive;
-      case VegStatus.negative:
-        return context.strings.display_product_page_veg_status_negative;
-      case VegStatus.possible:
-        return context.strings.display_product_page_veg_status_possible;
-      case VegStatus.unknown:
-        return context.strings.display_product_page_veg_status_unknown;
-      default:
-        throw StateError("Unhandled veg status element: $vegStatus");
-    }
-  }
-
-  String vegStatusSourceToStr(VegStatusSource source) {
-    switch (source) {
-      case VegStatusSource.community:
-        return context.strings.display_product_page_veg_status_source_community;
-      case VegStatusSource.open_food_facts:
-        return context.strings.display_product_page_veg_status_source_off;
-      case VegStatusSource.moderator:
-        return context.strings.display_product_page_veg_status_source_moderator;
-      default:
-        throw StateError("Unhandled veg status source element: $source");
-    }
-  }
-
-  Widget vegStatusIcon(VegStatus? vegStatus) {
-    if (vegStatus == null) {
-      vegStatus = VegStatus.unknown;
-    }
-    final icon;
-    switch (vegStatus) {
-      case VegStatus.positive:
-        icon = SvgPicture.asset("assets/veg_status_positive.svg");
-        break;
-      case VegStatus.negative:
-        icon = SvgPicture.asset("assets/veg_status_negative.svg");
-        break;
-      case VegStatus.possible:
-        icon = SvgPicture.asset("assets/veg_status_possible.svg");
-        break;
-      case VegStatus.unknown:
-        icon = SvgPicture.asset("assets/veg_status_unknown.svg");
-        break;
-      default:
-        throw Exception("Unhandled veg status: $vegStatus");
-    }
-    return SizedBox(width: 24, height: 24, child: icon);
-  }
-
-  bool askForVegStatusHelp(Product product) {
-    return vegStatusSourceOf(product) == VegStatusSource.open_food_facts;
+  bool askForVegStatusHelp() {
+    return vegStatusSource() == VegStatusSource.open_food_facts;
   }
 
   void onVegStatusHelpClick() {
@@ -267,20 +178,17 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     );
   }
 
-  VegStatusSource vegStatusSourceOf(Product product) {
-    var veganSource = product.veganStatusSource;
-    var vegetarianSource = product.vegetarianStatusSource;
-    if (veganSource == null || veganSource == VegStatusSource.unknown) {
-      veganSource = VegStatusSource.community;
+  VegStatusSource vegStatusSource() {
+    var source;
+    if (user.eatsVeggiesOnly ?? true) {
+      source = product.veganStatusSource;
+    } else {
+      source = product.vegetarianStatusSource;
     }
-    if (vegetarianSource == null ||
-        vegetarianSource == VegStatusSource.unknown) {
-      vegetarianSource = VegStatusSource.community;
+    if (source == null || source == VegStatusSource.unknown) {
+      source = VegStatusSource.community;
     }
-    // Return veg status source with worst priority
-    return veganSource.priority < vegetarianSource.priority
-        ? veganSource
-        : vegetarianSource;
+    return source;
   }
 
   Widget vegStatusSourceIcon(VegStatusSource vegStatusSource) {
@@ -342,9 +250,15 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
         children: <Widget>[
           SizedBox(width: 24),
           center(Text(ingredient.name, style: TextStyles.normal)),
-          center(vegStatusIcon(ingredient.vegetarianStatus)),
+          center(Text(vegStatusText(ingredient.vegetarianStatus),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis)),
           SizedBox(width: 12),
-          center(vegStatusIcon(ingredient.veganStatus)),
+          center(Text(vegStatusText(ingredient.veganStatus),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis)),
           SizedBox(width: 24),
         ],
         decoration: BoxDecoration(color: nextColor()),
@@ -362,6 +276,22 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           4: FlexColumnWidth(4),
           5: IntrinsicColumnWidth(),
         });
+  }
+
+  String vegStatusText(VegStatus? vegStatus) {
+    switch (vegStatus) {
+      case VegStatus.positive:
+        return context.strings.display_product_page_table_positive;
+      case VegStatus.negative:
+        return context.strings.display_product_page_table_negative;
+      case VegStatus.possible:
+        return context.strings.display_product_page_table_possible;
+      case VegStatus.unknown: // Fallthrough
+      case null:
+        return context.strings.display_product_page_table_unknown;
+      default:
+        throw Exception("Unknown veg status: $vegStatus");
+    }
   }
 
   void onReportClick() {
@@ -438,7 +368,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
         children: [
           TableRow(
             children: <Widget>[
-              vegStatusIcon(VegStatus.positive),
+              Text(vegStatusText(VegStatus.positive)),
               SizedBox(width: 16),
               Padding(
                   padding: EdgeInsets.only(bottom: 16),
@@ -450,7 +380,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              vegStatusIcon(VegStatus.negative),
+              Text(vegStatusText(VegStatus.negative)),
               SizedBox(width: 16),
               Padding(
                   padding: EdgeInsets.only(bottom: 16),
@@ -462,7 +392,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              vegStatusIcon(VegStatus.unknown),
+              Text(vegStatusText(VegStatus.unknown)),
               SizedBox(width: 16),
               Padding(
                   padding: EdgeInsets.only(bottom: 16),
@@ -474,7 +404,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              vegStatusIcon(VegStatus.possible),
+              Text(vegStatusText(VegStatus.possible)),
               SizedBox(width: 16),
               Text(
                   context.strings

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
@@ -15,6 +17,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   final ProductsManager _productsManager;
   final LangCodeHolder _langCodeHolder;
   final PermissionsManager _permissionsManager;
+  final UserParamsController _userParamsController;
 
   String? _barcode;
   bool _searching = false;
@@ -26,8 +29,12 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   bool get searching => _searching;
   bool get cameraAvailable => _cameraPermission == PermissionState.granted;
 
-  BarcodeScanPageModel(this._onStateChangeCallback, this._productsManager,
-      this._langCodeHolder, this._permissionsManager) {
+  BarcodeScanPageModel(
+      this._onStateChangeCallback,
+      this._productsManager,
+      this._langCodeHolder,
+      this._permissionsManager,
+      this._userParamsController) {
     _updateCameraPermission();
     WidgetsBinding.instance!.addObserver(this);
   }

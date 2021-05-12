@@ -25,8 +25,15 @@ class UserParamsControllerObserver {
 }
 
 class UserParamsController {
+  late UserParams? _cachedUserParams;
   bool _crashlyticsInited = false;
   final _observers = <UserParamsControllerObserver>[];
+
+  UserParamsController() {
+    () async {
+      _cachedUserParams = await getUserParams();
+    }.call();
+  }
 
   void addObserver(UserParamsControllerObserver observer) =>
       _observers.add(observer);
@@ -72,6 +79,10 @@ class UserParamsController {
       ..eatsHoney = eatsHoney
       ..userGroup = userGroup);
   }
+
+  /// Same as [UserParamsController.getUserParams] but will work only
+  /// if called not immediately after startup.
+  UserParams? get cachedUserParams => _cachedUserParams;
 
   Future<void> setUserParams(UserParams? userParams) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -145,6 +156,7 @@ class UserParamsController {
     } else {
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
     }
+    _cachedUserParams = userParams;
     _observers.forEach((obs) {
       obs.onUserParamsUpdate(userParams);
     });

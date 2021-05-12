@@ -144,13 +144,14 @@ flutter:
     - assets/camera_frame.svg
     - assets/camera_cancel.svg
     - assets/info_icon.svg
-    - assets/veg_status_positive.svg
+    - assets/veg_status_vegan.svg
+    - assets/veg_status_vegetarian.svg
     - assets/veg_status_negative.svg
-    - assets/veg_status_possible.svg
     - assets/veg_status_unknown.svg
     - assets/veg_status_source_auto.svg
     - assets/veg_status_source_community.svg
     - assets/veg_status_source_moderator.svg
+    - assets/veg_status_source_unknown.svg
     - assets/expand_down.svg
     - assets/expand_up.svg
     - assets/report.svg
