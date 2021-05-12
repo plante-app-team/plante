@@ -82,9 +82,10 @@ class ProductsManager {
       ..ingredientsText = offProduct.ingredientsTextTranslated
       ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
       ..imageFront =
-          _extractImageUri(offProduct, ProductImageType.FRONT, langCode)
+          _extractImageUri(offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode)
+      ..imageFrontThumb = _extractImageUri(offProduct, off.ImageField.FRONT, off.ImageSize.THUMB, langCode)
       ..imageIngredients =
-          _extractImageUri(offProduct, ProductImageType.INGREDIENTS, langCode));
+      _extractImageUri(offProduct, off.ImageField.INGREDIENTS, off.ImageSize.ORIGINAL, langCode));
 
     if (backendProduct?.vegetarianStatus != null) {
       final vegetarianStatus =
@@ -143,7 +144,7 @@ class ProductsManager {
   }
 
   Uri? _extractImageUri(
-      off.Product offProduct, ProductImageType imageType, String langCode) {
+      off.Product offProduct, off.ImageField imageType, off.ImageSize size, String langCode) {
     final images = offProduct.images;
     if (images == null) {
       return null;
@@ -153,21 +154,7 @@ class ProductsManager {
       if (image.language != lang || image.url == null) {
         continue;
       }
-      if (imageType == ProductImageType.FRONT &&
-          image.size != off.ImageSize.DISPLAY) {
-        continue;
-      }
-      if (imageType == ProductImageType.INGREDIENTS &&
-          image.size != off.ImageSize.ORIGINAL) {
-        continue;
-      }
-
-      if (image.field == off.ImageField.FRONT &&
-          imageType == ProductImageType.FRONT) {
-        return Uri.parse(image.url!);
-      }
-      if (image.field == off.ImageField.INGREDIENTS &&
-          imageType == ProductImageType.INGREDIENTS) {
+      if (imageType == image.field && size == image.size) {
         return Uri.parse(image.url!);
       }
     }

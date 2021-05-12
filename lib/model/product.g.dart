@@ -95,6 +95,12 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
         ..add('imageFront')
         ..add(serializers.serialize(value, specifiedType: const FullType(Uri)));
     }
+    value = object.imageFrontThumb;
+    if (value != null) {
+      result
+        ..add('imageFrontThumb')
+        ..add(serializers.serialize(value, specifiedType: const FullType(Uri)));
+    }
     value = object.imageIngredients;
     if (value != null) {
       result
@@ -167,6 +173,10 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.imageFront = serializers.deserialize(value,
               specifiedType: const FullType(Uri)) as Uri;
           break;
+        case 'imageFrontThumb':
+          result.imageFrontThumb = serializers.deserialize(value,
+              specifiedType: const FullType(Uri)) as Uri;
+          break;
         case 'imageIngredients':
           result.imageIngredients = serializers.deserialize(value,
               specifiedType: const FullType(Uri)) as Uri;
@@ -202,6 +212,8 @@ class _$Product extends Product {
   @override
   final Uri? imageFront;
   @override
+  final Uri? imageFrontThumb;
+  @override
   final Uri? imageIngredients;
 
   factory _$Product([void Function(ProductBuilder)? updates]) =>
@@ -219,6 +231,7 @@ class _$Product extends Product {
       this.ingredientsText,
       this.ingredientsAnalyzed,
       this.imageFront,
+      this.imageFrontThumb,
       this.imageIngredients})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(barcode, 'Product', 'barcode');
@@ -246,6 +259,7 @@ class _$Product extends Product {
         ingredientsText == other.ingredientsText &&
         ingredientsAnalyzed == other.ingredientsAnalyzed &&
         imageFront == other.imageFront &&
+        imageFrontThumb == other.imageFrontThumb &&
         imageIngredients == other.imageIngredients;
   }
 
@@ -261,17 +275,20 @@ class _$Product extends Product {
                                 $jc(
                                     $jc(
                                         $jc(
-                                            $jc($jc(0, barcode.hashCode),
-                                                vegetarianStatus.hashCode),
-                                            vegetarianStatusSource.hashCode),
-                                        veganStatus.hashCode),
-                                    veganStatusSource.hashCode),
-                                name.hashCode),
-                            brands.hashCode),
-                        categories.hashCode),
-                    ingredientsText.hashCode),
-                ingredientsAnalyzed.hashCode),
-            imageFront.hashCode),
+                                            $jc(
+                                                $jc($jc(0, barcode.hashCode),
+                                                    vegetarianStatus.hashCode),
+                                                vegetarianStatusSource
+                                                    .hashCode),
+                                            veganStatus.hashCode),
+                                        veganStatusSource.hashCode),
+                                    name.hashCode),
+                                brands.hashCode),
+                            categories.hashCode),
+                        ingredientsText.hashCode),
+                    ingredientsAnalyzed.hashCode),
+                imageFront.hashCode),
+            imageFrontThumb.hashCode),
         imageIngredients.hashCode));
   }
 
@@ -289,6 +306,7 @@ class _$Product extends Product {
           ..add('ingredientsText', ingredientsText)
           ..add('ingredientsAnalyzed', ingredientsAnalyzed)
           ..add('imageFront', imageFront)
+          ..add('imageFrontThumb', imageFrontThumb)
           ..add('imageIngredients', imageIngredients))
         .toString();
   }
@@ -350,6 +368,11 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   Uri? get imageFront => _$this._imageFront;
   set imageFront(Uri? imageFront) => _$this._imageFront = imageFront;
 
+  Uri? _imageFrontThumb;
+  Uri? get imageFrontThumb => _$this._imageFrontThumb;
+  set imageFrontThumb(Uri? imageFrontThumb) =>
+      _$this._imageFrontThumb = imageFrontThumb;
+
   Uri? _imageIngredients;
   Uri? get imageIngredients => _$this._imageIngredients;
   set imageIngredients(Uri? imageIngredients) =>
@@ -371,6 +394,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _ingredientsText = $v.ingredientsText;
       _ingredientsAnalyzed = $v.ingredientsAnalyzed?.toBuilder();
       _imageFront = $v.imageFront;
+      _imageFrontThumb = $v.imageFrontThumb;
       _imageIngredients = $v.imageIngredients;
       _$v = null;
     }
@@ -406,6 +430,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               ingredientsText: ingredientsText,
               ingredientsAnalyzed: _ingredientsAnalyzed?.build(),
               imageFront: imageFront,
+              imageFrontThumb: imageFrontThumb,
               imageIngredients: imageIngredients);
     } catch (_) {
       late String _$failedField;

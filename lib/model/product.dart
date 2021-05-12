@@ -24,6 +24,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
   BuiltList<Ingredient>? get ingredientsAnalyzed;
 
   Uri? get imageFront;
+  Uri? get imageFrontThumb;
   Uri? get imageIngredients;
 
   VegStatus? get vegetarianStatusAnalysis {
@@ -78,6 +79,8 @@ abstract class Product implements Built<Product, ProductBuilder> {
 
   bool isFrontImageFile() => isImageFile(ProductImageType.FRONT);
   bool isFrontImageRemote() => isImageRemote(ProductImageType.FRONT);
+  bool isFrontThumbImageFile() => isImageFile(ProductImageType.FRONT_THUMB);
+  bool isFrontThumbImageRemote() => isImageRemote(ProductImageType.FRONT_THUMB);
   bool isIngredientsImageFile() => isImageFile(ProductImageType.INGREDIENTS);
   bool isIngredientsImageRemote() =>
       isImageRemote(ProductImageType.INGREDIENTS);
@@ -93,6 +96,8 @@ abstract class Product implements Built<Product, ProductBuilder> {
         return imageFront;
       case ProductImageType.INGREDIENTS:
         return imageIngredients;
+      case ProductImageType.FRONT_THUMB:
+        return imageFrontThumb;
       default:
         throw Exception("Unhandled item: $imageType");
     }
@@ -118,6 +123,8 @@ abstract class Product implements Built<Product, ProductBuilder> {
         return rebuild((v) => v.imageFront = uri);
       case ProductImageType.INGREDIENTS:
         return rebuild((v) => v.imageIngredients = uri);
+      case ProductImageType.FRONT_THUMB:
+        return rebuild((v) => v.imageFrontThumb = uri);
       default:
         throw Exception("Unhandled item: $imageType");
     }
@@ -139,5 +146,6 @@ abstract class Product implements Built<Product, ProductBuilder> {
 
 enum ProductImageType {
   FRONT,
+  FRONT_THUMB,
   INGREDIENTS,
 }

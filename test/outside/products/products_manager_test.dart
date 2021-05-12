@@ -33,6 +33,10 @@ void main() {
          "400":{
             "h":400,
             "w":289
+         },
+         "100":{
+            "h":100,
+            "w":75
          }
       },
       "imgid":"1"
@@ -50,6 +54,7 @@ void main() {
   }
   """;
   final expectedImageFront = "https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg";
+  final expectedImageFrontThumb = "https://static.openfoodfacts.org/images/products/123/front_ru.16.100.jpg";
   final expectedImageIngredients = "https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg";
 
   late MockOffApi offApi;
@@ -110,6 +115,7 @@ void main() {
       ..ingredientsText = "lemon, water"
       ..ingredientsAnalyzed.addAll([])
       ..imageFront = Uri.parse(expectedImageFront)
+      ..imageFrontThumb = Uri.parse(expectedImageFrontThumb)
       ..imageIngredients = Uri.parse(expectedImageIngredients));
     expect(product, equals(expectedProduct));
   });
@@ -143,6 +149,7 @@ void main() {
       ..ingredientsText = "lemon, water"
       ..ingredientsAnalyzed.addAll([])
       ..imageFront = Uri.parse(expectedImageFront)
+      ..imageFrontThumb = Uri.parse(expectedImageFrontThumb)
       ..imageIngredients = Uri.parse(expectedImageIngredients));
     expect(product, equals(expectedProduct));
   });
