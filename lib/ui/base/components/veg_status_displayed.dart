@@ -17,17 +17,21 @@ class VegStatusDisplayed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         _vegStatusImage(),
         SizedBox(width: 6),
-        Text(_vegStatusText(context))
+        Flexible(
+            child: Text(_vegStatusText(context),
+                maxLines: 1, overflow: TextOverflow.ellipsis))
       ]),
       SizedBox(height: 4),
       Row(children: [
         _vegStatusSourceImage(),
         SizedBox(width: 6),
-        Text(_vegStatusSourceText(context))
+        Flexible(
+            child: Text(_vegStatusSourceText(context),
+                maxLines: 1, overflow: TextOverflow.ellipsis))
       ])
     ]);
   }

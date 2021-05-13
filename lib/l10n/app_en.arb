@@ -40,7 +40,6 @@
       "barcode_scan_page_product_not_found": "We don't have enough data for this product yet - but you can help the community by adding it",
       "barcode_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",
       "barcode_scan_page_searching_product": "Searching product ",
-      "barcode_scan_page_show_product": "Show product",
       "barcode_scan_page_add_product": "Add",
 
       "display_product_page_ingredients": "Ingredients:",
@@ -106,8 +105,8 @@
       "veg_status_displayed_vegetarian_status_unknown": "Vegetarian status unknown",
       "veg_status_displayed_not_vegan": "Not vegan",
       "veg_status_displayed_not_vegetarian": "Not vegetarian",
-      "veg_status_displayed_veg_status_source_community": "Information from community",
-      "veg_status_displayed_veg_status_source_off": "Automatic ingredients analysis",
+      "veg_status_displayed_veg_status_source_community": "Info from community",
+      "veg_status_displayed_veg_status_source_off": "Ingredients auto-analysis",
       "veg_status_displayed_veg_status_source_moderator": "Verified by a moderator",
       "veg_status_displayed_veg_status_source_unknown": "Internal error: source unknown"
 }

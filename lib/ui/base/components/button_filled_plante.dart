@@ -21,8 +21,8 @@ class ButtonFilledPlante extends StatelessWidget {
         child: OutlinedButton(
             child: child,
             style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(
-                    ColorsPlante.primaryMaterial.shade800),
+                overlayColor:
+                    MaterialStateProperty.all(ColorsPlante.splashColor),
                 backgroundColor: MaterialStateProperty.all(onPressed != null
                     ? ColorsPlante.primary
                     : ColorsPlante.primaryDisabled),

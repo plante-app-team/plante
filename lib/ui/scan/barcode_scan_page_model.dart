@@ -87,8 +87,8 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       return BarcodeScanPageContentState.searchingProduct(_barcode!);
     } else if (_foundProduct != null &&
         ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
-      return BarcodeScanPageContentState.productFound(
-          _foundProduct!, onProductExternalUpdate);
+      return BarcodeScanPageContentState.productFound(_foundProduct!,
+          _userParamsController.cachedUserParams!, onProductExternalUpdate);
     } else {
       final Product product;
       if (_foundProduct != null) {

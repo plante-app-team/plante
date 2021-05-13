@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
@@ -137,32 +136,30 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   Widget build(BuildContext context) {
     GetIt.I.get<LangCodeHolder>().langCode =
         Localizations.localeOf(context).languageCode;
+
     return Scaffold(
+        backgroundColor: _BACKGROUND_COLOR,
         body: SafeArea(
-      child: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            child:
-                // ColumnSuper is used for innerDistance
-                // Inner distance is needed to fix https://github.com/flutter/flutter/issues/14288
-                ColumnSuper(innerDistance: -2, children: [
-              HeaderPlante(color: _BACKGROUND_COLOR, spacingBottom: 25),
-              boxWithCutout(context, color: _BACKGROUND_COLOR),
+            child: Stack(children: [
+          Column(children: [
+            HeaderPlante(color: _BACKGROUND_COLOR, spacingBottom: 24),
+            boxWithCutout(context, color: _BACKGROUND_COLOR),
+            // Expanded(child: Align(alignment: Alignment.bottomCenter, child: contentWidget())),
+            Expanded(
+                child: Stack(clipBehavior: Clip.none, children: [
+              // Top: -2 is a part of a fix for https://github.com/flutter/flutter/issues/14288
+              Positioned.fill(
+                  top: -2, child: Container(color: _BACKGROUND_COLOR)),
               Container(
-                padding: EdgeInsets.only(left: 24, right: 24),
                 width: double.infinity,
                 color: _BACKGROUND_COLOR,
                 child: Column(children: [
                   SizedBox(height: 18),
-                  contentWidget(),
-                  // ColumnSuper doesn't support Expanded, but we need white
-                  // color to fill everything
-                  SizedBox(height: 10000)
+                  Expanded(child: contentWidget()),
                 ]),
-              )
-            ]),
-          ),
+              ),
+            ])),
+          ]),
           Row(children: [
             Material(
                 color: _BACKGROUND_COLOR,
@@ -196,9 +193,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                   child: model.searching && !isInTests()
                       ? LinearProgressIndicator()
                       : SizedBox.shrink())),
-        ],
-      ),
-    ));
+        ])));
   }
 
   Widget qrWidget() {
@@ -209,15 +204,9 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   }
 
   Widget contentWidget() {
-    final state = model.contentState;
-    final widget = Container(
-        key: Key(state.id),
-        height: 1000, // To fix animation jerk
-        child: state.buildWidget(context));
-    return AnimatedContainer(
+    return AnimatedSwitcher(
         duration: Duration(milliseconds: 250),
-        child: AnimatedSwitcher(
-            duration: Duration(milliseconds: 250), child: widget));
+        child: model.contentState.buildWidget(context));
   }
 
   Widget boxWithCutout(BuildContext context, {required Color color}) {
@@ -245,21 +234,17 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
               : Container(color: Colors.white));
     }
 
+    // Magic numbers are a part of a fix for https://github.com/flutter/flutter/issues/14288
     return Container(
         width: double.infinity,
-        padding: EdgeInsets.only(top: 1, bottom: 1),
-        child: ColumnSuper(invert: true, innerDistance: -1, children: [
-          Container(color: color, height: 2),
-          Stack(children: [
-            Positioned.fill(child: cameraWidget),
-            BoxWithCircleCutout(
-              width: double.infinity,
-              // +4 and 2 are to fix https://github.com/flutter/flutter/issues/14288
-              height: circleSize + 4,
-              cutoutPadding: 2,
-              color: color,
-            ),
-          ]),
+        child: Stack(children: [
+          Positioned.fill(top: 1, child: cameraWidget),
+          BoxWithCircleCutout(
+            width: double.infinity,
+            height: circleSize + 4,
+            cutoutPadding: 4,
+            color: color,
+          ),
         ]));
   }
 
@@ -273,7 +258,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    if (model.barcode == scanData.code) {
+    if (model.barcode == scanData.code && scanData.code != fakeScannedBarcode) {
       return;
     }
     if (scanData.code != fakeScannedBarcode) {

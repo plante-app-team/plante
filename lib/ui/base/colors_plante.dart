@@ -17,4 +17,5 @@ class ColorsPlante {
     900: Color(_primaryVal),
   });
   static const Color primaryDisabled = Color.fromARGB(255, 132, 161, 142);
+  static final Color splashColor = primaryMaterial.shade800;
 }

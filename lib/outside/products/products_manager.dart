@@ -81,11 +81,12 @@ class ProductsManager {
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])
       ..ingredientsText = offProduct.ingredientsTextTranslated
       ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
-      ..imageFront =
-          _extractImageUri(offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode)
-      ..imageFrontThumb = _extractImageUri(offProduct, off.ImageField.FRONT, off.ImageSize.THUMB, langCode)
-      ..imageIngredients =
-      _extractImageUri(offProduct, off.ImageField.INGREDIENTS, off.ImageSize.ORIGINAL, langCode));
+      ..imageFront = _extractImageUri(
+          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode)
+      ..imageFrontThumb = _extractImageUri(
+          offProduct, off.ImageField.FRONT, off.ImageSize.SMALL, langCode)
+      ..imageIngredients = _extractImageUri(offProduct,
+          off.ImageField.INGREDIENTS, off.ImageSize.ORIGINAL, langCode));
 
     if (backendProduct?.vegetarianStatus != null) {
       final vegetarianStatus =
@@ -143,8 +144,8 @@ class ProductsManager {
     return Ok(result);
   }
 
-  Uri? _extractImageUri(
-      off.Product offProduct, off.ImageField imageType, off.ImageSize size, String langCode) {
+  Uri? _extractImageUri(off.Product offProduct, off.ImageField imageType,
+      off.ImageSize size, String langCode) {
     final images = offProduct.images;
     if (images == null) {
       return null;

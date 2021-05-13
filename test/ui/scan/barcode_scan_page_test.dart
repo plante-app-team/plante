@@ -86,9 +86,6 @@ void main() {
     expect(
         find.text("Product name"),
         findsNothing);
-    expect(
-        find.text(context.strings.barcode_scan_page_show_product),
-        findsNothing);
 
     widget.newScanDataForTesting(_barcode("12345"));
     await tester.pumpAndSettle();
@@ -99,14 +96,11 @@ void main() {
     expect(
         find.text("Product name"),
         findsOneWidget);
-    expect(
-        find.text(context.strings.barcode_scan_page_show_product),
-        findsOneWidget);
 
     expect(
         find.byType(DisplayProductPage),
         findsNothing);
-    await tester.tap(find.text(context.strings.barcode_scan_page_show_product));
+    await tester.tap(find.text("Product name"));
     await tester.pumpAndSettle();
     expect(
         find.byType(DisplayProductPage),

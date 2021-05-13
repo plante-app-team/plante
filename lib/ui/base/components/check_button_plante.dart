@@ -27,7 +27,7 @@ class CheckButtonPlante extends StatelessWidget {
                 side: MaterialStateProperty.all<BorderSide>(
                     BorderSide(style: BorderStyle.none)),
                 overlayColor: MaterialStateProperty.all(checked
-                    ? ColorsPlante.primaryMaterial.shade800
+                    ? ColorsPlante.splashColor
                     : ColorsPlante.primaryDisabled),
                 backgroundColor: MaterialStateProperty.all(
                     checked ? ColorsPlante.primary : Color(0xFFEBEFEC)),

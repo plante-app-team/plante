@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
@@ -17,8 +19,8 @@ abstract class BarcodeScanPageContentState {
       BarcodeScanPageContentStateNothingScanned;
   factory BarcodeScanPageContentState.searchingProduct(String barcode) =
       BarcodeScanPageContentStateSearchingProduct;
-  factory BarcodeScanPageContentState.productFound(
-          Product product, ProductUpdatedCallback callback) =
+  factory BarcodeScanPageContentState.productFound(Product product,
+          UserParams beholder, ProductUpdatedCallback callback) =
       BarcodeScanPageContentStateProductFound;
   factory BarcodeScanPageContentState.productNotFound(
           Product product, ProductUpdatedCallback callback) =
@@ -37,10 +39,13 @@ class BarcodeScanPageContentStateNothingScanned
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text(context.strings.barcode_scan_page_point_camera_at_barcode,
-          textAlign: TextAlign.center, style: TextStyles.normal)
-    ]);
+    return Padding(
+        key: Key(id),
+        padding: EdgeInsets.only(left: 24, right: 24),
+        child: Column(children: [
+          Text(context.strings.barcode_scan_page_point_camera_at_barcode,
+              textAlign: TextAlign.center, style: TextStyles.normal)
+        ]));
   }
 }
 
@@ -53,10 +58,15 @@ class BarcodeScanPageContentStateSearchingProduct
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text("${context.strings.barcode_scan_page_searching_product} $barcode",
-          textAlign: TextAlign.center, style: TextStyles.normal)
-    ]);
+    return Padding(
+        key: Key(id),
+        padding: EdgeInsets.only(left: 24, right: 24),
+        child: Column(children: [
+          Text(
+              "${context.strings.barcode_scan_page_searching_product} $barcode",
+              textAlign: TextAlign.center,
+              style: TextStyles.normal)
+        ]));
   }
 }
 
@@ -80,8 +90,9 @@ abstract class BarcodeScanPageContentAbstractStateWithProduct
 class BarcodeScanPageContentStateProductFound
     extends BarcodeScanPageContentAbstractStateWithProduct {
   final Product product;
+  final UserParams beholder;
   BarcodeScanPageContentStateProductFound(
-      this.product, ProductUpdatedCallback callback)
+      this.product, this.beholder, ProductUpdatedCallback callback)
       : super(callback);
   @override
   String get id => "product_found";
@@ -90,18 +101,15 @@ class BarcodeScanPageContentStateProductFound
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text(product.name!,
-          textAlign: TextAlign.center, style: TextStyles.headline2),
-      SizedBox(height: 24),
-      SizedBox(
-        width: double.infinity,
-        child: ButtonFilledPlante.withText(
-            context.strings.barcode_scan_page_show_product, onPressed: () {
-          tryOpenProductPage(context);
-        }),
-      )
-    ]);
+    return Center(
+        child: Padding(
+            padding: EdgeInsets.only(left: 16, right: 16, bottom: 48),
+            child: ProductCard(
+                product: product,
+                beholder: beholder,
+                onTap: () {
+                  tryOpenProductPage(context);
+                })));
   }
 }
 
@@ -118,18 +126,21 @@ class BarcodeScanPageContentStateProductNotFound
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text(context.strings.barcode_scan_page_product_not_found,
-          textAlign: TextAlign.center, style: TextStyles.headline2),
-      SizedBox(height: 24),
-      SizedBox(
-        width: double.infinity,
-        child: ButtonFilledPlante.withText(
-            context.strings.barcode_scan_page_add_product, onPressed: () {
-          tryOpenProductPage(context);
-        }),
-      ),
-    ]);
+    return Padding(
+        key: Key(id),
+        padding: EdgeInsets.only(left: 24, right: 24),
+        child: Column(children: [
+          Text(context.strings.barcode_scan_page_product_not_found,
+              textAlign: TextAlign.center, style: TextStyles.headline2),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ButtonFilledPlante.withText(
+                context.strings.barcode_scan_page_add_product, onPressed: () {
+              tryOpenProductPage(context);
+            }),
+          ),
+        ]));
   }
 }
 
@@ -143,17 +154,20 @@ class BarcodeScanPageContentStateNoPermission
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text(context.strings.barcode_scan_page_camera_permission_reasoning,
-          textAlign: TextAlign.center, style: TextStyles.headline2),
-      SizedBox(height: 24),
-      SizedBox(
-        width: double.infinity,
-        child: ButtonFilledPlante.withText(
-            context.strings.global_give_permission,
-            onPressed: requestPermission),
-      ),
-    ]);
+    return Padding(
+        key: Key(id),
+        padding: EdgeInsets.only(left: 24, right: 24),
+        child: Column(children: [
+          Text(context.strings.barcode_scan_page_camera_permission_reasoning,
+              textAlign: TextAlign.center, style: TextStyles.headline2),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ButtonFilledPlante.withText(
+                context.strings.global_give_permission,
+                onPressed: requestPermission),
+          ),
+        ]));
   }
 }
 
@@ -166,20 +180,23 @@ class BarcodeScanPageContentStateCannotAskPermission
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Column(children: [
-      Text(
-          context
-              .strings.barcode_scan_page_camera_permission_reasoning_settings,
-          textAlign: TextAlign.center,
-          style: TextStyles.headline2),
-      SizedBox(height: 24),
-      SizedBox(
-        width: double.infinity,
-        child: ButtonFilledPlante.withText(
-            context.strings.global_open_app_settings, onPressed: () async {
-          openAppSettingsCallback.call();
-        }),
-      ),
-    ]);
+    return Padding(
+        key: Key(id),
+        padding: EdgeInsets.only(left: 24, right: 24),
+        child: Column(children: [
+          Text(
+              context.strings
+                  .barcode_scan_page_camera_permission_reasoning_settings,
+              textAlign: TextAlign.center,
+              style: TextStyles.headline2),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ButtonFilledPlante.withText(
+                context.strings.global_open_app_settings, onPressed: () async {
+              openAppSettingsCallback.call();
+            }),
+          ),
+        ]));
   }
 }

@@ -34,7 +34,7 @@ void main() {
             "h":400,
             "w":289
          },
-         "100":{
+         "200":{
             "h":100,
             "w":75
          }
@@ -54,7 +54,7 @@ void main() {
   }
   """;
   final expectedImageFront = "https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg";
-  final expectedImageFrontThumb = "https://static.openfoodfacts.org/images/products/123/front_ru.16.100.jpg";
+  final expectedImageFrontThumb = "https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg";
   final expectedImageIngredients = "https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg";
 
   late MockOffApi offApi;

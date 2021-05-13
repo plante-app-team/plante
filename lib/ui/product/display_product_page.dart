@@ -249,7 +249,10 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       rows.add(TableRow(
         children: <Widget>[
           SizedBox(width: 24),
-          center(Text(ingredient.name, style: TextStyles.normal)),
+          center(Text(ingredient.name,
+              style: TextStyles.normal,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis)),
           center(Text(vegStatusText(ingredient.vegetarianStatus),
               textAlign: TextAlign.center,
               maxLines: 1,
