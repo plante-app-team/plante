@@ -99,7 +99,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
       case ProductImageType.FRONT_THUMB:
         return imageFrontThumb;
       default:
-        throw Exception("Unhandled item: $imageType");
+        throw Exception('Unhandled item: $imageType');
     }
   }
 
@@ -107,7 +107,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
     if (uri == null) {
       return false;
     }
-    return uri.isScheme("FILE");
+    return uri.isScheme('FILE');
   }
 
   bool _isImageRemote(Uri? uri) {
@@ -126,7 +126,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
       case ProductImageType.FRONT_THUMB:
         return rebuild((v) => v.imageFrontThumb = uri);
       default:
-        throw Exception("Unhandled item: $imageType");
+        throw Exception('Unhandled item: $imageType');
     }
   }
 
@@ -135,7 +135,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
   }
 
   Map<String, dynamic> toJson() {
-    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
         as Map<String, dynamic>;
   }
 

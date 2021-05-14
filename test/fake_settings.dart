@@ -8,7 +8,7 @@ class FakeSettings implements Settings {
   Future<bool> fakeOffApiProductNotFound() async => false;
 
   @override
-  Future<String> fakeScannedProductBarcode() async => "";
+  Future<String> fakeScannedProductBarcode() async => '';
 
   @override
   Future<void> setFakeOffApi(bool value) async {}

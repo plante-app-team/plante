@@ -36,8 +36,9 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    final imageProviderCallback = (provider) async {
-      if (isInTests()) {
+    // ignore: prefer_function_declarations_over_variables
+    final imageProviderCallback = (ImageProvider provider) async {
+      if (dominantColor != null || isInTests()) {
         // PaletteGenerator.fromImageProvider is not very friendly with
         // tests - it starts a timer and gives no way to stop it, tests
         // hate that.
@@ -45,14 +46,10 @@ class _ProductCardState extends State<ProductCard> {
       }
       final paletteGenerator =
           await PaletteGenerator.fromImageProvider(provider);
-      if (dominantColor == null) {
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          setState(() {
-            dominantColor = paletteGenerator.dominantColor?.color ??
-                ColorsPlante.primaryDisabled;
-          });
-        });
-      }
+      setState(() {
+        dominantColor = paletteGenerator.dominantColor?.color ??
+            ColorsPlante.primaryDisabled;
+      });
     };
     final img = photo(imageProviderCallback);
 
@@ -62,13 +59,14 @@ class _ProductCardState extends State<ProductCard> {
         child: InkWell(
             overlayColor: MaterialStateProperty.all(ColorsPlante.splashColor),
             borderRadius: BorderRadius.circular(8),
+            onTap: onTap,
             child: Container(
               height: 121,
-              padding: EdgeInsets.all(6),
+              padding: const EdgeInsets.all(6),
               child: Row(children: [
                 AnimatedContainer(
-                  duration: Duration(milliseconds: 250),
-                  padding: EdgeInsets.all(10),
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: dominantColor ?? ColorsPlante.primaryDisabled,
                     borderRadius: BorderRadius.circular(4),
@@ -80,27 +78,26 @@ class _ProductCardState extends State<ProductCard> {
                         child: img,
                       )),
                 ),
-                SizedBox(width: 16.5),
+                const SizedBox(width: 16.5),
                 Flexible(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(product.name!,
                           style: TextStyles.headline2,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
-                      SizedBox(height: 18),
+                      const SizedBox(height: 18),
                       VegStatusDisplayed(product: product, user: beholder)
                     ])),
               ]),
-            ),
-            onTap: onTap));
+            )));
   }
 
   UriImagePlante? photo(
       dynamic Function(ImageProvider image) imageProviderCallback) {
-    final uri;
+    final Uri uri;
     if (product.imageFrontThumb != null) {
       uri = product.imageFrontThumb!;
     } else if (product.imageFront != null) {

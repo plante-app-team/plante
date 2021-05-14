@@ -21,21 +21,21 @@ class BackendError {
   BackendError._(this.errorKind, {this.errorStr, this.errorDescr});
 
   static bool isError(Map<String, dynamic> json) {
-    return json["error"] != null;
+    return json['error'] != null;
   }
 
   static BackendError fromJson(Map<String, dynamic> json) {
     assert(isError(json));
 
     final BackendErrorKind kind;
-    switch (json["error"]) {
-      case "already_registered":
+    switch (json['error']) {
+      case 'already_registered':
         kind = BackendErrorKind.ALREADY_REGISTERED;
         break;
-      case "google_email_not_verified":
+      case 'google_email_not_verified':
         kind = BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED;
         break;
-      case "product_not_found":
+      case 'product_not_found':
         kind = BackendErrorKind.PRODUCT_NOT_FOUND;
         break;
       default:
@@ -43,19 +43,20 @@ class BackendError {
         break;
     }
 
-    Log.w("BackendError from JSON: $json");
+    Log.w('BackendError from JSON: $json');
     return BackendError._(kind,
-        errorStr: json["error"], errorDescr: json["error_description"]);
+        errorStr: json['error'] as String?,
+        errorDescr: json['error_description'] as String?);
   }
 
   static BackendError fromResp(BackendResponse response) {
     assert(response.statusCode != 200);
-    Log.w("BackendError from HTTP response. "
-        "Code: ${response.statusCode}, "
-        "Reason: ${response.reasonPhrase}, "
-        "Headers: ${response.headers}, "
-        "body: ${response.body}. "
-        "Request URL was: ${response.requestUrl?.toString()}");
+    Log.w('BackendError from HTTP response. '
+        'Code: ${response.statusCode}, '
+        'Reason: ${response.reasonPhrase}, '
+        'Headers: ${response.headers}, '
+        'body: ${response.body}. '
+        'Request URL was: ${response.requestUrl?.toString()}');
     if (response.statusCode == 401) {
       return BackendError._(BackendErrorKind.NOT_AUTHORIZED,
           errorStr: null, errorDescr: response.reasonPhrase);
@@ -69,13 +70,13 @@ class BackendError {
   }
 
   static BackendError invalidJson(String invalidJson) {
-    Log.w("BackendError from invalid JSON: $invalidJson");
+    Log.w('BackendError from invalid JSON: $invalidJson');
     return BackendError._(BackendErrorKind.INVALID_JSON,
         errorDescr: invalidJson);
   }
 
   static BackendError other() {
-    Log.w("BackendError other");
+    Log.w('BackendError other');
     return BackendError._(BackendErrorKind.OTHER);
   }
 }

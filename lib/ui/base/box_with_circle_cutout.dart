@@ -8,7 +8,7 @@ class BoxWithCircleCutout extends StatelessWidget {
   final Color color;
   final EdgeInsets? padding;
 
-  BoxWithCircleCutout(
+  const BoxWithCircleCutout(
       {Key? key,
       required this.width,
       required this.height,
@@ -19,12 +19,12 @@ class BoxWithCircleCutout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipPath(
+        clipper: _Clipper((width < height ? width : height) - cutoutPadding),
         child: Container(
           width: width,
           height: height,
           color: color,
         ),
-        clipper: _Clipper((width < height ? width : height) - cutoutPadding),
       );
 }
 

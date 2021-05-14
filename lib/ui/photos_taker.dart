@@ -28,8 +28,8 @@ class PhotosTaker {
               initAspectRatio: CropAspectRatioPreset.original,
               lockAspectRatio: false,
               hideBottomControls: true),
-          iosUiSettings: IOSUiSettings(
-            minimumAspectRatio: 1.0,
+          iosUiSettings: const IOSUiSettings(
+            minimumAspectRatio: 1,
           ));
       final path = croppedFile?.path;
       if (path == null) {

@@ -27,14 +27,14 @@ class LocationController {
         _lastKnownPosition = Position.fromMap(json.decode(posString));
       } on FormatException catch (e) {
         _lastKnownPosition = null;
-        Log.e("LocationController exception while parsing $posString", ex: e);
+        Log.e('LocationController exception while parsing $posString', ex: e);
       }
     }
   }
 
   Future<void> _updateLastKnownPrefsPosition(Position position) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(PREF_LAST_KNOWN_POS, json.encode(position.toJson()));
+    await prefs.setString(PREF_LAST_KNOWN_POS, json.encode(position.toJson()));
   }
 
   Future<PermissionStatus> permissionStatus() async {
@@ -52,10 +52,10 @@ class LocationController {
       return null;
     }
 
-    var position = await Geolocator.getLastKnownPosition();
+    final position = await Geolocator.getLastKnownPosition();
     if (position != null && position != _lastKnownPosition) {
       _lastKnownPosition = position;
-      _updateLastKnownPrefsPosition(position);
+      await _updateLastKnownPrefsPosition(position);
     }
 
     return position;
@@ -67,7 +67,7 @@ class LocationController {
     }
     final result = await Geolocator.getCurrentPosition();
     _lastKnownPosition = result;
-    _updateLastKnownPrefsPosition(result);
+    await _updateLastKnownPrefsPosition(result);
     return result;
   }
 }

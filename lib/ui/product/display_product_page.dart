@@ -21,6 +21,7 @@ import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
+// ignore: always_use_package_imports
 import '_product_images_helper.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
@@ -29,13 +30,13 @@ class DisplayProductPage extends StatefulWidget {
   final Product _initialProduct;
   final ProductUpdatedCallback? productUpdatedCallback;
 
-  DisplayProductPage(this._initialProduct,
+  const DisplayProductPage(this._initialProduct,
       {Key? key, this.productUpdatedCallback})
       : super(key: key);
 
   @override
-  _DisplayProductPageState createState() => _DisplayProductPageState(
-      this._initialProduct, this.productUpdatedCallback);
+  _DisplayProductPageState createState() =>
+      _DisplayProductPageState(_initialProduct, productUpdatedCallback);
 }
 
 class _DisplayProductPageState extends State<DisplayProductPage> {
@@ -78,24 +79,27 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 child: ProductImagesHelper.productImageWidget(
                     product, ProductImageType.FRONT)),
             Container(
-                padding: EdgeInsets.only(left: 24, right: 24),
+                padding: const EdgeInsets.only(left: 24, right: 24),
                 child: Column(children: [
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   SizedBox(
                       width: double.infinity,
                       child: Text(product.name!, style: TextStyles.headline1)),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   if (product.brands != null && product.brands!.isNotEmpty)
                     Column(children: [
                       Row(children: [
                         Text(context.strings.display_product_page_brand,
                             style: TextStyles.normalBold),
-                        Text(product.brands!.join(", "),
+                        Text(product.brands!.join(', '),
                             style: TextStyles.normal)
                       ]),
-                      SizedBox(height: 21),
+                      const SizedBox(height: 21),
                     ]),
                   InkWell(
+                    onTap: vegStatusSource() == VegStatusSource.open_food_facts
+                        ? onVegStatusHelpClick
+                        : null,
                     child: Column(children: [
                       VegStatusDisplayed(product: product, user: user),
                       if (vegStatusSource() == VegStatusSource.open_food_facts)
@@ -104,27 +108,24 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                             child: Text(context.strings
                                 .display_product_page_click_to_help_with_veg_statuses)),
                     ]),
-                    onTap: vegStatusSource() == VegStatusSource.open_food_facts
-                        ? onVegStatusHelpClick
-                        : null,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   SizedBox(
                       width: double.infinity,
                       child: Text(
                           context.strings.display_product_page_ingredients,
                           style: TextStyles.normalBold)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   SizedBox(
                       width: double.infinity,
                       child: Text(product.ingredientsText!,
                           style: TextStyles.normal)),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                 ])),
             if (haveIngredientsAnalysis())
               Column(children: [
                 Padding(
-                    padding: EdgeInsets.only(left: 24, right: 24),
+                    padding: const EdgeInsets.only(left: 24, right: 24),
                     child: Row(children: [
                       Text(
                           context.strings
@@ -132,26 +133,26 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           style: TextStyles.normalBold),
                       InfoButtonPlante(onTap: showVegStatusesExplanation)
                     ])),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ingredientsAnalysisTable()
               ]),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             InkWell(
+              onTap: onReportClick,
               child: Padding(
-                padding: EdgeInsets.only(top: 8, bottom: 8),
+                padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  SvgPicture.asset("assets/report.svg"),
-                  SizedBox(width: 16),
+                  SvgPicture.asset('assets/report.svg'),
+                  const SizedBox(width: 16),
                   Text(context.strings.display_product_page_report_btn,
                       style: TextStyles.normal),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   // Invisible SVG for symmetry
-                  SvgPicture.asset("assets/report.svg",
+                  SvgPicture.asset('assets/report.svg',
                       color: Colors.transparent),
                 ]),
               ),
-              onTap: onReportClick,
             )
           ]),
         ]))));
@@ -166,7 +167,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       context,
       MaterialPageRoute(
           builder: (context) => InitProductPage(product,
-                  key: Key("init_product_page"),
+                  key: const Key('init_product_page'),
                   title: context
                       .strings.display_product_page_help_with_veg_statuses,
                   productUpdatedCallback: (product) {
@@ -179,7 +180,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   }
 
   VegStatusSource vegStatusSource() {
-    var source;
+    VegStatusSource? source;
     if (user.eatsVeggiesOnly ?? true) {
       source = product.veganStatusSource;
     } else {
@@ -194,15 +195,15 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   Widget vegStatusSourceIcon(VegStatusSource vegStatusSource) {
     switch (vegStatusSource) {
       case VegStatusSource.open_food_facts:
-        return SvgPicture.asset("assets/veg_status_source_auto.svg");
+        return SvgPicture.asset('assets/veg_status_source_auto.svg');
       case VegStatusSource.community:
-        return SvgPicture.asset("assets/veg_status_source_community.svg");
+        return SvgPicture.asset('assets/veg_status_source_community.svg');
       case VegStatusSource.moderator:
-        return SvgPicture.asset("assets/veg_status_source_moderator.svg");
+        return SvgPicture.asset('assets/veg_status_source_moderator.svg');
       case VegStatusSource.unknown:
-        return SvgPicture.asset("assets/veg_status_source_community.svg");
+        return SvgPicture.asset('assets/veg_status_source_community.svg');
       default:
-        throw Exception("Unhandled veg status source: $vegStatusSource");
+        throw Exception('Unhandled veg status source: $vegStatusSource');
     }
   }
 
@@ -212,10 +213,10 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
   Widget ingredientsAnalysisTable() {
     final rows = <TableRow>[];
-    final rowHeight = 30.0;
+    const rowHeight = 30.0;
 
-    final colorGrey = Color(0xFFF6F7FA);
-    final colorWhite = Colors.white;
+    const colorGrey = Color(0xFFF6F7FA);
+    const colorWhite = Colors.white;
     bool nextColorGrey = true;
     final nextColor = () {
       final nextColorVal = nextColorGrey ? colorGrey : colorWhite;
@@ -230,25 +231,25 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     };
 
     rows.add(TableRow(children: [
-      SizedBox(width: 24),
+      const SizedBox(width: 24),
       center(Text(context.strings.display_product_page_table_column1,
           style: TextStyles.normalBold)),
       center(Text(context.strings.display_product_page_table_column2,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyles.normalBold)),
-      SizedBox(width: 12),
+      const SizedBox(width: 12),
       center(Text(context.strings.display_product_page_table_column3,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyles.normalBold)),
-      SizedBox(width: 24),
+      const SizedBox(width: 24),
     ], decoration: BoxDecoration(color: nextColor())));
     final ingredients = product.ingredientsAnalyzed!;
     for (final ingredient in ingredients) {
       rows.add(TableRow(
         children: <Widget>[
-          SizedBox(width: 24),
+          const SizedBox(width: 24),
           center(Text(ingredient.name,
               style: TextStyles.normal,
               maxLines: 1,
@@ -257,18 +258,18 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           center(Text(vegStatusText(ingredient.veganStatus),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
-          SizedBox(width: 24),
+          const SizedBox(width: 24),
         ],
         decoration: BoxDecoration(color: nextColor()),
       ));
     }
     return Table(
-        key: Key("ingredients_analysis_table"),
+        key: const Key('ingredients_analysis_table'),
         children: rows,
         border: TableBorder.all(color: Colors.transparent),
         columnWidths: const <int, TableColumnWidth>{
@@ -293,7 +294,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       case null:
         return context.strings.display_product_page_table_unknown;
       default:
-        throw Exception("Unknown veg status: $vegStatus");
+        throw Exception('Unknown veg status: $vegStatus');
     }
   }
 
@@ -349,9 +350,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
             return DialogPlante(
               title: Text(context.strings.display_product_page_report),
               content: Column(children: [
-                if (loading) CircularProgressIndicator(),
+                if (loading) const CircularProgressIndicator(),
                 InputFieldMultilinePlante(
-                    key: Key("report_text"),
+                    key: const Key('report_text'),
                     maxLines: 5,
                     controller: reportTextController),
               ]),
@@ -372,9 +373,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           TableRow(
             children: <Widget>[
               Text(vegStatusText(VegStatus.positive)),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Padding(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
                       context.strings
                           .display_product_page_veg_status_positive_explanation,
@@ -384,9 +385,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           TableRow(
             children: <Widget>[
               Text(vegStatusText(VegStatus.negative)),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Padding(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
                       context.strings
                           .display_product_page_veg_status_negative_explanation,
@@ -396,9 +397,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           TableRow(
             children: <Widget>[
               Text(vegStatusText(VegStatus.unknown)),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Padding(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Text(
                       context.strings
                           .display_product_page_veg_status_unknown_explanation,
@@ -408,7 +409,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
           TableRow(
             children: <Widget>[
               Text(vegStatusText(VegStatus.possible)),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Text(
                   context.strings
                       .display_product_page_veg_status_possible_explanation,

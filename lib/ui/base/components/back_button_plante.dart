@@ -14,7 +14,7 @@ class BackButtonPlante extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onPressedReally;
+    final VoidCallback? onPressedReally;
     if (onPressed == _popOnClickFakeCallback) {
       onPressedReally = () {
         Navigator.of(context).pop();
@@ -27,8 +27,8 @@ class BackButtonPlante extends StatelessWidget {
         height: 44,
         child: FloatingActionButton(
           backgroundColor: Colors.white,
-          child: SvgPicture.asset("assets/back_arrow.svg"),
           onPressed: onPressedReally,
+          child: SvgPicture.asset('assets/back_arrow.svg'),
         ));
   }
 }

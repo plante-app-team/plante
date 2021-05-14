@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/l10n/strings.dart';
@@ -12,25 +10,28 @@ class AddPhotoButtonPlante extends StatelessWidget {
   final void Function()? onCancelTap;
   final Uri? existingPhoto;
 
-  AddPhotoButtonPlante(
-      {this.keyButton,
+  const AddPhotoButtonPlante(
+      {Key? key,
+      this.keyButton,
       required this.onAddTap,
       required this.onCancelTap,
-      required this.existingPhoto});
+      required this.existingPhoto})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Wrap(children: <Widget>[
       InkWell(
           key: keyButton,
+          onTap: existingPhoto == null ? onAddTap : onCancelTap,
           child: Stack(children: [
-            SvgPicture.asset("assets/camera_frame.svg"),
+            SvgPicture.asset('assets/camera_frame.svg'),
             if (existingPhoto == null)
               Positioned.fill(
                   child: Column(children: [
-                SizedBox(height: 20),
-                SvgPicture.asset("assets/camera.svg"),
-                SizedBox(height: 3),
+                const SizedBox(height: 20),
+                SvgPicture.asset('assets/camera.svg'),
+                const SizedBox(height: 3),
                 Text(context.strings.global_add,
                     style: TextStyles.normalColored),
               ])),
@@ -40,10 +41,9 @@ class AddPhotoButtonPlante extends StatelessWidget {
                 UriImagePlante(existingPhoto!),
                 Align(
                     alignment: Alignment.topRight,
-                    child: SvgPicture.asset("assets/camera_cancel.svg"))
+                    child: SvgPicture.asset('assets/camera_cancel.svg'))
               ]))
-          ]),
-          onTap: existingPhoto == null ? onAddTap : onCancelTap)
+          ])),
     ]);
   }
 }

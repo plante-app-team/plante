@@ -4,11 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 
 class TextStyles {
-  static TextStyle get normal =>
-      GoogleFonts.exo2(color: Color.fromARGB(255, 38, 50, 56), fontSize: 14);
+  static TextStyle get normal => GoogleFonts.exo2(
+      color: const Color.fromARGB(255, 38, 50, 56), fontSize: 14);
 
   static TextStyle get normalBold => GoogleFonts.exo2(
-      color: Color.fromARGB(255, 38, 50, 56),
+      color: const Color.fromARGB(255, 38, 50, 56),
       fontSize: 14,
       fontWeight: FontWeight.bold);
 
@@ -16,19 +16,25 @@ class TextStyles {
       GoogleFonts.exo2(color: ColorsPlante.primary, fontSize: 14);
 
   static TextStyle get headline1 => GoogleFonts.exo2(
-      color: Color(0xFF192123), fontSize: 24, fontWeight: FontWeight.bold);
+      color: const Color(0xFF192123),
+      fontSize: 24,
+      fontWeight: FontWeight.bold);
 
   static TextStyle get headline2 =>
-      GoogleFonts.exo2(color: Color(0xFF192123), fontSize: 18);
+      GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);
 
   static TextStyle get headline3 => GoogleFonts.exo2(
-      color: Color(0xFF231f20), fontSize: 16, fontWeight: FontWeight.bold);
+      color: const Color(0xff231f20),
+      fontSize: 16,
+      fontWeight: FontWeight.bold);
 
   static TextStyle get headline4 => GoogleFonts.exo2(
-      color: Color(0xFF231f20), fontSize: 14, fontWeight: FontWeight.bold);
+      color: const Color(0xFF231f20),
+      fontSize: 14,
+      fontWeight: FontWeight.bold);
 
   static TextStyle get input =>
-      GoogleFonts.exo2(color: Color(0xFF192123), fontSize: 18);
+      GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);
 
   static TextStyle get inputLabel =>
       GoogleFonts.exo2(color: Colors.black, fontSize: 16);
@@ -44,8 +50,8 @@ class TextStyles {
       fontSize: 18,
       fontWeight: FontWeight.bold);
 
-  static TextStyle get branding => TextStyle(
-      fontFamily: "Poppins",
+  static TextStyle get branding => const TextStyle(
+      fontFamily: 'Poppins',
       fontWeight: FontWeight.w500,
       fontSize: 24,
       color: ColorsPlante.primary);

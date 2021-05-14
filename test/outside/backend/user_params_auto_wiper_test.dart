@@ -14,7 +14,7 @@ void main() {
     final backend = MockBackend();
     BackendObserver? observer;
     when(backend.addObserver(any)).thenAnswer((realInvocation) {
-      observer = realInvocation.positionalArguments[0];
+      observer = realInvocation.positionalArguments[0] as BackendObserver?;
     });
     final userParametersController = MockUserParamsController();
     final _ = UserParamsAutoWiper(backend, userParametersController);

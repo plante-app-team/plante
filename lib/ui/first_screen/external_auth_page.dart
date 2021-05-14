@@ -19,7 +19,7 @@ typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
 class ExternalAuthPage extends StatefulWidget {
   final ExternalAuthCallback _callback;
 
-  ExternalAuthPage(this._callback);
+  const ExternalAuthPage(this._callback, {Key? key}) : super(key: key);
 
   @override
   _ExternalAuthPageState createState() => _ExternalAuthPageState(_callback);
@@ -42,18 +42,19 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
               child: SizedBox(
                   width: double.infinity,
                   child: Padding(
-                      padding:
-                          EdgeInsets.only(left: 24, right: 24, bottom: 132),
+                      padding: const EdgeInsets.only(
+                          left: 24, right: 24, bottom: 132),
                       child: Text(
                           context.strings.external_auth_page_continue_with,
                           style: TextStyles.headline1)))),
           Center(
               child: Padding(
-                  padding: EdgeInsets.only(left: 24, right: 24),
+                  padding: const EdgeInsets.only(left: 24, right: 24),
                   child: ButtonOutlinedPlante(
+                      onPressed: !_loading ? _onGoogleAuthClicked : null,
                       child: Stack(children: [
                         Container(
-                            padding: EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.only(left: 8),
                             child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -61,37 +62,39 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
                                       width: 24,
                                       height: 24,
                                       child: SvgPicture.asset(
-                                          "assets/google_icon.svg")),
+                                          'assets/google_icon.svg')),
                                 ])),
                         SizedBox(
                             width: double.infinity,
                             height: double.infinity,
                             child: Center(
-                                child: Text("Google",
+                                child: Text('Google',
                                     style: GoogleFonts.exo2(
                                         color: ColorsPlante.primary,
                                         fontSize: 18))))
-                      ]),
-                      onPressed: !_loading ? _onGoogleAuthClicked : null))),
+                      ])))),
           Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                  padding: EdgeInsets.only(bottom: 108),
+                  padding: const EdgeInsets.only(bottom: 108),
                   child: InkWell(
-                      child: Text(
-                          context.strings.external_auth_page_privacy_policy,
-                          style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline)),
-                      onTap: () {
-                        launch(PRIVACY_POLICY_URL);
-                      }))),
+                    onTap: () {
+                      launch(PRIVACY_POLICY_URL);
+                    },
+                    child: Text(
+                        context.strings.external_auth_page_privacy_policy,
+                        style: const TextStyle(
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline)),
+                  ))),
           AnimatedSwitcher(
-              duration: Duration(milliseconds: 250),
-              child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
-          InkWell(
-              child: SizedBox(width: 50, height: 50),
-              onTap: Log.startLogsSending)
+              duration: const Duration(milliseconds: 250),
+              child: _loading
+                  ? const LinearProgressIndicator()
+                  : const SizedBox.shrink()),
+          const InkWell(
+              onTap: Log.startLogsSending,
+              child: SizedBox(width: 50, height: 50)),
         ]),
       )
     ])));
@@ -105,7 +108,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
 
       final googleAccount = await GetIt.I.get<GoogleAuthorizer>().auth();
       if (googleAccount == null) {
-        Log.w("ExternalAuthPage: googleAccount == null");
+        Log.w('ExternalAuthPage: googleAccount == null');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(context.strings.global_something_went_wrong)));
         return;
@@ -126,7 +129,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
         return;
       }
 
-      _callback.call(loginResult.unwrap());
+      await _callback.call(loginResult.unwrap());
     } finally {
       setState(() {
         _loading = false;

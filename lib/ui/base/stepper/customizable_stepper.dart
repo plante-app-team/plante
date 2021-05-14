@@ -6,6 +6,7 @@ import 'package:plante/ui/base/stepper/_indicators_top.dart';
 import 'package:plante/ui/base/stepper/functions.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 
+// ignore: always_use_package_imports
 import '_default_subwidgets.dart';
 
 class CustomizableStepperController {
@@ -51,7 +52,8 @@ class CustomizableStepper extends StatelessWidget {
   final BackButtonWrapperController _backButtonController;
 
   CustomizableStepper(
-      {required List<StepperPage> pages,
+      {Key? key,
+      required List<StepperPage> pages,
       required CustomizableStepperController controller,
       PageIndicatorMaker pageIndicatorMaker = defaultIndicatorMaker,
       DividerMaker dividerMaker = defaultDividerMaker,
@@ -65,10 +67,11 @@ class CustomizableStepper extends StatelessWidget {
         _pageViewController =
             PageController(initialPage: controller._activePage),
         _indicatorController = controller._indicatorsController,
-        _backButtonController = controller._backButtonController {
+        _backButtonController = controller._backButtonController,
+        super(key: key) {
     _controller._stepForwardFn = () => _setPage(_controller._activePage + 1);
     _controller._stepBackwardFn = () => _setPage(_controller._activePage - 1);
-    _controller._setPageFunction = (int page) => _setPage(page);
+    _controller._setPageFunction = _setPage;
     final backButton = backButtonMaker.call(() {
       controller.stepBackward();
     });
@@ -80,12 +83,12 @@ class CustomizableStepper extends StatelessWidget {
       // and it has a shadow.
       // To avoid BackButtonPlante being cut, we add paddings around it.
       _backButton = Padding(
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
               left: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS,
               right: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS),
           child: Center(child: Wrap(children: [backButton])));
     } else {
-      _backButton = SizedBox.shrink();
+      _backButton = const SizedBox.shrink();
     }
     _backButtonHeaderPadding = 0;
     _backButtonController.setButtonShown(_controller._activePage > 0);
@@ -97,7 +100,7 @@ class CustomizableStepper extends StatelessWidget {
     }
     // NOTE: no 'await'
     _pageViewController.animateToPage(page,
-        duration: Duration(milliseconds: 250), curve: Curves.easeIn);
+        duration: const Duration(milliseconds: 250), curve: Curves.easeIn);
     _indicatorController.setPage(page);
     _backButtonController.setButtonShown(page > 0);
     _controller._activePage = page;
@@ -110,10 +113,18 @@ class CustomizableStepper extends StatelessWidget {
         right: _contentPadding.right,
         bottom: _contentPadding.bottom);
     final pages = _pages
-        .map((page) => Container(child: page, padding: pagesPadding))
+        .map((page) => Container(padding: pagesPadding, child: page))
         .toList();
 
     return WillPopScope(
+        onWillPop: () async {
+          if (_controller._activePage == 0) {
+            return true;
+          } else {
+            _controller.stepBackward();
+            return false;
+          }
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           verticalDirection: VerticalDirection.down,
@@ -127,20 +138,12 @@ class CustomizableStepper extends StatelessWidget {
             Expanded(
                 child: PageView(
               controller: _pageViewController,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.horizontal,
               children: pages,
             )), // Container with a label
           ],
-        ),
-        onWillPop: () async {
-          if (_controller._activePage == 0) {
-            return true;
-          } else {
-            _controller.stepBackward();
-            return false;
-          }
-        });
+        ));
   }
 }
 

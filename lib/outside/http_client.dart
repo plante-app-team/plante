@@ -12,9 +12,10 @@ class HttpClient extends BaseClient {
     return _realClient.send(request);
   }
 
+  @override
   void close() => _realClient.close();
 
   void _logRequest(BaseRequest request) {
-    Log.i("HttpClient request: ${request.url.toString()}");
+    Log.i('HttpClient request: ${request.url.toString()}');
   }
 }

@@ -49,8 +49,8 @@ class Backend {
     // Register
 
     final deviceId = (await DeviceInfo.get()).deviceID;
-    var response = await _backendGet("register_user/",
-        {"googleIdToken": googleIdToken, "deviceId": deviceId});
+    var response = await _backendGet('register_user/',
+        {'googleIdToken': googleIdToken, 'deviceId': deviceId});
     if (response.isError) {
       return Err(_errFromResp(response));
     }
@@ -62,7 +62,7 @@ class Backend {
 
     if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
-      Log.i("Backend: user registered: ${userParams.toString()}");
+      Log.i('Backend: user registered: ${userParams.toString()}');
       return Ok(userParams);
     }
     if (_errFromJson(json).errorKind != BackendErrorKind.ALREADY_REGISTERED) {
@@ -72,7 +72,7 @@ class Backend {
     // Login
 
     response = await _backendGet(
-        "login_user/", {"googleIdToken": googleIdToken, "deviceId": deviceId});
+        'login_user/', {'googleIdToken': googleIdToken, 'deviceId': deviceId});
     if (response.isError) {
       return Err(_errFromResp(response));
     }
@@ -84,7 +84,7 @@ class Backend {
 
     if (!_isError(json)) {
       final userParams = UserParams.fromJson(json)!;
-      Log.i("Backend: user logged in: ${userParams.toString()}");
+      Log.i('Backend: user logged in: ${userParams.toString()}');
       return Ok(userParams);
     } else {
       return Err(_errFromJson(json));
@@ -93,30 +93,30 @@ class Backend {
 
   Future<Result<bool, BackendError>> updateUserParams(UserParams userParams,
       {String? backendClientTokenOverride}) async {
-    final params = Map<String, String>();
+    final params = <String, String>{};
     if (userParams.name != null && userParams.name!.isNotEmpty) {
-      params["name"] = userParams.name!;
+      params['name'] = userParams.name!;
     }
     if (userParams.gender != null) {
-      params["gender"] = userParams.gender!.name;
+      params['gender'] = userParams.gender!.name;
     }
     if (userParams.birthday != null) {
-      params["birthday"] = userParams.birthdayStr!;
+      params['birthday'] = userParams.birthdayStr!;
     }
     if (userParams.eatsMilk != null) {
-      params["eatsMilk"] = userParams.eatsMilk!.toString();
+      params['eatsMilk'] = userParams.eatsMilk!.toString();
     }
     if (userParams.eatsEggs != null) {
-      params["eatsEggs"] = userParams.eatsEggs!.toString();
+      params['eatsEggs'] = userParams.eatsEggs!.toString();
     }
     if (userParams.eatsHoney != null) {
-      params["eatsHoney"] = userParams.eatsHoney!.toString();
+      params['eatsHoney'] = userParams.eatsHoney!.toString();
     }
     if (params.isEmpty) {
       return Ok(false);
     }
 
-    var response = await _backendGet("update_user_data/", params,
+    final response = await _backendGet('update_user_data/', params,
         backendClientTokenOverride: backendClientTokenOverride);
     if (response.isOk) {
       return Ok(true);
@@ -132,7 +132,7 @@ class Backend {
       return Ok(BackendProduct((e) => e.barcode = barcode));
     }
 
-    var response = await _backendGet("product_data/", {"barcode": barcode});
+    final response = await _backendGet('product_data/', {'barcode': barcode});
     if (response.isError) {
       return Err(_errFromResp(response));
     }
@@ -149,7 +149,7 @@ class Backend {
         return Err(error);
       }
     }
-    return Ok(BackendProduct.fromJson(json)!);
+    return Ok(BackendProduct.fromJson(json));
   }
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
@@ -159,36 +159,36 @@ class Backend {
       return Ok(None());
     }
 
-    final params = Map<String, String>();
+    final params = <String, String>{};
     params['barcode'] = barcode;
     if (vegetarianStatus != null) {
-      params["vegetarianStatus"] = vegetarianStatus.name;
+      params['vegetarianStatus'] = vegetarianStatus.name;
     }
     if (veganStatus != null) {
-      params["veganStatus"] = veganStatus.name;
+      params['veganStatus'] = veganStatus.name;
     }
-    var response = await _backendGet("create_update_product/", params);
+    final response = await _backendGet('create_update_product/', params);
     return _noneOrErrorFrom(response);
   }
 
   Future<Result<None, BackendError>> sendReport(
       String barcode, String reportText) async {
-    final params = Map<String, String>();
+    final params = <String, String>{};
     params['barcode'] = barcode;
     params['text'] = reportText;
-    var response = await _backendGet("make_report/", params);
+    final response = await _backendGet('make_report/', params);
     return _noneOrErrorFrom(response);
   }
 
   Future<Result<None, BackendError>> sendProductScan(String barcode) async {
-    final params = Map<String, String>();
+    final params = <String, String>{};
     params['barcode'] = barcode;
-    var response = await _backendGet("product_scan/", params);
+    final response = await _backendGet('product_scan/', params);
     return _noneOrErrorFrom(response);
   }
 
   Future<Result<UserParams, BackendError>> userData() async {
-    final response = await _backendGet("user_data/", {});
+    final response = await _backendGet('user_data/', {});
     if (response.isError) {
       return Err(_errFromResp(response));
     }
@@ -232,11 +232,11 @@ class Backend {
         backendClientTokenOverride ?? userParams?.backendClientToken;
 
     final headersReally =
-        Map<String, String>.from(headers ?? Map<String, String>());
+        Map<String, String>.from(headers ?? <String, String>{});
     if (backendClientToken != null) {
-      headersReally["Authorization"] = "Bearer $backendClientToken";
+      headersReally['Authorization'] = 'Bearer $backendClientToken';
     }
-    final url = Uri.https("$BACKEND_ADDRESS", "/backend/$path", params);
+    final url = Uri.https(BACKEND_ADDRESS, '/backend/$path', params);
     try {
       final httpResponse = await _http.get(url, headers: headersReally);
       return BackendResponse.fromHttpResponse(httpResponse);
@@ -284,7 +284,7 @@ class Backend {
 
 Map<String, dynamic>? _jsonDecodeSafe(String str) {
   try {
-    return jsonDecode(str);
+    return jsonDecode(str) as Map<String, dynamic>?;
   } on FormatException catch (e) {
     Log.w("Backend: couldn't decode safe: %str", ex: e);
     return null;

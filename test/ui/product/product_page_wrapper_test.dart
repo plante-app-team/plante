@@ -24,54 +24,54 @@ void main() {
 
     final userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v
-      ..backendClientToken = "123"
-      ..backendId = "321"
-      ..name = "Bob"
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
       ..eatsEggs = false
       ..eatsMilk = false
       ..eatsHoney = false);
-    userParamsController.setUserParams(user);
+    await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
   });
 
-  testWidgets("init page is shown when product is not filled", (WidgetTester tester) async {
+  testWidgets('init page is shown when product is not filled', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    final initialProduct = Product((v) => v.barcode = "123");
+    final initialProduct = Product((v) => v.barcode = '123');
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsOneWidget);
     expect(find.byType(DisplayProductPage), findsNothing);
   });
 
-  testWidgets("init page is not shown when product is filled", (WidgetTester tester) async {
+  testWidgets('init page is not shown when product is filled', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "name"
+      ..barcode = '123'
+      ..name = 'name'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..ingredientsText = "1, 2, 3"
-      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
+      ..ingredientsText = '1, 2, 3'
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
   });
 
-  testWidgets("init_product_page is not shown when "
-              "veg-statuses are filled by OFF", (WidgetTester tester) async {
+  testWidgets('init_product_page is not shown when '
+              'veg-statuses are filled by OFF', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = Product((v) => v
-      ..barcode = "123"
-      ..name = "name"
+      ..barcode = '123'
+      ..name = 'name'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.open_food_facts // OFF!
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
-      ..ingredientsText = "1, 2, 3"
-      ..imageIngredients = Uri.file(File("./test/assets/img.jpg").absolute.path)
-      ..imageFront = Uri.file(File("./test/assets/img.jpg").absolute.path));
+      ..ingredientsText = '1, 2, 3'
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
     await tester.superPump(ProductPageWrapper(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);

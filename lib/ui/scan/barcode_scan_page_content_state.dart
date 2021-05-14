@@ -35,13 +35,13 @@ abstract class BarcodeScanPageContentState {
 class BarcodeScanPageContentStateNothingScanned
     extends BarcodeScanPageContentState {
   @override
-  String get id => "nothing_scanned";
+  String get id => 'nothing_scanned';
 
   @override
   Widget buildWidget(BuildContext context) {
     return Padding(
         key: Key(id),
-        padding: EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(context.strings.barcode_scan_page_point_camera_at_barcode,
               textAlign: TextAlign.center, style: TextStyles.normal)
@@ -54,16 +54,16 @@ class BarcodeScanPageContentStateSearchingProduct
   final String barcode;
   BarcodeScanPageContentStateSearchingProduct(this.barcode);
   @override
-  String get id => "searching_product";
+  String get id => 'searching_product';
 
   @override
   Widget buildWidget(BuildContext context) {
     return Padding(
         key: Key(id),
-        padding: EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(
-              "${context.strings.barcode_scan_page_searching_product} $barcode",
+              '${context.strings.barcode_scan_page_searching_product} $barcode',
               textAlign: TextAlign.center,
               style: TextStyles.normal)
         ]));
@@ -95,7 +95,7 @@ class BarcodeScanPageContentStateProductFound
       this.product, this.beholder, ProductUpdatedCallback callback)
       : super(callback);
   @override
-  String get id => "product_found";
+  String get id => 'product_found';
   @override
   Product get productWithUnknownState => product;
 
@@ -103,7 +103,7 @@ class BarcodeScanPageContentStateProductFound
   Widget buildWidget(BuildContext context) {
     return Center(
         child: Padding(
-            padding: EdgeInsets.only(left: 16, right: 16, bottom: 48),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 48),
             child: ProductCard(
                 product: product,
                 beholder: beholder,
@@ -120,7 +120,7 @@ class BarcodeScanPageContentStateProductNotFound
       this.partialProduct, ProductUpdatedCallback callback)
       : super(callback);
   @override
-  String get id => "not_found_product";
+  String get id => 'not_found_product';
   @override
   Product get productWithUnknownState => partialProduct;
 
@@ -128,11 +128,11 @@ class BarcodeScanPageContentStateProductNotFound
   Widget buildWidget(BuildContext context) {
     return Padding(
         key: Key(id),
-        padding: EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(context.strings.barcode_scan_page_product_not_found,
               textAlign: TextAlign.center, style: TextStyles.headline2),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ButtonFilledPlante.withText(
@@ -150,17 +150,17 @@ class BarcodeScanPageContentStateNoPermission
 
   BarcodeScanPageContentStateNoPermission(this.requestPermission);
   @override
-  String get id => "no_permission";
+  String get id => 'no_permission';
 
   @override
   Widget buildWidget(BuildContext context) {
     return Padding(
         key: Key(id),
-        padding: EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(context.strings.barcode_scan_page_camera_permission_reasoning,
               textAlign: TextAlign.center, style: TextStyles.headline2),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ButtonFilledPlante.withText(
@@ -176,20 +176,20 @@ class BarcodeScanPageContentStateCannotAskPermission
   final VoidCallback openAppSettingsCallback;
   BarcodeScanPageContentStateCannotAskPermission(this.openAppSettingsCallback);
   @override
-  String get id => "cannot_ask_permission";
+  String get id => 'cannot_ask_permission';
 
   @override
   Widget buildWidget(BuildContext context) {
     return Padding(
         key: Key(id),
-        padding: EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(
               context.strings
                   .barcode_scan_page_camera_permission_reasoning_settings,
               textAlign: TextAlign.center,
               style: TextStyles.headline2),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
             child: ButtonFilledPlante.withText(

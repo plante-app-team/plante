@@ -3,13 +3,13 @@ import 'package:plante/ui/main/feed/feed_page.dart';
 import 'package:plante/ui/main/map/map_page.dart';
 
 class MainPage extends StatefulWidget {
-  MainPage({Key? key}) : super(key: key);
+  const MainPage({Key? key}) : super(key: key);
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  var _selectedPage = 0;
+  final _selectedPage = 0;
   final _pageOptions = [
     FeedPage(),
     MapPage(),

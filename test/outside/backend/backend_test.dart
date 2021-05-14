@@ -27,17 +27,17 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
 
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "user_id": "123",
         "client_token": "321"
       }
-    """);
+    ''');
 
-    final result = await backend.loginOrRegister("google ID");
+    final result = await backend.loginOrRegister('google ID');
     final expectedParams = UserParams((v) => v
-      ..backendId = "123"
-      ..backendClientToken = "321");
+      ..backendId = '123'
+      ..backendClientToken = '321');
     expect(result.unwrap(), equals(expectedParams));
   });
 
@@ -46,22 +46,22 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
 
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
       }
-    """);
-    httpClient.setResponse(".*login_user.*", """
+    ''');
+    httpClient.setResponse('.*login_user.*', '''
       {
         "user_id": "123",
         "client_token": "321"
       }
-    """);
+    ''');
 
-    final result = await backend.loginOrRegister("google ID");
+    final result = await backend.loginOrRegister('google ID');
     final expectedParams = UserParams((v) => v
-      ..backendId = "123"
-      ..backendClientToken = "321");
+      ..backendId = '123'
+      ..backendClientToken = '321');
     expect(result.unwrap(), equals(expectedParams));
   });
 
@@ -71,23 +71,23 @@ void main() {
     final backend = Backend(userParamsController, httpClient, fakeSettings);
 
     expect(await backend.isLoggedIn(), isFalse);
-    await userParamsController.setUserParams(UserParams((v) => v.backendId = "123"));
+    await userParamsController.setUserParams(UserParams((v) => v.backendId = '123'));
     expect(await backend.isLoggedIn(), isFalse);
-    await userParamsController.setUserParams(UserParams((v) => v.backendClientToken = "321"));
+    await userParamsController.setUserParams(UserParams((v) => v.backendClientToken = '321'));
     expect(await backend.isLoggedIn(), isTrue);
   });
 
   test('login when already logged in', () async {
     final httpClient = FakeHttpClient();
     final existingParams = UserParams((v) => v
-      ..backendId = "123"
-      ..backendClientToken = "321"
-      ..name = "Bob");
+      ..backendId = '123'
+      ..backendClientToken = '321'
+      ..name = 'Bob');
     final userParamsController = FakeUserParamsController();
     await userParamsController.setUserParams(existingParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    final result = await backend.loginOrRegister("google ID");
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrap(), equals(existingParams));
   });
 
@@ -96,13 +96,13 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
 
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "google_email_not_verified"
       }
-    """);
+    ''');
 
-    final result = await backend.loginOrRegister("google ID");
+    final result = await backend.loginOrRegister('google ID');
     expect(
         result.unwrapErr().errorKind, equals(
         BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED));
@@ -112,8 +112,8 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", "", responseCode: 500);
-    final result = await backend.loginOrRegister("google ID");
+    httpClient.setResponse('.*register_user.*', '', responseCode: 500);
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -121,8 +121,8 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", "{{{{bad bad bad}");
-    final result = await backend.loginOrRegister("google ID");
+    httpClient.setResponse('.*register_user.*', '{{{{bad bad bad}');
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -130,12 +130,12 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "some_error"
       }
-    """);
-    final result = await backend.loginOrRegister("google ID");
+    ''');
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -143,13 +143,13 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
       }
-    """);
-    httpClient.setResponse(".*login_user.*", "", responseCode: 500);
-    final result = await backend.loginOrRegister("google ID");
+    ''');
+    httpClient.setResponse('.*login_user.*', '', responseCode: 500);
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -157,13 +157,13 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
       }
-    """);
-    httpClient.setResponse(".*login_user.*", "{{{{bad bad bad}");
-    final result = await backend.loginOrRegister("google ID");
+    ''');
+    httpClient.setResponse('.*login_user.*', '{{{{bad bad bad}');
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -171,17 +171,17 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
       }
-    """);
-    httpClient.setResponse(".*login_user.*", """
+    ''');
+    httpClient.setResponse('.*login_user.*', '''
       {
         "error": "some_error"
       }
-    """);
-    final result = await backend.loginOrRegister("google ID");
+    ''');
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -189,8 +189,8 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponseException(".*register_user.*", SocketException(""));
-    final result = await backend.loginOrRegister("google ID");
+    httpClient.setResponseException('.*register_user.*', const SocketException(''));
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
@@ -198,13 +198,13 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
       }
-    """);
-    httpClient.setResponseException(".*register_user.*", SocketException(""));
-    final result = await backend.loginOrRegister("google ID");
+    ''');
+    httpClient.setResponseException('.*register_user.*', const SocketException(''));
+    final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
@@ -215,14 +215,14 @@ void main() {
     final observer = MockBackendObserver();
     backend.addObserver(observer);
 
-    httpClient.setResponse(".*register_user.*", """
+    httpClient.setResponse('.*register_user.*', '''
       {
         "error": "some_error"
       }
-    """);
+    ''');
 
     verifyNever(observer.onBackendError(any));
-    await backend.loginOrRegister("google ID");
+    await backend.loginOrRegister('google ID');
     verify(observer.onBackendError(any));
   });
 
@@ -230,87 +230,87 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*update_user_data.*", """ { "result": "ok" } """);
+    httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
     final updatedParams = initialParams.rebuild((v) => v
-      ..name = "Jack"
-      ..genderStr = "male"
-      ..birthdayStr = "20.07.1993"
+      ..name = 'Jack'
+      ..genderStr = 'male'
+      ..birthdayStr = '20.07.1993'
       ..eatsMilk = false
       ..eatsEggs = false
       ..eatsHoney = true);
     final result = await backend.updateUserParams(updatedParams);
     expect(result.isOk, isTrue);
 
-    final requests = httpClient.getRequestsMatching(".*update_user_data.*");
+    final requests = httpClient.getRequestsMatching('.*update_user_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
 
-    expect(request.url.queryParameters["name"], equals("Jack"));
-    expect(request.url.queryParameters["gender"], equals("male"));
-    expect(request.url.queryParameters["birthday"], equals("20.07.1993"));
-    expect(request.url.queryParameters["eatsMilk"], equals("false"));
-    expect(request.url.queryParameters["eatsEggs"], equals("false"));
-    expect(request.url.queryParameters["eatsHoney"], equals("true"));
+    expect(request.url.queryParameters['name'], equals('Jack'));
+    expect(request.url.queryParameters['gender'], equals('male'));
+    expect(request.url.queryParameters['birthday'], equals('20.07.1993'));
+    expect(request.url.queryParameters['eatsMilk'], equals('false'));
+    expect(request.url.queryParameters['eatsEggs'], equals('false'));
+    expect(request.url.queryParameters['eatsHoney'], equals('true'));
   });
 
   test('update user params has client token', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "my_token");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'my_token');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*update_user_data.*", """ { "result": "ok" } """);
+    httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
-    await backend.updateUserParams(initialParams.rebuild((v) => v.name = "Nora"));
-    final request = httpClient.getRequestsMatching(".*update_user_data.*")[0];
+    await backend.updateUserParams(initialParams.rebuild((v) => v.name = 'Nora'));
+    final request = httpClient.getRequestsMatching('.*update_user_data.*')[0];
 
-    expect(request.headers["Authorization"], equals("Bearer my_token"));
+    expect(request.headers['Authorization'], equals('Bearer my_token'));
   });
 
   test('update user params when not authorized', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*update_user_data.*", """ { "result": "ok" } """);
+    httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
-    await backend.updateUserParams(initialParams.rebuild((v) => v.name = "Nora"));
-    final request = httpClient.getRequestsMatching(".*update_user_data.*")[0];
+    await backend.updateUserParams(initialParams.rebuild((v) => v.name = 'Nora'));
+    final request = httpClient.getRequestsMatching('.*update_user_data.*')[0];
 
-    expect(request.headers["Authorization"], equals(null));
+    expect(request.headers['Authorization'], equals(null));
   });
 
   test('update user params network error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponseException(".*update_user_data.*", HttpException(""));
+    httpClient.setResponseException('.*update_user_data.*', const HttpException(''));
 
     final updatedParams = initialParams.rebuild((v) => v
-      ..name = "Jack"
-      ..genderStr = "male"
-      ..birthdayStr = "20.07.1993");
+      ..name = 'Jack'
+      ..genderStr = 'male'
+      ..birthdayStr = '20.07.1993');
     final result = await backend.updateUserParams(updatedParams);
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
@@ -319,13 +319,13 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*product_data.*", """
+    httpClient.setResponse('.*product_data.*', '''
      {
        "barcode": "123",
        "vegetarian_status": "${VegStatus.positive.name}",
@@ -333,41 +333,41 @@ void main() {
        "vegan_status": "${VegStatus.negative.name}",
        "vegan_status_source": "${VegStatusSource.moderator.name}"
      }
-      """);
+      ''');
 
-    final result = await backend.requestProduct("123");
+    final result = await backend.requestProduct('123');
     final product = result.unwrap();
     final expectedProduct = BackendProduct((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..vegetarianStatus = VegStatus.positive.name
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
     expect(product, equals(expectedProduct));
 
-    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    final requests = httpClient.getRequestsMatching('.*product_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('request product not found', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*product_data.*", """
+    httpClient.setResponse('.*product_data.*', '''
      {
        "error": "product_not_found"
      }
-      """);
+      ''');
 
-    final result = await backend.requestProduct("123");
+    final result = await backend.requestProduct('123');
     final product = result.unwrap();
     expect(product, isNull);
   });
@@ -376,34 +376,34 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*product_data.*", "", responseCode: 500);
+    httpClient.setResponse('.*product_data.*', '', responseCode: 500);
 
-    final result = await backend.requestProduct("123");
+    final result = await backend.requestProduct('123');
     expect(result.isErr, isTrue);
 
-    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    final requests = httpClient.getRequestsMatching('.*product_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('request product invalid JSON', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*product_data.*", """
+    httpClient.setResponse('.*product_data.*', '''
      {{{{{{{{{{{{
        "barcode": "123",
        "vegetarian_status": "${VegStatus.positive.name}",
@@ -411,30 +411,30 @@ void main() {
        "vegan_status": "${VegStatus.negative.name}",
        "vegan_status_source": "${VegStatusSource.moderator.name}"
      }
-      """);
+      ''');
 
-    final result = await backend.requestProduct("123");
+    final result = await backend.requestProduct('123');
     expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
 
-    final requests = httpClient.getRequestsMatching(".*product_data.*");
+    final requests = httpClient.getRequestsMatching('.*product_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('request product network exception', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponseException(".*product_data.*", SocketException(""));
+    httpClient.setResponseException('.*product_data.*', const SocketException(''));
 
-    final result = await backend.requestProduct("123");
+    final result = await backend.requestProduct('123');
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
@@ -442,110 +442,110 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*create_update_product.*",
-        """ { "result": "ok" } """);
+        '.*create_update_product.*',
+        ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
     expect(result.isOk, isTrue);
 
-    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    final requests = httpClient.getRequestsMatching('.*create_update_product.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(
-        request.url.queryParameters["vegetarianStatus"],
+        request.url.queryParameters['vegetarianStatus'],
         equals(VegStatus.positive.name));
     expect(
-        request.url.queryParameters["veganStatus"],
+        request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('create update product vegetarian status only', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*create_update_product.*",
-        """ { "result": "ok" } """);
+        '.*create_update_product.*',
+        ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         vegetarianStatus: VegStatus.positive);
     expect(result.isOk, isTrue);
 
-    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    final requests = httpClient.getRequestsMatching('.*create_update_product.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(
-        request.url.queryParameters["vegetarianStatus"],
+        request.url.queryParameters['vegetarianStatus'],
         equals(VegStatus.positive.name));
     expect(
-        request.url.queryParameters["veganStatus"],
+        request.url.queryParameters['veganStatus'],
         isNull);
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('create update product vegan status only', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*create_update_product.*",
-        """ { "result": "ok" } """);
+        '.*create_update_product.*',
+        ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         veganStatus: VegStatus.negative);
     expect(result.isOk, isTrue);
 
-    final requests = httpClient.getRequestsMatching(".*create_update_product.*");
+    final requests = httpClient.getRequestsMatching('.*create_update_product.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(
-        request.url.queryParameters["vegetarianStatus"],
+        request.url.queryParameters['vegetarianStatus'],
         isNull);
     expect(
-        request.url.queryParameters["veganStatus"],
+        request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
-    expect(request.headers["Authorization"], equals("Bearer aaa"));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('create update product http error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*create_update_product.*", "", responseCode: 500);
+    httpClient.setResponse('.*create_update_product.*', '', responseCode: 500);
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
     expect(result.isErr, isTrue);
@@ -555,16 +555,16 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse(".*create_update_product.*", "{{{{}");
+    httpClient.setResponse('.*create_update_product.*', '{{{{}');
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
     expect(result.isErr, isTrue);
@@ -574,17 +574,17 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException(
-        ".*create_update_product.*", SocketException(""));
+        '.*create_update_product.*', const SocketException(''));
 
     final result = await backend.createUpdateProduct(
-        "123",
+        '123',
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative);
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
@@ -594,18 +594,18 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*make_report.*",
-        """ { "result": "ok" } """);
+        '.*make_report.*',
+        ''' { "result": "ok" } ''');
 
     final result = await backend.sendReport(
-        "123",
+        '123',
         "that's a baaaad product");
     expect(result.isOk, isTrue);
   });
@@ -614,16 +614,16 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
-    httpClient.setResponseException(".*make_report.*", SocketException(""));
+    httpClient.setResponseException('.*make_report.*', const SocketException(''));
 
     final result = await backend.sendReport(
-        "123",
+        '123',
         "that's a baaaad product");
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
@@ -632,40 +632,40 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*user_data.*",
-        """ { "name": "Bob Kelso", "user_id": "123" } """);
+        '.*user_data.*',
+        ''' { "name": "Bob Kelso", "user_id": "123" } ''');
 
     final result = await backend.userData();
     expect(result.isOk, isTrue);
 
     final obtainedParams = result.unwrap();
-    expect(obtainedParams.name, equals("Bob Kelso"));
-    expect(obtainedParams.backendId, equals("123"));
+    expect(obtainedParams.name, equals('Bob Kelso'));
+    expect(obtainedParams.backendId, equals('123'));
     // NOTE: client token was not present in the response, but
     // the Backend class knows the token and can set it.
-    expect(obtainedParams.backendClientToken, equals("aaa"));
+    expect(obtainedParams.backendClientToken, equals('aaa'));
   });
 
   test('user data obtaining invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse(
-        ".*user_data.*",
-        """ {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } """);
+        '.*user_data.*',
+        ''' {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } ''');
 
     final result = await backend.userData();
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
@@ -675,14 +675,14 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
-      ..backendId = "123"
-      ..name = "Bob"
-      ..backendClientToken = "aaa");
-    userParamsController.setUserParams(initialParams);
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException(
-        ".*user_data.*", SocketException(""));
+        '.*user_data.*', const SocketException(''));
 
     final result = await backend.userData();
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));

@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 class GeneralDateInputFormatter extends TextInputFormatter {
   final int _startYear;
   final int _endYear;
-  var _lastValidText = TextEditingValue();
+  var _lastValidText = const TextEditingValue();
 
   GeneralDateInputFormatter(this._startYear, this._endYear);
 
@@ -38,7 +38,7 @@ class GeneralDateInputFormatter extends TextInputFormatter {
       return true;
     }
 
-    final divider = '.';
+    const divider = '.';
 
     // Day
     final firstDividerIndex = text.indexOf(divider);
@@ -115,11 +115,11 @@ class GeneralDateInputFormatter extends TextInputFormatter {
 
     // Let's check if the value IS or CAN be greater than min
     final maxStr = max.toString();
-    var possibleMaxValueStr = substr;
+    final possibleMaxValueStr = StringBuffer(substr);
     while (possibleMaxValueStr.length < maxStr.length) {
-      possibleMaxValueStr += "9";
+      possibleMaxValueStr.write('9');
     }
-    final possibleMaxValue = int.tryParse(possibleMaxValueStr);
+    final possibleMaxValue = int.tryParse(possibleMaxValueStr.toString());
     if (possibleMaxValue == null) {
       return false;
     }
@@ -138,7 +138,7 @@ class GeneralDateInputFormatter extends TextInputFormatter {
       final minStr = min.toString();
       while (possibleMinValue! < min &&
           possibleMinValueStr.length < minStr.length) {
-        possibleMinValue = int.parse(possibleMinValue.toString() + "0");
+        possibleMinValue = int.parse('${possibleMinValue}0');
         possibleMinValueStr = possibleMinValue.toString();
       }
       if (max < possibleMinValue) {

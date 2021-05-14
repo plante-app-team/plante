@@ -9,13 +9,13 @@ void main() {
 
   test('veg statuses when analysis not available', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed = null);
     expect(productWithNull.vegetarianStatusAnalysis, isNull);
     expect(productWithNull.veganStatusAnalysis, isNull);
 
     final productWithEmptyAnalysis = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([]));
     expect(productWithEmptyAnalysis.vegetarianStatusAnalysis, isNull);
     expect(productWithEmptyAnalysis.veganStatusAnalysis, isNull);
@@ -23,16 +23,16 @@ void main() {
 
   test('vegetarian status positive', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..vegetarianStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
       ]));
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.positive);
@@ -43,16 +43,16 @@ void main() {
 
   test('vegetarian status possible', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..vegetarianStatus = VegStatus.possible),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
       ]));
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.possible);
@@ -63,16 +63,16 @@ void main() {
 
   test('vegetarian status unknown', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..vegetarianStatus = VegStatus.possible),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.unknown),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
       ]));
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.unknown);
@@ -83,16 +83,16 @@ void main() {
 
   test('vegetarian status negative', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..vegetarianStatus = VegStatus.negative),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.unknown),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
       ]));
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.negative);
@@ -103,16 +103,16 @@ void main() {
 
   test('vegan status positive', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.positive)
       ]));
     expect(productWithNull.veganStatusAnalysis, VegStatus.positive);
@@ -123,16 +123,16 @@ void main() {
 
   test('vegan status possible', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.possible),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.positive)
       ]));
     expect(productWithNull.veganStatusAnalysis, VegStatus.possible);
@@ -143,16 +143,16 @@ void main() {
 
   test('vegan status unknown', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.possible),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.unknown)
       ]));
     expect(productWithNull.veganStatusAnalysis, VegStatus.unknown);
@@ -163,16 +163,16 @@ void main() {
 
   test('vegan status negative', () async {
     final productWithNull = Product((v) => v
-      ..barcode = "123"
+      ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = "ingr1"
+          ..name = 'ingr1'
           ..veganStatus = VegStatus.negative),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.possible),
         Ingredient((v) => v
-          ..name = "ingr2"
+          ..name = 'ingr2'
           ..veganStatus = VegStatus.unknown)
       ]));
     expect(productWithNull.veganStatusAnalysis, VegStatus.negative);

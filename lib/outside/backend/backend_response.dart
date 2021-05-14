@@ -19,16 +19,14 @@ class BackendResponse {
         body = response.body,
         headers = response.headers,
         exception = null;
-  BackendResponse.fromError(dynamic exception, Uri requestUrl)
-      : requestUrl = requestUrl,
-        statusCode = null,
+  BackendResponse.fromError(this.exception, this.requestUrl)
+      : statusCode = null,
         reasonPhrase = null,
-        body = "",
-        headers = {},
-        exception = exception {
+        body = '',
+        headers = {} {
     Log.w(
-        "BackendResponse.fromError, url: ${requestUrl.toString()}, "
-        "e: $exception",
+        'BackendResponse.fromError, url: ${requestUrl.toString()}, '
+        'e: $exception',
         ex: exception);
   }
 }

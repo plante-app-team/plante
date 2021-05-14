@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 class InfoButtonPlante extends StatelessWidget {
   final void Function() onTap;
 
-  InfoButtonPlante({Key? key, required this.onTap}) : super(key: key);
+  const InfoButtonPlante({Key? key, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +12,9 @@ class InfoButtonPlante extends StatelessWidget {
         width: 34,
         height: 34,
         child: InkWell(
+            onTap: onTap,
             child: Center(
-                child:
-                    Wrap(children: [SvgPicture.asset("assets/info_icon.svg")])),
-            onTap: onTap));
+                child: Wrap(
+                    children: [SvgPicture.asset('assets/info_icon.svg')]))));
   }
 }

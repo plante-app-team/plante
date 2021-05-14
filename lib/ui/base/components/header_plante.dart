@@ -26,11 +26,11 @@ class HeaderPlante extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
         color: color,
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           height: 104 + spacingBottom,
           child: Column(children: [
-            SizedBox(height: 28), // spacing
+            const SizedBox(height: 28), // spacing
             Expanded(
                 child: Stack(children: [
               Align(

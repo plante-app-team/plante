@@ -19,7 +19,7 @@ class _MapPageState extends State<MapPage> {
   final _osm = GetIt.I.get<OpenStreetMap>();
   final _mapController = Completer<GoogleMapController>();
   var _initialRealPositionSet = false;
-  var _supermarketsMarkers = Set<Marker>();
+  var _supermarketsMarkers = <Marker>{};
 
   @override
   void initState() {
@@ -30,17 +30,17 @@ class _MapPageState extends State<MapPage> {
   Future<void> _init() async {
     final lastKnownPosition = await _locationController.lastKnownPosition();
     if (lastKnownPosition != null && !_initialRealPositionSet) {
-      _moveCameraTo(CameraPosition(
+      await _moveCameraTo(CameraPosition(
           target:
               LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
           zoom: 15));
       _initialRealPositionSet = true;
     }
 
-    _mapController.future.then((mapController) {
+    await _mapController.future.then((mapController) {
       // We'd like to hide all businesses known to Google Maps because
       // we'll how our own list of shops and we don't want 2 lists to conflict.
-      final noBusinessesStyle = '''
+      const noBusinessesStyle = '''
       [
         {
           "featureType": "poi.business",
@@ -55,7 +55,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _moveCameraTo(CameraPosition position) async {
     final mapController = await _mapController.future;
-    mapController.animateCamera(CameraUpdate.newCameraPosition(position));
+    await mapController.animateCamera(CameraUpdate.newCameraPosition(position));
   }
 
   CameraPosition _initialCameraPosition() {
@@ -67,30 +67,29 @@ class _MapPageState extends State<MapPage> {
               LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
           zoom: 15);
     } else {
-      return CameraPosition(target: LatLng(44.4192543, 38.2052612), zoom: 15);
+      return const CameraPosition(
+          target: LatLng(44.4192543, 38.2052612), zoom: 15);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       body: GoogleMap(
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-        minMaxZoomPreference: MinMaxZoomPreference(13, 19),
+        minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
         mapType: MapType.normal,
         initialCameraPosition: _initialCameraPosition(),
-        onMapCreated: (GoogleMapController controller) {
-          _mapController.complete(controller);
-        },
+        onMapCreated: _mapController.complete,
         onCameraIdle: _obtainSupermarketsMarkers,
         markers: _supermarketsMarkers,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showUser,
         label: Text(context.strings.map_page_btn_where_am_i),
-        icon: Icon(Icons.person),
+        icon: const Icon(Icons.person),
       ),
     );
   }
@@ -105,9 +104,7 @@ class _MapPageState extends State<MapPage> {
     }
 
     var position = await _locationController.lastKnownPosition();
-    if (position == null) {
-      position = await _locationController.currentPosition();
-    }
+    position ??= await _locationController.currentPosition();
     if (position == null) {
       return;
     }
@@ -124,7 +121,7 @@ class _MapPageState extends State<MapPage> {
         Point(viewBounds.northeast.latitude, viewBounds.northeast.longitude),
         Point(viewBounds.southwest.latitude, viewBounds.southwest.longitude));
 
-    final newMarkers = Set<Marker>();
+    final newMarkers = <Marker>{};
     for (final supermarket in supermarkets) {
       newMarkers.add(Marker(
         markerId: MarkerId(supermarket.id),

@@ -6,16 +6,15 @@ class ButtonOutlinedPlante extends StatelessWidget {
   final Widget child;
   final VoidCallback? onPressed;
 
-  ButtonOutlinedPlante({Key? key, required this.child, required this.onPressed})
+  const ButtonOutlinedPlante(
+      {Key? key, required this.child, required this.onPressed})
       : super(key: key);
 
-  ButtonOutlinedPlante.withText(String text,
-      {Key? key, required VoidCallback? onPressed})
+  ButtonOutlinedPlante.withText(String text, {Key? key, this.onPressed})
       : child = Text(text,
             style: onPressed != null
                 ? TextStyles.buttonOutlinedEnabled
                 : TextStyles.buttonOutlinedDisabled),
-        onPressed = onPressed,
         super(key: key);
 
   @override
@@ -23,7 +22,6 @@ class ButtonOutlinedPlante extends StatelessWidget {
     return SizedBox(
         height: 46,
         child: OutlinedButton(
-            child: child,
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
                 overlayColor:
@@ -36,6 +34,7 @@ class ButtonOutlinedPlante extends StatelessWidget {
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)))),
-            onPressed: onPressed));
+            onPressed: onPressed,
+            child: child));
   }
 }

@@ -4,7 +4,7 @@ import 'package:plante/outside/http_client.dart';
 
 class FakeHttpClient extends HttpClient {
   late final MockClient _impl;
-  final _responses = Map<RegExp, _Response>();
+  final _responses = <RegExp, _Response>{};
   final _requests = <http.BaseRequest>[];
 
   FakeHttpClient() {
@@ -14,11 +14,11 @@ class FakeHttpClient extends HttpClient {
           if (response.value.httpResponse != null) {
             return response.value.httpResponse!;
           } else {
-            throw response.value.exception;
+            throw response.value.exception!;
           }
         }
       }
-      return http.Response("", 404);
+      return http.Response('', 404);
     });
   }
 
@@ -27,7 +27,7 @@ class FakeHttpClient extends HttpClient {
         _Response.ok(http.Response(response, responseCode));
   }
 
-  void setResponseException(String regex, dynamic exception) {
+  void setResponseException(String regex, Exception exception) {
     _responses[RegExp(regex)] = _Response.err(exception);
   }
 
@@ -51,7 +51,7 @@ class FakeHttpClient extends HttpClient {
 
 class _Response {
   final http.Response? httpResponse;
-  final dynamic? exception;
+  final Exception? exception;
   _Response.ok(this.httpResponse): exception = null;
   _Response.err(this.exception): httpResponse = null;
 }

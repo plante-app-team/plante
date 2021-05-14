@@ -11,8 +11,8 @@ class UriImagePlante extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final result;
-    if (uri.isScheme("FILE")) {
+    final Image result;
+    if (uri.isScheme('FILE')) {
       result = Image.file(File.fromUri(uri));
     } else {
       result = Image.network(uri.toString(), fit: BoxFit.cover,
@@ -20,7 +20,7 @@ class UriImagePlante extends StatelessWidget {
         if (loadingProgress == null) {
           return child;
         }
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       });
     }
     imageProviderCallback?.call(result.image);

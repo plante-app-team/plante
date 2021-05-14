@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/product.dart';
-import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
-
-import 'barcode_scan_page_content_state.dart';
+import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
 
 enum BarcodeScanPageSearchResult { OK, ERROR_NETWORK, ERROR_OTHER }
 
@@ -94,7 +92,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       if (_foundProduct != null) {
         product = _foundProduct!;
       } else {
-        product = Product((v) => v.barcode = _barcode!);
+        product = Product((v) => v.barcode = _barcode);
       }
       return BarcodeScanPageContentState.productNotFound(
           product, onProductExternalUpdate);

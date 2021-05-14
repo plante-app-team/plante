@@ -46,7 +46,7 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
     }
     try {
       return DateFormat('dd.MM.yyyy').parse(birthdayStr!);
-    } catch (FormatException) {
+    } on FormatException {
       return null;
     }
   }
@@ -61,7 +61,7 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
 
   Map<String, dynamic> toJson() {
     return BuildValueHelper.jsonSerializers
-        .serializeWith(UserParams.serializer, this) as Map<String, dynamic>;
+        .serializeWith(UserParams.serializer, this)! as Map<String, dynamic>;
   }
 
   factory UserParams([void Function(UserParamsBuilder) updates]) = _$UserParams;

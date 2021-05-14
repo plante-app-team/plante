@@ -31,11 +31,9 @@ class Log {
     _debugTree = DebugTree();
     Fimber.plantTree(_debugTree!);
 
-    if (logsDir == null) {
-      logsDir = await logsDirectory();
-    }
+    logsDir ??= await logsDirectory();
     _fileTree =
-        TimedRollingFileTree(filenamePrefix: logsDir.absolute.path + "/log");
+        TimedRollingFileTree(filenamePrefix: '${logsDir.absolute.path}/log');
     Fimber.plantTree(_fileTree!);
 
     if (kReleaseMode) {
@@ -44,7 +42,7 @@ class Log {
     }
 
     // NOTE: it's async but we don't wait for it
-    maybeCleanUpLogs(logsDir, maxSizeBytes);
+    await maybeCleanUpLogs(logsDir, maxSizeBytes);
   }
 
   static Future<void> maybeCleanUpLogs(
@@ -56,10 +54,7 @@ class Log {
     int totalSize = 0;
     final entries =
         await logsDir.list(recursive: true, followLinks: false).toList();
-    final files = entries
-        .where((element) => element is File)
-        .map((e) => e as File)
-        .toList();
+    final files = entries.whereType<File>().toList();
 
     final filesModified = <Pair<File, DateTime>>[];
     for (final file in files) {
@@ -83,12 +78,12 @@ class Log {
 
   static Future<Directory> logsDirectory() async {
     final internalStorage = await getApplicationDocumentsDirectory();
-    return Directory(internalStorage.path + "/logs");
+    return Directory('${internalStorage.path}/logs');
   }
 
   static void startLogsSending() async {
     final logsDir = await logsDirectory();
-    final logsZip = File(logsDir.absolute.path + ".zip");
+    final logsZip = File('${logsDir.absolute.path}.zip');
     if (await logsZip.exists()) {
       await logsZip.delete();
     }
@@ -98,14 +93,14 @@ class Log {
     } catch (e) {
       Log.e("Couldn't create a zip with logs", ex: e);
     }
-    Share.shareFiles([logsZip.path]);
+    await Share.shareFiles([logsZip.path]);
   }
 
   static void v(String message, {dynamic? ex, StackTrace? stacktrace}) {
     if (ex == null) {
       Fimber.v(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.v("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+      Fimber.v('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -113,7 +108,7 @@ class Log {
     if (ex == null) {
       Fimber.d(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.d("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+      Fimber.d('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -121,7 +116,7 @@ class Log {
     if (ex == null) {
       Fimber.i(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.i("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+      Fimber.i('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -129,7 +124,7 @@ class Log {
     if (ex == null) {
       Fimber.w(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.w("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+      Fimber.w('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -149,7 +144,7 @@ class Log {
       if (ex == null) {
         Fimber.e(message, ex: ex, stacktrace: stacktrace);
       } else {
-        Fimber.e("message (ex: $ex)", ex: ex, stacktrace: stacktrace);
+        Fimber.e('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
       }
     } finally {
       if (!crashlyticsAllowed && _crashlyticsTree != null) {
@@ -161,21 +156,21 @@ class Log {
 
 class _CrashlyticsFimberTree extends LogTree {
   @override
-  List<String> getLevels() => ["D", "I", "W", "E", "V"];
+  List<String> getLevels() => ['D', 'I', 'W', 'E', 'V'];
 
   @override
   void log(String level, String message,
-      {String? tag, ex, StackTrace? stacktrace}) {
+      {String? tag, dynamic ex, StackTrace? stacktrace}) {
     logImpl(level, message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   Future<void> logImpl(String level, String message,
-      {String? tag, ex, StackTrace? stacktrace}) async {
-    if (level == "E") {
+      {String? tag, dynamic ex, StackTrace? stacktrace}) async {
+    if (level == 'E') {
       await FirebaseCrashlytics.instance
           .recordError(ex, stacktrace, reason: message, fatal: false);
     } else {
-      await FirebaseCrashlytics.instance.log("Msg: $message, ex: $ex");
+      await FirebaseCrashlytics.instance.log('Msg: $message, ex: $ex');
     }
   }
 }

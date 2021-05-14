@@ -23,18 +23,19 @@ class OpenStreetMap {
         'overpass.openstreetmap.ru', 'api/interpreter', {'data': cmd}));
 
     if (r.statusCode != 200) {
-      Log.w("OSM.fetchShops: ${r.statusCode}, body: ${r.body}");
+      Log.w('OSM.fetchShops: ${r.statusCode}, body: ${r.body}');
       return [];
     }
 
-    final shopsJson = json.decode(utf8.decode(r.bodyBytes));
+    final shopsJson =
+        json.decode(utf8.decode(r.bodyBytes)) as Map<String, dynamic>;
     if (!shopsJson.containsKey('elements')) {
       Log.w("OSM.fetchShops: doesn't have 'elements'. JSON: $shopsJson");
       return [];
     }
 
     final result = <Shop>[];
-    for (var shopJson in shopsJson['elements']) {
+    for (final shopJson in shopsJson['elements']) {
       final shopType = shopJson['tags']?['shop'] as String?;
       final shopName = shopJson['tags']?['name'] as String?;
       if (shopName == null) {

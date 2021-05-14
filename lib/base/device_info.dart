@@ -12,15 +12,15 @@ class DeviceInfo {
   static Future<DeviceInfo> get() async {
     final deviceInfoPlugin = DeviceInfoPlugin();
     if (Platform.isAndroid) {
-      var build = await deviceInfoPlugin.androidInfo;
+      final build = await deviceInfoPlugin.androidInfo;
       return DeviceInfo(build.androidId, build.model, build.version.toString());
     } else if (Platform.isIOS) {
-      var data = await deviceInfoPlugin.iosInfo;
+      final data = await deviceInfoPlugin.iosInfo;
       return DeviceInfo(
           data.identifierForVendor, data.name, data.systemVersion);
     } else {
-      Log.w("DeviceInfo: platform not supported");
-      return DeviceInfo("not supported", "not supported", "not supported");
+      Log.w('DeviceInfo: platform not supported');
+      return DeviceInfo('not supported', 'not supported', 'not supported');
     }
   }
 }

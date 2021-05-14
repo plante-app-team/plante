@@ -19,23 +19,24 @@ class CheckButtonPlante extends StatelessWidget {
     return SizedBox(
         height: 43,
         child: OutlinedButton(
-            child: Text(text,
-                style: checked
-                    ? GoogleFonts.exo2(color: Colors.white, fontSize: 14)
-                    : GoogleFonts.exo2(color: Color(0xFF263238), fontSize: 14)),
             style: ButtonStyle(
                 side: MaterialStateProperty.all<BorderSide>(
-                    BorderSide(style: BorderStyle.none)),
+                    const BorderSide(style: BorderStyle.none)),
                 overlayColor: MaterialStateProperty.all(checked
                     ? ColorsPlante.splashColor
                     : ColorsPlante.primaryDisabled),
                 backgroundColor: MaterialStateProperty.all(
-                    checked ? ColorsPlante.primary : Color(0xFFEBEFEC)),
+                    checked ? ColorsPlante.primary : const Color(0xFFEBEFEC)),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)))),
             onPressed: () {
               onChanged.call(!checked);
-            }));
+            },
+            child: Text(text,
+                style: checked
+                    ? GoogleFonts.exo2(color: Colors.white, fontSize: 14)
+                    : GoogleFonts.exo2(
+                        color: const Color(0xFF263238), fontSize: 14))));
   }
 }

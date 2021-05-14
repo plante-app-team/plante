@@ -25,7 +25,7 @@ class OffApi {
     }
     final result = await off.OpenFoodAPIClient.saveProduct(user, product);
     if (result.error != null) {
-      Log.w("OffApi.saveProduct error: ${result.toJson()}");
+      Log.w('OffApi.saveProduct error: ${result.toJson()}');
     }
     return result;
   }
@@ -36,7 +36,7 @@ class OffApi {
     }
     final result = await off.OpenFoodAPIClient.addProductImage(user, image);
     if (result.error != null) {
-      Log.w("OffApi.addProductImage error: ${result.toJson()}");
+      Log.w('OffApi.addProductImage error: ${result.toJson()}');
     }
     return result;
   }
@@ -49,7 +49,7 @@ class OffApi {
     final result =
         await off.OpenFoodAPIClient.extractIngredients(user, barcode, language);
     if (result.status != 0) {
-      Log.w("OffApi.extractIngredients error: ${result.toJson()}");
+      Log.w('OffApi.extractIngredients error: ${result.toJson()}');
     }
     return result;
   }

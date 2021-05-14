@@ -20,8 +20,10 @@ class CustomizableStepperIndicatorsTop extends StatefulWidget {
   final DividerMaker dividerMaker;
   final int pagesCount;
 
-  CustomizableStepperIndicatorsTop(this.controller, this.pageIndicatorMaker,
-      this.dividerMaker, this.pagesCount);
+  const CustomizableStepperIndicatorsTop(this.controller,
+      this.pageIndicatorMaker, this.dividerMaker, this.pagesCount,
+      {Key? key})
+      : super(key: key);
 
   @override
   _CustomizableStepperIndicatorsTopState createState() =>
@@ -52,9 +54,9 @@ class _CustomizableStepperIndicatorsTopState
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> indicatorsWithDividers = [];
+    final List<Widget> indicatorsWithDividers = [];
     for (int index = 0; index < pagesCount; ++index) {
-      final indicatorState;
+      final PageIndicatorState indicatorState;
       if (index < activePage) {
         indicatorState = PageIndicatorState.PASSED;
       } else if (index == activePage) {

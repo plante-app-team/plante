@@ -27,7 +27,7 @@ class VegStatusSource extends EnumClass {
     try {
       return valueOf(name);
     } on ArgumentError catch (e) {
-      Log.w("Unknown VegStatusSource name: $name", ex: e);
+      Log.w('Unknown VegStatusSource name: $name', ex: e);
       return null;
     }
   }
@@ -48,7 +48,7 @@ extension VegStatusSourcePriority on VegStatusSource? {
       case VegStatusSource.moderator:
         return 3;
       default:
-        throw Exception("Unknown value: $this");
+        throw Exception('Unknown value: $this');
     }
   }
 }

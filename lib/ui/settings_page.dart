@@ -75,7 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-        child: Center(child: CircularProgressIndicator()),
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
@@ -88,41 +88,40 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyles.headline1),
               leftAction: BackButtonPlante.popOnClick()),
           Container(
-              padding: EdgeInsets.only(left: 24, right: 24),
+              padding: const EdgeInsets.only(left: 24, right: 24),
               child: Column(children: [
                 Row(children: [
                   InkWell(
-                      child: Text(
-                          context.strings.settings_page_your_id +
-                              (user.backendId ?? ""),
-                          style: TextStyles.normal),
                       onTap: () {
                         Clipboard.setData(
-                            ClipboardData(text: user.backendId ?? ""));
+                            ClipboardData(text: user.backendId ?? ''));
                         showSnackBar(context.strings.global_copied_to_clipboard,
                             context);
-                      }),
+                      },
+                      child: Text(
+                          context.strings.settings_page_your_id +
+                              (user.backendId ?? ''),
+                          style: TextStyles.normal)),
                 ]),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 SizedBox(
                     width: double.infinity,
                     child: Text(context.strings.settings_page_general,
                         style: TextStyles.headline2)),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_send_logs, onPressed: () {
-                      Log.startLogsSending();
-                    })),
-                if (developer) SizedBox(height: 24),
+                        context.strings.settings_page_send_logs,
+                        onPressed: Log.startLogsSending)),
+                if (developer) const SizedBox(height: 24),
                 if (developer)
                   SizedBox(
                       width: double.infinity,
                       child: Text(
                           context.strings.settings_page_developer_options,
                           style: TextStyles.headline2)),
-                if (developer) SizedBox(height: 12),
+                if (developer) const SizedBox(height: 12),
                 if (developer)
                   SizedBox(
                       width: double.infinity,
@@ -133,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             GetIt.I.get<UserParamsController>();
                         final params = await paramsController.getUserParams();
                         final newParams = params!
-                            .rebuild((e) => e..name = "😁" // s for "too short"
+                            .rebuild((e) => e..name = '😁' // s for "too short"
                                 );
                         await paramsController.setUserParams(newParams);
 
@@ -164,9 +163,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       }),
                 if (developer)
                   AnimatedSwitcher(
-                      duration: Duration(milliseconds: 250),
+                      duration: const Duration(milliseconds: 250),
                       child: !fakeOffApi
-                          ? SizedBox.shrink()
+                          ? const SizedBox.shrink()
                           : _CheckboxSettings(
                               text: context.strings
                                   .settings_page_fake_off_scanned_product_empty,
@@ -184,17 +183,17 @@ class _SettingsPageState extends State<SettingsPage> {
                         .strings.settings_page_fake_off_forced_scanned_barcode,
                     controller: barcodeOverrideController,
                   ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Center(
                     child: InkWell(
-                        child: Text(
-                            context.strings.external_auth_page_privacy_policy,
-                            style: TextStyle(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline)),
                         onTap: () {
                           launch(PRIVACY_POLICY_URL);
-                        }))
+                        },
+                        child: Text(
+                            context.strings.external_auth_page_privacy_policy,
+                            style: const TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline))))
               ]))
         ]))));
   }
@@ -205,7 +204,7 @@ class _CheckboxSettings extends StatelessWidget {
   final bool value;
   final dynamic Function(bool value) onChanged;
 
-  _CheckboxSettings(
+  const _CheckboxSettings(
       {required this.text, required this.value, required this.onChanged});
 
   @override

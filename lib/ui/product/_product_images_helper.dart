@@ -15,7 +15,7 @@ class ProductImagesHelper {
     if (existingRemoteImage != null) {
       return existingRemoteImage;
     }
-    return Icon(Icons.photo_camera_outlined);
+    return const Icon(Icons.photo_camera_outlined);
   }
 
   static Image? _takenProductImageWidget(
@@ -38,7 +38,7 @@ class ProductImagesHelper {
         if (loadingProgress == null) {
           return child;
         }
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       });
     }
     return null;

@@ -7,7 +7,7 @@ import 'package:plante/l10n/strings.dart';
 import '../../widget_tester_extension.dart';
 
 void main() {
-  testWidgets("Can fill all data and get user params", (WidgetTester tester) async {
+  testWidgets('Can fill all data and get user params', (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
       resultParams = params;
@@ -16,7 +16,7 @@ void main() {
     final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
 
     await tester.enterText(
-        find.byKey(Key("name")),
+        find.byKey(const Key('name')),
         'Bob');
 
     await tester.pumpAndSettle();
@@ -34,14 +34,14 @@ void main() {
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
-      ..name = "Bob"
+      ..name = 'Bob'
       ..eatsMilk = false
       ..eatsEggs = false
       ..eatsHoney = true);
     expect(resultParams, equals(expectedParams));
   });
 
-  testWidgets("Allows to not fill gender and birthday", (WidgetTester tester) async {
+  testWidgets('Allows to not fill gender and birthday', (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
       resultParams = params;
@@ -50,7 +50,7 @@ void main() {
     final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
 
     await tester.enterText(
-        find.byKey(Key("name")),
+        find.byKey(const Key('name')),
         'Bob');
 
     await tester.pumpAndSettle();
@@ -67,20 +67,20 @@ void main() {
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
-      ..name = "Bob"
+      ..name = 'Bob'
       ..eatsMilk = false
       ..eatsEggs = false
       ..eatsHoney = false);
     expect(resultParams, equals(expectedParams));
   });
 
-  testWidgets("Uses initial user name", (WidgetTester tester) async {
+  testWidgets('Uses initial user name', (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
       resultParams = params;
       return true;
     };
-    final initialParams = UserParams((v) => v.name = "Nora");
+    final initialParams = UserParams((v) => v.name = 'Nora');
     final context = await tester.superPump(InitUserPage(initialParams, resultParamsCallback));
 
     await tester.pumpAndSettle();
@@ -97,7 +97,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
-      ..name = "Nora"
+      ..name = 'Nora'
       ..eatsMilk = false
       ..eatsEggs = false
       ..eatsHoney = false);
@@ -109,7 +109,7 @@ void main() {
     final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
 
     await tester.enterText(
-        find.byKey(Key("name")),
+        find.byKey(const Key('name')),
         'Bo');
 
     await tester.pumpAndSettle();
@@ -122,13 +122,13 @@ void main() {
     expect(find.text(context.strings.init_user_page_i_eat_honey), findsNothing);
   });
 
-  testWidgets("Does not finish without vegan or vegetarian selection", (WidgetTester tester) async {
+  testWidgets('Does not finish without vegan or vegetarian selection', (WidgetTester tester) async {
     bool done = false;
     final resultParamsCallback = (UserParams params) async {
       done = true;
       return true;
     };
-    final initialParams = UserParams((v) => v.name = "Nora");
+    final initialParams = UserParams((v) => v.name = 'Nora');
     final context = await tester.superPump(InitUserPage(initialParams, resultParamsCallback));
 
     await tester.pumpAndSettle();

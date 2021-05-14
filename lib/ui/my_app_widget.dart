@@ -16,11 +16,10 @@ import 'package:plante/ui/scan/barcode_scan_page.dart';
 class MyAppWidget extends StatefulWidget {
   final UserParams? _initialUserParams;
 
-  MyAppWidget(this._initialUserParams);
+  const MyAppWidget(this._initialUserParams);
 
   @override
-  State<StatefulWidget> createState() =>
-      (_MyAppWidgetState(_initialUserParams));
+  State<StatefulWidget> createState() => _MyAppWidgetState(_initialUserParams);
 }
 
 class _MyAppWidgetState extends State<MyAppWidget>
@@ -34,13 +33,12 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(_AppForegroundDetector(() {
-      setSystemUIOverlayStyle();
-    }));
+    WidgetsBinding.instance!
+        .addObserver(_AppForegroundDetector(setSystemUIOverlayStyle));
   }
 
   Future<bool> _onUserParamsSpecified(UserParams params) async {
-    Log.i("MyAppWidget._onUserParamsSpecified: $params");
+    Log.i('MyAppWidget._onUserParamsSpecified: $params');
     final paramsController = GetIt.I.get<UserParamsController>();
 
     // Update on backend
@@ -57,17 +55,17 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "Plante",
+        title: 'Plante',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
           primarySwatch: ColorsPlante.primaryMaterial,
           accentColor: ColorsPlante.primary,
-          unselectedWidgetColor: Color(0xFFB5B7C3),
+          unselectedWidgetColor: const Color(0xFFB5B7C3),
           fontFamily: 'Poppins',
         ),
         home: AnimatedSwitcher(
-            duration: Duration(milliseconds: 250), child: _mainWidget()),
+            duration: const Duration(milliseconds: 250), child: _mainWidget()),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
   }
 
@@ -85,7 +83,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
     if (_initialUserParams == null) {
       return false;
     }
-    if ((_initialUserParams?.name ?? "").length < InitUserPage.minNameLength ||
+    if ((_initialUserParams?.name ?? '').length < InitUserPage.minNameLength ||
         _initialUserParams!.eatsMilk == null ||
         _initialUserParams!.eatsEggs == null ||
         _initialUserParams!.eatsHoney == null) {

@@ -34,7 +34,7 @@ void mainImpl() async {
   }
 
   Log.init();
-  Log.i("App start");
+  Log.i('App start');
 
   initDI();
   final initialUserParams =
@@ -42,10 +42,7 @@ void mainImpl() async {
 
   setSystemUIOverlayStyle();
 
-  // NOTE: we don't await for the function to complete.
-  () async {
-    _crashOnErrors = await GetIt.I.get<Settings>().crashOnErrors();
-  }.call();
+  _crashOnErrors = await GetIt.I.get<Settings>().crashOnErrors();
 
   runApp(RootRestorationScope(
       restorationId: 'root', child: MyAppWidget(initialUserParams)));
@@ -61,7 +58,7 @@ void onError(String text, dynamic? exception, StackTrace? stack) async {
     await FirebaseCrashlytics.instance
         .recordError(exception, stack, reason: text, fatal: true);
   }
-  if (exception is FlutterError && exception.message.contains("RenderFlex")) {
+  if (exception is FlutterError && exception.message.contains('RenderFlex')) {
     return;
   }
   if (_crashOnErrors ?? true) {

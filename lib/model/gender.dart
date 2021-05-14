@@ -6,23 +6,23 @@ extension GenderExtension on Gender {
   String get name {
     switch (this) {
       case Gender.MALE:
-        return "male";
+        return 'male';
       case Gender.FEMALE:
-        return "female";
+        return 'female';
       default:
-        throw Exception("Unhandled item: $this");
+        throw Exception('Unhandled item: $this');
     }
   }
 }
 
 Gender? genderFromGenderName(String genderName) {
   switch (genderName) {
-    case "male":
+    case 'male':
       return Gender.MALE;
-    case "female":
+    case 'female':
       return Gender.FEMALE;
     default:
-      Log.w("Unknown gender name: $genderName");
+      Log.w('Unknown gender name: $genderName');
       return null;
   }
 }

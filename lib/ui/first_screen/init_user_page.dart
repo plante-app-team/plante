@@ -16,7 +16,8 @@ class InitUserPage extends StatefulWidget {
   final UserParams userParams;
   final UserParamsSpecifiedCallback callback;
 
-  InitUserPage(this.userParams, this.callback);
+  const InitUserPage(this.userParams, this.callback, {Key? key})
+      : super(key: key);
 
   @override
   _InitUserPageState createState() => _InitUserPageState(userParams, callback);
@@ -59,7 +60,7 @@ class _InitUserPageState extends State<InitUserPage> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = _userParams.name ?? "";
+    _nameController.text = _userParams.name ?? '';
     _nameController.addListener(() {
       if (_validateFirstPageInputs()) {
         _userParams = _userParams.rebuild((v) => v.name = _nameController.text);
@@ -89,12 +90,14 @@ class _InitUserPageState extends State<InitUserPage> {
         body: SafeArea(
             child: Stack(children: [
           AnimatedSwitcher(
-              duration: Duration(milliseconds: 250),
-              child: _loading ? LinearProgressIndicator() : SizedBox.shrink()),
+              duration: const Duration(milliseconds: 250),
+              child: _loading
+                  ? const LinearProgressIndicator()
+                  : const SizedBox.shrink()),
           CustomizableStepper(
             pages: [_page1(), _page2()],
             controller: _stepperController,
-            contentPadding: EdgeInsets.only(left: 24, right: 24, top: 45),
+            contentPadding: const EdgeInsets.only(left: 24, right: 24, top: 45),
           )
         ])));
   }
@@ -107,12 +110,12 @@ class _InitUserPageState extends State<InitUserPage> {
               child: SizedBox(
                   width: double.infinity,
                   child: Padding(
-                      padding: EdgeInsets.only(bottom: 132),
+                      padding: const EdgeInsets.only(bottom: 132),
                       child: Text(context.strings.init_user_page_title,
                           style: TextStyles.headline1)))),
           Center(
               child: InputFieldPlante(
-            key: Key("name"),
+            key: const Key('name'),
             textCapitalization: TextCapitalization.sentences,
             label: context.strings.init_user_page_name_field_title,
             controller: _nameController,
@@ -133,7 +136,7 @@ class _InitUserPageState extends State<InitUserPage> {
             onPressed: _firstPageHasData && !_loading ? onNextPressed : null));
 
     final bottomControls =
-        Padding(child: buttonNext, padding: EdgeInsets.only(bottom: 38));
+        Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonNext);
 
     return StepperPage(content, bottomControls);
   }
@@ -141,20 +144,17 @@ class _InitUserPageState extends State<InitUserPage> {
   StepperPage _page2() {
     final onMilkCheckboxClick = (bool? value) {
       setState(() {
-        _userParams = _userParams
-            .rebuild((v) => v..eatsMilk = value != null ? value : false);
+        _userParams = _userParams.rebuild((v) => v..eatsMilk = value ?? false);
       });
     };
     final onEggsCheckboxClick = (bool? value) {
       setState(() {
-        _userParams = _userParams
-            .rebuild((v) => v..eatsEggs = value != null ? value : false);
+        _userParams = _userParams.rebuild((v) => v..eatsEggs = value ?? false);
       });
     };
     final onHoneyCheckboxClick = (bool? value) {
       setState(() {
-        _userParams = _userParams
-            .rebuild((v) => v..eatsHoney = value != null ? value : false);
+        _userParams = _userParams.rebuild((v) => v..eatsHoney = value ?? false);
       });
     };
 
@@ -165,15 +165,18 @@ class _InitUserPageState extends State<InitUserPage> {
               context.strings.init_user_page_nice_to_meet_you +
                   _nameController.text,
               style: TextStyles.headline1)),
-      SizedBox(height: 24),
+      const SizedBox(height: 24),
       SizedBox(
           width: double.infinity,
           child: Text(context.strings.init_user_page_tell_about_yourself,
               style: TextStyles.headline2)),
-      SizedBox(height: 16),
+      const SizedBox(height: 16),
       InkWell(
+        onTap: () {
+          isVegan = true;
+        },
         child: Container(
-            color: Color(0xFFF6F7FA),
+            color: const Color(0xFFF6F7FA),
             height: 48,
             child: Row(children: [
               Radio<bool>(
@@ -185,14 +188,14 @@ class _InitUserPageState extends State<InitUserPage> {
               Text(context.strings.init_user_page_im_vegan,
                   style: TextStyles.normal)
             ])),
-        onTap: () {
-          isVegan = true;
-        },
       ),
-      SizedBox(height: 7),
+      const SizedBox(height: 7),
       InkWell(
+        onTap: () {
+          isVegan = false;
+        },
         child: Container(
-            color: Color(0xFFF6F7FA),
+            color: const Color(0xFFF6F7FA),
             height: 48,
             child: Row(children: [
               Radio<bool>(
@@ -208,52 +211,49 @@ class _InitUserPageState extends State<InitUserPage> {
               Text(context.strings.init_user_page_im_vegetarian,
                   style: TextStyles.normal)
             ])),
-        onTap: () {
-          isVegan = false;
-        },
       ),
-      SizedBox(height: 24),
+      const SizedBox(height: 24),
       SizedBox(
           width: double.infinity,
           child: Text(context.strings.init_user_page_what_do_you_eat,
               style: TextStyles.normal)),
-      SizedBox(height: 21),
+      const SizedBox(height: 21),
       Container(
-          color: Color(0xFFF6F7FA),
+          color: const Color(0xFFF6F7FA),
           height: 48,
           child: Row(children: [
             InkWell(
+                onTap: () {
+                  onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
+                },
                 child: Row(children: [
                   Checkbox(
                       value: _userParams.eatsEggs ?? false,
                       onChanged: onEggsCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_eggs),
-                ]),
-                onTap: () {
-                  onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
-                }),
-            SizedBox(width: 24),
+                ])),
+            const SizedBox(width: 24),
             InkWell(
+                onTap: () {
+                  onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
+                },
                 child: Row(children: [
                   Checkbox(
                       value: _userParams.eatsMilk ?? false,
                       onChanged: onMilkCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_milk),
-                ]),
-                onTap: () {
-                  onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
-                }),
-            SizedBox(width: 24),
+                ])),
+            const SizedBox(width: 24),
             InkWell(
+                onTap: () {
+                  onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false));
+                },
                 child: Row(children: [
                   Checkbox(
                       value: _userParams.eatsHoney ?? false,
                       onChanged: onHoneyCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_honey),
-                ]),
-                onTap: () {
-                  onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false));
-                }),
+                ])),
           ])),
     ]);
 
@@ -281,7 +281,7 @@ class _InitUserPageState extends State<InitUserPage> {
             onPressed: !_loading && isVegan != null ? onDoneClicked : null));
 
     final bottomControls =
-        Padding(child: buttonDone, padding: EdgeInsets.only(bottom: 38));
+        Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonDone);
 
     return StepperPage(content, bottomControls);
   }

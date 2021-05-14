@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/log.dart';
 import 'package:plante/base/result.dart';
@@ -33,7 +34,7 @@ class ProductsManager {
     off.ProductField.INGREDIENTS_TEXT_TRANSLATED,
     off.ProductField.IMAGES,
   ];
-  static final _notTranslatedRegex = RegExp(r"^\w\w:.*");
+  static final _notTranslatedRegex = RegExp(r'^\w\w:.*');
 
   final OffApi _off;
   final Backend _backend;
@@ -48,11 +49,11 @@ class ProductsManager {
         language: off.LanguageHelper.fromJson(langCode),
         fields: _NEEDED_OFF_FIELDS.toList());
 
-    final offProductResult;
+    final off.ProductResult offProductResult;
     try {
       offProductResult = await _off.getProduct(configuration);
     } on IOException catch (e) {
-      Log.w("Network error in ProductsManager.getProduct", ex: e);
+      Log.w('Network error in ProductsManager.getProduct', ex: e);
       return Err(ProductsManagerError.NETWORK_ERROR);
     }
     final offProduct = offProductResult.product;
@@ -70,12 +71,12 @@ class ProductsManager {
     var result = Product((v) => v
       ..barcode = barcode
       ..vegetarianStatus =
-          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "")
+          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? '')
       ..vegetarianStatusSource = VegStatusSource.safeValueOf(
-          backendProduct?.vegetarianStatusSource ?? "")
-      ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? "")
+          backendProduct?.vegetarianStatusSource ?? '')
+      ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? '')
       ..veganStatusSource =
-          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "")
+          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? '')
       ..name = offProduct.productNameTranslated
       ..brands.addAll(offProduct.brandsTags ?? [])
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])
@@ -90,9 +91,9 @@ class ProductsManager {
 
     if (backendProduct?.vegetarianStatus != null) {
       final vegetarianStatus =
-          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? "");
+          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? '');
       var vegetarianStatusSource = VegStatusSource.safeValueOf(
-          backendProduct?.vegetarianStatusSource ?? "");
+          backendProduct?.vegetarianStatusSource ?? '');
       if (vegetarianStatusSource == null && vegetarianStatus != null) {
         vegetarianStatusSource = VegStatusSource.community;
       }
@@ -102,9 +103,9 @@ class ProductsManager {
     }
     if (backendProduct?.veganStatus != null) {
       final veganStatus =
-          VegStatus.safeValueOf(backendProduct?.veganStatus ?? "");
+          VegStatus.safeValueOf(backendProduct?.veganStatus ?? '');
       var veganStatusSource =
-          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? "");
+          VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? '');
       if (veganStatusSource == null && veganStatus != null) {
         veganStatusSource = VegStatusSource.community;
       }
@@ -215,7 +216,7 @@ class ProductsManager {
     try {
       offResult = await _off.saveProduct(_offUser(), offProduct);
     } on IOException catch (e) {
-      Log.w("ProductsManager.createUpdateProduct 1, e", ex: e);
+      Log.w('ProductsManager.createUpdateProduct 1, e', ex: e);
       return Err(ProductsManagerError.NETWORK_ERROR);
     }
     if (offResult.error != null) {
@@ -235,7 +236,7 @@ class ProductsManager {
       try {
         status = await _off.addProductImage(_offUser(), image);
       } on IOException catch (e) {
-        Log.w("ProductsManager.createUpdateProduct 2, e", ex: e);
+        Log.w('ProductsManager.createUpdateProduct 2, e', ex: e);
         return Err(ProductsManagerError.NETWORK_ERROR);
       }
       if (status.error != null) {
@@ -256,7 +257,7 @@ class ProductsManager {
       try {
         status = await _off.addProductImage(_offUser(), image);
       } on IOException catch (e) {
-        Log.w("ProductsManager.createUpdateProduct 3, e", ex: e);
+        Log.w('ProductsManager.createUpdateProduct 3, e', ex: e);
         return Err(ProductsManagerError.NETWORK_ERROR);
       }
       if (status.error != null) {
@@ -286,10 +287,8 @@ class ProductsManager {
 
   List<String> _connectDifferentlyTranslated(
       Iterable<String>? withNotTranslated, Iterable<String>? translatedOnly) {
-    final notTranslated = withNotTranslated
-            ?.where((e) => _notTranslatedRegex.hasMatch(e))
-            .toList() ??
-        [];
+    final notTranslated =
+        withNotTranslated?.where(_notTranslatedRegex.hasMatch).toList() ?? [];
     final allStrings = (translatedOnly?.toList() ?? []) + notTranslated;
     allStrings.sort();
     return allStrings;
@@ -303,10 +302,10 @@ class ProductsManager {
 
   String? _join(Iterable<String>? strs, String? langCode) {
     if (strs != null && strs.isNotEmpty) {
-      final langPrefix = langCode != null ? "$langCode:" : "";
+      final langPrefix = langCode != null ? '$langCode:' : '';
       return strs
-          .map((e) => _notTranslatedRegex.hasMatch(e) ? e : "$langPrefix$e")
-          .join(", ");
+          .map((e) => _notTranslatedRegex.hasMatch(e) ? e : '$langPrefix$e')
+          .join(', ');
     }
     return null;
   }
@@ -322,12 +321,12 @@ class ProductsManager {
 
     final offLang = off.LanguageHelper.fromJson(langCode);
 
-    final response;
+    final off.OcrIngredientsResult response;
     try {
       response =
           await _off.extractIngredients(_offUser(), product.barcode, offLang);
     } on IOException catch (e) {
-      Log.w("ProductsManager.updateProductAndExtractIngredients, e", ex: e);
+      Log.w('ProductsManager.updateProductAndExtractIngredients, e', ex: e);
       return Err(ProductsManagerError.NETWORK_ERROR);
     }
     if (response.status == 0) {
@@ -339,7 +338,7 @@ class ProductsManager {
   }
 
   off.User _offUser() =>
-      off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
+      const off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
 }
 
 extension _OffIngredientExtension on off.Ingredient {
@@ -363,7 +362,7 @@ extension _OffIngredientExtension on off.Ingredient {
       case off.IngredientSpecialPropertyStatus.IGNORE:
         return null;
       default:
-        throw StateError("Unhandled item: $offVegStatus");
+        throw StateError('Unhandled item: $offVegStatus');
     }
   }
 }

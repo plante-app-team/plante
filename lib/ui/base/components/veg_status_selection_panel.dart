@@ -40,7 +40,7 @@ class VegStatusSelectionPanel extends StatelessWidget {
           showVegStatusInfoDialog(context);
         })
       ]),
-      SizedBox(height: 8),
+      const SizedBox(height: 8),
       Row(children: [
         Expanded(
             child: CheckButtonPlante(
@@ -51,7 +51,7 @@ class VegStatusSelectionPanel extends StatelessWidget {
             onChanged.call(value ? VegStatus.positive : null);
           },
         )),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
             child: CheckButtonPlante(
           key: keyNegative,
@@ -62,7 +62,7 @@ class VegStatusSelectionPanel extends StatelessWidget {
           },
         )),
       ]),
-      SizedBox(height: 18),
+      const SizedBox(height: 18),
       Row(children: [
         Expanded(
             child: CheckButtonPlante(
@@ -73,7 +73,7 @@ class VegStatusSelectionPanel extends StatelessWidget {
             onChanged.call(value ? VegStatus.possible : null);
           },
         )),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
             child: CheckButtonPlante(
           key: keyUnknown,

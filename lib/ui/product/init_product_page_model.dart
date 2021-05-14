@@ -42,12 +42,11 @@ class InitProductPageModel {
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties => {
-        "product": productRestorable,
+        'product': productRestorable,
       };
 
-  InitProductPageModel(Product initialProduct, this.productsManager)
-      : initialProduct = initialProduct,
-        productRestorable = ProductRestorable(initialProduct);
+  InitProductPageModel(this.initialProduct, this.productsManager)
+      : productRestorable = ProductRestorable(initialProduct);
 
   bool askForFrontPhoto() {
     return initialProduct.imageFront == null;

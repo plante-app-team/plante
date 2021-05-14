@@ -64,7 +64,7 @@ class UserParamsController {
     }
 
     if (kReleaseMode && backendId != null && !_crashlyticsInited) {
-      FirebaseCrashlytics.instance.setUserIdentifier(backendId);
+      await FirebaseCrashlytics.instance.setUserIdentifier(backendId);
       _crashlyticsInited = true;
     }
 
@@ -85,7 +85,7 @@ class UserParamsController {
   UserParams? get cachedUserParams => _cachedUserParams;
 
   Future<void> setUserParams(UserParams? userParams) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (userParams == null) {
       await prefs.safeRemove(PREF_USER_PARAMS_NAME);
       await prefs.safeRemove(PREF_USER_PARAMS_GENDER);

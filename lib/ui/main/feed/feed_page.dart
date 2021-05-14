@@ -17,31 +17,28 @@ class _FeedPageState extends State<FeedPage> {
     return Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       ElevatedButton(
-          child: Text('Scan!'),
           onPressed: () {
-            Log.i("Scan clicked");
+            Log.i('Scan clicked');
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => BarcodeScanPage()),
             );
-          }),
+          },
+          child: const Text('Scan!')),
+      const ElevatedButton(
+          onPressed: Log.startLogsSending, child: Text('Send logs')),
       ElevatedButton(
-          child: Text('Send logs'),
-          onPressed: () {
-            Log.startLogsSending();
-          }),
-      ElevatedButton(
-          child: Text("Erase my name and exit"),
           onPressed: () async {
             final controller = GetIt.I.get<UserParamsController>();
             final params = await controller.getUserParams();
             await controller.setUserParams(params!.rebuild((e) => e
-              ..name = ""
+              ..name = ''
               ..eatsHoney = null
               ..eatsEggs = null
               ..eatsMilk = null));
             exit(0);
-          })
+          },
+          child: const Text('Erase my name and exit')),
     ]));
   }
 }

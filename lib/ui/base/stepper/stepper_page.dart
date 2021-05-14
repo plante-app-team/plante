@@ -4,9 +4,9 @@ import 'package:flutter/widgets.dart';
 class StepperPage extends StatelessWidget {
   final Widget content;
   final Widget? bottomControls;
-  final Key? key;
 
-  StepperPage(this.content, this.bottomControls, {this.key});
+  const StepperPage(this.content, this.bottomControls, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

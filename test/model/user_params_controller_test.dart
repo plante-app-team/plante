@@ -22,9 +22,9 @@ void main() {
     expect(initialParams, equals(null));
 
     final params = UserParams((v) => v
-        ..name = "Bob"
+        ..name = 'Bob'
         ..genderStr = Gender.MALE.name
-        ..birthdayStr = "20.07.1993"
+        ..birthdayStr = '20.07.1993'
         ..eatsMilk = true
         ..eatsEggs = false
         ..eatsHoney = true
@@ -46,11 +46,11 @@ void main() {
 
     // Not empty params
 
-    params = params.rebuild((v) => v.name = "Bob");
+    params = params.rebuild((v) => v.name = 'Bob');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.birthdayStr = "20.07.1993");
+    params = params.rebuild((v) => v.birthdayStr = '20.07.1993');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
@@ -70,11 +70,11 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.backendId = "123");
+    params = params.rebuild((v) => v.backendId = '123');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.backendClientToken = "321");
+    params = params.rebuild((v) => v.backendClientToken = '321');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
@@ -83,14 +83,14 @@ void main() {
     expect(params, equals(await controller.getUserParams()));
 
     final expectedParams = UserParams((v) => v
-      ..name = "Bob"
+      ..name = 'Bob'
       ..genderStr = Gender.FEMALE.name
-      ..birthdayStr = "20.07.1993"
+      ..birthdayStr = '20.07.1993'
       ..eatsMilk = true
       ..eatsEggs = false
       ..eatsHoney = false
-      ..backendId = "123"
-      ..backendClientToken = "321"
+      ..backendId = '123'
+      ..backendClientToken = '321'
       ..userGroup = 123);
     expect(params, equals(expectedParams));
   });
@@ -101,9 +101,9 @@ void main() {
     controller.addObserver(observer);
 
     final params = UserParams((v) => v
-      ..name = "Bob"
+      ..name = 'Bob'
       ..genderStr = Gender.MALE.name
-      ..birthdayStr = "20.07.1993"
+      ..birthdayStr = '20.07.1993'
       ..eatsMilk = true
       ..eatsEggs = false
       ..eatsHoney = true);
@@ -134,7 +134,7 @@ void main() {
     final controller = UserParamsController();
 
     // Some time!
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future.delayed(const Duration(milliseconds: 10));
 
     bool threw = false;
     try {
@@ -148,14 +148,14 @@ void main() {
   test('Cached user params are updated', () async {
     final controller = UserParamsController();
     // Some time!
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future.delayed(const Duration(milliseconds: 10));
 
     expect(controller.cachedUserParams, isNull);
 
     final params = UserParams((v) => v
-      ..name = "Bob"
+      ..name = 'Bob'
       ..genderStr = Gender.MALE.name
-      ..birthdayStr = "20.07.1993"
+      ..birthdayStr = '20.07.1993'
       ..eatsMilk = true
       ..eatsEggs = false
       ..eatsHoney = true);

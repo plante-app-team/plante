@@ -20,15 +20,15 @@ class VegStatusDisplayed extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         _vegStatusImage(),
-        SizedBox(width: 6),
+        const SizedBox(width: 6),
         Flexible(
             child: Text(_vegStatusText(context),
                 maxLines: 1, overflow: TextOverflow.ellipsis))
       ]),
-      SizedBox(height: 4),
+      const SizedBox(height: 4),
       Row(children: [
         _vegStatusSourceImage(),
-        SizedBox(width: 6),
+        const SizedBox(width: 6),
         Flexible(
             child: Text(_vegStatusSourceText(context),
                 maxLines: 1, overflow: TextOverflow.ellipsis))
@@ -45,7 +45,7 @@ class VegStatusDisplayed extends StatelessWidget {
   }
 
   VegStatusSource _vegStatusSource() {
-    final result;
+    final VegStatusSource result;
     if (_isUserVegan()) {
       result = product.veganStatusSource ?? VegStatusSource.unknown;
     } else {
@@ -53,7 +53,7 @@ class VegStatusDisplayed extends StatelessWidget {
     }
     if (result == VegStatusSource.unknown) {
       Log.e(
-          "Unknown veg status source for barcode ${product.barcode}, $product");
+          'Unknown veg status source for barcode ${product.barcode}, $product');
     }
     return result;
   }
@@ -62,17 +62,17 @@ class VegStatusDisplayed extends StatelessWidget {
     switch (_vegStatus()) {
       case VegStatus.positive:
         if (_isUserVegan()) {
-          return SvgPicture.asset("assets/veg_status_vegan.svg");
+          return SvgPicture.asset('assets/veg_status_vegan.svg');
         } else {
-          return SvgPicture.asset("assets/veg_status_vegetarian.svg");
+          return SvgPicture.asset('assets/veg_status_vegetarian.svg');
         }
       case VegStatus.negative:
-        return SvgPicture.asset("assets/veg_status_negative.svg");
+        return SvgPicture.asset('assets/veg_status_negative.svg');
       case VegStatus.possible: // Fallthrough
       case VegStatus.unknown:
-        return SvgPicture.asset("assets/veg_status_unknown.svg");
+        return SvgPicture.asset('assets/veg_status_unknown.svg');
       default:
-        throw Exception("Unknown veg status: ${_vegStatus()}");
+        throw Exception('Unknown veg status: ${_vegStatus()}');
     }
   }
 
@@ -89,7 +89,7 @@ class VegStatusDisplayed extends StatelessWidget {
         case VegStatus.unknown:
           return context.strings.veg_status_displayed_vegan_status_unknown;
         default:
-          throw Exception("Unknown veg status: ${_vegStatus()}");
+          throw Exception('Unknown veg status: ${_vegStatus()}');
       }
     } else {
       switch (_vegStatus()) {
@@ -101,7 +101,7 @@ class VegStatusDisplayed extends StatelessWidget {
         case VegStatus.unknown:
           return context.strings.veg_status_displayed_vegetarian_status_unknown;
         default:
-          throw Exception("Unknown veg status: ${_vegStatus()}");
+          throw Exception('Unknown veg status: ${_vegStatus()}');
       }
     }
   }
@@ -109,15 +109,15 @@ class VegStatusDisplayed extends StatelessWidget {
   Widget _vegStatusSourceImage() {
     switch (_vegStatusSource()) {
       case VegStatusSource.open_food_facts:
-        return SvgPicture.asset("assets/veg_status_source_auto.svg");
+        return SvgPicture.asset('assets/veg_status_source_auto.svg');
       case VegStatusSource.community:
-        return SvgPicture.asset("assets/veg_status_source_community.svg");
+        return SvgPicture.asset('assets/veg_status_source_community.svg');
       case VegStatusSource.moderator:
-        return SvgPicture.asset("assets/veg_status_source_moderator.svg");
+        return SvgPicture.asset('assets/veg_status_source_moderator.svg');
       case VegStatusSource.unknown:
-        return SvgPicture.asset("assets/veg_status_source_unknown.svg");
+        return SvgPicture.asset('assets/veg_status_source_unknown.svg');
       default:
-        throw Exception("Unknown veg status source: ${_vegStatusSource()}");
+        throw Exception('Unknown veg status source: ${_vegStatusSource()}');
     }
   }
 
@@ -132,7 +132,7 @@ class VegStatusDisplayed extends StatelessWidget {
       case VegStatusSource.unknown:
         return context.strings.veg_status_displayed_veg_status_source_unknown;
       default:
-        throw Exception("Unknown veg status source: ${_vegStatusSource()}");
+        throw Exception('Unknown veg status source: ${_vegStatusSource()}');
     }
   }
 }

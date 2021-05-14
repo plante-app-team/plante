@@ -16,6 +16,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/photos_taker.dart';
 
+// ignore: always_use_package_imports
 import 'init_product_page_model.dart';
 
 typedef DoneCallback = void Function();
@@ -68,7 +69,7 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   @override
-  String? get restorationId => "init_product_page";
+  String? get restorationId => 'init_product_page';
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
@@ -95,7 +96,7 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   ListBuilder<String> _textToListBuilder(String text) => ListBuilder(
-      text.split(",").map((e) => e.trim()).where((e) => e.isNotEmpty));
+      text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty));
 
   @override
   Widget build(BuildContext context) {
@@ -108,17 +109,17 @@ class _InitProductPageState extends State<InitProductPage>
                 },
                 child: Stack(children: [
                   SingleChildScrollView(
-                      key: Key("content"),
+                      key: const Key('content'),
                       child: Column(children: [
                         HeaderPlante(
                             rightAction: InkWell(
+                                onTap: cancel,
                                 child: Container(
-                                    padding: EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(12),
                                     child: Text(context.strings.global_cancel,
-                                        style: TextStyles.headline3)),
-                                onTap: cancel)),
+                                        style: TextStyles.headline3)))),
                         Container(
-                            padding: EdgeInsets.only(left: 24, right: 24),
+                            padding: const EdgeInsets.only(left: 24, right: 24),
                             child: Column(children: [
                               SizedBox(
                                   width: double.infinity,
@@ -128,10 +129,10 @@ class _InitProductPageState extends State<InitProductPage>
                                     style: TextStyles.headline1,
                                     textAlign: TextAlign.left,
                                   )),
-                              SizedBox(height: 24),
+                              const SizedBox(height: 24),
                               if (model.askForFrontPhoto())
                                 Column(
-                                    key: Key("front_photo_group"),
+                                    key: const Key('front_photo_group'),
                                     children: [
                                       SizedBox(
                                           width: double.infinity,
@@ -141,53 +142,57 @@ class _InitProductPageState extends State<InitProductPage>
                                             style: TextStyles.headline4,
                                             textAlign: TextAlign.left,
                                           )),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       SizedBox(
                                           width: double.infinity,
                                           child: AddPhotoButtonPlante(
-                                            keyButton: Key("front_photo"),
+                                            keyButton: const Key('front_photo'),
                                             onAddTap: takeFrontPhoto,
                                             onCancelTap: removeFrontPhoto,
                                             existingPhoto:
                                                 model.product.imageFront,
                                           )),
-                                      SizedBox(height: 24),
+                                      const SizedBox(height: 24),
                                     ]),
                               if (model.askForName())
-                                Column(key: Key("name_group"), children: [
+                                Column(key: const Key('name_group'), children: [
                                   InputFieldPlante(
-                                    key: Key("name"),
+                                    key: const Key('name'),
                                     label: context
                                         .strings.init_product_page_product_name,
                                     controller: nameTextController,
                                   ),
-                                  SizedBox(height: 10),
+                                  const SizedBox(height: 10),
                                 ]),
                               if (model.askForBrand())
-                                Column(key: Key("brand_group"), children: [
-                                  InputFieldPlante(
-                                    key: Key("brand"),
-                                    label: context.strings
-                                        .init_product_page_brand_optional,
-                                    controller: brandTextController,
-                                  ),
-                                  SizedBox(height: 10),
-                                ]),
+                                Column(
+                                    key: const Key('brand_group'),
+                                    children: [
+                                      InputFieldPlante(
+                                        key: const Key('brand'),
+                                        label: context.strings
+                                            .init_product_page_brand_optional,
+                                        controller: brandTextController,
+                                      ),
+                                      const SizedBox(height: 10),
+                                    ]),
                               if (model.askForCategories())
-                                Column(key: Key("categories_group"), children: [
-                                  InputFieldPlante(
-                                    key: Key("categories"),
-                                    label: context.strings
-                                        .init_product_page_categories_optional,
-                                    hint: context.strings
-                                        .init_product_page_categories_hint,
-                                    controller: categoriesTextController,
-                                  ),
-                                  SizedBox(height: 24),
-                                ]),
+                                Column(
+                                    key: const Key('categories_group'),
+                                    children: [
+                                      InputFieldPlante(
+                                        key: const Key('categories'),
+                                        label: context.strings
+                                            .init_product_page_categories_optional,
+                                        hint: context.strings
+                                            .init_product_page_categories_hint,
+                                        controller: categoriesTextController,
+                                      ),
+                                      const SizedBox(height: 24),
+                                    ]),
                               if (model.askForIngredientsData())
                                 Column(
-                                    key: Key("ingredients_group"),
+                                    key: const Key('ingredients_group'),
                                     children: [
                                       SizedBox(
                                           width: double.infinity,
@@ -197,28 +202,33 @@ class _InitProductPageState extends State<InitProductPage>
                                             style: TextStyles.headline4,
                                             textAlign: TextAlign.left,
                                           )),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       SizedBox(
                                           width: double.infinity,
                                           child: AddPhotoButtonPlante(
-                                            keyButton: Key("ingredients_photo"),
+                                            keyButton:
+                                                const Key('ingredients_photo'),
                                             onAddTap: takeIngredientsPhoto,
                                             onCancelTap: removeIngredientsPhoto,
                                             existingPhoto:
                                                 model.product.imageIngredients,
                                           )),
-                                      SizedBox(height: 16),
+                                      const SizedBox(height: 16),
                                       ingredientsTextGroup(),
                                     ]),
                               if (model.askForVeganStatus())
                                 Column(
-                                    key: Key("vegan_status_group"),
+                                    key: const Key('vegan_status_group'),
                                     children: [
                                       VegStatusSelectionPanel(
-                                        keyPositive: Key("vegan_positive_btn"),
-                                        keyNegative: Key("vegan_negative_btn"),
-                                        keyPossible: Key("vegan_possible_btn"),
-                                        keyUnknown: Key("vegan_unknown_btn"),
+                                        keyPositive:
+                                            const Key('vegan_positive_btn'),
+                                        keyNegative:
+                                            const Key('vegan_negative_btn'),
+                                        keyPossible:
+                                            const Key('vegan_possible_btn'),
+                                        keyUnknown:
+                                            const Key('vegan_unknown_btn'),
                                         title: context.strings
                                             .init_product_page_is_it_vegan,
                                         vegStatus: model.product.veganStatus,
@@ -230,21 +240,21 @@ class _InitProductPageState extends State<InitProductPage>
                                           });
                                         },
                                       ),
-                                      SizedBox(height: 24),
+                                      const SizedBox(height: 24),
                                     ]),
                               if (model.askForVegetarianStatus())
                                 Column(
-                                    key: Key("vegetarian_status_group"),
+                                    key: const Key('vegetarian_status_group'),
                                     children: [
                                       VegStatusSelectionPanel(
-                                        keyPositive:
-                                            Key("vegetarian_positive_btn"),
-                                        keyNegative:
-                                            Key("vegetarian_negative_btn"),
-                                        keyPossible:
-                                            Key("vegetarian_possible_btn"),
+                                        keyPositive: const Key(
+                                            'vegetarian_positive_btn'),
+                                        keyNegative: const Key(
+                                            'vegetarian_negative_btn'),
+                                        keyPossible: const Key(
+                                            'vegetarian_possible_btn'),
                                         keyUnknown:
-                                            Key("vegetarian_unknown_btn"),
+                                            const Key('vegetarian_unknown_btn'),
                                         title: context.strings
                                             .init_product_page_is_it_vegetarian,
                                         vegStatus:
@@ -258,12 +268,12 @@ class _InitProductPageState extends State<InitProductPage>
                                         },
                                       ),
                                     ]),
-                              SizedBox(height: 36),
+                              const SizedBox(height: 36),
                               SizedBox(
                                   width: double.infinity,
                                   child: ButtonOutlinedPlante.withText(
                                     context.strings.global_done,
-                                    key: Key("done_btn"),
+                                    key: const Key('done_btn'),
                                     onPressed:
                                         model.canSaveProduct() && !model.loading
                                             ? saveProduct
@@ -272,47 +282,47 @@ class _InitProductPageState extends State<InitProductPage>
                             ])),
                       ])),
                   AnimatedSwitcher(
-                      duration: Duration(milliseconds: 250),
+                      duration: const Duration(milliseconds: 250),
                       child: model.loading
-                          ? LinearProgressIndicator()
-                          : SizedBox.shrink())
+                          ? const LinearProgressIndicator()
+                          : const SizedBox.shrink())
                 ]))));
   }
 
   Widget ingredientsTextGroup() {
-    final result;
+    final Widget result;
     if (model.askForIngredientsText()) {
       if (!ocrInProgress) {
         result = Column(
-          key: Key("ingredients_text_group"),
+          key: const Key('ingredients_text_group'),
           children: [
             Text(context.strings.init_product_page_verify_ingredients_ocr,
                 style: TextStyles.normal),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             InputFieldMultilinePlante(
-              key: Key("ingredients_text"),
+              key: const Key('ingredients_text'),
               controller: ingredientsTextController,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
           ],
         );
       } else {
-        result = Column(key: Key("ingredients_text_group"), children: [
+        result = Column(key: const Key('ingredients_text_group'), children: [
           Row(children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 8),
+            const CircularProgressIndicator(),
+            const SizedBox(width: 8),
             Text(context.strings.init_product_page_ocr_in_progress,
                 style: TextStyles.normal)
           ]),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
         ]);
       }
     } else {
-      result = SizedBox.shrink();
+      result = const SizedBox.shrink();
     }
 
     return AnimatedSwitcher(
-        duration: Duration(milliseconds: 250), child: result);
+        duration: const Duration(milliseconds: 250), child: result);
   }
 
   void cancel() {
@@ -341,7 +351,7 @@ class _InitProductPageState extends State<InitProductPage>
                   positiveClicked.call();
                 },
               )),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                   child: ButtonFilledPlante.withText(
                 context.strings.global_no,
@@ -370,7 +380,7 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   void takeFrontPhoto() async {
-    takePhoto(ProductImageType.FRONT);
+    await takePhoto(ProductImageType.FRONT);
   }
 
   void removeFrontPhoto() {
@@ -402,7 +412,7 @@ class _InitProductPageState extends State<InitProductPage>
 
   void removeIngredientsPhoto() {
     removePhoto(ProductImageType.INGREDIENTS);
-    ingredientsTextController.text = "";
+    ingredientsTextController.text = '';
   }
 
   void saveProduct() async {

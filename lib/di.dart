@@ -4,6 +4,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
+import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -13,8 +14,6 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/user_params_fetcher.dart';
-
-import 'outside/http_client.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());

@@ -18,13 +18,13 @@ void main() {
     await GetIt.I.reset();
   });
 
-  testWidgets("Successful Google Sign in", (WidgetTester tester) async {
+  testWidgets('Successful Google Sign in', (WidgetTester tester) async {
     final googleAuthorizer = MockGoogleAuthorizer();
     final backend = MockBackend();
     GetIt.I.registerSingleton<GoogleAuthorizer>(googleAuthorizer);
     GetIt.I.registerSingleton<Backend>(backend);
 
-    final googleUser = GoogleUser("bob", "bob@bo.net", "123", DateTime.now());
+    final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
     when(backend.loginOrRegister(any)).thenAnswer((_) async => Ok(UserParams()));
 
@@ -35,12 +35,12 @@ void main() {
           return true;
         }));
 
-    await tester.tap(find.text("Google"));
+    await tester.tap(find.text('Google'));
 
     expect(obtainedParams, isNot(equals(null)));
   });
 
-  testWidgets("Not successful Google Sign in", (WidgetTester tester) async {
+  testWidgets('Not successful Google Sign in', (WidgetTester tester) async {
     final mock = MockGoogleAuthorizer();
     GetIt.I.registerSingleton<GoogleAuthorizer>(mock);
     when(mock.auth()).thenAnswer((_) async => null);
@@ -52,7 +52,7 @@ void main() {
           return true;
         }));
 
-    await tester.tap(find.text("Google"));
+    await tester.tap(find.text('Google'));
 
     expect(obtainedResult, equals(null));
   });

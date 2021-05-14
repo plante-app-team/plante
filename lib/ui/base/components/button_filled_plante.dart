@@ -3,14 +3,14 @@ import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class ButtonFilledPlante extends StatelessWidget {
-  final Key? key;
   final Widget child;
   final VoidCallback? onPressed;
 
-  ButtonFilledPlante({this.key, required this.child, required this.onPressed})
+  const ButtonFilledPlante(
+      {Key? key, required this.child, required this.onPressed})
       : super(key: key);
 
-  ButtonFilledPlante.withText(String text, {this.key, required this.onPressed})
+  ButtonFilledPlante.withText(String text, {Key? key, required this.onPressed})
       : child = Text(text, style: TextStyles.buttonFilled),
         super(key: key);
 
@@ -19,7 +19,6 @@ class ButtonFilledPlante extends StatelessWidget {
     return SizedBox(
         height: 46,
         child: OutlinedButton(
-            child: child,
             style: ButtonStyle(
                 overlayColor:
                     MaterialStateProperty.all(ColorsPlante.splashColor),
@@ -29,6 +28,7 @@ class ButtonFilledPlante extends StatelessWidget {
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)))),
-            onPressed: onPressed));
+            onPressed: onPressed,
+            child: child));
   }
 }
