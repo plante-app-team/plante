@@ -41,7 +41,7 @@ void main() {
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
-    await tester.drag(find.byKey(Key('content')), Offset(0, -3000));
+    await tester.drag(find.byKey(const Key('content')), const Offset(0, -3000));
     await tester.pumpAndSettle();
   }
 
@@ -73,21 +73,21 @@ void main() {
 
     if (nameInput != null) {
       await tester.enterText(
-          find.byKey(Key('name')),
+          find.byKey(const Key('name')),
           nameInput);
       await tester.pumpAndSettle();
     }
 
     if (brandInput != null) {
       await tester.enterText(
-          find.byKey(Key('brand')),
+          find.byKey(const Key('brand')),
           brandInput);
       await tester.pumpAndSettle();
     }
 
     if (categoriesInput != null) {
       await tester.enterText(
-          find.byKey(Key('categories')),
+          find.byKey(const Key('categories')),
           categoriesInput);
       await tester.pumpAndSettle();
     }
@@ -95,7 +95,7 @@ void main() {
     if (takeImageFront) {
       verifyNever(photosTaker.takeAndCropPhoto(any));
       await tester.tap(
-          find.byKey(Key('front_photo')));
+          find.byKey(const Key('front_photo')));
       verify(photosTaker.takeAndCropPhoto(any)).called(1);
       await tester.pumpAndSettle();
     }
@@ -104,7 +104,7 @@ void main() {
       expect(find.text('water, lemon'), findsNothing);
       verifyNever(photosTaker.takeAndCropPhoto(any));
       await tester.tap(
-          find.byKey(Key('ingredients_photo')));
+          find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
       expect(find.text('water, lemon'), findsOneWidget);
       verify(photosTaker.takeAndCropPhoto(any)).called(1);
@@ -112,7 +112,7 @@ void main() {
 
     if (ingredientsTextOverride != null) {
       await tester.enterText(
-          find.byKey(Key('ingredients_text')),
+          find.byKey(const Key('ingredients_text')),
           ingredientsTextOverride);
       await tester.pumpAndSettle();
     }
@@ -122,16 +122,16 @@ void main() {
     if (veganStatusInput != null) {
       switch (veganStatusInput) {
         case VegStatus.positive:
-          await tester.tap(find.byKey(Key('vegan_positive_btn')));
+          await tester.tap(find.byKey(const Key('vegan_positive_btn')));
           break;
         case VegStatus.negative:
-          await tester.tap(find.byKey(Key('vegan_negative_btn')));
+          await tester.tap(find.byKey(const Key('vegan_negative_btn')));
           break;
         case VegStatus.possible:
-          await tester.tap(find.byKey(Key('vegan_possible_btn')));
+          await tester.tap(find.byKey(const Key('vegan_possible_btn')));
           break;
         case VegStatus.unknown:
-          await tester.tap(find.byKey(Key('vegan_unknown_btn')));
+          await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
           break;
         default:
           throw Error();
@@ -141,16 +141,16 @@ void main() {
     if (vegetarianStatusInput != null) {
       switch (vegetarianStatusInput) {
         case VegStatus.positive:
-          await tester.tap(find.byKey(Key('vegetarian_positive_btn')));
+          await tester.tap(find.byKey(const Key('vegetarian_positive_btn')));
           break;
         case VegStatus.negative:
-          await tester.tap(find.byKey(Key('vegetarian_negative_btn')));
+          await tester.tap(find.byKey(const Key('vegetarian_negative_btn')));
           break;
         case VegStatus.possible:
-          await tester.tap(find.byKey(Key('vegetarian_possible_btn')));
+          await tester.tap(find.byKey(const Key('vegetarian_possible_btn')));
           break;
         case VegStatus.unknown:
-          await tester.tap(find.byKey(Key('vegetarian_unknown_btn')));
+          await tester.tap(find.byKey(const Key('vegetarian_unknown_btn')));
           break;
         default:
           throw Error();
@@ -160,7 +160,7 @@ void main() {
 
     expect(done, isFalse);
     verifyNever(productsManager.createUpdateProduct(any, any));
-    await tester.tap(find.byKey(Key('done_btn')));
+    await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     if (expectedProductResult != null) {
       final finalProduct = verify(
@@ -208,13 +208,13 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsNothing);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsNothing);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('name input field not present when product has data', (WidgetTester tester) async {
@@ -223,13 +223,13 @@ void main() {
       ..name = 'Hello there');
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsNothing);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsNothing);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('brand input field not present when product has data', (WidgetTester tester) async {
@@ -238,13 +238,13 @@ void main() {
       ..brands = ListBuilder<String>(['Cool brand']));
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsNothing);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsNothing);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('categories input field not present when product has data', (WidgetTester tester) async {
@@ -253,13 +253,13 @@ void main() {
       ..categories = ListBuilder<String>(['Cool category']));
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsNothing);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsNothing);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group not present when product has data', (WidgetTester tester) async {
@@ -269,13 +269,13 @@ void main() {
       ..ingredientsText = 'Tomato');
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsNothing);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsNothing);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group present when product has no ingredients image but has text', (WidgetTester tester) async {
@@ -284,13 +284,13 @@ void main() {
       ..ingredientsText = 'Tomato');
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group present when product has no ingredients text but has image', (WidgetTester tester) async {
@@ -299,13 +299,13 @@ void main() {
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path));
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group not present when product has data', (WidgetTester tester) async {
@@ -315,13 +315,13 @@ void main() {
       ..veganStatusSource = VegStatusSource.community);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsNothing);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsNothing);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group present when product has vegan data from OFF', (WidgetTester tester) async {
@@ -331,13 +331,13 @@ void main() {
       ..veganStatusSource = VegStatusSource.open_food_facts);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group present when product has vegan data without source', (WidgetTester tester) async {
@@ -346,13 +346,13 @@ void main() {
       ..veganStatus = VegStatus.positive);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegetarian group not present when product has data', (WidgetTester tester) async {
@@ -362,13 +362,13 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsNothing);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsNothing);
   });
 
   testWidgets('vegetarian group present when product has vegetarian data from OFF', (WidgetTester tester) async {
@@ -378,13 +378,13 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.open_food_facts);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegetarian group present when product has vegetarian data without source', (WidgetTester tester) async {
@@ -393,13 +393,13 @@ void main() {
       ..vegetarianStatus = VegStatus.positive);
     await tester.superPump(InitProductPage(initialProduct));
 
-    expect(find.byKey(Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(Key('name_group')), findsWidgets);
-    expect(find.byKey(Key('brand_group')), findsWidgets);
-    expect(find.byKey(Key('categories_group')), findsWidgets);
-    expect(find.byKey(Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(Key('vegetarian_status_group')), findsWidgets);
+    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
+    expect(find.byKey(const Key('name_group')), findsWidgets);
+    expect(find.byKey(const Key('brand_group')), findsWidgets);
+    expect(find.byKey(const Key('categories_group')), findsWidgets);
+    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
+    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('cannot save product without name', (WidgetTester tester) async {

@@ -24,7 +24,6 @@ analyzer:
     unnecessary_null_comparison: warning
   exclude:
     - "bin/cache/**"
-    - "test/**"
     - "lib/**.g.dart"
     - "submodules/**"
 

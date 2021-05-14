@@ -10,7 +10,7 @@ extension WidgetTesterExtension on WidgetTester {
     late BuildContext _context;
 
     final Widget widgetWrapper = MediaQuery(
-        data: MediaQueryData(),
+        data: const MediaQueryData(),
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: Builder(

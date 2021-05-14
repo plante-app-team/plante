@@ -107,7 +107,7 @@ void main() {
         findsOneWidget);
 
     final ingredientsAnalysisTable =
-    find.byKey(Key('ingredients_analysis_table')).evaluate().single.widget as Table;
+    find.byKey(const Key('ingredients_analysis_table')).evaluate().single.widget as Table;
     // 2 + header
     expect(ingredientsAnalysisTable.children.length, equals(3));
 
@@ -144,7 +144,7 @@ void main() {
       ..eatsMilk = false
       ..eatsHoney = false);
     await userParamsController.setUserParams(vegan);
-    var context = await tester.superPump(DisplayProductPage(product, key: Key('page1')));
+    var context = await tester.superPump(DisplayProductPage(product, key: const Key('page1')));
     expect(
         find.text(context.strings.veg_status_displayed_not_vegan),
         findsOneWidget);
@@ -160,7 +160,7 @@ void main() {
 
     final vegetarian = vegan.rebuild((v) => v.eatsMilk = true);
     await userParamsController.setUserParams(vegetarian);
-    context = await tester.superPump(DisplayProductPage(product, key: Key('page2')));
+    context = await tester.superPump(DisplayProductPage(product, key: const Key('page2')));
     expect(
         find.text(context.strings.veg_status_displayed_not_vegan),
         findsNothing);
@@ -219,7 +219,7 @@ void main() {
       find.text(context.strings.display_product_page_click_to_help_with_veg_statuses),
       findsOneWidget);
     expect(
-        find.byKey(Key('init_product_page')),
+        find.byKey(const Key('init_product_page')),
         findsNothing);
 
     await tester.tap(
@@ -227,18 +227,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-        find.byKey(Key('init_product_page')),
+        find.byKey(const Key('init_product_page')),
         findsWidgets);
 
-    await tester.tap(find.byKey(Key('vegan_unknown_btn')));
+    await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
     await tester.pumpAndSettle();
-    await tester.drag(find.byKey(Key('content')), Offset(0, -3000));
+    await tester.drag(find.byKey(const Key('content')), const Offset(0, -3000));
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
     expect(
-        find.byKey(Key('init_product_page')),
+        find.byKey(const Key('init_product_page')),
         findsNothing);
     expect(
         find.text(context.strings.display_product_page_help_with_veg_statuses),
@@ -270,7 +270,7 @@ void main() {
 
     verifyNever(backend.sendReport('123', 'Bad, bad product!'));
 
-    await tester.enterText(find.byKey(Key('report_text')), 'Bad, bad product!');
+    await tester.enterText(find.byKey(const Key('report_text')), 'Bad, bad product!');
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.display_product_page_report_send));
     await tester.pumpAndSettle();
