@@ -133,9 +133,6 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
 
   @override
   Widget build(BuildContext context) {
-    GetIt.I.get<LangCodeHolder>().langCode =
-        Localizations.localeOf(context).languageCode;
-
     return Scaffold(
         backgroundColor: _BACKGROUND_COLOR,
         body: SafeArea(

@@ -29,7 +29,8 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
 
   @override
   _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>> getProduct(
-          String? barcodeRaw, String? langCode) =>
+          String? barcodeRaw,
+          [String? langCode]) =>
       (super.noSuchMethod(
               Invocation.method(#getProduct, [barcodeRaw, langCode]),
               returnValue: Future.value(
@@ -37,7 +38,7 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
           as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
   @override
   _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>
-      createUpdateProduct(_i5.Product? product, String? langCode) => (super
+      createUpdateProduct(_i5.Product? product, [String? langCode]) => (super
               .noSuchMethod(
                   Invocation.method(#createUpdateProduct, [product, langCode]),
                   returnValue: Future.value(
@@ -45,8 +46,8 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
           as _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>);
   @override
   _i4.Future<_i2.Result<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>
-      updateProductAndExtractIngredients(
-              _i5.Product? product, String? langCode) =>
+      updateProductAndExtractIngredients(_i5.Product? product,
+              [String? langCode]) =>
           (super.noSuchMethod(
               Invocation.method(
                   #updateProductAndExtractIngredients, [product, langCode]),

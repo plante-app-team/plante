@@ -14,6 +14,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/base/lang_code_holder.dart';
 
 class ProductWithOCRIngredients {
   Product product;
@@ -38,12 +39,15 @@ class ProductsManager {
 
   final OffApi _off;
   final Backend _backend;
+  final LangCodeHolder _langCodeHolder;
   final _productsCache = <String, Product>{};
 
-  ProductsManager(this._off, this._backend);
+  ProductsManager(this._off, this._backend, this._langCodeHolder);
 
-  Future<Result<Product?, ProductsManagerError>> getProduct(
-      String barcodeRaw, String langCode) async {
+  Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw,
+      [String? langCode]) async {
+    langCode ??= _langCodeHolder.langCode;
+
     final configuration = off.ProductQueryConfiguration(barcodeRaw,
         lc: langCode,
         language: off.LanguageHelper.fromJson(langCode),
@@ -83,7 +87,7 @@ class ProductsManager {
       ..ingredientsText = offProduct.ingredientsTextTranslated
       ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
       ..imageFront = _extractImageUri(
-          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode)
+          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode!)
       ..imageFrontThumb = _extractImageUri(
           offProduct, off.ImageField.FRONT, off.ImageSize.SMALL, langCode)
       ..imageIngredients = _extractImageUri(offProduct,
@@ -179,7 +183,10 @@ class ProductsManager {
 
   /// Returns updated product if update was successful
   Future<Result<Product, ProductsManagerError>> createUpdateProduct(
-      Product product, String langCode) async {
+      Product product,
+      [String? langCode]) async {
+    langCode ??= _langCodeHolder.langCode;
+
     final cachedProduct = _productsCache[product.barcode];
     if (cachedProduct != null) {
       final allBrands =
@@ -311,8 +318,10 @@ class ProductsManager {
   }
 
   Future<Result<ProductWithOCRIngredients, ProductsManagerError>>
-      updateProductAndExtractIngredients(
-          Product product, String langCode) async {
+      updateProductAndExtractIngredients(Product product,
+          [String? langCode]) async {
+    langCode ??= _langCodeHolder.langCode;
+
     final productUpdateResult = await createUpdateProduct(product, langCode);
     if (productUpdateResult.isErr) {
       return Err(productUpdateResult.unwrapErr());

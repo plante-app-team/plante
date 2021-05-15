@@ -8,6 +8,7 @@ import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:test/test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
@@ -64,7 +65,7 @@ void main() {
   setUp(() {
     offApi = MockOffApi();
     backend = MockBackend();
-    productsManager = ProductsManager(offApi, backend);
+    productsManager = ProductsManager(offApi, backend, LangCodeHolder.inited('en'));
 
     when(offApi.saveProduct(any, any)).thenAnswer((_) async => off.Status());
     when(offApi.getProduct(any)).thenAnswer((_) async =>

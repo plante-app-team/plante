@@ -12,6 +12,7 @@ import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/model/product.dart' as _i5;
 import 'package:plante/model/user_params.dart' as _i8;
 import 'package:plante/model/veg_status.dart' as _i11;
+import 'package:plante/model/viewed_products_storage.dart' as _i15;
 import 'package:plante/outside/backend/backend.dart' as _i7;
 import 'package:plante/outside/backend/backend_error.dart' as _i9;
 import 'package:plante/outside/backend/backend_product.dart' as _i10;
@@ -33,7 +34,8 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
 
   @override
   _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>> getProduct(
-          String? barcodeRaw, String? langCode) =>
+          String? barcodeRaw,
+          [String? langCode]) =>
       (super.noSuchMethod(
               Invocation.method(#getProduct, [barcodeRaw, langCode]),
               returnValue: Future.value(
@@ -41,7 +43,7 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
           as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
   @override
   _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>
-      createUpdateProduct(_i5.Product? product, String? langCode) => (super
+      createUpdateProduct(_i5.Product? product, [String? langCode]) => (super
               .noSuchMethod(
                   Invocation.method(#createUpdateProduct, [product, langCode]),
                   returnValue: Future.value(
@@ -49,8 +51,8 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
           as _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>);
   @override
   _i4.Future<_i2.Result<_i3.ProductWithOCRIngredients, _i6.ProductsManagerError>>
-      updateProductAndExtractIngredients(
-              _i5.Product? product, String? langCode) =>
+      updateProductAndExtractIngredients(_i5.Product? product,
+              [String? langCode]) =>
           (super.noSuchMethod(
               Invocation.method(
                   #updateProductAndExtractIngredients, [product, langCode]),
@@ -201,4 +203,37 @@ class MockPermissionsManager extends _i1.Mock
   _i4.Future<bool> openAppSettings() =>
       (super.noSuchMethod(Invocation.method(#openAppSettings, []),
           returnValue: Future.value(false)) as _i4.Future<bool>);
+}
+
+/// A class which mocks [ViewedProductsStorage].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockViewedProductsStorage extends _i1.Mock
+    implements _i15.ViewedProductsStorage {
+  MockViewedProductsStorage() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Stream<void> updates() =>
+      (super.noSuchMethod(Invocation.method(#updates, []),
+          returnValue: const Stream<void>.empty()) as _i4.Stream<void>);
+  @override
+  _i4.Future<void> loadPersistentProductsForTesting() => (super.noSuchMethod(
+      Invocation.method(#loadPersistentProductsForTesting, []),
+      returnValue: Future.value(null),
+      returnValueForMissingStub: Future.value()) as _i4.Future<void>);
+  @override
+  List<_i5.Product> getProducts() =>
+      (super.noSuchMethod(Invocation.method(#getProducts, []),
+          returnValue: <_i5.Product>[]) as List<_i5.Product>);
+  @override
+  void addProduct(_i5.Product? product) =>
+      super.noSuchMethod(Invocation.method(#addProduct, [product]),
+          returnValueForMissingStub: null);
+  @override
+  _i4.Future<void> purgeForTesting() =>
+      (super.noSuchMethod(Invocation.method(#purgeForTesting, []),
+          returnValue: Future.value(null),
+          returnValueForMissingStub: Future.value()) as _i4.Future<void>);
 }

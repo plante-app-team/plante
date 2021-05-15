@@ -10,6 +10,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/back_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -41,7 +42,7 @@ class DisplayProductPage extends StatefulWidget {
 
 class _DisplayProductPageState extends State<DisplayProductPage> {
   Product product;
-  late final UserParams user;
+  final UserParams user;
   final ProductUpdatedCallback? productUpdatedCallback;
 
   final reportTextController = TextEditingController();
@@ -50,8 +51,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   bool get reportSendAllowed => reportTextController.text.trim().length > 3;
   bool loading = false;
 
-  _DisplayProductPageState(this.product, this.productUpdatedCallback) {
-    user = GetIt.I.get<UserParamsController>().cachedUserParams!;
+  _DisplayProductPageState(this.product, this.productUpdatedCallback)
+      : user = GetIt.I.get<UserParamsController>().cachedUserParams! {
+    GetIt.I.get<ViewedProductsStorage>().addProduct(product);
   }
 
   @override

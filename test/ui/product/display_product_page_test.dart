@@ -13,6 +13,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -28,6 +29,7 @@ void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
   late FakeUserParamsController userParamsController;
+  late ViewedProductsStorage viewedProductsStorage;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -53,6 +55,9 @@ void main() {
       ..eatsHoney = false);
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
+
+    viewedProductsStorage = ViewedProductsStorage(loadPersistentProducts: false);
+    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable
@@ -276,5 +281,20 @@ void main() {
     await tester.pumpAndSettle();
 
     verify(backend.sendReport('123', 'Bad, bad product!')).called(1);
+  });
+
+  testWidgets('viewed product is stored persistently', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar');
+
+    expect(viewedProductsStorage.getProducts(), equals([]));
+    await tester.superPump(DisplayProductPage(product));
+    expect(viewedProductsStorage.getProducts(), equals([product]));
   });
 }

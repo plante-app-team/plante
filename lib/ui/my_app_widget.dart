@@ -11,7 +11,7 @@ import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/ui/scan/barcode_scan_page.dart';
+import 'package:plante/ui/scan/barcode_scan_main_page.dart';
 
 class MyAppWidget extends StatefulWidget {
   final UserParams? _initialUserParams;
@@ -71,7 +71,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
 
   Widget _mainWidget() {
     if (_allRequiredUserParamsFilled()) {
-      return BarcodeScanPage();
+      return const BarcodeScanMainPage();
     }
     if (_initialUserParams != null) {
       return InitUserPage(_initialUserParams!, _onUserParamsSpecified);

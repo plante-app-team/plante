@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/http_client.dart';
@@ -34,8 +35,11 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));
-  GetIt.I.registerSingleton<ProductsManager>(
-      ProductsManager(GetIt.I.get<OffApi>(), GetIt.I.get<Backend>()));
+  GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
+      GetIt.I.get<OffApi>(),
+      GetIt.I.get<Backend>(),
+      GetIt.I.get<LangCodeHolder>()));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
+  GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
 }

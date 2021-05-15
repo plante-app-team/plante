@@ -36,6 +36,7 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    Uri? uri;
     // ignore: prefer_function_declarations_over_variables
     final imageProviderCallback = (ImageProvider provider) async {
       if (dominantColor != null || isInTests()) {
@@ -49,9 +50,15 @@ class _ProductCardState extends State<ProductCard> {
       setState(() {
         dominantColor = paletteGenerator.dominantColor?.color ??
             ColorsPlante.primaryDisabled;
+        _dominantColorsCache[uri!] = dominantColor!;
       });
     };
     final img = photo(imageProviderCallback);
+    uri = img?.uri;
+    Color defaultDominantColor = ColorsPlante.primaryDisabled;
+    if (uri != null && _dominantColorsCache.containsKey(uri)) {
+      defaultDominantColor = _dominantColorsCache[uri]!;
+    }
 
     return Material(
         color: Colors.white,
@@ -68,7 +75,7 @@ class _ProductCardState extends State<ProductCard> {
                   duration: const Duration(milliseconds: 250),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: dominantColor ?? ColorsPlante.primaryDisabled,
+                    color: dominantColor ?? defaultDominantColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: AspectRatio(
@@ -109,3 +116,5 @@ class _ProductCardState extends State<ProductCard> {
     return UriImagePlante(uri, imageProviderCallback: imageProviderCallback);
   }
 }
+
+final _dominantColorsCache = <Uri, Color>{};

@@ -155,3 +155,5 @@ flutter:
     - assets/expand_down.svg
     - assets/expand_up.svg
     - assets/report.svg
+    - assets/barcode.svg
+    - assets/history.svg
