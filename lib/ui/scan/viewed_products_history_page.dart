@@ -31,8 +31,6 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
   final UserParams user;
   final ProductsManager productsManager;
 
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? lastSnackBar;
-
   bool loading = false;
 
   List<Product> products = [];
@@ -80,7 +78,8 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
                 padding: const EdgeInsets.only(left: 16, right: 16),
                 child: SizedBox(
                     width: double.infinity,
-                    child: Text(context.strings.viewed_products_history_page_title,
+                    child: Text(
+                        context.strings.viewed_products_history_page_title,
                         style: TextStyles.headline1))),
             const SizedBox(height: 16),
             Expanded(
@@ -105,6 +104,7 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
     if (loading) {
       return;
     }
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     setState(() {
       loading = true;
     });
@@ -114,28 +114,18 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
       if (productUpdatedResult.isOk) {
         final productUpdated = productUpdatedResult.unwrap();
         if (productUpdated != null) {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ProductPageWrapper(productUpdated,
-                      productUpdatedCallback:
-                          viewedProductsStorage.addProduct)));
+          openProductPage(productUpdated);
         } else {
           Log.w(
               'Product exist in viewed history but not on backends: $product');
-          lastSnackBar?.close();
-          lastSnackBar = showSnackBar(
-              context.strings.global_something_went_wrong, context);
+          showSnackBar(context.strings.global_something_went_wrong, context);
         }
       } else {
-        lastSnackBar?.close();
         if (productUpdatedResult.unwrapErr() ==
             ProductsManagerError.NETWORK_ERROR) {
-          lastSnackBar =
-              showSnackBar(context.strings.global_network_error, context);
+          showSnackBar(context.strings.global_network_error, context);
         } else {
-          lastSnackBar = showSnackBar(
-              context.strings.global_something_went_wrong, context);
+          showSnackBar(context.strings.global_something_went_wrong, context);
         }
       }
     } finally {
@@ -143,5 +133,13 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
         loading = false;
       });
     }
+  }
+
+  void openProductPage(Product productUpdated) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProductPageWrapper(productUpdated,
+                productUpdatedCallback: viewedProductsStorage.addProduct)));
   }
 }

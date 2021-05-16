@@ -110,5 +110,8 @@
     "veg_status_displayed_veg_status_source_moderator": "Проверено модератором",
     "veg_status_displayed_veg_status_source_unknown": "Внутренняя ошибка: источник неизвестен",
 
-    "viewed_products_history_page_title": "Recently viewed"
+    "viewed_products_history_page_title": "Недавно просмотренные",
+
+    "expandable_plante_expand": "Развернуть",
+    "expandable_plante_collapse": "Свернуть"
 }

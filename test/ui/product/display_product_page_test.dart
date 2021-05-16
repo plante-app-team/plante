@@ -112,7 +112,7 @@ void main() {
         findsOneWidget);
 
     final ingredientsAnalysisTable =
-    find.byKey(const Key('ingredients_analysis_table')).evaluate().single.widget as Table;
+    find.byKey(const Key('ingredients_analysis_table')).evaluate().first.widget as Table;
     // 2 + header
     expect(ingredientsAnalysisTable.children.length, equals(3));
 

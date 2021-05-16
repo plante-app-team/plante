@@ -12,7 +12,7 @@ class BottomBarPlante extends StatelessWidget {
       required this.svgIcons,
       required this.selectedIcon,
       required this.onIconClick,
-        this.iconsKeys})
+      this.iconsKeys})
       : super(key: key);
 
   @override
@@ -41,9 +41,7 @@ class BottomBarPlante extends StatelessWidget {
                   icon: SvgPicture.asset(svgIcons[index],
                       color: index == selectedIcon
                           ? ColorsPlante.primary
-                          : const Color(0xFF979A9C)))
-          )
-      );
+                          : const Color(0xFF979A9C)))));
       result.add(button);
     }
     return result;

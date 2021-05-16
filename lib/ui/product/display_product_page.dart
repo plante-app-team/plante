@@ -14,6 +14,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/back_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
@@ -47,23 +48,12 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
 
   final reportTextController = TextEditingController();
   final expandController = ExpandableController();
-  bool expanded = false;
   bool get reportSendAllowed => reportTextController.text.trim().length > 3;
   bool loading = false;
 
   _DisplayProductPageState(this.product, this.productUpdatedCallback)
       : user = GetIt.I.get<UserParamsController>().cachedUserParams! {
     GetIt.I.get<ViewedProductsStorage>().addProduct(product);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    expandController.addListener(() {
-      setState(() {
-        expanded = expandController.expanded;
-      });
-    });
   }
 
   @override
@@ -124,20 +114,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                           style: TextStyles.normal)),
                   const SizedBox(height: 24),
                 ])),
-            if (haveIngredientsAnalysis())
-              Column(children: [
-                Padding(
-                    padding: const EdgeInsets.only(left: 24, right: 24),
-                    child: Row(children: [
-                      Text(
-                          context.strings
-                              .display_product_page_ingredients_analysis,
-                          style: TextStyles.normalBold),
-                      InfoButtonPlante(onTap: showVegStatusesExplanation)
-                    ])),
-                const SizedBox(height: 16),
-                ingredientsAnalysisTable()
-              ]),
+            if (haveIngredientsAnalysis()) ingredientsAnalysisWidget(),
             const SizedBox(height: 16),
             InkWell(
               onTap: onReportClick,
@@ -158,6 +135,33 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
             )
           ]),
         ]))));
+  }
+
+  Widget ingredientsAnalysisWidget() {
+    if (product.ingredientsAnalyzed?.length == 1) {
+      return ingredientsAnalysisWidgetWithLines(9999);
+    }
+    return ExpandablePlante(
+      collapsed: ingredientsAnalysisWidgetWithLines(1),
+      expanded: Column(children: [
+        ingredientsAnalysisWidgetWithLines(9999),
+        const SizedBox(height: 58)
+      ]),
+    );
+  }
+
+  Column ingredientsAnalysisWidgetWithLines(int lines) {
+    return Column(children: [
+      Padding(
+          padding: const EdgeInsets.only(left: 24, right: 24),
+          child: Row(children: [
+            Text(context.strings.display_product_page_ingredients_analysis,
+                style: TextStyles.normalBold),
+            InfoButtonPlante(onTap: showVegStatusesExplanation)
+          ])),
+      const SizedBox(height: 16),
+      ingredientsAnalysisTable(lines)
+    ]);
   }
 
   bool askForVegStatusHelp() {
@@ -213,7 +217,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       product.ingredientsAnalyzed != null &&
       product.ingredientsAnalyzed!.isNotEmpty;
 
-  Widget ingredientsAnalysisTable() {
+  Widget ingredientsAnalysisTable(int maxLines) {
     final rows = <TableRow>[];
     const rowHeight = 30.0;
 
@@ -248,6 +252,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
       const SizedBox(width: 24),
     ], decoration: BoxDecoration(color: nextColor())));
     final ingredients = product.ingredientsAnalyzed!;
+    var linesCount = 0;
     for (final ingredient in ingredients) {
       rows.add(TableRow(
         children: <Widget>[
@@ -269,6 +274,10 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
         ],
         decoration: BoxDecoration(color: nextColor()),
       ));
+      linesCount += 1;
+      if (linesCount >= maxLines) {
+        break;
+      }
     }
     return Table(
         key: const Key('ingredients_analysis_table'),
