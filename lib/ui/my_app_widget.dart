@@ -61,7 +61,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
         theme: ThemeData(
           primarySwatch: ColorsPlante.primaryMaterial,
           accentColor: ColorsPlante.primary,
-          unselectedWidgetColor: const Color(0xFFB5B7C3),
+          unselectedWidgetColor: const Color(0xFF979A9C),
           fontFamily: 'Poppins',
         ),
         home: AnimatedSwitcher(

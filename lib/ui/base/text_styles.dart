@@ -4,29 +4,32 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 
 class TextStyles {
-  static TextStyle get normal => GoogleFonts.exo2(
-      color: const Color.fromARGB(255, 38, 50, 56), fontSize: 14);
+  static const TextStyle normal =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF263238));
 
-  static TextStyle get normalBold => GoogleFonts.exo2(
-      color: const Color.fromARGB(255, 38, 50, 56),
+  static const TextStyle normalBold = TextStyle(
+      fontFamily: 'OpenSans',
       fontSize: 14,
-      fontWeight: FontWeight.bold);
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF1E2030));
 
-  static TextStyle get normalColored =>
-      GoogleFonts.exo2(color: ColorsPlante.primary, fontSize: 14);
+  static const TextStyle normalColored = TextStyle(
+      fontFamily: 'OpenSans', fontSize: 14, color: ColorsPlante.primary);
 
-  static TextStyle get headline1 => GoogleFonts.exo2(
-      color: const Color(0xFF192123),
+  static const TextStyle normalSmall =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF192123));
+
+  static const TextStyle headline1 = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.w700,
       fontSize: 24,
-      fontWeight: FontWeight.bold);
+      color: Color(0xFF192123));
 
   static TextStyle get headline2 =>
       GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);
 
-  static TextStyle get headline3 => GoogleFonts.exo2(
-      color: const Color(0xff231f20),
-      fontSize: 16,
-      fontWeight: FontWeight.bold);
+  static const TextStyle headline3 =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 16, color: Color(0xFF192123));
 
   static TextStyle get headline4 => GoogleFonts.exo2(
       color: const Color(0xFF231f20),
@@ -39,8 +42,11 @@ class TextStyles {
   static TextStyle get inputLabel =>
       GoogleFonts.exo2(color: Colors.black, fontSize: 16);
 
-  static TextStyle get buttonFilled => GoogleFonts.exo2(
-      color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold);
+  static const TextStyle buttonFilled = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.w700,
+      fontSize: 16,
+      color: Colors.white);
 
   static TextStyle get buttonOutlinedEnabled => GoogleFonts.exo2(
       color: ColorsPlante.primary, fontSize: 18, fontWeight: FontWeight.bold);
@@ -50,7 +56,7 @@ class TextStyles {
       fontSize: 18,
       fontWeight: FontWeight.bold);
 
-  static TextStyle get branding => const TextStyle(
+  static const TextStyle branding = TextStyle(
       fontFamily: 'Poppins',
       fontWeight: FontWeight.w500,
       fontSize: 24,

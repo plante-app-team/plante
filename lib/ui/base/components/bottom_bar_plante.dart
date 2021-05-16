@@ -30,9 +30,12 @@ class BottomBarPlante extends StatelessWidget {
   List<Widget> buttons() {
     final result = <Widget>[];
     for (var index = 0; index < svgIcons.length; ++index) {
+      final paddingLeft = index == 0 ? 12.25 : 0.0;
+      final paddingRight = index == svgIcons.length - 1 ? 12.25 : 0.0;
       final button = Expanded(
           child: Padding(
-              padding: const EdgeInsets.only(bottom: 7),
+              padding: EdgeInsets.only(
+                  bottom: 7, left: paddingLeft, right: paddingRight),
               child: IconButton(
                   key: iconsKeys?[index],
                   onPressed: () {
@@ -43,21 +46,6 @@ class BottomBarPlante extends StatelessWidget {
                           ? ColorsPlante.primary
                           : const Color(0xFF979A9C)))));
       result.add(button);
-    }
-    return result;
-  }
-
-  List<Widget> buttonsOld() {
-    final result = <Widget>[];
-    for (var index = 0; index < svgIcons.length; ++index) {
-      result.add(IconButton(
-          onPressed: () {
-            onIconClick.call(index);
-          },
-          icon: SvgPicture.asset(svgIcons[index],
-              color: index == selectedIcon
-                  ? ColorsPlante.primary
-                  : const Color(0xFF979A9C))));
     }
     return result;
   }

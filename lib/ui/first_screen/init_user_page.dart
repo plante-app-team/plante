@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
+import 'package:plante/ui/base/components/radio_plante.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -165,11 +167,11 @@ class _InitUserPageState extends State<InitUserPage> {
               context.strings.init_user_page_nice_to_meet_you +
                   _nameController.text,
               style: TextStyles.headline1)),
-      const SizedBox(height: 24),
+      const SizedBox(height: 12),
       SizedBox(
           width: double.infinity,
           child: Text(context.strings.init_user_page_tell_about_yourself,
-              style: TextStyles.headline2)),
+              style: TextStyles.headline3)),
       const SizedBox(height: 16),
       InkWell(
         onTap: () {
@@ -179,7 +181,8 @@ class _InitUserPageState extends State<InitUserPage> {
             color: const Color(0xFFF6F7FA),
             height: 48,
             child: Row(children: [
-              Radio<bool>(
+              const SizedBox(width: 10),
+              RadioPlante<bool>(
                   value: true,
                   groupValue: isVegan,
                   onChanged: (bool? value) {
@@ -198,14 +201,15 @@ class _InitUserPageState extends State<InitUserPage> {
             color: const Color(0xFFF6F7FA),
             height: 48,
             child: Row(children: [
-              Radio<bool>(
+              const SizedBox(width: 10),
+              RadioPlante<bool>(
                   value: false,
                   groupValue: isVegan,
                   onChanged: (bool? value) {
                     if (value == null) {
                       isVegan = null;
                     } else {
-                      isVegan = !value;
+                      isVegan = value;
                     }
                   }),
               Text(context.strings.init_user_page_im_vegetarian,
@@ -222,12 +226,13 @@ class _InitUserPageState extends State<InitUserPage> {
           color: const Color(0xFFF6F7FA),
           height: 48,
           child: Row(children: [
+            const SizedBox(width: 10),
             InkWell(
                 onTap: () {
                   onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
                 },
                 child: Row(children: [
-                  Checkbox(
+                  CheckboxPlante(
                       value: _userParams.eatsEggs ?? false,
                       onChanged: onEggsCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_eggs),
@@ -238,7 +243,7 @@ class _InitUserPageState extends State<InitUserPage> {
                   onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
                 },
                 child: Row(children: [
-                  Checkbox(
+                  CheckboxPlante(
                       value: _userParams.eatsMilk ?? false,
                       onChanged: onMilkCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_milk),
@@ -249,7 +254,7 @@ class _InitUserPageState extends State<InitUserPage> {
                   onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false));
                 },
                 child: Row(children: [
-                  Checkbox(
+                  CheckboxPlante(
                       value: _userParams.eatsHoney ?? false,
                       onChanged: onHoneyCheckboxClick),
                   Text(context.strings.init_user_page_i_eat_honey),

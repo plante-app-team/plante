@@ -149,7 +149,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                 width: double.infinity,
                 color: _BACKGROUND_COLOR,
                 child: Column(children: [
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14), // DANIL
                   Expanded(child: contentWidget()),
                 ]),
               ),
@@ -237,7 +237,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           BoxWithCircleCutout(
             width: double.infinity,
             height: circleSize + 4,
-            cutoutPadding: 4,
+            cutoutPadding: 2,
             color: color,
           ),
         ]));

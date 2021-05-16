@@ -6,6 +6,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/ui/base/text_styles.dart';
 
 class VegStatusDisplayed extends StatelessWidget {
   final Product product;
@@ -23,7 +24,9 @@ class VegStatusDisplayed extends StatelessWidget {
         const SizedBox(width: 6),
         Flexible(
             child: Text(_vegStatusText(context),
-                maxLines: 1, overflow: TextOverflow.ellipsis))
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.normalSmall))
       ]),
       const SizedBox(height: 4),
       Row(children: [
@@ -31,7 +34,9 @@ class VegStatusDisplayed extends StatelessWidget {
         const SizedBox(width: 6),
         Flexible(
             child: Text(_vegStatusSourceText(context),
-                maxLines: 1, overflow: TextOverflow.ellipsis))
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.normalSmall))
       ])
     ]);
   }
@@ -62,15 +67,27 @@ class VegStatusDisplayed extends StatelessWidget {
     switch (_vegStatus()) {
       case VegStatus.positive:
         if (_isUserVegan()) {
-          return SvgPicture.asset('assets/veg_status_vegan.svg');
+          return SizedBox(
+              width: 18,
+              height: 18,
+              child: SvgPicture.asset('assets/veg_status_vegan.svg'));
         } else {
-          return SvgPicture.asset('assets/veg_status_vegetarian.svg');
+          return SizedBox(
+              width: 18,
+              height: 18,
+              child: SvgPicture.asset('assets/veg_status_vegetarian.svg'));
         }
       case VegStatus.negative:
-        return SvgPicture.asset('assets/veg_status_negative.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_negative.svg'));
       case VegStatus.possible: // Fallthrough
       case VegStatus.unknown:
-        return SvgPicture.asset('assets/veg_status_unknown.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: Image.asset('assets/veg_status_unknown.png'));
       default:
         throw Exception('Unknown veg status: ${_vegStatus()}');
     }
@@ -109,13 +126,25 @@ class VegStatusDisplayed extends StatelessWidget {
   Widget _vegStatusSourceImage() {
     switch (_vegStatusSource()) {
       case VegStatusSource.open_food_facts:
-        return SvgPicture.asset('assets/veg_status_source_auto.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_source_auto.svg'));
       case VegStatusSource.community:
-        return SvgPicture.asset('assets/veg_status_source_community.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_source_community.svg'));
       case VegStatusSource.moderator:
-        return SvgPicture.asset('assets/veg_status_source_moderator.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_source_moderator.svg'));
       case VegStatusSource.unknown:
-        return SvgPicture.asset('assets/veg_status_source_unknown.svg');
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_source_unknown.svg'));
       default:
         throw Exception('Unknown veg status source: ${_vegStatusSource()}');
     }

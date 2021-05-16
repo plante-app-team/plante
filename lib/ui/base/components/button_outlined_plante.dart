@@ -23,6 +23,8 @@ class ButtonOutlinedPlante extends StatelessWidget {
         height: 46,
         child: OutlinedButton(
             style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                    const EdgeInsets.only(left: 24, right: 24)),
                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
                 overlayColor:
                     MaterialStateProperty.all(ColorsPlante.primaryDisabled),

@@ -20,7 +20,7 @@
     "init_user_page_title": "Как к вам обращаться?",
     "init_user_page_name_field_title": "Имя",
     "init_user_page_name_field_hint": "Мария",
-    "init_user_page_nice_to_meet_you": "Приятно познакомиться, ",
+    "init_user_page_nice_to_meet_you": "Приятно\nпознакомиться, ",
     "init_user_page_tell_about_yourself": "Расскажите немного о себе:",
     "init_user_page_im_vegan": "Я веган/веганка",
     "init_user_page_im_vegetarian": "Я вегетарианец/вегетарианка",
@@ -37,10 +37,12 @@
     "map_page_default_shop_type_name": "Магазин",
     "map_page_btn_where_am_i": "Где я?",
 
-    "barcode_scan_page_product_not_found": "У нас пока недостаточно данных об этом продукте, но вы можете помочь сообществу и добавить их",
+    "barcode_scan_page_product_not_found": "Продукт не найден",
+    "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
     "barcode_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
+    "barcode_scan_page_point_camera_at_next_barcode": "Наведите камеру на следующий штрихкод",
     "barcode_scan_page_searching_product": "Ищем продукт ",
-    "barcode_scan_page_add_product": "Добавить",
+    "barcode_scan_page_add_product": "Добавить продукт",
     "barcode_scan_page_camera_permission_reasoning": "Для включения сканера, приложению необходимо разрешение на использование камеры",
     "barcode_scan_page_camera_permission_reasoning_settings": "Для включения сканера нужно дать разрешение на использование камеры, перейдя в настройки",
 

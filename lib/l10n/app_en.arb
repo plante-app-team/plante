@@ -37,10 +37,12 @@
       "map_page_default_shop_type_name": "Shop",
       "map_page_btn_where_am_i": "Where am I?",
 
-      "barcode_scan_page_product_not_found": "We don't have enough data for this product yet - but you can help the community by adding it",
+      "barcode_scan_page_product_not_found": "Product not found",
+      "barcode_scan_page_product_not_found_descr": "We don't have enough data yet about product <PRODUCT>, but you can help the community by adding it",
       "barcode_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",
+      "barcode_scan_page_point_camera_at_next_barcode": "Aim the camera at the next barcode",
       "barcode_scan_page_searching_product": "Searching product ",
-      "barcode_scan_page_add_product": "Add",
+      "barcode_scan_page_add_product": "Add product",
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",

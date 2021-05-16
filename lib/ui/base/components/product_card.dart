@@ -91,11 +91,11 @@ class _ProductCardState extends State<ProductCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                       const SizedBox(height: 10),
-                      Text(product.name!,
-                          style: TextStyles.headline2,
+                      Text(product.name ?? '???',
+                          style: TextStyles.normalBold,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 4),
                       VegStatusDisplayed(product: product, user: beholder)
                     ])),
               ]),

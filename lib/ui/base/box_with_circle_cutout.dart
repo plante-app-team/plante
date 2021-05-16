@@ -19,7 +19,8 @@ class BoxWithCircleCutout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipPath(
-        clipper: _Clipper((width < height ? width : height) - cutoutPadding),
+        clipper:
+            _Clipper((width < height ? width : height) - cutoutPadding * 2),
         child: Container(
           width: width,
           height: height,

@@ -101,15 +101,24 @@ class BarcodeScanPageContentStateProductFound
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Center(
-        child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 48),
-            child: ProductCard(
-                product: product,
-                beholder: beholder,
-                onTap: () {
-                  tryOpenProductPage(context);
-                })));
+    return Padding(
+        key: Key(id),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Column(children: [
+          Text(context.strings.barcode_scan_page_point_camera_at_next_barcode,
+              textAlign: TextAlign.center, style: TextStyles.normal),
+          Expanded(
+              child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Wrap(children: [
+                    ProductCard(
+                        product: product,
+                        beholder: beholder,
+                        onTap: () {
+                          tryOpenProductPage(context);
+                        })
+                  ]))),
+        ]));
   }
 }
 
@@ -131,15 +140,18 @@ class BarcodeScanPageContentStateProductNotFound
         padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(context.strings.barcode_scan_page_product_not_found,
-              textAlign: TextAlign.center, style: TextStyles.headline2),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(
-                context.strings.barcode_scan_page_add_product, onPressed: () {
-              tryOpenProductPage(context);
-            }),
-          ),
+              textAlign: TextAlign.center, style: TextStyles.headline1),
+          const SizedBox(height: 16),
+          Text(
+              context.strings.barcode_scan_page_product_not_found_descr
+                  .replaceAll('<PRODUCT>', partialProduct.barcode),
+              textAlign: TextAlign.center,
+              style: TextStyles.normal),
+          const SizedBox(height: 18),
+          ButtonFilledPlante.withText(
+              context.strings.barcode_scan_page_add_product, onPressed: () {
+            tryOpenProductPage(context);
+          }),
         ]));
   }
 }
@@ -159,14 +171,10 @@ class BarcodeScanPageContentStateNoPermission
         padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
           Text(context.strings.barcode_scan_page_camera_permission_reasoning,
-              textAlign: TextAlign.center, style: TextStyles.headline2),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(
-                context.strings.global_give_permission,
-                onPressed: requestPermission),
-          ),
+              textAlign: TextAlign.center, style: TextStyles.headline3),
+          const SizedBox(height: 18),
+          ButtonFilledPlante.withText(context.strings.global_give_permission,
+              onPressed: requestPermission),
         ]));
   }
 }
@@ -188,15 +196,12 @@ class BarcodeScanPageContentStateCannotAskPermission
               context.strings
                   .barcode_scan_page_camera_permission_reasoning_settings,
               textAlign: TextAlign.center,
-              style: TextStyles.headline2),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(
-                context.strings.global_open_app_settings, onPressed: () async {
-              openAppSettingsCallback.call();
-            }),
-          ),
+              style: TextStyles.headline3),
+          const SizedBox(height: 18),
+          ButtonFilledPlante.withText(context.strings.global_open_app_settings,
+              onPressed: () async {
+            openAppSettingsCallback.call();
+          }),
         ]));
   }
 }
