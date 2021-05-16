@@ -216,9 +216,8 @@ flutter:
   assets:
     - assets/google_icon.svg
     - assets/back_arrow.svg
-    - assets/camera.svg
-    - assets/camera_frame.svg
-    - assets/camera_cancel.svg
+    - assets/add_photo.svg
+    - assets/remove_photo.svg
     - assets/info_icon.svg
     - assets/veg_status_vegan.svg
     - assets/veg_status_vegetarian.svg
@@ -233,3 +232,4 @@ flutter:
     - assets/report.svg
     - assets/barcode.svg
     - assets/history.svg
+    - assets/cancel.svg

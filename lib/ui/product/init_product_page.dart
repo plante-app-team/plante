@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
@@ -112,12 +113,10 @@ class _InitProductPageState extends State<InitProductPage>
                       key: const Key('content'),
                       child: Column(children: [
                         HeaderPlante(
-                            rightAction: InkWell(
-                                onTap: cancel,
-                                child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Text(context.strings.global_cancel,
-                                        style: TextStyles.headline3)))),
+                            rightActionPadding: 8,
+                            rightAction: IconButton(
+                                onPressed: cancel,
+                                icon: SvgPicture.asset('assets/cancel.svg'))),
                         Container(
                             padding: const EdgeInsets.only(left: 24, right: 24),
                             child: Column(children: [
@@ -162,7 +161,7 @@ class _InitProductPageState extends State<InitProductPage>
                                         .strings.init_product_page_product_name,
                                     controller: nameTextController,
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 24),
                                 ]),
                               if (model.askForBrand())
                                 Column(
@@ -174,7 +173,7 @@ class _InitProductPageState extends State<InitProductPage>
                                             .init_product_page_brand_optional,
                                         controller: brandTextController,
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 24),
                                     ]),
                               if (model.askForCategories())
                                 Column(
@@ -225,8 +224,6 @@ class _InitProductPageState extends State<InitProductPage>
                                             const Key('vegan_positive_btn'),
                                         keyNegative:
                                             const Key('vegan_negative_btn'),
-                                        keyPossible:
-                                            const Key('vegan_possible_btn'),
                                         keyUnknown:
                                             const Key('vegan_unknown_btn'),
                                         title: context.strings
@@ -251,8 +248,6 @@ class _InitProductPageState extends State<InitProductPage>
                                             'vegetarian_positive_btn'),
                                         keyNegative: const Key(
                                             'vegetarian_negative_btn'),
-                                        keyPossible: const Key(
-                                            'vegetarian_possible_btn'),
                                         keyUnknown:
                                             const Key('vegetarian_unknown_btn'),
                                         title: context.strings
@@ -271,7 +266,7 @@ class _InitProductPageState extends State<InitProductPage>
                               const SizedBox(height: 36),
                               SizedBox(
                                   width: double.infinity,
-                                  child: ButtonOutlinedPlante.withText(
+                                  child: ButtonFilledPlante.withText(
                                     context.strings.global_done,
                                     key: const Key('done_btn'),
                                     onPressed:
@@ -279,6 +274,7 @@ class _InitProductPageState extends State<InitProductPage>
                                             ? saveProduct
                                             : null,
                                   )),
+                              const SizedBox(height: 40)
                             ])),
                       ])),
                   AnimatedSwitcher(
@@ -297,13 +293,13 @@ class _InitProductPageState extends State<InitProductPage>
           key: const Key('ingredients_text_group'),
           children: [
             Text(context.strings.init_product_page_verify_ingredients_ocr,
-                style: TextStyles.normal),
+                style: TextStyles.hint),
             const SizedBox(height: 12),
             InputFieldMultilinePlante(
               key: const Key('ingredients_text'),
               controller: ingredientsTextController,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 17),
           ],
         );
       } else {
@@ -314,7 +310,7 @@ class _InitProductPageState extends State<InitProductPage>
             Text(context.strings.init_product_page_ocr_in_progress,
                 style: TextStyles.normal)
           ]),
-          const SizedBox(height: 12),
+          const SizedBox(height: 17),
         ]);
       }
     } else {

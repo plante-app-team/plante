@@ -68,10 +68,7 @@
 
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",
-      "veg_status_selection_panel_possible": "Possible",
-      "veg_status_selection_panel_unknown": "Unknown",
-      "veg_status_selection_panel_explanation": "\"Possible\" means the product has an ingredient, which veg-status depends on how it was manufactured. For example, \"Ferment\" can be vegan, non-vegan but vegetarian, and both non-vegan and not vegetarian.\n\n\"Unknown\" means that some of the ingredients are completely unknown to you.",
-      "veg_status_selection_panel_explanation_ok": "Alright!",
+      "veg_status_selection_panel_dunno": "Not sure",
 
       "settings_page_title": "Settings",
       "settings_page_your_id": "Your ID: ",

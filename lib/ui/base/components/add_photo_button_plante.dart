@@ -22,28 +22,25 @@ class AddPhotoButtonPlante extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(children: <Widget>[
       InkWell(
-          key: keyButton,
-          onTap: existingPhoto == null ? onAddTap : onCancelTap,
-          child: Stack(children: [
-            SvgPicture.asset('assets/camera_frame.svg'),
-            if (existingPhoto == null)
-              Positioned.fill(
-                  child: Column(children: [
-                const SizedBox(height: 20),
-                SvgPicture.asset('assets/camera.svg'),
-                const SizedBox(height: 3),
-                Text(context.strings.global_add,
-                    style: TextStyles.normalColored),
-              ])),
-            if (existingPhoto != null)
-              Positioned.fill(
-                  child: Stack(children: [
-                UriImagePlante(existingPhoto!),
-                Align(
-                    alignment: Alignment.topRight,
-                    child: SvgPicture.asset('assets/camera_cancel.svg'))
-              ]))
-          ])),
+        key: keyButton,
+        onTap: existingPhoto == null ? onAddTap : onCancelTap,
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Stack(children: [
+              SvgPicture.asset('assets/add_photo.svg'),
+              if (existingPhoto != null)
+                Positioned.fill(
+                    child: Stack(children: [
+                  Positioned.fill(child: UriImagePlante(existingPhoto!)),
+                  Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: SvgPicture.asset('assets/remove_photo.svg'),
+                      ))
+                ]))
+            ])),
+      ),
     ]);
   }
 }

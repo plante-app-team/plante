@@ -54,8 +54,8 @@ void main() {
         bool takeImageFront = true,
         bool takeImageIngredients = true,
         String? ingredientsTextOverride,
-        VegStatus? veganStatusInput = VegStatus.possible,
-        VegStatus? vegetarianStatusInput = VegStatus.possible}) async {
+        VegStatus? veganStatusInput = VegStatus.positive,
+        VegStatus? vegetarianStatusInput = VegStatus.positive}) async {
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
             (invoc) async => Ok(ProductWithOCRIngredients(
             invoc.positionalArguments[0] as Product,
@@ -127,12 +127,11 @@ void main() {
         case VegStatus.negative:
           await tester.tap(find.byKey(const Key('vegan_negative_btn')));
           break;
-        case VegStatus.possible:
-          await tester.tap(find.byKey(const Key('vegan_possible_btn')));
-          break;
         case VegStatus.unknown:
           await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
           break;
+        case VegStatus.possible:
+          throw Exception('Not supported by VegStatusSelectionPanel, a test is broken');
         default:
           throw Error();
       }
@@ -146,12 +145,11 @@ void main() {
         case VegStatus.negative:
           await tester.tap(find.byKey(const Key('vegetarian_negative_btn')));
           break;
-        case VegStatus.possible:
-          await tester.tap(find.byKey(const Key('vegetarian_possible_btn')));
-          break;
         case VegStatus.unknown:
           await tester.tap(find.byKey(const Key('vegetarian_unknown_btn')));
           break;
+        case VegStatus.possible:
+          throw Exception('Not supported by VegStatusSelectionPanel, a test is broken');
         default:
           throw Error();
       }
@@ -182,9 +180,9 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.possible
+      ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community);
 
     final done = await generalTest(
@@ -416,9 +414,9 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.possible
+      ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community);
 
     final done = await generalTest(
@@ -445,9 +443,9 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.possible
+      ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community);
 
     final done = await generalTest(
@@ -490,7 +488,7 @@ void main() {
   });
 
   testWidgets('cannot save product without vegetarian status', (WidgetTester tester) async {
-    final done = await generalTest(tester, vegetarianStatusInput: null, expectedProductResult: null);
+    final done = await generalTest(tester, veganStatusInput: VegStatus.unknown, vegetarianStatusInput: null, expectedProductResult: null);
     expect(done, isFalse);
   });
 
@@ -550,90 +548,6 @@ void main() {
     expect(done, isTrue);
   });
 
-  testWidgets('vegetarian possible makes vegan possible if it was positive', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
-      ..barcode = '123'
-      ..name = 'Lemon drink'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.possible // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    );
-
-    final done = await generalTest(
-        tester,
-        brandInput: null,
-        categoriesInput: null,
-        expectedProductResult: expectedProduct,
-        nameInput: expectedProduct.name,
-        takeImageFront: expectedProduct.imageFront != null,
-        takeImageIngredients: expectedProduct.imageIngredients != null,
-        veganStatusInput: VegStatus.positive, // !!!!!! positive input
-        vegetarianStatusInput: VegStatus.possible
-    );
-
-    expect(done, isTrue);
-  });
-
-  testWidgets("vegetarian possible doesn't change vegan if was negative", (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
-      ..barcode = '123'
-      ..name = 'Lemon drink'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.negative // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    );
-
-    final done = await generalTest(
-        tester,
-        brandInput: null,
-        categoriesInput: null,
-        expectedProductResult: expectedProduct,
-        nameInput: expectedProduct.name,
-        takeImageFront: expectedProduct.imageFront != null,
-        takeImageIngredients: expectedProduct.imageIngredients != null,
-        veganStatusInput: VegStatus.negative, // !!!!!! negative input
-        vegetarianStatusInput: VegStatus.possible
-    );
-
-    expect(done, isTrue);
-  });
-
-  testWidgets("vegetarian possible doesn't change vegan if was unknown", (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
-      ..barcode = '123'
-      ..name = 'Lemon drink'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.unknown // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    );
-
-    final done = await generalTest(
-        tester,
-        brandInput: null,
-        categoriesInput: null,
-        expectedProductResult: expectedProduct,
-        nameInput: expectedProduct.name,
-        takeImageFront: expectedProduct.imageFront != null,
-        takeImageIngredients: expectedProduct.imageIngredients != null,
-        veganStatusInput: VegStatus.unknown, // !!!!!! negative input
-        vegetarianStatusInput: VegStatus.possible
-    );
-
-    expect(done, isTrue);
-  });
-
   testWidgets('vegetarian unknown makes vegan unknown if it was positive', (WidgetTester tester) async {
     final expectedProduct = Product((v) => v
       ..barcode = '123'
@@ -656,34 +570,6 @@ void main() {
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: VegStatus.positive, // !!!!!! positive input
-        vegetarianStatusInput: VegStatus.unknown
-    );
-
-    expect(done, isTrue);
-  });
-
-  testWidgets('vegetarian unknown makes vegan unknown if it was possible', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
-      ..barcode = '123'
-      ..name = 'Lemon drink'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.unknown // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    );
-
-    final done = await generalTest(
-        tester,
-        brandInput: null,
-        categoriesInput: null,
-        expectedProductResult: expectedProduct,
-        nameInput: expectedProduct.name,
-        takeImageFront: expectedProduct.imageFront != null,
-        takeImageIngredients: expectedProduct.imageIngredients != null,
-        veganStatusInput: VegStatus.possible, // !!!!!! positive input
         vegetarianStatusInput: VegStatus.unknown
     );
 

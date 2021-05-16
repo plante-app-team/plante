@@ -29,12 +29,12 @@ class InputFieldMultilinePlante extends StatelessWidget {
         contentPadding: const EdgeInsets.only(left: 12, right: 12, top: 24),
         enabledBorder: const OutlineInputBorder(
             gapPadding: 20,
-            borderSide: BorderSide(color: ColorsPlante.primary),
-            borderRadius: BorderRadius.zero),
+            borderSide: BorderSide(color: Color(0xFF979A9C)),
+            borderRadius: BorderRadius.all(Radius.circular(8))),
         focusedBorder: const OutlineInputBorder(
             gapPadding: 20,
             borderSide: BorderSide(color: ColorsPlante.primary, width: 2),
-            borderRadius: BorderRadius.zero),
+            borderRadius: BorderRadius.all(Radius.circular(8))),
       ),
       controller: controller,
     );

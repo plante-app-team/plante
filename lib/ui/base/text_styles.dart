@@ -19,6 +19,9 @@ class TextStyles {
   static const TextStyle normalSmall =
       TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF192123));
 
+  static const TextStyle hint =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF979A9C));
+
   static const TextStyle headline1 = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.w700,
@@ -31,10 +34,11 @@ class TextStyles {
   static const TextStyle headline3 =
       TextStyle(fontFamily: 'OpenSans', fontSize: 16, color: Color(0xFF192123));
 
-  static TextStyle get headline4 => GoogleFonts.exo2(
-      color: const Color(0xFF231f20),
+  static const TextStyle headline4 = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
       fontSize: 14,
-      fontWeight: FontWeight.bold);
+      color: Color(0xFF192123));
 
   static TextStyle get input =>
       GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);

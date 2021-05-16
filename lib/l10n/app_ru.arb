@@ -70,10 +70,7 @@
 
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",
-    "veg_status_selection_panel_possible": "Возможно",
-    "veg_status_selection_panel_unknown": "Неизвестно",
-    "veg_status_selection_panel_explanation": "\"Возможно\" значит, что продукт имеет в составе ингредиент, который может иметь в зависимости от способа производства как положительный, так и отрицательный вег-статус. Например, \"Закваска\" может быть и веганской, и лишь вегетарианской, и не-вегетарианской вовсе.\n\n\"Неизвестно\" значит, что какой-то из ингредиентов вам совершенно незнаком.",
-    "veg_status_selection_panel_explanation_ok": "О как!",
+    "veg_status_selection_panel_dunno": "Не знаю",
 
     "settings_page_title": "Настройки",
     "settings_page_your_id": "Ваш ID: ",
