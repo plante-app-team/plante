@@ -4,7 +4,4 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-
-    <application
-        android:icon="@mipmap/launcher_icon_debug"/>
 </manifest>
