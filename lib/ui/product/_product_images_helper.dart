@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:plante/model/product.dart';
 
 class ProductImagesHelper {
-  static Widget productImageWidget(
+  static Image? productImageWidget(
       Product product, ProductImageType imageType) {
     final takenPhoto = _takenProductImageWidget(product, imageType);
     if (takenPhoto != null) {
@@ -15,7 +15,7 @@ class ProductImagesHelper {
     if (existingRemoteImage != null) {
       return existingRemoteImage;
     }
-    return const Icon(Icons.photo_camera_outlined);
+    return null;
   }
 
   static Image? _takenProductImageWidget(
@@ -24,7 +24,7 @@ class ProductImagesHelper {
     if (photoTaken) {
       final file = File.fromUri(product.imageUri(imageType)!);
       if (file.existsSync()) {
-        return Image.file(file);
+        return Image.file(file, fit: BoxFit.cover);
       }
     }
     return null;
@@ -34,7 +34,7 @@ class ProductImagesHelper {
       Product product, ProductImageType imageType) {
     if (product.isImageRemote(imageType)) {
       return Image.network(product.imageUri(imageType)!.toString(),
-          loadingBuilder: (context, child, loadingProgress) {
+          fit: BoxFit.cover, loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           return child;
         }

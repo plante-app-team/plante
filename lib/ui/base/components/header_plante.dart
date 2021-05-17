@@ -4,6 +4,8 @@ import 'package:plante/ui/base/text_styles.dart';
 
 class HeaderPlante extends StatelessWidget {
   static const DEFAULT_ACTIONS_SIDE_PADDINGS = 24.0;
+  static const DEFAULT_HEIGHT = 104.0;
+  static const DEFAULT_TOP_SPACING = 28.0;
   final Color color;
   final Widget? title;
   final Widget? leftAction;
@@ -28,9 +30,9 @@ class HeaderPlante extends StatelessWidget {
         color: color,
         child: SizedBox(
           width: double.infinity,
-          height: 104 + spacingBottom,
+          height: DEFAULT_HEIGHT + spacingBottom,
           child: Column(children: [
-            const SizedBox(height: 28), // spacing
+            const SizedBox(height: DEFAULT_TOP_SPACING), // spacing
             Expanded(
                 child: Stack(children: [
               Align(

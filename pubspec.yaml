@@ -59,6 +59,7 @@ dependencies:
   url_launcher: ^6.0.3
   google_fonts: ^2.0.0
   palette_generator: ^0.3.0
+  photo_view: ^0.11.1
 
 dev_dependencies:
   flutter_test:
@@ -233,3 +234,4 @@ flutter:
     - assets/barcode.svg
     - assets/history.svg
     - assets/cancel.svg
+    - assets/menu_ellipsis.svg

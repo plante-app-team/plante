@@ -171,7 +171,7 @@ class _InitUserPageState extends State<InitUserPage> {
       SizedBox(
           width: double.infinity,
           child: Text(context.strings.init_user_page_tell_about_yourself,
-              style: TextStyles.headline3)),
+              style: TextStyles.headline4)),
       const SizedBox(height: 16),
       InkWell(
         onTap: () {
@@ -220,7 +220,7 @@ class _InitUserPageState extends State<InitUserPage> {
       SizedBox(
           width: double.infinity,
           child: Text(context.strings.init_user_page_what_do_you_eat,
-              style: TextStyles.normal)),
+              style: TextStyles.headline4)),
       const SizedBox(height: 21),
       Container(
           color: const Color(0xFFF6F7FA),

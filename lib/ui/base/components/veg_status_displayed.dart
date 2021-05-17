@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/log.dart';
@@ -6,14 +7,21 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class VegStatusDisplayed extends StatelessWidget {
+  final String? helpText;
+  final VoidCallback? onHelpClick;
   final Product product;
   final UserParams user;
 
   const VegStatusDisplayed(
-      {Key? key, required this.product, required this.user})
+      {Key? key,
+      required this.product,
+      required this.user,
+      this.helpText,
+      this.onHelpClick})
       : super(key: key);
 
   @override
@@ -23,10 +31,13 @@ class VegStatusDisplayed extends StatelessWidget {
         _vegStatusImage(),
         const SizedBox(width: 6),
         Flexible(
+            fit: FlexFit.tight,
             child: Text(_vegStatusText(context),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyles.normalSmall))
+                style: TextStyles.normalSmall)),
+        if (helpText != null)
+          Wrap(children: [_HelpButton(text: helpText!, onPressed: onHelpClick)])
       ]),
       const SizedBox(height: 4),
       Row(children: [
@@ -102,7 +113,8 @@ class VegStatusDisplayed extends StatelessWidget {
           return context.strings.veg_status_displayed_vegan;
         case VegStatus.negative:
           return context.strings.veg_status_displayed_not_vegan;
-        case VegStatus.possible: // Fallthrough
+        case VegStatus.possible:
+          return context.strings.veg_status_displayed_vegan_status_possible;
         case VegStatus.unknown:
           return context.strings.veg_status_displayed_vegan_status_unknown;
         default:
@@ -114,7 +126,9 @@ class VegStatusDisplayed extends StatelessWidget {
           return context.strings.veg_status_displayed_vegetarian;
         case VegStatus.negative:
           return context.strings.veg_status_displayed_not_vegetarian;
-        case VegStatus.possible: // Fallthrough
+        case VegStatus.possible:
+          return context
+              .strings.veg_status_displayed_vegetarian_status_possible;
         case VegStatus.unknown:
           return context.strings.veg_status_displayed_vegetarian_status_unknown;
         default:
@@ -163,5 +177,34 @@ class VegStatusDisplayed extends StatelessWidget {
       default:
         throw Exception('Unknown veg status source: ${_vegStatusSource()}');
     }
+  }
+}
+
+class _HelpButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  const _HelpButton({Key? key, required this.text, required this.onPressed})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 28,
+        child: OutlinedButton(
+            style: ButtonStyle(
+                side: MaterialStateProperty.all<BorderSide>(
+                    const BorderSide(style: BorderStyle.none)),
+                overlayColor:
+                    MaterialStateProperty.all(ColorsPlante.primaryDisabled),
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xFFEBEFEC)),
+                padding: MaterialStateProperty.all(
+                    const EdgeInsets.only(left: 8, right: 8)),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)))),
+            onPressed: onPressed,
+            child:
+                Center(child: Text(text, style: TextStyles.smallBoldGreen))));
   }
 }

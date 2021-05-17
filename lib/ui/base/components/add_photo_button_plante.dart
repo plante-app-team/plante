@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
-import 'package:plante/ui/base/text_styles.dart';
 
 class AddPhotoButtonPlante extends StatelessWidget {
   final Key? keyButton;

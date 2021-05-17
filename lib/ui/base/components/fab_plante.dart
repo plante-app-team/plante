@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class BackButtonPlante extends StatelessWidget {
+class FabPlante extends StatelessWidget {
+  final String? heroTag;
+  final String svgAsset;
   final VoidCallback? onPressed;
 
   static final VoidCallback _popOnClickFakeCallback = () {};
 
-  const BackButtonPlante({Key? key, this.onPressed}) : super(key: key);
+  const FabPlante(
+      {Key? key, this.heroTag, required this.svgAsset, required this.onPressed})
+      : super(key: key);
 
-  BackButtonPlante.popOnClick({Key? key})
+  FabPlante.backBtnPopOnClick({Key? key, this.heroTag})
       : onPressed = _popOnClickFakeCallback,
+        svgAsset = 'assets/back_arrow.svg',
+        super(key: key);
+
+  const FabPlante.menuBtn({Key? key, required this.onPressed, this.heroTag})
+      : svgAsset = 'assets/menu_ellipsis.svg',
         super(key: key);
 
   @override
@@ -26,9 +35,10 @@ class BackButtonPlante extends StatelessWidget {
         width: 44,
         height: 44,
         child: FloatingActionButton(
+          heroTag: heroTag,
           backgroundColor: Colors.white,
           onPressed: onPressedReally,
-          child: SvgPicture.asset('assets/back_arrow.svg'),
+          child: SvgPicture.asset(svgAsset),
         ));
   }
 }

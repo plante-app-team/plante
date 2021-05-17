@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plante/base/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/veg_status.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
-import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class VegStatusSelectionPanel extends StatelessWidget {

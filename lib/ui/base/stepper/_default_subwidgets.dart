@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/back_button_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 
 // ignore: always_use_package_imports
 import 'functions.dart';
@@ -47,5 +47,5 @@ Widget defaultIndicatorMaker(int page, PageIndicatorState pageState) {
 }
 
 Widget? defaultBackButtonMaker(Function() back) {
-  return BackButtonPlante(onPressed: back);
+  return FabPlante(onPressed: back, svgAsset: 'assets/back_arrow.svg');
 }

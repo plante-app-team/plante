@@ -135,7 +135,7 @@ void main() {
     final product = Product((v) => v
       ..barcode = '123'
       ..name = 'My product'
-      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatus = VegStatus.unknown
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
@@ -270,6 +270,8 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
+    await tester.tap(find.byKey(const Key('options_button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.display_product_page_report_btn));
     await tester.pumpAndSettle();
 
@@ -296,5 +298,202 @@ void main() {
     expect(viewedProductsStorage.getProducts(), equals([]));
     await tester.superPump(DisplayProductPage(product));
     expect(viewedProductsStorage.getProducts(), equals([product]));
+  });
+
+  testWidgets('click on photo opens photo screen', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsNothing);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsNothing);
+
+    await tester.tap(find.byKey(const Key('product_header')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsOneWidget);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsNothing);
+  });
+
+  testWidgets('click on ingredients opens photo screen', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsNothing);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.display_product_page_ingredients));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsNothing);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsOneWidget);
+  });
+
+  testWidgets('veg status hint - positive', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('veg_status_hint')),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.display_product_page_veg_status_positive_warning),
+        findsOneWidget);
+  });
+
+  testWidgets('veg status hint - negative', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('veg_status_hint')),
+        findsNothing);
+  });
+
+  testWidgets('veg status hint - possible', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('veg_status_hint')),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.display_product_page_veg_status_possible_explanation),
+        findsOneWidget);
+  });
+
+  testWidgets('veg status hint - unknown', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.unknown
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.unknown
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar'
+      ..ingredientsAnalyzed.addAll([
+        Ingredient((v) => v
+          ..name = 'ingredient1'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.unknown),
+        Ingredient((v) => v
+          ..name = 'ingredient2'
+          ..vegetarianStatus = null
+          ..veganStatus = null),
+      ]));
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.byKey(const Key('veg_status_hint')),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.display_product_page_veg_status_unknown_explanation),
+        findsOneWidget);
   });
 }

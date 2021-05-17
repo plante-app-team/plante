@@ -12,19 +12,22 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/ui/base/components/back_button_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
+import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/init_product_page.dart';
+import 'package:plante/ui/product/product_photo_page.dart';
 
 // ignore: always_use_package_imports
-import '_product_images_helper.dart';
+import 'product_header_widget.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
@@ -51,6 +54,8 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   bool get reportSendAllowed => reportTextController.text.trim().length > 3;
   bool loading = false;
 
+  final menuButtonKey = GlobalKey();
+
   _DisplayProductPageState(this.product, this.productUpdatedCallback)
       : user = GetIt.I.get<UserParamsController>().cachedUserParams! {
     GetIt.I.get<ViewedProductsStorage>().addProduct(product);
@@ -65,76 +70,93 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 child: Stack(children: [
           Column(children: [
             HeaderPlante(
-              leftAction: BackButtonPlante.popOnClick(),
+              leftAction: FabPlante.backBtnPopOnClick(heroTag: 'left_action'),
+              // Sized box is only for the key
+              rightAction: SizedBox(
+                  key: const Key('options_button'),
+                  child: FabPlante.menuBtn(
+                      key: menuButtonKey,
+                      heroTag: 'right_action',
+                      onPressed: showProductMenu)),
             ),
-            SizedBox(
-                child: ProductImagesHelper.productImageWidget(
-                    product, ProductImageType.FRONT)),
-            Container(
+            Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: Column(children: [
+                  const SizedBox(height: 12),
+                  ProductHeaderWidget(
+                      key: const Key('product_header'),
+                      product: product,
+                      onTap: showProductPhoto),
+                ])),
+            const SizedBox(height: 19),
+            Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24),
                 child: Column(children: [
-                  const SizedBox(height: 24),
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(product.name!, style: TextStyles.headline1)),
-                  const SizedBox(height: 24),
-                  if (product.brands != null && product.brands!.isNotEmpty)
-                    Column(children: [
-                      Row(children: [
-                        Text(context.strings.display_product_page_brand,
-                            style: TextStyles.normalBold),
-                        Text(product.brands!.join(', '),
-                            style: TextStyles.normal)
-                      ]),
-                      const SizedBox(height: 21),
-                    ]),
                   InkWell(
-                    onTap: vegStatusSource() == VegStatusSource.open_food_facts
-                        ? onVegStatusHelpClick
-                        : null,
-                    child: Column(children: [
-                      VegStatusDisplayed(product: product, user: user),
-                      if (vegStatusSource() == VegStatusSource.open_food_facts)
-                        SizedBox(
-                            width: double.infinity,
-                            child: Text(context.strings
-                                .display_product_page_click_to_help_with_veg_statuses)),
-                    ]),
+                    onTap: askForVegStatusHelp() ? onVegStatusHelpClick : null,
+                    child: VegStatusDisplayed(
+                        product: product,
+                        user: user,
+                        helpText: askForVegStatusHelp()
+                            ? context.strings
+                                .display_product_page_click_to_help_with_veg_statuses
+                            : null,
+                        onHelpClick: onVegStatusHelpClick),
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                          context.strings.display_product_page_ingredients,
-                          style: TextStyles.normalBold)),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(product.ingredientsText!,
-                          style: TextStyles.normal)),
-                  const SizedBox(height: 24),
                 ])),
-            if (haveIngredientsAnalysis()) ingredientsAnalysisWidget(),
+            const SizedBox(height: 16),
+            if (vegStatusHint() != null)
+              Padding(
+                  key: const Key('veg_status_hint'),
+                  padding: const EdgeInsets.only(left: 12, right: 12),
+                  child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 12, top: 8, right: 12, bottom: 8),
+                        child: Text(vegStatusHint()!, style: TextStyles.hint),
+                      ))),
             const SizedBox(height: 16),
             InkWell(
-              onTap: onReportClick,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 8),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  SvgPicture.asset('assets/report.svg'),
-                  const SizedBox(width: 16),
-                  Text(context.strings.display_product_page_report_btn,
-                      style: TextStyles.normal),
-                  const SizedBox(width: 16),
-                  // Invisible SVG for symmetry
-                  SvgPicture.asset('assets/report.svg',
-                      color: Colors.transparent),
-                ]),
-              ),
-            )
+                onTap: showProductIngredientsPhoto,
+                child: Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24),
+                    child: Column(children: [
+                      SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                              context.strings.display_product_page_ingredients,
+                              style: TextStyles.normalBold)),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                          width: double.infinity,
+                          child: Text(product.ingredientsText!,
+                              style: TextStyles.normal)),
+                      const SizedBox(height: 24),
+                    ]))),
+            if (haveIngredientsAnalysis()) ingredientsAnalysisWidget(),
+            const SizedBox(height: 16)
           ]),
         ]))));
+  }
+
+  String? vegStatusHint() {
+    switch (vegStatus()) {
+      case VegStatus.positive:
+        return context.strings.display_product_page_veg_status_positive_warning;
+      case VegStatus.negative:
+        return null;
+      case VegStatus.possible:
+        return context
+            .strings.display_product_page_veg_status_possible_explanation;
+      case VegStatus.unknown:
+        return context
+            .strings.display_product_page_veg_status_unknown_explanation;
+    }
   }
 
   Widget ingredientsAnalysisWidget() {
@@ -183,6 +205,16 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                 });
               })),
     );
+  }
+
+  VegStatus vegStatus() {
+    VegStatus? status;
+    if (user.eatsVeggiesOnly ?? true) {
+      status = product.veganStatus;
+    } else {
+      status = product.vegetarianStatus;
+    }
+    return status ?? VegStatus.unknown;
   }
 
   VegStatusSource vegStatusSource() {
@@ -448,5 +480,41 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
         );
       },
     );
+  }
+
+  void showProductPhoto() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProductPhotoPage(
+                key: const Key('product_front_image_page'),
+                product: product,
+                imageType: ProductImageType.FRONT)));
+  }
+
+  void showProductIngredientsPhoto() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ProductPhotoPage(
+                key: const Key('product_ingredients_image_page'),
+                product: product,
+                imageType: ProductImageType.INGREDIENTS)));
+  }
+
+  void showProductMenu() async {
+    final selected =
+        await showMenuPlante(target: menuButtonKey, context: context, values: [
+      1
+    ], children: [
+      MenuItemPlante(
+        title: context.strings.display_product_page_report_btn,
+        description: context.strings.display_product_page_report,
+      )
+    ]);
+
+    if (selected == 1) {
+      onReportClick();
+    }
   }
 }

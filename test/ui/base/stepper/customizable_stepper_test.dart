@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/ui/base/components/back_button_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 
@@ -149,7 +149,7 @@ void main() {
     expect(find.text('Page 1'), findsOneWidget);
     expect(find.text('Page 2'), findsNothing);
     // No back button on page 1
-    expect(find.byType(BackButtonPlante), findsNothing);
+    expect(find.byType(FabPlante), findsNothing);
 
     await tester.tap(find.text('Cool button 1'));
     await tester.pumpAndSettle();
@@ -159,16 +159,16 @@ void main() {
     expect(find.text('Page 2'), findsOneWidget);
 
     // A back button on second page
-    expect(find.byType(BackButtonPlante), findsOneWidget);
+    expect(find.byType(FabPlante), findsOneWidget);
 
-    await tester.tap(find.byType(BackButtonPlante));
+    await tester.tap(find.byType(FabPlante));
     await tester.pumpAndSettle();
 
     // On page 1 again
     expect(find.text('Page 1'), findsOneWidget);
     expect(find.text('Page 2'), findsNothing);
     // No back button on page 1
-    expect(find.byType(BackButtonPlante), findsNothing);
+    expect(find.byType(FabPlante), findsNothing);
   });
 }
 

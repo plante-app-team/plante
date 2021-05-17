@@ -11,7 +11,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/ui/base/components/back_button_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
@@ -86,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
           HeaderPlante(
               title: Text(context.strings.settings_page_title,
                   style: TextStyles.headline1),
-              leftAction: BackButtonPlante.popOnClick()),
+              leftAction: FabPlante.backBtnPopOnClick()),
           Container(
               padding: const EdgeInsets.only(left: 24, right: 24),
               child: Column(children: [
