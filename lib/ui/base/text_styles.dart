@@ -33,18 +33,15 @@ class TextStyles {
 
   static const TextStyle headline1 = TextStyle(
       fontFamily: 'Montserrat',
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.bold,
       fontSize: 24,
       color: Color(0xFF192123));
 
   static const TextStyle headline1White = TextStyle(
       fontFamily: 'Montserrat',
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.bold,
       fontSize: 24,
       color: Color(0xFFFFFFFF));
-
-  static TextStyle get headline2 =>
-      GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);
 
   static const TextStyle headline3 =
       TextStyle(fontFamily: 'OpenSans', fontSize: 16, color: Color(0xFF192123));
@@ -55,25 +52,28 @@ class TextStyles {
       fontSize: 14,
       color: Color(0xFF192123));
 
-  static TextStyle get input =>
-      GoogleFonts.exo2(color: const Color(0xFF192123), fontSize: 18);
+  static const TextStyle input =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF192123));
 
-  static TextStyle get inputLabel =>
-      GoogleFonts.exo2(color: Colors.black, fontSize: 16);
+  static const TextStyle inputLabel = normalSmall;
 
   static const TextStyle buttonFilled = TextStyle(
       fontFamily: 'Montserrat',
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.bold,
       fontSize: 16,
       color: Colors.white);
 
-  static TextStyle get buttonOutlinedEnabled => GoogleFonts.exo2(
-      color: ColorsPlante.primary, fontSize: 18, fontWeight: FontWeight.bold);
+  static const TextStyle buttonOutlinedEnabled = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+      color: ColorsPlante.primary);
 
-  static TextStyle get buttonOutlinedDisabled => GoogleFonts.exo2(
-      color: ColorsPlante.primaryDisabled,
-      fontSize: 18,
-      fontWeight: FontWeight.bold);
+  static const TextStyle buttonOutlinedDisabled = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+      color: ColorsPlante.primaryDisabled);
 
   static const TextStyle branding = TextStyle(
       fontFamily: 'Poppins',

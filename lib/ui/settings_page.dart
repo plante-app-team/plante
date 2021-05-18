@@ -107,7 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SizedBox(
                     width: double.infinity,
                     child: Text(context.strings.settings_page_general,
-                        style: TextStyles.headline2)),
+                        style: TextStyles.headline3)),
                 const SizedBox(height: 12),
                 SizedBox(
                     width: double.infinity,
@@ -120,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       width: double.infinity,
                       child: Text(
                           context.strings.settings_page_developer_options,
-                          style: TextStyles.headline2)),
+                          style: TextStyles.headline3)),
                 if (developer) const SizedBox(height: 12),
                 if (developer)
                   SizedBox(
