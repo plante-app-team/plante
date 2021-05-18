@@ -185,6 +185,12 @@ class ProductsManager {
   Future<Result<Product, ProductsManagerError>> createUpdateProduct(
       Product product,
       [String? langCode]) async {
+    // Ensure the product is in our cache if it exists in OFF
+    final getResult = await getProduct(product.barcode);
+    if (getResult.isErr) {
+      return Err(getResult.unwrapErr());
+    }
+
     langCode ??= _langCodeHolder.langCode;
 
     final cachedProduct = _productsCache[product.barcode];
@@ -212,13 +218,24 @@ class ProductsManager {
 
     // OFF product
 
-    final offProduct = off.Product(
-        translatedLang: off.LanguageHelper.fromJson(langCode),
-        barcode: product.barcode,
-        productNameTranslated: product.name,
-        brands: _join(product.brands, null),
-        categories: _join(product.categories, langCode),
-        ingredientsTextTranslated: product.ingredientsText);
+    final off.Product offProduct;
+    if (cachedProduct == null) {
+      offProduct = off.Product(
+          lang: off.LanguageHelper.fromJson(langCode),
+          barcode: product.barcode,
+          productName: product.name,
+          brands: _join(product.brands, null),
+          categories: _join(product.categories, langCode),
+          ingredientsText: product.ingredientsText);
+    } else {
+      offProduct = off.Product(
+          translatedLang: off.LanguageHelper.fromJson(langCode),
+          barcode: product.barcode,
+          productNameTranslated: product.name,
+          brands: _join(product.brands, null),
+          categories: _join(product.categories, langCode),
+          ingredientsTextTranslated: product.ingredientsText);
+    }
     final offResult;
     try {
       offResult = await _off.saveProduct(_offUser(), offProduct);

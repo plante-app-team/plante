@@ -81,6 +81,19 @@ void main() {
         Ok(BackendProduct((v) => v.barcode = invc.positionalArguments[0] as String)));
   });
 
+  void ensureProductIsInOFF(Product product) {
+    final offProduct = off.Product.fromJson({
+      'code': product.barcode,
+      'product_name_ru': product.name,
+      'brands_tags': product.brands?.toList() ?? [],
+      'categories_tags_translated': product.categories?.toList() ?? [],
+      'ingredients_text_ru': product.ingredientsText,
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+  }
+
   test('get product when the product is on both OFF and backend', () async {
     final offProduct = off.Product.fromJson({
       'code': '123',
@@ -222,6 +235,7 @@ void main() {
       ..ingredientsText = 'lemon, water'
       ..imageFront = Uri.file('/tmp/img1.jpg')
       ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
@@ -232,10 +246,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals('123'));
+    expect(capturedOffProduct.lang, isNull);
+    expect(capturedOffProduct.translatedLang, off.OpenFoodFactsLanguage.RUSSIAN);
     expect(capturedOffProduct.productName, isNull);
     expect(capturedOffProduct.productNameTranslated, equals('name'));
     expect(capturedOffProduct.brands, equals('Brand name'));
-    expect(capturedOffProduct.categories, equals('ru:plant, ru:lemon'));
+    expect(capturedOffProduct.categories, equals('ru:lemon, ru:plant'));
     expect(capturedOffProduct.ingredientsText, isNull);
     expect(capturedOffProduct.ingredientsTextTranslated, equals('lemon, water'));
 
@@ -273,6 +289,7 @@ void main() {
       ..brands.add('Brand name')
       ..categories.addAll(['plant', 'lemon'])
       ..ingredientsText = 'lemon, water');
+    ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
@@ -283,10 +300,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals('123'));
+    expect(capturedOffProduct.lang, isNull);
+    expect(capturedOffProduct.translatedLang, off.OpenFoodFactsLanguage.RUSSIAN);
     expect(capturedOffProduct.productName, isNull);
     expect(capturedOffProduct.productNameTranslated, equals('name'));
     expect(capturedOffProduct.brands, equals('Brand name'));
-    expect(capturedOffProduct.categories, equals('ru:plant, ru:lemon'));
+    expect(capturedOffProduct.categories, equals('ru:lemon, ru:plant'));
     expect(capturedOffProduct.ingredientsText, isNull);
     expect(capturedOffProduct.ingredientsTextTranslated, equals('lemon, water'));
 
@@ -312,6 +331,7 @@ void main() {
       ..categories.addAll(['plant', 'lemon'])
       ..ingredientsText = 'lemon, water'
       ..imageFront = Uri.file('/tmp/img1.jpg'));
+    ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
@@ -322,10 +342,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals('123'));
+    expect(capturedOffProduct.lang, isNull);
+    expect(capturedOffProduct.translatedLang, off.OpenFoodFactsLanguage.RUSSIAN);
     expect(capturedOffProduct.productName, isNull);
     expect(capturedOffProduct.productNameTranslated, equals('name'));
     expect(capturedOffProduct.brands, equals('Brand name'));
-    expect(capturedOffProduct.categories, equals('ru:plant, ru:lemon'));
+    expect(capturedOffProduct.categories, equals('ru:lemon, ru:plant'));
     expect(capturedOffProduct.ingredientsText, isNull);
     expect(capturedOffProduct.ingredientsTextTranslated, equals('lemon, water'));
 
@@ -360,6 +382,7 @@ void main() {
       ..categories.addAll(['plant', 'lemon'])
       ..ingredientsText = 'lemon, water'
       ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
@@ -370,10 +393,12 @@ void main() {
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured.first as off.Product;
     expect(capturedOffProduct.barcode, equals('123'));
+    expect(capturedOffProduct.lang, isNull);
+    expect(capturedOffProduct.translatedLang, off.OpenFoodFactsLanguage.RUSSIAN);
     expect(capturedOffProduct.productName, isNull);
     expect(capturedOffProduct.productNameTranslated, equals('name'));
     expect(capturedOffProduct.brands, equals('Brand name'));
-    expect(capturedOffProduct.categories, equals('ru:plant, ru:lemon'));
+    expect(capturedOffProduct.categories, equals('ru:lemon, ru:plant'));
     expect(capturedOffProduct.ingredientsText, isNull);
     expect(capturedOffProduct.ingredientsTextTranslated, equals('lemon, water'));
 
@@ -409,6 +434,7 @@ void main() {
       ..ingredientsText = 'lemon, water'
       ..imageFront = Uri.file('/tmp/img1.jpg')
       ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
 
     when(offApi.saveProduct(any, any)).thenAnswer(
             (_) async => throw const SocketException(''));
@@ -430,6 +456,7 @@ void main() {
       ..ingredientsText = 'lemon, water'
       ..imageFront = Uri.file('/tmp/img1.jpg')
       ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
 
     when(offApi.addProductImage(any, any)).thenAnswer(
             (_) async => throw const SocketException(''));
@@ -451,6 +478,7 @@ void main() {
       ..ingredientsText = 'lemon, water'
       ..imageFront = Uri.file('/tmp/img1.jpg')
       ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
 
     when(backend.createUpdateProduct(
         any,
@@ -460,6 +488,52 @@ void main() {
 
     final result = await productsManager.createUpdateProduct(product, 'ru');
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+  });
+
+  test('create product which does not exist in OFF yet', () async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..name = 'name'
+      ..brands.add('Brand name')
+      ..categories.addAll(['plant', 'lemon'])
+      ..ingredientsText = 'lemon, water');
+
+    // Product is not in OFF yet
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+      const off.ProductResult(product: null));
+
+    verifyZeroInteractions(offApi);
+    verifyZeroInteractions(backend);
+
+    await productsManager.createUpdateProduct(product, 'ru');
+
+    // Off Product
+    // NOTE that [productName], [ingredientsText] and [lang] ARE NOT nulls, while
+    // [productNameTranslated], [ingredientsTextTranslated] and [translatedLang] ARE.
+    final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
+        .captured.first as off.Product;
+    expect(capturedOffProduct.barcode, equals('123'));
+    expect(capturedOffProduct.lang, off.OpenFoodFactsLanguage.RUSSIAN);
+    expect(capturedOffProduct.translatedLang, isNull);
+    expect(capturedOffProduct.productName, equals('name'));
+    expect(capturedOffProduct.productNameTranslated, isNull);
+    expect(capturedOffProduct.brands, equals('Brand name'));
+    expect(capturedOffProduct.categories, equals('ru:plant, ru:lemon'));
+    expect(capturedOffProduct.ingredientsText, equals('lemon, water'));
+    expect(capturedOffProduct.ingredientsTextTranslated, isNull);
+
+    // Backend Product
+    verify(backend.createUpdateProduct(
+        '123',
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative))
+        .called(1);
+
+    verifyNever(offApi.addProductImage(any, captureAny));
   });
 
   test('ingredients extraction successful', () async {
@@ -894,5 +968,42 @@ void main() {
     expect(product.vegetarianStatusSource, VegStatusSource.open_food_facts);
     expect(product.veganStatus, VegStatus.possible);
     expect(product.veganStatusSource, VegStatusSource.open_food_facts);
+  });
+
+  test('product is requested from OFF before it\'s saved so it would be cached', () async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..name = 'name'
+      ..ingredientsText = 'lemon, water');
+
+    verifyNever(offApi.getProduct(any));
+    final saveResult = await productsManager.createUpdateProduct(product, 'ru');
+    verify(offApi.getProduct(any));
+
+    expect(saveResult.isOk, isTrue);
+  });
+
+  test('product saving aborts if product request failed', () async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..name = 'name'
+      ..ingredientsText = 'lemon, water');
+
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        const off.ProductResult(status: 123));
+
+    verifyNever(offApi.getProduct(any));
+    final saveResult = await productsManager.createUpdateProduct(product, 'ru');
+    verify(offApi.getProduct(any));
+
+    expect(saveResult.isErr, isTrue);
   });
 }
