@@ -39,10 +39,12 @@ class ProductHeaderWidget extends StatelessWidget {
                 child: Padding(
                     padding: const EdgeInsets.only(left: 12, bottom: 18),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Text(product.name!,
-                          style: TextStyles.headline1White,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1),
+                      SizedBox(
+                          width: double.infinity,
+                          child: Text(product.name!,
+                              style: TextStyles.headline1White,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1)),
                       if (product.brands != null && product.brands!.isNotEmpty)
                         Row(children: [
                           Text(context.strings.display_product_page_brand,
