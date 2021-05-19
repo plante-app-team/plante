@@ -12,6 +12,8 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
@@ -106,30 +108,37 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
         _loading = true;
       });
 
+      // Google login
       final googleAccount = await GetIt.I.get<GoogleAuthorizer>().auth();
       if (googleAccount == null) {
         Log.w('ExternalAuthPage: googleAccount == null');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.strings.global_something_went_wrong)));
+        showSnackBar(context.strings.global_something_went_wrong, context);
         return;
       }
 
+      // Backend login
       final backend = GetIt.I.get<Backend>();
       final loginResult = await backend.loginOrRegister(googleAccount.idToken);
       if (loginResult.isErr) {
         final error = loginResult.unwrapErr();
         if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(context
-                  .strings.external_auth_page_google_email_not_verified)));
+          showSnackBar(
+              context.strings.external_auth_page_google_email_not_verified,
+              context);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(context.strings.global_something_went_wrong)));
+          showSnackBar(context.strings.global_something_went_wrong, context);
         }
         return;
       }
 
-      await _callback.call(loginResult.unwrap());
+      // Take external name
+      var userParams = loginResult.unwrap();
+      if ((userParams.name ?? '').length < InitUserPage.MIN_NAME_LENGTH) {
+        userParams = userParams.rebuild((e) => e.name = googleAccount.name);
+      }
+
+      // Nice!
+      await _callback.call(userParams);
     } finally {
       setState(() {
         _loading = false;

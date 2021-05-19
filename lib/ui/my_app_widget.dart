@@ -83,7 +83,8 @@ class _MyAppWidgetState extends State<MyAppWidget>
     if (_initialUserParams == null) {
       return false;
     }
-    if ((_initialUserParams?.name ?? '').length < InitUserPage.minNameLength ||
+    if ((_initialUserParams?.name ?? '').length <
+            InitUserPage.MIN_NAME_LENGTH ||
         _initialUserParams!.eatsMilk == null ||
         _initialUserParams!.eatsEggs == null ||
         _initialUserParams!.eatsHoney == null) {

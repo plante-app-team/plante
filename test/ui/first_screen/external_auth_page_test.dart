@@ -37,7 +37,9 @@ void main() {
 
     await tester.tap(find.text('Google'));
 
-    expect(obtainedParams, isNot(equals(null)));
+    // We expect the Google name to be sent to the server
+    final expectedParams = UserParams((e) => e.name = 'bob');
+    expect(obtainedParams, equals(expectedParams));
   });
 
   testWidgets('Not successful Google Sign in', (WidgetTester tester) async {

@@ -13,7 +13,7 @@ typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);
 
 class InitUserPage extends StatefulWidget {
-  static const minNameLength = 3;
+  static const MIN_NAME_LENGTH = 3;
 
   final UserParams userParams;
   final UserParamsSpecifiedCallback callback;
@@ -82,7 +82,7 @@ class _InitUserPageState extends State<InitUserPage> {
   }
 
   bool _calcFirstPageHasData() {
-    return InitUserPage.minNameLength <= _nameController.text.trim().length;
+    return InitUserPage.MIN_NAME_LENGTH <= _nameController.text.trim().length;
   }
 
   @override
