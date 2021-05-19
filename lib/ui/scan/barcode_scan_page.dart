@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
@@ -42,12 +43,14 @@ class BarcodeScanPage extends StatefulWidget {
 
 class _BarcodeScanPageState extends State<BarcodeScanPage>
     with RouteAware, WidgetsBindingObserver {
-  late final BarcodeScanPageModel model;
+  late final BarcodeScanPageModel _model;
 
-  String fakeScannedBarcode = '';
+  String _fakeScannedBarcode = '';
 
-  qr.QRViewController? qrController;
+  qr.QRViewController? _qrController;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  
+  bool _flashOn = false;
 
   @override
   void initState() {
@@ -62,7 +65,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
         });
       }
     };
-    model = BarcodeScanPageModel(
+    _model = BarcodeScanPageModel(
         stateChangeCallback,
         GetIt.I.get<ProductsManager>(),
         GetIt.I.get<LangCodeHolder>(),
@@ -74,10 +77,10 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
       if (ModalRoute.of(context)?.isCurrent == true) {
-        await qrController?.resumeCamera();
+        await _qrController?.resumeCamera();
       }
     } else if (state == AppLifecycleState.paused) {
-      await qrController?.pauseCamera();
+      await _qrController?.pauseCamera();
     }
   }
 
@@ -85,7 +88,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     final settings = GetIt.I.get<Settings>();
     final result = await settings.fakeScannedProductBarcode();
     setState(() {
-      fakeScannedBarcode = result;
+      _fakeScannedBarcode = result;
     });
   }
 
@@ -103,16 +106,16 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      qrController?.pauseCamera();
+      _qrController?.pauseCamera();
     } else if (Platform.isIOS) {
-      qrController?.resumeCamera();
+      _qrController?.resumeCamera();
     }
   }
 
   @override
   void dispose() {
-    model.dispose();
-    qrController?.dispose();
+    _model.dispose();
+    _qrController?.dispose();
     GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
     WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
@@ -121,14 +124,14 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   @override
   void didPopNext() {
     if (ModalRoute.of(context)?.isCurrent == true) {
-      qrController?.resumeCamera();
+      _qrController?.resumeCamera();
       updateFakeScannedBarcode();
     }
   }
 
   @override
   void didPushNext() {
-    qrController?.pauseCamera();
+    _qrController?.pauseCamera();
   }
 
   @override
@@ -138,7 +141,17 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
         body: SafeArea(
             child: Stack(children: [
           Column(children: [
-            const HeaderPlante(color: _BACKGROUND_COLOR, spacingBottom: 24),
+            HeaderPlante(
+                color: _BACKGROUND_COLOR,
+                spacingBottom: 24,
+                leftActionPadding: 12,
+                rightActionPadding: 12,
+                leftAction: IconButton(
+                    onPressed: _toggleFlash,
+                    icon: SvgPicture.asset(_flashOn ? 'assets/flash_enabled.svg' : 'assets/flash_disabled.svg')),
+                rightAction: IconButton(
+                    onPressed: _openSettings,
+                    icon: SvgPicture.asset('assets/settings.svg'))),
             boxWithCutout(context, color: _BACKGROUND_COLOR),
             Expanded(
                 child: Stack(clipBehavior: Clip.none, children: [
@@ -155,37 +168,21 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
               ),
             ])),
           ]),
-          Row(children: [
+          if (_fakeScannedBarcode.isNotEmpty)
             Material(
                 color: _BACKGROUND_COLOR,
                 child: IconButton(
-                    color: Colors.yellow,
-                    icon: const Icon(Icons.flash_on),
-                    onPressed: _toggleFlash)),
-            if (fakeScannedBarcode.isNotEmpty)
-              Material(
-                  color: _BACKGROUND_COLOR,
-                  child: IconButton(
-                      color: Colors.grey,
-                      icon: const Icon(Icons.tag_faces),
-                      onPressed: () {
-                        _onNewScanData(qr.Barcode(
-                            fakeScannedBarcode, qr.BarcodeFormat.unknown, []));
-                      })),
-          ]),
-          Align(
-              alignment: Alignment.topRight,
-              child: Material(
-                  color: _BACKGROUND_COLOR,
-                  child: IconButton(
-                      color: Colors.grey,
-                      icon: const Icon(Icons.settings),
-                      onPressed: _openSettings))),
+                    color: Colors.grey,
+                    icon: const Icon(Icons.tag_faces),
+                    onPressed: () {
+                      _onNewScanData(qr.Barcode(
+                          _fakeScannedBarcode, qr.BarcodeFormat.unknown, []));
+                    })),
           SizedBox(
               width: double.infinity,
               child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
-                  child: model.searching && !isInTests()
+                  child: _model.searching && !isInTests()
                       ? const LinearProgressIndicator()
                       : const SizedBox.shrink())),
         ])));
@@ -201,7 +198,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   Widget contentWidget() {
     return AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
-        child: model.contentState.buildWidget(context));
+        child: _model.contentState.buildWidget(context));
   }
 
   Widget boxWithCutout(BuildContext context, {required Color color}) {
@@ -220,11 +217,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     final Widget cameraWidget;
     if (isInTests()) {
       cameraWidget =
-          model.cameraAvailable ? qrWidget() : Container(color: Colors.white);
+          _model.cameraAvailable ? qrWidget() : Container(color: Colors.white);
     } else {
       cameraWidget = AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: model.cameraAvailable
+          child: _model.cameraAvailable
               ? qrWidget()
               : Container(color: Colors.white));
     }
@@ -245,21 +242,21 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
 
   void _onQRViewCreated(qr.QRViewController controller) {
     setState(() {
-      qrController = controller;
+      _qrController = controller;
     });
     controller.scannedDataStream.listen(_onNewScanData);
   }
 
   void _onNewScanData(qr.Barcode scanData) async {
-    if (model.barcode == scanData.code && scanData.code != fakeScannedBarcode) {
+    if (_model.barcode == scanData.code && scanData.code != _fakeScannedBarcode) {
       return;
     }
-    if (scanData.code != fakeScannedBarcode) {
+    if (scanData.code != _fakeScannedBarcode) {
       // Note: no await because we don't care about result
       sendProductScan(scanData);
     }
 
-    final searchResult = await model.searchProduct(scanData.code);
+    final searchResult = await _model.searchProduct(scanData.code);
     switch (searchResult) {
       case BarcodeScanPageSearchResult.OK:
         // Nice
@@ -279,7 +276,10 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
 
   void _toggleFlash() async {
     try {
-      await qrController?.toggleFlash();
+      await _qrController?.toggleFlash();
+      setState(() {
+        _flashOn = !_flashOn;
+      });
     } on qr.CameraException catch (e) {
       Log.w('QrScanPage._toggleFlash error', ex: e);
     }

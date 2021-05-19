@@ -128,3 +128,6 @@ flutter:
     - assets/history.svg
     - assets/cancel.svg
     - assets/menu_ellipsis.svg
+    - assets/flash_disabled.svg
+    - assets/flash_enabled.svg
+    - assets/settings.svg
