@@ -83,6 +83,9 @@ class Log {
 
   static void startLogsSending() async {
     final logsDir = await logsDirectory();
+    if (!(await logsDir.exists())) {
+      return;
+    }
     final logsZip = File('${logsDir.absolute.path}.zip');
     if (await logsZip.exists()) {
       await logsZip.delete();
