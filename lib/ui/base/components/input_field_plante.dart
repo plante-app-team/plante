@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
@@ -8,13 +9,17 @@ class InputFieldPlante extends StatelessWidget {
   final String? hint;
   final TextCapitalization textCapitalization;
   final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   const InputFieldPlante(
       {Key? key,
       this.label,
       this.hint,
       this.textCapitalization = TextCapitalization.sentences,
-      this.controller})
+      this.controller,
+      this.keyboardType,
+      this.inputFormatters})
       : super(key: key);
 
   @override
@@ -25,6 +30,8 @@ class InputFieldPlante extends StatelessWidget {
           textCapitalization: textCapitalization,
           key: key,
           style: TextStyles.input,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyles.inputLabel,

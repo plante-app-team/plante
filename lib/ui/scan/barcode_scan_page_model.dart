@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -22,6 +23,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   Product? _foundProduct;
   String get _langCode => _langCodeHolder.langCode;
   PermissionState? _cameraPermission;
+  String _manualBarcode = '';
 
   String? get barcode => _barcode;
   bool get searching => _searching;
@@ -123,5 +125,14 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
     } else {
       return BarcodeScanPageSearchResult.OK;
     }
+  }
+
+  void manualBarcodeChanged(String value) {
+    _manualBarcode = value;
+    _onStateChangeCallback.call();
+  }
+
+  bool isManualBarcodeValid() {
+    return isBarcodeValid(_manualBarcode);
   }
 }

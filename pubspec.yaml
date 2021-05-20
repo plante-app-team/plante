@@ -131,3 +131,5 @@ flutter:
     - assets/flash_disabled.svg
     - assets/flash_enabled.svg
     - assets/settings.svg
+    - assets/barcode_scan_mode.svg
+    - assets/barcode_type_mode.svg

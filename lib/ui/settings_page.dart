@@ -31,8 +31,6 @@ class _SettingsPageState extends State<SettingsPage> {
   bool fakeOffApi = false;
   bool offScannedProductEmpty = false;
 
-  final barcodeOverrideController = TextEditingController();
-
   late Settings settings;
   late UserParams user;
 
@@ -58,11 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
     crashOnErrors = await settings.crashOnErrors();
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
-    barcodeOverrideController.text = await settings.fakeScannedProductBarcode();
-    barcodeOverrideController.addListener(() {
-      settings.setFakeScannedProductBarcode(barcodeOverrideController.text);
-    });
-
     setState(() {
       loading = false;
     });
@@ -163,7 +156,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       }),
                 if (developer)
                   AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
+                      duration: DURATION_DEFAULT,
                       child: !fakeOffApi
                           ? const SizedBox.shrink()
                           : _CheckboxSettings(
@@ -177,12 +170,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                       offScannedProductEmpty);
                                 });
                               })),
-                if (developer)
-                  InputFieldPlante(
-                    label: context
-                        .strings.settings_page_fake_off_forced_scanned_barcode,
-                    controller: barcodeOverrideController,
-                  ),
                 const SizedBox(height: 10),
                 Center(
                     child: InkWell(

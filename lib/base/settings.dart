@@ -2,7 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _FAKE_OFF_API = 'FAKE_OFF_API';
 const _FAKE_OFF_API_PRODUCT_NOT_FOUND = 'FAKE_OFF_API_PRODUCT_NOT_FOUND';
-const _FAKE_SCANNED_PRODUCT_BARCODE = 'FAKE_SCANNED_PRODUCT_BARCODE';
 const _CRASH_ON_ERRORS = 'CRASH_ON_ERRORS';
 
 class Settings {
@@ -25,16 +24,6 @@ class Settings {
   Future<void> setFakeOffApiProductNotFound(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_FAKE_OFF_API_PRODUCT_NOT_FOUND, value);
-  }
-
-  Future<String> fakeScannedProductBarcode() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_FAKE_SCANNED_PRODUCT_BARCODE) ?? '';
-  }
-
-  Future<void> setFakeScannedProductBarcode(String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_FAKE_SCANNED_PRODUCT_BARCODE, value);
   }
 
   Future<void> setCrashOnErrors(bool value) async {

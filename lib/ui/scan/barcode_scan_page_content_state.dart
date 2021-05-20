@@ -39,13 +39,7 @@ class BarcodeScanPageContentStateNothingScanned
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Padding(
-        key: Key(id),
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
-          Text(context.strings.barcode_scan_page_point_camera_at_barcode,
-              textAlign: TextAlign.center, style: TextStyles.normal)
-        ]));
+    return SizedBox.shrink();
   }
 }
 
@@ -105,8 +99,6 @@ class BarcodeScanPageContentStateProductFound
         key: Key(id),
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: Column(children: [
-          Text(context.strings.barcode_scan_page_point_camera_at_next_barcode,
-              textAlign: TextAlign.center, style: TextStyles.normal),
           Expanded(
               child: Align(
                   alignment: Alignment.bottomCenter,

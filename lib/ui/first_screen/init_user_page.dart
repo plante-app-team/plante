@@ -8,6 +8,7 @@ import 'package:plante/ui/base/components/radio_plante.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);
@@ -92,7 +93,7 @@ class _InitUserPageState extends State<InitUserPage> {
         body: SafeArea(
             child: Stack(children: [
           AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: DURATION_DEFAULT,
               child: _loading
                   ? const LinearProgressIndicator()
                   : const SizedBox.shrink()),

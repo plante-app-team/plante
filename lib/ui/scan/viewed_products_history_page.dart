@@ -66,7 +66,7 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
           Stack(children: [
             const HeaderPlante(),
             AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
+                duration: DURATION_DEFAULT,
                 child: loading
                     ? const LinearProgressIndicator()
                     : const SizedBox.shrink()),
@@ -104,7 +104,6 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
     if (loading) {
       return;
     }
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     setState(() {
       loading = true;
     });

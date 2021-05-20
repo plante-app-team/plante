@@ -2,7 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/base/dialog_plante.dart';
+import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -278,7 +278,7 @@ class _InitProductPageState extends State<InitProductPage>
                             ])),
                       ])),
                   AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
+                      duration: DURATION_DEFAULT,
                       child: model.loading
                           ? const LinearProgressIndicator()
                           : const SizedBox.shrink())
@@ -317,8 +317,7 @@ class _InitProductPageState extends State<InitProductPage>
       result = const SizedBox.shrink();
     }
 
-    return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250), child: result);
+    return AnimatedSwitcher(duration: DURATION_DEFAULT, child: result);
   }
 
   void cancel() {

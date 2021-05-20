@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 // ignore: always_use_package_imports
 import 'functions.dart';
@@ -30,7 +31,7 @@ Widget defaultIndicatorMaker(int page, PageIndicatorState pageState) {
   final text = (page + 1).toString();
 
   final indicator = AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
+      duration: DURATION_DEFAULT,
       width: size,
       height: size,
       decoration: BoxDecoration(

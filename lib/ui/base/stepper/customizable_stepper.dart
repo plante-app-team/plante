@@ -5,6 +5,7 @@ import 'package:plante/ui/base/stepper/_back_button_wrapper.dart';
 import 'package:plante/ui/base/stepper/_indicators_top.dart';
 import 'package:plante/ui/base/stepper/functions.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 // ignore: always_use_package_imports
 import '_default_subwidgets.dart';
@@ -100,7 +101,7 @@ class CustomizableStepper extends StatelessWidget {
     }
     // NOTE: no 'await'
     _pageViewController.animateToPage(page,
-        duration: const Duration(milliseconds: 250), curve: Curves.easeIn);
+        duration: DURATION_DEFAULT, curve: Curves.easeIn);
     _indicatorController.setPage(page);
     _backButtonController.setButtonShown(page > 0);
     _controller._activePage = page;

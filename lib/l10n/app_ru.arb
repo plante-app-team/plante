@@ -10,6 +10,8 @@
     "global_yes": "Да",
     "global_give_permission": "Дать разрешение",
     "global_open_app_settings": "Открыть настройки",
+    "global_barcode": "Штрихкод",
+    "global_send": "Отправить",
 
     "image_cropper_title": "Давайте-ка обрежем!",
 
@@ -40,11 +42,11 @@
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
     "barcode_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
-    "barcode_scan_page_point_camera_at_next_barcode": "Наведите камеру на следующий штрихкод",
     "barcode_scan_page_searching_product": "Ищем продукт ",
     "barcode_scan_page_add_product": "Добавить продукт",
     "barcode_scan_page_camera_permission_reasoning": "Для включения сканера, приложению необходимо разрешение на использование камеры",
     "barcode_scan_page_camera_permission_reasoning_settings": "Для включения сканера нужно дать разрешение на использование камеры, перейдя в настройки",
+    "barcode_scan_page_invalid_barcode": "Недействительный штрихкод",
 
     "display_product_page_ingredients": "Состав:",
     "display_product_page_ingredients_analysis": "Автоматический анализ состава",

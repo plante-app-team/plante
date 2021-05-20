@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 class BackButtonWrapperController {
   bool _shown = false;
@@ -37,18 +39,11 @@ class _BackButtonWrapperState extends State<BackButtonWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    if (isInTests()) {
-      // AnimatedCrossFade always have both widgets created which is not ok for testing
-      return widget.controller._shown
-          ? widget.backButton
-          : const SizedBox.shrink();
-    }
-    return AnimatedCrossFade(
+    return AnimatedCrossFadePlante(
         firstChild: widget.backButton,
         secondChild: const SizedBox.shrink(),
         crossFadeState: widget.controller._shown
             ? CrossFadeState.showFirst
-            : CrossFadeState.showSecond,
-        duration: const Duration(milliseconds: 250));
+            : CrossFadeState.showSecond);
   }
 }

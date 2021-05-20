@@ -8,6 +8,7 @@ import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 class ProductCard extends StatefulWidget {
   final Product product;
@@ -72,7 +73,7 @@ class _ProductCardState extends State<ProductCard> {
               padding: const EdgeInsets.all(6),
               child: Row(children: [
                 AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
+                  duration: DURATION_DEFAULT,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: dominantColor ?? defaultDominantColor,

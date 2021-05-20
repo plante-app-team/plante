@@ -8,6 +8,7 @@ import 'package:plante/base/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -64,8 +65,8 @@ class _MyAppWidgetState extends State<MyAppWidget>
           unselectedWidgetColor: const Color(0xFF979A9C),
           fontFamily: 'Poppins',
         ),
-        home: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250), child: _mainWidget()),
+        home:
+            AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
   }
 

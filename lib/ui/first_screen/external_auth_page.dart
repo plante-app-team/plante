@@ -90,7 +90,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
                             decoration: TextDecoration.underline)),
                   ))),
           AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: DURATION_DEFAULT,
               child: _loading
                   ? const LinearProgressIndicator()
                   : const SizedBox.shrink()),

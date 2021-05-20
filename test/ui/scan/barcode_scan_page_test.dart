@@ -80,11 +80,8 @@ void main() {
           ..vegetarianStatusSource = VegStatusSource.community)));
 
     final widget = BarcodeScanPage();
-    final context = await tester.superPump(widget);
+    await tester.superPump(widget);
 
-    expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsOneWidget);
     expect(
         find.text('Product name'),
         findsNothing);
@@ -92,9 +89,6 @@ void main() {
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsNothing);
     expect(
         find.text('Product name'),
         findsOneWidget);
@@ -118,18 +112,12 @@ void main() {
     const barcode = '12345';
 
     expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsOneWidget);
-    expect(
         find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
 
     widget.newScanDataForTesting(_barcode(barcode));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsNothing);
     expect(
         find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
@@ -178,9 +166,6 @@ void main() {
     expect(
         find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
         findsOneWidget);
-    expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsNothing);
 
     await tester.tap(find.text(context.strings.global_give_permission));
     await tester.pumpAndSettle();
@@ -188,9 +173,6 @@ void main() {
     expect(
         find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
         findsNothing);
-    expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsOneWidget);
   });
 
   testWidgets('permission request through settings', (WidgetTester tester) async {
@@ -203,9 +185,6 @@ void main() {
         find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
         findsNothing);
     expect(
-        find.text(context.strings.barcode_scan_page_point_camera_at_barcode),
-        findsNothing);
-    expect(
         find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
         findsOneWidget);
 
@@ -213,6 +192,91 @@ void main() {
     await tester.tap(find.text(context.strings.global_open_app_settings));
     await tester.pumpAndSettle();
     verify(permissionsManager.openAppSettings());
+  });
+
+  testWidgets('manual barcode search', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+        Ok(Product((e) => e
+          ..barcode = invc.positionalArguments[0] as String
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community
+          ..vegetarianStatusSource = VegStatusSource.community)));
+
+    final widget = BarcodeScanPage();
+    final context = await tester.superPump(widget);
+
+    expect(
+        find.byKey(const Key('manual_barcode_input')),
+        findsNothing);
+
+    await tester.tap(find.byKey(const Key('input_mode_switch')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const Key('manual_barcode_input')),
+        findsWidgets);
+    await tester.enterText(find.byKey(const Key('manual_barcode_input')), '4000417025005');
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('Product name'),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.global_send));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('Product name'),
+        findsOneWidget);
+  });
+
+  testWidgets('manual barcode search, but barcode is invalid', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+        Ok(Product((e) => e
+          ..barcode = invc.positionalArguments[0] as String
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community
+          ..vegetarianStatusSource = VegStatusSource.community)));
+
+    final widget = BarcodeScanPage();
+    final context = await tester.superPump(widget);
+
+    expect(
+        find.byKey(const Key('manual_barcode_input')),
+        findsNothing);
+
+    await tester.tap(find.byKey(const Key('input_mode_switch')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const Key('manual_barcode_input')),
+        findsWidgets);
+    await tester.enterText(find.byKey(const Key('manual_barcode_input')), '1234567891234');
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_invalid_barcode),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.global_send));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('Product name'),
+        findsNothing);
+    expect(
+        find.text(context.strings.barcode_scan_page_invalid_barcode),
+        findsWidgets);
   });
 }
 
