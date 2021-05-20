@@ -269,6 +269,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
           qr.Barcode(
               _manualBarcodeTextController.text, qr.BarcodeFormat.unknown, []),
           forceSearch: true);
+      FocusScope.of(context).unfocus();
     };
     final onDisabledPressed = () {
       if (!_model.searching) {

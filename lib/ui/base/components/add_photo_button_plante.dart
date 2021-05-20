@@ -34,7 +34,7 @@ class AddPhotoButtonPlante extends StatelessWidget {
                       padding: const EdgeInsets.all(2),
                       child: Align(
                         alignment: Alignment.topRight,
-                        child: SvgPicture.asset('assets/remove_photo.svg'),
+                        child: SvgPicture.asset('assets/cancel_circle.svg'),
                       ))
                 ]))
             ])),

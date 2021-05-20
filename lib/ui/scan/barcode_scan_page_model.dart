@@ -67,6 +67,12 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
     _onStateChangeCallback.call();
   }
 
+  void _onFoundProductCanceled() {
+    _foundProduct = null;
+    _barcode = null;
+    _onStateChangeCallback.call();
+  }
+
   BarcodeScanPageContentState get contentState {
     if (_cameraPermission != null &&
         _cameraPermission != PermissionState.granted) {
@@ -87,8 +93,11 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       return BarcodeScanPageContentState.searchingProduct(_barcode!);
     } else if (_foundProduct != null &&
         ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
-      return BarcodeScanPageContentState.productFound(_foundProduct!,
-          _userParamsController.cachedUserParams!, onProductExternalUpdate);
+      return BarcodeScanPageContentState.productFound(
+          _foundProduct!,
+          _userParamsController.cachedUserParams!,
+          onProductExternalUpdate,
+          _onFoundProductCanceled);
     } else {
       final Product product;
       if (_foundProduct != null) {
@@ -97,7 +106,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
         product = Product((v) => v.barcode = _barcode);
       }
       return BarcodeScanPageContentState.productNotFound(
-          product, onProductExternalUpdate);
+          product, onProductExternalUpdate, _onFoundProductCanceled);
     }
   }
 

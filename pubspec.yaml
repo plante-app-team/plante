@@ -111,7 +111,7 @@ flutter:
     - assets/google_icon.svg
     - assets/back_arrow.svg
     - assets/add_photo.svg
-    - assets/remove_photo.svg
+    - assets/cancel_circle.svg
     - assets/info_icon.svg
     - assets/veg_status_vegan.svg
     - assets/veg_status_vegetarian.svg
