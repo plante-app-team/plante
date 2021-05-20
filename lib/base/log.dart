@@ -36,10 +36,8 @@ class Log {
         TimedRollingFileTree(filenamePrefix: '${logsDir.absolute.path}/log');
     Fimber.plantTree(_fileTree!);
 
-    if (kReleaseMode) {
-      _crashlyticsTree = _CrashlyticsFimberTree();
-      Fimber.plantTree(_crashlyticsTree!);
-    }
+    _crashlyticsTree = _CrashlyticsFimberTree();
+    Fimber.plantTree(_crashlyticsTree!);
 
     // NOTE: it's async but we don't wait for it
     await maybeCleanUpLogs(logsDir, maxSizeBytes);

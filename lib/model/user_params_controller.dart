@@ -63,7 +63,7 @@ class UserParamsController {
       return null;
     }
 
-    if (kReleaseMode && backendId != null && !_crashlyticsInited) {
+    if (backendId != null && !_crashlyticsInited) {
       await FirebaseCrashlytics.instance.setUserIdentifier(backendId);
       _crashlyticsInited = true;
     }
