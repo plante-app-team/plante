@@ -15,6 +15,7 @@ class SwitchPlante extends StatefulWidget {
 
   final Color colorBackground;
   final Color colorActive;
+  final BoxShadow? boxShadow;
 
   const SwitchPlante({
     Key? key,
@@ -26,6 +27,7 @@ class SwitchPlante extends StatefulWidget {
     this.colorActive = ColorsPlante.primary,
     this.width = 190,
     this.height = 39,
+    this.boxShadow,
   }) : super(key: key);
 
   @override
@@ -85,6 +87,7 @@ class _SwitchPlanteState extends State<SwitchPlante>
           decoration: BoxDecoration(
             color: widget.colorBackground,
             borderRadius: BorderRadius.circular(30),
+            boxShadow: widget.boxShadow != null ? [widget.boxShadow!] : null,
           ),
         ),
         AnimatedAlign(

@@ -147,6 +147,11 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                   callback: _switchInputMode,
                   leftSvgAsset: 'assets/barcode_scan_mode.svg',
                   rightSvgAsset: 'assets/barcode_type_mode.svg',
+                  boxShadow: BoxShadow(
+                    color: Colors.grey.withOpacity(0.25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 4),
+                  ),
                 ),
                 spacingBottom: 24,
                 leftActionPadding: 12,
