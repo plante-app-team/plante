@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/button_base_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class ButtonFilledPlante extends StatelessWidget {
-  final double height;
+  final double? height;
   final Widget child;
   final VoidCallback? onPressed;
   final VoidCallback? onDisabledPressed;
@@ -13,38 +14,24 @@ class ButtonFilledPlante extends StatelessWidget {
       required this.child,
       required this.onPressed,
       this.onDisabledPressed,
-      this.height = 46})
+      this.height})
       : super(key: key);
 
   ButtonFilledPlante.withText(String text,
-      {Key? key,
-      required this.onPressed,
-      this.onDisabledPressed,
-      this.height = 46})
+      {Key? key, required this.onPressed, this.onDisabledPressed, this.height})
       : child = Text(text, style: TextStyles.buttonFilled),
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
-        highlightColor: Colors.transparent,
-        onTap: onPressed != null ? null : onDisabledPressed,
-        child: SizedBox(
-            height: height,
-            child: OutlinedButton(
-                style: ButtonStyle(
-                    padding: MaterialStateProperty.all(
-                        const EdgeInsets.only(left: 24, right: 24)),
-                    overlayColor:
-                        MaterialStateProperty.all(ColorsPlante.splashColor),
-                    backgroundColor: MaterialStateProperty.all(onPressed != null
-                        ? ColorsPlante.primary
-                        : ColorsPlante.primaryDisabled),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)))),
-                onPressed: onPressed,
-                child: child)));
+    return ButtonBasePlante(
+      height: height,
+      backgroundColorEnabled: ColorsPlante.primary,
+      backgroundColorDisabled: ColorsPlante.primaryDisabled,
+      overlayColor: ColorsPlante.splashColor,
+      onPressed: onPressed,
+      onDisabledPressed: onDisabledPressed,
+      child: child,
+    );
   }
 }

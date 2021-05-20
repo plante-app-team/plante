@@ -39,7 +39,7 @@ class BarcodeScanPageContentStateNothingScanned
 
   @override
   Widget buildWidget(BuildContext context) {
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }
 

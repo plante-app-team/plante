@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 typedef SwitchPlanteCallback = void Function(bool leftSelected);
