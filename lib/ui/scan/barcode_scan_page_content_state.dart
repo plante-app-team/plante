@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:plante/ui/base/components/barcode_spinner.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -57,15 +58,10 @@ class BarcodeScanPageContentStateSearchingProduct
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Padding(
+    return _CardContainer(
         key: Key(id),
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
-          Text(
-              '${context.strings.barcode_scan_page_searching_product} $barcode',
-              textAlign: TextAlign.center,
-              style: TextStyles.normal)
-        ]));
+        child:
+            const SizedBox(height: 77, child: Center(child: BarcodeSpinner())));
   }
 }
 
@@ -101,33 +97,14 @@ class BarcodeScanPageContentStateProductFound
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Padding(
-        key: Key(id),
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: Column(children: [
-          Expanded(
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Wrap(children: [
-                    Stack(children: [
-                      ProductCard(
-                          product: product,
-                          beholder: beholder,
-                          onTap: () {
-                            tryOpenProductPage(context);
-                          }),
-                      Align(
-                          alignment: Alignment.topRight,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: IconButton(
-                                onPressed: cancelCallback,
-                                icon: SvgPicture.asset(
-                                    'assets/cancel_circle.svg')),
-                          ))
-                    ])
-                  ]))),
-        ]));
+    return _CardContainer(
+        cancelCallback: cancelCallback,
+        child: ProductCard(
+            product: product,
+            beholder: beholder,
+            onTap: () {
+              tryOpenProductPage(context);
+            }));
   }
 }
 

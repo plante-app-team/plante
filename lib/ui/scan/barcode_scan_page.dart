@@ -179,14 +179,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
                 ]),
               ),
             ])),
-          ]),
-          SizedBox(
-              width: double.infinity,
-              child: AnimatedSwitcher(
-                  duration: DURATION_DEFAULT,
-                  child: _model.searching && !isInTests()
-                      ? const LinearProgressIndicator()
-                      : const SizedBox.shrink())),
+          ])
         ])));
   }
 
