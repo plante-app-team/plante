@@ -227,6 +227,7 @@ class _CardContainer extends StatelessWidget {
                             child: Material(
                               color: Colors.transparent,
                               child: IconButton(
+                                  key: const Key('card_cancel_btn'),
                                   onPressed: cancelCallback,
                                   icon: SvgPicture.asset(
                                       'assets/cancel_circle.svg')),

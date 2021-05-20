@@ -278,6 +278,62 @@ void main() {
         find.text(context.strings.barcode_scan_page_invalid_barcode),
         findsWidgets);
   });
+
+
+
+  testWidgets('cancel found product card', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+        Ok(Product((e) => e
+          ..barcode = invc.positionalArguments[0] as String
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community
+          ..vegetarianStatusSource = VegStatusSource.community)));
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    widget.newScanDataForTesting(_barcode('12345'));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('Product name'),
+        findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('Product name'),
+        findsNothing);
+  });
+
+  testWidgets('cancel not found product card', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async => Ok(null));
+
+    final widget = BarcodeScanPage();
+    final context = await tester.superPump(widget);
+
+    const barcode = '12345';
+
+    widget.newScanDataForTesting(_barcode(barcode));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_product_not_found),
+        findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_product_not_found),
+        findsNothing);
+  });
 }
 
 qr.Barcode _barcode(String barcode) =>
