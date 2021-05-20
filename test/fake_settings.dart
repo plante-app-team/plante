@@ -12,10 +12,4 @@ class FakeSettings implements Settings {
 
   @override
   Future<void> setFakeOffApiProductNotFound(bool value) async {}
-
-  @override
-  Future<bool> crashOnErrors() async => true;
-
-  @override
-  Future<void> setCrashOnErrors(bool value) async {}
 }

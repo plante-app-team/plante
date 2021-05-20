@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/ui_utils.dart';
 
 class BarcodeSpinner extends StatefulWidget {
   const BarcodeSpinner({Key? key}) : super(key: key);

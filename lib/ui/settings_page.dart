@@ -26,7 +26,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool loading = true;
   bool developer = false;
-  bool crashOnErrors = false;
   bool fakeOffApi = false;
   bool offScannedProductEmpty = false;
 
@@ -52,7 +51,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     developer = true;
-    crashOnErrors = await settings.crashOnErrors();
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
     setState(() {
@@ -133,16 +131,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
                         exit(0);
                       })),
-                if (developer)
-                  _CheckboxSettings(
-                      text: context.strings.settings_page_crash_on_errors,
-                      value: crashOnErrors,
-                      onChanged: (value) {
-                        setState(() {
-                          crashOnErrors = value;
-                          settings.setCrashOnErrors(crashOnErrors);
-                        });
-                      }),
                 if (developer)
                   _CheckboxSettings(
                       text: context.strings.settings_page_fake_off,

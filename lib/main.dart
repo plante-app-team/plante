@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:isolate';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -8,30 +8,33 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
-import 'package:plante/base/settings.dart';
 import 'package:plante/di.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/my_app_widget.dart';
 
-bool? _crashOnErrors;
-
 void main() {
   runZonedGuarded(mainImpl, (Object error, StackTrace stack) {
-    onError(error.toString(), error, stack);
+    FirebaseCrashlytics.instance.recordError(error, stack);
   });
 }
 
 void mainImpl() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-    onError(details.toString(), details.exception, details.stack);
-  };
+  await Firebase.initializeApp();
+  await FirebaseCrashlytics.instance
+      .setCrashlyticsCollectionEnabled(kReleaseMode);
 
-  if (kReleaseMode) {
-    await Firebase.initializeApp();
-  }
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FirebaseCrashlytics.instance.recordFlutterError(details);
+  };
+  Isolate.current.addErrorListener(RawReceivePort((pair) async {
+    final List<dynamic> errorAndStacktrace = pair as List<dynamic>;
+    await FirebaseCrashlytics.instance.recordError(
+      errorAndStacktrace.first,
+      errorAndStacktrace.last as StackTrace?,
+    );
+  }).sendPort);
 
   Log.init();
   Log.i('App start');
@@ -42,26 +45,6 @@ void mainImpl() async {
 
   setSystemUIOverlayStyle();
 
-  _crashOnErrors = await GetIt.I.get<Settings>().crashOnErrors();
-
   runApp(RootRestorationScope(
       restorationId: 'root', child: MyAppWidget(initialUserParams)));
-}
-
-void onError(String text, dynamic? exception, StackTrace? stack) async {
-  Log.e(text,
-      ex: exception,
-      stacktrace: stack,
-      crashAllowed: false /* We'll crash ourselves */,
-      crashlyticsAllowed: false /* We'll send the error ourselves */);
-  if (kReleaseMode) {
-    await FirebaseCrashlytics.instance
-        .recordError(exception, stack, reason: text, fatal: true);
-  }
-  if (exception is FlutterError && exception.message.contains('RenderFlex')) {
-    return;
-  }
-  if (_crashOnErrors ?? true) {
-    exit(1);
-  }
 }
