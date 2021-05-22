@@ -37,6 +37,7 @@ class InputFieldPlante extends StatelessWidget {
             labelStyle: TextStyles.inputLabel,
             hintText: hint,
             contentPadding: const EdgeInsets.only(left: 22, right: 22),
+            hintStyle: TextStyles.inputHint,
             enabledBorder: const OutlineInputBorder(
               gapPadding: 2,
               borderSide: BorderSide(color: Color.fromARGB(255, 28, 32, 44)),

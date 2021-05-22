@@ -53,6 +53,8 @@ class TextStyles {
 
   static const TextStyle input =
       TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF192123));
+  static const TextStyle inputHint =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF979A9C));
 
   static const TextStyle inputLabel = normalSmall;
 
