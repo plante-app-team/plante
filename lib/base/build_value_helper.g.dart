@@ -8,11 +8,19 @@ part of 'build_value_helper.dart';
 
 Serializers _$_serializers = (new Serializers().toBuilder()
       ..add(BackendProduct.serializer)
+      ..add(BackendShop.serializer)
       ..add(Ingredient.serializer)
       ..add(Product.serializer)
       ..add(UserParams.serializer)
       ..add(VegStatus.serializer)
       ..add(VegStatusSource.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(BackendProduct)]),
+          () => new ListBuilder<BackendProduct>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(String), const FullType(int)]),
+          () => new MapBuilder<String, int>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

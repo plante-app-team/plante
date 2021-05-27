@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:test/test.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -685,6 +687,210 @@ void main() {
         '.*user_data.*', const SocketException(''));
 
     final result = await backend.userData();
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+  });
+
+  test('requesting shops', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*products_at_shops_data.*',
+        '''
+          {
+            "results" : {
+              "8711880917" : {
+                "shop_osm_id" : "8711880917",
+                "products" : [ {
+                  "server_id" : 23,
+                  "barcode" : "4605932001284",
+                  "vegetarian_status" : "positive",
+                  "vegan_status" : "positive",
+                  "vegetarian_status_source" : "community",
+                  "vegan_status_source" : "community"
+                } ],
+                "products_last_seen_utc" : { }
+              },
+              "8771781029" : {
+                "shop_osm_id" : "8771781029",
+                "products" : [ {
+                  "server_id" : 16,
+                  "barcode" : "4612742721165",
+                  "vegetarian_status" : "positive",
+                  "vegan_status" : "positive",
+                  "vegetarian_status_source" : "community",
+                  "vegan_status_source" : "community"
+                }, {
+                  "server_id" : 17,
+                  "barcode" : "9001414603703",
+                  "vegetarian_status" : "positive",
+                  "vegan_status" : "positive",
+                  "vegetarian_status_source" : "community",
+                  "vegan_status_source" : "community"
+                } ],
+                "products_last_seen_utc" : {
+                  "4612742721165": 123456
+                }
+              }
+            }
+          }
+        ''');
+
+    final result = await backend.requestShops(['8711880917', '8771781029']);
+    expect(result.isOk, isTrue);
+
+    final shops = result.unwrap();
+    expect(shops.length, equals(2));
+
+    final BackendShop shop1;
+    final BackendShop shop2;
+    if (shops[0].osmId == '8711880917') {
+      shop1 = shops[0];
+      shop2 = shops[1];
+    } else {
+      shop1 = shops[1];
+      shop2 = shops[0];
+    }
+
+    final expectedProduct1 = BackendProduct.fromJson(jsonDecode('''
+    {
+      "server_id" : 23,
+      "barcode" : "4605932001284",
+      "vegetarian_status" : "positive",
+      "vegan_status" : "positive",
+      "vegetarian_status_source" : "community",
+      "vegan_status_source" : "community"
+    }''') as Map<String, dynamic>);
+    final expectedProduct2 = BackendProduct.fromJson(jsonDecode('''
+    {
+      "server_id" : 16,
+      "barcode" : "4612742721165",
+      "vegetarian_status" : "positive",
+      "vegan_status" : "positive",
+      "vegetarian_status_source" : "community",
+      "vegan_status_source" : "community"
+    }''') as Map<String, dynamic>);
+    final expectedProduct3 = BackendProduct.fromJson(jsonDecode('''
+    {
+      "server_id" : 17,
+      "barcode" : "9001414603703",
+      "vegetarian_status" : "positive",
+      "vegan_status" : "positive",
+      "vegetarian_status_source" : "community",
+      "vegan_status_source" : "community"
+    }''') as Map<String, dynamic>);
+
+    expect(shop1.products.length, equals(1));
+    expect(shop1.products[0], equals(expectedProduct1));
+
+    expect(shop2.products.length, equals(2));
+    expect(shop2.products[0], equals(expectedProduct2));
+    expect(shop2.products[1], equals(expectedProduct3));
+
+    expect(shop1.productsLastSeenUtc.length, equals(0));
+    expect(shop2.productsLastSeenUtc.length, equals(1));
+    expect(shop2.productsLastSeenUtc['4612742721165'], equals(123456));
+  });
+
+  test('requesting shops empty response', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*products_at_shops_data.*',
+        '''
+          {
+            "results" : {}
+          }
+        ''');
+
+    final result = await backend.requestShops(['8711880917', '8771781029']);
+    expect(result.unwrap().length, equals(0));
+  });
+
+  test('requesting shops invalid JSON response', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*products_at_shops_data.*',
+        '''
+          {{{{{{{{{{{{{{{{{{{{{{
+            "results" : {
+              "8711880917" : {
+                "shop_osm_id" : "8711880917",
+                "products" : [ {
+                  "server_id" : 23,
+                  "barcode" : "4605932001284",
+                  "vegetarian_status" : "positive",
+                  "vegan_status" : "positive",
+                  "vegetarian_status_source" : "community",
+                  "vegan_status_source" : "community"
+                } ],
+                "products_last_seen_utc" : { }
+              }
+            }
+          }
+        ''');
+
+    final result = await backend.requestShops(['8711880917', '8771781029']);
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops JSON without results response', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*products_at_shops_data.*',
+        '''
+          {
+            "rezzzults" : {}
+          }
+        ''');
+
+    final result = await backend.requestShops(['8711880917', '8771781029']);
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops network error', () async {
+    final httpClient = FakeHttpClient();
+    final userParamsController = FakeUserParamsController();
+    final initialParams = UserParams((v) => v
+      ..backendId = '123'
+      ..name = 'Bob'
+      ..backendClientToken = 'aaa');
+    await userParamsController.setUserParams(initialParams);
+
+    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*products_at_shops_data.*', const SocketException(''));
+
+    final result = await backend.requestShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 }

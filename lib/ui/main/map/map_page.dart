@@ -6,8 +6,9 @@ import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/model/location_controller.dart';
-import 'package:plante/outside/osm/open_street_map.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final _locationController = GetIt.I.get<LocationController>();
-  final _osm = GetIt.I.get<OpenStreetMap>();
+  final _shopsManager = GetIt.I.get<ShopsManager>();
   final _mapController = Completer<GoogleMapController>();
   var _initialRealPositionSet = false;
   var _supermarketsMarkers = <Marker>{};
@@ -117,19 +118,32 @@ class _MapPageState extends State<MapPage> {
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
 
-    final supermarkets = await _osm.fetchShops(
+    final shopsResult = await _shopsManager.fetchShops(
         Point(viewBounds.northeast.latitude, viewBounds.northeast.longitude),
         Point(viewBounds.southwest.latitude, viewBounds.southwest.longitude));
+    if (shopsResult.isErr) {
+      if (shopsResult.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
+        showSnackBar(context.strings.global_network_error, context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
+      setState(() {
+        _supermarketsMarkers = {};
+      });
+      return;
+    }
+    final shops =
+        shopsResult.unwrap().where((element) => element.productsCount > 0);
 
     final newMarkers = <Marker>{};
-    for (final supermarket in supermarkets) {
+    for (final shop in shops) {
       newMarkers.add(Marker(
-        markerId: MarkerId(supermarket.id),
-        position: LatLng(supermarket.latitude, supermarket.longitude),
+        markerId: MarkerId(shop.osmId),
+        position: LatLng(shop.latitude, shop.longitude),
         infoWindow: InfoWindow(
-            title: supermarket.name,
-            snippet: supermarket.type ??
-                context.strings.map_page_default_shop_type_name),
+            title: shop.name,
+            snippet:
+                shop.type ?? context.strings.map_page_default_shop_type_name),
       ));
     }
 

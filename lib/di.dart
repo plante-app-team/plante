@@ -8,8 +8,9 @@ import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/location_controller.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
-import 'package:plante/outside/osm/open_street_map.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
@@ -23,9 +24,10 @@ void initDI() {
       RouteObserver<ModalRoute>());
   GetIt.I.registerSingleton<UserParamsController>(UserParamsController());
   GetIt.I.registerSingleton<LocationController>(LocationController());
-  GetIt.I.registerSingleton<OpenStreetMap>(OpenStreetMap());
-  GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<HttpClient>(HttpClient());
+  GetIt.I.registerSingleton<OpenStreetMap>(
+      OpenStreetMap(GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
   GetIt.I.registerSingleton<Settings>(Settings());
   GetIt.I.registerSingleton<Backend>(Backend(
@@ -42,4 +44,6 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
+  GetIt.I.registerSingleton<ShopsManager>(
+      ShopsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<Backend>()));
 }

@@ -9,6 +9,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/base/device_info.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_response.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -212,6 +213,35 @@ class Backend {
     }
   }
 
+  Future<Result<List<BackendShop>, BackendError>> requestShops(
+      Iterable<String> osmIds) async {
+    final response =
+        await _backendGet('products_at_shops_data/', {'osmShopsIds': osmIds});
+    if (response.isError) {
+      return Err(_errFromResp(response));
+    }
+
+    final json = _jsonDecodeSafe(response.body);
+    if (json == null) {
+      return Err(_errInvalidJson(response.body));
+    }
+
+    if (!json.containsKey('results')) {
+      Log.w('Invalid products_at_shops_data response: $json');
+      return Err(BackendError.invalidJson(response.body));
+    }
+
+    final results = json['results'] as Map<String, dynamic>;
+    final shops = <BackendShop>[];
+    for (final result in results.values) {
+      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
+      if (shop != null) {
+        shops.add(shop);
+      }
+    }
+    return Ok(shops);
+  }
+
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
       return Err(_errFromResp(response));
@@ -224,7 +254,7 @@ class Backend {
     }
   }
 
-  Future<BackendResponse> _backendGet(String path, Map<String, String>? params,
+  Future<BackendResponse> _backendGet(String path, Map<String, dynamic>? params,
       {Map<String, String>? headers,
       String? backendClientTokenOverride}) async {
     final userParams = await _userParamsController.getUserParams();

@@ -33,7 +33,8 @@ class _MainPageState extends State<MainPage> {
           svgIcons: [
             if (enableNewestFeatures()) 'assets/report.svg',
             'assets/barcode.svg',
-            'assets/history.svg'],
+            'assets/history.svg'
+          ],
           selectedIcon: selectedPage,
           onIconClick: (index) {
             setState(() {
