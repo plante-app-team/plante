@@ -7,7 +7,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/backend_products_at_shop.dart';
 
 part 'build_value_helper.g.dart';
 
@@ -18,7 +18,7 @@ part 'build_value_helper.g.dart';
   VegStatusSource,
   Product,
   Ingredient,
-  BackendShop,
+  BackendProductsAtShop,
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers =

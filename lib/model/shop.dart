@@ -1,12 +1,12 @@
 import 'package:built_value/built_value.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 
 part 'shop.g.dart';
 
 abstract class Shop implements Built<Shop, ShopBuilder> {
   OsmShop get osmShop;
-  BackendShop? get backendShop;
+  BackendProductsAtShop? get backendShop;
 
   String get osmId => osmShop.osmId;
   String get name => osmShop.name;

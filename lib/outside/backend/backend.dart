@@ -9,7 +9,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/base/device_info.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_response.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -213,8 +213,8 @@ class Backend {
     }
   }
 
-  Future<Result<List<BackendShop>, BackendError>> requestShops(
-      Iterable<String> osmIds) async {
+  Future<Result<List<BackendProductsAtShop>, BackendError>>
+      requestProductsAtShops(Iterable<String> osmIds) async {
     final response =
         await _backendGet('products_at_shops_data/', {'osmShopsIds': osmIds});
     if (response.isError) {
@@ -232,9 +232,10 @@ class Backend {
     }
 
     final results = json['results'] as Map<String, dynamic>;
-    final shops = <BackendShop>[];
+    final shops = <BackendProductsAtShop>[];
     for (final result in results.values) {
-      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
+      final shop =
+          BackendProductsAtShop.fromJson(result as Map<String, dynamic>);
       if (shop != null) {
         shops.add(shop);
       }

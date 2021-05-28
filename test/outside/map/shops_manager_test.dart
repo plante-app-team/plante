@@ -7,7 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
@@ -29,7 +29,7 @@ void main() {
     _shopsManager = ShopsManager(_osm, _backend);
   });
 
-  test('fetchShops good scenario', () async {
+  test('fetchProductsAtShops good scenario', () async {
     final osmShops = [
       OsmShop((e) => e
         ..osmId = '1'
@@ -47,14 +47,14 @@ void main() {
     when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
 
     final backendShops = [
-      BackendShop((e) => e
+      BackendProductsAtShop((e) => e
         ..osmId = '1'
         ..products = ListBuilder([
           BackendProduct((e) => e.barcode = '123'),
           BackendProduct((e) => e.barcode = '124'),
         ])
         ..productsLastSeenUtc = MapBuilder({})),
-      BackendShop((e) => e
+      BackendProductsAtShop((e) => e
         ..osmId = '2'
         ..products = ListBuilder([
           BackendProduct((e) => e.barcode = '123'),
@@ -63,7 +63,7 @@ void main() {
           '123': 123456
         })),
     ];
-    when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Ok(backendShops));
 
     final expectedShops = [
       Shop((e) => e
@@ -73,18 +73,18 @@ void main() {
         ..osmShop.replace(osmShops[1])
         ..backendShop.replace(backendShops[1])),
     ];
-    
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+
+    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops, equals(expectedShops));
   });
 
-  test('fetchShops osm error', () async {
+  test('fetchProductsAtShops osm error', () async {
     when(_osm.fetchShops(any, any)).thenAnswer((_) async =>
         Err(OpenStreetMapError.NETWORK));
 
     final backendShops = [
-      BackendShop((e) => e
+      BackendProductsAtShop((e) => e
         ..osmId = '1'
         ..products = ListBuilder([
           BackendProduct((e) => e.barcode = '123'),
@@ -92,13 +92,13 @@ void main() {
         ])
         ..productsLastSeenUtc = MapBuilder({}))
     ];
-    when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
 
-  test('fetchShops backend error', () async {
+  test('fetchProductsAtShops backend error', () async {
     final osmShops = [
       OsmShop((e) => e
         ..osmId = '1'
@@ -108,9 +108,9 @@ void main() {
         ..latitude = 321)
     ];
     when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
-    when(_backend.requestShops(any)).thenAnswer((_) async => Err(BackendError.other()));
+    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Err(BackendError.other()));
 
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
 }

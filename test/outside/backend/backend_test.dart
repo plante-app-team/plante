@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:test/test.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -690,7 +690,7 @@ void main() {
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
-  test('requesting shops', () async {
+  test('requesting products at shops', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
@@ -742,14 +742,14 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestProductsAtShops(['8711880917', '8771781029']);
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
     expect(shops.length, equals(2));
 
-    final BackendShop shop1;
-    final BackendShop shop2;
+    final BackendProductsAtShop shop1;
+    final BackendProductsAtShop shop2;
     if (shops[0].osmId == '8711880917') {
       shop1 = shops[0];
       shop2 = shops[1];
@@ -798,7 +798,7 @@ void main() {
     expect(shop2.productsLastSeenUtc['4612742721165'], equals(123456));
   });
 
-  test('requesting shops empty response', () async {
+  test('requesting products at shops empty response', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
@@ -816,11 +816,11 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestProductsAtShops(['8711880917', '8771781029']);
     expect(result.unwrap().length, equals(0));
   });
 
-  test('requesting shops invalid JSON response', () async {
+  test('requesting products at shops invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
@@ -851,11 +851,11 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestProductsAtShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops JSON without results response', () async {
+  test('requesting products at shops JSON without results response', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
@@ -873,11 +873,11 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestProductsAtShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops network error', () async {
+  test('requesting products at shops network error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final initialParams = UserParams((v) => v
@@ -890,7 +890,7 @@ void main() {
     httpClient.setResponseException(
         '.*products_at_shops_data.*', const SocketException(''));
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestProductsAtShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 }

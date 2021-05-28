@@ -8,7 +8,7 @@ part of 'build_value_helper.dart';
 
 Serializers _$_serializers = (new Serializers().toBuilder()
       ..add(BackendProduct.serializer)
-      ..add(BackendShop.serializer)
+      ..add(BackendProductsAtShop.serializer)
       ..add(Ingredient.serializer)
       ..add(Product.serializer)
       ..add(UserParams.serializer)

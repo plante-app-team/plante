@@ -14,7 +14,7 @@ class ShopsManager {
 
   ShopsManager(this._openStreetMap, this._backend);
 
-  Future<Result<List<Shop>, ShopsManagerError>> fetchShops(
+  Future<Result<List<Shop>, ShopsManagerError>> fetchProductsAtShops(
       Point<double> northeast, Point<double> southwest) async {
     final osmShopsResult =
         await _openStreetMap.fetchShops(northeast, southwest);
@@ -23,7 +23,7 @@ class ShopsManager {
     }
     final osmShops = osmShopsResult.unwrap();
     final backendShopsResult =
-        await _backend.requestShops(osmShops.map((e) => e.osmId));
+        await _backend.requestProductsAtShops(osmShops.map((e) => e.osmId));
     if (backendShopsResult.isErr) {
       return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
     }
