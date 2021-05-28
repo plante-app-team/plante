@@ -12,6 +12,7 @@ import 'package:plante/outside/backend/backend.dart' as _i6;
 import 'package:plante/outside/backend/backend_error.dart' as _i8;
 import 'package:plante/outside/backend/backend_product.dart' as _i9;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i11;
+import 'package:plante/outside/backend/backend_shop.dart' as _i12;
 import 'package:plante/outside/identity/google_authorizer.dart' as _i4;
 import 'package:plante/outside/identity/google_user.dart' as _i2;
 
@@ -122,4 +123,11 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
           returnValue: Future.value(_FakeResult<
               List<_i11.BackendProductsAtShop>, _i8.BackendError>())) as _i5
           .Future<_i3.Result<List<_i11.BackendProductsAtShop>, _i8.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<List<_i12.BackendShop>, _i8.BackendError>> requestShops(
+          Iterable<String>? osmIds) =>
+      (super.noSuchMethod(Invocation.method(#requestShops, [osmIds]),
+              returnValue: Future.value(
+                  _FakeResult<List<_i12.BackendShop>, _i8.BackendError>()))
+          as _i5.Future<_i3.Result<List<_i12.BackendShop>, _i8.BackendError>>);
 }

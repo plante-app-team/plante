@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/backend/backend_products_at_shop.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
@@ -47,23 +45,15 @@ void main() {
     when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
 
     final backendShops = [
-      BackendProductsAtShop((e) => e
+      BackendShop((e) => e
         ..osmId = '1'
-        ..products = ListBuilder([
-          BackendProduct((e) => e.barcode = '123'),
-          BackendProduct((e) => e.barcode = '124'),
-        ])
-        ..productsLastSeenUtc = MapBuilder({})),
-      BackendProductsAtShop((e) => e
+        ..productsCount = 2
+      ),
+      BackendShop((e) => e
         ..osmId = '2'
-        ..products = ListBuilder([
-          BackendProduct((e) => e.barcode = '123'),
-        ])
-        ..productsLastSeenUtc = MapBuilder({
-          '123': 123456
-        })),
+        ..productsCount = 1),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
     final expectedShops = [
       Shop((e) => e
@@ -74,7 +64,7 @@ void main() {
         ..backendShop.replace(backendShops[1])),
     ];
 
-    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops, equals(expectedShops));
   });
@@ -84,17 +74,17 @@ void main() {
         Err(OpenStreetMapError.NETWORK));
 
     final backendShops = [
-      BackendProductsAtShop((e) => e
+      BackendShop((e) => e
         ..osmId = '1'
-        ..products = ListBuilder([
-          BackendProduct((e) => e.barcode = '123'),
-          BackendProduct((e) => e.barcode = '124'),
-        ])
-        ..productsLastSeenUtc = MapBuilder({}))
+        ..productsCount = 2
+      ),
+      BackendShop((e) => e
+        ..osmId = '2'
+        ..productsCount = 1),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
 
@@ -108,9 +98,9 @@ void main() {
         ..latitude = 321)
     ];
     when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Err(BackendError.other()));
+    when(_backend.requestShops(any)).thenAnswer((_) async => Err(BackendError.other()));
 
-    final shopsRes = await _shopsManager.fetchProductsAtShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
 }

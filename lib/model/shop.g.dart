@@ -10,7 +10,7 @@ class _$Shop extends Shop {
   @override
   final OsmShop osmShop;
   @override
-  final BackendProductsAtShop? backendShop;
+  final BackendShop? backendShop;
 
   factory _$Shop([void Function(ShopBuilder)? updates]) =>
       (new ShopBuilder()..update(updates)).build();
@@ -55,10 +55,10 @@ class ShopBuilder implements Builder<Shop, ShopBuilder> {
   OsmShopBuilder get osmShop => _$this._osmShop ??= new OsmShopBuilder();
   set osmShop(OsmShopBuilder? osmShop) => _$this._osmShop = osmShop;
 
-  BackendProductsAtShopBuilder? _backendShop;
-  BackendProductsAtShopBuilder get backendShop =>
-      _$this._backendShop ??= new BackendProductsAtShopBuilder();
-  set backendShop(BackendProductsAtShopBuilder? backendShop) =>
+  BackendShopBuilder? _backendShop;
+  BackendShopBuilder get backendShop =>
+      _$this._backendShop ??= new BackendShopBuilder();
+  set backendShop(BackendShopBuilder? backendShop) =>
       _$this._backendShop = backendShop;
 
   ShopBuilder();

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import 'package:plante/base/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
@@ -10,6 +11,7 @@ import 'package:plante/base/device_info.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -232,10 +234,39 @@ class Backend {
     }
 
     final results = json['results'] as Map<String, dynamic>;
-    final shops = <BackendProductsAtShop>[];
+    final productsAtShops = <BackendProductsAtShop>[];
     for (final result in results.values) {
-      final shop =
+      final productsAtShop =
           BackendProductsAtShop.fromJson(result as Map<String, dynamic>);
+      if (productsAtShop != null) {
+        productsAtShops.add(productsAtShop);
+      }
+    }
+    return Ok(productsAtShops);
+  }
+
+  Future<Result<List<BackendShop>, BackendError>> requestShops(
+      Iterable<String> osmIds) async {
+    final response = await _backendGet('shops_data/', {},
+        body: jsonEncode({'osm_ids': osmIds.toList()}), contentType: 'application/json');
+    if (response.isError) {
+      return Err(_errFromResp(response));
+    }
+
+    final json = _jsonDecodeSafe(response.body);
+    if (json == null) {
+      return Err(_errInvalidJson(response.body));
+    }
+
+    if (!json.containsKey('results')) {
+      Log.w('Invalid shops_data response: $json');
+      return Err(BackendError.invalidJson(response.body));
+    }
+
+    final results = json['results'] as Map<String, dynamic>;
+    final shops = <BackendShop>[];
+    for (final result in results.values) {
+      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
       if (shop != null) {
         shops.add(shop);
       }
@@ -257,7 +288,9 @@ class Backend {
 
   Future<BackendResponse> _backendGet(String path, Map<String, dynamic>? params,
       {Map<String, String>? headers,
-      String? backendClientTokenOverride}) async {
+      String? backendClientTokenOverride,
+      String? body,
+      String? contentType}) async {
     final userParams = await _userParamsController.getUserParams();
     final backendClientToken =
         backendClientTokenOverride ?? userParams?.backendClientToken;
@@ -267,9 +300,20 @@ class Backend {
     if (backendClientToken != null) {
       headersReally['Authorization'] = 'Bearer $backendClientToken';
     }
+    if (contentType != null) {
+      headersReally['Content-Type'] = contentType;
+    }
     final url = Uri.https(BACKEND_ADDRESS, '/backend/$path', params);
     try {
-      final httpResponse = await _http.get(url, headers: headersReally);
+      final request = http.Request('GET', url);
+      request.headers.addAll(headersReally);
+
+      if (body != null) {
+        request.body = body;
+      }
+
+      final httpResponse =
+          await http.Response.fromStream(await _http.send(request));
       return BackendResponse.fromHttpResponse(httpResponse);
     } on IOException catch (e) {
       return BackendResponse.fromError(e, url);

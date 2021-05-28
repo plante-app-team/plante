@@ -20,6 +20,7 @@ import 'package:plante/outside/backend/backend.dart' as _i13;
 import 'package:plante/outside/backend/backend_error.dart' as _i15;
 import 'package:plante/outside/backend/backend_product.dart' as _i16;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i18;
+import 'package:plante/outside/backend/backend_shop.dart' as _i19;
 import 'package:plante/outside/off/off_api.dart' as _i6;
 
 // ignore_for_file: comment_references
@@ -151,4 +152,11 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
           returnValue: Future.value(_FakeResult<
               List<_i18.BackendProductsAtShop>, _i15.BackendError>())) as _i7
           .Future<_i5.Result<List<_i18.BackendProductsAtShop>, _i15.BackendError>>);
+  @override
+  _i7.Future<_i5.Result<List<_i19.BackendShop>, _i15.BackendError>>
+      requestShops(Iterable<String>? osmIds) => (super.noSuchMethod(
+              Invocation.method(#requestShops, [osmIds]),
+              returnValue: Future.value(
+                  _FakeResult<List<_i19.BackendShop>, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<List<_i19.BackendShop>, _i15.BackendError>>);
 }

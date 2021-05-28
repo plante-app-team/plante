@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend.dart' as _i6;
 import 'package:plante/outside/backend/backend_error.dart' as _i7;
 import 'package:plante/outside/backend/backend_product.dart' as _i8;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i10;
+import 'package:plante/outside/backend/backend_shop.dart' as _i11;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -135,4 +136,11 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
           returnValue: Future.value(_FakeResult<
               List<_i10.BackendProductsAtShop>, _i7.BackendError>())) as _i5
           .Future<_i3.Result<List<_i10.BackendProductsAtShop>, _i7.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<List<_i11.BackendShop>, _i7.BackendError>> requestShops(
+          Iterable<String>? osmIds) =>
+      (super.noSuchMethod(Invocation.method(#requestShops, [osmIds]),
+              returnValue: Future.value(
+                  _FakeResult<List<_i11.BackendShop>, _i7.BackendError>()))
+          as _i5.Future<_i3.Result<List<_i11.BackendShop>, _i7.BackendError>>);
 }
