@@ -248,7 +248,8 @@ class Backend {
   Future<Result<List<BackendShop>, BackendError>> requestShops(
       Iterable<String> osmIds) async {
     final response = await _backendGet('shops_data/', {},
-        body: jsonEncode({'osm_ids': osmIds.toList()}), contentType: 'application/json');
+        body: jsonEncode({'osm_ids': osmIds.toList()}),
+        contentType: 'application/json');
     if (response.isError) {
       return Err(_errFromResp(response));
     }

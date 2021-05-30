@@ -14,7 +14,7 @@ class ShopsManager {
 
   ShopsManager(this._openStreetMap, this._backend);
 
-  Future<Result<List<Shop>, ShopsManagerError>> fetchShops(
+  Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
       Point<double> northeast, Point<double> southwest) async {
     final osmShopsResult =
         await _openStreetMap.fetchShops(northeast, southwest);
@@ -32,14 +32,14 @@ class ShopsManager {
     final backendShopsMap = {
       for (final backendShop in backendShops) backendShop.osmId: backendShop
     };
-    final shops = <Shop>[];
+    final shops = <String, Shop>{};
     for (final osmShop in osmShops) {
       final backendShopNullable = backendShopsMap[osmShop.osmId];
       var shop = Shop((e) => e.osmShop.replace(osmShop));
       if (backendShopNullable != null) {
         shop = shop.rebuild((e) => e.backendShop.replace(backendShopNullable));
       }
-      shops.add(shop);
+      shops[osmShop.osmId] = shop;
     }
     return Ok(shops);
   }

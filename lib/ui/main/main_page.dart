@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
-import 'package:plante/ui/main/map/map_page.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
 

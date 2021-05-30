@@ -55,14 +55,14 @@ void main() {
     ];
     when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    final expectedShops = [
-      Shop((e) => e
+    final expectedShops = {
+      osmShops[0].osmId: Shop((e) => e
         ..osmShop.replace(osmShops[0])
         ..backendShop.replace(backendShops[0])),
-      Shop((e) => e
+      osmShops[1].osmId: Shop((e) => e
         ..osmShop.replace(osmShops[1])
         ..backendShop.replace(backendShops[1])),
-    ];
+    };
 
     final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
