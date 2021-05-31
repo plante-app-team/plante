@@ -38,6 +38,7 @@
 
     "map_page_default_shop_type_name": "Магазин",
     "map_page_btn_where_am_i": "Где я?",
+    "map_page_empty_shops": "Пустые магазины",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",

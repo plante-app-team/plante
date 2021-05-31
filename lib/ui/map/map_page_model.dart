@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
@@ -41,6 +42,7 @@ class MapPageModel {
       this._updateShopsCallback, this._errorCallback, this._updateCallback);
 
   bool get loading => _loadingArea != null;
+  Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
   Future<bool> ensurePermissions() async {
     if (!await _locationController.permissionStatus().isGranted) {

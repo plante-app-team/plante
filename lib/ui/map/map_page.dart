@@ -8,6 +8,8 @@ import 'package:plante/model/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/base/components/checkbox_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/markers_builder.dart';
@@ -24,6 +26,15 @@ class _MapPageState extends State<MapPage> {
   var _shopsMarkers = <Marker>{};
   late final ClusterManager _clusterManager;
   Timer? _mapUpdatesTimer;
+
+  bool _showEmptyShopsChecked = false;
+  bool get _showEmptyShops => _showEmptyShopsChecked;
+  set _showEmptyShops(bool value) {
+    setState(() {
+      _showEmptyShopsChecked = value;
+      _onShopsUpdated(_model.shopsCache);
+    });
+  }
 
   bool get _loading => _model.loading;
 
@@ -86,7 +97,8 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(children: [
+      body: SafeArea(
+          child: Stack(children: [
         GoogleMap(
           myLocationEnabled: true,
           myLocationButtonEnabled: false,
@@ -103,13 +115,31 @@ class _MapPageState extends State<MapPage> {
           onCameraIdle: _onCameraIdle,
           markers: _shopsMarkers,
         ),
-        SafeArea(
-            child: AnimatedSwitcher(
-                duration: DURATION_DEFAULT,
-                child: _loading
-                    ? const LinearProgressIndicator()
-                    : const SizedBox.shrink())),
-      ]),
+        AnimatedSwitcher(
+            duration: DURATION_DEFAULT,
+            child: _loading
+                ? const LinearProgressIndicator()
+                : const SizedBox.shrink()),
+        Align(
+            alignment: Alignment.topRight,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  _showEmptyShops = !_showEmptyShops;
+                },
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text(context.strings.map_page_empty_shops,
+                      style: TextStyles.normalSmall),
+                  CheckboxPlante(
+                      value: _showEmptyShops,
+                      onChanged: (value) {
+                        _showEmptyShops = value ?? false;
+                      })
+                ]),
+              ),
+            ))
+      ])),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showUser,
         label: Text(context.strings.map_page_btn_where_am_i),
@@ -133,11 +163,12 @@ class _MapPageState extends State<MapPage> {
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
     _updateMap(delay: const Duration(milliseconds: 1000));
-    _model.onCameraMoved(viewBounds);
+    await _model.onCameraMoved(viewBounds);
   }
 
   void _onShopsUpdated(Map<String, Shop> shops) {
     _clusterManager.setItems(shops.values
+        .where((shop) => _showEmptyShops ? true : shop.productsCount > 0)
         .map((shop) =>
             ClusterItem(LatLng(shop.latitude, shop.longitude), item: shop))
         .toList());
