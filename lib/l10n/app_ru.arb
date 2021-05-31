@@ -117,5 +117,30 @@
     "viewed_products_history_page_title": "Недавно просмотренные",
 
     "expandable_plante_expand": "Развернуть",
-    "expandable_plante_collapse": "Свернуть"
+    "expandable_plante_collapse": "Свернуть",
+
+    "shop_type_bakery": "Пекарня",
+    "shop_type_beverages": "Напитки",
+    "shop_type_cheese": "Сыр",
+    "shop_type_chocolate": "Шоколад",
+    "shop_type_coffee": "Кофе",
+    "shop_type_confectionery": "Кондитерские изделия",
+    "shop_type_convenience": "Магазин",
+    "shop_type_deli": "Гастроном",
+    "shop_type_dairy": "Молочный магазин",
+    "shop_type_farm": "Фермерские продукты",
+    "shop_type_frozen_food": "Замороженные продукты",
+    "shop_type_greengrocer": "Овощной магазин",
+    "shop_type_health_food": "Здоровая еда",
+    "shop_type_ice_cream": "Мороженное",
+    "shop_type_organic": "Органическая еда",
+    "shop_type_pasta": "Макаронные изделия",
+    "shop_type_pastry": "Кондитерские изделия",
+    "shop_type_spices": "Специи",
+    "shop_type_general": "Магазин",
+    "shop_type_supermarket": "Супермаркет",
+    "shop_type_grocery": "Продукты",
+
+    "shops_list_page_title": "Магазины",
+    "shop_card_products_number": "Продукты: "
 }

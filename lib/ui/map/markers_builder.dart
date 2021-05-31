@@ -5,13 +5,16 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
 
-Future<Marker> markersBuilder(Cluster<Shop> cluster) async {
+typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
+
+Future<Marker> markersBuilder(
+    Cluster<Shop> cluster, MarkerClickCallback callback) async {
   return Marker(
     markerId: MarkerId(cluster.getId()),
     position: cluster.location,
     onTap: () {
-      print('---- $cluster');
-      cluster.items.forEach(print);
+      callback(
+          cluster.items.where((shop) => shop != null).map((shop) => shop!));
     },
     icon: await _getMarkerBitmap(
         cluster.items.where((element) => element != null).map((e) => e!)),

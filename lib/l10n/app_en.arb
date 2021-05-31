@@ -117,5 +117,30 @@
       "viewed_products_history_page_title": "Recently viewed",
 
       "expandable_plante_expand": "Expand",
-      "expandable_plante_collapse": "Collapse"
+      "expandable_plante_collapse": "Collapse",
+
+      "shop_type_bakery": "Bakery",
+      "shop_type_beverages": "Beverages",
+      "shop_type_cheese": "Cheese",
+      "shop_type_chocolate": "Chocolate",
+      "shop_type_coffee": "Coffee",
+      "shop_type_confectionery": "Confectionery",
+      "shop_type_convenience": "Convenience",
+      "shop_type_deli": "Deli",
+      "shop_type_dairy": "Dairy",
+      "shop_type_farm": "Farm",
+      "shop_type_frozen_food": "Frozen food",
+      "shop_type_greengrocer": "Greengrocer",
+      "shop_type_health_food": "Health food",
+      "shop_type_ice_cream": "Ice cream",
+      "shop_type_organic": "Organic",
+      "shop_type_pasta": "Pasta",
+      "shop_type_pastry": "Pastry",
+      "shop_type_spices": "Spices",
+      "shop_type_general": "General",
+      "shop_type_supermarket": "Supermarket",
+      "shop_type_grocery": "Grocery",
+
+      "shops_list_page_title": "Shops",
+      "shop_card_products_number": "Products: "
 }

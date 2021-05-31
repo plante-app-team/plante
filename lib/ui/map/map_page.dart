@@ -13,6 +13,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/markers_builder.dart';
+import 'package:plante/ui/map/shops_list_page.dart';
 
 class MapPage extends StatefulWidget {
   @override
@@ -65,8 +66,26 @@ class _MapPageState extends State<MapPage> {
     /// God's help (you'll need it).
     const clusteringLevels = <double>[12, 12, 12, 12, 12, 12, 14, 16.5, 20];
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
-        markerBuilder: markersBuilder, levels: clusteringLevels);
+        markerBuilder: _markersBuilder, levels: clusteringLevels);
     _init();
+  }
+
+  Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
+    return markersBuilder(cluster, _onMarkerClick);
+  }
+
+  void _onMarkerClick(Iterable<Shop> shops) {
+    if (shops.isEmpty) {
+      return;
+    }
+    if (shops.length > 1) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ShopsListPage(shops: shops.toList())));
+    } else {
+      showSnackBar(shops.first.name, context);
+    }
   }
 
   Future<void> _init() async {

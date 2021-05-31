@@ -5,33 +5,9 @@ import 'dart:math';
 import 'package:http/http.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-
-const _SHOP_TYPES = [
-  'bakery',
-  'beverages',
-  'brewing_supplies',
-  'cheese',
-  'chocolate',
-  'coffee',
-  'confectionery',
-  'convenience',
-  'deli',
-  'dairy',
-  'farm',
-  'frozen_food',
-  'greengrocer',
-  'health_food',
-  'ice_cream',
-  'organic',
-  'pasta',
-  'pastry',
-  'spices',
-  'general',
-  'supermarket',
-  'grocery'
-];
 
 enum OpenStreetMapError { NETWORK, OTHER }
 
@@ -45,8 +21,9 @@ class OpenStreetMap {
     final val2 = southwest.y;
     final val3 = northeast.x;
     final val4 = northeast.y;
+    final typesStr = ShopType.values.map((type) => type.osmName).join('|');
     final cmd =
-        '[out:json];node[shop~"${_SHOP_TYPES.join('|')}"]($val1,$val2,$val3,$val4);out;';
+        '[out:json];node[shop~"$typesStr"]($val1,$val2,$val3,$val4);out;';
 
     final Response r;
     try {
