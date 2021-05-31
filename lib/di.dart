@@ -44,6 +44,8 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
-  GetIt.I.registerSingleton<ShopsManager>(
-      ShopsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<Backend>()));
+  GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
+      GetIt.I.get<OpenStreetMap>(),
+      GetIt.I.get<Backend>(),
+      GetIt.I.get<ProductsManager>()));
 }

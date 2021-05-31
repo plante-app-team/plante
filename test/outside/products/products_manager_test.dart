@@ -1006,4 +1006,43 @@ void main() {
 
     expect(saveResult.isErr, isTrue);
   });
+
+  test('inflate backend product', () async {
+    final offProduct = off.Product.fromJson({
+      'code': '123',
+      'product_name_ru': 'name',
+      'brands_tags': ['Brand name'],
+      'categories_tags_translated': ['plant', 'lemon'],
+      'ingredients_text_ru': 'lemon, water',
+      'images': jsonDecode(imagesJson),
+    });
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    final backendProduct = BackendProduct((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive.name
+      ..vegetarianStatusSource = VegStatusSource.community.name
+      ..veganStatus = VegStatus.negative.name
+      ..veganStatusSource = VegStatusSource.moderator.name);
+    final productRes = await productsManager.inflate(backendProduct);
+    final product = productRes.unwrap();
+
+    final expectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..name = 'name'
+      ..brands.add('Brand name')
+      ..categories.addAll(['plant', 'lemon'])
+      ..ingredientsText = 'lemon, water'
+      ..ingredientsAnalyzed.addAll([]));
+    expect(product, equals(expectedProduct));
+
+    // We expect the backend to not be touched since
+    // we already have a backend product.
+    verifyNever(backend.requestProduct(any));
+  });
 }

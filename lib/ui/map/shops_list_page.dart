@@ -5,6 +5,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/shop_card.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/map/shop_product_range_page.dart';
 
 class ShopsListPage extends StatefulWidget {
   final List<Shop> shops;
@@ -37,10 +38,17 @@ class _ShopsListPageState extends State<ShopsListPage> {
                         child: ShopCard(
                             shop: shop,
                             onTap: () {
-                              showSnackBar(shop.name, context);
+                              _openShopPage(context, shop);
                             })))
                     .toList()))
       ])),
     );
+  }
+
+  void _openShopPage(BuildContext context, Shop shop) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ShopProductRangePage(shop: shop)));
   }
 }

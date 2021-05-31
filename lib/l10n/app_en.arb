@@ -12,6 +12,7 @@
       "global_open_app_settings": "Open app settings",
       "global_barcode": "Barcode",
       "global_send": "Send",
+      "global_try_again": "Try again",
 
       "image_cropper_title": "Let's crop it!",
 
@@ -142,5 +143,9 @@
       "shop_type_grocery": "Grocery",
 
       "shops_list_page_title": "Shops",
-      "shop_card_products_number": "Products: "
+      "shop_card_products_number": "Products: ",
+
+      "shop_product_range_page_this_shop_has_no_product": "No product are added to this shop yet",
+      "shop_product_range_page_product_last_seen_here": "Last seen here: ",
+      "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?"
 }

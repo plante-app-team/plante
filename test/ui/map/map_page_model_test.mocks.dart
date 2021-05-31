@@ -12,6 +12,7 @@ import 'package:permission_handler_platform_interface/permission_handler_platfor
 import 'package:plante/base/result.dart' as _i3;
 import 'package:plante/model/location_controller.dart' as _i4;
 import 'package:plante/model/shop.dart' as _i8;
+import 'package:plante/model/shop_product_range.dart' as _i10;
 import 'package:plante/outside/map/shops_manager.dart' as _i7;
 
 // ignore_for_file: comment_references
@@ -68,4 +69,12 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
                   _FakeResult<Map<String, _i8.Shop>, _i7.ShopsManagerError>()))
           as _i5
               .Future<_i3.Result<Map<String, _i8.Shop>, _i7.ShopsManagerError>>);
+  @override
+  _i5.Future<_i3.Result<_i10.ShopProductRange, _i7.ShopsManagerError>>
+      fetchShopProductRange(_i8.Shop? shop) => (super.noSuchMethod(
+              Invocation.method(#fetchShopProductRange, [shop]),
+              returnValue: Future.value(
+                  _FakeResult<_i10.ShopProductRange, _i7.ShopsManagerError>()))
+          as _i5.Future<
+              _i3.Result<_i10.ShopProductRange, _i7.ShopsManagerError>>);
 }

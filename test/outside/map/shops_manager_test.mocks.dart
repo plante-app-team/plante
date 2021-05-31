@@ -7,6 +7,7 @@ import 'dart:math' as _i6;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/result.dart' as _i2;
+import 'package:plante/model/product.dart' as _i15;
 import 'package:plante/model/user_params.dart' as _i8;
 import 'package:plante/model/veg_status.dart' as _i11;
 import 'package:plante/outside/backend/backend.dart' as _i7;
@@ -16,6 +17,8 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i12;
 import 'package:plante/outside/backend/backend_shop.dart' as _i13;
 import 'package:plante/outside/map/open_street_map.dart' as _i3;
 import 'package:plante/outside/map/osm_shop.dart' as _i5;
+import 'package:plante/outside/products/products_manager.dart' as _i14;
+import 'package:plante/outside/products/products_manager_error.dart' as _i16;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -132,4 +135,50 @@ class MockBackend extends _i1.Mock implements _i7.Backend {
               returnValue: Future.value(
                   _FakeResult<List<_i13.BackendShop>, _i9.BackendError>()))
           as _i4.Future<_i2.Result<List<_i13.BackendShop>, _i9.BackendError>>);
+}
+
+/// A class which mocks [ProductsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockProductsManager extends _i1.Mock implements _i14.ProductsManager {
+  MockProductsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<_i2.Result<_i15.Product?, _i16.ProductsManagerError>> getProduct(
+          String? barcodeRaw,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#getProduct, [barcodeRaw, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i15.Product?, _i16.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i15.Product?, _i16.ProductsManagerError>>);
+  @override
+  _i4.Future<_i2.Result<_i15.Product?, _i16.ProductsManagerError>> inflate(
+          _i10.BackendProduct? backendProduct,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#inflate, [backendProduct, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i15.Product?, _i16.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i15.Product?, _i16.ProductsManagerError>>);
+  @override
+  _i4.Future<_i2.Result<_i15.Product, _i16.ProductsManagerError>>
+      createUpdateProduct(_i15.Product? product, [String? langCode]) => (super
+              .noSuchMethod(
+                  Invocation.method(#createUpdateProduct, [product, langCode]),
+                  returnValue: Future.value(
+                      _FakeResult<_i15.Product, _i16.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i15.Product, _i16.ProductsManagerError>>);
+  @override
+  _i4.Future<_i2.Result<_i14.ProductWithOCRIngredients, _i16.ProductsManagerError>>
+      updateProductAndExtractIngredients(_i15.Product? product,
+              [String? langCode]) =>
+          (super.noSuchMethod(
+                  Invocation.method(
+                      #updateProductAndExtractIngredients, [product, langCode]),
+                  returnValue: Future.value(
+                      _FakeResult<_i14.ProductWithOCRIngredients, _i16.ProductsManagerError>()))
+              as _i4.Future<_i2.Result<_i14.ProductWithOCRIngredients, _i16.ProductsManagerError>>);
 }

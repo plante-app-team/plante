@@ -7,12 +7,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/markers_builder.dart';
+import 'package:plante/ui/map/shop_product_range_page.dart';
 import 'package:plante/ui/map/shops_list_page.dart';
 
 class MapPage extends StatefulWidget {
@@ -84,7 +86,10 @@ class _MapPageState extends State<MapPage> {
           MaterialPageRoute(
               builder: (context) => ShopsListPage(shops: shops.toList())));
     } else {
-      showSnackBar(shops.first.name, context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ShopProductRangePage(shop: shops.first)));
     }
   }
 

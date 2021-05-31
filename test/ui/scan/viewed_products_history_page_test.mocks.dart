@@ -7,6 +7,7 @@ import 'dart:async' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/model/product.dart' as _i5;
+import 'package:plante/outside/backend/backend_product.dart' as _i7;
 import 'package:plante/outside/products/products_manager.dart' as _i3;
 import 'package:plante/outside/products/products_manager_error.dart' as _i6;
 
@@ -29,6 +30,15 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
           [String? langCode]) =>
       (super.noSuchMethod(
               Invocation.method(#getProduct, [barcodeRaw, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i5.Product?, _i6.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
+  @override
+  _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>> inflate(
+          _i7.BackendProduct? backendProduct,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#inflate, [backendProduct, langCode]),
               returnValue: Future.value(
                   _FakeResult<_i5.Product?, _i6.ProductsManagerError>()))
           as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);

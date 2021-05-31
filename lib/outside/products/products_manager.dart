@@ -11,6 +11,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -46,6 +47,23 @@ class ProductsManager {
 
   Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw,
       [String? langCode]) async {
+    return _getProduct(barcodeRaw: barcodeRaw, langCode: langCode);
+  }
+
+  Future<Result<Product?, ProductsManagerError>> inflate(
+      BackendProduct backendProduct,
+      [String? langCode]) async {
+    return _getProduct(backendProduct: backendProduct, langCode: langCode);
+  }
+
+  Future<Result<Product?, ProductsManagerError>> _getProduct(
+      {String? barcodeRaw,
+      BackendProduct? backendProduct,
+      String? langCode}) async {
+    if (barcodeRaw == null && backendProduct == null) {
+      Log.e('Invalid getProduct implementation');
+    }
+    barcodeRaw ??= backendProduct!.barcode;
     langCode ??= _langCodeHolder.langCode;
 
     final configuration = off.ProductQueryConfiguration(barcodeRaw,
@@ -66,11 +84,13 @@ class ProductsManager {
     }
 
     final barcode = offProduct.barcode!;
-    final backendProductResult = await _backend.requestProduct(barcode);
-    if (backendProductResult.isErr) {
-      return _convertBackendError(backendProductResult);
+    if (backendProduct == null) {
+      final backendProductResult = await _backend.requestProduct(barcode);
+      if (backendProductResult.isErr) {
+        return _convertBackendError(backendProductResult);
+      }
+      backendProduct = backendProductResult.unwrap();
     }
-    final backendProduct = backendProductResult.unwrap();
 
     var result = Product((v) => v
       ..barcode = barcode

@@ -4,13 +4,14 @@
 
 import 'dart:async' as _i4;
 
-import 'package:flutter/src/widgets/framework.dart' as _i8;
+import 'package:flutter/src/widgets/framework.dart' as _i9;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/model/product.dart' as _i5;
+import 'package:plante/outside/backend/backend_product.dart' as _i7;
 import 'package:plante/outside/products/products_manager.dart' as _i3;
 import 'package:plante/outside/products/products_manager_error.dart' as _i6;
-import 'package:plante/ui/photos_taker.dart' as _i7;
+import 'package:plante/ui/photos_taker.dart' as _i8;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -37,6 +38,15 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
                   _FakeResult<_i5.Product?, _i6.ProductsManagerError>()))
           as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
   @override
+  _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>> inflate(
+          _i7.BackendProduct? backendProduct,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#inflate, [backendProduct, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i5.Product?, _i6.ProductsManagerError>()))
+          as _i4.Future<_i2.Result<_i5.Product?, _i6.ProductsManagerError>>);
+  @override
   _i4.Future<_i2.Result<_i5.Product, _i6.ProductsManagerError>>
       createUpdateProduct(_i5.Product? product, [String? langCode]) => (super
               .noSuchMethod(
@@ -59,13 +69,13 @@ class MockProductsManager extends _i1.Mock implements _i3.ProductsManager {
 /// A class which mocks [PhotosTaker].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPhotosTaker extends _i1.Mock implements _i7.PhotosTaker {
+class MockPhotosTaker extends _i1.Mock implements _i8.PhotosTaker {
   MockPhotosTaker() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<Uri?> takeAndCropPhoto(_i8.BuildContext? context) =>
+  _i4.Future<Uri?> takeAndCropPhoto(_i9.BuildContext? context) =>
       (super.noSuchMethod(Invocation.method(#takeAndCropPhoto, [context]),
           returnValue: Future.value(_FakeUri())) as _i4.Future<Uri?>);
 }

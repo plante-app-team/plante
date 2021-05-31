@@ -12,6 +12,7 @@
     "global_open_app_settings": "Открыть настройки",
     "global_barcode": "Штрихкод",
     "global_send": "Отправить",
+    "global_try_again": "Попробовать ещё раз",
 
     "image_cropper_title": "Давайте-ка обрежем!",
 
@@ -142,5 +143,9 @@
     "shop_type_grocery": "Продукты",
 
     "shops_list_page_title": "Магазины",
-    "shop_card_products_number": "Продукты: "
+    "shop_card_products_number": "Продукты: ",
+
+    "shop_product_range_page_this_shop_has_no_product": "В этом магазине продуктов пока нет",
+    "shop_product_range_page_product_last_seen_here": "Последний раз тут видели: ",
+    "shop_product_range_page_have_you_seen_product_here": "Такой продукт тут есть?"
 }
