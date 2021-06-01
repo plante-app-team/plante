@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:plante/base/base.dart';
@@ -67,6 +68,12 @@ class BackendError {
       return BackendError._(BackendErrorKind.OTHER,
           errorStr: null, errorDescr: response.reasonPhrase);
     }
+  }
+
+  static BackendError invalidDecodedJson(Map<String, dynamic> invalidJson) {
+    Log.w('BackendError from invalid but decoded JSON: $invalidJson');
+    return BackendError._(BackendErrorKind.INVALID_JSON,
+        errorDescr: jsonEncode(invalidJson));
   }
 
   static BackendError invalidJson(String invalidJson) {

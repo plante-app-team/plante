@@ -50,48 +50,31 @@ class Backend {
     }
 
     // Register
-
     final deviceId = (await DeviceInfo.get()).deviceID;
-    var response = await _backendGet('register_user/',
+    var jsonRes = await _backendGetJson('register_user/',
         {'googleIdToken': googleIdToken, 'deviceId': deviceId});
-    if (response.isError) {
-      return Err(_errFromResp(response));
-    }
-
-    var json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
-
-    if (!_isError(json)) {
-      final userParams = UserParams.fromJson(json)!;
+    if (jsonRes.isOk) {
+      final userParams = UserParams.fromJson(jsonRes.unwrap())!;
       Log.i('Backend: user registered: ${userParams.toString()}');
       return Ok(userParams);
-    }
-    if (_errFromJson(json).errorKind != BackendErrorKind.ALREADY_REGISTERED) {
-      return Err(_errFromJson(json));
+    } else {
+      if (jsonRes.unwrapErr().errorKind != BackendErrorKind.ALREADY_REGISTERED) {
+        return Err(jsonRes.unwrapErr());
+      } else {
+        // Already registered, need to login
+      }
     }
 
     // Login
 
-    response = await _backendGet(
+    jsonRes = await _backendGetJson(
         'login_user/', {'googleIdToken': googleIdToken, 'deviceId': deviceId});
-    if (response.isError) {
-      return Err(_errFromResp(response));
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
     }
-
-    json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
-
-    if (!_isError(json)) {
-      final userParams = UserParams.fromJson(json)!;
-      Log.i('Backend: user logged in: ${userParams.toString()}');
-      return Ok(userParams);
-    } else {
-      return Err(_errFromJson(json));
-    }
+    final userParams = UserParams.fromJson(jsonRes.unwrap())!;
+    Log.i('Backend: user logged in: ${userParams.toString()}');
+    return Ok(userParams);
   }
 
   Future<Result<bool, BackendError>> updateUserParams(UserParams userParams,
@@ -135,23 +118,15 @@ class Backend {
       return Ok(BackendProduct((e) => e.barcode = barcode));
     }
 
-    final response = await _backendGet('product_data/', {'barcode': barcode});
-    if (response.isError) {
-      return Err(_errFromResp(response));
-    }
-    final json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
-
-    if (_isError(json)) {
-      final error = _errFromJson(json);
-      if (error.errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
+    final jsonRes = await _backendGetJson('product_data/', {'barcode': barcode});
+    if (jsonRes.isErr) {
+      if (jsonRes.unwrapErr().errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
         return Ok(null);
       } else {
-        return Err(error);
+        return Err(jsonRes.unwrapErr());
       }
     }
+    final json = jsonRes.unwrap();
     return Ok(BackendProduct.fromJson(json));
   }
 
@@ -191,46 +166,34 @@ class Backend {
   }
 
   Future<Result<UserParams, BackendError>> userData() async {
-    final response = await _backendGet('user_data/', {});
-    if (response.isError) {
-      return Err(_errFromResp(response));
+    final jsonRes = await _backendGetJson('user_data/', {});
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
     }
+    final json = jsonRes.unwrap();
 
-    final json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
-
-    if (!_isError(json)) {
-      final backendUserParams = UserParams.fromJson(json)!;
-      // NOTE: client token is not present in the response, but
-      // the Backend class knows the token and can set it.
-      // If it wouldn't set it, the `userData()` method clients would get
-      // not fully set params.
-      final storedUserParams = await _userParamsController.getUserParams();
-      return Ok(backendUserParams.rebuild(
-          (e) => e..backendClientToken = storedUserParams?.backendClientToken));
-    } else {
-      return Err(_errFromJson(json));
-    }
+    final backendUserParams = UserParams.fromJson(json)!;
+    // NOTE: client token is not present in the response, but
+    // the Backend class knows the token and can set it.
+    // If it wouldn't set it, the `userData()` method clients would get
+    // not fully set params.
+    final storedUserParams = await _userParamsController.getUserParams();
+    return Ok(backendUserParams.rebuild(
+        (e) => e..backendClientToken = storedUserParams?.backendClientToken));
   }
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
       requestProductsAtShops(Iterable<String> osmIds) async {
-    final response =
-        await _backendGet('products_at_shops_data/', {'osmShopsIds': osmIds});
-    if (response.isError) {
-      return Err(_errFromResp(response));
+    final jsonRes =
+        await _backendGetJson('products_at_shops_data/', {'osmShopsIds': osmIds});
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
     }
-
-    final json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
+    final json = jsonRes.unwrap();
 
     if (!json.containsKey('results')) {
       Log.w('Invalid products_at_shops_data response: $json');
-      return Err(BackendError.invalidJson(response.body));
+      return Err(BackendError.invalidDecodedJson(json));
     }
 
     final results = json['results'] as Map<String, dynamic>;
@@ -247,21 +210,17 @@ class Backend {
 
   Future<Result<List<BackendShop>, BackendError>> requestShops(
       Iterable<String> osmIds) async {
-    final response = await _backendGet('shops_data/', {},
+    final jsonRes = await _backendGetJson('shops_data/', {},
         body: jsonEncode({'osm_ids': osmIds.toList()}),
         contentType: 'application/json');
-    if (response.isError) {
-      return Err(_errFromResp(response));
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
     }
-
-    final json = _jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
+    final json = jsonRes.unwrap();
 
     if (!json.containsKey('results')) {
       Log.w('Invalid shops_data response: $json');
-      return Err(BackendError.invalidJson(response.body));
+      return Err(BackendError.invalidDecodedJson(json));
     }
 
     final results = json['results'] as Map<String, dynamic>;
@@ -285,6 +244,31 @@ class Backend {
     } else {
       return Err(_errOther());
     }
+  }
+
+  Future<Result<Map<String, dynamic>, BackendError>> _backendGetJson(
+      String path, Map<String, dynamic>? params,
+      {Map<String, String>? headers,
+        String? backendClientTokenOverride,
+        String? body,
+        String? contentType}) async {
+    final response = await _backendGet(path, params,
+        headers: headers,
+        backendClientTokenOverride: backendClientTokenOverride,
+        body: body,
+        contentType: contentType);
+    if (response.isError) {
+      return Err(_errFromResp(response));
+    }
+
+    final json = _jsonDecodeSafe(response.body);
+    if (json == null) {
+      return Err(_errInvalidJson(response.body));
+    }
+    if (_isError(json)) {
+      return Err(_errFromJson(json));
+    }
+    return Ok(json);
   }
 
   Future<BackendResponse> _backendGet(String path, Map<String, dynamic>? params,
