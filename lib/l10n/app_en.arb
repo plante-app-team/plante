@@ -13,6 +13,7 @@
       "global_barcode": "Barcode",
       "global_send": "Send",
       "global_try_again": "Try again",
+      "global_done_thanks": "Done! Thank you!",
 
       "image_cropper_title": "Let's crop it!",
 
@@ -100,7 +101,6 @@
       "init_product_page_ocr_in_progress": "Ingredients recognition...",
       "init_product_page_cancel_adding_product_q": "Cancel product creation?",
       "init_product_page_delete_photo_q": "Delete photo?",
-      "init_product_page_done_msg": "Done! Thank you!",
 
       "veg_status_displayed_vegan": "Vegan",
       "veg_status_displayed_vegetarian": "Vegetarian",
@@ -147,5 +147,7 @@
 
       "shop_product_range_page_this_shop_has_no_product": "No product are added to this shop yet",
       "shop_product_range_page_product_last_seen_here": "Last seen here: ",
-      "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?"
+      "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?",
+      "shop_product_range_page_you_sure_positive_vote": "Are you sure you saw the product in this shop?",
+      "shop_product_range_page_you_sure_negative_vote": "Are you sure the product is not sold in this shop?"
 }

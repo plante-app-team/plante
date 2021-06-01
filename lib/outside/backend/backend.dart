@@ -58,7 +58,8 @@ class Backend {
       Log.i('Backend: user registered: ${userParams.toString()}');
       return Ok(userParams);
     } else {
-      if (jsonRes.unwrapErr().errorKind != BackendErrorKind.ALREADY_REGISTERED) {
+      if (jsonRes.unwrapErr().errorKind !=
+          BackendErrorKind.ALREADY_REGISTERED) {
         return Err(jsonRes.unwrapErr());
       } else {
         // Already registered, need to login
@@ -118,7 +119,8 @@ class Backend {
       return Ok(BackendProduct((e) => e.barcode = barcode));
     }
 
-    final jsonRes = await _backendGetJson('product_data/', {'barcode': barcode});
+    final jsonRes =
+        await _backendGetJson('product_data/', {'barcode': barcode});
     if (jsonRes.isErr) {
       if (jsonRes.unwrapErr().errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
         return Ok(null);
@@ -184,8 +186,8 @@ class Backend {
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
       requestProductsAtShops(Iterable<String> osmIds) async {
-    final jsonRes =
-        await _backendGetJson('products_at_shops_data/', {'osmShopsIds': osmIds});
+    final jsonRes = await _backendGetJson(
+        'products_at_shops_data/', {'osmShopsIds': osmIds});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
@@ -234,6 +236,16 @@ class Backend {
     return Ok(shops);
   }
 
+  Future<Result<None, BackendError>> productPresenceVote(
+      String barcode, String osmId, bool positive) async {
+    final response = await _backendGet('product_presence_vote/', {
+      'barcode': barcode,
+      'shopOsmId': osmId,
+      'voteVal': positive ? '1' : '0',
+    });
+    return _noneOrErrorFrom(response);
+  }
+
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
       return Err(_errFromResp(response));
@@ -249,9 +261,9 @@ class Backend {
   Future<Result<Map<String, dynamic>, BackendError>> _backendGetJson(
       String path, Map<String, dynamic>? params,
       {Map<String, String>? headers,
-        String? backendClientTokenOverride,
-        String? body,
-        String? contentType}) async {
+      String? backendClientTokenOverride,
+      String? body,
+      String? contentType}) async {
     final response = await _backendGet(path, params,
         headers: headers,
         backendClientTokenOverride: backendClientTokenOverride,

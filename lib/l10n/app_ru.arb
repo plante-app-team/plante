@@ -13,6 +13,7 @@
     "global_barcode": "Штрихкод",
     "global_send": "Отправить",
     "global_try_again": "Попробовать ещё раз",
+    "global_done_thanks": "Готово! Спасибо!",
 
     "image_cropper_title": "Давайте-ка обрежем!",
 
@@ -100,7 +101,6 @@
     "init_product_page_ocr_in_progress": "Распознание состава...",
     "init_product_page_cancel_adding_product_q": "Отменить добавление продукта?",
     "init_product_page_delete_photo_q": "Удалить фото?",
-    "init_product_page_done_msg": "Готово! Спасибо!",
 
     "veg_status_displayed_vegan": "Веганский",
     "veg_status_displayed_vegetarian": "Вегетарианский",
@@ -147,5 +147,7 @@
 
     "shop_product_range_page_this_shop_has_no_product": "В этом магазине продуктов пока нет",
     "shop_product_range_page_product_last_seen_here": "Последний раз тут видели: ",
-    "shop_product_range_page_have_you_seen_product_here": "Такой продукт тут есть?"
+    "shop_product_range_page_have_you_seen_product_here": "Такой продукт тут есть?",
+    "shop_product_range_page_you_sure_positive_vote": "Вы уверены, что видели продукт в магазине?",
+    "shop_product_range_page_you_sure_negative_vote": "Вы уверены, что продукта в магазине нет?"
 }

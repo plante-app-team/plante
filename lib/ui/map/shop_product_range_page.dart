@@ -5,13 +5,18 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -27,13 +32,16 @@ class ShopProductRangePage extends StatefulWidget {
 class _ShopProductRangePageState extends State<ShopProductRangePage> {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
+  final Backend _backend;
   bool _loading = false;
+  bool _performingBackendAction = false;
   ShopProductRange? _shopProductRange;
   ShopsManagerError? _shopProductRangeLoadingError;
 
   _ShopProductRangePageState()
       : _shopsManager = GetIt.I.get<ShopsManager>(),
-        _userParamsController = GetIt.I.get<UserParamsController>();
+        _userParamsController = GetIt.I.get<UserParamsController>(),
+        _backend = GetIt.I.get<Backend>();
 
   @override
   void initState() {
@@ -112,29 +120,46 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
                   }),
               Text(
                   '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr'),
-              Text(
-                  '${context.strings.shop_product_range_page_have_you_seen_product_here}'),
+              Text(context
+                  .strings.shop_product_range_page_have_you_seen_product_here),
               Row(children: [
                 Expanded(
                     child: ButtonOutlinedPlante.withText(
-                        context.strings.global_no)),
+                        context.strings.global_no, onPressed: () {
+                  _onProductPresenceVote(e, false);
+                })),
                 Expanded(
                     child: ButtonOutlinedPlante.withText(
-                        context.strings.global_yes))
+                        context.strings.global_yes, onPressed: () {
+                  _onProductPresenceVote(e, true);
+                }))
               ])
             ]));
       }).toList());
     }
     return Scaffold(
       body: SafeArea(
-          child: Column(children: [
-        const HeaderPlante(),
-        Padding(
-            padding: const EdgeInsets.only(left: 26),
-            child: SizedBox(
-                width: double.infinity,
-                child: Text(widget.shop.name, style: TextStyles.headline1))),
-        Expanded(child: content)
+          child: Stack(children: [
+        Column(children: [
+          const HeaderPlante(),
+          Padding(
+              padding: const EdgeInsets.only(left: 26),
+              child: SizedBox(
+                  width: double.infinity,
+                  child: Text(widget.shop.name, style: TextStyles.headline1))),
+          Expanded(child: content)
+        ]),
+        Positioned.fill(
+            child: AnimatedCrossFadePlante(
+          crossFadeState: _performingBackendAction
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          firstChild: const SizedBox.shrink(),
+          secondChild: Container(
+            color: const Color(0x70FFFFFF),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+        ))
       ])),
     );
   }
@@ -163,4 +188,68 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
     _shopProductRange =
         _shopProductRange!.rebuild((e) => e.products.replace(products));
   }
+
+  void _onProductPresenceVote(Product product, bool positive) async {
+    final title = positive
+        ? context.strings.shop_product_range_page_you_sure_positive_vote
+        : context.strings.shop_product_range_page_you_sure_negative_vote;
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return DialogPlante(
+            content: Text(title, style: TextStyles.headline1),
+            actions: Row(children: [
+              Expanded(
+                  child: ButtonOutlinedPlante.withText(
+                context.strings.global_no,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )),
+              const SizedBox(width: 16),
+              Expanded(
+                  child: ButtonFilledPlante.withText(
+                context.strings.global_yes,
+                onPressed: () {
+                  _performProductPresenceVote(product, positive);
+                  Navigator.of(context).pop();
+                },
+              )),
+            ]));
+      },
+    );
+  }
+
+  void _performProductPresenceVote(Product product, bool positive) async {
+    setState(() {
+      _performingBackendAction = true;
+    });
+    try {
+      final result = await _backend.productPresenceVote(
+          product.barcode, widget.shop.osmId, positive);
+      if (result.isOk) {
+        showSnackBar(context.strings.global_done_thanks, context);
+        setState(() {
+          // TODO(https://trello.com/c/dCDHecZS/): test
+          _shopProductRange = _shopProductRange!.rebuild((e) =>
+              e.productsLastSeenUtc[product.barcode] =
+                  DateTime.now().secondsSinceEpoch);
+        });
+      } else {
+        if (result.unwrapErr().errorKind == BackendErrorKind.NETWORK_ERROR) {
+          showSnackBar(context.strings.global_network_error, context);
+        } else {
+          showSnackBar(context.strings.global_something_went_wrong, context);
+        }
+      }
+    } finally {
+      setState(() {
+        _performingBackendAction = false;
+      });
+    }
+  }
+}
+
+extension _DateTimeExt on DateTime {
+  int get secondsSinceEpoch => (millisecondsSinceEpoch / 1000).round();
 }

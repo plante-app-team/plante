@@ -7,7 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';

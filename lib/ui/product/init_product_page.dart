@@ -415,7 +415,7 @@ class _InitProductPageState extends State<InitProductPage>
     if (ok) {
       productUpdatedCallback?.call(model.product);
       Navigator.of(context).pop();
-      showSnackBar(context.strings.init_product_page_done_msg, context);
+      showSnackBar(context.strings.global_done_thanks, context);
       doneCallback?.call();
     } else {
       showSnackBar(context.strings.global_something_went_wrong, context);

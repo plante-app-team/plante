@@ -835,6 +835,28 @@ void main() {
     final result = await backend.requestShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
+
+  test('product presence vote', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*product_presence_vote.*', ''' { "result": "ok" } ''');
+
+    var result = await backend.productPresenceVote('123456', '1', true);
+    expect(result.isOk, isTrue);
+    result = await backend.productPresenceVote('123456', '1', false);
+    expect(result.isOk, isTrue);
+  });
+
+  test('product presence vote error', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*product_presence_vote.*', const SocketException(''));
+
+    final result = await backend.productPresenceVote('123456', '1', true);
+    expect(result.isErr, isTrue);
+  });
 }
 
 Future<FakeUserParamsController> _initUserParams() async {
