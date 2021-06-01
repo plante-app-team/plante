@@ -231,12 +231,8 @@ void main() {
 
   test('update user params', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
+    final userParamsController = await _initUserParams();
+    final initialParams = userParamsController.cachedUserParams!;
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
@@ -300,12 +296,8 @@ void main() {
 
   test('update user params network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
+    final userParamsController = await _initUserParams();
+    final initialParams = userParamsController.cachedUserParams!;
 
     final backend = Backend(userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException('.*update_user_data.*', const HttpException(''));
@@ -320,14 +312,7 @@ void main() {
 
   test('request product', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {
        "barcode": "123",
@@ -356,14 +341,7 @@ void main() {
 
   test('request product not found', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {
        "error": "product_not_found"
@@ -377,14 +355,7 @@ void main() {
 
   test('request product http error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '', responseCode: 500);
 
     final result = await backend.requestProduct('123');
@@ -398,14 +369,7 @@ void main() {
 
   test('request product invalid JSON', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {{{{{{{{{{{{
        "barcode": "123",
@@ -427,14 +391,7 @@ void main() {
 
   test('request product network exception', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException('.*product_data.*', const SocketException(''));
 
     final result = await backend.requestProduct('123');
@@ -443,14 +400,7 @@ void main() {
 
   test('create update product', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -475,14 +425,7 @@ void main() {
 
   test('create update product vegetarian status only', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -506,14 +449,7 @@ void main() {
 
   test('create update product vegan status only', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -537,14 +473,7 @@ void main() {
 
   test('create update product http error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*create_update_product.*', '', responseCode: 500);
 
     final result = await backend.createUpdateProduct(
@@ -556,14 +485,7 @@ void main() {
 
   test('create update product invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*create_update_product.*', '{{{{}');
 
     final result = await backend.createUpdateProduct(
@@ -575,14 +497,7 @@ void main() {
 
   test('create update product network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*create_update_product.*', const SocketException(''));
 
@@ -595,14 +510,7 @@ void main() {
 
   test('send report', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*make_report.*',
         ''' { "result": "ok" } ''');
@@ -615,14 +523,7 @@ void main() {
 
   test('send report network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException('.*make_report.*', const SocketException(''));
 
     final result = await backend.sendReport(
@@ -633,14 +534,7 @@ void main() {
 
   test('user data obtaining', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*user_data.*',
         ''' { "name": "Bob Kelso", "user_id": "123" } ''');
@@ -658,14 +552,7 @@ void main() {
 
   test('user data obtaining invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*user_data.*',
         ''' {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } ''');
@@ -676,14 +563,7 @@ void main() {
 
   test('user data obtaining network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*user_data.*', const SocketException(''));
 
@@ -693,14 +573,7 @@ void main() {
 
   test('requesting products at shops', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -801,14 +674,7 @@ void main() {
 
   test('requesting products at shops empty response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -823,14 +689,7 @@ void main() {
 
   test('requesting products at shops invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -858,14 +717,7 @@ void main() {
 
   test('requesting products at shops JSON without results response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -880,14 +732,7 @@ void main() {
 
   test('requesting products at shops network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*products_at_shops_data.*', const SocketException(''));
 
@@ -897,14 +742,7 @@ void main() {
 
   test('requesting shops', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -944,14 +782,7 @@ void main() {
 
   test('requesting shops empty response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -966,14 +797,7 @@ void main() {
 
   test('requesting shops invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -989,14 +813,7 @@ void main() {
 
   test('requesting shops JSON without results response', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -1011,18 +828,21 @@ void main() {
 
   test('requesting shops network error', () async {
     final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final initialParams = UserParams((v) => v
-      ..backendId = '123'
-      ..name = 'Bob'
-      ..backendClientToken = 'aaa');
-    await userParamsController.setUserParams(initialParams);
-
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*shops_data.*', const SocketException(''));
 
     final result = await backend.requestShops(['8711880917', '8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
+}
+
+Future<FakeUserParamsController> _initUserParams() async {
+  final userParamsController = FakeUserParamsController();
+  final initialParams = UserParams((v) => v
+    ..backendId = '123'
+    ..name = 'Bob'
+    ..backendClientToken = 'aaa');
+  await userParamsController.setUserParams(initialParams);
+  return userParamsController;
 }
