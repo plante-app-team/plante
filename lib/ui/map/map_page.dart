@@ -6,43 +6,40 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/ui/base/components/checkbox_plante.dart';
-import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/map_page_mode.dart';
+import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/markers_builder.dart';
-import 'package:plante/ui/map/shop_product_range_page.dart';
-import 'package:plante/ui/map/shops_list_page.dart';
 
 class MapPage extends StatefulWidget {
+  final Product? productToAdd;
+
+  const MapPage({Key? key, this.productToAdd}) : super(key: key);
+
   @override
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
+  static final _instances = <_MapPageState>[];
   late final MapPageModel _model;
+  late MapPageMode _mode;
 
   final _mapController = Completer<GoogleMapController>();
   var _shopsMarkers = <Marker>{};
   late final ClusterManager _clusterManager;
   Timer? _mapUpdatesTimer;
 
-  bool _showEmptyShopsChecked = false;
-  bool get _showEmptyShops => _showEmptyShopsChecked;
-  set _showEmptyShops(bool value) {
-    setState(() {
-      _showEmptyShopsChecked = value;
-      _onShopsUpdated(_model.shopsCache);
-    });
-  }
-
   bool get _loading => _model.loading;
 
   @override
   void initState() {
     super.initState();
+
     final updateCallback = () {
       if (mounted) {
         setState(() {
@@ -68,31 +65,42 @@ class _MapPageState extends State<MapPage> {
     const clusteringLevels = <double>[12, 12, 12, 12, 12, 12, 14, 16.5, 20];
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
-    _init();
+
+    final widgetSource = () => widget;
+    final contextSource = () => context;
+    final switchModeCallback = (MapPageMode newMode) {
+      setState(() {
+        _mode = newMode;
+        _mode.init();
+      });
+    };
+    final updateMapCallback = () {
+      _onShopsUpdated(_model.shopsCache);
+    };
+    _mode = MapPageModeDefault(widgetSource, contextSource, updateCallback,
+        updateMapCallback, switchModeCallback);
+    _mode.init();
+
+    _initAsync();
+    _instances.add(this);
+    _instances.forEach((instance) {
+      instance.onInstancesChange();
+    });
   }
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
-    return markersBuilder(cluster, _onMarkerClick);
+    final extraData = ShopsMarkersExtraData(_mode.selectedShops());
+    return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 
   void _onMarkerClick(Iterable<Shop> shops) {
     if (shops.isEmpty) {
       return;
     }
-    if (shops.length > 1) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ShopsListPage(shops: shops.toList())));
-    } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ShopProductRangePage(shop: shops.first)));
-    }
+    _mode.onMarkerClick(shops);
   }
 
-  Future<void> _init() async {
+  Future<void> _initAsync() async {
     final mapController = await _mapController.future;
     // We'd like to hide all businesses known to Google Maps because
     // we'll how our own list of shops and we don't want 2 lists to conflict.
@@ -118,6 +126,27 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
+  void dispose() {
+    _instances.remove(this);
+    _instances.forEach((instance) {
+      instance.onInstancesChange();
+    });
+    super.dispose();
+    () async {
+      final mapController = await _mapController.future;
+      mapController.dispose();
+    }.call();
+  }
+
+  void onInstancesChange() {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      setState(() {
+        // Update!
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -136,32 +165,19 @@ class _MapPageState extends State<MapPage> {
           },
           onCameraMove: _clusterManager.onCameraMove,
           onCameraIdle: _onCameraIdle,
-          markers: _shopsMarkers,
+          // When there are more than 2 instances of GoogleMap and both
+          // of them have markers, this screws up the markers for some reason.
+          // Couldn't figure out why, probably there's a mistake either in
+          // the Google Map lib or in the Clustering lib, but it's easier to
+          // just use markers for 1 instance at a time.
+          markers: _instances.last == this ? _shopsMarkers : {},
         ),
+        _mode.buildOverlay(context),
         AnimatedSwitcher(
             duration: DURATION_DEFAULT,
             child: _loading
                 ? const LinearProgressIndicator()
                 : const SizedBox.shrink()),
-        Align(
-            alignment: Alignment.topRight,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  _showEmptyShops = !_showEmptyShops;
-                },
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(context.strings.map_page_empty_shops,
-                      style: TextStyles.normalSmall),
-                  CheckboxPlante(
-                      value: _showEmptyShops,
-                      onChanged: (value) {
-                        _showEmptyShops = value ?? false;
-                      })
-                ]),
-              ),
-            ))
       ])),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showUser,
@@ -190,8 +206,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _onShopsUpdated(Map<String, Shop> shops) {
-    _clusterManager.setItems(shops.values
-        .where((shop) => _showEmptyShops ? true : shop.productsCount > 0)
+    _clusterManager.setItems(_mode
+        .filter(shops.values)
         .map((shop) =>
             ClusterItem(LatLng(shop.latitude, shop.longitude), item: shop))
         .toList());

@@ -7,6 +7,7 @@
     "global_done": "Готово",
     "global_cancel": "Отмена",
     "global_no": "Нет",
+    "global_oops_no": "Упс, нет",
     "global_yes": "Да",
     "global_give_permission": "Дать разрешение",
     "global_open_app_settings": "Открыть настройки",
@@ -41,6 +42,7 @@
     "map_page_default_shop_type_name": "Магазин",
     "map_page_btn_where_am_i": "Где я?",
     "map_page_empty_shops": "Пустые магазины",
+    "map_page_is_product_sold_q": "Продукт «<PRODUCT>» продаётся в магазине «<SHOP>»?",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
@@ -73,6 +75,7 @@
     "display_product_page_veg_status_unknown_explanation": "О вег-статусе ингредиента нет информации",
     "display_product_page_veg_status_possible_explanation": "Ингредиент может иметь разный вег-статус в зависимости от способа производства.\nНапример, \"Закваска\" может быть и веганской, и лишь вегетарианской, и не вегетарианской вовсе.",
     "display_product_page_veg_status_explanations_ok": "О как!",
+    "display_product_page_veg_mark_on_map": "Указать на карте",
 
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",

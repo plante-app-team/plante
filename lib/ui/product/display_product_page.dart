@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
@@ -23,6 +24,7 @@ import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_photo_page.dart';
 
@@ -120,6 +122,23 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                             left: 12, top: 8, right: 12, bottom: 8),
                         child: Text(vegStatusHint()!, style: TextStyles.hint),
                       ))),
+            const SizedBox(height: 16),
+            Container(
+                width: double.infinity,
+                height: 96,
+                color: ColorsPlante.primary,
+                child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      overlayColor:
+                          MaterialStateProperty.all(ColorsPlante.splashColor),
+                      onTap: _markOnMap,
+                      child: Center(
+                          child: Text(
+                              context
+                                  .strings.display_product_page_veg_mark_on_map,
+                              style: TextStyles.buttonFilled)),
+                    ))),
             const SizedBox(height: 16),
             InkWell(
                 onTap: showProductIngredientsPhoto,
@@ -516,5 +535,13 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     if (selected == 1) {
       onReportClick();
     }
+  }
+
+  void _markOnMap() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MapPage(productToAdd: product),
+        ));
   }
 }

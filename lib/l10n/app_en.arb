@@ -7,6 +7,7 @@
       "global_done": "Done",
       "global_cancel": "Cancel",
       "global_no": "No",
+      "global_oops_no": "Oops, no",
       "global_yes": "Yes",
       "global_give_permission": "Give permission",
       "global_open_app_settings": "Open app settings",
@@ -41,6 +42,7 @@
       "map_page_default_shop_type_name": "Shop",
       "map_page_btn_where_am_i": "Where am I?",
       "map_page_empty_shops": "Empty shops",
+      "map_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
@@ -73,6 +75,7 @@
       "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
       "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be vegan, non-vegan but vegetarian, and both non-vegan and not vegetarian",
       "display_product_page_veg_status_explanations_ok": "Alright!",
+      "display_product_page_veg_mark_on_map": "Help with location",
 
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",

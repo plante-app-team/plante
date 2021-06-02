@@ -61,6 +61,7 @@ dependencies:
   palette_generator: ^0.3.0
   photo_view: ^0.11.1
   google_maps_cluster_manager: ^1.0.0
+  visibility_detector: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -134,3 +135,8 @@ flutter:
     - assets/settings.svg
     - assets/barcode_scan_mode.svg
     - assets/barcode_type_mode.svg
+    - assets/map_marker_empty.svg
+    - assets/map_marker_filled.svg
+    - assets/map_marker_selected.svg
+    - assets/map_marker_group_empty.svg
+    - assets/map_marker_group_filled.svg

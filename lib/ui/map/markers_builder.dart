@@ -1,14 +1,25 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
 
 typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 
+class ShopsMarkersExtraData {
+  final Set<Shop> selectedShops;
+  ShopsMarkersExtraData(this.selectedShops);
+}
+
 Future<Marker> markersBuilder(
-    Cluster<Shop> cluster, MarkerClickCallback callback) async {
+    Cluster<Shop> cluster,
+    ShopsMarkersExtraData extraData,
+    BuildContext context,
+    MarkerClickCallback callback) async {
+  final shops =
+      cluster.items.where((element) => element != null).map((e) => e!);
   return Marker(
     markerId: MarkerId(cluster.getId()),
     position: cluster.location,
@@ -16,46 +27,52 @@ Future<Marker> markersBuilder(
       callback(
           cluster.items.where((shop) => shop != null).map((shop) => shop!));
     },
-    icon: await _getMarkerBitmap(
-        cluster.items.where((element) => element != null).map((e) => e!)),
+    icon: await _getMarkerBitmap(shops, extraData, context),
   );
 }
 
-Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops) async {
-  const size = 125;
-  final PictureRecorder pictureRecorder = PictureRecorder();
-  final Canvas canvas = Canvas(pictureRecorder);
-  final Color paint1Color;
-  if (shops.any((e) => e.productsCount > 0)) {
-    paint1Color = Colors.orange;
+Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
+    ShopsMarkersExtraData extraData, BuildContext context) async {
+  if (shops.length == 1) {
+    if (extraData.selectedShops.contains(shops.first)) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_selected.svg');
+    } else if (shops.any((e) => e.productsCount > 0)) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_filled.svg');
+    } else {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_empty.svg');
+    }
   } else {
-    paint1Color = Colors.grey;
+    if (shops.any((e) => extraData.selectedShops.contains(e))) {
+      throw Exception('Not supported yet - we have no image!');
+    } else if (shops.any((e) => e.productsCount > 0)) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_group_filled.svg');
+    } else {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_group_empty.svg');
+    }
   }
-  final Paint paint1 = Paint()..color = paint1Color;
-  final Paint paint2 = Paint()..color = Colors.white;
+}
 
-  canvas.drawCircle(const Offset(size / 2, size / 2), size / 2.0, paint1);
-  canvas.drawCircle(const Offset(size / 2, size / 2), size / 2.2, paint2);
-  canvas.drawCircle(const Offset(size / 2, size / 2), size / 2.8, paint1);
+/// Stolen from https://stackoverflow.com/a/57609840
+Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
+    BuildContext context, String assetName) async {
+  final svgString = await DefaultAssetBundle.of(context).loadString(assetName);
+  final svgDrawableRoot = await svg.fromSvgString(svgString, '');
 
-  if (shops.length > 1) {
-    final painter = TextPainter(textDirection: TextDirection.ltr);
-    painter.text = TextSpan(
-      text: shops.length.toString(),
-      style: const TextStyle(
-          fontSize: size / 3,
-          color: Colors.white,
-          fontWeight: FontWeight.normal),
-    );
-    painter.layout();
-    painter.paint(
-      canvas,
-      Offset(size / 2 - painter.width / 2, size / 2 - painter.height / 2),
-    );
-  }
+  // toPicture() and toImage() don't seem to be pixel ratio aware,
+  // so we calculate the actual sizes here
+  final queryData = MediaQuery.of(context);
+  final devicePixelRatio = queryData.devicePixelRatio;
+  final width = 32 * devicePixelRatio; // where 32 is your SVG's original width
+  final height = 40 * devicePixelRatio; // same thing
 
-  final img = await pictureRecorder.endRecording().toImage(size, size);
-  final data = await img.toByteData(format: ImageByteFormat.png);
+  final picture = svgDrawableRoot.toPicture(size: Size(width, height));
 
-  return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
+  final image = await picture.toImage(width.round(), height.round());
+  final bytes = await image.toByteData(format: ImageByteFormat.png);
+  return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
 }
