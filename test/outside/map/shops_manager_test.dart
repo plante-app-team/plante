@@ -23,7 +23,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 
 import 'shops_manager_test.mocks.dart';
 
-@GenerateMocks([OpenStreetMap, Backend, ProductsManager])
+@GenerateMocks([OpenStreetMap, Backend, ProductsManager, ShopsManagerListener])
 void main() {
   late MockOpenStreetMap _osm;
   late MockBackend _backend;
@@ -156,7 +156,7 @@ void main() {
     final expectedShopProductRange = ShopProductRange((e) => e
       ..shop.replace(aShop)
       ..products.addAll(products)
-      ..productsLastSeenUtc.addEntries(
+      ..productsLastSeenSecsUtc.addEntries(
           backendProductsAtShops[0].productsLastSeenUtc.entries));
     expect(result.unwrap(), equals(expectedShopProductRange));
   });
@@ -249,5 +249,126 @@ void main() {
     final result = await _shopsManager.fetchShopProductRange(aShop);
     // Last error received from ShopsManager is expected to be what we get here
     expect(result.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
+  });
+
+  test('putProductToShops good scenario', () async {
+    final product = Product((e) => e.barcode = '123');
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar2'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2)))
+    ];
+
+    when(_backend.putProductToShop(any, any)).thenAnswer((_) async => Ok(None()));
+
+    final listener = MockShopsManagerListener();
+    when(listener.onLocalShopsChange()).thenAnswer((_) {});
+
+    _shopsManager.addListener(listener);
+    verifyNever(listener.onLocalShopsChange());
+
+    final result = await _shopsManager.putProductToShops(product, shops);
+    expect(result.isOk, isTrue);
+    verify(listener.onLocalShopsChange()).called(1);
+  });
+
+  test('putProductToShops error in the middle', () async {
+    final product = Product((e) => e.barcode = '123');
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar2'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '3'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar3'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '3'
+          ..productsCount = 2)))
+    ];
+
+    var calls = 0;
+    when(_backend.putProductToShop(any, any)).thenAnswer((_) async {
+      calls += 1;
+      if (calls >= 2) {
+        return Err(BackendError.other());
+      }
+      return Ok(None());
+    });
+
+    final listener = MockShopsManagerListener();
+    when(listener.onLocalShopsChange()).thenAnswer((_) {});
+
+    _shopsManager.addListener(listener);
+    verifyNever(listener.onLocalShopsChange());
+
+    final result = await _shopsManager.putProductToShops(product, shops);
+    // Expecting an error
+    expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
+    // Expecting the third call to not happen
+    expect(calls, equals(2));
+    // Expecting the listener to be notified
+    verify(listener.onLocalShopsChange()).called(1);
+  });
+
+  test('putProductToShops all errors', () async {
+    final product = Product((e) => e.barcode = '123');
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2)))
+    ];
+
+    when(_backend.putProductToShop(any, any)).thenAnswer((_) async => Err(BackendError.other()));
+
+    final listener = MockShopsManagerListener();
+    when(listener.onLocalShopsChange()).thenAnswer((_) {});
+
+    _shopsManager.addListener(listener);
+    verifyNever(listener.onLocalShopsChange());
+
+    final result = await _shopsManager.putProductToShops(product, shops);
+    // Expecting an error
+    expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
+    // Expecting the listener to be not notified
+    verifyNever(listener.onLocalShopsChange());
   });
 }

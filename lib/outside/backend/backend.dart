@@ -246,6 +246,15 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
+  Future<Result<None, BackendError>> putProductToShop(
+      String barcode, String osmId) async {
+    final response = await _backendGet('put_product_to_shop/', {
+      'barcode': barcode,
+      'shopOsmId': osmId,
+    });
+    return _noneOrErrorFrom(response);
+  }
+
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
       return Err(_errFromResp(response));

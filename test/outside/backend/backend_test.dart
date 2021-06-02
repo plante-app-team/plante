@@ -857,6 +857,26 @@ void main() {
     final result = await backend.productPresenceVote('123456', '1', true);
     expect(result.isErr, isTrue);
   });
+
+  test('put product to shop', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*put_product_to_shop.*', ''' { "result": "ok" } ''');
+
+    final result = await backend.putProductToShop('123456', '1');
+    expect(result.isOk, isTrue);
+  });
+
+  test('put product to shop error', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*put_product_to_shop.*', const SocketException(''));
+
+    final result = await backend.putProductToShop('123456', '1');
+    expect(result.isErr, isTrue);
+  });
 }
 
 Future<FakeUserParamsController> _initUserParams() async {

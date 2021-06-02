@@ -17,6 +17,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i12;
 import 'package:plante/outside/backend/backend_shop.dart' as _i13;
 import 'package:plante/outside/map/open_street_map.dart' as _i3;
 import 'package:plante/outside/map/osm_shop.dart' as _i5;
+import 'package:plante/outside/map/shops_manager.dart' as _i17;
 import 'package:plante/outside/products/products_manager.dart' as _i14;
 import 'package:plante/outside/products/products_manager_error.dart' as _i16;
 
@@ -135,6 +136,22 @@ class MockBackend extends _i1.Mock implements _i7.Backend {
               returnValue: Future.value(
                   _FakeResult<List<_i13.BackendShop>, _i9.BackendError>()))
           as _i4.Future<_i2.Result<List<_i13.BackendShop>, _i9.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i2.None, _i9.BackendError>> productPresenceVote(
+          String? barcode, String? osmId, bool? positive) =>
+      (super.noSuchMethod(
+          Invocation.method(#productPresenceVote, [barcode, osmId, positive]),
+          returnValue:
+              Future.value(_FakeResult<_i2.None, _i9.BackendError>())) as _i4
+          .Future<_i2.Result<_i2.None, _i9.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i2.None, _i9.BackendError>> putProductToShop(
+          String? barcode, String? osmId) =>
+      (super.noSuchMethod(
+              Invocation.method(#putProductToShop, [barcode, osmId]),
+              returnValue:
+                  Future.value(_FakeResult<_i2.None, _i9.BackendError>()))
+          as _i4.Future<_i2.Result<_i2.None, _i9.BackendError>>);
 }
 
 /// A class which mocks [ProductsManager].
@@ -181,4 +198,14 @@ class MockProductsManager extends _i1.Mock implements _i14.ProductsManager {
                   returnValue: Future.value(
                       _FakeResult<_i14.ProductWithOCRIngredients, _i16.ProductsManagerError>()))
               as _i4.Future<_i2.Result<_i14.ProductWithOCRIngredients, _i16.ProductsManagerError>>);
+}
+
+/// A class which mocks [ShopsManagerListener].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockShopsManagerListener extends _i1.Mock
+    implements _i17.ShopsManagerListener {
+  MockShopsManagerListener() {
+    _i1.throwOnMissingStub(this);
+  }
 }

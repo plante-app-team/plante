@@ -232,7 +232,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
         setState(() {
           // TODO(https://trello.com/c/dCDHecZS/): test
           _shopProductRange = _shopProductRange!.rebuild((e) =>
-              e.productsLastSeenUtc[product.barcode] =
+              e.productsLastSeenSecsUtc[product.barcode] =
                   DateTime.now().secondsSinceEpoch);
         });
       } else {

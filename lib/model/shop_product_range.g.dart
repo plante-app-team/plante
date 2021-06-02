@@ -27,7 +27,7 @@ class _$ShopProductRange extends ShopProductRange {
     BuiltValueNullFieldError.checkNotNull(
         products, 'ShopProductRange', 'products');
     BuiltValueNullFieldError.checkNotNull(
-        productsLastSeenSecsUtc, 'ShopProductRange', 'productsLastSeenUtc');
+        productsLastSeenSecsUtc, 'ShopProductRange', 'productsLastSeenSecsUtc');
   }
 
   @override
@@ -58,7 +58,7 @@ class _$ShopProductRange extends ShopProductRange {
     return (newBuiltValueToStringHelper('ShopProductRange')
           ..add('shop', shop)
           ..add('products', products)
-          ..add('productsLastSeenUtc', productsLastSeenSecsUtc))
+          ..add('productsLastSeenSecsUtc', productsLastSeenSecsUtc))
         .toString();
   }
 }
@@ -76,11 +76,12 @@ class ShopProductRangeBuilder
       _$this._products ??= new ListBuilder<Product>();
   set products(ListBuilder<Product>? products) => _$this._products = products;
 
-  MapBuilder<String, int>? _productsLastSeenUtc;
-  MapBuilder<String, int> get productsLastSeenUtc =>
-      _$this._productsLastSeenUtc ??= new MapBuilder<String, int>();
-  set productsLastSeenUtc(MapBuilder<String, int>? productsLastSeenUtc) =>
-      _$this._productsLastSeenUtc = productsLastSeenUtc;
+  MapBuilder<String, int>? _productsLastSeenSecsUtc;
+  MapBuilder<String, int> get productsLastSeenSecsUtc =>
+      _$this._productsLastSeenSecsUtc ??= new MapBuilder<String, int>();
+  set productsLastSeenSecsUtc(
+          MapBuilder<String, int>? productsLastSeenSecsUtc) =>
+      _$this._productsLastSeenSecsUtc = productsLastSeenSecsUtc;
 
   ShopProductRangeBuilder();
 
@@ -89,7 +90,7 @@ class ShopProductRangeBuilder
     if ($v != null) {
       _shop = $v.shop.toBuilder();
       _products = $v.products.toBuilder();
-      _productsLastSeenUtc = $v.productsLastSeenSecsUtc.toBuilder();
+      _productsLastSeenSecsUtc = $v.productsLastSeenSecsUtc.toBuilder();
       _$v = null;
     }
     return this;
@@ -114,7 +115,7 @@ class ShopProductRangeBuilder
           new _$ShopProductRange._(
               shop: shop.build(),
               products: products.build(),
-              productsLastSeenSecsUtc: productsLastSeenUtc.build());
+              productsLastSeenSecsUtc: productsLastSeenSecsUtc.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -122,8 +123,8 @@ class ShopProductRangeBuilder
         shop.build();
         _$failedField = 'products';
         products.build();
-        _$failedField = 'productsLastSeenUtc';
-        productsLastSeenUtc.build();
+        _$failedField = 'productsLastSeenSecsUtc';
+        productsLastSeenSecsUtc.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'ShopProductRange', _$failedField, e.toString());

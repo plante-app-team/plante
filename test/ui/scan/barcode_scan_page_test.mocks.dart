@@ -164,6 +164,22 @@ class MockBackend extends _i1.Mock implements _i8.Backend {
               returnValue: Future.value(
                   _FakeResult<List<_i13.BackendShop>, _i10.BackendError>()))
           as _i4.Future<_i2.Result<List<_i13.BackendShop>, _i10.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i2.None, _i10.BackendError>> productPresenceVote(
+          String? barcode, String? osmId, bool? positive) =>
+      (super.noSuchMethod(
+          Invocation.method(#productPresenceVote, [barcode, osmId, positive]),
+          returnValue:
+              Future.value(_FakeResult<_i2.None, _i10.BackendError>())) as _i4
+          .Future<_i2.Result<_i2.None, _i10.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i2.None, _i10.BackendError>> putProductToShop(
+          String? barcode, String? osmId) =>
+      (super.noSuchMethod(
+              Invocation.method(#putProductToShop, [barcode, osmId]),
+              returnValue:
+                  Future.value(_FakeResult<_i2.None, _i10.BackendError>()))
+          as _i4.Future<_i2.Result<_i2.None, _i10.BackendError>>);
 }
 
 /// A class which mocks [RouteObserver].
@@ -242,7 +258,7 @@ class MockViewedProductsStorage extends _i1.Mock
   @override
   _i4.Stream<void> updates() =>
       (super.noSuchMethod(Invocation.method(#updates, []),
-          returnValue: const Stream<void>.empty()) as _i4.Stream<void>);
+          returnValue: Stream<void>.empty()) as _i4.Stream<void>);
   @override
   _i4.Future<void> loadPersistentProductsForTesting() => (super.noSuchMethod(
       Invocation.method(#loadPersistentProductsForTesting, []),

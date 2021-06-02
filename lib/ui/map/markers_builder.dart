@@ -46,7 +46,8 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     }
   } else {
     if (shops.any((e) => extraData.selectedShops.contains(e))) {
-      throw Exception('Not supported yet - we have no image!');
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_selected.svg');
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_group_filled.svg');

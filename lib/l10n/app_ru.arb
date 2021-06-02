@@ -43,6 +43,7 @@
     "map_page_btn_where_am_i": "Где я?",
     "map_page_empty_shops": "Пустые магазины",
     "map_page_is_product_sold_q": "Продукт «<PRODUCT>» продаётся в магазине «<SHOP>»?",
+    "map_page_cancel_putting_product_q": "Отменить добавление продукта на карту?",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",

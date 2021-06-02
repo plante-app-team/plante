@@ -11,6 +11,7 @@ import 'package:permission_handler_platform_interface/permission_handler_platfor
     as _i6;
 import 'package:plante/base/result.dart' as _i3;
 import 'package:plante/model/location_controller.dart' as _i4;
+import 'package:plante/model/product.dart' as _i11;
 import 'package:plante/model/shop.dart' as _i8;
 import 'package:plante/model/shop_product_range.dart' as _i10;
 import 'package:plante/outside/map/shops_manager.dart' as _i7;
@@ -60,6 +61,14 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
   }
 
   @override
+  void addListener(_i7.ShopsManagerListener? listener) =>
+      super.noSuchMethod(Invocation.method(#addListener, [listener]),
+          returnValueForMissingStub: null);
+  @override
+  void removeListener(_i7.ShopsManagerListener? listener) =>
+      super.noSuchMethod(Invocation.method(#removeListener, [listener]),
+          returnValueForMissingStub: null);
+  @override
   _i5.Future<
       _i3.Result<Map<String, _i8.Shop>, _i7.ShopsManagerError>> fetchShops(
           _i9.Point<double>? northeast, _i9.Point<double>? southwest) =>
@@ -77,4 +86,12 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
                   _FakeResult<_i10.ShopProductRange, _i7.ShopsManagerError>()))
           as _i5.Future<
               _i3.Result<_i10.ShopProductRange, _i7.ShopsManagerError>>);
+  @override
+  _i5.Future<_i3.Result<_i3.None, _i7.ShopsManagerError>> putProductToShops(
+          _i11.Product? product, List<_i8.Shop>? shops) =>
+      (super.noSuchMethod(
+              Invocation.method(#putProductToShops, [product, shops]),
+              returnValue:
+                  Future.value(_FakeResult<_i3.None, _i7.ShopsManagerError>()))
+          as _i5.Future<_i3.Result<_i3.None, _i7.ShopsManagerError>>);
 }

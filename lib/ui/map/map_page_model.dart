@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/location_controller.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/lat_lng_extensions.dart';
@@ -20,7 +21,7 @@ enum MapPageModelError {
   OTHER,
 }
 
-class MapPageModel {
+class MapPageModel implements ShopsManagerListener {
   static const _DEFAULT_USER_POS = LatLng(44.4192543, 38.2052612);
   static const MAX_SHOPS_LOADS_ATTEMPTS = 3;
   static final _shopsLoadsAttemptsCooldown = isInTests()
@@ -35,13 +36,22 @@ class MapPageModel {
   final _loadedAreas = <LatLngBounds>{};
   DateTime _lastShopsLoadTime = DateTime(2000);
   LatLngBounds? _loadingArea;
+  bool _networkOperationInProgress = false;
+
+  LatLngBounds? _latestViewPort;
 
   int get loadedAreasCount => _loadedAreas.length;
 
   MapPageModel(this._locationController, this._shopsManager,
-      this._updateShopsCallback, this._errorCallback, this._updateCallback);
+      this._updateShopsCallback, this._errorCallback, this._updateCallback) {
+    _shopsManager.addListener(this);
+  }
 
-  bool get loading => _loadingArea != null;
+  void dispose() {
+    _shopsManager.removeListener(this);
+  }
+
+  bool get loading => _loadingArea != null || _networkOperationInProgress;
   Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
   Future<bool> ensurePermissions() async {
@@ -89,6 +99,7 @@ class MapPageModel {
   }
 
   Future<void> onCameraMoved(LatLngBounds viewBounds) async {
+    _latestViewPort = viewBounds;
     final result = await _maybeLoadShops(viewBounds, attemptNumber: 1);
     if (result.isOk) {
       final loadedSomething = result.unwrap();
@@ -153,5 +164,27 @@ class MapPageModel {
     _shopsCache.addAll(shops);
     _loadedAreas.add(boundsToLoad);
     return Ok(shops.isNotEmpty);
+  }
+
+  Future<Result<None, ShopsManagerError>> putProductToShops(
+      Product product, List<Shop> shops) async {
+    _networkOperationInProgress = true;
+    _updateCallback.call();
+    try {
+      return await _shopsManager.putProductToShops(product, shops);
+    } finally {
+      _networkOperationInProgress = false;
+      _updateCallback.call();
+    }
+  }
+
+  @override
+  void onLocalShopsChange() {
+    /// Invalidating cache!
+    _loadedAreas.clear();
+    _shopsCache.clear();
+    if (_latestViewPort != null) {
+      onCameraMoved(_latestViewPort!);
+    }
   }
 }

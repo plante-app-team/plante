@@ -12,12 +12,25 @@ import 'package:plante/outside/products/products_manager_error.dart';
 
 enum ShopsManagerError { NETWORK_ERROR, OTHER }
 
+abstract class ShopsManagerListener {
+  void onLocalShopsChange();
+}
+
 class ShopsManager {
+  final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _openStreetMap;
   final Backend _backend;
   final ProductsManager _productsManager;
 
   ShopsManager(this._openStreetMap, this._backend, this._productsManager);
+
+  void addListener(ShopsManagerListener listener) {
+    _listeners.add(listener);
+  }
+
+  void removeListener(ShopsManagerListener listener) {
+    _listeners.remove(listener);
+  }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
       Point<double> northeast, Point<double> southwest) async {
@@ -83,8 +96,29 @@ class ShopsManager {
     return Ok(ShopProductRange((e) => e
       ..shop.replace(shop)
       ..products.addAll(products)
-      ..productsLastSeenUtc
+      ..productsLastSeenSecsUtc
           .addEntries(backendProductsAtShop.productsLastSeenUtc.entries)));
+  }
+
+  Future<Result<None, ShopsManagerError>> putProductToShops(
+      Product product, List<Shop> shops) async {
+    bool someChange = false;
+    for (final shop in shops) {
+      final res = await _backend.putProductToShop(product.barcode, shop.osmId);
+      if (res.isErr) {
+        if (someChange) {
+          _listeners.forEach((e) {
+            e.onLocalShopsChange();
+          });
+        }
+        return Err(_convertBackendErr(res.unwrapErr()));
+      }
+      someChange = true;
+    }
+    _listeners.forEach((e) {
+      e.onLocalShopsChange();
+    });
+    return Ok(None());
   }
 }
 

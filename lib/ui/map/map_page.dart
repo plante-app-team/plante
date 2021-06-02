@@ -77,8 +77,8 @@ class _MapPageState extends State<MapPage> {
     final updateMapCallback = () {
       _onShopsUpdated(_model.shopsCache);
     };
-    _mode = MapPageModeDefault(widgetSource, contextSource, updateCallback,
-        updateMapCallback, switchModeCallback);
+    _mode = MapPageModeDefault(_model, widgetSource, contextSource,
+        updateCallback, updateMapCallback, switchModeCallback);
     _mode.init();
 
     _initAsync();
@@ -132,6 +132,7 @@ class _MapPageState extends State<MapPage> {
       instance.onInstancesChange();
     });
     super.dispose();
+    _model.dispose();
     () async {
       final mapController = await _mapController.future;
       mapController.dispose();
@@ -148,43 +149,45 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Stack(children: [
-        GoogleMap(
-          myLocationEnabled: true,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
-          minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
-          mapType: MapType.normal,
-          initialCameraPosition:
-              _model.lastKnownUserPosInstant() ?? _model.defaultUserPos(),
-          onMapCreated: (GoogleMapController controller) {
-            _mapController.complete(controller);
-            _clusterManager.setMapController(controller);
-          },
-          onCameraMove: _clusterManager.onCameraMove,
-          onCameraIdle: _onCameraIdle,
-          // When there are more than 2 instances of GoogleMap and both
-          // of them have markers, this screws up the markers for some reason.
-          // Couldn't figure out why, probably there's a mistake either in
-          // the Google Map lib or in the Clustering lib, but it's easier to
-          // just use markers for 1 instance at a time.
-          markers: _instances.last == this ? _shopsMarkers : {},
-        ),
-        _mode.buildOverlay(context),
-        AnimatedSwitcher(
-            duration: DURATION_DEFAULT,
-            child: _loading
-                ? const LinearProgressIndicator()
-                : const SizedBox.shrink()),
-      ])),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showUser,
-        label: Text(context.strings.map_page_btn_where_am_i),
-        icon: const Icon(Icons.person),
-      ),
-    );
+    return WillPopScope(
+        onWillPop: _mode.onWillPop,
+        child: Scaffold(
+          body: SafeArea(
+              child: Stack(children: [
+            GoogleMap(
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
+              mapType: MapType.normal,
+              initialCameraPosition:
+                  _model.lastKnownUserPosInstant() ?? _model.defaultUserPos(),
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
+                _clusterManager.setMapController(controller);
+              },
+              onCameraMove: _clusterManager.onCameraMove,
+              onCameraIdle: _onCameraIdle,
+              // When there are more than 2 instances of GoogleMap and both
+              // of them have markers, this screws up the markers for some reason.
+              // Couldn't figure out why, probably there's a mistake either in
+              // the Google Map lib or in the Clustering lib, but it's easier to
+              // just use markers for 1 instance at a time.
+              markers: _instances.last == this ? _shopsMarkers : {},
+            ),
+            _mode.buildOverlay(context),
+            AnimatedSwitcher(
+                duration: DURATION_DEFAULT,
+                child: _loading
+                    ? const LinearProgressIndicator()
+                    : const SizedBox.shrink()),
+          ])),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: _showUser,
+            label: Text(context.strings.map_page_btn_where_am_i),
+            icon: const Icon(Icons.person),
+          ),
+        ));
   }
 
   Future<void> _showUser() async {

@@ -6,6 +6,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_add_product.dart';
+import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/shop_product_range_page.dart';
 import 'package:plante/ui/map/shops_list_page.dart';
 
@@ -13,13 +14,14 @@ class MapPageModeDefault extends MapPageMode {
   bool _showEmptyShops = false;
 
   MapPageModeDefault(
+      MapPageModel model,
       WidgetSource widgetSource,
       ContextSource contextSource,
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
       ModeSwitchCallback modeSwitchCallback)
-      : super(MapPageModeParams(widgetSource, contextSource, updateCallback,
-            updateMapCallback, modeSwitchCallback));
+      : super(MapPageModeParams(model, widgetSource, contextSource,
+            updateCallback, updateMapCallback, modeSwitchCallback));
 
   @override
   void init() {

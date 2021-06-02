@@ -130,4 +130,20 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
               returnValue: Future.value(
                   _FakeResult<List<_i12.BackendShop>, _i8.BackendError>()))
           as _i5.Future<_i3.Result<List<_i12.BackendShop>, _i8.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<_i3.None, _i8.BackendError>> productPresenceVote(
+          String? barcode, String? osmId, bool? positive) =>
+      (super.noSuchMethod(
+          Invocation.method(#productPresenceVote, [barcode, osmId, positive]),
+          returnValue:
+              Future.value(_FakeResult<_i3.None, _i8.BackendError>())) as _i5
+          .Future<_i3.Result<_i3.None, _i8.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<_i3.None, _i8.BackendError>> putProductToShop(
+          String? barcode, String? osmId) =>
+      (super.noSuchMethod(
+              Invocation.method(#putProductToShop, [barcode, osmId]),
+              returnValue:
+                  Future.value(_FakeResult<_i3.None, _i8.BackendError>()))
+          as _i5.Future<_i3.Result<_i3.None, _i8.BackendError>>);
 }
