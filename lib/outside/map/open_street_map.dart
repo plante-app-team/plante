@@ -23,7 +23,10 @@ class OpenStreetMap {
     final val4 = northeast.y;
     final typesStr = ShopType.values.map((type) => type.osmName).join('|');
     final cmd =
-        '[out:json];node[shop~"$typesStr"]($val1,$val2,$val3,$val4);out;';
+        '[out:json];('
+        'node[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
+        'relation[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
+        ');out center;';
 
     final Response r;
     try {
@@ -56,8 +59,17 @@ class OpenStreetMap {
       }
 
       final id = shopJson['id']?.toString();
-      final lat = shopJson['lat'] as double?;
-      final lon = shopJson['lon'] as double?;
+      final double? lat;
+      final double? lon;
+      final center = shopJson['center'] as Map<dynamic, dynamic>?;
+      if (center != null) {
+        lat = center['lat'] as double?;
+        lon = center['lon'] as double?;
+      } else {
+        lat = shopJson['lat'] as double?;
+        lon = shopJson['lon'] as double?;
+      }
+
       if (id == null || lat == null || lon == null) {
         continue;
       }

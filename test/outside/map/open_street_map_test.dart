@@ -39,6 +39,31 @@ void main() {
             "name": "Orehovskiy",
             "shop": "convenience"
           }
+        },
+        {
+          "type": "relation",
+          "id": 12702145,
+          "center": {
+            "lat": 51.4702343,
+            "lon": 45.9190756
+          },
+          "members": [
+            {
+              "type": "way",
+              "ref": 942131328,
+              "role": "outer"
+            },
+            {
+              "type": "way",
+              "ref": 942131327,
+              "role": "outer"
+            }
+          ],
+          "tags": {
+            "name": "Grozd",
+            "shop": "supermarket",
+            "type": "multipolygon"
+          }
         }
       ]
     }
@@ -48,7 +73,7 @@ void main() {
 
     final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
-    expect(shops.length, equals(2));
+    expect(shops.length, equals(3));
 
     final expectedShop1 = OsmShop((e) => e
         ..osmId = '992336735'
@@ -62,8 +87,15 @@ void main() {
       ..type = 'convenience'
       ..latitude = 56.3257464
       ..longitude = 44.0121258);
+    final expectedShop3 = OsmShop((e) => e
+      ..osmId = '12702145'
+      ..name = 'Grozd'
+      ..type = 'supermarket'
+      ..latitude = 51.4702343
+      ..longitude = 45.9190756);
     expect(shops, contains(expectedShop1));
     expect(shops, contains(expectedShop2));
+    expect(shops, contains(expectedShop3));
   });
 
   test('fetchShops empty response', () async {
