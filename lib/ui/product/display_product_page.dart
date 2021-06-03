@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/model/product.dart';
@@ -123,23 +124,26 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                         child: Text(vegStatusHint()!, style: TextStyles.hint),
                       ))),
             const SizedBox(height: 16),
-            Container(
-                width: double.infinity,
-                height: 96,
-                color: ColorsPlante.primary,
-                child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      overlayColor:
-                          MaterialStateProperty.all(ColorsPlante.splashColor),
-                      onTap: _markOnMap,
-                      child: Center(
-                          child: Text(
-                              context
-                                  .strings.display_product_page_veg_mark_on_map,
-                              style: TextStyles.buttonFilled)),
-                    ))),
-            const SizedBox(height: 16),
+            if (enableNewestFeatures())
+              Column(children: [
+                Container(
+                    width: double.infinity,
+                    height: 96,
+                    color: ColorsPlante.primary,
+                    child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          overlayColor: MaterialStateProperty.all(
+                              ColorsPlante.splashColor),
+                          onTap: _markOnMap,
+                          child: Center(
+                              child: Text(
+                                  context.strings
+                                      .display_product_page_veg_mark_on_map,
+                                  style: TextStyles.buttonFilled)),
+                        ))),
+                const SizedBox(height: 16),
+              ]),
             InkWell(
                 onTap: showProductIngredientsPhoto,
                 child: Padding(
