@@ -133,6 +133,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                     child: Material(
                         color: Colors.transparent,
                         child: InkWell(
+                          key: const Key('mark_on_map'),
                           overlayColor: MaterialStateProperty.all(
                               ColorsPlante.splashColor),
                           onTap: _markOnMap,

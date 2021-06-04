@@ -8,6 +8,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -15,8 +16,10 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -24,10 +27,12 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'display_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend])
+@GenerateMocks([ProductsManager, Backend, LocationController, ShopsManager])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
+  late MockLocationController locationController;
+  late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
 
@@ -58,6 +63,13 @@ void main() {
 
     viewedProductsStorage = ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
+
+    locationController = MockLocationController();
+    when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    GetIt.I.registerSingleton<LocationController>(locationController);
+
+    shopsManager = MockShopsManager();
+    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable
@@ -495,5 +507,25 @@ void main() {
     expect(
         find.text(context.strings.display_product_page_veg_status_unknown_explanation),
         findsOneWidget);
+  });
+
+  testWidgets('mark on map button', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..vegetarianStatus = VegStatus.unknown
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.unknown
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar');
+
+    await tester.superPump(DisplayProductPage(product));
+
+    expect(find.byType(MapPage), findsNothing);
+
+    await tester.tap(find.byKey(const Key('mark_on_map')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MapPage), findsOneWidget);
   });
 }
