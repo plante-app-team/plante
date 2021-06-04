@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,9 +46,9 @@ class LocationController {
     return await Permission.location.request();
   }
 
-  Position? lastKnownPositionInstant() => _lastKnownPosition;
+  Point<double>? lastKnownPositionInstant() => _lastKnownPosition?.toPoint();
 
-  Future<Position?> lastKnownPosition() async {
+  Future<Point<double>?> lastKnownPosition() async {
     if (!await permissionStatus().isGranted) {
       return null;
     }
@@ -58,16 +59,20 @@ class LocationController {
       await _updateLastKnownPrefsPosition(position);
     }
 
-    return position;
+    return position?.toPoint();
   }
 
-  Future<Position?> currentPosition() async {
+  Future<Point<double>?> currentPosition() async {
     if (!await permissionStatus().isGranted) {
       return null;
     }
     final result = await Geolocator.getCurrentPosition();
     _lastKnownPosition = result;
     await _updateLastKnownPrefsPosition(result);
-    return result;
+    return result.toPoint();
   }
+}
+
+extension MyPositionExt on Position {
+  Point<double> toPoint() => Point(latitude, longitude);
 }

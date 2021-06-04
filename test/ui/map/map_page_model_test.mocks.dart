@@ -3,23 +3,22 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i5;
-import 'dart:math' as _i9;
+import 'dart:math' as _i2;
 
-import 'package:geolocator_platform_interface/src/models/position.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart'
     as _i6;
 import 'package:plante/base/result.dart' as _i3;
 import 'package:plante/model/location_controller.dart' as _i4;
-import 'package:plante/model/product.dart' as _i11;
+import 'package:plante/model/product.dart' as _i10;
 import 'package:plante/model/shop.dart' as _i8;
-import 'package:plante/model/shop_product_range.dart' as _i10;
+import 'package:plante/model/shop_product_range.dart' as _i9;
 import 'package:plante/outside/map/shops_manager.dart' as _i7;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
 
-class _FakePosition extends _i1.Fake implements _i2.Position {}
+class _FakePoint<T extends num> extends _i1.Fake implements _i2.Point<T> {}
 
 class _FakeResult<OK, ERR> extends _i1.Fake implements _i3.Result<OK, ERR> {}
 
@@ -43,13 +42,15 @@ class MockLocationController extends _i1.Mock
               returnValue: Future.value(_i6.PermissionStatus.granted))
           as _i5.Future<_i6.PermissionStatus>);
   @override
-  _i5.Future<_i2.Position?> lastKnownPosition() => (super.noSuchMethod(
-      Invocation.method(#lastKnownPosition, []),
-      returnValue: Future.value(_FakePosition())) as _i5.Future<_i2.Position?>);
+  _i5.Future<_i2.Point<double>?> lastKnownPosition() =>
+      (super.noSuchMethod(Invocation.method(#lastKnownPosition, []),
+              returnValue: Future.value(_FakePoint<double>()))
+          as _i5.Future<_i2.Point<double>?>);
   @override
-  _i5.Future<_i2.Position?> currentPosition() => (super.noSuchMethod(
-      Invocation.method(#currentPosition, []),
-      returnValue: Future.value(_FakePosition())) as _i5.Future<_i2.Position?>);
+  _i5.Future<_i2.Point<double>?> currentPosition() =>
+      (super.noSuchMethod(Invocation.method(#currentPosition, []),
+              returnValue: Future.value(_FakePoint<double>()))
+          as _i5.Future<_i2.Point<double>?>);
 }
 
 /// A class which mocks [ShopsManager].
@@ -71,7 +72,7 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
   @override
   _i5.Future<
       _i3.Result<Map<String, _i8.Shop>, _i7.ShopsManagerError>> fetchShops(
-          _i9.Point<double>? northeast, _i9.Point<double>? southwest) =>
+          _i2.Point<double>? northeast, _i2.Point<double>? southwest) =>
       (super.noSuchMethod(
               Invocation.method(#fetchShops, [northeast, southwest]),
               returnValue: Future.value(
@@ -79,16 +80,16 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
           as _i5
               .Future<_i3.Result<Map<String, _i8.Shop>, _i7.ShopsManagerError>>);
   @override
-  _i5.Future<_i3.Result<_i10.ShopProductRange, _i7.ShopsManagerError>>
+  _i5.Future<_i3.Result<_i9.ShopProductRange, _i7.ShopsManagerError>>
       fetchShopProductRange(_i8.Shop? shop) => (super.noSuchMethod(
               Invocation.method(#fetchShopProductRange, [shop]),
               returnValue: Future.value(
-                  _FakeResult<_i10.ShopProductRange, _i7.ShopsManagerError>()))
-          as _i5.Future<
-              _i3.Result<_i10.ShopProductRange, _i7.ShopsManagerError>>);
+                  _FakeResult<_i9.ShopProductRange, _i7.ShopsManagerError>()))
+          as _i5
+              .Future<_i3.Result<_i9.ShopProductRange, _i7.ShopsManagerError>>);
   @override
   _i5.Future<_i3.Result<_i3.None, _i7.ShopsManagerError>> putProductToShops(
-          _i11.Product? product, List<_i8.Shop>? shops) =>
+          _i10.Product? product, List<_i8.Shop>? shops) =>
       (super.noSuchMethod(
               Invocation.method(#putProductToShops, [product, shops]),
               returnValue:

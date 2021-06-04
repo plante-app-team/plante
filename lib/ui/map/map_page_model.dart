@@ -76,8 +76,7 @@ class MapPageModel implements ShopsManagerListener {
       return null;
     }
     return CameraPosition(
-        target: LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
-        zoom: 15);
+        target: LatLng(lastKnownPosition.x, lastKnownPosition.y), zoom: 15);
   }
 
   Future<CameraPosition?> lastKnownUserPos() async {
@@ -86,8 +85,7 @@ class MapPageModel implements ShopsManagerListener {
       return null;
     }
     return CameraPosition(
-        target: LatLng(lastKnownPosition.latitude, lastKnownPosition.longitude),
-        zoom: 15);
+        target: LatLng(lastKnownPosition.x, lastKnownPosition.y), zoom: 15);
   }
 
   Future<CameraPosition?> currentUserPos() async {
@@ -95,8 +93,7 @@ class MapPageModel implements ShopsManagerListener {
     if (position == null) {
       return null;
     }
-    return CameraPosition(
-        target: LatLng(position.latitude, position.longitude), zoom: 15);
+    return CameraPosition(target: LatLng(position.x, position.y), zoom: 15);
   }
 
   Future<void> onCameraMoved(LatLngBounds viewBounds) async {
