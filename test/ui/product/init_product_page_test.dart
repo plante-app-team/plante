@@ -8,21 +8,41 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/location_controller.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shop.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
+import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'init_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, PhotosTaker])
+@GenerateMocks([ProductsManager, PhotosTaker, ShopsManager, LocationController])
 void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
+  late MockShopsManager shopsManager;
+  late MockLocationController locationController;
+
+  final aShop = Shop((e) => e
+    ..osmShop.replace(OsmShop((e) => e
+      ..osmId = '1'
+      ..longitude = 11
+      ..latitude = 11
+      ..name = 'Spar'))
+    ..backendShop.replace(BackendShop((e) => e
+      ..osmId = '1'
+      ..productsCount = 2)));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -38,6 +58,16 @@ void main() {
     when(productsManager.updateProductAndExtractIngredients(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
+
+    shopsManager = MockShopsManager();
+    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
+    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
+
+    GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
+
+    locationController = MockLocationController();
+    when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    GetIt.I.registerSingleton<LocationController>(locationController);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -55,7 +85,8 @@ void main() {
         bool takeImageIngredients = true,
         String? ingredientsTextOverride,
         VegStatus? veganStatusInput = VegStatus.positive,
-        VegStatus? vegetarianStatusInput = VegStatus.positive}) async {
+        VegStatus? vegetarianStatusInput = VegStatus.positive,
+        List<Shop>? selectedShops}) async {
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
             (invoc) async => Ok(ProductWithOCRIngredients(
             invoc.positionalArguments[0] as Product,
@@ -92,6 +123,20 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    if (selectedShops != null) {
+      expect(find.byType(MapPage), findsNothing);
+
+      await tester.tap(
+          find.byKey(const Key('shops_btn')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MapPage), findsOneWidget);
+
+      final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
+      mapPage.finishForTesting(selectedShops.isNotEmpty ? selectedShops : null);
+      await tester.pumpAndSettle();
+    }
+
     if (takeImageFront) {
       verifyNever(photosTaker.takeAndCropPhoto(any));
       await tester.tap(
@@ -99,6 +144,8 @@ void main() {
       verify(photosTaker.takeAndCropPhoto(any)).called(1);
       await tester.pumpAndSettle();
     }
+
+    await scrollToBottom(tester);
 
     if (takeImageIngredients) {
       expect(find.text('water, lemon'), findsNothing);
@@ -168,6 +215,12 @@ void main() {
       verifyNever(productsManager.createUpdateProduct(captureAny, any));
     }
 
+    if (expectedProductResult != null && selectedShops != null && selectedShops.isNotEmpty) {
+      verify(shopsManager.putProductToShops(expectedProductResult, selectedShops));
+    } else {
+      verifyNever(shopsManager.putProductToShops(any, any));
+    }
+
     return done;
   }
 
@@ -194,7 +247,8 @@ void main() {
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
-      vegetarianStatusInput: expectedProduct.vegetarianStatus
+      vegetarianStatusInput: expectedProduct.vegetarianStatus,
+      selectedShops: [aShop]
     );
 
     expect(done, isTrue);
@@ -602,5 +656,69 @@ void main() {
     );
 
     expect(done, isTrue);
+  });
+
+  testWidgets('no shops selected when map opened', (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        brandInput: expectedProduct.brands!.join(', '),
+        categoriesInput: expectedProduct.categories!.join(', '),
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: expectedProduct.imageIngredients != null,
+        veganStatusInput: expectedProduct.veganStatus,
+        vegetarianStatusInput: expectedProduct.vegetarianStatus,
+        selectedShops: [] // No shop
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('shops sending to server finishes with error but all other things are ok', (WidgetTester tester) async {
+    final perfectlyGoodExpectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Err(ShopsManagerError.OTHER));
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        nameInput: perfectlyGoodExpectedProduct.name,
+        brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
+        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
+        takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
+        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
+        vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
+        selectedShops: [aShop]
+    );
+
+    // Even though perfectlyGoodExpectedProduct expected to be stored,
+    // page is expected to be not finished, because of shops sending error
+    expect(done, isFalse);
   });
 }

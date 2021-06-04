@@ -6,6 +6,79 @@ part of 'osm_shop.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+Serializer<OsmShop> _$osmShopSerializer = new _$OsmShopSerializer();
+
+class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
+  @override
+  final Iterable<Type> types = const [OsmShop, _$OsmShop];
+  @override
+  final String wireName = 'OsmShop';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, OsmShop object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'osmId',
+      serializers.serialize(object.osmId,
+          specifiedType: const FullType(String)),
+      'name',
+      serializers.serialize(object.name, specifiedType: const FullType(String)),
+      'latitude',
+      serializers.serialize(object.latitude,
+          specifiedType: const FullType(double)),
+      'longitude',
+      serializers.serialize(object.longitude,
+          specifiedType: const FullType(double)),
+    ];
+    Object? value;
+    value = object.type;
+    if (value != null) {
+      result
+        ..add('type')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    return result;
+  }
+
+  @override
+  OsmShop deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = new OsmShopBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'osmId':
+          result.osmId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'name':
+          result.name = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'type':
+          result.type = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'latitude':
+          result.latitude = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double;
+          break;
+        case 'longitude':
+          result.longitude = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$OsmShop extends OsmShop {
   @override
   final String osmId;

@@ -8,6 +8,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -15,6 +16,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -27,7 +29,8 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'barcode_scan_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend, RouteObserver, PermissionsManager, ViewedProductsStorage])
+@GenerateMocks([ProductsManager, Backend, RouteObserver, PermissionsManager,
+  ViewedProductsStorage, ShopsManager, LocationController])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
@@ -48,6 +51,10 @@ void main() {
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
+    GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
+    final locationController = MockLocationController();
+    when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    GetIt.I.registerSingleton<LocationController>(locationController);
 
     final userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v

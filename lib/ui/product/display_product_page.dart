@@ -546,7 +546,9 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MapPage(productToAdd: product),
+          builder: (context) => MapPage(
+              requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+              product: product),
         ));
   }
 }

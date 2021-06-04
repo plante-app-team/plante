@@ -6,6 +6,59 @@ part of 'shop.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+Serializer<Shop> _$shopSerializer = new _$ShopSerializer();
+
+class _$ShopSerializer implements StructuredSerializer<Shop> {
+  @override
+  final Iterable<Type> types = const [Shop, _$Shop];
+  @override
+  final String wireName = 'Shop';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, Shop object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'osmShop',
+      serializers.serialize(object.osmShop,
+          specifiedType: const FullType(OsmShop)),
+    ];
+    Object? value;
+    value = object.backendShop;
+    if (value != null) {
+      result
+        ..add('backendShop')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(BackendShop)));
+    }
+    return result;
+  }
+
+  @override
+  Shop deserialize(Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = new ShopBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'osmShop':
+          result.osmShop.replace(serializers.deserialize(value,
+              specifiedType: const FullType(OsmShop))! as OsmShop);
+          break;
+        case 'backendShop':
+          result.backendShop.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BackendShop))! as BackendShop);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$Shop extends Shop {
   @override
   final OsmShop osmShop;

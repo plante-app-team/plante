@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_add_product.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/shop_product_range_page.dart';
 import 'package:plante/ui/map/shops_list_page.dart';
@@ -25,8 +28,21 @@ class MapPageModeDefault extends MapPageMode {
 
   @override
   void init() {
-    if (widget.productToAdd != null) {
-      switchModeTo(MapPageModeAddProduct(params));
+    switch (widget.requestedMode) {
+      case MapPageRequestedMode.ADD_PRODUCT:
+        if (widget.product == null) {
+          Log.e('Requested mode ADD_PRODUCT but the product is null');
+        }
+        switchModeTo(MapPageModeAddProduct(params));
+        break;
+      case MapPageRequestedMode.SELECT_SHOPS:
+        switchModeTo(MapPageModeSelectShops(params));
+        break;
+      case MapPageRequestedMode.DEFAULT:
+        if (widget.product != null) {
+          Log.e('Requested mode DEFAULT but "productToAdd" != null');
+        }
+        break;
     }
   }
 

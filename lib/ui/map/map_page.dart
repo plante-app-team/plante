@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
@@ -15,13 +16,40 @@ import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 import 'package:plante/ui/map/markers_builder.dart';
 
-class MapPage extends StatefulWidget {
-  final Product? productToAdd;
+enum MapPageRequestedMode {
+  DEFAULT,
+  ADD_PRODUCT,
+  SELECT_SHOPS,
+}
 
-  const MapPage({Key? key, this.productToAdd}) : super(key: key);
+class MapPage extends StatefulWidget {
+  final Product? product;
+  final List<Shop> initialSelectedShops;
+  final MapPageRequestedMode requestedMode;
+  final _testingFinishCallbackStorage = _TestingFinishCallbackStorage();
+
+  MapPage(
+      {Key? key,
+      this.product,
+      this.initialSelectedShops = const [],
+      this.requestedMode = MapPageRequestedMode.DEFAULT})
+      : super(key: key);
 
   @override
   _MapPageState createState() => _MapPageState();
+
+  void finishForTesting<T>(T result) {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests');
+    }
+    _testingFinishCallbackStorage.finishCallback?.call(result);
+  }
+}
+
+typedef _TestingFinishCallback = dynamic Function(dynamic result);
+
+class _TestingFinishCallbackStorage {
+  _TestingFinishCallback? finishCallback;
 }
 
 class _MapPageState extends State<MapPage> {
@@ -39,6 +67,9 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    widget._testingFinishCallbackStorage.finishCallback = (result) {
+      _model.finishWith(context, result);
+    };
 
     final updateCallback = () {
       if (mounted) {

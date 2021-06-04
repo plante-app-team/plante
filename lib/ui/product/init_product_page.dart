@@ -2,6 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
@@ -15,6 +17,7 @@ import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/veg_status_selection_panel.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 
 // ignore: always_use_package_imports
@@ -40,7 +43,7 @@ class InitProductPage extends StatefulWidget {
 
 class _InitProductPageState extends State<InitProductPage>
     with RestorationMixin {
-  final InitProductPageModel model;
+  late final InitProductPageModel model;
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
 
@@ -54,10 +57,9 @@ class _InitProductPageState extends State<InitProductPage>
       TextEditingController();
 
   _InitProductPageState(
-      Product initialProduct, this.productUpdatedCallback, this.doneCallback)
-      : model = InitProductPageModel(
-            initialProduct, GetIt.I.get<ProductsManager>()) {
-    model.onModelProduct = onStateUpdated;
+      Product initialProduct, this.productUpdatedCallback, this.doneCallback) {
+    model = InitProductPageModel(initialProduct, onStateUpdated, [],
+        GetIt.I.get<ProductsManager>(), GetIt.I.get<ShopsManager>());
   }
 
   void onStateUpdated() {
@@ -115,7 +117,7 @@ class _InitProductPageState extends State<InitProductPage>
                         HeaderPlante(
                             rightActionPadding: 8,
                             rightAction: IconButton(
-                                onPressed: cancel,
+                                onPressed: _cancel,
                                 icon: SvgPicture.asset('assets/cancel.svg'))),
                         Container(
                             padding: const EdgeInsets.only(left: 24, right: 24),
@@ -146,8 +148,8 @@ class _InitProductPageState extends State<InitProductPage>
                                           width: double.infinity,
                                           child: AddPhotoButtonPlante(
                                             keyButton: const Key('front_photo'),
-                                            onAddTap: takeFrontPhoto,
-                                            onCancelTap: removeFrontPhoto,
+                                            onAddTap: _takeFrontPhoto,
+                                            onCancelTap: _removeFrontPhoto,
                                             existingPhoto:
                                                 model.product.imageFront,
                                           )),
@@ -189,6 +191,39 @@ class _InitProductPageState extends State<InitProductPage>
                                       ),
                                       const SizedBox(height: 24),
                                     ]),
+                              if (model.askForShops())
+                                Column(
+                                    key: const Key('shops_group'),
+                                    children: [
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: Text(
+                                            context.strings
+                                                .init_product_page_where_sold_optional,
+                                            style: TextStyles.headline4,
+                                            textAlign: TextAlign.left,
+                                          )),
+                                      const SizedBox(height: 16),
+                                      Row(
+                                          textDirection: TextDirection.rtl,
+                                          children: [
+                                            ButtonOutlinedPlante.withText(
+                                                context.strings
+                                                    .init_product_page_open_map,
+                                                key: const Key('shops_btn'),
+                                                onPressed: _markShopsOnMap),
+                                            Expanded(
+                                                child: Text(
+                                                    model.shops
+                                                        .map((shop) =>
+                                                            '«${shop.name}»')
+                                                        .join(', '),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis))
+                                          ]),
+                                      const SizedBox(height: 24),
+                                    ]),
                               if (model.askForIngredientsData())
                                 Column(
                                     key: const Key('ingredients_group'),
@@ -207,13 +242,14 @@ class _InitProductPageState extends State<InitProductPage>
                                           child: AddPhotoButtonPlante(
                                             keyButton:
                                                 const Key('ingredients_photo'),
-                                            onAddTap: takeIngredientsPhoto,
-                                            onCancelTap: removeIngredientsPhoto,
+                                            onAddTap: _takeIngredientsPhoto,
+                                            onCancelTap:
+                                                _removeIngredientsPhoto,
                                             existingPhoto:
                                                 model.product.imageIngredients,
                                           )),
                                       const SizedBox(height: 16),
-                                      ingredientsTextGroup(),
+                                      _ingredientsTextGroup(),
                                     ]),
                               if (model.askForVeganStatus())
                                 Column(
@@ -271,7 +307,7 @@ class _InitProductPageState extends State<InitProductPage>
                                     key: const Key('done_btn'),
                                     onPressed:
                                         model.canSaveProduct() && !model.loading
-                                            ? saveProduct
+                                            ? _saveProduct
                                             : null,
                                   )),
                               const SizedBox(height: 40)
@@ -285,7 +321,7 @@ class _InitProductPageState extends State<InitProductPage>
                 ]))));
   }
 
-  Widget ingredientsTextGroup() {
+  Widget _ingredientsTextGroup() {
     final Widget result;
     if (model.askForIngredientsText()) {
       if (!ocrInProgress) {
@@ -320,18 +356,18 @@ class _InitProductPageState extends State<InitProductPage>
     return AnimatedSwitcher(duration: DURATION_DEFAULT, child: result);
   }
 
-  void cancel() {
+  void _cancel() {
     if (widget.initialProduct == model.product) {
       Navigator.of(context).pop();
       return;
     }
-    showWarningDialog(context.strings.init_product_page_cancel_adding_product_q,
-        () {
+    _showWarningDialog(
+        context.strings.init_product_page_cancel_adding_product_q, () {
       Navigator.of(context).pop();
     });
   }
 
-  void showWarningDialog(String warning, dynamic Function() positiveClicked) {
+  void _showWarningDialog(String warning, dynamic Function() positiveClicked) {
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -359,7 +395,7 @@ class _InitProductPageState extends State<InitProductPage>
     );
   }
 
-  Future<bool> takePhoto(ProductImageType imageType) async {
+  Future<bool> _takePhoto(ProductImageType imageType) async {
     final path = await GetIt.I.get<PhotosTaker>().takeAndCropPhoto(context);
     if (path == null) {
       return false;
@@ -368,22 +404,22 @@ class _InitProductPageState extends State<InitProductPage>
     return true;
   }
 
-  void removePhoto(ProductImageType imageType) {
-    showWarningDialog(context.strings.init_product_page_delete_photo_q, () {
+  void _removePhoto(ProductImageType imageType) {
+    _showWarningDialog(context.strings.init_product_page_delete_photo_q, () {
       model.product = model.product.rebuildWithImage(imageType, null);
     });
   }
 
-  void takeFrontPhoto() async {
-    await takePhoto(ProductImageType.FRONT);
+  void _takeFrontPhoto() async {
+    await _takePhoto(ProductImageType.FRONT);
   }
 
-  void removeFrontPhoto() {
-    removePhoto(ProductImageType.FRONT);
+  void _removeFrontPhoto() {
+    _removePhoto(ProductImageType.FRONT);
   }
 
-  void takeIngredientsPhoto() async {
-    final taken = await takePhoto(ProductImageType.INGREDIENTS);
+  void _takeIngredientsPhoto() async {
+    final taken = await _takePhoto(ProductImageType.INGREDIENTS);
     if (!taken || !mounted) {
       return;
     }
@@ -405,12 +441,12 @@ class _InitProductPageState extends State<InitProductPage>
     }
   }
 
-  void removeIngredientsPhoto() {
-    removePhoto(ProductImageType.INGREDIENTS);
+  void _removeIngredientsPhoto() {
+    _removePhoto(ProductImageType.INGREDIENTS);
     ingredientsTextController.text = '';
   }
 
-  void saveProduct() async {
+  void _saveProduct() async {
     final ok = await model.saveProduct(context.langCode);
     if (ok) {
       productUpdatedCallback?.call(model.product);
@@ -420,5 +456,18 @@ class _InitProductPageState extends State<InitProductPage>
     } else {
       showSnackBar(context.strings.global_something_went_wrong, context);
     }
+  }
+
+  void _markShopsOnMap() async {
+    final shops = await Navigator.push<List<Shop>>(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MapPage(
+                requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+                initialSelectedShops: model.shops)));
+    if (shops == null) {
+      return;
+    }
+    model.shops = shops;
   }
 }

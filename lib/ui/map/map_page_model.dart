@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/base/base.dart';
@@ -186,5 +187,9 @@ class MapPageModel implements ShopsManagerListener {
     if (_latestViewPort != null) {
       onCameraMoved(_latestViewPort!);
     }
+  }
+
+  void finishWith<T>(BuildContext context, T result) {
+    Navigator.pop(context, result);
   }
 }

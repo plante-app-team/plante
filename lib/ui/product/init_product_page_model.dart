@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
+import 'package:plante/model/shop.dart';
+import 'package:plante/model/shops_list_restorable.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class InitProductPageModel {
-  late final dynamic Function() onModelProduct;
-  final Product initialProduct;
-  final ProductRestorable productRestorable;
-  final ProductsManager productsManager;
+  late final dynamic Function() _onProductUpdate;
+  final Product _initialProduct;
+  final ProductRestorable _productRestorable;
+  final ShopsListRestorable _shopsRestorable;
+  final ProductsManager _productsManager;
+  final ShopsManager _shopsManager;
 
-  Product get product => productRestorable.value;
+  Product get product => _productRestorable.value;
   set product(Product value) {
     if (value.veganStatus != product.veganStatus) {
       // Vegan status changed
@@ -35,40 +41,49 @@ class InitProductPageModel {
         value = value.rebuild((v) => v.veganStatus = VegStatus.unknown);
       }
     }
-    productRestorable.value = value;
-    onModelProduct.call();
+    _productRestorable.value = value;
+    _onProductUpdate.call();
+  }
+
+  List<Shop> get shops => _shopsRestorable.value;
+  set shops(List<Shop> value) {
+    _shopsRestorable.value = value;
+    _onProductUpdate.call();
   }
 
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties => {
-        'product': productRestorable,
+        'product': _productRestorable,
+        'shops': _shopsRestorable,
       };
 
-  InitProductPageModel(this.initialProduct, this.productsManager)
-      : productRestorable = ProductRestorable(initialProduct);
+  InitProductPageModel(this._initialProduct, this._onProductUpdate,
+      List<Shop> _initialShops, this._productsManager, this._shopsManager)
+      : _productRestorable = ProductRestorable(_initialProduct),
+        _shopsRestorable = ShopsListRestorable(_initialShops);
 
   bool askForFrontPhoto() {
-    return initialProduct.imageFront == null;
+    return _initialProduct.imageFront == null;
   }
 
   bool askForName() {
-    return initialProduct.name == null || initialProduct.name!.trim().isEmpty;
+    return _initialProduct.name == null || _initialProduct.name!.trim().isEmpty;
   }
 
   bool askForBrand() {
-    return initialProduct.brands == null || initialProduct.brands!.isEmpty;
+    return _initialProduct.brands == null || _initialProduct.brands!.isEmpty;
   }
 
   bool askForCategories() {
-    return initialProduct.categories == null ||
-        initialProduct.categories!.isEmpty;
+    return _initialProduct.categories == null ||
+        _initialProduct.categories!.isEmpty;
   }
 
   bool askForIngredientsData() {
-    return initialProduct.ingredientsText == null ||
-        initialProduct.ingredientsText!.trim().isEmpty ||
-        initialProduct.imageIngredients == null;
+    return _initialProduct.ingredientsText == null ||
+        _initialProduct.ingredientsText!.trim().isEmpty ||
+        _initialProduct.imageIngredients == null;
   }
 
   bool askForIngredientsText() {
@@ -76,22 +91,22 @@ class InitProductPageModel {
   }
 
   bool askForVeganStatus() {
-    return initialProduct.veganStatus == null ||
-        initialProduct.veganStatusSource == null ||
-        initialProduct.veganStatusSource == VegStatusSource.open_food_facts;
+    return _initialProduct.veganStatus == null ||
+        _initialProduct.veganStatusSource == null ||
+        _initialProduct.veganStatusSource == VegStatusSource.open_food_facts;
   }
 
   bool askForVegetarianStatus() {
-    return initialProduct.vegetarianStatus == null ||
-        initialProduct.vegetarianStatusSource == null ||
-        initialProduct.vegetarianStatusSource ==
+    return _initialProduct.vegetarianStatus == null ||
+        _initialProduct.vegetarianStatusSource == null ||
+        _initialProduct.vegetarianStatusSource ==
             VegStatusSource.open_food_facts;
   }
 
   Future<String?> ocrIngredients(String langCode) async {
-    final initialProductWithIngredientsPhoto = initialProduct.rebuildWithImage(
+    final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
         ProductImageType.INGREDIENTS, product.imageIngredients);
-    final ocrResult = await productsManager.updateProductAndExtractIngredients(
+    final ocrResult = await _productsManager.updateProductAndExtractIngredients(
         initialProductWithIngredientsPhoto, langCode);
 
     if (ocrResult.isErr) {
@@ -109,20 +124,36 @@ class InitProductPageModel {
 
   Future<bool> saveProduct(String langCode) async {
     loading = true;
-    onModelProduct();
+    _onProductUpdate.call();
     try {
       final savedProduct = product.rebuild((e) => e
         ..veganStatusSource = VegStatusSource.community
         ..vegetarianStatusSource = VegStatusSource.community);
-      final result =
-          await productsManager.createUpdateProduct(savedProduct, langCode);
-      if (result.isOk) {
+
+      final productResult =
+          await _productsManager.createUpdateProduct(savedProduct, langCode);
+      if (productResult.isOk) {
         product = savedProduct;
+      } else {
+        return false;
       }
-      return result.isOk;
+
+      if (shops.isNotEmpty) {
+        final shopsResult =
+            await _shopsManager.putProductToShops(product, shops);
+        if (shopsResult.isErr) {
+          return false;
+        }
+      }
+
+      return true;
     } finally {
       loading = false;
-      onModelProduct();
+      _onProductUpdate.call();
     }
+  }
+
+  bool askForShops() {
+    return enableNewestFeatures();
   }
 }

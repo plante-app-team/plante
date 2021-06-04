@@ -3,12 +3,15 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:plante/model/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -18,7 +21,7 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
 
-@GenerateMocks([ProductsManager])
+@GenerateMocks([ProductsManager, ShopsManager, LocationController])
 void main() {
   setUp(() async {
     await GetIt.I.reset();
@@ -34,6 +37,10 @@ void main() {
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage(loadPersistentProducts: false));
+    GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
+    final locationController = MockLocationController();
+    when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    GetIt.I.registerSingleton<LocationController>(locationController);
   });
 
   testWidgets('init page is shown when product is not filled', (WidgetTester tester) async {
