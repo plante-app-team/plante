@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -876,6 +877,50 @@ void main() {
 
     final result = await backend.putProductToShop('123456', '1');
     expect(result.isErr, isTrue);
+  });
+
+  test('create shop', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*create_shop.*', ''' { "osm_id": "123456" } ''');
+
+    final result = await backend.createShop(
+        name: 'hello there',
+        coords: const Point<double>(123, 321),
+        type: 'supermarket');
+    expect(result.isOk, isTrue);
+    expect('123456', equals(result.unwrap().osmId));
+    expect(0, equals(result.unwrap().productsCount));
+  });
+
+  test('create shop error', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*create_shop.*', const SocketException(''));
+
+    final result = await backend.createShop(
+        name: 'hello there',
+        coords: const Point<double>(123, 321),
+        type: 'supermarket');
+    expect(result.isErr, isTrue);
+  });
+
+  test('create shop not expected json response', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*create_shop.*', ''' { "result": "ok" } ''');
+
+    final result = await backend.createShop(
+        name: 'hello there',
+        coords: const Point<double>(123, 321),
+        type: 'supermarket');
+
+    // 'osm_id' was expected, not 'result'
+    expect(result.isErr, isTrue);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
   });
 }
 

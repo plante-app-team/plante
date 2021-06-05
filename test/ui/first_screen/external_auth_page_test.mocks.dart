@@ -3,6 +3,7 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i5;
+import 'dart:math' as _i13;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/result.dart' as _i3;
@@ -146,4 +147,13 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
               returnValue:
                   Future.value(_FakeResult<_i3.None, _i8.BackendError>()))
           as _i5.Future<_i3.Result<_i3.None, _i8.BackendError>>);
+  @override
+  _i5.Future<_i3.Result<_i12.BackendShop, _i8.BackendError>> createShop(
+          {String? name, _i13.Point<double>? coords, String? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i12.BackendShop, _i8.BackendError>()))
+          as _i5.Future<_i3.Result<_i12.BackendShop, _i8.BackendError>>);
 }

@@ -13,6 +13,7 @@ import 'package:plante/model/location_controller.dart' as _i4;
 import 'package:plante/model/product.dart' as _i10;
 import 'package:plante/model/shop.dart' as _i8;
 import 'package:plante/model/shop_product_range.dart' as _i9;
+import 'package:plante/model/shop_type.dart' as _i11;
 import 'package:plante/outside/map/shops_manager.dart' as _i7;
 
 // ignore_for_file: comment_references
@@ -95,4 +96,13 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
               returnValue:
                   Future.value(_FakeResult<_i3.None, _i7.ShopsManagerError>()))
           as _i5.Future<_i3.Result<_i3.None, _i7.ShopsManagerError>>);
+  @override
+  _i5.Future<_i3.Result<_i8.Shop, _i7.ShopsManagerError>> createShop(
+          {String? name, _i2.Point<double>? coords, _i11.ShopType? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue:
+                  Future.value(_FakeResult<_i8.Shop, _i7.ShopsManagerError>()))
+          as _i5.Future<_i3.Result<_i8.Shop, _i7.ShopsManagerError>>);
 }

@@ -7,6 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
+import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
@@ -366,6 +367,88 @@ void main() {
     verifyNever(listener.onLocalShopsChange());
 
     final result = await _shopsManager.putProductToShops(product, shops);
+    // Expecting an error
+    expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
+    // Expecting the listener to be not notified
+    verifyNever(listener.onLocalShopsChange());
+  });
+
+  test('createShop good scenario', () async {
+    when(_backend.createShop(
+        name: anyNamed('name'),
+        coords: anyNamed('coords'),
+        type: anyNamed('type')
+    )).thenAnswer((_) async => Ok(BackendShop((e) => e
+      ..osmId = '123456'
+      ..productsCount = 0)));
+
+    final listener = MockShopsManagerListener();
+    when(listener.onLocalShopsChange()).thenAnswer((_) {});
+
+    _shopsManager.addListener(listener);
+    verifyNever(listener.onLocalShopsChange());
+
+    final result = await _shopsManager.createShop(
+        name: 'Horns and Hooves',
+        coords: const Point<double>(10, 20),
+        type: ShopType.supermarket);
+    expect(result.isOk, isTrue);
+    verify(listener.onLocalShopsChange()).called(1);
+
+    final expectedResult = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmId = '123456'
+        ..longitude = 10
+        ..latitude = 20
+        ..name = 'Horns and Hooves'
+        ..type = ShopType.supermarket.osmName))
+      ..backendShop.replace(BackendShop((e) => e
+        ..osmId = '123456'
+        ..productsCount = 0)));
+    expect(result.unwrap(), equals(expectedResult));
+  });
+
+  test('createShop caches created shop', () async {
+    when(_backend.createShop(
+        name: anyNamed('name'),
+        coords: anyNamed('coords'),
+        type: anyNamed('type')
+    )).thenAnswer((_) async => Ok(BackendShop((e) => e
+      ..osmId = '123456'
+      ..productsCount = 0)));
+
+    final result = await _shopsManager.createShop(
+        name: 'Horns and Hooves',
+        coords: const Point<double>(10, 20),
+        type: ShopType.supermarket);
+    final createdShop = result.unwrap();
+
+    // Both OSM and backend have no shops for us
+    when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(const []));
+    when(_backend.requestShops(any)).thenAnswer((_) async => Ok(const []));
+
+    // But we expect the created shop to be cached and given to us anyways
+    final shops = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    expect(shops.unwrap(), equals({ createdShop.osmId: createdShop }));
+  });
+
+  test('createShop error', () async {
+    when(_backend.createShop(
+        name: anyNamed('name'),
+        coords: anyNamed('coords'),
+        type: anyNamed('type')
+    )).thenAnswer((_) async => Err(BackendError.other()));
+
+    final listener = MockShopsManagerListener();
+    when(listener.onLocalShopsChange()).thenAnswer((_) {});
+
+    _shopsManager.addListener(listener);
+    verifyNever(listener.onLocalShopsChange());
+
+    final result = await _shopsManager.createShop(
+        name: 'Horns and Hooves',
+        coords: const Point<double>(10, 20),
+        type: ShopType.supermarket);
     // Expecting an error
     expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
     // Expecting the listener to be not notified

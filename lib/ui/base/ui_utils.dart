@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/dialog_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/l10n/strings.dart';
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
@@ -38,5 +43,34 @@ Future<T?> showMenuPlante<T>(
         position.dy + box.size.height, position.dx, position.dy),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     items: items,
+  );
+}
+
+Future<T?> showYesNoDialog<T>(
+    BuildContext context, String title, VoidCallback onYes) async {
+  return await showDialog<T>(
+    context: context,
+    builder: (BuildContext context) {
+      return DialogPlante(
+          content: Text(title, style: TextStyles.headline1),
+          actions: Row(children: [
+            Expanded(
+                child: ButtonOutlinedPlante.withText(
+              context.strings.global_no,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )),
+            const SizedBox(width: 16),
+            Expanded(
+                child: ButtonFilledPlante.withText(
+              context.strings.global_yes,
+              onPressed: () {
+                Navigator.of(context).pop();
+                onYes.call();
+              },
+            )),
+          ]));
+    },
   );
 }

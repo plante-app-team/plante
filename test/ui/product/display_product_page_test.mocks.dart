@@ -13,6 +13,7 @@ import 'package:plante/model/location_controller.dart' as _i15;
 import 'package:plante/model/product.dart' as _i6;
 import 'package:plante/model/shop.dart' as _i18;
 import 'package:plante/model/shop_product_range.dart' as _i19;
+import 'package:plante/model/shop_type.dart' as _i20;
 import 'package:plante/model/user_params.dart' as _i10;
 import 'package:plante/model/veg_status.dart' as _i12;
 import 'package:plante/outside/backend/backend.dart' as _i9;
@@ -185,6 +186,15 @@ class MockBackend extends _i1.Mock implements _i9.Backend {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i11.BackendError>()))
           as _i5.Future<_i2.Result<_i2.None, _i11.BackendError>>);
+  @override
+  _i5.Future<_i2.Result<_i14.BackendShop, _i11.BackendError>> createShop(
+          {String? name, _i3.Point<double>? coords, String? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i14.BackendShop, _i11.BackendError>()))
+          as _i5.Future<_i2.Result<_i14.BackendShop, _i11.BackendError>>);
 }
 
 /// A class which mocks [LocationController].
@@ -259,4 +269,13 @@ class MockShopsManager extends _i1.Mock implements _i17.ShopsManager {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i17.ShopsManagerError>()))
           as _i5.Future<_i2.Result<_i2.None, _i17.ShopsManagerError>>);
+  @override
+  _i5.Future<_i2.Result<_i18.Shop, _i17.ShopsManagerError>> createShop(
+          {String? name, _i3.Point<double>? coords, _i20.ShopType? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i18.Shop, _i17.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i18.Shop, _i17.ShopsManagerError>>);
 }

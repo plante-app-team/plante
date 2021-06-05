@@ -10,7 +10,8 @@ typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 
 class ShopsMarkersExtraData {
   final Set<Shop> selectedShops;
-  ShopsMarkersExtraData(this.selectedShops);
+  final Set<Shop> accentedShops;
+  ShopsMarkersExtraData(this.selectedShops, this.accentedShops);
 }
 
 Future<Marker> markersBuilder(
@@ -37,6 +38,9 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     if (extraData.selectedShops.contains(shops.first)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_selected.svg');
+    } else if (extraData.accentedShops.contains(shops.first)) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_accented.svg');
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg');
@@ -48,6 +52,9 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     if (shops.any((e) => extraData.selectedShops.contains(e))) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_selected.svg');
+    } else if (shops.any((e) => extraData.accentedShops.contains(e))) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/map_marker_accented.svg');
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_group_filled.svg');

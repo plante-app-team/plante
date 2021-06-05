@@ -12,7 +12,6 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
-import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -193,31 +192,9 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
     final title = positive
         ? context.strings.shop_product_range_page_you_sure_positive_vote
         : context.strings.shop_product_range_page_you_sure_negative_vote;
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return DialogPlante(
-            content: Text(title, style: TextStyles.headline1),
-            actions: Row(children: [
-              Expanded(
-                  child: ButtonOutlinedPlante.withText(
-                context.strings.global_no,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )),
-              const SizedBox(width: 16),
-              Expanded(
-                  child: ButtonFilledPlante.withText(
-                context.strings.global_yes,
-                onPressed: () {
-                  _performProductPresenceVote(product, positive);
-                  Navigator.of(context).pop();
-                },
-              )),
-            ]));
-      },
-    );
+    await showYesNoDialog(context, title, () {
+      _performProductPresenceVote(product, positive);
+    });
   }
 
   void _performProductPresenceVote(Product product, bool positive) async {

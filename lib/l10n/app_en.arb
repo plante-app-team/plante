@@ -45,6 +45,12 @@
       "map_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
       "map_page_is_new_product_sold_q": "Is the product being sold at «<SHOP>»?",
       "map_page_cancel_putting_product_q": "Cancel putting the product to the map?",
+      "map_page_how_new_shop_is_called": "What is the name of the shop?",
+      "map_page_how_new_shop_is_called_label": "Shop's name",
+      "map_page_how_new_shop_is_called_hint": "Spar",
+      "map_page_plus_shop": "+ mark a new shop",
+      "map_page_click_where_new_shop_located": "Click where the new shop is located",
+      "map_page_cancel_shop_creation_q": "Cancel shop creation?",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

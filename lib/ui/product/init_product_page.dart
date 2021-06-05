@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -368,31 +367,9 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   void _showWarningDialog(String warning, dynamic Function() positiveClicked) {
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return DialogPlante(
-            content: Text(warning, style: TextStyles.headline1),
-            actions: Row(children: [
-              Expanded(
-                  child: ButtonOutlinedPlante.withText(
-                context.strings.global_yes,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  positiveClicked.call();
-                },
-              )),
-              const SizedBox(width: 16),
-              Expanded(
-                  child: ButtonFilledPlante.withText(
-                context.strings.global_no,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )),
-            ]));
-      },
-    );
+    showYesNoDialog(context, warning, () {
+      positiveClicked.call();
+    });
   }
 
   Future<bool> _takePhoto(ProductImageType imageType) async {

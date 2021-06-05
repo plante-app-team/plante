@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -27,11 +29,16 @@ abstract class MapPageMode {
   MapPage get widget => params.widgetSource.call();
   BuildContext get context => params.contextSource.call();
 
-  void init() {}
+  void init(MapPageMode? previousMode) {}
   Iterable<Shop> filter(Iterable<Shop> shops) => shops;
   Set<Shop> selectedShops() => {};
+  Set<Shop> accentedShops() => {};
+
+  /// Extra shops added to what MapPageModel has
+  Set<Shop> additionalShops() => {};
   Widget buildOverlay(BuildContext context);
-  void onMarkerClick(Iterable<Shop> shops);
+  void onMarkerClick(Iterable<Shop> shops) {}
+  void onMapClick(Point<double> coords) {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;

@@ -10,6 +10,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/lat_lng_extensions.dart';
 
@@ -170,6 +171,22 @@ class MapPageModel implements ShopsManagerListener {
     _updateCallback.call();
     try {
       return await _shopsManager.putProductToShops(product, shops);
+    } finally {
+      _networkOperationInProgress = false;
+      _updateCallback.call();
+    }
+  }
+
+  Future<Result<Shop, ShopsManagerError>> createShop(
+      String name, Point<double> coords) async {
+    _networkOperationInProgress = true;
+    _updateCallback.call();
+    try {
+      return await _shopsManager.createShop(
+        name: name,
+        coords: coords,
+        type: ShopType.supermarket,
+      );
     } finally {
       _networkOperationInProgress = false;
       _updateCallback.call();

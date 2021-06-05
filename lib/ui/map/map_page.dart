@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -101,16 +102,23 @@ class _MapPageState extends State<MapPage> {
     final contextSource = () => context;
     final switchModeCallback = (MapPageMode newMode) {
       setState(() {
+        final oldMode = _mode;
         _mode = newMode;
-        _mode.init();
+        _mode.init(oldMode);
       });
     };
     final updateMapCallback = () {
-      _onShopsUpdated(_model.shopsCache);
+      final additionalShops = {
+        for (var shop in _mode.additionalShops()) shop.osmId: shop
+      };
+      final allShops = <String, Shop>{};
+      allShops.addAll(_model.shopsCache);
+      allShops.addAll(additionalShops);
+      _onShopsUpdated(allShops);
     };
     _mode = MapPageModeDefault(_model, widgetSource, contextSource,
         updateCallback, updateMapCallback, switchModeCallback);
-    _mode.init();
+    _mode.init(null);
 
     _initAsync();
     _instances.add(this);
@@ -120,7 +128,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
-    final extraData = ShopsMarkersExtraData(_mode.selectedShops());
+    final extraData =
+        ShopsMarkersExtraData(_mode.selectedShops(), _mode.accentedShops());
     return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 
@@ -199,6 +208,7 @@ class _MapPageState extends State<MapPage> {
               },
               onCameraMove: _clusterManager.onCameraMove,
               onCameraIdle: _onCameraIdle,
+              onTap: _onMapTap,
               // When there are more than 2 instances of GoogleMap and both
               // of them have markers, this screws up the markers for some reason.
               // Couldn't figure out why, probably there's a mistake either in
@@ -270,4 +280,12 @@ class _MapPageState extends State<MapPage> {
       _shopsMarkers = markers;
     });
   }
+
+  void _onMapTap(LatLng coords) {
+    _mode.onMapClick(coords.toPoint());
+  }
+}
+
+extension _MyLatLngExt on LatLng {
+  Point<double> toPoint() => Point(longitude, latitude);
 }

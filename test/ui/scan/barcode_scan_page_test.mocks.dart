@@ -9,13 +9,14 @@ import 'package:flutter/src/widgets/navigator.dart' as _i15;
 import 'package:flutter/src/widgets/routes.dart' as _i16;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart'
-    as _i23;
+    as _i24;
 import 'package:plante/base/permissions_manager.dart' as _i17;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/model/location_controller.dart' as _i22;
+import 'package:plante/model/location_controller.dart' as _i23;
 import 'package:plante/model/product.dart' as _i6;
 import 'package:plante/model/shop.dart' as _i20;
 import 'package:plante/model/shop_product_range.dart' as _i21;
+import 'package:plante/model/shop_type.dart' as _i22;
 import 'package:plante/model/user_params.dart' as _i10;
 import 'package:plante/model/veg_status.dart' as _i12;
 import 'package:plante/model/viewed_products_storage.dart' as _i18;
@@ -189,6 +190,15 @@ class MockBackend extends _i1.Mock implements _i9.Backend {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i11.BackendError>()))
           as _i5.Future<_i2.Result<_i2.None, _i11.BackendError>>);
+  @override
+  _i5.Future<_i2.Result<_i14.BackendShop, _i11.BackendError>> createShop(
+          {String? name, _i3.Point<double>? coords, String? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i14.BackendShop, _i11.BackendError>()))
+          as _i5.Future<_i2.Result<_i14.BackendShop, _i11.BackendError>>);
 }
 
 /// A class which mocks [RouteObserver].
@@ -329,27 +339,36 @@ class MockShopsManager extends _i1.Mock implements _i19.ShopsManager {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i19.ShopsManagerError>()))
           as _i5.Future<_i2.Result<_i2.None, _i19.ShopsManagerError>>);
+  @override
+  _i5.Future<_i2.Result<_i20.Shop, _i19.ShopsManagerError>> createShop(
+          {String? name, _i3.Point<double>? coords, _i22.ShopType? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i20.Shop, _i19.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i20.Shop, _i19.ShopsManagerError>>);
 }
 
 /// A class which mocks [LocationController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLocationController extends _i1.Mock
-    implements _i22.LocationController {
+    implements _i23.LocationController {
   MockLocationController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.Future<_i23.PermissionStatus> permissionStatus() =>
+  _i5.Future<_i24.PermissionStatus> permissionStatus() =>
       (super.noSuchMethod(Invocation.method(#permissionStatus, []),
-              returnValue: Future.value(_i23.PermissionStatus.granted))
-          as _i5.Future<_i23.PermissionStatus>);
+              returnValue: Future.value(_i24.PermissionStatus.granted))
+          as _i5.Future<_i24.PermissionStatus>);
   @override
-  _i5.Future<_i23.PermissionStatus> requestPermission() =>
+  _i5.Future<_i24.PermissionStatus> requestPermission() =>
       (super.noSuchMethod(Invocation.method(#requestPermission, []),
-              returnValue: Future.value(_i23.PermissionStatus.granted))
-          as _i5.Future<_i23.PermissionStatus>);
+              returnValue: Future.value(_i24.PermissionStatus.granted))
+          as _i5.Future<_i24.PermissionStatus>);
   @override
   _i5.Future<_i3.Point<double>?> lastKnownPosition() =>
       (super.noSuchMethod(Invocation.method(#lastKnownPosition, []),

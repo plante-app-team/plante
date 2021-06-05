@@ -152,6 +152,15 @@ class MockBackend extends _i1.Mock implements _i7.Backend {
               returnValue:
                   Future.value(_FakeResult<_i2.None, _i9.BackendError>()))
           as _i4.Future<_i2.Result<_i2.None, _i9.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i13.BackendShop, _i9.BackendError>> createShop(
+          {String? name, _i6.Point<double>? coords, String? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i13.BackendShop, _i9.BackendError>()))
+          as _i4.Future<_i2.Result<_i13.BackendShop, _i9.BackendError>>);
 }
 
 /// A class which mocks [ProductsManager].

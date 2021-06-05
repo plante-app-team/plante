@@ -45,6 +45,12 @@
     "map_page_is_product_sold_q": "Продукт «<PRODUCT>» продаётся в магазине «<SHOP>»?",
     "map_page_is_new_product_sold_q": "Продукт продаётся в магазине «<SHOP>»?",
     "map_page_cancel_putting_product_q": "Отменить добавление продукта на карту?",
+    "map_page_how_new_shop_is_called": "Как называется магазин?",
+    "map_page_how_new_shop_is_called_label": "Название магазина",
+    "map_page_how_new_shop_is_called_hint": "Пятёрочка",
+    "map_page_plus_shop": "+ отметить новый магазин",
+    "map_page_click_where_new_shop_located": "Кликните на место, где расположен не учтённый магазин",
+    "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",

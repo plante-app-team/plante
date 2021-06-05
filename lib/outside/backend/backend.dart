@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:plante/base/log.dart';
@@ -253,6 +254,28 @@ class Backend {
       'shopOsmId': osmId,
     });
     return _noneOrErrorFrom(response);
+  }
+
+  Future<Result<BackendShop, BackendError>> createShop(
+      {required String name,
+      required Point<double> coords,
+      required String type}) async {
+    final jsonRes = await _backendGetJson('create_shop/', {
+      'lon': coords.x.toString(),
+      'lat': coords.y.toString(),
+      'name': name,
+      'type': type
+    });
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+    if (!json.containsKey('osm_id')) {
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+    return Ok(BackendShop((e) => e
+      ..osmId = json['osm_id'] as String
+      ..productsCount = 0));
   }
 
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {

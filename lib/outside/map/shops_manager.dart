@@ -4,9 +4,11 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
+import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 
@@ -17,6 +19,7 @@ abstract class ShopsManagerListener {
 }
 
 class ShopsManager {
+  final _recentlyCreatedShops = <String, Shop>{};
   final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _openStreetMap;
   final Backend _backend;
@@ -59,6 +62,7 @@ class ShopsManager {
       }
       shops[osmShop.osmId] = shop;
     }
+    shops.addAll(_recentlyCreatedShops);
     return Ok(shops);
   }
 
@@ -119,6 +123,33 @@ class ShopsManager {
       e.onLocalShopsChange();
     });
     return Ok(None());
+  }
+
+  /// Note: currently server doesn't support all shop types
+  Future<Result<Shop, ShopsManagerError>> createShop(
+      {required String name,
+      required Point<double> coords,
+      required ShopType type}) async {
+    final res = await _backend.createShop(
+        name: name, coords: coords, type: type.osmName);
+    if (res.isOk) {
+      final backendShop = res.unwrap();
+      final shop = Shop((e) => e
+        ..backendShop.replace(backendShop)
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = backendShop.osmId
+          ..name = name
+          ..type = type.osmName
+          ..longitude = coords.x
+          ..latitude = coords.y)));
+      _recentlyCreatedShops[shop.osmId] = shop;
+      _listeners.forEach((e) {
+        e.onLocalShopsChange();
+      });
+      return Ok(shop);
+    } else {
+      return Err(_convertBackendErr(res.unwrapErr()));
+    }
   }
 }
 

@@ -27,7 +27,7 @@ class MapPageModeDefault extends MapPageMode {
             updateCallback, updateMapCallback, modeSwitchCallback));
 
   @override
-  void init() {
+  void init(MapPageMode? previousMode) {
     switch (widget.requestedMode) {
       case MapPageRequestedMode.ADD_PRODUCT:
         if (widget.product == null) {

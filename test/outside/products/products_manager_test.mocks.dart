@@ -3,6 +3,7 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i7;
+import 'dart:math' as _i20;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as _i4;
@@ -175,4 +176,13 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
               returnValue:
                   Future.value(_FakeResult<_i5.None, _i15.BackendError>()))
           as _i7.Future<_i5.Result<_i5.None, _i15.BackendError>>);
+  @override
+  _i7.Future<_i5.Result<_i19.BackendShop, _i15.BackendError>> createShop(
+          {String? name, _i20.Point<double>? coords, String? type}) =>
+      (super.noSuchMethod(
+              Invocation.method(
+                  #createShop, [], {#name: name, #coords: coords, #type: type}),
+              returnValue: Future.value(
+                  _FakeResult<_i19.BackendShop, _i15.BackendError>()))
+          as _i7.Future<_i5.Result<_i19.BackendShop, _i15.BackendError>>);
 }
