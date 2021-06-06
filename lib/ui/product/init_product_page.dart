@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -39,6 +43,11 @@ class InitProductPage extends StatefulWidget {
   @override
   _InitProductPageState createState() => _InitProductPageState(
       initialProduct, productUpdatedCallback, doneCallback);
+
+  Future<Directory> cacheDir() async {
+    final tempDir = await getTemporaryDirectory();
+    return Directory('${tempDir.path}/init_product_cache');
+  }
 }
 
 class _InitProductPageState extends State<InitProductPage>
@@ -69,6 +78,25 @@ class _InitProductPageState extends State<InitProductPage>
     setState(() {
       // Update!
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _ensureCacheDirExistence();
+  }
+
+  void _ensureCacheDirExistence() async {
+    final cache = await widget.cacheDir();
+    if (!isInTests()) {
+      if (!(await cache.exists())) {
+        await cache.create(recursive: true);
+      }
+    } else {
+      if (!cache.existsSync()) {
+        cache.createSync(recursive: true);
+      }
+    }
   }
 
   @override
@@ -363,7 +391,8 @@ class _InitProductPageState extends State<InitProductPage>
       return;
     }
     Log.i('InitProductPage: _cancel with confirmation');
-    showYesNoDialog(context, context.strings.init_product_page_cancel_adding_product_q, () {
+    showYesNoDialog(
+        context, context.strings.init_product_page_cancel_adding_product_q, () {
       Log.i('InitProductPage: _cancel exit confirmed');
       Navigator.of(context).pop();
     });
@@ -371,18 +400,21 @@ class _InitProductPageState extends State<InitProductPage>
 
   Future<bool> _takePhoto(ProductImageType imageType) async {
     Log.i('InitProductPage: _takePhoto start, imageType: $imageType');
-    final path = await GetIt.I.get<PhotosTaker>().takeAndCropPhoto(context);
-    if (path == null) {
-      Log.i('InitProductPage: path == null');
+    final outPath = await GetIt.I
+        .get<PhotosTaker>()
+        .takeAndCropPhoto(context, await widget.cacheDir());
+    if (outPath == null) {
+      Log.i('InitProductPage: outPath == null');
       return false;
     }
-    model.product = model.product.rebuildWithImage(imageType, path);
+    model.product = model.product.rebuildWithImage(imageType, outPath);
     Log.i('InitProductPage: _takePhoto success');
     return true;
   }
 
   void _removePhoto(ProductImageType imageType) {
-    showYesNoDialog(context, context.strings.init_product_page_delete_photo_q, () {
+    showYesNoDialog(context, context.strings.init_product_page_delete_photo_q,
+        () {
       Log.i('InitProductPage: _removePhoto confirmation');
       model.product = model.product.rebuildWithImage(imageType, null);
     });
@@ -408,7 +440,8 @@ class _InitProductPageState extends State<InitProductPage>
 
       final ingredientsText = await model.ocrIngredients(context.langCode);
       if (ingredientsText != null) {
-        Log.i('InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
+        Log.i(
+            'InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
         ingredientsTextController.text = ingredientsText;
       } else {
         Log.i('InitProductPage: _takeIngredientsPhoto fail');
@@ -435,6 +468,11 @@ class _InitProductPageState extends State<InitProductPage>
       productUpdatedCallback?.call(model.product);
       Navigator.of(context).pop();
       showSnackBar(context.strings.global_done_thanks, context);
+      if (!isInTests()) {
+        await (await widget.cacheDir()).delete();
+      } else {
+        (await widget.cacheDir()).deleteSync();
+      }
       doneCallback?.call();
     } else {
       showSnackBar(context.strings.global_something_went_wrong, context);

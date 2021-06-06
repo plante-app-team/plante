@@ -16,7 +16,7 @@
       "global_try_again": "Try again",
       "global_done_thanks": "Done! Thank you!",
 
-      "image_cropper_title": "Let's crop it!",
+      "image_crop_page_title": "Let's crop it!",
 
       "external_auth_page_continue_with": "Continue with",
       "external_auth_page_google_email_not_verified": "Error: Google email is not verified",

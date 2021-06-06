@@ -48,7 +48,7 @@ void main() {
     await GetIt.I.reset();
 
     photosTaker = MockPhotosTaker();
-    when(photosTaker.takeAndCropPhoto(any)).thenAnswer((_) async =>
+    when(photosTaker.takeAndCropPhoto(any, any)).thenAnswer((_) async =>
         Uri.file(File('./test/assets/img.jpg').absolute.path));
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
@@ -98,9 +98,21 @@ void main() {
     final callback = () {
       done = true;
     };
-    await tester.superPump(InitProductPage(
+    final widget = InitProductPage(
         Product((v) => v.barcode = '123'),
-        doneCallback: callback));
+        doneCallback: callback);
+
+    final cacheDir = await widget.cacheDir();
+    if (cacheDir.existsSync()) {
+      cacheDir.deleteSync();
+    }
+    expect(cacheDir.existsSync(), isFalse);
+
+    await tester.superPump(widget);
+
+    // Cache dir is always expected to be created
+    await tester.pumpAndSettle();
+    expect(cacheDir.existsSync(), isTrue);
 
     if (nameInput != null) {
       await tester.enterText(
@@ -138,10 +150,10 @@ void main() {
     }
 
     if (takeImageFront) {
-      verifyNever(photosTaker.takeAndCropPhoto(any));
+      verifyNever(photosTaker.takeAndCropPhoto(any, any));
       await tester.tap(
           find.byKey(const Key('front_photo')));
-      verify(photosTaker.takeAndCropPhoto(any)).called(1);
+      verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
       await tester.pumpAndSettle();
     }
 
@@ -149,12 +161,12 @@ void main() {
 
     if (takeImageIngredients) {
       expect(find.text('water, lemon'), findsNothing);
-      verifyNever(photosTaker.takeAndCropPhoto(any));
+      verifyNever(photosTaker.takeAndCropPhoto(any, any));
       await tester.tap(
           find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
       expect(find.text('water, lemon'), findsOneWidget);
-      verify(photosTaker.takeAndCropPhoto(any)).called(1);
+      verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
     }
 
     if (ingredientsTextOverride != null) {
@@ -220,6 +232,9 @@ void main() {
     } else {
       verifyNever(shopsManager.putProductToShops(any, any));
     }
+
+    // If done, cache dir must be deleted
+    expect(cacheDir.existsSync(), equals(!done));
 
     return done;
   }

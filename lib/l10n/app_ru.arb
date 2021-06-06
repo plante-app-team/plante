@@ -16,7 +16,7 @@
     "global_try_again": "Попробовать ещё раз",
     "global_done_thanks": "Готово! Спасибо!",
 
-    "image_cropper_title": "Давайте-ка обрежем!",
+    "image_crop_page_title": "Давайте-ка обрежем!",
 
     "external_auth_page_continue_with": "Продолжить с",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",

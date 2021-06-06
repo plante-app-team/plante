@@ -27,16 +27,16 @@ void mainImpl() async {
       .setCrashlyticsCollectionEnabled(kReleaseMode);
 
   FlutterError.onError = (FlutterErrorDetails details) {
-    Log.e('FE: ${details.toString()}', ex: details.exception,
-        stacktrace: details.stack, crashAllowed: false);
+    Log.e('FE: ${details.toString()}',
+        ex: details.exception, stacktrace: details.stack, crashAllowed: false);
     FirebaseCrashlytics.instance.recordFlutterError(details);
   };
   Isolate.current.addErrorListener(RawReceivePort((pair) async {
     final List<dynamic> errorAndStacktrace = pair as List<dynamic>;
     final error = errorAndStacktrace.first;
     final stack = errorAndStacktrace.last as StackTrace?;
-    Log.e('IE: ${error.toString()}', ex: error,
-        stacktrace: stack, crashAllowed: false);
+    Log.e('IE: ${error.toString()}',
+        ex: error, stacktrace: stack, crashAllowed: false);
     await FirebaseCrashlytics.instance.recordError(error, stack);
   }).sendPort);
 
