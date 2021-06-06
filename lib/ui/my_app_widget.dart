@@ -110,6 +110,7 @@ class _AppForegroundDetector extends WidgetsBindingObserver {
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    Log.i('didChangeAppLifecycleState, state: $state');
     if (state == AppLifecycleState.resumed) {
       await foregroundCallback.call();
     }
