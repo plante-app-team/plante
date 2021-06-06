@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
@@ -357,32 +358,32 @@ class _InitProductPageState extends State<InitProductPage>
 
   void _cancel() {
     if (widget.initialProduct == model.product) {
+      Log.i('InitProductPage: _cancel instant exit');
       Navigator.of(context).pop();
       return;
     }
-    _showWarningDialog(
-        context.strings.init_product_page_cancel_adding_product_q, () {
+    Log.i('InitProductPage: _cancel with confirmation');
+    showYesNoDialog(context, context.strings.init_product_page_cancel_adding_product_q, () {
+      Log.i('InitProductPage: _cancel exit confirmed');
       Navigator.of(context).pop();
-    });
-  }
-
-  void _showWarningDialog(String warning, dynamic Function() positiveClicked) {
-    showYesNoDialog(context, warning, () {
-      positiveClicked.call();
     });
   }
 
   Future<bool> _takePhoto(ProductImageType imageType) async {
+    Log.i('InitProductPage: _takePhoto start, imageType: $imageType');
     final path = await GetIt.I.get<PhotosTaker>().takeAndCropPhoto(context);
     if (path == null) {
+      Log.i('InitProductPage: path == null');
       return false;
     }
     model.product = model.product.rebuildWithImage(imageType, path);
+    Log.i('InitProductPage: _takePhoto success');
     return true;
   }
 
   void _removePhoto(ProductImageType imageType) {
-    _showWarningDialog(context.strings.init_product_page_delete_photo_q, () {
+    showYesNoDialog(context, context.strings.init_product_page_delete_photo_q, () {
+      Log.i('InitProductPage: _removePhoto confirmation');
       model.product = model.product.rebuildWithImage(imageType, null);
     });
   }
@@ -401,13 +402,16 @@ class _InitProductPageState extends State<InitProductPage>
       return;
     }
     try {
+      Log.i('InitProductPage: _takeIngredientsPhoto ocr start');
       ocrInProgress = true;
       onStateUpdated();
 
       final ingredientsText = await model.ocrIngredients(context.langCode);
       if (ingredientsText != null) {
+        Log.i('InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
         ingredientsTextController.text = ingredientsText;
       } else {
+        Log.i('InitProductPage: _takeIngredientsPhoto fail');
         showSnackBar(context.strings.global_something_went_wrong, context);
         model.product =
             model.product.rebuildWithImage(ProductImageType.INGREDIENTS, null);
@@ -424,8 +428,10 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   void _saveProduct() async {
+    Log.i('InitProductPage: _saveProduct start: ${model.product}');
     final ok = await model.saveProduct(context.langCode);
     if (ok) {
+      Log.i('InitProductPage: _saveProduct success');
       productUpdatedCallback?.call(model.product);
       Navigator.of(context).pop();
       showSnackBar(context.strings.global_done_thanks, context);
@@ -436,6 +442,7 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   void _markShopsOnMap() async {
+    Log.i('InitProductPage: _markShopsOnMap start');
     final shops = await Navigator.push<List<Shop>>(
         context,
         MaterialPageRoute(
@@ -443,8 +450,10 @@ class _InitProductPageState extends State<InitProductPage>
                 requestedMode: MapPageRequestedMode.SELECT_SHOPS,
                 initialSelectedShops: model.shops)));
     if (shops == null) {
+      Log.i('InitProductPage: _markShopsOnMap no shops marked');
       return;
     }
+    Log.i('InitProductPage: _markShopsOnMap success: $shops');
     model.shops = shops;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
@@ -123,6 +124,7 @@ class InitProductPageModel {
   }
 
   Future<bool> saveProduct(String langCode) async {
+    Log.i('InitProductPageModel: saveProduct: start');
     loading = true;
     _onProductUpdate.call();
     try {
@@ -133,19 +135,23 @@ class InitProductPageModel {
       final productResult =
           await _productsManager.createUpdateProduct(savedProduct, langCode);
       if (productResult.isOk) {
+        Log.i('InitProductPageModel: saveProduct: product saved');
         product = savedProduct;
       } else {
         return false;
       }
 
       if (shops.isNotEmpty) {
+        Log.i('InitProductPageModel: saveProduct: saving shops');
         final shopsResult =
             await _shopsManager.putProductToShops(product, shops);
         if (shopsResult.isErr) {
+          Log.i('InitProductPageModel: saveProduct: saving shops fail');
           return false;
         }
       }
 
+      Log.i('InitProductPageModel: saveProduct: success');
       return true;
     } finally {
       loading = false;

@@ -138,19 +138,10 @@ class Log {
       throw Exception(message);
     }
 
-    if (!crashlyticsAllowed && _crashlyticsTree != null) {
-      Fimber.unplantTree(_crashlyticsTree!);
-    }
-    try {
-      if (ex == null) {
-        Fimber.e(message, ex: ex, stacktrace: stacktrace);
-      } else {
-        Fimber.e('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
-      }
-    } finally {
-      if (!crashlyticsAllowed && _crashlyticsTree != null) {
-        Fimber.plantTree(_crashlyticsTree!);
-      }
+    if (ex == null) {
+      Fimber.e(message, ex: ex, stacktrace: stacktrace);
+    } else {
+      Fimber.e('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 }
@@ -167,11 +158,8 @@ class _CrashlyticsFimberTree extends LogTree {
 
   Future<void> logImpl(String level, String message,
       {String? tag, dynamic ex, StackTrace? stacktrace}) async {
-    if (level == 'E') {
-      await FirebaseCrashlytics.instance
-          .recordError(ex, stacktrace, reason: message, fatal: false);
-    } else {
-      await FirebaseCrashlytics.instance.log('Msg: $message, ex: $ex');
-    }
+    tag ??= '??';
+    final msg = '$level $tag, msg: $message, ex: $ex, stack: $stacktrace';
+    await FirebaseCrashlytics.instance.log(msg);
   }
 }

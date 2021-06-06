@@ -14,6 +14,7 @@ import 'package:plante/ui/my_app_widget.dart';
 
 void main() {
   runZonedGuarded(mainImpl, (Object error, StackTrace stack) {
+    Log.e(error.toString(), ex: error, stacktrace: stack, crashAllowed: false);
     FirebaseCrashlytics.instance.recordError(error, stack);
   });
 }
@@ -26,14 +27,17 @@ void mainImpl() async {
       .setCrashlyticsCollectionEnabled(kReleaseMode);
 
   FlutterError.onError = (FlutterErrorDetails details) {
+    Log.e('FE: ${details.toString()}', ex: details.exception,
+        stacktrace: details.stack, crashAllowed: false);
     FirebaseCrashlytics.instance.recordFlutterError(details);
   };
   Isolate.current.addErrorListener(RawReceivePort((pair) async {
     final List<dynamic> errorAndStacktrace = pair as List<dynamic>;
-    await FirebaseCrashlytics.instance.recordError(
-      errorAndStacktrace.first,
-      errorAndStacktrace.last as StackTrace?,
-    );
+    final error = errorAndStacktrace.first;
+    final stack = errorAndStacktrace.last as StackTrace?;
+    Log.e('IE: ${error.toString()}', ex: error,
+        stacktrace: stack, crashAllowed: false);
+    await FirebaseCrashlytics.instance.recordError(error, stack);
   }).sendPort);
 
   Log.init();
