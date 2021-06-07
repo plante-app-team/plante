@@ -74,11 +74,8 @@ abstract class BarcodeScanPageContentAbstractStateWithProduct
   Product get productWithUnknownState;
 
   void tryOpenProductPage(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ProductPageWrapper(productWithUnknownState,
-                productUpdatedCallback: productUpdatedCallback)));
+    ProductPageWrapper.show(context, productWithUnknownState,
+        productUpdatedCallback: productUpdatedCallback);
   }
 }
 

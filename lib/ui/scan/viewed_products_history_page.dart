@@ -135,10 +135,7 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
   }
 
   void openProductPage(Product productUpdated) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ProductPageWrapper(productUpdated,
-                productUpdatedCallback: viewedProductsStorage.addProduct)));
+    ProductPageWrapper.show(context, productUpdated,
+        productUpdatedCallback: viewedProductsStorage.addProduct);
   }
 }

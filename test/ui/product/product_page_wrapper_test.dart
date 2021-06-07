@@ -13,6 +13,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -21,7 +22,7 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, ShopsManager, LocationController])
+@GenerateMocks([ProductsManager, ShopsManager, LocationController, PhotosTaker])
 void main() {
   setUp(() async {
     await GetIt.I.reset();
@@ -41,12 +42,16 @@ void main() {
     final locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     GetIt.I.registerSingleton<LocationController>(locationController);
+
+    final photosTaker = MockPhotosTaker();
+    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
+    when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
   });
 
   testWidgets('init page is shown when product is not filled', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = Product((v) => v.barcode = '123');
-    await tester.superPump(ProductPageWrapper(initialProduct));
+    await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsOneWidget);
     expect(find.byType(DisplayProductPage), findsNothing);
   });
@@ -63,7 +68,7 @@ void main() {
       ..ingredientsText = '1, 2, 3'
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
-    await tester.superPump(ProductPageWrapper(initialProduct));
+    await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
   });
@@ -81,7 +86,7 @@ void main() {
       ..ingredientsText = '1, 2, 3'
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
-    await tester.superPump(ProductPageWrapper(initialProduct));
+    await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
   });

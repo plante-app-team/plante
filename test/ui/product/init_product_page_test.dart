@@ -50,6 +50,9 @@ void main() {
     photosTaker = MockPhotosTaker();
     when(photosTaker.takeAndCropPhoto(any, any)).thenAnswer((_) async =>
         Uri.file(File('./test/assets/img.jpg').absolute.path));
+    when(photosTaker.cropPhoto(any, any, any)).thenAnswer((_) async =>
+        Uri.file(File('./test/assets/img.jpg').absolute.path));
+    when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     productsManager = MockProductsManager();
@@ -735,5 +738,91 @@ void main() {
     // Even though perfectlyGoodExpectedProduct expected to be stored,
     // page is expected to be not finished, because of shops sending error
     expect(done, isFalse);
+  });
+
+  testWidgets('finish taking front photo when restoring', (WidgetTester tester) async {
+    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
+            (invoc) async => Ok(ProductWithOCRIngredients(
+            invoc.positionalArguments[0] as Product,
+            'water, lemon')));
+
+    // Lost photo exists!
+    when(photosTaker.retrieveLostPhoto()).thenAnswer(
+            (_) async => Ok(Uri.parse('./test/assets/img.jpg')));
+
+    verifyNever(photosTaker.cropPhoto(any, any, any));
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'),
+        photoBeingTakenForTests: ProductImageType.FRONT);
+    await tester.superPump(widget);
+
+    // Lost photo cropping expected to be started
+    verify(photosTaker.cropPhoto(any, any, any));
+
+    // Now let's fill the product and ensure it's filled enough to be saved
+    // The front photo is not taken by us as we expect it to be restored.
+    await tester.enterText(
+        find.byKey(const Key('name')),
+        'hello there');
+    await tester.pumpAndSettle();
+
+    await scrollToBottom(tester);
+    await tester.tap(find.byKey(const Key('ingredients_photo')));
+    await tester.pumpAndSettle();
+
+    await scrollToBottom(tester);
+    await tester.tap(find.byKey(const Key('vegan_positive_btn')));
+    await tester.pumpAndSettle();
+
+    verifyNever(productsManager.createUpdateProduct(any, any));
+    await tester.tap(find.byKey(const Key('done_btn')));
+    await tester.pumpAndSettle();
+    verify(productsManager.createUpdateProduct(captureAny, any));
+  });
+
+  testWidgets('finish taking ingredients photo when restoring', (WidgetTester tester) async {
+    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
+            (invoc) async => Ok(ProductWithOCRIngredients(
+            invoc.positionalArguments[0] as Product,
+            'water, lemon')));
+
+    // Lost photo exists!
+    when(photosTaker.retrieveLostPhoto()).thenAnswer(
+            (_) async => Ok(Uri.parse('./test/assets/img.jpg')));
+
+    verifyNever(photosTaker.cropPhoto(any, any, any));
+    verifyNever(productsManager.updateProductAndExtractIngredients(any));
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'),
+        photoBeingTakenForTests: ProductImageType.INGREDIENTS);
+    await tester.superPump(widget);
+
+    // Lost photo cropping expected to be started
+    verify(photosTaker.cropPhoto(any, any, any));
+    // Because the lost photo is an ingredients photo -
+    // OCR is expected to be performed.
+    verify(productsManager.updateProductAndExtractIngredients(any));
+
+    // Now let's fill the product and ensure it's filled enough to be saved
+    // The ingredients photo is not taken by us as we expect it to be restored.
+    await tester.enterText(
+        find.byKey(const Key('name')),
+        'hello there');
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+        find.byKey(const Key('front_photo')));
+    await tester.pumpAndSettle();
+
+    await scrollToBottom(tester);
+    await tester.tap(find.byKey(const Key('vegan_positive_btn')));
+    await tester.pumpAndSettle();
+
+    verifyNever(productsManager.createUpdateProduct(any, any));
+    await tester.tap(find.byKey(const Key('done_btn')));
+    await tester.pumpAndSettle();
+    verify(productsManager.createUpdateProduct(captureAny, any));
   });
 }

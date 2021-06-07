@@ -39,7 +39,7 @@ dependencies:
   qr_code_scanner: ^0.4.0
   openfoodfacts:
     path: submodules/openfoodfacts-dart
-  image_picker: ^0.7.2+1
+  image_picker: ^0.8.0+1
   flutter_svg: ^0.21.0-nullsafety.0
   google_sign_in: ^5.0.1
   firebase_core: ^1.0.4

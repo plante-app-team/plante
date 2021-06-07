@@ -164,11 +164,8 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
   }
 
   void _openProductPage(Product product) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ProductPageWrapper(product,
-                productUpdatedCallback: _onProductUpdate)));
+    ProductPageWrapper.show(context, product,
+        productUpdatedCallback: _onProductUpdate);
   }
 
   void _onProductUpdate(Product updatedProduct) {

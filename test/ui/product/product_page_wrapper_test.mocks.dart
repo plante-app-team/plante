@@ -3,8 +3,11 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i5;
+import 'dart:io' as _i17;
 import 'dart:math' as _i3;
 
+import 'package:flutter/src/services/message_codec.dart' as _i18;
+import 'package:flutter/src/widgets/framework.dart' as _i16;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart'
     as _i14;
@@ -18,6 +21,7 @@ import 'package:plante/outside/backend/backend_product.dart' as _i8;
 import 'package:plante/outside/map/shops_manager.dart' as _i9;
 import 'package:plante/outside/products/products_manager.dart' as _i4;
 import 'package:plante/outside/products/products_manager_error.dart' as _i7;
+import 'package:plante/ui/photos_taker.dart' as _i15;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -25,6 +29,8 @@ import 'package:plante/outside/products/products_manager_error.dart' as _i7;
 class _FakeResult<OK, ERR> extends _i1.Fake implements _i2.Result<OK, ERR> {}
 
 class _FakePoint<T extends num> extends _i1.Fake implements _i3.Point<T> {}
+
+class _FakeUri extends _i1.Fake implements Uri {}
 
 /// A class which mocks [ProductsManager].
 ///
@@ -153,4 +159,32 @@ class MockLocationController extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#currentPosition, []),
               returnValue: Future.value(_FakePoint<double>()))
           as _i5.Future<_i3.Point<double>?>);
+}
+
+/// A class which mocks [PhotosTaker].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPhotosTaker extends _i1.Mock implements _i15.PhotosTaker {
+  MockPhotosTaker() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<Uri?> takeAndCropPhoto(
+          _i16.BuildContext? context, _i17.Directory? outFolder) =>
+      (super.noSuchMethod(
+          Invocation.method(#takeAndCropPhoto, [context, outFolder]),
+          returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
+  @override
+  _i5.Future<Uri?> cropPhoto(String? photoPath, _i16.BuildContext? context,
+          _i17.Directory? outFolder) =>
+      (super.noSuchMethod(
+          Invocation.method(#cropPhoto, [photoPath, context, outFolder]),
+          returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
+  @override
+  _i5.Future<_i2.Result<Uri, _i18.PlatformException>?> retrieveLostPhoto() =>
+      (super.noSuchMethod(Invocation.method(#retrieveLostPhoto, []),
+              returnValue:
+                  Future.value(_FakeResult<Uri, _i18.PlatformException>()))
+          as _i5.Future<_i2.Result<Uri, _i18.PlatformException>?>);
 }

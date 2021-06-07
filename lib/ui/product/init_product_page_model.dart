@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
@@ -9,16 +11,27 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class InitProductPageModel {
+  static const _NO_PHOTO = -1;
   late final dynamic Function() _onProductUpdate;
-  final Product _initialProduct;
+  late final dynamic Function() _forceReloadAllProductData;
+  final ProductRestorable _initialProductRestorable;
   final ProductRestorable _productRestorable;
   final ShopsListRestorable _shopsRestorable;
+  final RestorableInt _photoBeingTaken = RestorableInt(_NO_PHOTO);
+
+  bool _ocrInProgress = false;
+
+  Directory? _cacheDir;
   final ProductsManager _productsManager;
   final ShopsManager _shopsManager;
+  final PhotosTaker _photosTaker;
+  Product get _initialProduct => _initialProductRestorable.value;
 
+  bool get ocrInProgress => _ocrInProgress;
   Product get product => _productRestorable.value;
   set product(Product value) {
     if (value.veganStatus != product.veganStatus) {
@@ -55,14 +68,85 @@ class InitProductPageModel {
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties => {
+        'initial_product': _initialProductRestorable,
         'product': _productRestorable,
         'shops': _shopsRestorable,
+        'photo_being_taken': _photoBeingTaken,
       };
 
-  InitProductPageModel(this._initialProduct, this._onProductUpdate,
-      List<Shop> _initialShops, this._productsManager, this._shopsManager)
-      : _productRestorable = ProductRestorable(_initialProduct),
+  InitProductPageModel(
+      Product initialProduct,
+      this._onProductUpdate,
+      this._forceReloadAllProductData,
+      List<Shop> _initialShops,
+      this._productsManager,
+      this._shopsManager,
+      this._photosTaker)
+      : _initialProductRestorable = ProductRestorable(initialProduct),
+        _productRestorable = ProductRestorable(initialProduct),
         _shopsRestorable = ShopsListRestorable(_initialShops);
+
+  void setPhotoBeingTakenForTests(ProductImageType imageType) {
+    if (!isInTests()) {
+      throw Exception();
+    }
+    _photoBeingTaken.value = imageType.index;
+  }
+
+  void initPhotoTaker(BuildContext context, Directory cacheDir) async {
+    _cacheDir = cacheDir;
+
+    try {
+      final lostPhoto = await _photosTaker.retrieveLostPhoto();
+      Log.i('InitProductPageModel initPhotoTaker, '
+          'lostPhoto: $lostPhoto, '
+          '_photoBeingTaken: ${_photoBeingTaken.value}');
+      if (lostPhoto == null || _photoBeingTaken.value == _NO_PHOTO) {
+        return;
+      }
+      if (lostPhoto.isErr) {
+        Log.w('PhotosTaker error', ex: lostPhoto.unwrapErr());
+        return;
+      }
+
+      final imageTypeNum =
+          _photoBeingTaken.value.clamp(0, ProductImageType.values.length - 1);
+      final imageType = ProductImageType.values[imageTypeNum];
+
+      Log.i('InitProductPageModel obtained photo, cropping');
+      final outPath = await _photosTaker.cropPhoto(
+          lostPhoto.unwrap().path, context, cacheDir);
+      if (outPath == null) {
+        Log.i('InitProductPageModel cropping finished without photo');
+        return;
+      }
+
+      Log.i('InitProductPageModel cropped photo');
+      _onPhotoTaken(imageType, outPath);
+    } finally {
+      _photoBeingTaken.value = _NO_PHOTO;
+    }
+  }
+
+  void takePhoto(ProductImageType imageType, BuildContext context) async {
+    if (_cacheDir == null) {
+      Log.i('InitProductPageModel: takePhoto return because no cache dir');
+      return;
+    }
+    _photoBeingTaken.value = imageType.index;
+    try {
+      Log.i('InitProductPageModel: takePhoto start, imageType: $imageType');
+      final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!);
+      if (outPath == null) {
+        Log.i('InitProductPageModel: takePhoto, outPath == null');
+        return;
+      }
+      Log.i('InitProductPageModel: takePhoto success');
+      _onPhotoTaken(imageType, outPath);
+    } finally {
+      _photoBeingTaken.value = _NO_PHOTO;
+    }
+  }
 
   bool askForFrontPhoto() {
     return _initialProduct.imageFront == null;
@@ -104,11 +188,11 @@ class InitProductPageModel {
             VegStatusSource.open_food_facts;
   }
 
-  Future<String?> ocrIngredients(String langCode) async {
+  Future<String?> ocrIngredients() async {
     final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
         ProductImageType.INGREDIENTS, product.imageIngredients);
-    final ocrResult = await _productsManager.updateProductAndExtractIngredients(
-        initialProductWithIngredientsPhoto, langCode);
+    final ocrResult = await _productsManager
+        .updateProductAndExtractIngredients(initialProductWithIngredientsPhoto);
 
     if (ocrResult.isErr) {
       return null;
@@ -161,5 +245,33 @@ class InitProductPageModel {
 
   bool askForShops() {
     return enableNewestFeatures();
+  }
+
+  void _onPhotoTaken(ProductImageType imageType, Uri outPath) async {
+    product = product.rebuildWithImage(imageType, outPath);
+
+    if (imageType != ProductImageType.INGREDIENTS) {
+      return;
+    }
+
+    try {
+      Log.i('InitProductPage: _takeIngredientsPhoto ocr start');
+      _ocrInProgress = true;
+      _onProductUpdate.call();
+
+      final ingredientsText = await ocrIngredients();
+      if (ingredientsText != null) {
+        Log.i(
+            'InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
+        product = product.rebuild((e) => e.ingredientsText = ingredientsText);
+        _forceReloadAllProductData.call();
+      } else {
+        Log.i('InitProductPage: _takeIngredientsPhoto fail');
+        product = product.rebuildWithImage(ProductImageType.INGREDIENTS, null);
+      }
+    } finally {
+      _ocrInProgress = false;
+      _onProductUpdate.call();
+    }
   }
 }

@@ -14,8 +14,8 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
-  var selectedPage = 0;
+class _MainPageState extends State<MainPage> with RestorationMixin {
+  final selectedPage = RestorableInt(0);
   final pageOptions = [
     if (enableNewestFeatures()) MapPage(),
     BarcodeScanPage(key: const Key('barcode_scan_page')),
@@ -24,21 +24,35 @@ class _MainPageState extends State<MainPage> {
   final PageController pagerController = PageController();
 
   @override
+  String? get restorationId => 'main_page';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(selectedPage, 'selected_page');
+  }
+
+  @override
+  void dispose() {
+    selectedPage.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     GetIt.I.get<LangCodeHolder>().langCode =
         Localizations.localeOf(context).languageCode;
     return Scaffold(
-        body: IndexedStack(index: selectedPage, children: pageOptions),
+        body: IndexedStack(index: selectedPage.value, children: pageOptions),
         bottomNavigationBar: BottomBarPlante(
           svgIcons: [
             if (enableNewestFeatures()) 'assets/report.svg',
             'assets/barcode.svg',
             'assets/history.svg'
           ],
-          selectedIcon: selectedPage,
+          selectedIcon: selectedPage.value,
           onIconClick: (index) {
             setState(() {
-              selectedPage = index;
+              selectedPage.value = index;
             });
           },
         ));

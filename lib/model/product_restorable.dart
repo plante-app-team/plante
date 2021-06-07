@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 
 class ProductRestorable extends RestorableValue<Product> {
@@ -16,9 +17,10 @@ class ProductRestorable extends RestorableValue<Product> {
 
   @override
   Product fromPrimitives(Object? data) {
-    if (data != null && data is Map<String, dynamic>) {
+    if (data != null && data is Map<dynamic, dynamic>) {
       return Product.fromJson(data)!;
     }
+    Log.w('ProductRestorable could not restore from $data');
     return createDefaultValue();
   }
 

@@ -49,6 +49,5 @@ void mainImpl() async {
 
   setSystemUIOverlayStyle();
 
-  runApp(RootRestorationScope(
-      restorationId: 'root', child: MyAppWidget(initialUserParams)));
+  runApp(MyAppWidget(initialUserParams));
 }

@@ -12,8 +12,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:label="Plante"
-        android:icon="@mipmap/icon"
-        android:requestLegacyExternalStorage="true">
+        android:icon="@mipmap/icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

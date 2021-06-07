@@ -9,6 +9,8 @@ import 'package:plante/model/veg_status_source.dart';
 part 'product.g.dart';
 
 abstract class Product implements Built<Product, ProductBuilder> {
+  static final Product empty = Product((e) => e.barcode = '');
+
   String get barcode;
   VegStatus? get vegetarianStatus;
   VegStatusSource? get vegetarianStatusSource;
@@ -130,7 +132,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
     }
   }
 
-  static Product? fromJson(Map<String, dynamic> json) {
+  static Product? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers.deserializeWith(serializer, json);
   }
 

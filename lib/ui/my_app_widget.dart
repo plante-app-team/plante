@@ -25,9 +25,9 @@ class MyAppWidget extends StatefulWidget {
 
 class _MyAppWidgetState extends State<MyAppWidget>
     implements UserParamsControllerObserver {
-  UserParams? _initialUserParams;
+  UserParams? _userParams;
 
-  _MyAppWidgetState(this._initialUserParams) {
+  _MyAppWidgetState(this._userParams) {
     GetIt.I.get<UserParamsController>().addObserver(this);
   }
 
@@ -57,6 +57,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Plante',
+        restorationScopeId: 'app',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
@@ -74,21 +75,20 @@ class _MyAppWidgetState extends State<MyAppWidget>
     if (_allRequiredUserParamsFilled()) {
       return const MainPage();
     }
-    if (_initialUserParams != null) {
-      return InitUserPage(_initialUserParams!, _onUserParamsSpecified);
+    if (_userParams != null) {
+      return InitUserPage(_userParams!, _onUserParamsSpecified);
     }
     return ExternalAuthPage(_onUserParamsSpecified);
   }
 
   bool _allRequiredUserParamsFilled() {
-    if (_initialUserParams == null) {
+    if (_userParams == null) {
       return false;
     }
-    if ((_initialUserParams?.name ?? '').length <
-            InitUserPage.MIN_NAME_LENGTH ||
-        _initialUserParams!.eatsMilk == null ||
-        _initialUserParams!.eatsEggs == null ||
-        _initialUserParams!.eatsHoney == null) {
+    if ((_userParams?.name ?? '').length < InitUserPage.MIN_NAME_LENGTH ||
+        _userParams!.eatsMilk == null ||
+        _userParams!.eatsEggs == null ||
+        _userParams!.eatsHoney == null) {
       return false;
     }
     return true;
@@ -98,7 +98,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   void onUserParamsUpdate(UserParams? userParams) {
     // Will reset screen to ExternalAuthPage if user params are wiped
     setState(() {
-      _initialUserParams = userParams;
+      _userParams = userParams;
     });
   }
 }

@@ -17,23 +17,30 @@ class ShopsListRestorable extends RestorableValue<List<Shop>> {
 
   @override
   List<Shop> fromPrimitives(Object? data) {
-    if (data != null && data is List<Map<String, dynamic>>) {
+    if (data != null && data is List<dynamic>) {
       final shops = <Shop>[];
       for (final item in data) {
+        if (item is! Map<dynamic, dynamic>) {
+          Log.w(
+              'Could not deserialize a shop in ShopsListRestorable (1): $item');
+          continue;
+        }
         final shop = Shop.fromJson(item);
         if (shop == null) {
-          Log.w('Could not deserialize a shop in ShopsListRestorable: $item');
+          Log.w(
+              'Could not deserialize a shop in ShopsListRestorable (2): $item');
           continue;
         }
         shops.add(shop);
       }
       return shops;
     }
+    Log.w('ShopsListRestorable could not restore from $data');
     return createDefaultValue();
   }
 
   @override
   Object toPrimitives() {
-    return value.map((e) => e.toJson());
+    return value.map((e) => e.toJson()).toList();
   }
 }

@@ -8,6 +8,13 @@ import 'package:plante/outside/map/osm_shop.dart';
 part 'shop.g.dart';
 
 abstract class Shop implements Built<Shop, ShopBuilder> {
+  static final Shop empty = Shop((e) => e
+    ..osmShop.replace(OsmShop((e) => e
+      ..osmId = ''
+      ..name = ''
+      ..latitude = 0
+      ..longitude = 0)));
+
   OsmShop get osmShop;
   BackendShop? get backendShop;
 
@@ -19,7 +26,7 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   double get longitude => osmShop.longitude;
   int get productsCount => backendShop?.productsCount ?? 0;
 
-  static Shop? fromJson(Map<String, dynamic> json) {
+  static Shop? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(Shop.serializer, json);
   }

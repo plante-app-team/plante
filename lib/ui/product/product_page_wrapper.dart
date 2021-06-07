@@ -1,19 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-class ProductPageWrapper extends StatefulWidget {
-  final Product initialProduct;
-  final ProductUpdatedCallback? productUpdatedCallback;
+class ProductPageWrapper {
+  static int lastShowRequestId = 0;
+  static Map<int, ProductUpdatedCallback> updateCallbacks = {};
 
-  const ProductPageWrapper(this.initialProduct, {this.productUpdatedCallback});
+  static Widget createForTesting(Product product) {
+    return _createPageFor(product, null);
+  }
 
-  @override
-  _ProductPageWrapperState createState() =>
-      _ProductPageWrapperState(initialProduct, productUpdatedCallback);
+  static void show(BuildContext context, Product initialProduct,
+      {ProductUpdatedCallback? productUpdatedCallback}) {
+    final requestId = ++lastShowRequestId;
+    final args = [requestId, initialProduct.toJson()];
+    if (productUpdatedCallback != null) {
+      updateCallbacks[requestId] = productUpdatedCallback;
+    }
+    Navigator.restorablePush(context, _routeBuilder, arguments: args);
+  }
+
+  static Route<void> _routeBuilder(BuildContext context, Object? arguments) {
+    return MaterialPageRoute<void>(builder: (BuildContext context) {
+      final Product product;
+      final int requestId;
+      final ProductUpdatedCallback? callback;
+      if (arguments != null) {
+        final args = arguments as List<dynamic>;
+        requestId = args[0] as int;
+        product =
+            Product.fromJson(args[1] as Map<dynamic, dynamic>) ?? Product.empty;
+        callback = updateCallbacks.remove(requestId);
+        if (callback == null) {
+          Log.w('product page is created without a callback, '
+              'probably restored');
+        }
+      } else {
+        Log.e('product page is created without arguments');
+        requestId = -1;
+        product = Product.empty;
+        callback = null;
+      }
+
+      return _createPageFor(product, callback);
+    });
+  }
+
+  static Widget _createPageFor(
+      Product product, ProductUpdatedCallback? callback) {
+    if (!isProductFilledEnoughForDisplay(product)) {
+      return InitProductPage(product,
+          key: const Key('init_product_page'),
+          productUpdatedCallback: callback);
+    } else {
+      return DisplayProductPage(product,
+          key: const Key('display_product_page'),
+          productUpdatedCallback: callback);
+    }
+  }
 
   static bool isProductFilledEnoughForDisplay(Product product) =>
       product.name != null &&
@@ -24,29 +72,4 @@ class ProductPageWrapper extends StatefulWidget {
       product.imageIngredients != null &&
       product.ingredientsText != null &&
       product.ingredientsText!.isNotEmpty;
-}
-
-class _ProductPageWrapperState extends State<ProductPageWrapper> {
-  final Product _initialProduct;
-  final ProductUpdatedCallback? _productUpdatedCallback;
-
-  _ProductPageWrapperState(this._initialProduct, this._productUpdatedCallback);
-
-  @override
-  Widget build(BuildContext context) {
-    final Widget page;
-    if (!_isProductFilledEnough()) {
-      page = InitProductPage(_initialProduct,
-          key: const Key('init_product_page'),
-          productUpdatedCallback: _productUpdatedCallback);
-    } else {
-      page = DisplayProductPage(_initialProduct,
-          key: const Key('display_product_page'),
-          productUpdatedCallback: _productUpdatedCallback);
-    }
-    return Container(child: page);
-  }
-
-  bool _isProductFilledEnough() =>
-      ProductPageWrapper.isProductFilledEnoughForDisplay(_initialProduct);
 }

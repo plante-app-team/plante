@@ -36,9 +36,19 @@ class InitProductPage extends StatefulWidget {
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
 
-  const InitProductPage(this.initialProduct,
-      {Key? key, this.title, this.productUpdatedCallback, this.doneCallback})
-      : super(key: key);
+  final ProductImageType? photoBeingTakenForTests;
+
+  InitProductPage(this.initialProduct,
+      {Key? key,
+      this.title,
+      this.productUpdatedCallback,
+      this.doneCallback,
+      this.photoBeingTakenForTests})
+      : super(key: key) {
+    if (photoBeingTakenForTests != null && !isInTests()) {
+      throw Exception();
+    }
+  }
 
   @override
   _InitProductPageState createState() => _InitProductPageState(
@@ -56,8 +66,6 @@ class _InitProductPageState extends State<InitProductPage>
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
 
-  bool ocrInProgress = false;
-
   final TextEditingController nameTextController = TextEditingController();
   final TextEditingController brandTextController = TextEditingController();
   final TextEditingController categoriesTextController =
@@ -67,8 +75,14 @@ class _InitProductPageState extends State<InitProductPage>
 
   _InitProductPageState(
       Product initialProduct, this.productUpdatedCallback, this.doneCallback) {
-    model = InitProductPageModel(initialProduct, onStateUpdated, [],
-        GetIt.I.get<ProductsManager>(), GetIt.I.get<ShopsManager>());
+    model = InitProductPageModel(
+        initialProduct,
+        onStateUpdated,
+        forceUseModelData,
+        [],
+        GetIt.I.get<ProductsManager>(),
+        GetIt.I.get<ShopsManager>(),
+        GetIt.I.get<PhotosTaker>());
   }
 
   void onStateUpdated() {
@@ -78,6 +92,20 @@ class _InitProductPageState extends State<InitProductPage>
     setState(() {
       // Update!
     });
+  }
+
+  void forceUseModelData() {
+    if (!mounted) {
+      return;
+    }
+    setState(takeModelProductText);
+  }
+
+  void takeModelProductText() {
+    nameTextController.text = model.product.name ?? '';
+    brandTextController.text = model.product.brands?.join(', ') ?? '';
+    categoriesTextController.text = model.product.categories?.join(', ') ?? '';
+    ingredientsTextController.text = model.product.ingredientsText ?? '';
   }
 
   @override
@@ -108,6 +136,8 @@ class _InitProductPageState extends State<InitProductPage>
       registerForRestoration(property.value, property.key);
     }
 
+    takeModelProductText();
+
     nameTextController.addListener(() {
       model.product =
           model.product.rebuild((e) => e.name = nameTextController.text);
@@ -124,6 +154,21 @@ class _InitProductPageState extends State<InitProductPage>
       model.product = model.product
           .rebuild((e) => e.ingredientsText = ingredientsTextController.text);
     });
+
+    () async {
+      if (widget.photoBeingTakenForTests != null) {
+        model.setPhotoBeingTakenForTests(widget.photoBeingTakenForTests!);
+      }
+      model.initPhotoTaker(context, await widget.cacheDir());
+    }.call();
+  }
+
+  @override
+  void dispose() {
+    for (final property in model.restorableProperties.values) {
+      property.dispose();
+    }
+    super.dispose();
   }
 
   ListBuilder<String> _textToListBuilder(String text) => ListBuilder(
@@ -352,7 +397,7 @@ class _InitProductPageState extends State<InitProductPage>
   Widget _ingredientsTextGroup() {
     final Widget result;
     if (model.askForIngredientsText()) {
-      if (!ocrInProgress) {
+      if (!model.ocrInProgress) {
         result = Column(
           key: const Key('ingredients_text_group'),
           children: [
@@ -398,18 +443,8 @@ class _InitProductPageState extends State<InitProductPage>
     });
   }
 
-  Future<bool> _takePhoto(ProductImageType imageType) async {
-    Log.i('InitProductPage: _takePhoto start, imageType: $imageType');
-    final outPath = await GetIt.I
-        .get<PhotosTaker>()
-        .takeAndCropPhoto(context, await widget.cacheDir());
-    if (outPath == null) {
-      Log.i('InitProductPage: outPath == null');
-      return false;
-    }
-    model.product = model.product.rebuildWithImage(imageType, outPath);
-    Log.i('InitProductPage: _takePhoto success');
-    return true;
+  void _takePhoto(ProductImageType imageType) async {
+    model.takePhoto(imageType, context);
   }
 
   void _removePhoto(ProductImageType imageType) {
@@ -420,8 +455,8 @@ class _InitProductPageState extends State<InitProductPage>
     });
   }
 
-  void _takeFrontPhoto() async {
-    await _takePhoto(ProductImageType.FRONT);
+  void _takeFrontPhoto() {
+    _takePhoto(ProductImageType.FRONT);
   }
 
   void _removeFrontPhoto() {
@@ -429,30 +464,7 @@ class _InitProductPageState extends State<InitProductPage>
   }
 
   void _takeIngredientsPhoto() async {
-    final taken = await _takePhoto(ProductImageType.INGREDIENTS);
-    if (!taken || !mounted) {
-      return;
-    }
-    try {
-      Log.i('InitProductPage: _takeIngredientsPhoto ocr start');
-      ocrInProgress = true;
-      onStateUpdated();
-
-      final ingredientsText = await model.ocrIngredients(context.langCode);
-      if (ingredientsText != null) {
-        Log.i(
-            'InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
-        ingredientsTextController.text = ingredientsText;
-      } else {
-        Log.i('InitProductPage: _takeIngredientsPhoto fail');
-        showSnackBar(context.strings.global_something_went_wrong, context);
-        model.product =
-            model.product.rebuildWithImage(ProductImageType.INGREDIENTS, null);
-      }
-    } finally {
-      ocrInProgress = false;
-      onStateUpdated();
-    }
+    _takePhoto(ProductImageType.INGREDIENTS);
   }
 
   void _removeIngredientsPhoto() {
