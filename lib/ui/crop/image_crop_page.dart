@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -35,7 +37,12 @@ class _ImageCropPageState extends State<ImageCropPage> {
 
   void _initAsync() async {
     Log.i('ImageCropPage loading image start, ${widget.imagePath}');
-    _originalImage = await File(widget.imagePath).readAsBytes();
+    _originalImage = await FlutterImageCompress.compressWithFile(
+      widget.imagePath,
+      minWidth: window.physicalSize.width.toInt(),
+      minHeight: window.physicalSize.height.toInt(),
+      quality: 95,
+    );
     _cropController = CropController();
     Log.i('ImageCropPage loading image done');
     setState(() {

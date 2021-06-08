@@ -62,6 +62,7 @@ dependencies:
   google_maps_cluster_manager: ^1.0.0
   visibility_detector: ^0.2.0
   crop_your_image: ^0.5.3
+  flutter_image_compress: ^1.0.0
 
 dev_dependencies:
   flutter_test:
