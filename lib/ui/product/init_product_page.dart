@@ -52,6 +52,8 @@ class InitProductPage extends StatefulWidget {
     if (isInTests()) {
       final now = DateTime.now().millisecondsSinceEpoch;
       cacheFolderForTest = '/tmp/$now';
+    } else {
+      cacheFolderForTest = null;
     }
   }
 
