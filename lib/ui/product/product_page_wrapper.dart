@@ -69,7 +69,5 @@ class ProductPageWrapper {
       product.vegetarianStatus != null &&
       product.veganStatus != null &&
       product.imageFront != null &&
-      product.imageIngredients != null &&
-      product.ingredientsText != null &&
-      product.ingredientsText!.isNotEmpty;
+      product.imageIngredients != null;
 }

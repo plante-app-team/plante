@@ -14,6 +14,13 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
+enum InitProductPageOcrState {
+  NONE,
+  IN_PROGRESS,
+  SUCCESS,
+  FAILURE,
+}
+
 class InitProductPageModel {
   static const _NO_PHOTO = -1;
   late final dynamic Function() _onProductUpdate;
@@ -23,7 +30,7 @@ class InitProductPageModel {
   final ShopsListRestorable _shopsRestorable;
   final RestorableInt _photoBeingTaken = RestorableInt(_NO_PHOTO);
 
-  bool _ocrInProgress = false;
+  InitProductPageOcrState _ocrState = InitProductPageOcrState.NONE;
 
   Directory? _cacheDir;
   final ProductsManager _productsManager;
@@ -31,7 +38,7 @@ class InitProductPageModel {
   final PhotosTaker _photosTaker;
   Product get _initialProduct => _initialProductRestorable.value;
 
-  bool get ocrInProgress => _ocrInProgress;
+  InitProductPageOcrState get ocrState => _ocrState;
   Product get product => _productRestorable.value;
   set product(Product value) {
     if (value.veganStatus != product.veganStatus) {
@@ -188,21 +195,6 @@ class InitProductPageModel {
             VegStatusSource.open_food_facts;
   }
 
-  Future<String?> ocrIngredients() async {
-    final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
-        ProductImageType.INGREDIENTS, product.imageIngredients);
-    final ocrResult = await _productsManager
-        .updateProductAndExtractIngredients(initialProductWithIngredientsPhoto);
-
-    if (ocrResult.isErr) {
-      return null;
-    }
-    final ocrSuccess = ocrResult.unwrap();
-    product = product.rebuildWithImage(
-        ProductImageType.INGREDIENTS, ocrSuccess.product.imageIngredients);
-    return ocrSuccess.ingredients;
-  }
-
   bool canSaveProduct() {
     return ProductPageWrapper.isProductFilledEnoughForDisplay(product);
   }
@@ -254,24 +246,42 @@ class InitProductPageModel {
       return;
     }
 
+    performOcr();
+  }
+
+  void performOcr() async {
     try {
-      Log.i('InitProductPage: _takeIngredientsPhoto ocr start');
-      _ocrInProgress = true;
+      Log.i('InitProductPage: performOcr start');
+      _ocrState = InitProductPageOcrState.IN_PROGRESS;
       _onProductUpdate.call();
 
-      final ingredientsText = await ocrIngredients();
+      final ingredientsText = await _ocrIngredientsImpl();
       if (ingredientsText != null) {
-        Log.i(
-            'InitProductPage: _takeIngredientsPhoto success: $ingredientsText');
+        Log.i('InitProductPage: performOcr success: $ingredientsText');
+        _ocrState = InitProductPageOcrState.SUCCESS;
         product = product.rebuild((e) => e.ingredientsText = ingredientsText);
         _forceReloadAllProductData.call();
       } else {
-        Log.i('InitProductPage: _takeIngredientsPhoto fail');
-        product = product.rebuildWithImage(ProductImageType.INGREDIENTS, null);
+        Log.i('InitProductPage: performOcr fail');
+        _ocrState = InitProductPageOcrState.FAILURE;
       }
     } finally {
-      _ocrInProgress = false;
       _onProductUpdate.call();
     }
+  }
+
+  Future<String?> _ocrIngredientsImpl() async {
+    final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
+        ProductImageType.INGREDIENTS, product.imageIngredients);
+    final ocrResult = await _productsManager
+        .updateProductAndExtractIngredients(initialProductWithIngredientsPhoto);
+
+    if (ocrResult.isErr) {
+      return null;
+    }
+    final ocrSuccess = ocrResult.unwrap();
+    product = product.rebuildWithImage(
+        ProductImageType.INGREDIENTS, ocrSuccess.product.imageIngredients);
+    return ocrSuccess.ingredients;
   }
 }

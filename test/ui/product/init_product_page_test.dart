@@ -22,6 +22,7 @@ import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
@@ -89,11 +90,20 @@ void main() {
         String? ingredientsTextOverride,
         VegStatus? veganStatusInput = VegStatus.positive,
         VegStatus? vegetarianStatusInput = VegStatus.positive,
-        List<Shop>? selectedShops}) async {
+        List<Shop>? selectedShops,
+        int requiredManualOcrAttempts = 0,
+        int ocrSuccessfulAttemptNumber = 1}) async {
+    var ocrAttempts = 0;
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async => Ok(ProductWithOCRIngredients(
-            invoc.positionalArguments[0] as Product,
-            'water, lemon')));
+            (invoc) async {
+              ocrAttempts += 1;
+              if (ocrAttempts < ocrSuccessfulAttemptNumber) {
+                return Err(ProductsManagerError.OTHER);
+              }
+              return Ok(ProductWithOCRIngredients(
+                invoc.positionalArguments[0] as Product,
+                'water, lemon'));
+            });
 
     verifyZeroInteractions(productsManager);
 
@@ -101,6 +111,7 @@ void main() {
     final callback = () {
       done = true;
     };
+
     final widget = InitProductPage(
         Product((v) => v.barcode = '123'),
         doneCallback: callback);
@@ -111,7 +122,7 @@ void main() {
     }
     expect(cacheDir.existsSync(), isFalse);
 
-    await tester.superPump(widget);
+    final context = await tester.superPump(widget);
 
     // Cache dir is always expected to be created
     await tester.pumpAndSettle();
@@ -163,13 +174,32 @@ void main() {
     await scrollToBottom(tester);
 
     if (takeImageIngredients) {
-      expect(find.text('water, lemon'), findsNothing);
       verifyNever(photosTaker.takeAndCropPhoto(any, any));
-      await tester.tap(
-          find.byKey(const Key('ingredients_photo')));
+      expect(ocrAttempts, equals(0));
+      await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
-      expect(find.text('water, lemon'), findsOneWidget);
+      expect(ocrAttempts, equals(1));
       verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
+
+      var performedManualOcrAttempts = 0;
+      while (true) {
+        if (ocrAttempts < ocrSuccessfulAttemptNumber) {
+          expect(find.text(context.strings.init_product_page_ocr_error_descr),
+              findsOneWidget);
+          expect(find.text('water, lemon'), findsNothing);
+        } else {
+          expect(find.text(context.strings.init_product_page_ocr_error_descr),
+              findsNothing);
+          expect(find.text('water, lemon'), findsOneWidget);
+        }
+        if (performedManualOcrAttempts < requiredManualOcrAttempts) {
+          await tester.tap(find.byKey(const Key('ocr_try_again')));
+          await tester.pumpAndSettle();
+          performedManualOcrAttempts += 1;
+        } else {
+          break;
+        }
+      }
     }
 
     if (ingredientsTextOverride != null) {
@@ -545,9 +575,35 @@ void main() {
     expect(done, isFalse);
   });
 
-  testWidgets('cannot save product without ingredients text', (WidgetTester tester) async {
-    final done = await generalTest(tester, ingredientsTextOverride: '', expectedProductResult: null);
-    expect(done, isFalse);
+  testWidgets('can save product without ingredients text', (WidgetTester tester) async {
+    final expectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = '' // Empty!
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: expectedProduct,
+        nameInput: expectedProduct.name,
+        brandInput: expectedProduct.brands!.join(', '),
+        categoriesInput: expectedProduct.categories!.join(', '),
+        takeImageFront: expectedProduct.imageFront != null,
+        takeImageIngredients: true,
+        ingredientsTextOverride: '',
+        veganStatusInput: expectedProduct.veganStatus,
+        vegetarianStatusInput: expectedProduct.vegetarianStatus,
+        selectedShops: [aShop]
+    );
+
+    expect(done, isTrue);
   });
 
   testWidgets('cannot save product without vegan status', (WidgetTester tester) async {
@@ -738,6 +794,70 @@ void main() {
     // Even though perfectlyGoodExpectedProduct expected to be stored,
     // page is expected to be not finished, because of shops sending error
     expect(done, isFalse);
+  });
+
+  testWidgets('ocr fail and manual ingredients input', (WidgetTester tester) async {
+    final perfectlyGoodExpectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        nameInput: perfectlyGoodExpectedProduct.name,
+        brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
+        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
+        takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
+        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
+        vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
+        ocrSuccessfulAttemptNumber: 3, // 2 OCRs attempts will fail (first (auto) and the manual)
+        requiredManualOcrAttempts: 1, // We'll try to perform restart OCR only once
+        ingredientsTextOverride: 'water, lemon' // But will write ingredients manually
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('ocr fail and successful retry', (WidgetTester tester) async {
+    final perfectlyGoodExpectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        nameInput: perfectlyGoodExpectedProduct.name,
+        brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
+        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
+        takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
+        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
+        vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
+        ocrSuccessfulAttemptNumber: 3, // 2 OCRs attempts will fail (first (auto) and the first manual)
+        requiredManualOcrAttempts: 2, // We'll try to perform a second OCR!
+        ingredientsTextOverride: null // And will NOT write ingredients manually
+    );
+
+    expect(done, isTrue);
   });
 
   testWidgets('finish taking front photo when restoring', (WidgetTester tester) async {

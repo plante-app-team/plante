@@ -533,4 +533,75 @@ void main() {
 
     expect(find.byType(MapPage), findsOneWidget);
   });
+
+  testWidgets('ingredients text displayed when present', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'Water, salt, sugar');
+
+    await tester.superPump(DisplayProductPage(product));
+    expect(find.byKey(const Key('product_ingredients_text')), findsOneWidget);
+    expect(find.text('Water, salt, sugar'), findsOneWidget);
+    expect(find.byKey(const Key('product_ingredients_photo')), findsNothing);
+  });
+
+  testWidgets('ingredients photo displayed when there is no ingredients text', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = null);
+
+    await tester.superPump(DisplayProductPage(product));
+    expect(find.byKey(const Key('product_ingredients_text')), findsNothing);
+    expect(find.text('Water, salt, sugar'), findsNothing);
+    expect(find.byKey(const Key('product_ingredients_photo')), findsOneWidget);
+  });
+
+  testWidgets('click on ingredients photo opens photo screen', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = null);
+
+    await tester.superPump(DisplayProductPage(product));
+    expect(find.byKey(const Key('product_ingredients_text')), findsNothing);
+    expect(find.text('Water, salt, sugar'), findsNothing);
+    expect(find.byKey(const Key('product_ingredients_photo')), findsOneWidget);
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsNothing);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsNothing);
+
+    await tester.tap(find.byKey(const Key('product_ingredients_photo')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const Key('product_front_image_page')),
+        findsNothing);
+    expect(
+        find.byKey(const Key('product_ingredients_image_page')),
+        findsOneWidget);
+  });
 }

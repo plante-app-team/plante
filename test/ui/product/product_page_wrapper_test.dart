@@ -73,6 +73,23 @@ void main() {
     expect(find.byType(DisplayProductPage), findsOneWidget);
   });
 
+  testWidgets('init page is not shown when product is filled but lacks ingredients text', (WidgetTester tester) async {
+    GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
+    final initialProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'name'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.community
+      ..ingredientsText = null // !!!!!!!!
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
+    await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
+    expect(find.byType(InitProductPage), findsNothing);
+    expect(find.byType(DisplayProductPage), findsOneWidget);
+  });
+
   testWidgets('init_product_page is not shown when '
               'veg-statuses are filled by OFF', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());

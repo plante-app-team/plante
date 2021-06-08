@@ -6,6 +6,7 @@ import 'package:plante/outside/off/off_api.dart';
 class FakeOffApi implements OffApi {
   final Settings _settings;
   final Map<String, off.Product> _fakeProducts = {};
+  final Set<String> _triedOcrProducts = {};
 
   FakeOffApi(this._settings);
 
@@ -38,6 +39,11 @@ class FakeOffApi implements OffApi {
   Future<off.OcrIngredientsResult> extractIngredients(
       off.User user, String barcode, off.OpenFoodFactsLanguage language) async {
     await Future.delayed(const Duration(seconds: 2));
+    if (!_triedOcrProducts.contains(barcode)) {
+      // First OCR attempt will always end with a failure
+      _triedOcrProducts.add(barcode);
+      return const off.OcrIngredientsResult(status: 1);
+    }
     return const off.OcrIngredientsResult(
         status: 0, ingredientsTextFromImage: 'Cucumbers, salad, onion');
   }

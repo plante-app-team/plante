@@ -37,6 +37,7 @@ class InitProductPage extends StatefulWidget {
   final VoidCallback? doneCallback;
 
   final ProductImageType? photoBeingTakenForTests;
+  late final String? cacheFolderForTest;
 
   InitProductPage(this.initialProduct,
       {Key? key,
@@ -48,6 +49,10 @@ class InitProductPage extends StatefulWidget {
     if (photoBeingTakenForTests != null && !isInTests()) {
       throw Exception();
     }
+    if (isInTests()) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      cacheFolderForTest = '/tmp/$now';
+    }
   }
 
   @override
@@ -55,6 +60,12 @@ class InitProductPage extends StatefulWidget {
       initialProduct, productUpdatedCallback, doneCallback);
 
   Future<Directory> cacheDir() async {
+    if (cacheFolderForTest != null) {
+      if (!isInTests()) {
+        throw Exception();
+      }
+      return Directory(cacheFolderForTest!);
+    }
     final tempDir = await getTemporaryDirectory();
     return Directory('${tempDir.path}/init_product_cache');
   }
@@ -397,30 +408,55 @@ class _InitProductPageState extends State<InitProductPage>
   Widget _ingredientsTextGroup() {
     final Widget result;
     if (model.askForIngredientsText()) {
-      if (!model.ocrInProgress) {
-        result = Column(
-          key: const Key('ingredients_text_group'),
-          children: [
-            Text(context.strings.init_product_page_verify_ingredients_ocr,
-                style: TextStyles.hint),
-            const SizedBox(height: 12),
-            InputFieldMultilinePlante(
-              key: const Key('ingredients_text'),
-              controller: ingredientsTextController,
-            ),
+      switch (model.ocrState) {
+        case InitProductPageOcrState.NONE:
+          Log.w('model.askForIngredientsText true, but ocr state is NONE');
+          result = const SizedBox.shrink();
+          break;
+        case InitProductPageOcrState.IN_PROGRESS:
+          result = Column(key: const Key('ingredients_text_group'), children: [
+            Row(children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 8),
+              Text(context.strings.init_product_page_ocr_in_progress,
+                  style: TextStyles.normal)
+            ]),
             const SizedBox(height: 17),
-          ],
-        );
-      } else {
-        result = Column(key: const Key('ingredients_text_group'), children: [
-          Row(children: [
-            const CircularProgressIndicator(),
-            const SizedBox(width: 8),
-            Text(context.strings.init_product_page_ocr_in_progress,
-                style: TextStyles.normal)
-          ]),
-          const SizedBox(height: 17),
-        ]);
+          ]);
+          break;
+        case InitProductPageOcrState.SUCCESS:
+          result = Column(
+            key: const Key('ingredients_text_group'),
+            children: [
+              Text(context.strings.init_product_page_verify_ingredients_ocr,
+                  style: TextStyles.hint),
+              const SizedBox(height: 12),
+              InputFieldMultilinePlante(
+                key: const Key('ingredients_text'),
+                controller: ingredientsTextController,
+              ),
+              const SizedBox(height: 17),
+            ],
+          );
+          break;
+        case InitProductPageOcrState.FAILURE:
+          result = Column(
+            key: const Key('ingredients_text_group'),
+            children: [
+              Text(context.strings.init_product_page_ocr_error_descr,
+                  style: TextStyles.hint),
+              const SizedBox(height: 8),
+              ButtonFilledPlante.withText(context.strings.global_try_again,
+                  key: const Key('ocr_try_again'), onPressed: model.performOcr),
+              const SizedBox(height: 12),
+              InputFieldMultilinePlante(
+                key: const Key('ingredients_text'),
+                controller: ingredientsTextController,
+              ),
+              const SizedBox(height: 17),
+            ],
+          );
+          break;
       }
     } else {
       result = const SizedBox.shrink();

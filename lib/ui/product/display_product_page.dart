@@ -89,6 +89,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                   ProductHeaderWidget(
                       key: const Key('product_header'),
                       product: product,
+                      imageType: ProductImageType.FRONT,
                       onTap: showProductPhoto),
                 ])),
             const SizedBox(height: 19),
@@ -156,10 +157,18 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
                               context.strings.display_product_page_ingredients,
                               style: TextStyles.normalBold)),
                       const SizedBox(height: 8),
-                      SizedBox(
-                          width: double.infinity,
-                          child: Text(product.ingredientsText!,
-                              style: TextStyles.normal)),
+                      if (product.ingredientsText != null)
+                        SizedBox(
+                            key: const Key('product_ingredients_text'),
+                            width: double.infinity,
+                            child: Text(product.ingredientsText!,
+                                style: TextStyles.normal)),
+                      if (product.ingredientsText == null)
+                        ProductHeaderWidget(
+                            key: const Key('product_ingredients_photo'),
+                            product: product,
+                            imageType: ProductImageType.INGREDIENTS,
+                            onTap: showProductIngredientsPhoto),
                       const SizedBox(height: 24),
                     ]))),
             if (haveIngredientsAnalysis()) ingredientsAnalysisWidget(),

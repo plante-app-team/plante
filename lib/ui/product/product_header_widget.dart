@@ -8,9 +8,13 @@ import '_product_images_helper.dart';
 
 class ProductHeaderWidget extends StatelessWidget {
   final Product product;
+  final ProductImageType imageType;
   final VoidCallback onTap;
   const ProductHeaderWidget(
-      {Key? key, required this.product, required this.onTap})
+      {Key? key,
+      required this.product,
+      required this.imageType,
+      required this.onTap})
       : super(key: key);
 
   @override
@@ -21,8 +25,7 @@ class ProductHeaderWidget extends StatelessWidget {
         SizedBox(
             height: 161,
             width: double.infinity,
-            child: ProductImagesHelper.productImageWidget(
-                product, ProductImageType.FRONT)),
+            child: ProductImagesHelper.productImageWidget(product, imageType)),
         Positioned.fill(
             child: Container(
           decoration: const BoxDecoration(
@@ -39,12 +42,13 @@ class ProductHeaderWidget extends StatelessWidget {
                 child: Padding(
                     padding: const EdgeInsets.only(left: 12, bottom: 18),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      SizedBox(
-                          width: double.infinity,
-                          child: Text(product.name!,
-                              style: TextStyles.headline1White,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1)),
+                      if (imageType == ProductImageType.FRONT)
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text(product.name!,
+                                style: TextStyles.headline1White,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1)),
                       if (product.brands != null && product.brands!.isNotEmpty)
                         Row(children: [
                           Text(context.strings.display_product_page_brand,
