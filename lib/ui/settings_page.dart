@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/base/settings.dart';
@@ -31,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   late Settings settings;
   late UserParams user;
+  late PackageInfo packageInfo;
 
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
     developer = true;
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
+    packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       loading = false;
     });
@@ -167,7 +170,19 @@ class _SettingsPageState extends State<SettingsPage> {
                             context.strings.external_auth_page_privacy_policy,
                             style: const TextStyle(
                                 color: Colors.blue,
-                                decoration: TextDecoration.underline))))
+                                decoration: TextDecoration.underline)))),
+                const SizedBox(height: 10),
+                Center(
+                    child: InkWell(
+                        onTap: () {
+                          Clipboard.setData(
+                              ClipboardData(text: packageInfo.asString()));
+                          showSnackBar(
+                              context.strings.global_copied_to_clipboard,
+                              context);
+                        },
+                        child: Text(packageInfo.asString(),
+                            style: TextStyles.hint))),
               ]))
         ]))));
   }
@@ -191,5 +206,11 @@ class _CheckboxSettings extends StatelessWidget {
       title: Text(text, style: TextStyles.normal),
       contentPadding: EdgeInsets.zero,
     );
+  }
+}
+
+extension _PackageInfoExt on PackageInfo {
+  String asString() {
+    return '$appName $version $buildNumber';
   }
 }
