@@ -25,6 +25,7 @@ class OpenStreetMap {
     final cmd = '[out:json];('
         'node[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
         'relation[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
+        'way[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
         ');out center;';
 
     final Response r;
