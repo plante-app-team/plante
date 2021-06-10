@@ -192,6 +192,7 @@ class _MapPageState extends State<MapPage> {
     return WillPopScope(
         onWillPop: _mode.onWillPop,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           body: SafeArea(
               child: Stack(children: [
             GoogleMap(
