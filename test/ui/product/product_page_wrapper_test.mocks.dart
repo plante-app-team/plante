@@ -9,10 +9,9 @@ import 'dart:math' as _i3;
 import 'package:flutter/src/services/message_codec.dart' as _i18;
 import 'package:flutter/src/widgets/framework.dart' as _i16;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart'
-    as _i14;
+import 'package:plante/base/base.dart' as _i14;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/model/location_controller.dart' as _i13;
+import 'package:plante/location/location_controller.dart' as _i13;
 import 'package:plante/model/product.dart' as _i6;
 import 'package:plante/model/shop.dart' as _i10;
 import 'package:plante/model/shop_product_range.dart' as _i11;
@@ -140,16 +139,6 @@ class MockLocationController extends _i1.Mock
   }
 
   @override
-  _i5.Future<_i14.PermissionStatus> permissionStatus() =>
-      (super.noSuchMethod(Invocation.method(#permissionStatus, []),
-              returnValue: Future.value(_i14.PermissionStatus.granted))
-          as _i5.Future<_i14.PermissionStatus>);
-  @override
-  _i5.Future<_i14.PermissionStatus> requestPermission() =>
-      (super.noSuchMethod(Invocation.method(#requestPermission, []),
-              returnValue: Future.value(_i14.PermissionStatus.granted))
-          as _i5.Future<_i14.PermissionStatus>);
-  @override
   _i5.Future<_i3.Point<double>?> lastKnownPosition() =>
       (super.noSuchMethod(Invocation.method(#lastKnownPosition, []),
               returnValue: Future.value(_FakePoint<double>()))
@@ -159,6 +148,12 @@ class MockLocationController extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#currentPosition, []),
               returnValue: Future.value(_FakePoint<double>()))
           as _i5.Future<_i3.Point<double>?>);
+  @override
+  void callWhenLastPositionKnown(
+          _i14.ArgCallback<_i3.Point<double>>? callback) =>
+      super.noSuchMethod(
+          Invocation.method(#callWhenLastPositionKnown, [callback]),
+          returnValueForMissingStub: null);
 }
 
 /// A class which mocks [PhotosTaker].

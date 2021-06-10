@@ -6,9 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -28,7 +29,8 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'display_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend, LocationController, ShopsManager, PhotosTaker])
+@GenerateMocks([ProductsManager, Backend, LocationController, ShopsManager,
+                PhotosTaker, PermissionsManager])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
@@ -75,6 +77,8 @@ void main() {
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
     when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
+
+    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

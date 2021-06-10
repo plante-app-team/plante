@@ -9,7 +9,7 @@ enum PermissionState {
   permanentlyDenied,
 }
 
-enum PermissionKind { CAMERA }
+enum PermissionKind { CAMERA, LOCATION }
 
 /// Wrapper around the permission_handler lib mainly for testing purposes
 class PermissionsManager {
@@ -33,6 +33,8 @@ extension _WappedPermissionType on PermissionKind {
     switch (this) {
       case PermissionKind.CAMERA:
         return wrapped.Permission.camera;
+      case PermissionKind.LOCATION:
+        return wrapped.Permission.locationWhenInUse;
     }
   }
 }

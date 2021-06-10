@@ -2,12 +2,14 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/location/ip_location_provider.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -18,13 +20,19 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/user_params_fetcher.dart';
 
 void initDI() {
+  GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
       RouteObserver<ModalRoute>());
   GetIt.I.registerSingleton<UserParamsController>(UserParamsController());
-  GetIt.I.registerSingleton<LocationController>(LocationController());
   GetIt.I.registerSingleton<HttpClient>(HttpClient());
+  GetIt.I.registerSingleton<IpLocationProvider>(
+      IpLocationProvider(GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<LocationController>(LocationController(
+      GetIt.I.get<IpLocationProvider>(),
+      GetIt.I.get<PermissionsManager>(),
+      GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<OpenStreetMap>(
       OpenStreetMap(GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());

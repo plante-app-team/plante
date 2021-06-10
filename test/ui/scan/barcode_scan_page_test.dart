@@ -8,7 +8,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';

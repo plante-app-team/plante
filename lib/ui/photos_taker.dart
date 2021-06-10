@@ -10,8 +10,6 @@ import 'package:plante/base/result.dart';
 import 'package:plante/ui/crop/image_crop_page.dart';
 
 class PhotosTaker {
-  // TODO: files are big and other apps and activities are opened here - we need
-  //       to handle a situation when a picture is taken/cropped but our app has died
   Future<Uri?> takeAndCropPhoto(
       BuildContext context, Directory outFolder) async {
     Log.i('takeAndCropPhoto start');

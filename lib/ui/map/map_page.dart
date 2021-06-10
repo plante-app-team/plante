@@ -6,7 +6,8 @@ import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
@@ -79,8 +80,13 @@ class _MapPageState extends State<MapPage> {
         });
       }
     };
-    _model = MapPageModel(GetIt.I.get<LocationController>(),
-        GetIt.I.get<ShopsManager>(), _onShopsUpdated, _onError, updateCallback);
+    _model = MapPageModel(
+        GetIt.I.get<LocationController>(),
+        GetIt.I.get<PermissionsManager>(),
+        GetIt.I.get<ShopsManager>(),
+        _onShopsUpdated,
+        _onError,
+        updateCallback);
 
     /// The clustering library levels logic is complicated.
     ///
@@ -189,6 +195,12 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    var initialPos = _model.lastKnownUserPosInstant();
+    if (initialPos == null) {
+      _model.callWhenUserPosKnown(_moveCameraTo);
+      initialPos = _model.defaultUserPos();
+    }
+
     return WillPopScope(
         onWillPop: _mode.onWillPop,
         child: Scaffold(
@@ -201,8 +213,7 @@ class _MapPageState extends State<MapPage> {
               zoomControlsEnabled: false,
               minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
               mapType: MapType.normal,
-              initialCameraPosition:
-                  _model.lastKnownUserPosInstant() ?? _model.defaultUserPos(),
+              initialCameraPosition: initialPos,
               onMapCreated: (GoogleMapController controller) {
                 _mapController.complete(controller);
                 _clusterManager.setMapController(controller);

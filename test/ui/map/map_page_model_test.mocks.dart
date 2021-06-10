@@ -6,10 +6,10 @@ import 'dart:async' as _i5;
 import 'dart:math' as _i2;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart'
-    as _i6;
+import 'package:plante/base/base.dart' as _i6;
+import 'package:plante/base/permissions_manager.dart' as _i12;
 import 'package:plante/base/result.dart' as _i3;
-import 'package:plante/model/location_controller.dart' as _i4;
+import 'package:plante/location/location_controller.dart' as _i4;
 import 'package:plante/model/product.dart' as _i10;
 import 'package:plante/model/shop.dart' as _i8;
 import 'package:plante/model/shop_product_range.dart' as _i9;
@@ -33,16 +33,6 @@ class MockLocationController extends _i1.Mock
   }
 
   @override
-  _i5.Future<_i6.PermissionStatus> permissionStatus() =>
-      (super.noSuchMethod(Invocation.method(#permissionStatus, []),
-              returnValue: Future.value(_i6.PermissionStatus.granted))
-          as _i5.Future<_i6.PermissionStatus>);
-  @override
-  _i5.Future<_i6.PermissionStatus> requestPermission() =>
-      (super.noSuchMethod(Invocation.method(#requestPermission, []),
-              returnValue: Future.value(_i6.PermissionStatus.granted))
-          as _i5.Future<_i6.PermissionStatus>);
-  @override
   _i5.Future<_i2.Point<double>?> lastKnownPosition() =>
       (super.noSuchMethod(Invocation.method(#lastKnownPosition, []),
               returnValue: Future.value(_FakePoint<double>()))
@@ -52,6 +42,12 @@ class MockLocationController extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#currentPosition, []),
               returnValue: Future.value(_FakePoint<double>()))
           as _i5.Future<_i2.Point<double>?>);
+  @override
+  void callWhenLastPositionKnown(
+          _i6.ArgCallback<_i2.Point<double>>? callback) =>
+      super.noSuchMethod(
+          Invocation.method(#callWhenLastPositionKnown, [callback]),
+          returnValueForMissingStub: null);
 }
 
 /// A class which mocks [ShopsManager].
@@ -105,4 +101,29 @@ class MockShopsManager extends _i1.Mock implements _i7.ShopsManager {
               returnValue:
                   Future.value(_FakeResult<_i8.Shop, _i7.ShopsManagerError>()))
           as _i5.Future<_i3.Result<_i8.Shop, _i7.ShopsManagerError>>);
+}
+
+/// A class which mocks [PermissionsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPermissionsManager extends _i1.Mock
+    implements _i12.PermissionsManager {
+  MockPermissionsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i12.PermissionState> status(_i12.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#status, [permission]),
+              returnValue: Future.value(_i12.PermissionState.granted))
+          as _i5.Future<_i12.PermissionState>);
+  @override
+  _i5.Future<_i12.PermissionState> request(_i12.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#request, [permission]),
+              returnValue: Future.value(_i12.PermissionState.granted))
+          as _i5.Future<_i12.PermissionState>);
+  @override
+  _i5.Future<bool> openAppSettings() =>
+      (super.noSuchMethod(Invocation.method(#openAppSettings, []),
+          returnValue: Future.value(false)) as _i5.Future<bool>);
 }

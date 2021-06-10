@@ -4,10 +4,10 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
@@ -24,7 +24,7 @@ enum MapPageModelError {
 }
 
 class MapPageModel implements ShopsManagerListener {
-  static const _DEFAULT_USER_POS = LatLng(44.4192543, 38.2052612);
+  static const _DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
   static const MAX_SHOPS_LOADS_ATTEMPTS = 3;
   static final _shopsLoadsAttemptsCooldown = isInTests()
       ? const Duration(milliseconds: 50)
@@ -33,6 +33,7 @@ class MapPageModel implements ShopsManagerListener {
   final MapPageModelErrorCallback _errorCallback;
   final VoidCallback _updateCallback;
   final LocationController _locationController;
+  final PermissionsManager _permissionsManager;
   final ShopsManager _shopsManager;
   final _shopsCache = <String, Shop>{};
   final _loadedAreas = <LatLngBounds>{};
@@ -44,8 +45,13 @@ class MapPageModel implements ShopsManagerListener {
 
   int get loadedAreasCount => _loadedAreas.length;
 
-  MapPageModel(this._locationController, this._shopsManager,
-      this._updateShopsCallback, this._errorCallback, this._updateCallback) {
+  MapPageModel(
+      this._locationController,
+      this._permissionsManager,
+      this._shopsManager,
+      this._updateShopsCallback,
+      this._errorCallback,
+      this._updateCallback) {
     _shopsManager.addListener(this);
   }
 
@@ -57,9 +63,11 @@ class MapPageModel implements ShopsManagerListener {
   Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
   Future<bool> ensurePermissions() async {
-    if (!await _locationController.permissionStatus().isGranted) {
-      final status = await _locationController.requestPermission();
-      if (!status.isGranted && !status.isLimited) {
+    var permission = await _permissionsManager.status(PermissionKind.LOCATION);
+    if (permission != PermissionState.granted) {
+      permission = await _permissionsManager.request(PermissionKind.LOCATION);
+      if (permission != PermissionState.granted &&
+          permission != PermissionState.limited) {
         // TODO(https://trello.com/c/662nLdKd/): properly handle all possible statuses
         return false;
       }
@@ -77,7 +85,7 @@ class MapPageModel implements ShopsManagerListener {
       return null;
     }
     return CameraPosition(
-        target: LatLng(lastKnownPosition.x, lastKnownPosition.y), zoom: 15);
+        target: LatLng(lastKnownPosition.y, lastKnownPosition.x), zoom: 15);
   }
 
   Future<CameraPosition?> lastKnownUserPos() async {
@@ -86,7 +94,7 @@ class MapPageModel implements ShopsManagerListener {
       return null;
     }
     return CameraPosition(
-        target: LatLng(lastKnownPosition.x, lastKnownPosition.y), zoom: 15);
+        target: LatLng(lastKnownPosition.y, lastKnownPosition.x), zoom: 15);
   }
 
   Future<CameraPosition?> currentUserPos() async {
@@ -94,7 +102,14 @@ class MapPageModel implements ShopsManagerListener {
     if (position == null) {
       return null;
     }
-    return CameraPosition(target: LatLng(position.x, position.y), zoom: 15);
+    return CameraPosition(target: LatLng(position.y, position.x), zoom: 15);
+  }
+
+  void callWhenUserPosKnown(ArgumentCallback<CameraPosition> callback) {
+    _locationController.callWhenLastPositionKnown((position) {
+      callback.call(
+          CameraPosition(target: LatLng(position.y, position.x), zoom: 15));
+    });
   }
 
   Future<void> onCameraMoved(LatLngBounds viewBounds) async {

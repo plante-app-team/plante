@@ -7,8 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/model/location_controller.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -28,7 +29,8 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'init_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, PhotosTaker, ShopsManager, LocationController])
+@GenerateMocks([ProductsManager, PhotosTaker, ShopsManager, LocationController,
+                PermissionsManager])
 void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
@@ -72,6 +74,8 @@ void main() {
     locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     GetIt.I.registerSingleton<LocationController>(locationController);
+
+    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
