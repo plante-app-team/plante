@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,6 +13,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_default.dart';
@@ -235,10 +237,14 @@ class _MapPageState extends State<MapPage> {
                     ? const LinearProgressIndicator()
                     : const SizedBox.shrink()),
           ])),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: FloatingActionButton(
             onPressed: _showUser,
-            label: Text(context.strings.map_page_btn_where_am_i),
-            icon: const Icon(Icons.person),
+            backgroundColor: Colors.white,
+            splashColor: ColorsPlante.primaryDisabled,
+            child: SizedBox(
+                width: 30,
+                height: 30,
+                child: SvgPicture.asset('assets/my_location.svg')),
           ),
         ));
   }

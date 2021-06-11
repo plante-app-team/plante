@@ -40,7 +40,6 @@
       "main_page_bottom_btn_map": "Products map",
 
       "map_page_default_shop_type_name": "Shop",
-      "map_page_btn_where_am_i": "Where am I?",
       "map_page_empty_shops": "Empty shops",
       "map_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
       "map_page_is_new_product_sold_q": "Is the product being sold at «<SHOP>»?",

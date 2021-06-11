@@ -40,7 +40,6 @@
     "main_page_bottom_btn_map": "Карта продуктов",
 
     "map_page_default_shop_type_name": "Магазин",
-    "map_page_btn_where_am_i": "Где я?",
     "map_page_empty_shops": "Пустые магазины",
     "map_page_is_product_sold_q": "Продукт «<PRODUCT>» продаётся в магазине «<SHOP>»?",
     "map_page_is_new_product_sold_q": "Продукт продаётся в магазине «<SHOP>»?",
