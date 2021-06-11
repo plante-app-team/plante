@@ -126,7 +126,7 @@ flutter:
     - assets/veg_status_source_unknown.svg
     - assets/expand_down.svg
     - assets/expand_up.svg
-    - assets/report.svg
+    - assets/marker_abstract.svg
     - assets/barcode.svg
     - assets/history.svg
     - assets/cancel.svg

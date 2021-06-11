@@ -45,7 +45,7 @@ class _MainPageState extends State<MainPage> with RestorationMixin {
         body: IndexedStack(index: selectedPage.value, children: pageOptions),
         bottomNavigationBar: BottomBarPlante(
           svgIcons: [
-            if (enableNewestFeatures()) 'assets/report.svg',
+            if (enableNewestFeatures()) 'assets/marker_abstract.svg',
             'assets/barcode.svg',
             'assets/history.svg'
           ],
