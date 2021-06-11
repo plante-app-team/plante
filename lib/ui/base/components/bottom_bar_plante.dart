@@ -44,7 +44,7 @@ class BottomBarPlante extends StatelessWidget {
                   icon: SvgPicture.asset(svgIcons[index],
                       color: index == selectedIcon
                           ? ColorsPlante.primary
-                          : const Color(0xFF979A9C)))));
+                          : ColorsPlante.grey))));
       result.add(button);
     }
     return result;

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/ui/base/text_styles.dart';
 
 typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 
@@ -36,51 +37,88 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     ShopsMarkersExtraData extraData, BuildContext context) async {
   if (shops.length == 1) {
     if (extraData.selectedShops.contains(shops.first)) {
-      return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_selected.svg');
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/map_marker_selected.svg', 1, TextStyles.markerFilled);
     } else if (extraData.accentedShops.contains(shops.first)) {
-      return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_accented.svg');
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/map_marker_accented.svg', 1, TextStyles.markerAccented);
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_filled.svg');
+          context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
     } else {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_empty.svg');
+          context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);
     }
   } else {
     if (shops.any((e) => extraData.selectedShops.contains(e))) {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_selected.svg');
+          context,
+          'assets/map_marker_group_selected.svg',
+          shops.length,
+          TextStyles.markerFilled);
     } else if (shops.any((e) => extraData.accentedShops.contains(e))) {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_accented.svg');
+          context,
+          'assets/map_marker_group_accented.svg',
+          shops.length,
+          TextStyles.markerAccented);
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_group_filled.svg');
+          context,
+          'assets/map_marker_group_filled.svg',
+          shops.length,
+          TextStyles.markerFilled);
     } else {
       return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/map_marker_group_empty.svg');
+          context,
+          'assets/map_marker_group_empty.svg',
+          shops.length,
+          TextStyles.markerEmpty);
     }
   }
 }
 
+final _imagePaint = Paint();
+final _textPainter = TextPainter(textDirection: TextDirection.ltr);
+
 /// Stolen from https://stackoverflow.com/a/57609840
-Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(
-    BuildContext context, String assetName) async {
+Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
+    String assetName, int shops, TextStyle textStyle) async {
+  final pictureRecorder = PictureRecorder();
+  final Canvas canvas = Canvas(pictureRecorder);
+
+  // Marker image
+  var size = 45.0; // SVG original size
   final svgString = await DefaultAssetBundle.of(context).loadString(assetName);
   final svgDrawableRoot = await svg.fromSvgString(svgString, '');
-
   // toPicture() and toImage() don't seem to be pixel ratio aware,
   // so we calculate the actual sizes here
   final queryData = MediaQuery.of(context);
   final devicePixelRatio = queryData.devicePixelRatio;
-  final width = 32 * devicePixelRatio; // where 32 is your SVG's original width
-  final height = 40 * devicePixelRatio; // same thing
+  size = size * devicePixelRatio;
+  final picture = svgDrawableRoot.toPicture(size: Size(size, size));
+  final image = await picture.toImage(size.round(), size.round());
+  canvas.drawImage(image, Offset.zero, _imagePaint);
 
-  final picture = svgDrawableRoot.toPicture(size: Size(width, height));
+  // Text
+  if (shops != 1) {
+    _textPainter.text = TextSpan(text: shops.toString(), style: textStyle);
+    _textPainter.layout();
+    // Magic numbers! Figured out manually, might be wrong
+    final double xOffset;
+    if (shops == 6) {
+      xOffset = 54;
+    } else if (shops == 8) {
+      xOffset = 55;
+    } else {
+      xOffset = 56;
+    }
+    _textPainter.paint(canvas, Offset(xOffset - _textPainter.width / 2, 28));
+  }
 
-  final image = await picture.toImage(width.round(), height.round());
-  final bytes = await image.toByteData(format: ImageByteFormat.png);
-  return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  final img =
+      await pictureRecorder.endRecording().toImage(size.round(), size.round());
+  final data = await img.toByteData(format: ImageByteFormat.png);
+
+  return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
 }

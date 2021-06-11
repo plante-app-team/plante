@@ -22,7 +22,7 @@ class TextStyles {
       TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF192123));
 
   static const TextStyle hint =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF979A9C));
+      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: ColorsPlante.grey);
 
   static const TextStyle smallBoldGreen = TextStyle(
       fontFamily: 'OpenSans',
@@ -54,7 +54,7 @@ class TextStyles {
   static const TextStyle input =
       TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF192123));
   static const TextStyle inputHint =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF979A9C));
+      TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: ColorsPlante.grey);
 
   static const TextStyle inputLabel = normalSmall;
 
@@ -81,4 +81,22 @@ class TextStyles {
       fontWeight: FontWeight.w500,
       fontSize: 24,
       color: ColorsPlante.primary);
+
+  static const TextStyle markerFilled = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 45,
+      color: ColorsPlante.primary);
+
+  static const TextStyle markerAccented = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 45,
+      color: Color(0xFFF02222));
+
+  static const TextStyle markerEmpty = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 45,
+      color: ColorsPlante.grey);
 }

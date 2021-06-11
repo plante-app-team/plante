@@ -142,3 +142,5 @@ flutter:
     - assets/map_marker_group_empty.svg
     - assets/map_marker_group_filled.svg
     - assets/map_marker_accented.svg
+    - assets/map_marker_group_accented.svg
+    - assets/map_marker_group_selected.svg
