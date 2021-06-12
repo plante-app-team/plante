@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -59,11 +58,15 @@ class MapPageModeDefault extends MapPageMode {
   }
 
   @override
+  Set<Shop> accentedShops() => _displayedShops.toSet();
+
+  @override
   void onMarkerClick(Iterable<Shop> shops) {
     _displayedShops.clear();
     _displayedShops.addAll(shops.toList());
     _displayedShops.sort((a, b) => b.productsCount - a.productsCount);
     updateWidget();
+    updateMap();
   }
 
   @override
@@ -148,5 +151,6 @@ class MapPageModeDefault extends MapPageMode {
   void _hideShopsCard() {
     _displayedShops.clear();
     updateWidget();
+    updateMap();
   }
 }
