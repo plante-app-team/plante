@@ -50,6 +50,9 @@
     "map_page_plus_shop": "+ отметить новый магазин",
     "map_page_click_where_new_shop_located": "Кликните на место, где расположен не учтённый магазин",
     "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
+    "map_page_no_products_in_shop": "Тут пока нет добавленных продуктов",
+    "map_page_there_are_products_in_shop": "В магазине есть кое-что интересное!",
+    "map_page_open_shop_products": "Открыть список продуктов",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",

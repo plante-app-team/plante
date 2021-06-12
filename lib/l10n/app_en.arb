@@ -50,6 +50,9 @@
       "map_page_plus_shop": "+ mark a new shop",
       "map_page_click_where_new_shop_located": "Click where the new shop is located",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
+      "map_page_no_products_in_shop": "This shop doesn't have added products yet",
+      "map_page_there_are_products_in_shop": "There's something interesting in the shop!",
+      "map_page_open_shop_products": "Open products list",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

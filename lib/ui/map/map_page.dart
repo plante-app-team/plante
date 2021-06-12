@@ -237,15 +237,17 @@ class _MapPageState extends State<MapPage> {
                     ? const LinearProgressIndicator()
                     : const SizedBox.shrink()),
           ])),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _showUser,
-            backgroundColor: Colors.white,
-            splashColor: ColorsPlante.primaryDisabled,
-            child: SizedBox(
-                width: 30,
-                height: 30,
-                child: SvgPicture.asset('assets/my_location.svg')),
-          ),
+          floatingActionButton: _mode.shopWhereAmIFAB()
+              ? FloatingActionButton(
+                  onPressed: _showUser,
+                  backgroundColor: Colors.white,
+                  splashColor: ColorsPlante.primaryDisabled,
+                  child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: SvgPicture.asset('assets/my_location.svg')),
+                )
+              : null,
         ));
   }
 

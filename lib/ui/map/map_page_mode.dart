@@ -33,6 +33,7 @@ abstract class MapPageMode {
   Iterable<Shop> filter(Iterable<Shop> shops) => shops;
   Set<Shop> selectedShops() => {};
   Set<Shop> accentedShops() => {};
+  bool shopWhereAmIFAB() => true;
 
   /// Extra shops added to what MapPageModel has
   Set<Shop> additionalShops() => {};
