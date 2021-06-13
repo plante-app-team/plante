@@ -30,30 +30,75 @@ class MapPage extends StatefulWidget {
   final Product? product;
   final List<Shop> initialSelectedShops;
   final MapPageRequestedMode requestedMode;
-  final _testingFinishCallbackStorage = _TestingFinishCallbackStorage();
+  final _testingStorage = _TestingStorage();
 
   MapPage(
       {Key? key,
       this.product,
       this.initialSelectedShops = const [],
-      this.requestedMode = MapPageRequestedMode.DEFAULT})
-      : super(key: key);
+      this.requestedMode = MapPageRequestedMode.DEFAULT,
+      GoogleMapController? mapControllerForTesting})
+      : super(key: key) {
+    if (mapControllerForTesting != null && !isInTests()) {
+      throw Exception('MapPage: not in tests (init)');
+    }
+    _testingStorage.mapControllerForTesting = mapControllerForTesting;
+  }
 
   @override
   _MapPageState createState() => _MapPageState();
 
+  @visibleForTesting
   void finishForTesting<T>(T result) {
     if (!isInTests()) {
-      throw Exception('MapPage: not in tests');
+      throw Exception('MapPage: not in tests (finishForTesting)');
     }
-    _testingFinishCallbackStorage.finishCallback?.call(result);
+    _testingStorage.finishCallback?.call(result);
+  }
+
+  @visibleForTesting
+  void onMapIdleForTesting() {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (onMapIdleForTesting)');
+    }
+    _testingStorage.onMapIdleCallback?.call();
+  }
+
+  @visibleForTesting
+  void onMarkerClickForTesting(Iterable<Shop> markerShops) {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (onMarkerClickForTesting)');
+    }
+    _testingStorage.onMarkerClickCallback?.call(markerShops);
+  }
+
+  @visibleForTesting
+  MapPageMode getModeForTesting() {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (getModeForTesting)');
+    }
+    return _testingStorage.mode!;
+  }
+
+  @visibleForTesting
+  Set<Shop> getDisplayedShopsForTesting() {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (getDisplayedShopsForTesting)');
+    }
+    return _testingStorage.displayedShops;
   }
 }
 
 typedef _TestingFinishCallback = dynamic Function(dynamic result);
 
-class _TestingFinishCallbackStorage {
+class _TestingStorage {
   _TestingFinishCallback? finishCallback;
+  VoidCallback? onMapIdleCallback;
+  ArgCallback<Iterable<Shop>>? onMarkerClickCallback;
+  MapPageMode? mode;
+  final Set<Shop> displayedShops = {};
+
+  GoogleMapController? mapControllerForTesting;
 }
 
 class _MapPageState extends State<MapPage> {
@@ -71,9 +116,11 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    widget._testingFinishCallbackStorage.finishCallback = (result) {
+    widget._testingStorage.finishCallback = (result) {
       _model.finishWith(context, result);
     };
+    widget._testingStorage.onMapIdleCallback = _onCameraIdle;
+    widget._testingStorage.onMarkerClickCallback = _onMarkerClick;
 
     final updateCallback = () {
       if (mounted) {
@@ -82,13 +129,16 @@ class _MapPageState extends State<MapPage> {
         });
       }
     };
-    _model = MapPageModel(
-        GetIt.I.get<LocationController>(),
-        GetIt.I.get<PermissionsManager>(),
-        GetIt.I.get<ShopsManager>(),
-        _onShopsUpdated,
-        _onError,
-        updateCallback);
+    final updateMapCallback = () {
+      final allShops = <Shop>{};
+      allShops.addAll(_model.shopsCache.values);
+      allShops.addAll(_mode.additionalShops());
+      _onShopsUpdated(_mode.filter(allShops));
+    };
+    _model = MapPageModel(GetIt.I.get<LocationController>(),
+        GetIt.I.get<PermissionsManager>(), GetIt.I.get<ShopsManager>(), (_) {
+      updateMapCallback.call();
+    }, _onError, updateCallback);
 
     /// The clustering library levels logic is complicated.
     ///
@@ -113,26 +163,23 @@ class _MapPageState extends State<MapPage> {
         final oldMode = _mode;
         _mode = newMode;
         _mode.init(oldMode);
+        widget._testingStorage.mode = _mode;
       });
-    };
-    final updateMapCallback = () {
-      final additionalShops = {
-        for (var shop in _mode.additionalShops()) shop.osmId: shop
-      };
-      final allShops = <String, Shop>{};
-      allShops.addAll(_model.shopsCache);
-      allShops.addAll(additionalShops);
-      _onShopsUpdated(allShops);
     };
     _mode = MapPageModeDefault(_model, widgetSource, contextSource,
         updateCallback, updateMapCallback, switchModeCallback);
     _mode.init(null);
+    widget._testingStorage.mode = _mode;
 
     _initAsync();
     _instances.add(this);
     _instances.forEach((instance) {
       instance.onInstancesChange();
     });
+
+    if (widget._testingStorage.mapControllerForTesting != null) {
+      _mapController.complete(widget._testingStorage.mapControllerForTesting);
+    }
   }
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
@@ -181,6 +228,7 @@ class _MapPageState extends State<MapPage> {
     });
     super.dispose();
     _model.dispose();
+    _mapUpdatesTimer?.cancel();
     () async {
       final mapController = await _mapController.future;
       mapController.dispose();
@@ -239,6 +287,7 @@ class _MapPageState extends State<MapPage> {
           ])),
           floatingActionButton: _mode.shopWhereAmIFAB()
               ? FloatingActionButton(
+                  key: const Key('my_location_fab'),
                   onPressed: _showUser,
                   backgroundColor: Colors.white,
                   splashColor: ColorsPlante.primaryDisabled,
@@ -269,9 +318,11 @@ class _MapPageState extends State<MapPage> {
     await _model.onCameraMoved(viewBounds);
   }
 
-  void _onShopsUpdated(Map<String, Shop> shops) {
-    _clusterManager.setItems(_mode
-        .filter(shops.values)
+  void _onShopsUpdated(Iterable<Shop> shops) {
+    widget._testingStorage.displayedShops.clear();
+    widget._testingStorage.displayedShops.addAll(shops);
+
+    _clusterManager.setItems(shops
         .map((shop) =>
             ClusterItem(LatLng(shop.latitude, shop.longitude), item: shop))
         .toList());

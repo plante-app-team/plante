@@ -5,16 +5,12 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/map/shop_product_range_page.dart';
 
 class ShopCard extends StatelessWidget {
   final Shop shop;
-  final ArgCallback<Shop> cancelCallback;
-  final ArgCallback<Shop> openShopsCallback;
-  const ShopCard(
-      {Key? key,
-      required this.shop,
-      required this.cancelCallback,
-      required this.openShopsCallback})
+  final ArgCallback<Shop>? cancelCallback;
+  const ShopCard({Key? key, required this.shop, this.cancelCallback})
       : super(key: key);
 
   @override
@@ -55,25 +51,31 @@ class ShopCard extends StatelessWidget {
                   width: double.infinity,
                   child: Text(
                       shop.productsCount <= 0
-                          ? context.strings.map_page_no_products_in_shop
-                          : context.strings.map_page_there_are_products_in_shop,
+                          ? context.strings.shop_card_no_products_in_shop
+                          : context
+                              .strings.shop_card_there_are_products_in_shop,
                       style: TextStyles.normal)),
               const SizedBox(height: 8),
               SizedBox(
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
-                      context.strings.map_page_open_shop_products,
-                      onPressed: _onOpenShop))
+                      context.strings.shop_card_open_shop_products,
+                      onPressed: () {
+                    _onOpenShop(context);
+                  }))
             ]),
           ),
         ]));
   }
 
   void _onCancel() {
-    cancelCallback.call(shop);
+    cancelCallback?.call(shop);
   }
 
-  void _onOpenShop() {
-    openShopsCallback.call(shop);
+  void _onOpenShop(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ShopProductRangePage(shop: shop)));
   }
 }

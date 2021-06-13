@@ -12,7 +12,6 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_add_product.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops.dart';
 import 'package:plante/ui/map/map_page_model.dart';
-import 'package:plante/ui/map/shop_product_range_page.dart';
 
 class MapPageModeDefault extends MapPageMode {
   bool _showEmptyShops = false;
@@ -136,14 +135,7 @@ class MapPageModeDefault extends MapPageMode {
                         bottom: 12),
                     child: ShopCard(
                         shop: _displayedShops[itemIndex],
-                        cancelCallback: (Shop shop) => _hideShopsCard(),
-                        openShopsCallback: (Shop shop) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ShopProductRangePage(shop: shop)));
-                        }))
+                        cancelCallback: (Shop shop) => _hideShopsCard()))
               ]))
         ]));
   }
