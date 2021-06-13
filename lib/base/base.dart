@@ -11,6 +11,7 @@ const PRIVACY_POLICY_URL =
     'https://docs.google.com/document/d/1fSeiIwDZhcf8d1ad7H8R1YCoffVxaalSIZ35SGuXkec/edit?usp=sharing';
 
 typedef ArgCallback<T> = void Function(T argument);
+typedef ResCallback<T> = T Function();
 
 bool isInTests() {
   return Platform.environment.containsKey('FLUTTER_TEST');

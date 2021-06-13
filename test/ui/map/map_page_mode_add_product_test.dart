@@ -241,8 +241,6 @@ void main() {
   });
 
   testWidgets('can switch mode to the Add Shop Mode', (WidgetTester tester) async {
-    expect(shops[0].productsCount, equals(0));
-
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,

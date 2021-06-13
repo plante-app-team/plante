@@ -36,6 +36,7 @@ class _CreateShopDialogContentState extends State<CreateShopDialogContent> {
           style: TextStyles.headline4),
       const SizedBox(height: 24),
       InputFieldPlante(
+        key: const Key('new_shop_name_input'),
         label: context.strings.map_page_how_new_shop_is_called_label,
         hint: context.strings.map_page_how_new_shop_is_called_hint,
         controller: _textController,

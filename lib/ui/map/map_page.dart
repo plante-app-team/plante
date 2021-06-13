@@ -73,11 +73,19 @@ class MapPage extends StatefulWidget {
   }
 
   @visibleForTesting
+  void onMapClickForTesting(LatLng coords) {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (onMapClickForTesting)');
+    }
+    _testingStorage.onMapClickCallback?.call(coords);
+  }
+
+  @visibleForTesting
   MapPageMode getModeForTesting() {
     if (!isInTests()) {
       throw Exception('MapPage: not in tests (getModeForTesting)');
     }
-    return _testingStorage.mode!;
+    return _testingStorage.modeCallback!.call();
   }
 
   @visibleForTesting
@@ -95,7 +103,8 @@ class _TestingStorage {
   _TestingFinishCallback? finishCallback;
   VoidCallback? onMapIdleCallback;
   ArgCallback<Iterable<Shop>>? onMarkerClickCallback;
-  MapPageMode? mode;
+  ArgCallback<LatLng>? onMapClickCallback;
+  ResCallback<MapPageMode>? modeCallback;
   final Set<Shop> displayedShops = {};
 
   GoogleMapController? mapControllerForTesting;
@@ -121,6 +130,10 @@ class _MapPageState extends State<MapPage> {
     };
     widget._testingStorage.onMapIdleCallback = _onCameraIdle;
     widget._testingStorage.onMarkerClickCallback = _onMarkerClick;
+    widget._testingStorage.onMapClickCallback = _onMapTap;
+    widget._testingStorage.modeCallback = () {
+      return _mode;
+    };
 
     final updateCallback = () {
       if (mounted) {
@@ -163,13 +176,11 @@ class _MapPageState extends State<MapPage> {
         final oldMode = _mode;
         _mode = newMode;
         _mode.init(oldMode);
-        widget._testingStorage.mode = _mode;
       });
     };
     _mode = MapPageModeDefault(_model, widgetSource, contextSource,
         updateCallback, updateMapCallback, switchModeCallback);
     _mode.init(null);
-    widget._testingStorage.mode = _mode;
 
     _initAsync();
     _instances.add(this);

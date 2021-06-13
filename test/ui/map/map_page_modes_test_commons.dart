@@ -86,5 +86,9 @@ class MapPageModesTestCommons {
                 northeast: const LatLng(20, 20)));
     when(mapController.dispose()).thenAnswer((_) {});
     when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
+    when(shopsManager.createShop(
+        name: anyNamed('name'),
+        coords: anyNamed('coords'),
+        type: anyNamed('type'))).thenAnswer((_) async => Ok(shops[0]));
   }
 }
