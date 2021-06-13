@@ -8,6 +8,8 @@ import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 
+const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
+
 abstract class MapPageModeSelectShopsBase extends MapPageMode {
   final _selectedShops = <Shop>{};
 
@@ -38,8 +40,7 @@ abstract class MapPageModeSelectShopsBase extends MapPageMode {
         return;
       }
 
-      if (_selectedShops.length >= 10) {
-        // TODO(https://trello.com/c/dCDHecZS/): test
+      if (_selectedShops.length >= MAP_PAGE_MODE_SELECTED_SHOPS_MAX) {
         Log.w('Not allowing to select more than 10 shops');
         return;
       }

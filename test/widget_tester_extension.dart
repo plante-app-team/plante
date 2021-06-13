@@ -6,6 +6,7 @@ extension WidgetTesterExtension on WidgetTester {
   Future<BuildContext> superPump(
       Widget widget,
       {Duration? duration,
+        NavigatorObserver? navigatorObserver,
         EnginePhase phase = EnginePhase.sendSemanticsUpdate}) async {
     late BuildContext _context;
 
@@ -19,6 +20,10 @@ extension WidgetTesterExtension on WidgetTester {
               return Scaffold(body: widget);
             },
           ),
+          navigatorObservers: [
+            if (navigatorObserver != null)
+              navigatorObserver
+          ],
         )
     );
 
