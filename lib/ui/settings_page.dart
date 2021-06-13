@@ -45,6 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final userNullable =
         await GetIt.I.get<UserParamsController>().getUserParams();
     user = userNullable!;
+    packageInfo = await PackageInfo.fromPlatform();
     if (user.userGroup == null || user.userGroup == 1) {
       setState(() {
         loading = false;
@@ -55,7 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
     developer = true;
     fakeOffApi = await settings.fakeOffApi();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
-    packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       loading = false;
     });

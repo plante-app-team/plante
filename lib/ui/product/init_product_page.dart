@@ -519,7 +519,7 @@ class _InitProductPageState extends State<InitProductPage>
       Navigator.of(context).pop();
       showSnackBar(context.strings.global_done_thanks, context);
       if (!isInTests()) {
-        await (await widget.cacheDir()).delete();
+        await (await widget.cacheDir()).delete(recursive: true);
       } else {
         (await widget.cacheDir()).deleteSync();
       }
