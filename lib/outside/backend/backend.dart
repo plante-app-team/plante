@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/fake_backend.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -27,6 +28,7 @@ class BackendObserver {
 }
 
 class Backend {
+  final _fakeBackend = FakeBackend();
   final UserParamsController _userParamsController;
   final HttpClient _http;
   final Settings _settings;
@@ -39,12 +41,19 @@ class Backend {
   void removeObserver(BackendObserver observer) => _observers.remove(observer);
 
   Future<bool> isLoggedIn() async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.isLoggedIn();
+    }
     final userParams = await _userParamsController.getUserParams();
     return userParams?.backendClientToken != null;
   }
 
   Future<Result<UserParams, BackendError>> loginOrRegister(
       String googleIdToken) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.loginOrRegister(googleIdToken);
+    }
+
     if (await isLoggedIn()) {
       final userParams = await _userParamsController.getUserParams();
       return Ok(userParams!);
@@ -81,6 +90,11 @@ class Backend {
 
   Future<Result<bool, BackendError>> updateUserParams(UserParams userParams,
       {String? backendClientTokenOverride}) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.updateUserParams(userParams,
+          backendClientTokenOverride: backendClientTokenOverride);
+    }
+
     final params = <String, String>{};
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params['name'] = userParams.name!;
@@ -115,9 +129,8 @@ class Backend {
 
   Future<Result<BackendProduct?, BackendError>> requestProduct(
       String barcode) async {
-    if (await _settings.fakeOffApi()) {
-      // Sure, that's the requested product (lie)
-      return Ok(BackendProduct((e) => e.barcode = barcode));
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.requestProduct(barcode);
     }
 
     final jsonRes =
@@ -135,9 +148,9 @@ class Backend {
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
       {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
-    if (await _settings.fakeOffApi()) {
-      // Sure, the update was ok (lie)
-      return Ok(None());
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.createUpdateProduct(barcode,
+          vegetarianStatus: vegetarianStatus, veganStatus: veganStatus);
     }
 
     final params = <String, String>{};
@@ -154,6 +167,10 @@ class Backend {
 
   Future<Result<None, BackendError>> sendReport(
       String barcode, String reportText) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.sendReport(barcode, reportText);
+    }
+
     final params = <String, String>{};
     params['barcode'] = barcode;
     params['text'] = reportText;
@@ -162,6 +179,10 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> sendProductScan(String barcode) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.sendProductScan(barcode);
+    }
+
     final params = <String, String>{};
     params['barcode'] = barcode;
     final response = await _backendGet('product_scan/', params);
@@ -169,6 +190,10 @@ class Backend {
   }
 
   Future<Result<UserParams, BackendError>> userData() async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.userData();
+    }
+
     final jsonRes = await _backendGetJson('user_data/', {});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
@@ -187,6 +212,10 @@ class Backend {
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
       requestProductsAtShops(Iterable<String> osmIds) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.requestProductsAtShops(osmIds);
+    }
+
     final jsonRes = await _backendGetJson(
         'products_at_shops_data/', {'osmShopsIds': osmIds});
     if (jsonRes.isErr) {
@@ -213,6 +242,10 @@ class Backend {
 
   Future<Result<List<BackendShop>, BackendError>> requestShops(
       Iterable<String> osmIds) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.requestShops(osmIds);
+    }
+
     final jsonRes = await _backendGetJson('shops_data/', {},
         body: jsonEncode({'osm_ids': osmIds.toList()}),
         contentType: 'application/json');
@@ -239,6 +272,10 @@ class Backend {
 
   Future<Result<None, BackendError>> productPresenceVote(
       String barcode, String osmId, bool positive) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.productPresenceVote(barcode, osmId, positive);
+    }
+
     final response = await _backendGet('product_presence_vote/', {
       'barcode': barcode,
       'shopOsmId': osmId,
@@ -249,6 +286,10 @@ class Backend {
 
   Future<Result<None, BackendError>> putProductToShop(
       String barcode, String osmId) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.putProductToShop(barcode, osmId);
+    }
+
     final response = await _backendGet('put_product_to_shop/', {
       'barcode': barcode,
       'shopOsmId': osmId,
@@ -260,6 +301,11 @@ class Backend {
       {required String name,
       required Point<double> coords,
       required String type}) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.createShop(
+          name: name, coords: coords, type: type);
+    }
+
     final jsonRes = await _backendGetJson('create_shop/', {
       'lon': coords.x.toString(),
       'lat': coords.y.toString(),

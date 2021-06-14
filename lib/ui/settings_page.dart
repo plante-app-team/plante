@@ -27,7 +27,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool loading = true;
   bool developer = false;
-  bool fakeOffApi = false;
+  bool testingBackends = false;
   bool offScannedProductEmpty = false;
 
   late Settings settings;
@@ -54,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     developer = true;
-    fakeOffApi = await settings.fakeOffApi();
+    testingBackends = await settings.testingBackends();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
     setState(() {
       loading = false;
@@ -136,18 +136,18 @@ class _SettingsPageState extends State<SettingsPage> {
                       })),
                 if (developer)
                   _CheckboxSettings(
-                      text: context.strings.settings_page_fake_off,
-                      value: fakeOffApi,
+                      text: context.strings.settings_page_testing_backends,
+                      value: testingBackends,
                       onChanged: (value) {
                         setState(() {
-                          fakeOffApi = value;
-                          settings.setFakeOffApi(fakeOffApi);
+                          testingBackends = value;
+                          settings.setTestingBackends(testingBackends);
                         });
                       }),
                 if (developer)
                   AnimatedSwitcher(
                       duration: DURATION_DEFAULT,
-                      child: !fakeOffApi
+                      child: !testingBackends
                           ? const SizedBox.shrink()
                           : _CheckboxSettings(
                               text: context.strings

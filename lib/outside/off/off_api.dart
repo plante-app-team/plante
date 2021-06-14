@@ -13,14 +13,14 @@ class OffApi {
 
   Future<off.ProductResult> getProduct(
       off.ProductQueryConfiguration configuration) async {
-    if (await _settings.fakeOffApi()) {
+    if (await _settings.testingBackends()) {
       return await _fakeOffApi.getProduct(configuration);
     }
     return await off.OpenFoodAPIClient.getProduct(configuration);
   }
 
   Future<off.Status> saveProduct(off.User user, off.Product product) async {
-    if (await _settings.fakeOffApi()) {
+    if (await _settings.testingBackends()) {
       return await _fakeOffApi.saveProduct(user, product);
     }
     final result = await off.OpenFoodAPIClient.saveProduct(user, product);
@@ -31,7 +31,7 @@ class OffApi {
   }
 
   Future<off.Status> addProductImage(off.User user, off.SendImage image) async {
-    if (await _settings.fakeOffApi()) {
+    if (await _settings.testingBackends()) {
       return await _fakeOffApi.addProductImage(user, image);
     }
     final result = await off.OpenFoodAPIClient.addProductImage(user, image);
@@ -43,7 +43,7 @@ class OffApi {
 
   Future<off.OcrIngredientsResult> extractIngredients(
       off.User user, String barcode, off.OpenFoodFactsLanguage language) async {
-    if (await _settings.fakeOffApi()) {
+    if (await _settings.testingBackends()) {
       return await _fakeOffApi.extractIngredients(user, barcode, language);
     }
     final result =
