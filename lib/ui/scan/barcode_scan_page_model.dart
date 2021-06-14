@@ -75,7 +75,8 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
 
   BarcodeScanPageContentState get contentState {
     if (_cameraPermission != null &&
-        _cameraPermission != PermissionState.granted) {
+        _cameraPermission != PermissionState.granted &&
+        _manualBarcode.isEmpty) {
       if (_cameraPermission == PermissionState.denied) {
         final requestPermission = () async {
           _cameraPermission =
