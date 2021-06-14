@@ -6,7 +6,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -27,23 +29,23 @@ import 'package:plante/ui/base/ui_utils.dart';
 
 const _BACKGROUND_COLOR = Color(0xfff5f7fa);
 
-// mutation is used for testing only
-// ignore: must_be_immutable
 class BarcodeScanPage extends StatefulWidget {
-  _BarcodeScanPageState? _lastState;
+  final Shop? addProductToShop;
+  final _testingStorage = _TestingStorage();
 
-  BarcodeScanPage({Key? key}) : super(key: key);
+  BarcodeScanPage({Key? key, this.addProductToShop}) : super(key: key);
 
   @override
-  _BarcodeScanPageState createState() {
-    _lastState = _BarcodeScanPageState();
-    return _lastState!;
-  }
+  _BarcodeScanPageState createState() => _BarcodeScanPageState();
 
   void newScanDataForTesting(qr.Barcode barcode) {
     assert(isInTests());
-    _lastState?._onNewScanData(barcode);
+    _testingStorage.newScanDataCallback!.call(barcode);
   }
+}
+
+class _TestingStorage {
+  ArgCallback<qr.Barcode>? newScanDataCallback;
 }
 
 class _BarcodeScanPageState extends State<BarcodeScanPage>
@@ -60,6 +62,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   @override
   void initState() {
     super.initState();
+    widget._testingStorage.newScanDataCallback = _onNewScanData;
     WidgetsBinding.instance!.addObserver(this);
 
     final stateChangeCallback = () {
@@ -71,7 +74,9 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     };
     _model = BarcodeScanPageModel(
         stateChangeCallback,
+        () => widget,
         GetIt.I.get<ProductsManager>(),
+        GetIt.I.get<ShopsManager>(),
         GetIt.I.get<LangCodeHolder>(),
         GetIt.I.get<PermissionsManager>(),
         GetIt.I.get<UserParamsController>());

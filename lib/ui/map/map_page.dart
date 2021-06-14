@@ -358,9 +358,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _updateMarkers(Set<Marker> markers) {
-    setState(() {
-      _shopsMarkers = markers;
-    });
+    if (mounted) {
+      setState(() {
+        _shopsMarkers = markers;
+      });
+    }
   }
 
   void _onMapTap(LatLng coords) {

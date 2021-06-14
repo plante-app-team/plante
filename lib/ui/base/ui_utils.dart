@@ -46,9 +46,9 @@ Future<T?> showMenuPlante<T>(
   );
 }
 
-Future<T?> showYesNoDialog<T>(
-    BuildContext context, String title, VoidCallback onYes) async {
-  return await showDialog<T>(
+Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
+    [VoidCallback? onYes]) async {
+  return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return DialogPlante(
@@ -58,7 +58,7 @@ Future<T?> showYesNoDialog<T>(
                 child: ButtonOutlinedPlante.withText(
               context.strings.global_no,
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(false);
               },
             )),
             const SizedBox(width: 16),
@@ -66,8 +66,8 @@ Future<T?> showYesNoDialog<T>(
                 child: ButtonFilledPlante.withText(
               context.strings.global_yes,
               onPressed: () {
-                Navigator.of(context).pop();
-                onYes.call();
+                Navigator.of(context).pop(true);
+                onYes?.call();
               },
             )),
           ]));

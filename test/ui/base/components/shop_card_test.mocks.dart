@@ -5,7 +5,10 @@
 import 'dart:async' as _i5;
 import 'dart:math' as _i7;
 
+import 'package:flutter/src/widgets/navigator.dart' as _i21;
+import 'package:flutter/src/widgets/routes.dart' as _i22;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:plante/base/permissions_manager.dart' as _i20;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/model/product.dart' as _i9;
 import 'package:plante/model/shop.dart' as _i6;
@@ -20,6 +23,8 @@ import 'package:plante/outside/backend/backend_product.dart' as _i14;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i16;
 import 'package:plante/outside/backend/backend_shop.dart' as _i17;
 import 'package:plante/outside/map/shops_manager.dart' as _i4;
+import 'package:plante/outside/products/products_manager.dart' as _i18;
+import 'package:plante/outside/products/products_manager_error.dart' as _i19;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -227,4 +232,114 @@ class MockBackend extends _i1.Mock implements _i12.Backend {
               returnValue: Future.value(
                   _FakeResult<_i17.BackendShop, _i13.BackendError>()))
           as _i5.Future<_i2.Result<_i17.BackendShop, _i13.BackendError>>);
+}
+
+/// A class which mocks [ProductsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockProductsManager extends _i1.Mock implements _i18.ProductsManager {
+  MockProductsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i2.Result<_i9.Product?, _i19.ProductsManagerError>> getProduct(
+          String? barcodeRaw,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#getProduct, [barcodeRaw, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i9.Product?, _i19.ProductsManagerError>()))
+          as _i5.Future<_i2.Result<_i9.Product?, _i19.ProductsManagerError>>);
+  @override
+  _i5.Future<_i2.Result<_i9.Product?, _i19.ProductsManagerError>> inflate(
+          _i14.BackendProduct? backendProduct,
+          [String? langCode]) =>
+      (super.noSuchMethod(
+              Invocation.method(#inflate, [backendProduct, langCode]),
+              returnValue: Future.value(
+                  _FakeResult<_i9.Product?, _i19.ProductsManagerError>()))
+          as _i5.Future<_i2.Result<_i9.Product?, _i19.ProductsManagerError>>);
+  @override
+  _i5.Future<_i2.Result<_i9.Product, _i19.ProductsManagerError>>
+      createUpdateProduct(_i9.Product? product, [String? langCode]) => (super
+              .noSuchMethod(
+                  Invocation.method(#createUpdateProduct, [product, langCode]),
+                  returnValue: Future.value(
+                      _FakeResult<_i9.Product, _i19.ProductsManagerError>()))
+          as _i5.Future<_i2.Result<_i9.Product, _i19.ProductsManagerError>>);
+  @override
+  _i5.Future<_i2.Result<_i18.ProductWithOCRIngredients, _i19.ProductsManagerError>>
+      updateProductAndExtractIngredients(_i9.Product? product,
+              [String? langCode]) =>
+          (super.noSuchMethod(
+                  Invocation.method(
+                      #updateProductAndExtractIngredients, [product, langCode]),
+                  returnValue: Future.value(
+                      _FakeResult<_i18.ProductWithOCRIngredients, _i19.ProductsManagerError>()))
+              as _i5.Future<_i2.Result<_i18.ProductWithOCRIngredients, _i19.ProductsManagerError>>);
+}
+
+/// A class which mocks [PermissionsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPermissionsManager extends _i1.Mock
+    implements _i20.PermissionsManager {
+  MockPermissionsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i20.PermissionState> status(_i20.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#status, [permission]),
+              returnValue: Future.value(_i20.PermissionState.granted))
+          as _i5.Future<_i20.PermissionState>);
+  @override
+  _i5.Future<_i20.PermissionState> request(_i20.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#request, [permission]),
+              returnValue: Future.value(_i20.PermissionState.granted))
+          as _i5.Future<_i20.PermissionState>);
+  @override
+  _i5.Future<bool> openAppSettings() =>
+      (super.noSuchMethod(Invocation.method(#openAppSettings, []),
+          returnValue: Future.value(false)) as _i5.Future<bool>);
+}
+
+/// A class which mocks [RouteObserver].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockRouteObserver<R extends _i21.Route<dynamic>> extends _i1.Mock
+    implements _i22.RouteObserver<R> {
+  MockRouteObserver() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void subscribe(_i22.RouteAware? routeAware, R? route) =>
+      super.noSuchMethod(Invocation.method(#subscribe, [routeAware, route]),
+          returnValueForMissingStub: null);
+  @override
+  void unsubscribe(_i22.RouteAware? routeAware) =>
+      super.noSuchMethod(Invocation.method(#unsubscribe, [routeAware]),
+          returnValueForMissingStub: null);
+  @override
+  void didPop(_i21.Route<dynamic>? route, _i21.Route<dynamic>? previousRoute) =>
+      super.noSuchMethod(Invocation.method(#didPop, [route, previousRoute]),
+          returnValueForMissingStub: null);
+  @override
+  void didPush(
+          _i21.Route<dynamic>? route, _i21.Route<dynamic>? previousRoute) =>
+      super.noSuchMethod(Invocation.method(#didPush, [route, previousRoute]),
+          returnValueForMissingStub: null);
+  @override
+  void didRemove(
+          _i21.Route<dynamic>? route, _i21.Route<dynamic>? previousRoute) =>
+      super.noSuchMethod(Invocation.method(#didRemove, [route, previousRoute]),
+          returnValueForMissingStub: null);
+  @override
+  void didStartUserGesture(
+          _i21.Route<dynamic>? route, _i21.Route<dynamic>? previousRoute) =>
+      super.noSuchMethod(
+          Invocation.method(#didStartUserGesture, [route, previousRoute]),
+          returnValueForMissingStub: null);
 }

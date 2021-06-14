@@ -32,6 +32,7 @@ typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
 class InitProductPage extends StatefulWidget {
   final Product initialProduct;
+  final List<Shop> initialShops;
   final String? title;
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
@@ -41,6 +42,7 @@ class InitProductPage extends StatefulWidget {
 
   InitProductPage(this.initialProduct,
       {Key? key,
+      this.initialShops = const [],
       this.title,
       this.productUpdatedCallback,
       this.doneCallback,
@@ -58,8 +60,7 @@ class InitProductPage extends StatefulWidget {
   }
 
   @override
-  _InitProductPageState createState() => _InitProductPageState(
-      initialProduct, productUpdatedCallback, doneCallback);
+  _InitProductPageState createState() => _InitProductPageState();
 
   Future<Directory> cacheDir() async {
     if (cacheFolderForTest != null) {
@@ -76,8 +77,6 @@ class InitProductPage extends StatefulWidget {
 class _InitProductPageState extends State<InitProductPage>
     with RestorationMixin {
   late final InitProductPageModel model;
-  final ProductUpdatedCallback? productUpdatedCallback;
-  final VoidCallback? doneCallback;
 
   final TextEditingController nameTextController = TextEditingController();
   final TextEditingController brandTextController = TextEditingController();
@@ -85,18 +84,6 @@ class _InitProductPageState extends State<InitProductPage>
       TextEditingController();
   final TextEditingController ingredientsTextController =
       TextEditingController();
-
-  _InitProductPageState(
-      Product initialProduct, this.productUpdatedCallback, this.doneCallback) {
-    model = InitProductPageModel(
-        initialProduct,
-        onStateUpdated,
-        forceUseModelData,
-        [],
-        GetIt.I.get<ProductsManager>(),
-        GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<PhotosTaker>());
-  }
 
   void onStateUpdated() {
     if (!mounted) {
@@ -124,6 +111,14 @@ class _InitProductPageState extends State<InitProductPage>
   @override
   void initState() {
     super.initState();
+    model = InitProductPageModel(
+        widget.initialProduct,
+        onStateUpdated,
+        forceUseModelData,
+        widget.initialShops,
+        GetIt.I.get<ProductsManager>(),
+        GetIt.I.get<ShopsManager>(),
+        GetIt.I.get<PhotosTaker>());
     _ensureCacheDirExistence();
   }
 
@@ -515,7 +510,7 @@ class _InitProductPageState extends State<InitProductPage>
     final ok = await model.saveProduct(context.langCode);
     if (ok) {
       Log.i('InitProductPage: _saveProduct success');
-      productUpdatedCallback?.call(model.product);
+      widget.productUpdatedCallback?.call(model.product);
       Navigator.of(context).pop();
       showSnackBar(context.strings.global_done_thanks, context);
       if (!isInTests()) {
@@ -523,7 +518,7 @@ class _InitProductPageState extends State<InitProductPage>
       } else {
         (await widget.cacheDir()).deleteSync();
       }
-      doneCallback?.call();
+      widget.doneCallback?.call();
     } else {
       showSnackBar(context.strings.global_something_went_wrong, context);
     }

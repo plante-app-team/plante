@@ -95,6 +95,7 @@ void main() {
         VegStatus? veganStatusInput = VegStatus.positive,
         VegStatus? vegetarianStatusInput = VegStatus.positive,
         List<Shop>? selectedShops,
+        List<Shop> initialShops = const [],
         int requiredManualOcrAttempts = 0,
         int ocrSuccessfulAttemptNumber = 1}) async {
     var ocrAttempts = 0;
@@ -118,7 +119,8 @@ void main() {
 
     final widget = InitProductPage(
         Product((v) => v.barcode = '123'),
-        doneCallback: callback);
+        doneCallback: callback,
+        initialShops: initialShops);
 
     final cacheDir = await widget.cacheDir();
     if (cacheDir.existsSync()) {
@@ -264,8 +266,13 @@ void main() {
       verifyNever(productsManager.createUpdateProduct(captureAny, any));
     }
 
-    if (expectedProductResult != null && selectedShops != null && selectedShops.isNotEmpty) {
-      verify(shopsManager.putProductToShops(expectedProductResult, selectedShops));
+    final expectedShops = <Shop>[];
+    expectedShops.addAll(initialShops);
+    if (selectedShops != null) {
+      expectedShops.addAll(selectedShops);
+    }
+    if (expectedProductResult != null && expectedShops.isNotEmpty) {
+      verify(shopsManager.putProductToShops(expectedProductResult, expectedShops));
     } else {
       verifyNever(shopsManager.putProductToShops(any, any));
     }
@@ -784,7 +791,7 @@ void main() {
 
     final done = await generalTest(
         tester,
-        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
@@ -816,7 +823,7 @@ void main() {
 
     final done = await generalTest(
         tester,
-        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
@@ -848,7 +855,7 @@ void main() {
 
     final done = await generalTest(
         tester,
-        expectedProductResult: perfectlyGoodExpectedProduct, // No saved product is expected because
+        expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
@@ -859,6 +866,36 @@ void main() {
         ocrSuccessfulAttemptNumber: 3, // 2 OCRs attempts will fail (first (auto) and the first manual)
         requiredManualOcrAttempts: 2, // We'll try to perform a second OCR!
         ingredientsTextOverride: null // And will NOT write ingredients manually
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('opened with initial shops', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: product,
+        nameInput: product.name,
+        brandInput: product.brands!.join(', '),
+        categoriesInput: product.categories!.join(', '),
+        takeImageFront: product.imageFront != null,
+        takeImageIngredients: product.imageIngredients != null,
+        veganStatusInput: product.veganStatus,
+        vegetarianStatusInput: product.vegetarianStatus,
+        initialShops: [aShop]
     );
 
     expect(done, isTrue);

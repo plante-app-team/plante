@@ -6,6 +6,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/shop_product_range_page.dart';
+import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 class ShopCard extends StatelessWidget {
   final Shop shop;
@@ -50,32 +51,44 @@ class ShopCard extends StatelessWidget {
               SizedBox(
                   width: double.infinity,
                   child: Text(
-                      shop.productsCount <= 0
-                          ? context.strings.shop_card_no_products_in_shop
-                          : context
-                              .strings.shop_card_there_are_products_in_shop,
+                      _haveProducts()
+                          ? context.strings.shop_card_there_are_products_in_shop
+                          : context.strings.shop_card_no_products_in_shop,
                       style: TextStyles.normal)),
               const SizedBox(height: 8),
               SizedBox(
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
-                      context.strings.shop_card_open_shop_products,
+                      _haveProducts()
+                          ? context.strings.shop_card_open_shop_products
+                          : context.strings.shop_card_add_product,
                       onPressed: () {
-                    _onOpenShop(context);
+                    _onMainButtonClick(context);
                   }))
             ]),
           ),
         ]));
   }
 
+  bool _haveProducts() {
+    return 0 < shop.productsCount;
+  }
+
   void _onCancel() {
     cancelCallback?.call(shop);
   }
 
-  void _onOpenShop(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ShopProductRangePage(shop: shop)));
+  void _onMainButtonClick(BuildContext context) {
+    if (_haveProducts()) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ShopProductRangePage(shop: shop)));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => BarcodeScanPage(addProductToShop: shop)));
+    }
   }
 }

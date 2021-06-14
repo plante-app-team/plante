@@ -1,19 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:plante/base/barcode_utils.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
+import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
 
 enum BarcodeScanPageSearchResult { OK, ERROR_NETWORK, ERROR_OTHER }
 
 class BarcodeScanPageModel with WidgetsBindingObserver {
   final VoidCallback _onStateChangeCallback;
+  final ResCallback<BarcodeScanPage> _widgetCallback;
   final ProductsManager _productsManager;
+  final ShopsManager _shopsManager;
   final LangCodeHolder _langCodeHolder;
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
@@ -25,13 +31,17 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   PermissionState? _cameraPermission;
   String _manualBarcode = '';
 
+  BarcodeScanPage get _widget => _widgetCallback.call();
+
   String? get barcode => _barcode;
   bool get searching => _searching;
   bool get cameraAvailable => _cameraPermission == PermissionState.granted;
 
   BarcodeScanPageModel(
       this._onStateChangeCallback,
+      this._widgetCallback,
       this._productsManager,
+      this._shopsManager,
       this._langCodeHolder,
       this._permissionsManager,
       this._userParamsController) {
@@ -94,11 +104,19 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       return BarcodeScanPageContentState.searchingProduct(_barcode!);
     } else if (_foundProduct != null &&
         ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
-      return BarcodeScanPageContentState.productFound(
-          _foundProduct!,
-          _userParamsController.cachedUserParams!,
-          onProductExternalUpdate,
-          _onFoundProductCanceled);
+      if (_widget.addProductToShop == null) {
+        return BarcodeScanPageContentState.productFound(
+            _foundProduct!,
+            _userParamsController.cachedUserParams!,
+            onProductExternalUpdate,
+            _onFoundProductCanceled);
+      } else {
+        return BarcodeScanPageContentState.addProductToShop(
+            _foundProduct!,
+            _widget.addProductToShop!,
+            _addProductToShop,
+            _onFoundProductCanceled);
+      }
     } else {
       final Product product;
       if (_foundProduct != null) {
@@ -107,7 +125,10 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
         product = Product((v) => v.barcode = _barcode);
       }
       return BarcodeScanPageContentState.productNotFound(
-          product, onProductExternalUpdate, _onFoundProductCanceled);
+          product,
+          _widget.addProductToShop,
+          onProductExternalUpdate,
+          _onFoundProductCanceled);
     }
   }
 
@@ -144,5 +165,11 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
 
   bool isManualBarcodeValid() {
     return isBarcodeValid(_manualBarcode);
+  }
+
+  Future<Result<None, ShopsManagerError>> _addProductToShop() async {
+    final product = _foundProduct!;
+    final shop = _widget.addProductToShop!;
+    return _shopsManager.putProductToShops(product, [shop]);
   }
 }

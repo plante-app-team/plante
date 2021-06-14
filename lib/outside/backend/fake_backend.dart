@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
+import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
@@ -99,7 +100,16 @@ class FakeBackend implements Backend {
   Future<Result<BackendProduct?, BackendError>> requestProduct(
       String barcode) async {
     await _delay();
-    return Ok(BackendProduct((e) => e.barcode = barcode));
+    return Ok(_createBackendProduct(barcode));
+  }
+
+  BackendProduct _createBackendProduct(String barcode) {
+    return BackendProduct((e) => e
+      ..barcode = barcode
+      ..veganStatus = VegStatus.unknown.name
+      ..veganStatusSource = VegStatusSource.community.name
+      ..vegetarianStatus = VegStatus.unknown.name
+      ..vegetarianStatusSource = VegStatusSource.unknown.name);
   }
 
   @override
@@ -123,7 +133,7 @@ class FakeBackend implements Backend {
 
     _createFakeShopIfNotExists(osmId: osmId);
     _fakeShops[osmId] = _fakeShops[osmId]!.rebuild((e) => e
-      ..products.add(BackendProduct((e) => e.barcode = barcode))
+      ..products.add(_createBackendProduct(barcode))
       ..productsLastSeenUtc[barcode] = _nowSecs());
     return Ok(None());
   }
@@ -155,11 +165,14 @@ class FakeBackend implements Backend {
       return _fakeShops[osmId]!;
     }
     osmId ??= DateTime.now().millisecondsSinceEpoch.toString();
-    productsNumber ??= _randInt(0, 5);
+    if (_randInt(0, 2) == 1) {
+      productsNumber ??= 0;
+    } else {
+      productsNumber ??= _randInt(1, 5);
+    }
     final fakeProducts = <BackendProduct>[];
     for (var i = 0; i < productsNumber; ++i) {
-      fakeProducts.add(
-          BackendProduct((e) => e..barcode = _randInt(100, 200).toString()));
+      fakeProducts.add(_createBackendProduct(_randInt(100, 200).toString()));
     }
     final lastSeen = <String, int>{};
     for (final product in fakeProducts) {

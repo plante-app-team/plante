@@ -10,12 +10,15 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
@@ -37,6 +40,7 @@ void main() {
   late MockBackend backend;
   late MockRouteObserver<ModalRoute> routesObserver;
   late MockPermissionsManager permissionsManager;
+  late MockShopsManager shopsManager;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -52,7 +56,8 @@ void main() {
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
-    GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
+    shopsManager = MockShopsManager();
+    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     final locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     GetIt.I.registerSingleton<LocationController>(locationController);
@@ -75,6 +80,7 @@ void main() {
     when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.request(any)).thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
+    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
   });
 
   testWidgets('product found', (WidgetTester tester) async {
@@ -344,6 +350,133 @@ void main() {
     expect(
         find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
+  });
+
+  testWidgets('opened to add a product to shop, existing product', (WidgetTester tester) async {
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmId = '1'
+        ..longitude = 11
+        ..latitude = 11
+        ..name = 'Spar'))
+      ..backendShop.replace(BackendShop((e) => e
+        ..osmId = '1'
+        ..productsCount = 2)));
+    final product = Product((e) => e
+      ..barcode = '12345'
+      ..name = 'Beans can'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..vegetarianStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community
+      ..vegetarianStatusSource = VegStatusSource.community);
+    when(productsManager.getProduct(any, any)).thenAnswer((_) async => Ok(product));
+
+    final widget = BarcodeScanPage(addProductToShop: shop);
+    final context = await tester.superPump(widget);
+
+    final expectedQuestion = context.strings.map_page_is_product_sold_q
+        .replaceAll('<PRODUCT>', 'Beans can')
+        .replaceAll('<SHOP>', shop.name);
+
+    expect(find.text(expectedQuestion), findsNothing);
+    widget.newScanDataForTesting(_barcode('12345'));
+    await tester.pumpAndSettle();
+    expect(find.text(expectedQuestion), findsOneWidget);
+
+    expect(find.byType(BarcodeScanPage), findsOneWidget);
+    verifyNever(shopsManager.putProductToShops(any, any));
+    await tester.tap(find.text(context.strings.global_yes));
+    await tester.pumpAndSettle();
+    // Expecting the page to close
+    expect(find.byType(BarcodeScanPage), findsNothing);
+    // Expecting the product to be put to the shop
+    verify(shopsManager.putProductToShops(product, [shop]));
+  });
+
+  testWidgets('opened to add a product to shop, existing product, then canceled', (WidgetTester tester) async {
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmId = '1'
+        ..longitude = 11
+        ..latitude = 11
+        ..name = 'Spar'))
+      ..backendShop.replace(BackendShop((e) => e
+        ..osmId = '1'
+        ..productsCount = 2)));
+    final product = Product((e) => e
+      ..barcode = '12345'
+      ..name = 'Beans can'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..vegetarianStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community
+      ..vegetarianStatusSource = VegStatusSource.community);
+    when(productsManager.getProduct(any, any)).thenAnswer((_) async => Ok(product));
+
+    final widget = BarcodeScanPage(addProductToShop: shop);
+    final context = await tester.superPump(widget);
+
+    final expectedQuestion = context.strings.map_page_is_product_sold_q
+        .replaceAll('<PRODUCT>', 'Beans can')
+        .replaceAll('<SHOP>', shop.name);
+
+    expect(find.text(expectedQuestion), findsNothing);
+    widget.newScanDataForTesting(_barcode('12345'));
+    await tester.pumpAndSettle();
+    expect(find.text(expectedQuestion), findsOneWidget);
+
+    expect(find.byType(BarcodeScanPage), findsOneWidget);
+    verifyNever(shopsManager.putProductToShops(any, any));
+    await tester.tap(find.text(context.strings.global_no));
+    await tester.pumpAndSettle();
+    // Expecting the page to close
+    expect(find.byType(BarcodeScanPage), findsNothing);
+    // Expecting the product to be NOT put to the shop
+    verifyNever(shopsManager.putProductToShops(any, any));
+  });
+
+  testWidgets('opened to add a product to shop, new product', (WidgetTester tester) async {
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmId = '1'
+        ..longitude = 11
+        ..latitude = 11
+        ..name = 'Spar'))
+      ..backendShop.replace(BackendShop((e) => e
+        ..osmId = '1'
+        ..productsCount = 2)));
+    when(productsManager.getProduct(any, any)).thenAnswer((_) async => Ok(null));
+
+    final widget = BarcodeScanPage(addProductToShop: shop);
+    final context = await tester.superPump(widget);
+
+    expect(
+        find.text(context.strings.barcode_scan_page_product_not_found),
+        findsNothing);
+    widget.newScanDataForTesting(_barcode('12345'));
+    await tester.pumpAndSettle();
+    expect(
+        find.text(context.strings.barcode_scan_page_product_not_found),
+        findsOneWidget);
+
+    expect(find.byType(BarcodeScanPage), findsOneWidget);
+    expect(find.byType(InitProductPage), findsNothing);
+    verifyNever(shopsManager.putProductToShops(any, any));
+    await tester.tap(find.text(context.strings.barcode_scan_page_add_product));
+    await tester.pumpAndSettle();
+    // Expecting the page to close
+    expect(find.byType(BarcodeScanPage), findsNothing);
+    // Expecting product addition to be started
+    expect(find.byType(InitProductPage), findsOneWidget);
+
+    final initProductPage =
+      find.byType(InitProductPage).evaluate().first.widget as InitProductPage;
+    expect(initProductPage.initialShops, equals([shop]));
   });
 }
 

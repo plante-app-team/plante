@@ -55,7 +55,7 @@
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
       "barcode_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",
       "barcode_scan_page_searching_product": "Searching product ",
-      "barcode_scan_page_add_product": "Add product",
+      "barcode_scan_page_add_product": "Add the product",
       "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
       "barcode_scan_page_camera_permission_reasoning_settings": "To use the barcodes scanner please give the camera permission to the app in the app settings",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
@@ -166,5 +166,6 @@
 
       "shop_card_no_products_in_shop": "This shop doesn't have added products yet",
       "shop_card_there_are_products_in_shop": "There's something interesting in the shop!",
-      "shop_card_open_shop_products": "Open products list"
+      "shop_card_open_shop_products": "Open products list",
+      "shop_card_add_product": "Add a product"
 }

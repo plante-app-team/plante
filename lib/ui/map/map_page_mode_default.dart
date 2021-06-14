@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
@@ -61,6 +62,13 @@ class MapPageModeDefault extends MapPageMode {
 
   @override
   void onMarkerClick(Iterable<Shop> shops) {
+    _setDisplayedShops(shops);
+  }
+
+  void _setDisplayedShops(Iterable<Shop> shops) {
+    if (listEquals(shops.toList(), _displayedShops)) {
+      return;
+    }
     _displayedShops.clear();
     _displayedShops.addAll(shops.toList());
     _displayedShops.sort((a, b) => b.productsCount - a.productsCount);

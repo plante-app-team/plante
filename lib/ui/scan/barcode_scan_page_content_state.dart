@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/barcode_spinner.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 typedef ProductUpdatedCallback = dynamic Function(Product updatedProduct);
+typedef AddProductToShopCallback = Future<Result<None, ShopsManagerError>>
+    Function();
 
 abstract class BarcodeScanPageContentState {
   String get id;
@@ -29,6 +35,7 @@ abstract class BarcodeScanPageContentState {
       VoidCallback cancelCallback) = BarcodeScanPageContentStateProductFound;
   factory BarcodeScanPageContentState.productNotFound(
       Product product,
+      Shop? shopToAddTo,
       ProductUpdatedCallback callback,
       VoidCallback cancelCallback) = BarcodeScanPageContentStateProductNotFound;
   factory BarcodeScanPageContentState.noPermission(VoidCallback callback) =
@@ -36,6 +43,12 @@ abstract class BarcodeScanPageContentState {
   factory BarcodeScanPageContentState.cannotAskPermission(
           VoidCallback openAppSettingsCallback) =
       BarcodeScanPageContentStateCannotAskPermission;
+  factory BarcodeScanPageContentState.addProductToShop(
+          Product product,
+          Shop shop,
+          AddProductToShopCallback addProductToShopCallback,
+          VoidCallback cancelCallback) =
+      BarcodeScanPageContentStateAddProductToShop;
 }
 
 class BarcodeScanPageContentStateNothingScanned
@@ -73,8 +86,12 @@ abstract class BarcodeScanPageContentAbstractStateWithProduct
 
   Product get productWithUnknownState;
 
-  void tryOpenProductPage(BuildContext context) {
+  void tryOpenProductPage(BuildContext context, [Shop? shopToAddTo]) {
+    if (shopToAddTo != null) {
+      Navigator.of(context).pop();
+    }
     ProductPageWrapper.show(context, productWithUnknownState,
+        shopToAddTo: shopToAddTo,
         productUpdatedCallback: productUpdatedCallback);
   }
 }
@@ -108,9 +125,10 @@ class BarcodeScanPageContentStateProductFound
 class BarcodeScanPageContentStateProductNotFound
     extends BarcodeScanPageContentAbstractStateWithProduct {
   final Product partialProduct;
+  final Shop? shopToAddTo;
   final VoidCallback cancelCallback;
-  BarcodeScanPageContentStateProductNotFound(
-      this.partialProduct, ProductUpdatedCallback callback, this.cancelCallback)
+  BarcodeScanPageContentStateProductNotFound(this.partialProduct,
+      this.shopToAddTo, ProductUpdatedCallback callback, this.cancelCallback)
       : super(callback);
   @override
   String get id => 'not_found_product';
@@ -137,7 +155,7 @@ class BarcodeScanPageContentStateProductNotFound
             const SizedBox(height: 18),
             ButtonFilledPlante.withText(
                 context.strings.barcode_scan_page_add_product, onPressed: () {
-              tryOpenProductPage(context);
+              tryOpenProductPage(context, shopToAddTo);
             }),
           ])),
     );
@@ -191,6 +209,75 @@ class BarcodeScanPageContentStateCannotAskPermission
             openAppSettingsCallback.call();
           }),
         ]));
+  }
+}
+
+class BarcodeScanPageContentStateAddProductToShop
+    extends BarcodeScanPageContentState {
+  final Product product;
+  final Shop shop;
+  final AddProductToShopCallback addProductToShopCallback;
+  final VoidCallback cancelCallback;
+
+  BarcodeScanPageContentStateAddProductToShop(this.product, this.shop,
+      this.addProductToShopCallback, this.cancelCallback);
+
+  @override
+  String get id => 'add_product_to_shop';
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    final title = context.strings.map_page_is_product_sold_q
+        .replaceAll('<PRODUCT>', product.name ?? '')
+        .replaceAll('<SHOP>', shop.name);
+    return Container(
+        margin: MediaQuery.of(context).viewInsets,
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Material(
+            color: Colors.white,
+            child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 24, top: 24, right: 24, bottom: 16),
+                child: Wrap(children: [
+                  Column(children: [
+                    Text(title, style: TextStyles.headline1),
+                    const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                        width: double.infinity,
+                        child: Row(children: [
+                          Expanded(
+                              child: ButtonOutlinedPlante.withText(
+                            context.strings.global_no,
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          )),
+                          const SizedBox(width: 16),
+                          Expanded(
+                              child: ButtonFilledPlante.withText(
+                            context.strings.global_yes,
+                            onPressed: () {
+                              _tryAddProductToShop(context);
+                            },
+                          )),
+                        ]))
+                  ])
+                ]))));
+  }
+
+  void _tryAddProductToShop(BuildContext context) async {
+    final result = await addProductToShopCallback.call();
+    if (result.isErr) {
+      if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
+        showSnackBar(context.strings.global_network_error, context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
+    } else {
+      showSnackBar(context.strings.global_done_thanks, context);
+      Navigator.of(context).pop();
+    }
   }
 }
 

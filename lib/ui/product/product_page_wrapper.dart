@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
@@ -11,13 +12,18 @@ class ProductPageWrapper {
   static Map<int, ProductUpdatedCallback> updateCallbacks = {};
 
   static Widget createForTesting(Product product) {
-    return _createPageFor(product, null);
+    return _createPageFor(product, null, null);
   }
 
+  /// If [shopToAddTo] is used, ENSURE [isProductFilledEnoughForDisplay] == false
   static void show(BuildContext context, Product initialProduct,
-      {ProductUpdatedCallback? productUpdatedCallback}) {
+      {ProductUpdatedCallback? productUpdatedCallback, Shop? shopToAddTo}) {
     final requestId = ++lastShowRequestId;
-    final args = [requestId, initialProduct.toJson()];
+    final args = [
+      requestId,
+      initialProduct.toJson(),
+      if (shopToAddTo != null) shopToAddTo.toJson()
+    ];
     if (productUpdatedCallback != null) {
       updateCallbacks[requestId] = productUpdatedCallback;
     }
@@ -27,6 +33,7 @@ class ProductPageWrapper {
   static Route<void> _routeBuilder(BuildContext context, Object? arguments) {
     return MaterialPageRoute<void>(builder: (BuildContext context) {
       final Product product;
+      Shop? shopToAddTo;
       final int requestId;
       final ProductUpdatedCallback? callback;
       if (arguments != null) {
@@ -34,6 +41,9 @@ class ProductPageWrapper {
         requestId = args[0] as int;
         product =
             Product.fromJson(args[1] as Map<dynamic, dynamic>) ?? Product.empty;
+        if (args.length > 2) {
+          shopToAddTo = Shop.fromJson(args[2] as Map<dynamic, dynamic>);
+        }
         callback = updateCallbacks.remove(requestId);
         if (callback == null) {
           Log.w('product page is created without a callback, '
@@ -46,17 +56,24 @@ class ProductPageWrapper {
         callback = null;
       }
 
-      return _createPageFor(product, callback);
+      return _createPageFor(product, shopToAddTo, callback);
     });
   }
 
   static Widget _createPageFor(
-      Product product, ProductUpdatedCallback? callback) {
+      Product product, Shop? shopToAddTo, ProductUpdatedCallback? callback) {
     if (!isProductFilledEnoughForDisplay(product)) {
       return InitProductPage(product,
+          initialShops: [if (shopToAddTo != null) shopToAddTo],
           key: const Key('init_product_page'),
           productUpdatedCallback: callback);
     } else {
+      if (shopToAddTo != null) {
+        Log.e('_createPageFor, shopToAddTo != null but product '
+            'display is selected. Did you forget to call '
+            'isProductFilledEnoughForDisplay before '
+            'ProductPageWrapper.show?');
+      }
       return DisplayProductPage(product,
           key: const Key('display_product_page'),
           productUpdatedCallback: callback);
