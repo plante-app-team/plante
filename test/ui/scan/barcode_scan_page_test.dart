@@ -377,7 +377,7 @@ void main() {
     final widget = BarcodeScanPage(addProductToShop: shop);
     final context = await tester.superPump(widget);
 
-    final expectedQuestion = context.strings.map_page_is_product_sold_q
+    final expectedQuestion = context.strings.barcode_scan_page_is_product_sold_q
         .replaceAll('<PRODUCT>', 'Beans can')
         .replaceAll('<SHOP>', shop.name);
 
@@ -421,7 +421,7 @@ void main() {
     final widget = BarcodeScanPage(addProductToShop: shop);
     final context = await tester.superPump(widget);
 
-    final expectedQuestion = context.strings.map_page_is_product_sold_q
+    final expectedQuestion = context.strings.barcode_scan_page_is_product_sold_q
         .replaceAll('<PRODUCT>', 'Beans can')
         .replaceAll('<SHOP>', shop.name);
 

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
@@ -5,6 +6,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
@@ -60,10 +62,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
 
     widget.onMarkerClickForTesting([shops[1]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
     verifyNever(shopsManager.putProductToShops(any, any));
@@ -75,6 +81,48 @@ void main() {
     expect(find.byType(MapPage), findsNothing);
     // Verify the product is added to the shop
     verify(shopsManager.putProductToShops(product, [shops[0], shops[1]]));
+  });
+
+  testWidgets('can put products to shops cluster', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+        product: product);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    widget.onMarkerClickForTesting([shops[0], shops[1]]);
+    await tester.pumpAndSettle();
+
+    // Button 1 click
+    final yesButton1 = find.text(context.strings.global_yes)
+        .evaluate().first.widget;
+    await tester.tap(find.byWidget(yesButton1));
+    await tester.pumpAndSettle();
+    // Scroll to card 2
+    final card1 = find.byType(ShopCard).evaluate().first.widget;
+    await tester.drag(find.byWidget(card1), const Offset(-3000, 0));
+    await tester.pumpAndSettle();
+    // Button 2 click
+    final yesButton2 = find.text(context.strings.global_yes)
+        .evaluate().last.widget;
+    await tester.tap(find.byWidget(yesButton2));
+    await tester.pumpAndSettle();
+
+    final cancelButton = find.byKey(const Key('card_cancel_btn'))
+        .evaluate().first.widget;
+    await tester.tap(find.byWidget(cancelButton));
+    await tester.pumpAndSettle();
+
+    verifyNever(shopsManager.putProductToShops(any, any));
+    await tester.tap(find.text(context.strings.global_done));
+    await tester.pumpAndSettle();
+
+    // Expecting the page to be closed
+    expect(find.byType(MapPage), findsNothing);
+    // Verify the product is added to the shops
+    verify(shopsManager.putProductToShops(product, [shops[1], shops[0]]));
   });
 
   testWidgets('cannot put products to shops when no products are selected', (WidgetTester tester) async {
@@ -95,7 +143,7 @@ void main() {
     verifyNever(shopsManager.putProductToShops(any, any));
   });
 
-  testWidgets('second tap on shop unselects it', (WidgetTester tester) async {
+  testWidgets('unselect shop', (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -104,16 +152,22 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    // Tap 1
+    // Select
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals({shops[0]}));
 
-    // Tap 2
+    // Unselect
     widget.onMarkerClickForTesting([shops[0]]);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(context.strings.global_no));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals(<Shop>{}));
@@ -136,11 +190,15 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
+    // Select
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
 
+    // Cancel
     await tester.tap(find.text(context.strings.global_cancel));
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
@@ -175,7 +233,7 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
+    await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
@@ -183,7 +241,7 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     // Cancel
-    await tester.tap(find.text(context.strings.global_no));
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals(<Shop>{}));
@@ -217,9 +275,9 @@ void main() {
     for (final shop in manyShops) {
       widget.onMarkerClickForTesting([shop]);
       await tester.pumpAndSettle();
-      if (find.text(context.strings.global_yes).evaluate().isNotEmpty) {
-        await tester.tap(find.text(context.strings.global_yes));
-      }
+      await tester.tap(find.text(context.strings.global_yes));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('card_cancel_btn')));
       await tester.pumpAndSettle();
     }
     expect(widget.getModeForTesting().selectedShops(), equals(

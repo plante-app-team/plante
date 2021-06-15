@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/map/map_page_mode_base.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 
 const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
 
-abstract class MapPageModeSelectShopsBase extends MapPageMode {
+abstract class MapPageModeSelectShopsWhereProductSoldBase
+    extends MapPageModeShopsCardBase {
   final _selectedShops = <Shop>{};
+  final _unselectedShops = <Shop>{};
 
-  MapPageModeSelectShopsBase(MapPageModeParams params) : super(params) {
+  MapPageModeSelectShopsWhereProductSoldBase(MapPageModeParams params)
+      : super(params) {
     _selectedShops.addAll(widget.initialSelectedShops);
   }
 
@@ -31,37 +38,42 @@ abstract class MapPageModeSelectShopsBase extends MapPageMode {
   }
 
   @override
-  void onMarkerClick(Iterable<Shop> shops) {
-    if (shops.length == 1) {
-      final shop = shops.first;
-      if (_selectedShops.contains(shop)) {
-        _selectedShops.remove(shop);
-        updateMap();
-        return;
-      }
-
-      if (_selectedShops.length >= MAP_PAGE_MODE_SELECTED_SHOPS_MAX) {
-        Log.w('Not allowing to select more than 10 shops');
-        return;
-      }
-
-      final String title;
-      if (widget.product != null) {
-        title = context.strings.map_page_is_product_sold_q
-            .replaceAll('<PRODUCT>', widget.product!.name ?? '')
-            .replaceAll('<SHOP>', shop.name);
-      } else {
-        title = context.strings.map_page_is_new_product_sold_q
-            .replaceAll('<SHOP>', shop.name);
-      }
-      showYesNoDialog<void>(context, title, () {
-        _selectedShops.add(shop);
-        updateMap();
-      });
+  ShopCard createCardFor(Shop shop, ArgCallback<Shop>? cancelCallback) {
+    final Product product;
+    if (widget.product != null) {
+      product = widget.product!;
     } else {
-      // TODO(https://trello.com/c/dCDHecZS/): implement with proper design
-      showSnackBar('Markers cluster click is not supported yet', context);
+      product = Product((e) => e.barcode = 'fake_product');
     }
+
+    bool? isSold;
+    if (_selectedShops.contains(shop)) {
+      isSold = true;
+    } else if (_unselectedShops.contains(shop)) {
+      isSold = false;
+    }
+
+    return ShopCard.askIfProductIsSold(
+        product: product,
+        shop: shop,
+        isProductSold: isSold,
+        onIsProductSoldChanged: _onProductSoldChange,
+        cancelCallback: cancelCallback);
+  }
+
+  void _onProductSoldChange(Shop shop, bool? isSold) {
+    _selectedShops.remove(shop);
+    _unselectedShops.remove(shop);
+    if (isSold == true) {
+      if (_selectedShops.length < MAP_PAGE_MODE_SELECTED_SHOPS_MAX) {
+        _selectedShops.add(shop);
+      } else {
+        Log.w('Not allowing to select more than 10 shops');
+      }
+    } else if (isSold == false) {
+      _unselectedShops.add(shop);
+    }
+    updateWidget();
   }
 
   @override
@@ -91,7 +103,8 @@ abstract class MapPageModeSelectShopsBase extends MapPageMode {
         alignment: Alignment.topCenter,
         child: ButtonFilledPlante.withText(context.strings.map_page_plus_shop,
             onPressed: !model.loading ? _addShopClick : null),
-      )
+      ),
+      shopsCardsWidget(context)
     ]);
   }
 

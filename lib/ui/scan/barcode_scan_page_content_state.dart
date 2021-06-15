@@ -227,7 +227,7 @@ class BarcodeScanPageContentStateAddProductToShop
 
   @override
   Widget buildWidget(BuildContext context) {
-    final title = context.strings.map_page_is_product_sold_q
+    final title = context.strings.barcode_scan_page_is_product_sold_q
         .replaceAll('<PRODUCT>', product.name ?? '')
         .replaceAll('<SHOP>', shop.name);
     return Container(

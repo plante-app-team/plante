@@ -45,6 +45,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('card_cancel_btn')));
+    await tester.pumpAndSettle();
 
     reset(navigationObserver);
 
@@ -56,7 +58,7 @@ void main() {
     expect(await capturedRoute.popped, equals([shops[0]]));
   });
 
-   testWidgets('shop selection with provided product', (WidgetTester tester) async {
+  testWidgets('shop selection with provided product', (WidgetTester tester) async {
     final product = Product((e) => e
       ..barcode = '222'
       ..name = 'Product name');
@@ -76,10 +78,8 @@ void main() {
     await tester.pumpAndSettle();
 
     final productString = context.strings.map_page_is_product_sold_q
-        .replaceAll('<PRODUCT>', product.name!)
-        .replaceAll('<SHOP>', shops[0].name);
-    final noProductString = context.strings.map_page_is_new_product_sold_q
-        .replaceAll('<SHOP>', shops[0].name);
+        .replaceAll('<PRODUCT>', product.name!);
+    final noProductString = context.strings.map_page_is_new_product_sold_q;
     expect(find.text(productString), findsOneWidget);
     expect(find.text(noProductString), findsNothing);
   });
@@ -99,8 +99,7 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
 
-    final noProductString = context.strings.map_page_is_new_product_sold_q
-        .replaceAll('<SHOP>', shops[0].name);
+    final noProductString = context.strings.map_page_is_new_product_sold_q;
     expect(find.text(noProductString), findsOneWidget);
   });
 }

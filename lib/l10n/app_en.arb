@@ -41,8 +41,8 @@
 
       "map_page_default_shop_type_name": "Shop",
       "map_page_empty_shops": "Empty shops",
-      "map_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
-      "map_page_is_new_product_sold_q": "Is the product being sold at «<SHOP>»?",
+      "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
+      "map_page_is_new_product_sold_q": "Is the product being sold here?",
       "map_page_cancel_putting_product_q": "Cancel putting the product to the map?",
       "map_page_how_new_shop_is_called": "What is the name of the shop?",
       "map_page_how_new_shop_is_called_label": "Shop's name",
@@ -59,6 +59,7 @@
       "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
       "barcode_scan_page_camera_permission_reasoning_settings": "To use the barcodes scanner please give the camera permission to the app in the app settings",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
+      "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",

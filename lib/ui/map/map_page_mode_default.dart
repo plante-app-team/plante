@@ -11,12 +11,12 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_add_product.dart';
+import 'package:plante/ui/map/map_page_mode_base.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
-class MapPageModeDefault extends MapPageMode {
+class MapPageModeDefault extends MapPageModeShopsCardBase {
   bool _showEmptyShops = false;
-  final _displayedShops = <Shop>[];
 
   MapPageModeDefault(
       MapPageModel model,
@@ -38,7 +38,7 @@ class MapPageModeDefault extends MapPageMode {
         switchModeTo(MapPageModeAddProduct(params));
         break;
       case MapPageRequestedMode.SELECT_SHOPS:
-        switchModeTo(MapPageModeSelectShops(params));
+        switchModeTo(MapPageModeSelectShopsWhereProductSold(params));
         break;
       case MapPageRequestedMode.DEFAULT:
         if (widget.product != null) {
@@ -49,31 +49,9 @@ class MapPageModeDefault extends MapPageMode {
   }
 
   @override
-  bool shopWhereAmIFAB() => _displayedShops.isEmpty;
-
-  @override
   Iterable<Shop> filter(Iterable<Shop> shops) {
     return shops
         .where((shop) => _showEmptyShops ? true : shop.productsCount > 0);
-  }
-
-  @override
-  Set<Shop> accentedShops() => _displayedShops.toSet();
-
-  @override
-  void onMarkerClick(Iterable<Shop> shops) {
-    _setDisplayedShops(shops);
-  }
-
-  void _setDisplayedShops(Iterable<Shop> shops) {
-    if (listEquals(shops.toList(), _displayedShops)) {
-      return;
-    }
-    _displayedShops.clear();
-    _displayedShops.addAll(shops.toList());
-    _displayedShops.sort((a, b) => b.productsCount - a.productsCount);
-    updateWidget();
-    updateMap();
   }
 
   @override
@@ -102,55 +80,12 @@ class MapPageModeDefault extends MapPageMode {
               ]),
             ),
           )),
-      AnimatedSwitcher(
-          duration: DURATION_DEFAULT,
-          child:
-              _displayedShops.isEmpty ? const SizedBox.shrink() : _shopCards())
+      shopsCardsWidget(context),
     ]);
   }
 
-  Widget _shopCards() {
-    return PageView.builder(
-      controller: PageController(viewportFraction: 0.90),
-      itemCount: _displayedShops.length,
-      itemBuilder: _buildShopCard,
-    );
-  }
-
-  Widget _buildShopCard(BuildContext context, int itemIndex) {
-    const horizontalPadding = 6.0;
-    final double leftPadding;
-    if (itemIndex == 0) {
-      leftPadding = 0;
-    } else {
-      leftPadding = horizontalPadding;
-    }
-    return Material(
-        color: Colors.transparent,
-        child: Stack(children: [
-          InkWell(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: _hideShopsCard,
-          ),
-          Align(
-              alignment: Alignment.bottomCenter,
-              child: Wrap(children: [
-                Padding(
-                    padding: EdgeInsets.only(
-                        left: leftPadding,
-                        right: horizontalPadding,
-                        bottom: 12),
-                    child: ShopCard(
-                        shop: _displayedShops[itemIndex],
-                        cancelCallback: (Shop shop) => _hideShopsCard()))
-              ]))
-        ]));
-  }
-
-  void _hideShopsCard() {
-    _displayedShops.clear();
-    updateWidget();
-    updateMap();
+  @override
+  ShopCard createCardFor(Shop shop, cancelCallback) {
+    return ShopCard.forProductRange(shop: shop, cancelCallback: cancelCallback);
   }
 }

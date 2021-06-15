@@ -23,7 +23,8 @@ class MapPageModeCreateShop extends MapPageMode {
 
   @override
   void init(MapPageMode? previousMode) {
-    if (previousMode == null || previousMode is! MapPageModeSelectShopsBase) {
+    if (previousMode == null ||
+        previousMode is! MapPageModeSelectShopsWhereProductSoldBase) {
       Log.e('MapPageModeSelectShopsBase expected, got $previousMode');
     }
     _selectedShop.addAll(previousMode!.selectedShops());
@@ -119,7 +120,7 @@ class MapPageModeCreateShop extends MapPageMode {
       Point<double>(shop.longitude, shop.latitude),
     );
     if (result.isOk) {
-      switchModeTo(MapPageModeSelectShops(params));
+      switchModeTo(MapPageModeSelectShopsWhereProductSold(params));
     } else {
       if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);

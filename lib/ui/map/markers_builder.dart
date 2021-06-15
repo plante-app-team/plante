@@ -36,12 +36,12 @@ Future<Marker> markersBuilder(
 Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     ShopsMarkersExtraData extraData, BuildContext context) async {
   if (shops.length == 1) {
-    if (extraData.selectedShops.contains(shops.first)) {
-      return _bitmapDescriptorFromSvgAsset(context,
-          'assets/map_marker_selected.svg', 1, TextStyles.markerFilled);
-    } else if (extraData.accentedShops.contains(shops.first)) {
+    if (extraData.accentedShops.contains(shops.first)) {
       return _bitmapDescriptorFromSvgAsset(context,
           'assets/map_marker_accented.svg', 1, TextStyles.markerAccented);
+    } else if (extraData.selectedShops.contains(shops.first)) {
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/map_marker_selected.svg', 1, TextStyles.markerFilled);
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
@@ -50,18 +50,21 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);
     }
   } else {
-    if (shops.any((e) => extraData.selectedShops.contains(e))) {
-      return _bitmapDescriptorFromSvgAsset(
-          context,
-          'assets/map_marker_group_selected.svg',
-          shops.length,
-          TextStyles.markerFilled);
-    } else if (shops.any((e) => extraData.accentedShops.contains(e))) {
+    if (shops.any((e) => extraData.accentedShops.contains(e))) {
       return _bitmapDescriptorFromSvgAsset(
           context,
           'assets/map_marker_group_accented.svg',
           shops.length,
           TextStyles.markerAccented);
+    } else if (shops.any((e) => extraData.selectedShops.contains(e))) {
+      return _bitmapDescriptorFromSvgAsset(
+          context,
+          'assets/map_marker_group_selected.svg',
+          // The icon has a checkmark where the
+          // shops number would be, so we want to draw no number,
+          // and to do that we act as if there's just 1 shop at the marker.
+          1,
+          TextStyles.markerFilled);
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context,
