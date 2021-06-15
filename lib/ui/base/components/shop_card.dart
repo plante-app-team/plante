@@ -179,10 +179,7 @@ class ShopCard extends StatelessWidget {
 
   void _onMainButtonClick(BuildContext context) {
     if (_haveProducts()) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ShopProductRangePage(shop: shop)));
+      ShopProductRangePage.show(context: context, shop: shop);
     } else {
       Navigator.push(
           context,

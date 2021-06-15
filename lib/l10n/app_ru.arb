@@ -164,6 +164,7 @@
     "shop_product_range_page_have_you_seen_product_here": "Такой продукт тут есть?",
     "shop_product_range_page_you_sure_positive_vote": "Вы уверены, что видели продукт в магазине?",
     "shop_product_range_page_you_sure_negative_vote": "Вы уверены, что продукта в магазине нет?",
+    "shop_product_range_page_add_product": "Добавить продукт",
 
     "shop_card_no_products_in_shop": "Тут пока нет добавленных продуктов",
     "shop_card_there_are_products_in_shop": "В магазине есть кое-что интересное!",

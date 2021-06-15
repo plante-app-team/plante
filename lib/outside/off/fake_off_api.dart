@@ -1,5 +1,6 @@
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/outside/off/off_api.dart';
 
@@ -64,8 +65,8 @@ class FakeOffApi implements OffApi {
           status: 1, barcode: configuration.barcode, product: null);
     }
     final product = off.Product(
-        barcode: '123',
-        productNameTranslated: 'name',
+        barcode: randInt(1000000, 9999999).toString(),
+        productNameTranslated: _generateName(),
         images: <off.ProductImage>[
           off.ProductImage(
               field: off.ImageField.FRONT,
@@ -100,3 +101,62 @@ class FakeOffApi implements OffApi {
     return off.Status(status: 1);
   }
 }
+
+String _generateName() {
+  final cookingType = _FAKE_COOKING_TYPE[randInt(0, _FAKE_COOKING_TYPE.length)];
+  final name = _FAKE_NAMES[randInt(0, _FAKE_NAMES.length)];
+  return '$cookingType $name';
+}
+
+const _FAKE_COOKING_TYPE = [
+  'Fried',
+  'Boiled',
+  'Dried',
+  'Toasted',
+  'Fresh',
+];
+
+const _FAKE_NAMES = [
+  'bananas',
+  'apples',
+  'strawberries',
+  'grapes',
+  'oranges',
+  'Watermelon',
+  'Lemons',
+  'avocados',
+  'peaches',
+  'blueberries',
+  'pineapple',
+  'cantaloupe',
+  'cherries',
+  'pears',
+  'limes',
+  'mangoes',
+  'raspberries',
+  'blackberries',
+  'plums',
+  'Nectarines',
+  'Nectarines',
+  'Vegetables',
+  'potatoes',
+  'tomatoes',
+  'onions',
+  'carrots',
+  'broccoli',
+  'bell peppers',
+  'lettuce',
+  'cucumbers',
+  'celery',
+  'salad mix',
+  'corn',
+  'garlic',
+  'mushrooms',
+  'cabbage',
+  'spinach',
+  'sweet potatoes',
+  'green beans',
+  'cauliflower',
+  'green onions',
+  'asparagus',
+];

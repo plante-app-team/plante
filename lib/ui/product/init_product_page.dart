@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
@@ -14,7 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
@@ -362,11 +361,9 @@ class _InitProductPageState extends State<InitProductPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             HeaderPlante(
-                                rightActionPadding: 8,
-                                rightAction: IconButton(
+                                rightAction: FabPlante(
                                     onPressed: _cancel,
-                                    icon:
-                                        SvgPicture.asset('assets/cancel.svg'))),
+                                    svgAsset: 'assets/cancel.svg')),
                             Container(
                                 padding:
                                     const EdgeInsets.only(left: 24, right: 24),

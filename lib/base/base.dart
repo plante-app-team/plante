@@ -13,6 +13,12 @@ const PRIVACY_POLICY_URL =
 typedef ArgCallback<T> = void Function(T argument);
 typedef ResCallback<T> = T Function();
 
+final _random = Random();
+
+int randInt(int min, int max) {
+  return min + _random.nextInt(max - min);
+}
+
 bool isInTests() {
   return Platform.environment.containsKey('FLUTTER_TEST');
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
@@ -12,26 +13,61 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
-import 'package:plante/ui/base/components/header_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
-  const ShopProductRangePage({Key? key, required this.shop}) : super(key: key);
+  const ShopProductRangePage._({Key? key, required this.shop})
+      : super(key: key);
+
+  @visibleForTesting
+  static ShopProductRangePage createForTesting(Shop shop) {
+    if (!isInTests()) {
+      throw Exception('!isInTests()');
+    }
+    return ShopProductRangePage._(shop: shop);
+  }
+
+  static void show(
+      {Key? key, required BuildContext context, required Shop shop}) {
+    final args = [
+      shop.toJson(),
+    ];
+    Navigator.restorablePush(context, _routeBuilder, arguments: args);
+  }
+
+  static Route<void> _routeBuilder(BuildContext context, Object? arguments) {
+    return MaterialPageRoute<void>(builder: (BuildContext context) {
+      Shop shop = Shop.empty;
+      if (arguments != null) {
+        final args = arguments as List<dynamic>;
+        shop = Shop.fromJson(args[0] as Map<dynamic, dynamic>) ?? Shop.empty;
+      }
+      if (shop == Shop.empty) {
+        Log.e('ShopProductRangePage is created with invalid arguments or '
+            'without any. Args: $arguments');
+      }
+      return ShopProductRangePage._(shop: shop);
+    });
+  }
 
   @override
   _ShopProductRangePageState createState() => _ShopProductRangePageState();
 }
 
-class _ShopProductRangePageState extends State<ShopProductRangePage> {
+class _ShopProductRangePageState extends State<ShopProductRangePage>
+    with RouteAware {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
   final Backend _backend;
+  final RouteObserver<ModalRoute> _routeObserver;
   bool _loading = false;
   bool _performingBackendAction = false;
   ShopProductRange? _shopProductRange;
@@ -40,7 +76,8 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
   _ShopProductRangePageState()
       : _shopsManager = GetIt.I.get<ShopsManager>(),
         _userParamsController = GetIt.I.get<UserParamsController>(),
-        _backend = GetIt.I.get<Backend>();
+        _backend = GetIt.I.get<Backend>(),
+        _routeObserver = GetIt.I.get<RouteObserver<ModalRoute>>();
 
   @override
   void initState() {
@@ -50,9 +87,29 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _routeObserver.unsubscribe(this);
+  }
+
+  @override
   void didUpdateWidget(ShopProductRangePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     _load();
+  }
+
+  @override
+  void didPopNext() {
+    if (ModalRoute.of(context)?.isCurrent == true) {
+      // Reload!
+      _load();
+    }
   }
 
   void _load() async {
@@ -104,7 +161,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
           children: products.map((e) {
         final date = DateTime.fromMillisecondsSinceEpoch(
             _shopProductRange!.lastSeenSecs(e) * 1000);
-        final dateStr = DateFormat.yMMMMd(context.langCode).format(date);
+        final dateStr = intl.DateFormat.yMMMMd(context.langCode).format(date);
 
         return Padding(
             key: Key('product_${e.barcode}'),
@@ -140,12 +197,28 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
       body: SafeArea(
           child: Stack(children: [
         Column(children: [
-          const HeaderPlante(),
           Padding(
-              padding: const EdgeInsets.only(left: 26),
-              child: SizedBox(
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+            child: Column(children: [
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    FabPlante.closeBtnPopOnClick(
+                        key: const Key('close_button')),
+                    Expanded(
+                        child: Text(widget.shop.name,
+                            style: TextStyles.headline1)),
+                  ]),
+              const SizedBox(height: 28),
+              SizedBox(
                   width: double.infinity,
-                  child: Text(widget.shop.name, style: TextStyles.headline1))),
+                  child: ButtonFilledPlante.withText(
+                      context.strings.shop_product_range_page_add_product,
+                      onPressed: !_loading ? _onAddProductClick : null)),
+            ]),
+          ),
+          const SizedBox(height: 24),
           Expanded(child: content)
         ]),
         Positioned.fill(
@@ -221,6 +294,14 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
         _performingBackendAction = false;
       });
     }
+  }
+
+  void _onAddProductClick() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                BarcodeScanPage(addProductToShop: widget.shop)));
   }
 }
 

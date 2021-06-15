@@ -39,13 +39,23 @@ class BarcodeScanPage extends StatefulWidget {
   _BarcodeScanPageState createState() => _BarcodeScanPageState();
 
   void newScanDataForTesting(qr.Barcode barcode) {
-    assert(isInTests());
+    if (!isInTests()) {
+      throw Exception('newScanDataForTesting not in tests');
+    }
     _testingStorage.newScanDataCallback!.call(barcode);
+  }
+
+  void closeForTesting() {
+    if (!isInTests()) {
+      throw Exception('closeForTesting not in tests');
+    }
+    _testingStorage.closeCallback!.call();
   }
 }
 
 class _TestingStorage {
   ArgCallback<qr.Barcode>? newScanDataCallback;
+  VoidCallback? closeCallback;
 }
 
 class _BarcodeScanPageState extends State<BarcodeScanPage>
@@ -63,6 +73,9 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   void initState() {
     super.initState();
     widget._testingStorage.newScanDataCallback = _onNewScanData;
+    widget._testingStorage.closeCallback = () {
+      Navigator.of(context).pop();
+    };
     WidgetsBinding.instance!.addObserver(this);
 
     final stateChangeCallback = () {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
@@ -11,7 +12,11 @@ class ProductPageWrapper {
   static int lastShowRequestId = 0;
   static Map<int, ProductUpdatedCallback> updateCallbacks = {};
 
+  @visibleForTesting
   static Widget createForTesting(Product product) {
+    if (!isInTests()) {
+      throw Exception('!isInTests()');
+    }
     return _createPageFor(product, null, null);
   }
 

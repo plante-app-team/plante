@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -20,14 +21,9 @@ class FakeBackend implements Backend {
     ..eatsHoney = false
     ..userGroup = 2);
   final _fakeShops = <String, BackendProductsAtShop>{};
-  final _random = Random();
 
   Future _delay() async {
     await Future.delayed(const Duration(seconds: 1));
-  }
-
-  int _randInt(int min, int max) {
-    return min + _random.nextInt(max - min);
   }
 
   int _nowSecs() {
@@ -165,18 +161,18 @@ class FakeBackend implements Backend {
       return _fakeShops[osmId]!;
     }
     osmId ??= DateTime.now().millisecondsSinceEpoch.toString();
-    if (_randInt(0, 2) == 1) {
+    if (randInt(0, 2) == 1) {
       productsNumber ??= 0;
     } else {
-      productsNumber ??= _randInt(1, 5);
+      productsNumber ??= randInt(1, 5);
     }
     final fakeProducts = <BackendProduct>[];
     for (var i = 0; i < productsNumber; ++i) {
-      fakeProducts.add(_createBackendProduct(_randInt(100, 200).toString()));
+      fakeProducts.add(_createBackendProduct(randInt(100, 200).toString()));
     }
     final lastSeen = <String, int>{};
     for (final product in fakeProducts) {
-      lastSeen[product.barcode] = _nowSecs() - 60 * 60 * 24 * _randInt(1, 10);
+      lastSeen[product.barcode] = _nowSecs() - 60 * 60 * 24 * randInt(1, 10);
     }
 
     final productsAtShop = BackendProductsAtShop((e) => e

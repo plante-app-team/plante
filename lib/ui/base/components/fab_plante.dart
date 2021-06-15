@@ -17,6 +17,11 @@ class FabPlante extends StatelessWidget {
         svgAsset = 'assets/back_arrow.svg',
         super(key: key);
 
+  FabPlante.closeBtnPopOnClick({Key? key, this.heroTag})
+      : onPressed = _popOnClickFakeCallback,
+        svgAsset = 'assets/cancel.svg',
+        super(key: key);
+
   const FabPlante.menuBtn({Key? key, required this.onPressed, this.heroTag})
       : svgAsset = 'assets/menu_ellipsis.svg',
         super(key: key);
