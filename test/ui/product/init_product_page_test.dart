@@ -96,6 +96,7 @@ void main() {
         VegStatus? vegetarianStatusInput = VegStatus.positive,
         List<Shop>? selectedShops,
         List<Shop> initialShops = const [],
+        List<Shop> shopsToCancel = const [],
         int requiredManualOcrAttempts = 0,
         int ocrSuccessfulAttemptNumber = 1}) async {
     var ocrAttempts = 0;
@@ -165,8 +166,23 @@ void main() {
       expect(find.byType(MapPage), findsOneWidget);
 
       final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
-      mapPage.finishForTesting(selectedShops.isNotEmpty ? selectedShops : null);
+      mapPage.finishForTesting(
+          selectedShops.isNotEmpty ?
+          selectedShops + initialShops :
+          null);
       await tester.pumpAndSettle();
+    }
+
+    if (shopsToCancel.isNotEmpty) {
+      for (final shopToCancel in shopsToCancel) {
+        final key = Key('shop_label_${shopToCancel.osmId}');
+        final label = find.byKey(key);
+        final cancel = find.descendant(
+            of: label,
+            matching: find.byKey(const Key('label_cancelable_cancel')));
+        await tester.tap(cancel);
+        await tester.pumpAndSettle();
+      }
     }
 
     if (takeImageFront) {
@@ -271,8 +287,12 @@ void main() {
     if (selectedShops != null) {
       expectedShops.addAll(selectedShops);
     }
+    expectedShops.removeWhere((shop) => shopsToCancel.contains(shop));
     if (expectedProductResult != null && expectedShops.isNotEmpty) {
-      verify(shopsManager.putProductToShops(expectedProductResult, expectedShops));
+      final sentShops =
+        verify(shopsManager.putProductToShops(expectedProductResult, captureAny))
+            .captured.first as List<Shop>;
+      expect(expectedShops.toSet(), equals(sentShops.toSet()));
     } else {
       verifyNever(shopsManager.putProductToShops(any, any));
     }
@@ -896,6 +916,129 @@ void main() {
         veganStatusInput: product.veganStatus,
         vegetarianStatusInput: product.vegetarianStatus,
         initialShops: [aShop]
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('opened with initial shops, then select shops', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+    ];
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: product,
+        nameInput: product.name,
+        brandInput: product.brands!.join(', '),
+        categoriesInput: product.categories!.join(', '),
+        takeImageFront: product.imageFront != null,
+        takeImageIngredients: product.imageIngredients != null,
+        veganStatusInput: product.veganStatus,
+        vegetarianStatusInput: product.vegetarianStatus,
+        initialShops: [shops[0]],
+        selectedShops: [shops[1]],
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('cancel initial and selected shops', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '3'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '3'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '4'
+          ..longitude = 11
+          ..latitude = 11
+          ..name = 'Spar'))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '4'
+          ..productsCount = 2))),
+    ];
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: product,
+        nameInput: product.name,
+        brandInput: product.brands!.join(', '),
+        categoriesInput: product.categories!.join(', '),
+        takeImageFront: product.imageFront != null,
+        takeImageIngredients: product.imageIngredients != null,
+        veganStatusInput: product.veganStatus,
+        vegetarianStatusInput: product.vegetarianStatus,
+        initialShops: [shops[0], shops[1]],
+        selectedShops: [shops[2], shops[3]],
+        shopsToCancel: [shops[1], shops[3]],
     );
 
     expect(done, isTrue);
