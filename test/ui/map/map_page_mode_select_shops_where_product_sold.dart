@@ -8,7 +8,7 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 
 import '../../widget_tester_extension.dart';
-import 'map_page_mode_select_shops_test.mocks.dart';
+import 'map_page_mode_select_shops_where_product_sold.mocks.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
 

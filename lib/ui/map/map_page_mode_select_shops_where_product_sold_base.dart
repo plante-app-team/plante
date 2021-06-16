@@ -4,11 +4,10 @@ import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/fab_add_shop.dart';
+import 'package:plante/ui/map/components/fab_add_shop.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_base.dart';
@@ -18,6 +17,7 @@ const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
 
 abstract class MapPageModeSelectShopsWhereProductSoldBase
     extends MapPageModeShopsCardBase {
+  static const _HINT_ID = 'MapPageModeSelectShopsWhereProductSoldBase hint 1';
   final _selectedShops = <Shop>{};
   final _unselectedShops = <Shop>{};
 
@@ -37,6 +37,15 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     if (previousMode != null) {
       _selectedShops.addAll(previousMode.selectedShops());
     }
+
+    hintsController.addHint(
+        _HINT_ID, context.strings.map_page_click_on_shop_where_product_sold);
+  }
+
+  @mustCallSuper
+  @override
+  void deinit() {
+    hintsController.removeHint(_HINT_ID);
   }
 
   @override

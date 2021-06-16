@@ -26,7 +26,7 @@ void main() {
   });
 
   Future<void> switchMode(WidgetTester tester, MapPage widget, BuildContext context) async {
-    final context = await tester.superPump(widget);
+    await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
@@ -107,5 +107,31 @@ void main() {
     // Mode is changed
     expect(widget.getModeForTesting().runtimeType,
         isNot(equals(MapPageModeCreateShop)));
+  });
+
+  testWidgets('user hints transition', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+        initialSelectedShops: [shops[1]]);
+    final context = await tester.superPump(widget);
+
+    // Old hint
+    expect(
+        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.map_page_click_where_new_shop_located),
+        findsNothing);
+
+    await switchMode(tester, widget, context);
+
+    // New hint
+    expect(
+        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+        findsNothing);
+    expect(
+        find.text(context.strings.map_page_click_where_new_shop_located),
+        findsOneWidget);
   });
 }

@@ -10,7 +10,7 @@ import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops_base.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
 
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
@@ -47,6 +47,19 @@ void main() {
     final displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops.length, equals(shops.length));
     expect(displayedShops, containsAll(shops));
+  });
+
+
+  testWidgets('user hint', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+        product: product);
+    final context = await tester.superPump(widget);
+
+    expect(
+        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+        findsOneWidget);
   });
 
   testWidgets('can put products to shops', (WidgetTester tester) async {

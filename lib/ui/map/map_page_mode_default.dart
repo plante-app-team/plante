@@ -6,12 +6,13 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_add_product.dart';
 import 'package:plante/ui/map/map_page_mode_base.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
 class MapPageModeDefault extends MapPageModeShopsCardBase {
@@ -19,13 +20,20 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   MapPageModeDefault(
       MapPageModel model,
+      MapHintsListController hintsController,
       WidgetSource widgetSource,
       ContextSource contextSource,
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
       ModeSwitchCallback modeSwitchCallback)
-      : super(MapPageModeParams(model, widgetSource, contextSource,
-            updateCallback, updateMapCallback, modeSwitchCallback));
+      : super(MapPageModeParams(
+            model,
+            hintsController,
+            widgetSource,
+            contextSource,
+            updateCallback,
+            updateMapCallback,
+            modeSwitchCallback));
 
   @override
   void init(MapPageMode? previousMode) {

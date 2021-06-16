@@ -7,16 +7,17 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/create_shop_dialog_content.dart';
+import 'package:plante/ui/map/components/create_shop_dialog_content.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops_base.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
 import 'package:plante/l10n/strings.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
+  static const _HINT_ID = 'MapPageModeCreateShop hint 1';
   final Set<Shop> _selectedShop = <Shop>{};
   Shop? _shopBeingCreated;
   MapPageModeCreateShop(MapPageModeParams params) : super(params);
@@ -28,6 +29,14 @@ class MapPageModeCreateShop extends MapPageMode {
       Log.e('MapPageModeSelectShopsBase expected, got $previousMode');
     }
     _selectedShop.addAll(previousMode!.selectedShops());
+
+    hintsController.addHint(
+        _HINT_ID, context.strings.map_page_click_where_new_shop_located);
+  }
+
+  @override
+  void deinit() {
+    hintsController.removeHint(_HINT_ID);
   }
 
   @override
@@ -74,32 +83,23 @@ class MapPageModeCreateShop extends MapPageMode {
   }
 
   @override
-  Widget buildOverlay(BuildContext context) {
-    return Stack(children: [
-      Align(
-          alignment: Alignment.topCenter,
-          child: Text(context.strings.map_page_click_where_new_shop_located)),
-      Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 26, right: 26, bottom: 68),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              SizedBox(
-                  width: double.infinity,
-                  child: ButtonOutlinedPlante.withText(
-                      context.strings.global_cancel,
-                      onPressed: _onCancelClick)),
-              const SizedBox(height: 8),
-              SizedBox(
-                  width: double.infinity,
-                  child: ButtonFilledPlante.withText(
-                      context.strings.global_done,
-                      onPressed: _shopBeingCreated != null && !model.loading
-                          ? _onDoneClick
-                          : null)),
-            ]),
-          )),
-    ]);
+  Widget buildBottomActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(
+            width: double.infinity,
+            child: ButtonTextPlante(context.strings.global_cancel,
+                onPressed: _onCancelClick)),
+        const SizedBox(height: 8),
+        SizedBox(
+            width: double.infinity,
+            child: ButtonFilledPlante.withText(context.strings.global_done,
+                onPressed: _shopBeingCreated != null && !model.loading
+                    ? _onDoneClick
+                    : null)),
+      ]),
+    );
   }
 
   void _onCancelClick() async {

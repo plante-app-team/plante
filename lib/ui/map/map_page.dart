@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,9 +12,9 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/fab_my_location.dart';
+import 'package:plante/ui/map/components/fab_my_location.dart';
+import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
@@ -114,12 +113,15 @@ class _TestingStorage {
 class _MapPageState extends State<MapPage> {
   static final _instances = <_MapPageState>[];
   late final MapPageModel _model;
+  var _modeInited = false;
   late MapPageMode _mode;
 
   final _mapController = Completer<GoogleMapController>();
   var _shopsMarkers = <Marker>{};
   late final ClusterManager _clusterManager;
   Timer? _mapUpdatesTimer;
+
+  final _hintsController = MapHintsListController();
 
   bool get _loading => _model.loading;
 
@@ -175,13 +177,13 @@ class _MapPageState extends State<MapPage> {
     final switchModeCallback = (MapPageMode newMode) {
       setState(() {
         final oldMode = _mode;
+        oldMode.deinit();
         _mode = newMode;
         _mode.init(oldMode);
       });
     };
-    _mode = MapPageModeDefault(_model, widgetSource, contextSource,
-        updateCallback, updateMapCallback, switchModeCallback);
-    _mode.init(null);
+    _mode = MapPageModeDefault(_model, _hintsController, widgetSource,
+        contextSource, updateCallback, updateMapCallback, switchModeCallback);
 
     _initAsync();
     _instances.add(this);
@@ -191,6 +193,15 @@ class _MapPageState extends State<MapPage> {
 
     if (widget._testingStorage.mapControllerForTesting != null) {
       _mapController.complete(widget._testingStorage.mapControllerForTesting);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_modeInited) {
+      _mode.init(null);
+      _modeInited = true;
     }
   }
 
@@ -238,13 +249,13 @@ class _MapPageState extends State<MapPage> {
     _instances.forEach((instance) {
       instance.onInstancesChange();
     });
-    super.dispose();
     _model.dispose();
     _mapUpdatesTimer?.cancel();
     () async {
       final mapController = await _mapController.future;
       mapController.dispose();
     }.call();
+    super.dispose();
   }
 
   void onInstancesChange() {
@@ -296,6 +307,13 @@ class _MapPageState extends State<MapPage> {
               _mode.buildBottomActions(context),
             ]),
           )),
+      Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+          child: MapHintsList(controller: _hintsController),
+        ),
+      ),
       _mode.buildOverlay(context),
       AnimatedSwitcher(
           duration: DURATION_DEFAULT,

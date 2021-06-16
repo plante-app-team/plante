@@ -24,6 +24,9 @@ class TextStyles {
   static const TextStyle hint =
       TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: ColorsPlante.grey);
 
+  static const TextStyle hintWhite =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Colors.white);
+
   static const TextStyle smallBoldGreen = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 12,
