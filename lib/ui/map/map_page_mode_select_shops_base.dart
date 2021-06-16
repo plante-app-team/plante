@@ -5,6 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -80,32 +81,32 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   Widget buildOverlay(BuildContext context) {
     return Stack(children: [
       Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 26, right: 26, bottom: 68),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              SizedBox(
-                  width: double.infinity,
-                  child: ButtonOutlinedPlante.withText(
-                      context.strings.global_cancel,
-                      onPressed: _onCancelClick)),
-              const SizedBox(height: 8),
-              SizedBox(
-                  width: double.infinity,
-                  child: ButtonFilledPlante.withText(
-                      context.strings.global_done,
-                      onPressed: selectedShops().isNotEmpty && !model.loading
-                          ? onDoneClick
-                          : null)),
-            ]),
-          )),
-      Align(
         alignment: Alignment.topCenter,
         child: ButtonFilledPlante.withText(context.strings.map_page_plus_shop,
             onPressed: !model.loading ? _addShopClick : null),
       ),
       shopsCardsWidget(context)
     ]);
+  }
+
+  @override
+  Widget buildBottomActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        SizedBox(
+            width: double.infinity,
+            child: ButtonTextPlante(context.strings.global_cancel,
+                onPressed: _onCancelClick)),
+        const SizedBox(height: 8),
+        SizedBox(
+            width: double.infinity,
+            child: ButtonFilledPlante.withText(context.strings.global_done,
+                onPressed: selectedShops().isNotEmpty && !model.loading
+                    ? onDoneClick
+                    : null)),
+      ]),
+    );
   }
 
   void _addShopClick() {

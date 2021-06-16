@@ -59,7 +59,6 @@ void main() {
 
     expect(find.byType(ShopCard), findsNothing);
     expect(find.text(shops[1].name), findsNothing);
-    expect(find.byKey(const Key('my_location_fab')), findsOneWidget);
     expect(widget.getModeForTesting().accentedShops(), isEmpty);
 
     widget.onMarkerClickForTesting([shops[1]]);
@@ -67,7 +66,6 @@ void main() {
 
     expect(find.byType(ShopCard), findsOneWidget);
     expect(find.text(shops[1].name), findsOneWidget);
-    expect(find.byKey(const Key('my_location_fab')), findsNothing);
     expect(widget.getModeForTesting().accentedShops(), equals({shops[1]}));
 
     expect(find.text(shops[0].name), findsNothing);
@@ -84,7 +82,6 @@ void main() {
     expect(find.byType(ShopCard), findsNothing);
     expect(find.text(shops[1].name), findsNothing);
     expect(find.text(shops[2].name), findsNothing);
-    expect(find.byKey(const Key('my_location_fab')), findsOneWidget);
     expect(widget.getModeForTesting().accentedShops(), isEmpty);
 
     widget.onMarkerClickForTesting([shops[1], shops[2]]);
@@ -93,7 +90,6 @@ void main() {
     expect(find.byType(ShopCard), findsNWidgets(2));
     expect(find.text(shops[1].name), findsOneWidget);
     expect(find.text(shops[2].name), findsOneWidget);
-    expect(find.byKey(const Key('my_location_fab')), findsNothing);
     expect(widget.getModeForTesting().accentedShops(), equals({shops[1], shops[2]}));
 
     expect(find.text(shops[0].name), findsNothing);

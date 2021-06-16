@@ -15,6 +15,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/fab_my_location.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
@@ -262,52 +263,56 @@ class _MapPageState extends State<MapPage> {
       initialPos = _model.defaultUserPos();
     }
 
+    final content = Stack(children: [
+      GoogleMap(
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+        minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
+        mapType: MapType.normal,
+        initialCameraPosition: initialPos,
+        onMapCreated: (GoogleMapController controller) {
+          _mapController.complete(controller);
+          _clusterManager.setMapController(controller);
+        },
+        onCameraMove: _clusterManager.onCameraMove,
+        onCameraIdle: _onCameraIdle,
+        onTap: _onMapTap,
+        // When there are more than 2 instances of GoogleMap and both
+        // of them have markers, this screws up the markers for some reason.
+        // Couldn't figure out why, probably there's a mistake either in
+        // the Google Map lib or in the Clustering lib, but it's easier to
+        // just use markers for 1 instance at a time.
+        markers: _instances.last == this ? _shopsMarkers : {},
+      ),
+      Align(
+          alignment: Alignment.bottomCenter,
+          child: AnimatedContainer(
+            duration: DURATION_DEFAULT,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FabMyLocation(
+                          key: const Key('my_location_fab'),
+                          onPressed: _showUser))),
+              _mode.buildBottomActions(context),
+            ]),
+          )),
+      _mode.buildOverlay(context),
+      AnimatedSwitcher(
+          duration: DURATION_DEFAULT,
+          child: _loading
+              ? const LinearProgressIndicator()
+              : const SizedBox.shrink()),
+    ]);
+
     return WillPopScope(
         onWillPop: _mode.onWillPop,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          body: SafeArea(
-              child: Stack(children: [
-            GoogleMap(
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
-              minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
-              mapType: MapType.normal,
-              initialCameraPosition: initialPos,
-              onMapCreated: (GoogleMapController controller) {
-                _mapController.complete(controller);
-                _clusterManager.setMapController(controller);
-              },
-              onCameraMove: _clusterManager.onCameraMove,
-              onCameraIdle: _onCameraIdle,
-              onTap: _onMapTap,
-              // When there are more than 2 instances of GoogleMap and both
-              // of them have markers, this screws up the markers for some reason.
-              // Couldn't figure out why, probably there's a mistake either in
-              // the Google Map lib or in the Clustering lib, but it's easier to
-              // just use markers for 1 instance at a time.
-              markers: _instances.last == this ? _shopsMarkers : {},
-            ),
-            _mode.buildOverlay(context),
-            AnimatedSwitcher(
-                duration: DURATION_DEFAULT,
-                child: _loading
-                    ? const LinearProgressIndicator()
-                    : const SizedBox.shrink()),
-          ])),
-          floatingActionButton: _mode.shopWhereAmIFAB()
-              ? FloatingActionButton(
-                  key: const Key('my_location_fab'),
-                  onPressed: _showUser,
-                  backgroundColor: Colors.white,
-                  splashColor: ColorsPlante.primaryDisabled,
-                  child: SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: SvgPicture.asset('assets/my_location.svg')),
-                )
-              : null,
+          body: SafeArea(child: content),
         ));
   }
 
