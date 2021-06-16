@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 
-class FabMyLocation extends StatelessWidget {
+class FabAddShop extends StatelessWidget {
   final VoidCallback? onPressed;
-  const FabMyLocation({Key? key, required this.onPressed}) : super(key: key);
+  const FabAddShop({Key? key, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      heroTag: 'my_location',
+      heroTag: 'plus_shop',
       onPressed: onPressed,
-      backgroundColor: Colors.white,
-      splashColor: ColorsPlante.primaryDisabled,
+      backgroundColor: ColorsPlante.primary,
+      splashColor: ColorsPlante.splashColor,
       child: SizedBox(
           width: 30,
           height: 30,
-          child: SvgPicture.asset('assets/my_location.svg')),
+          child: SvgPicture.asset('assets/plus_shop.svg')),
     );
   }
 }

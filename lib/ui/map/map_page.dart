@@ -290,13 +290,9 @@ class _MapPageState extends State<MapPage> {
           child: AnimatedContainer(
             duration: DURATION_DEFAULT,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: FabMyLocation(
-                          key: const Key('my_location_fab'),
-                          onPressed: _showUser))),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: Column(children: _fabs())),
               _mode.buildBottomActions(context),
             ]),
           )),
@@ -314,6 +310,17 @@ class _MapPageState extends State<MapPage> {
           resizeToAvoidBottomInset: false,
           body: SafeArea(child: content),
         ));
+  }
+
+  List<Widget> _fabs() {
+    final fabs = _mode.buildFABs() +
+        [
+          FabMyLocation(key: const Key('my_location_fab'), onPressed: _showUser)
+        ];
+    return fabs
+        .map((e) => Padding(
+            padding: const EdgeInsets.only(right: 24, bottom: 24), child: e))
+        .toList();
   }
 
   Future<void> _showUser() async {

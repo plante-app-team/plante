@@ -30,7 +30,7 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(context.strings.map_page_plus_shop));
+    await tester.tap(find.byKey(const Key('add_shop_fab')));
     await tester.pumpAndSettle();
 
     expect(widget.getModeForTesting().runtimeType,

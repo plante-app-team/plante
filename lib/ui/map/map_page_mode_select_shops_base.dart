@@ -8,6 +8,7 @@ import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/fab_add_shop.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_base.dart';
@@ -79,14 +80,16 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
 
   @override
   Widget buildOverlay(BuildContext context) {
-    return Stack(children: [
-      Align(
-        alignment: Alignment.topCenter,
-        child: ButtonFilledPlante.withText(context.strings.map_page_plus_shop,
-            onPressed: !model.loading ? _addShopClick : null),
-      ),
-      shopsCardsWidget(context)
-    ]);
+    return Stack(children: [shopsCardsWidget(context)]);
+  }
+
+  @override
+  List<Widget> buildFABs() {
+    return [
+      FabAddShop(
+          key: const Key('add_shop_fab'),
+          onPressed: !model.loading ? _addShopClick : null)
+    ];
   }
 
   @override

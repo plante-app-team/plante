@@ -312,7 +312,7 @@ void main() {
     expect(widget.getModeForTesting().runtimeType,
         isNot(equals(MapPageModeCreateShop)));
 
-    await tester.tap(find.text(context.strings.map_page_plus_shop));
+    await tester.tap(find.byKey(const Key('add_shop_fab')));
     await tester.pumpAndSettle();
 
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
