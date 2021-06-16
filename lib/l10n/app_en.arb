@@ -97,6 +97,7 @@
       "settings_page_developer_options": "Developer options",
       "settings_page_crash_on_errors": "Crash on errors",
       "settings_page_testing_backends": "Use fake and testing backends",
+      "settings_page_testing_backends_quick_answers": "Fake and testing backends answers are quick",
       "settings_page_fake_off_scanned_product_empty": "Scanned product is empty",
 
       "init_product_page_title": "New product",

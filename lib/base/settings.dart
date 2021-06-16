@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _TESTING_BACKENDS = 'TESTING_BACKENDS';
+const _TESTING_BACKENDS_QUICK_ANSWERS = 'TESTING_BACKENDS_QUICK_ANSWERS';
 const _FAKE_OFF_API_PRODUCT_NOT_FOUND = 'FAKE_OFF_API_PRODUCT_NOT_FOUND';
 
 class Settings {
@@ -13,6 +14,16 @@ class Settings {
   Future<void> setTestingBackends(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_TESTING_BACKENDS, value);
+  }
+
+  Future<bool> testingBackendsQuickAnswers() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_TESTING_BACKENDS_QUICK_ANSWERS) ?? false;
+  }
+
+  Future<void> setTestingBackendsQuickAnswers(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_TESTING_BACKENDS_QUICK_ANSWERS, value);
   }
 
   Future<bool> fakeOffApiProductNotFound() async {

@@ -12,4 +12,10 @@ class FakeSettings implements Settings {
 
   @override
   Future<bool> testingBackends() async => false;
+
+  @override
+  Future<void> setTestingBackendsQuickAnswers(bool value) async {}
+
+  @override
+  Future<bool> testingBackendsQuickAnswers() async => true;
 }

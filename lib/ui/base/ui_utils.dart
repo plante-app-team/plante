@@ -5,6 +5,8 @@ import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:intl/date_symbol_data_local.dart';
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
@@ -52,6 +54,7 @@ Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
     context: context,
     builder: (BuildContext context) {
       return DialogPlante(
+          key: const Key('yes_no_dialog'),
           content: Text(title, style: TextStyles.headline1),
           actions: Row(children: [
             Expanded(
@@ -73,4 +76,16 @@ Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
           ]));
     },
   );
+}
+
+String secsSinceEpochToStr(int secs, BuildContext context) {
+  return dateToStr(DateTime.fromMillisecondsSinceEpoch(secs * 1000), context);
+}
+
+String millisSinceEpochToStr(int millis, BuildContext context) {
+  return dateToStr(DateTime.fromMillisecondsSinceEpoch(millis), context);
+}
+
+String dateToStr(DateTime date, BuildContext context) {
+  return intl.DateFormat.yMMMMd(context.langCode).format(date);
 }

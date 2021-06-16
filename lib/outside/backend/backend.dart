@@ -28,14 +28,16 @@ class BackendObserver {
 }
 
 class Backend {
-  final _fakeBackend = FakeBackend();
+  late final Backend _fakeBackend;
   final UserParamsController _userParamsController;
   final HttpClient _http;
   final Settings _settings;
 
   final _observers = <BackendObserver>[];
 
-  Backend(this._userParamsController, this._http, this._settings);
+  Backend(this._userParamsController, this._http, this._settings) {
+    _fakeBackend = FakeBackend(_settings);
+  }
 
   void addObserver(BackendObserver observer) => _observers.add(observer);
   void removeObserver(BackendObserver observer) => _observers.remove(observer);

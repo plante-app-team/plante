@@ -97,6 +97,7 @@
     "settings_page_developer_options": "Опции разработчиков",
     "settings_page_crash_on_errors": "Креш при ошибках",
     "settings_page_testing_backends": "Использовать фальшивые и тестовые серверы",
+    "settings_page_testing_backends_quick_answers": "Быстрые ответы фальшивых и тестовых серверов",
     "settings_page_fake_off_scanned_product_empty": "Сканируемый продукт пуст",
 
     "init_product_page_title": "Добавление продукта",

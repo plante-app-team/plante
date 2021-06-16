@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -12,6 +13,10 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 
 class FakeBackend implements Backend {
+  final Settings _settings;
+
+  FakeBackend(this._settings);
+
   UserParams _userParams = UserParams((e) => e
     ..backendId = DateTime.now().millisecondsSinceEpoch.toString()
     ..backendClientToken = 'token'
@@ -22,8 +27,12 @@ class FakeBackend implements Backend {
     ..userGroup = 2);
   final _fakeShops = <String, BackendProductsAtShop>{};
 
-  Future _delay() async {
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> _delay() async {
+    if (await _settings.testingBackendsQuickAnswers()) {
+      await Future.delayed(const Duration(milliseconds: 1));
+    } else {
+      await Future.delayed(const Duration(seconds: 1));
+    }
   }
 
   int _nowSecs() {

@@ -13,7 +13,7 @@ class FakeOffApi implements OffApi {
 
   @override
   Future<off.Status> addProductImage(off.User user, off.SendImage image) async {
-    await Future<dynamic>.delayed(const Duration(seconds: 2));
+    await _delay();
     final newImage;
     if (image.imageField == off.ImageField.FRONT) {
       newImage = off.ProductImage(
@@ -36,10 +36,18 @@ class FakeOffApi implements OffApi {
     return off.Status(status: 0);
   }
 
+  Future<void> _delay() async {
+    if (await _settings.testingBackendsQuickAnswers()) {
+      await Future.delayed(const Duration(milliseconds: 2));
+    } else {
+      await Future.delayed(const Duration(seconds: 2));
+    }
+  }
+
   @override
   Future<off.OcrIngredientsResult> extractIngredients(
       off.User user, String barcode, off.OpenFoodFactsLanguage language) async {
-    await Future.delayed(const Duration(seconds: 2));
+    await _delay();
     if (!_triedOcrProducts.contains(barcode)) {
       // First OCR attempt will always end with a failure
       _triedOcrProducts.add(barcode);
@@ -52,7 +60,7 @@ class FakeOffApi implements OffApi {
   @override
   Future<off.ProductResult> getProduct(
       off.ProductQueryConfiguration configuration) async {
-    await Future.delayed(const Duration(seconds: 2));
+    await _delay();
     if (_fakeProducts[configuration.barcode] != null) {
       return off.ProductResult(
           status: 1,
@@ -96,7 +104,7 @@ class FakeOffApi implements OffApi {
 
   @override
   Future<off.Status> saveProduct(off.User user, off.Product product) async {
-    await Future.delayed(const Duration(seconds: 2));
+    await _delay();
     _fakeProducts[product.barcode!] = product;
     return off.Status(status: 1);
   }
@@ -114,6 +122,8 @@ const _FAKE_COOKING_TYPE = [
   'Dried',
   'Toasted',
   'Fresh',
+  'Organic',
+  'Delicious',
 ];
 
 const _FAKE_NAMES = [
@@ -136,7 +146,6 @@ const _FAKE_NAMES = [
   'raspberries',
   'blackberries',
   'plums',
-  'Nectarines',
   'Nectarines',
   'Vegetables',
   'potatoes',

@@ -28,6 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool loading = true;
   bool developer = false;
   bool testingBackends = false;
+  bool testingBackendsQuickAnswers = false;
   bool offScannedProductEmpty = false;
 
   late Settings settings;
@@ -55,6 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     developer = true;
     testingBackends = await settings.testingBackends();
+    testingBackendsQuickAnswers = await settings.testingBackendsQuickAnswers();
     offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
     setState(() {
       loading = false;
@@ -149,17 +151,30 @@ class _SettingsPageState extends State<SettingsPage> {
                       duration: DURATION_DEFAULT,
                       child: !testingBackends
                           ? const SizedBox.shrink()
-                          : _CheckboxSettings(
-                              text: context.strings
-                                  .settings_page_fake_off_scanned_product_empty,
-                              value: offScannedProductEmpty,
-                              onChanged: (value) {
-                                setState(() {
-                                  offScannedProductEmpty = value;
-                                  settings.setFakeOffApiProductNotFound(
-                                      offScannedProductEmpty);
-                                });
-                              })),
+                          : Column(children: [
+                              _CheckboxSettings(
+                                  text: context.strings
+                                      .settings_page_fake_off_scanned_product_empty,
+                                  value: offScannedProductEmpty,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      offScannedProductEmpty = value;
+                                      settings.setFakeOffApiProductNotFound(
+                                          offScannedProductEmpty);
+                                    });
+                                  }),
+                              _CheckboxSettings(
+                                  text: context.strings
+                                      .settings_page_testing_backends_quick_answers,
+                                  value: testingBackendsQuickAnswers,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      testingBackendsQuickAnswers = value;
+                                      settings.setTestingBackendsQuickAnswers(
+                                          testingBackendsQuickAnswers);
+                                    });
+                                  }),
+                            ])),
                 const SizedBox(height: 10),
                 Center(
                     child: InkWell(

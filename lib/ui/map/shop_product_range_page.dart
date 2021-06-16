@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/model/product.dart';
@@ -12,14 +13,13 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
-import 'package:intl/intl.dart' as intl;
-import 'package:intl/date_symbol_data_local.dart';
+
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 class ShopProductRangePage extends StatefulWidget {
@@ -62,12 +62,10 @@ class ShopProductRangePage extends StatefulWidget {
   _ShopProductRangePageState createState() => _ShopProductRangePageState();
 }
 
-class _ShopProductRangePageState extends State<ShopProductRangePage>
-    with RouteAware {
+class _ShopProductRangePageState extends State<ShopProductRangePage> {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
   final Backend _backend;
-  final RouteObserver<ModalRoute> _routeObserver;
   bool _loading = false;
   bool _performingBackendAction = false;
   ShopProductRange? _shopProductRange;
@@ -76,40 +74,13 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
   _ShopProductRangePageState()
       : _shopsManager = GetIt.I.get<ShopsManager>(),
         _userParamsController = GetIt.I.get<UserParamsController>(),
-        _backend = GetIt.I.get<Backend>(),
-        _routeObserver = GetIt.I.get<RouteObserver<ModalRoute>>();
+        _backend = GetIt.I.get<Backend>();
 
   @override
   void initState() {
     super.initState();
     _load();
     initializeDateFormatting();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _routeObserver.subscribe(this, ModalRoute.of(context)!);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _routeObserver.unsubscribe(this);
-  }
-
-  @override
-  void didUpdateWidget(ShopProductRangePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _load();
-  }
-
-  @override
-  void didPopNext() {
-    if (ModalRoute.of(context)?.isCurrent == true) {
-      // Reload!
-      _load();
-    }
   }
 
   void _load() async {
@@ -138,62 +109,41 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
       content = const Center(child: CircularProgressIndicator());
     } else if (_shopProductRangeLoadingError != null) {
       if (_shopProductRangeLoadingError == ShopsManagerError.NETWORK_ERROR) {
-        content = Center(
-            child: Column(children: [
-          Text(context.strings.global_network_error, style: TextStyles.normal),
-          ButtonFilledPlante.withText(context.strings.global_try_again,
-              onPressed: _load)
-        ]));
+        content = Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  Text(context.strings.global_network_error,
+                      textAlign: TextAlign.center, style: TextStyles.normal),
+                  const SizedBox(height: 8),
+                  ButtonFilledPlante.withText(context.strings.global_try_again,
+                      onPressed: _load)
+                ])));
       } else {
-        content = Center(
-            child: Text(context.strings.global_something_went_wrong,
-                style: TextStyles.normal));
+        content = Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+                child: Text(context.strings.global_something_went_wrong,
+                    textAlign: TextAlign.center, style: TextStyles.normal)));
       }
     } else if (_shopProductRange!.products.isEmpty) {
-      content = Center(
-          child: Text(
-              context.strings.shop_product_range_page_this_shop_has_no_product,
-              style: TextStyles.normal));
+      content = Padding(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+              child: Text(
+                  context
+                      .strings.shop_product_range_page_this_shop_has_no_product,
+                  textAlign: TextAlign.center,
+                  style: TextStyles.normal)));
     } else {
       final products = _shopProductRange!.products;
-      final user = _userParamsController.cachedUserParams!;
       content = ListView(
-          children: products.map((e) {
-        final date = DateTime.fromMillisecondsSinceEpoch(
-            _shopProductRange!.lastSeenSecs(e) * 1000);
-        final dateStr = intl.DateFormat.yMMMMd(context.langCode).format(date);
-
-        return Padding(
-            key: Key('product_${e.barcode}'),
-            padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ProductCard(
-                  product: e,
-                  beholder: user,
-                  onTap: () {
-                    _openProductPage(e);
-                  }),
-              Text(
-                  '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr'),
-              Text(context
-                  .strings.shop_product_range_page_have_you_seen_product_here),
-              Row(children: [
-                Expanded(
-                    child: ButtonOutlinedPlante.withText(
-                        context.strings.global_no, onPressed: () {
-                  _onProductPresenceVote(e, false);
-                })),
-                Expanded(
-                    child: ButtonOutlinedPlante.withText(
-                        context.strings.global_yes, onPressed: () {
-                  _onProductPresenceVote(e, true);
-                }))
-              ])
-            ]));
-      }).toList());
+          children: products.map((e) => _productToCard(e, context)).toList());
     }
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
       body: SafeArea(
           child: Stack(children: [
         Column(children: [
@@ -236,6 +186,56 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
     );
   }
 
+  Padding _productToCard(Product product, BuildContext context) {
+    final user = _userParamsController.cachedUserParams!;
+    final dateStr =
+        secsSinceEpochToStr(_shopProductRange!.lastSeenSecs(product), context);
+
+    final cardExtraContent = Padding(
+        padding: const EdgeInsets.only(left: 6, right: 6, bottom: 4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+              context
+                  .strings.shop_product_range_page_have_you_seen_product_here,
+              style: TextStyles.normal),
+          const SizedBox(height: 12),
+          Row(children: [
+            Expanded(
+                child: CheckButtonPlante(
+              checked: false,
+              text: context.strings.global_no,
+              onChanged: (_) {
+                _onProductPresenceVote(product, false);
+              },
+            )),
+            const SizedBox(width: 13),
+            Expanded(
+                child: CheckButtonPlante(
+              checked: false,
+              text: context.strings.global_yes,
+              onChanged: (_) {
+                _onProductPresenceVote(product, true);
+              },
+            )),
+          ])
+        ]));
+
+    return Padding(
+        key: Key('product_${product.barcode}'),
+        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ProductCard(
+              product: product,
+              hint:
+                  '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr',
+              beholder: user,
+              extraContent: cardExtraContent,
+              onTap: () {
+                _openProductPage(product);
+              }),
+        ]));
+  }
+
   void _openProductPage(Product product) {
     ProductPageWrapper.show(context, product,
         productUpdatedCallback: _onProductUpdate);
@@ -243,6 +243,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
 
   void _onProductUpdate(Product updatedProduct) {
     if (_shopProductRange == null) {
+      Log.w('_onProductUpdate called but we have no products range');
       return;
     }
     final products = _shopProductRange!.products.toList();
@@ -254,8 +255,10 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
       return;
     }
     products[productToUpdate] = updatedProduct;
-    _shopProductRange =
-        _shopProductRange!.rebuild((e) => e.products.replace(products));
+    setState(() {
+      _shopProductRange =
+          _shopProductRange!.rebuild((e) => e.products.replace(products));
+    });
   }
 
   void _onProductPresenceVote(Product product, bool positive) async {
@@ -276,12 +279,13 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
           product.barcode, widget.shop.osmId, positive);
       if (result.isOk) {
         showSnackBar(context.strings.global_done_thanks, context);
-        setState(() {
-          // TODO(https://trello.com/c/dCDHecZS/): test
-          _shopProductRange = _shopProductRange!.rebuild((e) =>
-              e.productsLastSeenSecsUtc[product.barcode] =
-                  DateTime.now().secondsSinceEpoch);
-        });
+        if (positive) {
+          setState(() {
+            _shopProductRange = _shopProductRange!.rebuild((e) =>
+                e.productsLastSeenSecsUtc[product.barcode] =
+                    DateTime.now().secondsSinceEpoch);
+          });
+        }
       } else {
         if (result.unwrapErr().errorKind == BackendErrorKind.NETWORK_ERROR) {
           showSnackBar(context.strings.global_network_error, context);
@@ -296,12 +300,14 @@ class _ShopProductRangePageState extends State<ShopProductRangePage>
     }
   }
 
-  void _onAddProductClick() {
-    Navigator.push(
+  void _onAddProductClick() async {
+    await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
                 BarcodeScanPage(addProductToShop: widget.shop)));
+    // Reload!
+    _load();
   }
 }
 

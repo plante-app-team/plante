@@ -13,27 +13,27 @@ import 'package:plante/ui/base/ui_utils.dart';
 class ProductCard extends StatefulWidget {
   final Product product;
   final UserParams beholder;
+  final String? hint;
   final VoidCallback onTap;
+  final Widget? extraContent;
 
   const ProductCard(
       {Key? key,
       required this.product,
       required this.beholder,
-      required this.onTap})
+      this.hint,
+      required this.onTap,
+      this.extraContent})
       : super(key: key);
 
   @override
-  _ProductCardState createState() =>
-      _ProductCardState(product, beholder, onTap);
+  _ProductCardState createState() => _ProductCardState();
 }
 
 class _ProductCardState extends State<ProductCard> {
-  final Product product;
-  final UserParams beholder;
-  final VoidCallback onTap;
   Color? dominantColor;
 
-  _ProductCardState(this.product, this.beholder, this.onTap);
+  _ProductCardState();
 
   @override
   Widget build(BuildContext context) {
@@ -67,51 +67,64 @@ class _ProductCardState extends State<ProductCard> {
         child: InkWell(
             overlayColor: MaterialStateProperty.all(ColorsPlante.splashColor),
             borderRadius: BorderRadius.circular(8),
-            onTap: onTap,
+            onTap: widget.onTap,
             child: Container(
-              height: 121,
-              padding: const EdgeInsets.all(6),
-              child: Row(children: [
-                AnimatedContainer(
-                  duration: DURATION_DEFAULT,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: dominantColor ?? defaultDominantColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: AspectRatio(
-                      aspectRatio: 1,
-                      child: ClipRRect(
+                padding: const EdgeInsets.all(6),
+                child: Column(children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    AnimatedContainer(
+                      height: 109,
+                      duration: DURATION_DEFAULT,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: dominantColor ?? defaultDominantColor,
                         borderRadius: BorderRadius.circular(4),
-                        child: img,
-                      )),
-                ),
-                const SizedBox(width: 16.5),
-                Flexible(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      const SizedBox(height: 10),
-                      Text(product.name ?? '???',
-                          style: TextStyles.normalBold,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 4),
-                      VegStatusDisplayed(product: product, user: beholder)
-                    ])),
-              ]),
-            )));
+                      ),
+                      child: AspectRatio(
+                          aspectRatio: 1,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: img,
+                          )),
+                    ),
+                    const SizedBox(width: 16.5),
+                    Flexible(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          const SizedBox(height: 10),
+                          Text(widget.product.name ?? '???',
+                              style: TextStyles.normalBold,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 4),
+                          if (widget.hint != null)
+                            Column(children: [
+                              Text(widget.hint!, style: TextStyles.hint),
+                              const SizedBox(height: 8),
+                            ]),
+                          VegStatusDisplayed(
+                              product: widget.product, user: widget.beholder),
+                        ])),
+                  ]),
+                  if (widget.extraContent != null)
+                    Column(children: [
+                      const SizedBox(height: 16),
+                      widget.extraContent!
+                    ])
+                ]))));
   }
 
   UriImagePlante? photo(
       dynamic Function(ImageProvider image) imageProviderCallback) {
     final Uri uri;
-    if (product.imageFrontThumb != null) {
-      uri = product.imageFrontThumb!;
-    } else if (product.imageFront != null) {
-      uri = product.imageFront!;
+    if (widget.product.imageFrontThumb != null) {
+      uri = widget.product.imageFrontThumb!;
+    } else if (widget.product.imageFront != null) {
+      uri = widget.product.imageFront!;
     } else {
-      Log.w("Product in ProductCard doesn't have a front image: $product");
+      Log.w("Product in ProductCard doesn't have a front image: "
+          '${widget.product}');
       return null;
     }
     return UriImagePlante(uri, imageProviderCallback: imageProviderCallback);
