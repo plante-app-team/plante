@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
@@ -33,7 +32,6 @@ class MapPageModel implements ShopsManagerListener {
   final MapPageModelErrorCallback _errorCallback;
   final VoidCallback _updateCallback;
   final LocationController _locationController;
-  final PermissionsManager _permissionsManager;
   final ShopsManager _shopsManager;
   final _shopsCache = <String, Shop>{};
   final _loadedAreas = <LatLngBounds>{};
@@ -45,13 +43,8 @@ class MapPageModel implements ShopsManagerListener {
 
   int get loadedAreasCount => _loadedAreas.length;
 
-  MapPageModel(
-      this._locationController,
-      this._permissionsManager,
-      this._shopsManager,
-      this._updateShopsCallback,
-      this._errorCallback,
-      this._updateCallback) {
+  MapPageModel(this._locationController, this._shopsManager,
+      this._updateShopsCallback, this._errorCallback, this._updateCallback) {
     _shopsManager.addListener(this);
   }
 
@@ -61,19 +54,6 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _loadingArea != null || _networkOperationInProgress;
   Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-
-  Future<bool> ensurePermissions() async {
-    var permission = await _permissionsManager.status(PermissionKind.LOCATION);
-    if (permission != PermissionState.granted) {
-      permission = await _permissionsManager.request(PermissionKind.LOCATION);
-      if (permission != PermissionState.granted &&
-          permission != PermissionState.limited) {
-        // TODO(https://trello.com/c/662nLdKd/): properly handle all possible statuses
-        return false;
-      }
-    }
-    return true;
-  }
 
   CameraPosition defaultUserPos() {
     return const CameraPosition(target: _DEFAULT_USER_POS, zoom: 15);

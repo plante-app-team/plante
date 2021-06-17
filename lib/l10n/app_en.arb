@@ -50,6 +50,7 @@
       "map_page_click_where_new_shop_located": "Click where the new shop is located",
       "map_page_click_on_shop_where_product_sold": "Click the shop marker, where the product is being sold",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
+      "map_page_location_permission_reasoning_settings": "In order for the app to locate you, please give the location permission to the app in the app settings",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

@@ -112,6 +112,7 @@ class _TestingStorage {
 
 class _MapPageState extends State<MapPage> {
   static final _instances = <_MapPageState>[];
+  final PermissionsManager _permissionsManager;
   late final MapPageModel _model;
   var _modeInited = false;
   late MapPageMode _mode;
@@ -124,6 +125,8 @@ class _MapPageState extends State<MapPage> {
   final _hintsController = MapHintsListController();
 
   bool get _loading => _model.loading;
+
+  _MapPageState() : _permissionsManager = GetIt.I.get<PermissionsManager>();
 
   @override
   void initState() {
@@ -151,8 +154,8 @@ class _MapPageState extends State<MapPage> {
       allShops.addAll(_mode.additionalShops());
       _onShopsUpdated(_mode.filter(allShops));
     };
-    _model = MapPageModel(GetIt.I.get<LocationController>(),
-        GetIt.I.get<PermissionsManager>(), GetIt.I.get<ShopsManager>(), (_) {
+    _model = MapPageModel(
+        GetIt.I.get<LocationController>(), GetIt.I.get<ShopsManager>(), (_) {
       updateMapCallback.call();
     }, _onError, updateCallback);
 
@@ -342,7 +345,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _showUser() async {
-    if (!await _model.ensurePermissions()) {
+    if (!await _ensurePermissions()) {
       return;
     }
     final position = await _model.currentUserPos();
@@ -350,6 +353,30 @@ class _MapPageState extends State<MapPage> {
       return;
     }
     await _moveCameraTo(position);
+  }
+
+  Future<bool> _ensurePermissions() async {
+    var permission = await _permissionsManager.status(PermissionKind.LOCATION);
+    if (permission == PermissionState.granted) {
+      return true;
+    }
+
+    if (permission == PermissionState.denied) {
+      permission = await _permissionsManager.request(PermissionKind.LOCATION);
+      if (permission != PermissionState.permanentlyDenied) {
+        return permission == PermissionState.granted ||
+            permission == PermissionState.limited;
+      }
+    }
+
+    await showDoOrCancelDialog(
+        context,
+        context.strings.map_page_location_permission_reasoning_settings,
+        context.strings.global_open_app_settings,
+        _permissionsManager.openAppSettings);
+    permission = await _permissionsManager.status(PermissionKind.LOCATION);
+    return permission == PermissionState.granted ||
+        permission == PermissionState.limited;
   }
 
   void _onCameraIdle() async {

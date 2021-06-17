@@ -16,12 +16,13 @@ class DialogPlante extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: Container(
             margin: MediaQuery.of(context).viewInsets,
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 38, left: 16, right: 16),
             child: Material(
                 color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                elevation: 4,
                 child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 24, top: 24, right: 24, bottom: 16),
+                    padding: const EdgeInsets.all(24),
                     child: Wrap(children: [
                       Column(children: [
                         if (title != null)

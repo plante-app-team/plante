@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/shop.dart';
@@ -14,11 +13,10 @@ import 'package:plante/ui/map/map_page_model.dart';
 
 import 'map_page_model_test.mocks.dart';
 
-@GenerateMocks([LocationController, ShopsManager, PermissionsManager])
+@GenerateMocks([LocationController, ShopsManager])
 void main() {
   late MockLocationController locationController;
   late MockShopsManager shopsManager;
-  late MockPermissionsManager permissionsManager;
   late MapPageModel model;
 
   Map<String, Shop>? latestLoadedShops;
@@ -43,9 +41,8 @@ void main() {
 
     locationController = MockLocationController();
     shopsManager = MockShopsManager();
-    permissionsManager = MockPermissionsManager();
 
-    model = MapPageModel(locationController, permissionsManager, shopsManager,
+    model = MapPageModel(locationController, shopsManager,
         (shops) {
           latestLoadedShops = shops;
         },

@@ -79,6 +79,7 @@ class MapPageModesTestCommons {
 
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
+    when(locationController.currentPosition()).thenAnswer((_) async => null);
     when(mapController.getVisibleRegion()).thenAnswer(
             (_) async =>
             LatLngBounds(
@@ -90,5 +91,6 @@ class MapPageModesTestCommons {
         name: anyNamed('name'),
         coords: anyNamed('coords'),
         type: anyNamed('type'))).thenAnswer((_) async => Ok(shops[0]));
+    when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
   }
 }

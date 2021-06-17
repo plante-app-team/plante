@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
@@ -47,8 +48,8 @@ Future<T?> showMenuPlante<T>(
   );
 }
 
-Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
-    [VoidCallback? onYes]) async {
+Future<bool?> showYesNoDialog<bool>(
+    BuildContext context, String title, VoidCallback onYes) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -69,9 +70,41 @@ Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
               context.strings.global_yes,
               onPressed: () {
                 Navigator.of(context).pop(true);
-                onYes?.call();
+                onYes.call();
               },
             )),
+          ]));
+    },
+  );
+}
+
+Future<bool?> showDoOrCancelDialog<bool>(BuildContext context, String title,
+    String doWhat, VoidCallback onDo) async {
+  return await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return DialogPlante(
+          key: const Key('do_or_cancel_dialog'),
+          content: Text(title, style: TextStyles.headline3),
+          actions: Column(children: [
+            SizedBox(
+                width: double.infinity,
+                child: ButtonTextPlante(
+                  context.strings.global_cancel,
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                )),
+            const SizedBox(height: 8),
+            SizedBox(
+                width: double.infinity,
+                child: ButtonFilledPlante.withText(
+                  doWhat,
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    onDo.call();
+                  },
+                )),
           ]));
     },
   );

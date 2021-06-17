@@ -50,6 +50,7 @@
     "map_page_click_where_new_shop_located": "Кликните на место, где расположен не учтённый магазин",
     "map_page_click_on_shop_where_product_sold": "Кликните на маркер магазина, в котором находится продукт",
     "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
+    "map_page_location_permission_reasoning_settings": "Для определения вашего местоположения приложению необходимо системное разрешение",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
