@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -84,17 +84,25 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
 
 final _imagePaint = Paint();
 final _textPainter = TextPainter(textDirection: TextDirection.ltr);
+final _assetsCache = <String, DrawableRoot>{};
 
 /// Stolen from https://stackoverflow.com/a/57609840
 Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
     String assetName, int shops, TextStyle textStyle) async {
-  final pictureRecorder = PictureRecorder();
+  final pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
 
   // Marker image
   var size = 45.0; // SVG original size
-  final svgString = await DefaultAssetBundle.of(context).loadString(assetName);
-  final svgDrawableRoot = await svg.fromSvgString(svgString, '');
+  final DrawableRoot svgDrawableRoot;
+  if (_assetsCache.containsKey(assetName)) {
+    svgDrawableRoot = _assetsCache[assetName]!;
+  } else {
+    final svgString = await DefaultAssetBundle.of(context).loadString(
+        assetName);
+    svgDrawableRoot = await svg.fromSvgString(svgString, '');
+    _assetsCache[assetName] = svgDrawableRoot;
+  }
   // toPicture() and toImage() don't seem to be pixel ratio aware,
   // so we calculate the actual sizes here
   final queryData = MediaQuery.of(context);
@@ -122,7 +130,7 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
 
   final img =
       await pictureRecorder.endRecording().toImage(size.round(), size.round());
-  final data = await img.toByteData(format: ImageByteFormat.png);
+  final data = await img.toByteData(format: ui.ImageByteFormat.png);
 
   return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
 }
