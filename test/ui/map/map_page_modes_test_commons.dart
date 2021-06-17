@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
@@ -90,7 +93,20 @@ class MapPageModesTestCommons {
     when(shopsManager.createShop(
         name: anyNamed('name'),
         coords: anyNamed('coords'),
-        type: anyNamed('type'))).thenAnswer((_) async => Ok(shops[0]));
+        type: anyNamed('type'))).thenAnswer((invc) async {
+          final name = invc.namedArguments[const Symbol('name')] as String;
+          final coords = invc.namedArguments[const Symbol('coords')] as Point<double>;
+          final id = randInt(100, 500);
+          return Ok(Shop((e) => e
+            ..osmShop.replace(OsmShop((e) => e
+              ..osmId = id.toString()
+              ..longitude = coords.x
+              ..latitude = coords.y
+              ..name = name))
+            ..backendShop.replace(BackendShop((e) => e
+              ..osmId = id.toString()
+              ..productsCount = 0))));
+    });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
   }
 }

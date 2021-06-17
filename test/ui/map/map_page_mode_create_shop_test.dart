@@ -109,13 +109,19 @@ void main() {
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
-    // Product is created
+    // Shop is created
     verify(shopsManager.createShop(
         name: 'new shop',
         coords: anyNamed('coords'),
         type: anyNamed('type')));
     // Mode is changed
-    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeSelectShopsWhereProductSold));
+    expect(widget.getModeForTesting().runtimeType,
+        equals(MapPageModeSelectShopsWhereProductSold));
+
+    // New mode has the created shop in its selection
+    final selectedCreatedShop = widget.getModeForTesting().selectedShops()
+        .where((shop) => shop.name == 'new shop');
+    expect(selectedCreatedShop.length, equals(1));
   });
 
   testWidgets('user hints transition', (WidgetTester tester) async {
