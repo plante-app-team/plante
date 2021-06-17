@@ -313,9 +313,12 @@ class _MapPageState extends State<MapPage> {
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
-          padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
-          child: MapHintsList(controller: _hintsController),
-        ),
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+            child: Column(children: [
+              _mode.buildHeader(context),
+              MapHintsList(controller: _hintsController),
+              _mode.buildTopActions(context),
+            ])),
       ),
       _mode.buildOverlay(context),
       AnimatedSwitcher(

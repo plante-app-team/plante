@@ -48,6 +48,8 @@ abstract class MapPageMode {
   /// Extra shops added to what MapPageModel has
   Set<Shop> additionalShops() => {};
   Widget buildOverlay(BuildContext context) => const SizedBox.shrink();
+  Widget buildHeader(BuildContext context) => const SizedBox.shrink();
+  Widget buildTopActions(BuildContext context) => const SizedBox.shrink();
   Widget buildBottomActions(BuildContext context) => const SizedBox.shrink();
   List<Widget> buildFABs() => const [];
   void onMarkerClick(Iterable<Shop> shops) {}
