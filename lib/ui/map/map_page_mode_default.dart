@@ -65,31 +65,33 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   Widget buildTopActions(BuildContext context) {
     return Align(
         alignment: Alignment.centerRight,
-        child: Material(
-          color: const Color(0xFFEBF0ED),
-          elevation: 1,
-          borderRadius: BorderRadius.circular(8),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () {
-              _showEmptyShops = !_showEmptyShops;
-              updateWidget();
-              updateMap();
-            },
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              const SizedBox(width: 16),
-              Text(context.strings.map_page_empty_shops,
-                  style: TextStyles.smallBoldGreen),
-              CheckboxPlante(
-                  value: _showEmptyShops,
-                  onChanged: (value) {
-                    _showEmptyShops = value ?? false;
-                    updateWidget();
-                    updateMap();
-                  })
-            ]),
-          ),
-        ));
+        child: SizedBox(
+            height: 40,
+            child: Material(
+              color: const Color(0xFFEBF0ED),
+              elevation: 1,
+              borderRadius: BorderRadius.circular(8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8),
+                onTap: () {
+                  _showEmptyShops = !_showEmptyShops;
+                  updateWidget();
+                  updateMap();
+                },
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const SizedBox(width: 16),
+                  Text(context.strings.map_page_empty_shops,
+                      style: TextStyles.smallBoldGreen),
+                  CheckboxPlante(
+                      value: _showEmptyShops,
+                      onChanged: (value) {
+                        _showEmptyShops = value ?? false;
+                        updateWidget();
+                        updateMap();
+                      })
+                ]),
+              ),
+            )));
   }
 
   @override
