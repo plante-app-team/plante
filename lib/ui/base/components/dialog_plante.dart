@@ -5,9 +5,14 @@ class DialogPlante extends StatelessWidget {
   final Widget? title;
   final Widget content;
   final Widget? actions;
+  final EdgeInsets contentPadding;
 
   const DialogPlante(
-      {Key? key, this.title, required this.content, this.actions})
+      {Key? key,
+      this.title,
+      required this.content,
+      this.actions,
+      this.contentPadding = const EdgeInsets.all(24)})
       : super(key: key);
 
   @override
@@ -22,7 +27,7 @@ class DialogPlante extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 elevation: 4,
                 child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: contentPadding,
                     child: Wrap(children: [
                       Column(children: [
                         if (title != null)

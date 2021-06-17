@@ -10,7 +10,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/components/create_shop_dialog_content.dart';
+import 'package:plante/ui/map/components/create_shop_dialog.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
@@ -58,7 +58,7 @@ class MapPageModeCreateShop extends MapPageMode {
     final result = await showDialog<CreateShopDialogResult>(
       context: context,
       builder: (BuildContext context) {
-        return const DialogPlante(content: CreateShopDialogContent());
+        return const CreateShopDialog();
       },
     );
 
