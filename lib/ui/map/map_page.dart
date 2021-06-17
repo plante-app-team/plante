@@ -280,6 +280,7 @@ class _MapPageState extends State<MapPage> {
     final content = Stack(children: [
       GoogleMap(
         myLocationEnabled: true,
+        mapToolbarEnabled: false,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
         minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
