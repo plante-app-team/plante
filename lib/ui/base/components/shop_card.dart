@@ -57,28 +57,25 @@ class ShopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.25),
-              blurRadius: 4,
-              offset: const Offset(0, 4),
-            )
-          ],
-        ),
+    return Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        elevation: 3,
         child: Stack(children: [
           Align(
-              alignment: Alignment.topRight,
-              child: Material(
-                color: Colors.transparent,
-                child: IconButton(
-                    key: const Key('card_cancel_btn'),
-                    onPressed: _onCancel,
-                    icon: SvgPicture.asset('assets/cancel_circle.svg')),
-              )),
+            alignment: Alignment.topRight,
+            child: InkWell(
+              key: const Key('card_cancel_btn'),
+              borderRadius: BorderRadius.circular(24),
+              onTap: _onCancel,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SvgPicture.asset(
+                  'assets/cancel_circle.svg',
+                ),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(children: [
@@ -86,7 +83,11 @@ class ShopCard extends StatelessWidget {
                 const SizedBox(
                     width:
                         35), // So that the name wouldn't be behind the cancel button
-                Expanded(child: Text(shop.name, style: TextStyles.headline1))
+                Expanded(
+                    child: Text(shop.name,
+                        style: TextStyles.headline1,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis))
               ]),
               const SizedBox(height: 35),
               if (checkedProduct == null) _productRangeContent(context),

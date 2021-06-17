@@ -49,11 +49,15 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   Widget _shopCards() {
-    return PageView.builder(
-      controller: PageController(viewportFraction: 0.90),
-      itemCount: _displayedShops.length,
-      itemBuilder: _buildShopCard,
-    );
+    return Align(
+        alignment: Alignment.bottomCenter,
+        child: SizedBox(
+            height: 230,
+            child: PageView.builder(
+              controller: PageController(viewportFraction: 0.87),
+              itemCount: _displayedShops.length,
+              itemBuilder: _buildShopCard,
+            )));
   }
 
   Widget _buildShopCard(BuildContext context, int itemIndex) {
@@ -66,24 +70,15 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     }
     return Material(
         color: Colors.transparent,
-        child: Stack(children: [
-          InkWell(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: _hideShopsCard,
-          ),
-          Align(
-              alignment: Alignment.bottomCenter,
-              child: Wrap(children: [
-                Padding(
-                    padding: EdgeInsets.only(
-                        left: leftPadding,
-                        right: horizontalPadding,
-                        bottom: 12),
-                    child: createCardFor(_displayedShops[itemIndex],
-                        (Shop shop) => _hideShopsCard()))
-              ]))
-        ]));
+        child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Wrap(children: [
+              Padding(
+                  padding: EdgeInsets.only(
+                      left: leftPadding, right: horizontalPadding, bottom: 12),
+                  child: createCardFor(_displayedShops[itemIndex],
+                      (Shop shop) => _hideShopsCard()))
+            ])));
   }
 
   void _hideShopsCard() {
