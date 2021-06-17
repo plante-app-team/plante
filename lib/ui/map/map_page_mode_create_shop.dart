@@ -8,7 +8,6 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
-import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/create_shop_dialog.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -17,6 +16,7 @@ import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base
 import 'package:plante/l10n/strings.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
+  static const _NEW_SHOP_PSEUDO_OSM_ID = 'NEW_SHOP_PSEUDO_OSM_ID';
   static const _HINT_ID = 'MapPageModeCreateShop hint 1';
   final Set<Shop> _selectedShop = <Shop>{};
   Shop? _shopBeingCreated;
@@ -38,6 +38,12 @@ class MapPageModeCreateShop extends MapPageMode {
   void deinit() {
     hintsController.removeHint(_HINT_ID);
   }
+
+  // Let's hide markers of all other shops so that
+  // they wouldn't mess user's taps
+  @override
+  Iterable<Shop> filter(Iterable<Shop> shops) =>
+      shops.where((shop) => shop.osmId == _NEW_SHOP_PSEUDO_OSM_ID);
 
   @override
   Set<Shop> selectedShops() => _selectedShop;
@@ -73,12 +79,12 @@ class MapPageModeCreateShop extends MapPageMode {
   Shop _createShop(String name, Point<double> coords) {
     return Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = 'new shop from MapPageModeCreateShop'
+        ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
         ..longitude = coords.x
         ..latitude = coords.y
         ..name = name))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = 'new shop from MapPageModeCreateShop'
+        ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
         ..productsCount = 0)));
   }
 
