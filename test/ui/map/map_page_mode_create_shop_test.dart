@@ -6,6 +6,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
+import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
@@ -48,6 +49,16 @@ void main() {
     expect(widget.getModeForTesting().selectedShops(), equals({shops[1]}));
   });
 
+  testWidgets('all shops markers are hidden', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS);
+    final context = await tester.superPump(widget);
+    await switchMode(tester, widget, context);
+
+    expect(widget.getDisplayedShopsForTesting(), isEmpty);
+  });
+
   testWidgets('map click', (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
@@ -59,7 +70,6 @@ void main() {
     expect(widget.getModeForTesting().accentedShops(), equals(<Shop>{}));
     expect(widget.getModeForTesting().additionalShops(), equals(<Shop>{}));
     final expectedAllShops = <Shop>{};
-    expectedAllShops.addAll(shops);
     expectedAllShops.addAll(widget.getModeForTesting().additionalShops());
     expect(widget.getDisplayedShopsForTesting(), equals(expectedAllShops));
 
@@ -105,8 +115,7 @@ void main() {
         coords: anyNamed('coords'),
         type: anyNamed('type')));
     // Mode is changed
-    expect(widget.getModeForTesting().runtimeType,
-        isNot(equals(MapPageModeCreateShop)));
+    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeSelectShopsWhereProductSold));
   });
 
   testWidgets('user hints transition', (WidgetTester tester) async {
@@ -133,5 +142,20 @@ void main() {
     expect(
         find.text(context.strings.map_page_click_where_new_shop_located),
         findsOneWidget);
+  });
+
+  testWidgets('cancellation returns to previous mode', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+        initialSelectedShops: [shops[1]]);
+    final context = await tester.superPump(widget);
+    await switchMode(tester, widget, context);
+
+    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
+
+    await tester.tap(find.byKey(const Key('close_create_shop_button')));
+
+    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeSelectShopsWhereProductSold));
   });
 }

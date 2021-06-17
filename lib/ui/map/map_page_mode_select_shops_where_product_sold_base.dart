@@ -26,7 +26,10 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     _selectedShops.addAll(widget.initialSelectedShops);
   }
 
+  @protected
   void onDoneClick();
+  @protected
+  void onAddShopClicked();
 
   @override
   Set<Shop> selectedShops() => _selectedShops;
@@ -35,7 +38,8 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   void init(MapPageMode? previousMode) {
     if (previousMode != null) {
-      _selectedShops.addAll(previousMode.selectedShops());
+      _selectedShops.addAll(
+          previousMode.selectedShops().take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX));
     }
 
     hintsController.addHint(
@@ -97,7 +101,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     return [
       FabAddShop(
           key: const Key('add_shop_fab'),
-          onPressed: !model.loading ? _addShopClick : null)
+          onPressed: !model.loading ? onAddShopClicked : null)
     ];
   }
 
@@ -119,10 +123,6 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
                     : null)),
       ]),
     );
-  }
-
-  void _addShopClick() {
-    switchModeTo(MapPageModeCreateShop(params));
   }
 
   void _onCancelClick() async {

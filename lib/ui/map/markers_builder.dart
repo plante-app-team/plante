@@ -98,8 +98,8 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
   if (_assetsCache.containsKey(assetName)) {
     svgDrawableRoot = _assetsCache[assetName]!;
   } else {
-    final svgString = await DefaultAssetBundle.of(context).loadString(
-        assetName);
+    final svgString =
+        await DefaultAssetBundle.of(context).loadString(assetName);
     svgDrawableRoot = await svg.fromSvgString(svgString, '');
     _assetsCache[assetName] = svgDrawableRoot;
   }

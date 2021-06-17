@@ -13,6 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -110,7 +111,7 @@ class _TestingStorage {
   GoogleMapController? mapControllerForTesting;
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   static final _instances = <_MapPageState>[];
   final PermissionsManager _permissionsManager;
   late final MapPageModel _model;
@@ -302,23 +303,20 @@ class _MapPageState extends State<MapPage> {
       ),
       Align(
           alignment: Alignment.bottomCenter,
-          child: AnimatedContainer(
-            duration: DURATION_DEFAULT,
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: Column(children: _fabs())),
-              _mode.buildBottomActions(context),
-            ]),
-          )),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Align(
+                alignment: Alignment.centerRight,
+                child: Column(children: _fabs())),
+            _mode.buildBottomActions(context),
+          ])),
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
-              _mode.buildHeader(context),
+              AnimatedModeWidget(child: _mode.buildHeader(context)),
               MapHintsList(controller: _hintsController),
-              _mode.buildTopActions(context),
+              AnimatedModeWidget(child: _mode.buildTopActions(context)),
             ])),
       ),
       _mode.buildOverlay(context),
