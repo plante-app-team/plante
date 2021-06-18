@@ -8,7 +8,6 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/create_shop_dialog.dart';
@@ -106,18 +105,18 @@ class MapPageModeCreateShop extends MapPageMode {
   }
 
   @override
-  Widget buildBottomActions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(context.strings.global_done,
-                onPressed: _shopBeingCreated != null && !model.loading
-                    ? _onDoneClick
-                    : null)),
-      ]),
-    );
+  List<Widget> buildBottomActions(BuildContext context) {
+    return [
+      SizedBox(
+          key: const Key('map_page_done'),
+          width: double.infinity,
+          child: Padding(
+              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
+              child: ButtonFilledPlante.withText(context.strings.global_done,
+                  onPressed: _shopBeingCreated != null && !model.loading
+                      ? _onDoneClick
+                      : null))),
+    ];
   }
 
   void _onCancelClick() async {

@@ -11,7 +11,6 @@ import 'package:plante/ui/map/components/fab_add_shop.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_shops_card_base.dart';
-import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 
 const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
 
@@ -106,23 +105,25 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  Widget buildBottomActions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        SizedBox(
-            width: double.infinity,
-            child: ButtonTextPlante(context.strings.global_cancel,
-                onPressed: _onCancelClick)),
-        const SizedBox(height: 8),
-        SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(context.strings.global_done,
-                onPressed: selectedShops().isNotEmpty && !model.loading
-                    ? onDoneClick
-                    : null)),
-      ]),
-    );
+  List<Widget> buildBottomActions(BuildContext context) {
+    return [
+      SizedBox(
+          key: const Key('map_page_cancel'),
+          width: double.infinity,
+          child: Padding(
+              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 8),
+              child: ButtonTextPlante(context.strings.global_cancel,
+                  onPressed: _onCancelClick))),
+      SizedBox(
+          key: const Key('map_page_done'),
+          width: double.infinity,
+          child: Padding(
+              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
+              child: ButtonFilledPlante.withText(context.strings.global_done,
+                  onPressed: selectedShops().isNotEmpty && !model.loading
+                      ? onDoneClick
+                      : null))),
+    ];
   }
 
   void _onCancelClick() async {

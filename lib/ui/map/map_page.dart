@@ -12,6 +12,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
@@ -306,8 +307,11 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Align(
                 alignment: Alignment.centerRight,
-                child: Column(children: _fabs())),
-            _mode.buildBottomActions(context),
+                child: SizedBox(
+                    width: 80,
+                    child: AnimatedListSimplePlante(children: _fabs()))),
+            AnimatedListSimplePlante(
+                children: _mode.buildBottomActions(context)),
           ])),
       Align(
         alignment: Alignment.topCenter,
@@ -342,7 +346,9 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         ];
     return fabs
         .map((e) => Padding(
-            padding: const EdgeInsets.only(right: 24, bottom: 24), child: e))
+            key: Key('${e.key}_wrapped'),
+            padding: const EdgeInsets.only(right: 24, bottom: 24),
+            child: e))
         .toList();
   }
 
