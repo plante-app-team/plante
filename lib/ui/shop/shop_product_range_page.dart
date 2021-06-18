@@ -25,8 +25,8 @@ import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
-  const ShopProductRangePage._({Key? key, required this.shop})
-      : super(key: key);
+  final _testingStorage = _TestingStorage();
+  ShopProductRangePage._({Key? key, required this.shop}) : super(key: key);
 
   @visibleForTesting
   static ShopProductRangePage createForTesting(Shop shop) {
@@ -61,6 +61,18 @@ class ShopProductRangePage extends StatefulWidget {
 
   @override
   _ShopProductRangePageState createState() => _ShopProductRangePageState();
+
+  @visibleForTesting
+  void forceContentReloadForTesting() {
+    if (!isInTests()) {
+      throw Exception('forceContentReloadForTesting called not in tests');
+    }
+    _testingStorage.forceReload!.call();
+  }
+}
+
+class _TestingStorage {
+  VoidCallback? forceReload;
 }
 
 class _ShopProductRangePageState extends State<ShopProductRangePage> {
@@ -83,6 +95,8 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
         widget.shop,
         updateCallback);
     initializeDateFormatting();
+
+    widget._testingStorage.forceReload = _model.reload;
   }
 
   @override

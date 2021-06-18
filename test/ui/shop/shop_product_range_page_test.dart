@@ -76,8 +76,8 @@ void main() {
       ..ingredientsText = 'Water, salt, sugar'),
   ];
   final productsLastSeen = {
-    products[0]: DateTime(2011, 1, 1),
-    products[1]: DateTime(2012, 2, 2),
+    products[0]: DateTime(2012, 1, 1),
+    products[1]: DateTime(2011, 2, 2),
   };
   final productsLastSeenSecs = productsLastSeen.map((key, value) =>
       MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
@@ -410,5 +410,338 @@ void main() {
         of: find.byWidget(card),
         matching: find.text(context.strings.veg_status_displayed_vegan)),
         findsOneWidget);
+  });
+
+  testWidgets('non-vegan products are not shown to a vegan', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Milk apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.possible
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.negative
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    final productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2011, 2, 2),
+    };
+    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final veganUser = UserParams((v) => v
+      ..name = 'Bob'
+      ..genderStr = Gender.FEMALE.name
+      ..eatsMilk = false
+      ..eatsEggs = false
+      ..eatsHoney = false);
+    await userParamsController.setUserParams(veganUser);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    expect(find.text(products[0].name!), findsNothing);
+    expect(find.text(products[1].name!), findsOneWidget);
+  });
+
+  testWidgets('non-vegetarian products are not shown to a vegetarian', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Meat apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.negative
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.negative
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    final productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2011, 2, 2),
+    };
+    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final veganUser = UserParams((v) => v
+      ..name = 'Bob'
+      ..genderStr = Gender.FEMALE.name
+      ..eatsMilk = true
+      ..eatsEggs = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(veganUser);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    expect(find.text(products[0].name!), findsNothing);
+    expect(find.text(products[1].name!), findsOneWidget);
+  });
+
+  testWidgets('non-vegan products ARE shown to a vegetarian', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Meat apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.negative
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    final productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2011, 2, 2),
+    };
+    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final veganUser = UserParams((v) => v
+      ..name = 'Bob'
+      ..genderStr = Gender.FEMALE.name
+      ..eatsMilk = true
+      ..eatsEggs = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(veganUser);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    expect(find.text(products[0].name!), findsOneWidget);
+    expect(find.text(products[1].name!), findsOneWidget);
+  });
+
+  testWidgets('products are sorted by their last-seen property (order 1)', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    final productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2011, 2, 2),
+    };
+    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    final product0Center = tester.getCenter(find.text(products[0].name!));
+    final product1Center = tester.getCenter(find.text(products[1].name!));
+    expect(product1Center.dy, greaterThan(product0Center.dy));
+  });
+
+  testWidgets('products are sorted by their last-seen property (order 2)', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    final productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2013, 2, 2),
+    };
+    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    final product0Center = tester.getCenter(find.text(products[0].name!));
+    final product1Center = tester.getCenter(find.text(products[1].name!));
+    expect(product1Center.dy, lessThan(product0Center.dy));
+  });
+
+  testWidgets('products reloading changes order only when products set changes', (WidgetTester tester) async {
+    final products = [
+      Product((v) => v
+        ..barcode = '123'
+        ..name = 'Apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+      Product((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'),
+    ];
+    var productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2011, 2, 2),
+    };
+    var productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    var range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    // Create widget
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    // Initial order
+    var product0Center = tester.getCenter(find.text(products[0].name!));
+    var product1Center = tester.getCenter(find.text(products[1].name!));
+    expect(product1Center.dy, greaterThan(product0Center.dy));
+
+    // Change the 'last seen' property
+    productsLastSeen = {
+      products[0]: DateTime(2012, 1, 1),
+      products[1]: DateTime(2013, 2, 2),
+    };
+    productsLastSeenSecs = productsLastSeen.map((key, value) =>
+        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
+    range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    // Force content reload
+    clearInteractions(shopsManager);
+    widget.forceContentReloadForTesting();
+    await tester.pumpAndSettle();
+    verify(shopsManager.fetchShopProductRange(any)); // Verify the reload
+
+    // Verify initial order is kept, even though
+    // the 'last seen' properties have changed
+    product0Center = tester.getCenter(find.text(products[0].name!));
+    product1Center = tester.getCenter(find.text(products[1].name!));
+    expect(product1Center.dy, greaterThan(product0Center.dy));
+
+    // Add another product, unrelated to first 2
+    products.add(
+      Product((v) => v
+        ..barcode = '223'
+        ..name = 'Some unrelated product'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..vegetarianStatus = VegStatus.positive
+        ..vegetarianStatusSource = VegStatusSource.open_food_facts
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar'));
+
+    // NOTE: we'll keep the 'last seen' properties same
+
+    // Range with the new product
+    range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(products)
+      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    // Force content reload
+    clearInteractions(shopsManager);
+    widget.forceContentReloadForTesting();
+    await tester.pumpAndSettle();
+    verify(shopsManager.fetchShopProductRange(any)); // Verify the reload
+
+    // Verify initial order is NOT kept!
+    // Second product is not first.
+    product0Center = tester.getCenter(find.text(products[0].name!));
+    product1Center = tester.getCenter(find.text(products[1].name!));
+    expect(product1Center.dy, lessThan(product0Center.dy));
   });
 }
