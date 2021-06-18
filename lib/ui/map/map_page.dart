@@ -291,6 +291,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         onMapCreated: (GoogleMapController controller) {
           _mapController.complete(controller);
           _clusterManager.setMapController(controller);
+          _clusterManager.onCameraMove(initialPos!);
         },
         onCameraMove: _clusterManager.onCameraMove,
         onCameraIdle: _onCameraIdle,
