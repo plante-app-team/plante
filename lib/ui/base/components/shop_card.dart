@@ -7,7 +7,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/map/shop_product_range_page.dart';
+import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 typedef ShopCardProductSoldChangeCallback = dynamic Function(

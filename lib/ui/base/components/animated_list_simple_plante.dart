@@ -34,8 +34,8 @@ class _AnimatedListSimplePlanteState extends State<AnimatedListSimplePlante> {
             (context, animation) =>
                 _wrapChild(oldWidget.children[pos], animation)),
         change: (pos, payload) {/* nothing to do */},
-        move: (from, to) =>
-          throw Exception('detectMoves: false was passed, moves not expected'),
+        move: (from, to) => throw Exception(
+            'detectMoves: false was passed, moves not expected'),
       );
     }
   }

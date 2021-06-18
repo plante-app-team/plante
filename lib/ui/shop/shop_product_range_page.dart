@@ -21,6 +21,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 import 'package:plante/ui/scan/barcode_scan_page.dart';
+import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
@@ -63,84 +64,61 @@ class ShopProductRangePage extends StatefulWidget {
 }
 
 class _ShopProductRangePageState extends State<ShopProductRangePage> {
-  final ShopsManager _shopsManager;
-  final UserParamsController _userParamsController;
-  final Backend _backend;
-  bool _loading = false;
-  bool _performingBackendAction = false;
-  ShopProductRange? _shopProductRange;
-  ShopsManagerError? _shopProductRangeLoadingError;
-
-  _ShopProductRangePageState()
-      : _shopsManager = GetIt.I.get<ShopsManager>(),
-        _userParamsController = GetIt.I.get<UserParamsController>(),
-        _backend = GetIt.I.get<Backend>();
+  late final ShopProductRangePageModel _model;
 
   @override
   void initState() {
     super.initState();
-    _load();
-    initializeDateFormatting();
-  }
-
-  void _load() async {
-    setState(() {
-      _loading = true;
-      _shopProductRangeLoadingError = null;
-    });
-    try {
-      final loadResult = await _shopsManager.fetchShopProductRange(widget.shop);
-      if (loadResult.isOk) {
-        _shopProductRange = loadResult.unwrap();
-      } else {
-        _shopProductRangeLoadingError = loadResult.unwrapErr();
+    final updateCallback = () {
+      if (mounted) {
+        setState(() {
+          // Update!
+        });
       }
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
+    };
+    _model = ShopProductRangePageModel(
+        GetIt.I.get<ShopsManager>(),
+        GetIt.I.get<UserParamsController>(),
+        GetIt.I.get<Backend>(),
+        widget.shop,
+        updateCallback);
+    initializeDateFormatting();
   }
 
   @override
   Widget build(BuildContext context) {
     Widget content;
-    if (_loading) {
+    final errorWrapper = (Widget child) {
+      return Padding(
+          padding: const EdgeInsets.all(16), child: Center(child: child));
+    };
+    final errorText = (String text) =>
+        Text(text, textAlign: TextAlign.center, style: TextStyles.normal);
+
+    if (_model.loading) {
       content = const Center(child: CircularProgressIndicator());
-    } else if (_shopProductRangeLoadingError != null) {
-      if (_shopProductRangeLoadingError == ShopsManagerError.NETWORK_ERROR) {
-        content = Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  Text(context.strings.global_network_error,
-                      textAlign: TextAlign.center, style: TextStyles.normal),
-                  const SizedBox(height: 8),
-                  ButtonFilledPlante.withText(context.strings.global_try_again,
-                      onPressed: _load)
-                ])));
+    } else if (_model.loadedRangeRes.isErr) {
+      if (_model.loadedRangeRes.unwrapErr() ==
+          ShopsManagerError.NETWORK_ERROR) {
+        content = errorWrapper(
+            Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          errorText(context.strings.global_network_error),
+          const SizedBox(height: 8),
+          ButtonFilledPlante.withText(context.strings.global_try_again,
+              onPressed: _model.reload)
+        ]));
       } else {
-        content = Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-                child: Text(context.strings.global_something_went_wrong,
-                    textAlign: TextAlign.center, style: TextStyles.normal)));
+        content = errorWrapper(
+            errorText(context.strings.global_something_went_wrong));
       }
-    } else if (_shopProductRange!.products.isEmpty) {
-      content = Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-              child: Text(
-                  context
-                      .strings.shop_product_range_page_this_shop_has_no_product,
-                  textAlign: TextAlign.center,
-                  style: TextStyles.normal)));
+    } else if (_model.loadedProducts.isEmpty) {
+      content = errorWrapper(errorText(
+          context.strings.shop_product_range_page_this_shop_has_no_product));
     } else {
-      final products = _shopProductRange!.products;
       content = ListView(
-          children: products.map((e) => _productToCard(e, context)).toList());
+          children: _model.loadedProducts
+              .map((e) => _productToCard(e, context))
+              .toList());
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -165,7 +143,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
                       context.strings.shop_product_range_page_add_product,
-                      onPressed: !_loading ? _onAddProductClick : null)),
+                      onPressed: !_model.loading ? _onAddProductClick : null)),
             ]),
           ),
           const SizedBox(height: 24),
@@ -173,7 +151,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
         ]),
         Positioned.fill(
             child: AnimatedCrossFadePlante(
-          crossFadeState: _performingBackendAction
+          crossFadeState: _model.performingBackendAction
               ? CrossFadeState.showSecond
               : CrossFadeState.showFirst,
           firstChild: const SizedBox.shrink(),
@@ -187,9 +165,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
   }
 
   Padding _productToCard(Product product, BuildContext context) {
-    final user = _userParamsController.cachedUserParams!;
-    final dateStr =
-        secsSinceEpochToStr(_shopProductRange!.lastSeenSecs(product), context);
+    final dateStr = secsSinceEpochToStr(_model.lastSeenSecs(product), context);
 
     final cardExtraContent = Padding(
         padding: const EdgeInsets.only(left: 6, right: 6, bottom: 4),
@@ -228,7 +204,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
               product: product,
               hint:
                   '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr',
-              beholder: user,
+              beholder: _model.user,
               extraContent: cardExtraContent,
               onTap: () {
                 _openProductPage(product);
@@ -238,66 +214,24 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
 
   void _openProductPage(Product product) {
     ProductPageWrapper.show(context, product,
-        productUpdatedCallback: _onProductUpdate);
-  }
-
-  void _onProductUpdate(Product updatedProduct) {
-    if (_shopProductRange == null) {
-      Log.w('_onProductUpdate called but we have no products range');
-      return;
-    }
-    final products = _shopProductRange!.products.toList();
-    final productToUpdate = products
-        .indexWhere((product) => product.barcode == updatedProduct.barcode);
-    if (productToUpdate == -1) {
-      Log.e(
-          'Updated product is not found. Product: $updatedProduct, all products: $products');
-      return;
-    }
-    products[productToUpdate] = updatedProduct;
-    setState(() {
-      _shopProductRange =
-          _shopProductRange!.rebuild((e) => e.products.replace(products));
-    });
+        productUpdatedCallback: _model.onProductUpdate);
   }
 
   void _onProductPresenceVote(Product product, bool positive) async {
     final title = positive
         ? context.strings.shop_product_range_page_you_sure_positive_vote
         : context.strings.shop_product_range_page_you_sure_negative_vote;
-    await showYesNoDialog(context, title, () {
-      _performProductPresenceVote(product, positive);
-    });
-  }
-
-  void _performProductPresenceVote(Product product, bool positive) async {
-    setState(() {
-      _performingBackendAction = true;
-    });
-    try {
-      final result = await _backend.productPresenceVote(
-          product.barcode, widget.shop.osmId, positive);
+    await showYesNoDialog(context, title, () async {
+      final result = await _model.productPresenceVote(product, positive);
       if (result.isOk) {
         showSnackBar(context.strings.global_done_thanks, context);
-        if (positive) {
-          setState(() {
-            _shopProductRange = _shopProductRange!.rebuild((e) =>
-                e.productsLastSeenSecsUtc[product.barcode] =
-                    DateTime.now().secondsSinceEpoch);
-          });
-        }
+      } else if (result.unwrapErr().errorKind ==
+          BackendErrorKind.NETWORK_ERROR) {
+        showSnackBar(context.strings.global_network_error, context);
       } else {
-        if (result.unwrapErr().errorKind == BackendErrorKind.NETWORK_ERROR) {
-          showSnackBar(context.strings.global_network_error, context);
-        } else {
-          showSnackBar(context.strings.global_something_went_wrong, context);
-        }
+        showSnackBar(context.strings.global_something_went_wrong, context);
       }
-    } finally {
-      setState(() {
-        _performingBackendAction = false;
-      });
-    }
+    });
   }
 
   void _onAddProductClick() async {
@@ -306,11 +240,6 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
         MaterialPageRoute(
             builder: (context) =>
                 BarcodeScanPage(addProductToShop: widget.shop)));
-    // Reload!
-    _load();
+    _model.reload();
   }
-}
-
-extension _DateTimeExt on DateTime {
-  int get secondsSinceEpoch => (millisecondsSinceEpoch / 1000).round();
 }

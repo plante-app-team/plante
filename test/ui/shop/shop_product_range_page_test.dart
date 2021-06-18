@@ -24,7 +24,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/shop_product_range_page.dart';
+import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
