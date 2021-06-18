@@ -61,12 +61,20 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   Widget _buildShopCard(BuildContext context, int itemIndex) {
-    const horizontalPadding = 6.0;
     final double leftPadding;
-    if (itemIndex == 0) {
+    final double rightPadding;
+    if (_displayedShops.length == 1) {
       leftPadding = 0;
+      rightPadding = 0;
+    } else if (itemIndex == 0) {
+      leftPadding = 0;
+      rightPadding = 6;
+    } else if (itemIndex == _displayedShops.length - 1) {
+      leftPadding = 6;
+      rightPadding = 0;
     } else {
-      leftPadding = horizontalPadding;
+      leftPadding = 6;
+      rightPadding = 6;
     }
     return Material(
         color: Colors.transparent,
@@ -75,7 +83,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
             child: Wrap(children: [
               Padding(
                   padding: EdgeInsets.only(
-                      left: leftPadding, right: horizontalPadding, bottom: 12),
+                      left: leftPadding, right: rightPadding, bottom: 12),
                   child: createCardFor(_displayedShops[itemIndex],
                       (Shop shop) => _hideShopsCard()))
             ])));
