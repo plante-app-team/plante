@@ -104,7 +104,7 @@ void main() {
       ..productsCount = 0)));
   });
 
-  test('shops fetch and then cached', () async {
+  test('shops fetched and then cached', () async {
     verifyZeroInteractions(osm);
     verifyZeroInteractions(backend);
 
@@ -126,6 +126,37 @@ void main() {
     // No backends expected to be touched! Cache expected to be used!
     verifyZeroInteractions(osm);
     verifyZeroInteractions(backend);
+  });
+
+  test('shops products range update changes shops cache', () async {
+    // Fetch #1
+    final shopsRes1 = await shopsManager.fetchShops(northeast, southwest);
+    final shops1 = shopsRes1.unwrap();
+    expect(shops1, equals(fullShops));
+    // Both backends expected to be touched
+    verify(osm.fetchShops(any, any));
+    verify(backend.requestShops(any));
+    // Reset mocks
+    clearInteractions(osm);
+    clearInteractions(backend);
+
+    // A range update
+    final putRes = await shopsManager
+        .putProductToShops(rangeProducts[2], [shops1.values.first]);
+    expect(putRes.isOk, isTrue);
+
+    // Fetch #2
+    final shopsRes2 = await shopsManager.fetchShops(northeast, southwest);
+    // Both backends expected to be NOT touched, cache expected to be used
+    verifyNever(osm.fetchShops(any, any));
+    verifyNever(backend.requestShops(any));
+
+    // Ensure +1 product in productsCount
+    final shops2 = shopsRes2.unwrap();
+    expect(shops2, isNot(equals(shops1)));
+    expect(shops2.values.first.osmId, equals(shops1.values.first.osmId));
+    expect(shops2.values.first.productsCount,
+        equals(shops1.values.first.productsCount + 1));
   });
 
   test('cache behaviour when multiple shops fetches started at the same time', () async {

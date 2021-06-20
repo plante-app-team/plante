@@ -164,6 +164,16 @@ class ShopsManager {
             ..productsLastSeenSecsUtc[product.barcode] = now);
           _rangesCache[shop.osmId] = rangeCache;
         }
+
+        var shopCache = _shopsCache[shop.osmId];
+        var backendShop = shopCache?.backendShop;
+        if (shopCache != null && backendShop != null) {
+          backendShop = backendShop
+              .rebuild((e) => e.productsCount = backendShop!.productsCount + 1);
+          shopCache =
+              shopCache.rebuild((e) => e.backendShop.replace(backendShop!));
+          _shopsCache[shop.osmId] = shopCache;
+        }
       }
       _notifyListeners();
     }
