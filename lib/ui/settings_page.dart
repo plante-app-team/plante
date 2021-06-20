@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -47,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
         await GetIt.I.get<UserParamsController>().getUserParams();
     user = userNullable!;
     packageInfo = await PackageInfo.fromPlatform();
-    if (user.userGroup == null || user.userGroup == 1) {
+    if (kReleaseMode && (user.userGroup == null || user.userGroup == 1)) {
       setState(() {
         loading = false;
       });
