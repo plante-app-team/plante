@@ -13,6 +13,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 import '../../fake_shared_preferences.dart';
@@ -27,6 +28,8 @@ class MapPageModesTestCommons {
   late MockGoogleMapController mapController;
   late FakeSharedPreferences prefs;
   late MockLatestCameraPosStorage latestCameraPosStorage;
+
+  final shopsManagerListeners = <ShopsManagerListener>[];
 
   final shops = [
     Shop((e) => e
@@ -66,7 +69,7 @@ class MapPageModesTestCommons {
         ..osmId = '3'
         ..productsCount = 3))),
   ];
-  late final Map<String, Shop> shopsMap;
+  late Map<String, Shop> shopsMap;
 
   Future<void> setUp() async {
     shopsMap = { for (final shop in shops) shop.osmId: shop };
@@ -83,6 +86,16 @@ class MapPageModesTestCommons {
     prefs = FakeSharedPreferences();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
+
+    shopsManagerListeners.clear();
+    when(shopsManager.addListener(any)).thenAnswer((invc) {
+      final listener = invc.positionalArguments[0] as ShopsManagerListener;
+      shopsManagerListeners.add(listener);
+    });
+    when(shopsManager.removeListener(any)).thenAnswer((invc) {
+      final listener = invc.positionalArguments[0] as ShopsManagerListener;
+      shopsManagerListeners.remove(listener);
+    });
 
     when(shopsManager.fetchShops(any, any)).thenAnswer((_) async =>
         Ok(shopsMap));

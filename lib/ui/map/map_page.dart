@@ -153,6 +153,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     };
     final updateMapCallback = () {
       final allShops = <Shop>{};
+      _mode.onShopsUpdated(_model.shopsCache);
       allShops.addAll(_model.shopsCache.values);
       allShops.addAll(_mode.additionalShops());
       _onShopsUpdated(_mode.filter(allShops));

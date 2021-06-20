@@ -40,6 +40,22 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     updateMap();
   }
 
+  @override
+  void onShopsUpdated(Map<String, Shop> shops) {
+    if (_displayedShops.isEmpty) {
+      return;
+    }
+    final oldDisplayedShops = _displayedShops.toList();
+    for (var index = 0; index < _displayedShops.length; ++index) {
+      final shop = _displayedShops[index];
+      _displayedShops[index] = shops[shop.osmId] ?? shop;
+    }
+    if (!listEquals(oldDisplayedShops, _displayedShops)) {
+      updateWidget();
+      updateMap();
+    }
+  }
+
   @protected
   Widget shopsCardsWidget(BuildContext context) {
     return AnimatedSwitcher(

@@ -53,6 +53,7 @@ abstract class MapPageMode {
   List<Widget> buildBottomActions(BuildContext context) => const [];
   List<Widget> buildFABs() => const [];
   void onMarkerClick(Iterable<Shop> shops) {}
+  void onShopsUpdated(Map<String, Shop> shops) {}
   void onMapClick(Point<double> coords) {}
 
   /// True if allowed to pop, false if Pop is handled by the mode

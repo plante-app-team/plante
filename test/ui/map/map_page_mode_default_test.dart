@@ -51,7 +51,7 @@ void main() {
   });
 
   testWidgets('shop click', (WidgetTester tester) async {
-    final widget = MapPage();
+    final widget = MapPage(mapControllerForTesting: mapController);
     await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
@@ -73,7 +73,7 @@ void main() {
   });
 
   testWidgets('marker with many shops click', (WidgetTester tester) async {
-    final widget = MapPage();
+    final widget = MapPage(mapControllerForTesting: mapController);
     await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
@@ -96,7 +96,7 @@ void main() {
   });
 
   testWidgets('when many cards are shown, shops with many products are first', (WidgetTester tester) async {
-    final widget = MapPage();
+    final widget = MapPage(mapControllerForTesting: mapController);
     await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
@@ -107,5 +107,40 @@ void main() {
     final emptyShopLeft = tester.getCenter(find.text(shops[0].name));
     final notEmptyShopLeft = tester.getCenter(find.text(shops[1].name));
     expect(emptyShopLeft.dx, greaterThan(notEmptyShopLeft.dx));
+  });
+
+  testWidgets('shop card changes when shops update', (WidgetTester tester) async {
+    expect(shops[0].productsCount, 0);
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    widget.onMarkerClickForTesting([shops[0]]);
+    await tester.pumpAndSettle();
+
+    expect(find.text(context.strings.shop_card_no_products_in_shop),
+        findsOneWidget);
+    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        findsNothing);
+
+    // Add a product to the shop, kind of
+    var backendShop = commons.shops[0].backendShop!;
+    backendShop = backendShop
+        .rebuild((e) => e.productsCount = backendShop.productsCount + 1);
+    commons.shops[0] =
+        commons.shops[0].rebuild((e) => e.backendShop.replace(backendShop));
+    commons.shopsMap = { for (final shop in commons.shops) shop.osmId: shop };
+    // Notify about the update
+    commons.shopsManagerListeners.forEach((listener) {
+      listener.onLocalShopsChange();
+    });
+    await tester.pumpAndSettle();
+
+    expect(find.text(context.strings.shop_card_no_products_in_shop),
+        findsNothing);
+    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        findsOneWidget);
   });
 }
