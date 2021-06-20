@@ -7,7 +7,7 @@ class BackendResponse {
   final String? reasonPhrase;
   final String body;
   final Map<String, String> headers;
-  final dynamic? exception;
+  final dynamic exception;
 
   bool get isOk => statusCode == 200;
   bool get isError => !isOk;

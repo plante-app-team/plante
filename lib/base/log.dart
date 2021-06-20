@@ -97,7 +97,7 @@ class Log {
     await Share.shareFiles([logsZip.path]);
   }
 
-  static void v(String message, {dynamic? ex, StackTrace? stacktrace}) {
+  static void v(String message, {dynamic ex, StackTrace? stacktrace}) {
     if (ex == null) {
       Fimber.v(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -105,7 +105,7 @@ class Log {
     }
   }
 
-  static void d(String message, {dynamic? ex, StackTrace? stacktrace}) {
+  static void d(String message, {dynamic ex, StackTrace? stacktrace}) {
     if (ex == null) {
       Fimber.d(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -113,7 +113,7 @@ class Log {
     }
   }
 
-  static void i(String message, {dynamic? ex, StackTrace? stacktrace}) {
+  static void i(String message, {dynamic ex, StackTrace? stacktrace}) {
     if (ex == null) {
       Fimber.i(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -121,7 +121,7 @@ class Log {
     }
   }
 
-  static void w(String message, {dynamic? ex, StackTrace? stacktrace}) {
+  static void w(String message, {dynamic ex, StackTrace? stacktrace}) {
     if (ex == null) {
       Fimber.w(message, ex: ex, stacktrace: stacktrace);
     } else {
