@@ -7,6 +7,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
+import 'package:plante/model/shared_preferences_ext.dart';
 import 'package:plante/base/log.dart';
 
 const PREF_LAST_KNOWN_POS = 'PREF_LAST_KNOWN_POS2';
@@ -46,29 +47,7 @@ class LocationController {
 
   Future<Point<double>?> _tryObtainLastKnownPositionFromPrefs() async {
     final prefs = await _prefsHolder.get();
-    final posString = prefs.getString(PREF_LAST_KNOWN_POS);
-    if (posString == null) {
-      return null;
-    }
-
-    final lonLatStrs = posString.split(';');
-    if (lonLatStrs.length != 2) {
-      if (lonLatStrs.isNotEmpty) {
-        Log.e('Invalid posStr (1): $posString}');
-      }
-      await prefs.remove(PREF_LAST_KNOWN_POS);
-      return null;
-    }
-
-    final lon = double.tryParse(lonLatStrs[0]);
-    final lat = double.tryParse(lonLatStrs[1]);
-    if (lon == null || lat == null) {
-      Log.e('Invalid posStr (2): $posString}');
-      await prefs.remove(PREF_LAST_KNOWN_POS);
-      return null;
-    }
-
-    return Point<double>(lon, lat);
+    return prefs.getPoint(PREF_LAST_KNOWN_POS);
   }
 
   Future<void> _initLastKnownPosition() async {
@@ -107,7 +86,7 @@ class LocationController {
   static Future<void> _updateLastKnownPrefsPosition(
       Point<double> position, SharedPreferencesHolder prefsHolder) async {
     final prefs = await prefsHolder.get();
-    await prefs.setString(PREF_LAST_KNOWN_POS, '${position.x};${position.y}');
+    await prefs.setPoint(PREF_LAST_KNOWN_POS, position);
   }
 
   Future<PermissionState> _permissionStatus() async {

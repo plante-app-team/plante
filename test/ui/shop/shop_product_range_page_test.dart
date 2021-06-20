@@ -20,6 +20,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';

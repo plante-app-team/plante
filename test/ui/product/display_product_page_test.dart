@@ -20,11 +20,13 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'display_product_page_test.mocks.dart';
@@ -53,6 +55,9 @@ void main() {
     when(backend.sendReport(any, any)).thenAnswer((_) async => Ok(None()));
     GetIt.I.registerSingleton<Backend>(backend);
 
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+
     userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v
       ..backendClientToken = '123'
@@ -69,6 +74,7 @@ void main() {
 
     locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<LocationController>(locationController);
 
     shopsManager = MockShopsManager();

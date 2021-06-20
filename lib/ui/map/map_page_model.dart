@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
@@ -11,7 +12,9 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/lat_lng_extensions.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 typedef MapPageModelUpdateShopsCallback = void Function(
     Map<String, Shop> shops);
@@ -23,28 +26,27 @@ enum MapPageModelError {
 }
 
 class MapPageModel implements ShopsManagerListener {
-  static const _DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
-  static const MAX_SHOPS_LOADS_ATTEMPTS = 3;
-  static final _shopsLoadsAttemptsCooldown = isInTests()
-      ? const Duration(milliseconds: 50)
-      : const Duration(seconds: 3);
+  static const DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
+
   final MapPageModelUpdateShopsCallback _updateShopsCallback;
   final MapPageModelErrorCallback _errorCallback;
   final VoidCallback _updateCallback;
   final LocationController _locationController;
   final ShopsManager _shopsManager;
-  final _shopsCache = <String, Shop>{};
-  final _loadedAreas = <LatLngBounds>{};
-  DateTime _lastShopsLoadTime = DateTime(2000);
-  LatLngBounds? _loadingArea;
-  bool _networkOperationInProgress = false;
+  final LatestCameraPosStorage _latestCameraPosStorage;
 
   LatLngBounds? _latestViewPort;
+  bool _networkOperationInProgress = false;
 
-  int get loadedAreasCount => _loadedAreas.length;
+  Map<String, Shop> _shopsCache = {};
 
-  MapPageModel(this._locationController, this._shopsManager,
-      this._updateShopsCallback, this._errorCallback, this._updateCallback) {
+  MapPageModel(
+      this._locationController,
+      this._shopsManager,
+      this._latestCameraPosStorage,
+      this._updateShopsCallback,
+      this._errorCallback,
+      this._updateCallback) {
     _shopsManager.addListener(this);
   }
 
@@ -52,147 +54,102 @@ class MapPageModel implements ShopsManagerListener {
     _shopsManager.removeListener(this);
   }
 
-  bool get loading => _loadingArea != null || _networkOperationInProgress;
+  bool get loading => _networkOperationInProgress;
   Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
+  CameraPosition? initialCameraPosInstant() {
+    var result = _latestCameraPosStorage.getCached();
+    if (result != null) {
+      return _pointToCameraPos(result);
+    }
+    result = _locationController.lastKnownPositionInstant();
+    if (result != null) {
+      return _pointToCameraPos(result);
+    }
+    return null;
+  }
+
+  Future<CameraPosition> initialCameraPos() async {
+    var result = await _latestCameraPosStorage.get();
+    if (result != null) {
+      return _pointToCameraPos(result);
+    }
+    result = await _locationController.lastKnownPosition();
+    if (result != null) {
+      return _pointToCameraPos(result);
+    }
+    final _completer = Completer<CameraPosition>();
+    _locationController.callWhenLastPositionKnown((pos) {
+      _completer.complete(_pointToCameraPos(pos));
+    });
+    return _completer.future;
+  }
+
   CameraPosition defaultUserPos() {
-    return const CameraPosition(target: _DEFAULT_USER_POS, zoom: 15);
+    return const CameraPosition(target: DEFAULT_USER_POS, zoom: 15);
   }
 
-  CameraPosition? lastKnownUserPosInstant() {
-    final lastKnownPosition = _locationController.lastKnownPositionInstant();
-    if (lastKnownPosition == null) {
-      return null;
-    }
-    return CameraPosition(
-        target: LatLng(lastKnownPosition.y, lastKnownPosition.x), zoom: 15);
-  }
-
-  Future<CameraPosition?> lastKnownUserPos() async {
-    final lastKnownPosition = await _locationController.lastKnownPosition();
-    if (lastKnownPosition == null) {
-      return null;
-    }
-    return CameraPosition(
-        target: LatLng(lastKnownPosition.y, lastKnownPosition.x), zoom: 15);
+  CameraPosition _pointToCameraPos(Point<double> point) {
+    return CameraPosition(target: LatLng(point.y, point.x), zoom: 15);
   }
 
   Future<CameraPosition?> currentUserPos() async {
-    final position = await _locationController.currentPosition();
-    if (position == null) {
-      return null;
+    final result = await _locationController.currentPosition();
+    if (result != null) {
+      return _pointToCameraPos(result);
     }
-    return CameraPosition(target: LatLng(position.y, position.x), zoom: 15);
-  }
-
-  void callWhenUserPosKnown(ArgumentCallback<CameraPosition> callback) {
-    _locationController.callWhenLastPositionKnown((position) {
-      callback.call(
-          CameraPosition(target: LatLng(position.y, position.x), zoom: 15));
-    });
   }
 
   Future<void> onCameraMoved(LatLngBounds viewBounds) async {
     _latestViewPort = viewBounds;
-    final result = await _maybeLoadShops(viewBounds, attemptNumber: 1);
+    unawaited(_latestCameraPosStorage.set(viewBounds.center.toPoint()));
+
+    final result = await _networkOperation(() async {
+      return await _shopsManager.fetchShops(
+          viewBounds.northeast.toPoint(), viewBounds.southwest.toPoint());
+    });
+
     if (result.isOk) {
-      final loadedSomething = result.unwrap();
-      if (loadedSomething) {
-        _updateShopsCallback.call(_shopsCache);
-      }
+      _shopsCache = result.unwrap();
+      _updateShopsCallback.call(result.unwrap());
     } else {
-      _errorCallback.call(result.unwrapErr());
+      _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
     }
     _updateCallback.call();
   }
 
-  Future<Result<bool, MapPageModelError>> _maybeLoadShops(
-      LatLngBounds viewBounds,
-      {required int attemptNumber}) async {
-    for (final loadedArea in _loadedAreas) {
-      if (loadedArea.containsBounds(viewBounds)) {
-        // Already loaded
-        return Ok(false);
-      }
-    }
-
-    if (_loadingArea != null && _loadingArea!.containsBounds(viewBounds)) {
-      // Already loading
-      return Ok(false);
-    }
-    final boundsToLoad = viewBounds.center.makeSquare(20 * 1 / 111); // +-20 kms
-    _loadingArea = boundsToLoad;
-    final timeSinceLastLoad = DateTime.now().difference(_lastShopsLoadTime);
-    if (timeSinceLastLoad < _shopsLoadsAttemptsCooldown) {
-      await Future.delayed(_shopsLoadsAttemptsCooldown - timeSinceLastLoad);
-    }
-    if (_loadingArea != boundsToLoad) {
-      // Another load started while we were waiting
-      return Ok(false);
-    }
-
-    _lastShopsLoadTime = DateTime.now();
-    final Result<Map<String, Shop>, ShopsManagerError> shopsResult;
-    try {
-      shopsResult = await _shopsManager.fetchShops(
-          Point(boundsToLoad.northeast.latitude,
-              boundsToLoad.northeast.longitude),
-          Point(boundsToLoad.southwest.latitude,
-              boundsToLoad.southwest.longitude));
-    } finally {
-      _loadingArea = null;
-    }
-
-    if (shopsResult.isErr) {
-      if (shopsResult.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
-        return Err(MapPageModelError.NETWORK_ERROR);
-      } else {
-        if (attemptNumber >= MAX_SHOPS_LOADS_ATTEMPTS) {
-          return Err(MapPageModelError.OTHER);
-        }
-        return _maybeLoadShops(viewBounds, attemptNumber: attemptNumber + 1);
-      }
-    }
-
-    final shops = shopsResult.unwrap();
-    _shopsCache.addAll(shops);
-    _loadedAreas.add(boundsToLoad);
-    return Ok(shops.isNotEmpty);
-  }
-
-  Future<Result<None, ShopsManagerError>> putProductToShops(
-      Product product, List<Shop> shops) async {
+  Future<T> _networkOperation<T>(Future<T> Function() operation) async {
     _networkOperationInProgress = true;
     _updateCallback.call();
     try {
-      return await _shopsManager.putProductToShops(product, shops);
+      return await operation.call();
     } finally {
       _networkOperationInProgress = false;
       _updateCallback.call();
     }
   }
 
+  Future<Result<None, ShopsManagerError>> putProductToShops(
+      Product product, List<Shop> shops) async {
+    return await _networkOperation(() async {
+      return await _shopsManager.putProductToShops(product, shops);
+    });
+  }
+
   Future<Result<Shop, ShopsManagerError>> createShop(
       String name, Point<double> coords) async {
-    _networkOperationInProgress = true;
-    _updateCallback.call();
-    try {
+    return await _networkOperation(() async {
       return await _shopsManager.createShop(
         name: name,
         coords: coords,
         type: ShopType.supermarket,
       );
-    } finally {
-      _networkOperationInProgress = false;
-      _updateCallback.call();
-    }
+    });
   }
 
   @override
   void onLocalShopsChange() {
     /// Invalidating cache!
-    _loadedAreas.clear();
-    _shopsCache.clear();
     if (_latestViewPort != null) {
       onCameraMoved(_latestViewPort!);
     }
@@ -200,5 +157,14 @@ class MapPageModel implements ShopsManagerListener {
 
   void finishWith<T>(BuildContext context, T result) {
     Navigator.pop(context, result);
+  }
+}
+
+MapPageModelError _convertShopsManagerError(ShopsManagerError error) {
+  switch (error) {
+    case ShopsManagerError.NETWORK_ERROR:
+      return MapPageModelError.NETWORK_ERROR;
+    case ShopsManagerError.OTHER:
+      return MapPageModelError.OTHER;
   }
 }

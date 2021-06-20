@@ -18,13 +18,16 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'init_product_page_test.mocks.dart';
@@ -73,9 +76,13 @@ void main() {
 
     locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<LocationController>(locationController);
 
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
+
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {

@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/model/shop.dart';
 
 extension LatLngBoundsExt on LatLngBounds {
   LatLng get center {
@@ -38,6 +41,10 @@ extension LatLngBoundsExt on LatLngBounds {
         north2 <= north1 &&
         south1 <= south2;
   }
+
+  bool containsShop(Shop shop) {
+    return contains(LatLng(shop.latitude, shop.longitude));
+  }
 }
 
 extension LatLngExt on LatLng {
@@ -56,5 +63,9 @@ extension LatLngExt on LatLng {
       northeast: LatLng(north, east),
       southwest: LatLng(south, west),
     );
+  }
+
+  Point<double> toPoint() {
+    return Point<double>(longitude, latitude);
   }
 }

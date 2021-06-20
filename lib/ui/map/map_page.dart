@@ -17,6 +17,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
@@ -157,7 +158,9 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       _onShopsUpdated(_mode.filter(allShops));
     };
     _model = MapPageModel(
-        GetIt.I.get<LocationController>(), GetIt.I.get<ShopsManager>(), (_) {
+        GetIt.I.get<LocationController>(),
+        GetIt.I.get<ShopsManager>(),
+        GetIt.I.get<LatestCameraPosStorage>(), (_) {
       updateMapCallback.call();
     }, _onError, updateCallback);
 
@@ -237,10 +240,6 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       ]
       ''';
     await mapController.setMapStyle(noBusinessesStyle);
-    final lastKnownPos = await _model.lastKnownUserPos();
-    if (lastKnownPos != null) {
-      await _moveCameraTo(lastKnownPos);
-    }
   }
 
   Future<void> _moveCameraTo(CameraPosition position) async {
@@ -273,9 +272,9 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var initialPos = _model.lastKnownUserPosInstant();
+    var initialPos = _model.initialCameraPosInstant();
     if (initialPos == null) {
-      _model.callWhenUserPosKnown(_moveCameraTo);
+      _model.initialCameraPos().then(_moveCameraTo);
       initialPos = _model.defaultUserPos();
     }
 
@@ -292,6 +291,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           _mapController.complete(controller);
           _clusterManager.setMapController(controller);
           _clusterManager.onCameraMove(initialPos!);
+          _onCameraIdle();
         },
         onCameraMove: _clusterManager.onCameraMove,
         onCameraIdle: _onCameraIdle,

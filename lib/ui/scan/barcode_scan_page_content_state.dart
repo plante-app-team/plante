@@ -5,7 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/base/components/barcode_spinner.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';

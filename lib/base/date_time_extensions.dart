@@ -7,4 +7,6 @@ extension DateTimeExtensions on DateTime {
   DateTime minusYears(int years) {
     return plusYears(-years);
   }
+
+  int get secondsSinceEpoch => (millisecondsSinceEpoch / 1000).round();
 }

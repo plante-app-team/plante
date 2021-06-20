@@ -6,27 +6,29 @@ import 'dart:async' as _i8;
 import 'dart:math' as _i3;
 import 'dart:typed_data' as _i6;
 
-import 'package:google_maps_flutter/google_maps_flutter.dart' as _i16;
+import 'package:google_maps_flutter/google_maps_flutter.dart' as _i17;
 import 'package:google_maps_flutter_platform_interface/src/types/camera.dart'
-    as _i18;
+    as _i19;
 import 'package:google_maps_flutter_platform_interface/src/types/location.dart'
     as _i4;
 import 'package:google_maps_flutter_platform_interface/src/types/marker.dart'
-    as _i19;
+    as _i20;
 import 'package:google_maps_flutter_platform_interface/src/types/screen_coordinate.dart'
     as _i5;
 import 'package:google_maps_flutter_platform_interface/src/types/tile_overlay.dart'
-    as _i17;
+    as _i18;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:plante/base/base.dart' as _i15;
+import 'package:plante/base/base.dart' as _i16;
 import 'package:plante/base/permissions_manager.dart' as _i7;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/location/location_controller.dart' as _i14;
-import 'package:plante/model/product.dart' as _i12;
-import 'package:plante/model/shop.dart' as _i10;
-import 'package:plante/model/shop_product_range.dart' as _i11;
-import 'package:plante/model/shop_type.dart' as _i13;
+import 'package:plante/location/location_controller.dart' as _i15;
+import 'package:plante/model/product.dart' as _i13;
+import 'package:plante/model/shop.dart' as _i11;
+import 'package:plante/model/shop_product_range.dart' as _i12;
+import 'package:plante/model/shop_type.dart' as _i14;
 import 'package:plante/outside/map/shops_manager.dart' as _i9;
+import 'package:plante/outside/map/shops_manager_types.dart' as _i10;
+import 'package:plante/ui/map/latest_camera_pos_storage.dart' as _i21;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -77,54 +79,60 @@ class MockShopsManager extends _i1.Mock implements _i9.ShopsManager {
   }
 
   @override
-  void addListener(_i9.ShopsManagerListener? listener) =>
+  int get loadedAreasCount =>
+      (super.noSuchMethod(Invocation.getter(#loadedAreasCount), returnValue: 0)
+          as int);
+  @override
+  void addListener(_i10.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#addListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  void removeListener(_i9.ShopsManagerListener? listener) =>
+  void removeListener(_i10.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
   _i8.Future<
-      _i2.Result<Map<String, _i10.Shop>, _i9.ShopsManagerError>> fetchShops(
+      _i2.Result<Map<String, _i11.Shop>, _i10.ShopsManagerError>> fetchShops(
           _i3.Point<double>? northeast, _i3.Point<double>? southwest) =>
-      (super.noSuchMethod(Invocation.method(#fetchShops, [northeast, southwest]),
-              returnValue: Future.value(
-                  _FakeResult<Map<String, _i10.Shop>, _i9.ShopsManagerError>()))
-          as _i8.Future<
-              _i2.Result<Map<String, _i10.Shop>, _i9.ShopsManagerError>>);
+      (super.noSuchMethod(
+          Invocation.method(#fetchShops, [northeast, southwest]),
+          returnValue: Future.value(
+              _FakeResult<Map<String, _i11.Shop>, _i10.ShopsManagerError>())) as _i8
+          .Future<_i2.Result<Map<String, _i11.Shop>, _i10.ShopsManagerError>>);
   @override
-  _i8.Future<_i2.Result<_i11.ShopProductRange, _i9.ShopsManagerError>>
-      fetchShopProductRange(_i10.Shop? shop) => (super.noSuchMethod(
-              Invocation.method(#fetchShopProductRange, [shop]),
-              returnValue: Future.value(
-                  _FakeResult<_i11.ShopProductRange, _i9.ShopsManagerError>()))
-          as _i8.Future<
-              _i2.Result<_i11.ShopProductRange, _i9.ShopsManagerError>>);
+  _i8.Future<_i2.Result<_i12.ShopProductRange, _i10.ShopsManagerError>>
+      fetchShopProductRange(_i11.Shop? shop, {bool? noCache = false}) => (super
+              .noSuchMethod(
+                  Invocation.method(
+                      #fetchShopProductRange, [shop], {#noCache: noCache}),
+                  returnValue: Future.value(
+                      _FakeResult<_i12.ShopProductRange, _i10.ShopsManagerError>()))
+          as _i8
+              .Future<_i2.Result<_i12.ShopProductRange, _i10.ShopsManagerError>>);
   @override
-  _i8.Future<_i2.Result<_i2.None, _i9.ShopsManagerError>> putProductToShops(
-          _i12.Product? product, List<_i10.Shop>? shops) =>
+  _i8.Future<_i2.Result<_i2.None, _i10.ShopsManagerError>> putProductToShops(
+          _i13.Product? product, List<_i11.Shop>? shops) =>
       (super.noSuchMethod(
               Invocation.method(#putProductToShops, [product, shops]),
               returnValue:
-                  Future.value(_FakeResult<_i2.None, _i9.ShopsManagerError>()))
-          as _i8.Future<_i2.Result<_i2.None, _i9.ShopsManagerError>>);
+                  Future.value(_FakeResult<_i2.None, _i10.ShopsManagerError>()))
+          as _i8.Future<_i2.Result<_i2.None, _i10.ShopsManagerError>>);
   @override
-  _i8.Future<_i2.Result<_i10.Shop, _i9.ShopsManagerError>> createShop(
-          {String? name, _i3.Point<double>? coords, _i13.ShopType? type}) =>
+  _i8.Future<_i2.Result<_i11.Shop, _i10.ShopsManagerError>> createShop(
+          {String? name, _i3.Point<double>? coords, _i14.ShopType? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coords: coords, #type: type}),
-              returnValue:
-                  Future.value(_FakeResult<_i10.Shop, _i9.ShopsManagerError>()))
-          as _i8.Future<_i2.Result<_i10.Shop, _i9.ShopsManagerError>>);
+              returnValue: Future.value(
+                  _FakeResult<_i11.Shop, _i10.ShopsManagerError>()))
+          as _i8.Future<_i2.Result<_i11.Shop, _i10.ShopsManagerError>>);
 }
 
 /// A class which mocks [LocationController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLocationController extends _i1.Mock
-    implements _i14.LocationController {
+    implements _i15.LocationController {
   MockLocationController() {
     _i1.throwOnMissingStub(this);
   }
@@ -141,7 +149,7 @@ class MockLocationController extends _i1.Mock
           as _i8.Future<_i3.Point<double>?>);
   @override
   void callWhenLastPositionKnown(
-          _i15.ArgCallback<_i3.Point<double>>? callback) =>
+          _i16.ArgCallback<_i3.Point<double>>? callback) =>
       super.noSuchMethod(
           Invocation.method(#callWhenLastPositionKnown, [callback]),
           returnValueForMissingStub: null);
@@ -151,7 +159,7 @@ class MockLocationController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGoogleMapController extends _i1.Mock
-    implements _i16.GoogleMapController {
+    implements _i17.GoogleMapController {
   MockGoogleMapController() {
     _i1.throwOnMissingStub(this);
   }
@@ -160,17 +168,17 @@ class MockGoogleMapController extends _i1.Mock
   int get mapId =>
       (super.noSuchMethod(Invocation.getter(#mapId), returnValue: 0) as int);
   @override
-  _i8.Future<void> clearTileCache(_i17.TileOverlayId? tileOverlayId) =>
+  _i8.Future<void> clearTileCache(_i18.TileOverlayId? tileOverlayId) =>
       (super.noSuchMethod(Invocation.method(#clearTileCache, [tileOverlayId]),
           returnValue: Future.value(null),
           returnValueForMissingStub: Future.value()) as _i8.Future<void>);
   @override
-  _i8.Future<void> animateCamera(_i18.CameraUpdate? cameraUpdate) =>
+  _i8.Future<void> animateCamera(_i19.CameraUpdate? cameraUpdate) =>
       (super.noSuchMethod(Invocation.method(#animateCamera, [cameraUpdate]),
           returnValue: Future.value(null),
           returnValueForMissingStub: Future.value()) as _i8.Future<void>);
   @override
-  _i8.Future<void> moveCamera(_i18.CameraUpdate? cameraUpdate) =>
+  _i8.Future<void> moveCamera(_i19.CameraUpdate? cameraUpdate) =>
       (super.noSuchMethod(Invocation.method(#moveCamera, [cameraUpdate]),
           returnValue: Future.value(null),
           returnValueForMissingStub: Future.value()) as _i8.Future<void>);
@@ -194,17 +202,17 @@ class MockGoogleMapController extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#getLatLng, [screenCoordinate]),
           returnValue: Future.value(_FakeLatLng())) as _i8.Future<_i4.LatLng>);
   @override
-  _i8.Future<void> showMarkerInfoWindow(_i19.MarkerId? markerId) =>
+  _i8.Future<void> showMarkerInfoWindow(_i20.MarkerId? markerId) =>
       (super.noSuchMethod(Invocation.method(#showMarkerInfoWindow, [markerId]),
           returnValue: Future.value(null),
           returnValueForMissingStub: Future.value()) as _i8.Future<void>);
   @override
-  _i8.Future<void> hideMarkerInfoWindow(_i19.MarkerId? markerId) =>
+  _i8.Future<void> hideMarkerInfoWindow(_i20.MarkerId? markerId) =>
       (super.noSuchMethod(Invocation.method(#hideMarkerInfoWindow, [markerId]),
           returnValue: Future.value(null),
           returnValueForMissingStub: Future.value()) as _i8.Future<void>);
   @override
-  _i8.Future<bool> isMarkerInfoWindowShown(_i19.MarkerId? markerId) => (super
+  _i8.Future<bool> isMarkerInfoWindowShown(_i20.MarkerId? markerId) => (super
       .noSuchMethod(Invocation.method(#isMarkerInfoWindowShown, [markerId]),
           returnValue: Future.value(false)) as _i8.Future<bool>);
   @override
@@ -216,4 +224,25 @@ class MockGoogleMapController extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#takeSnapshot, []),
               returnValue: Future.value(_FakeUint8List()))
           as _i8.Future<_i6.Uint8List?>);
+}
+
+/// A class which mocks [LatestCameraPosStorage].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLatestCameraPosStorage extends _i1.Mock
+    implements _i21.LatestCameraPosStorage {
+  MockLatestCameraPosStorage() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i8.Future<void> set(_i3.Point<double>? pos) =>
+      (super.noSuchMethod(Invocation.method(#set, [pos]),
+          returnValue: Future.value(null),
+          returnValueForMissingStub: Future.value()) as _i8.Future<void>);
+  @override
+  _i8.Future<_i3.Point<double>?> get() =>
+      (super.noSuchMethod(Invocation.method(#get, []),
+              returnValue: Future.value(_FakePoint<double>()))
+          as _i8.Future<_i3.Point<double>?>);
 }

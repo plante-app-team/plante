@@ -73,7 +73,7 @@ class FakeOffApi implements OffApi {
           status: 1, barcode: configuration.barcode, product: null);
     }
     final product = off.Product(
-        barcode: randInt(1000000, 9999999).toString(),
+        barcode: configuration.barcode,
         productNameTranslated: _generateName(),
         images: <off.ProductImage>[
           off.ProductImage(

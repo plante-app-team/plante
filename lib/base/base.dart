@@ -41,3 +41,8 @@ void setSystemUIOverlayStyle() {
 double degreesToRads(double deg) {
   return (deg * pi) / 180.0;
 }
+
+/// Used to disable warnings about not awaited futures
+void unawaited<T>(Future<T> future) {
+  // Nothing to do
+}

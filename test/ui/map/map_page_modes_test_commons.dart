@@ -13,16 +13,20 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
+import '../../fake_shared_preferences.dart';
 import 'map_page_modes_test_commons.mocks.dart';
 
 @GenerateMocks([PermissionsManager, ShopsManager, LocationController,
-  GoogleMapController])
+  GoogleMapController, LatestCameraPosStorage])
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
   late MockLocationController locationController;
   late MockGoogleMapController mapController;
+  late FakeSharedPreferences prefs;
+  late MockLatestCameraPosStorage latestCameraPosStorage;
 
   final shops = [
     Shop((e) => e
@@ -76,6 +80,9 @@ class MapPageModesTestCommons {
     locationController = MockLocationController();
     GetIt.I.registerSingleton<LocationController>(locationController);
     mapController = MockGoogleMapController();
+    prefs = FakeSharedPreferences();
+    latestCameraPosStorage = MockLatestCameraPosStorage();
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
 
     when(shopsManager.fetchShops(any, any)).thenAnswer((_) async =>
         Ok(shopsMap));
@@ -89,6 +96,7 @@ class MapPageModesTestCommons {
                 southwest: const LatLng(10, 10),
                 northeast: const LatLng(20, 20)));
     when(mapController.dispose()).thenAnswer((_) {});
+    when(mapController.setMapStyle(any)).thenAnswer((_) async {});
     when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
     when(shopsManager.createShop(
         name: anyNamed('name'),
@@ -108,5 +116,9 @@ class MapPageModesTestCommons {
               ..productsCount = 0))));
     });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
+
+    when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
+    when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
+    when(latestCameraPosStorage.set(any)).thenAnswer((_) async {});
   }
 }

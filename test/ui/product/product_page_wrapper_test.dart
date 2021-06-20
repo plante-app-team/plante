@@ -41,6 +41,7 @@ void main() {
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
     final locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
+    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<LocationController>(locationController);
 
     final photosTaker = MockPhotosTaker();

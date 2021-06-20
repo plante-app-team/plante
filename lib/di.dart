@@ -16,11 +16,14 @@ import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/user_params_fetcher.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
+  GetIt.I.registerSingleton<LatestCameraPosStorage>(
+      LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(

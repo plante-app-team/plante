@@ -3,22 +3,22 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i5;
-import 'dart:io' as _i27;
+import 'dart:io' as _i28;
 import 'dart:math' as _i3;
 
-import 'package:flutter/src/services/message_codec.dart' as _i28;
-import 'package:flutter/src/widgets/framework.dart' as _i26;
+import 'package:flutter/src/services/message_codec.dart' as _i29;
+import 'package:flutter/src/widgets/framework.dart' as _i27;
 import 'package:flutter/src/widgets/navigator.dart' as _i15;
 import 'package:flutter/src/widgets/routes.dart' as _i16;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:plante/base/base.dart' as _i24;
+import 'package:plante/base/base.dart' as _i25;
 import 'package:plante/base/permissions_manager.dart' as _i17;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/location/location_controller.dart' as _i23;
+import 'package:plante/location/location_controller.dart' as _i24;
 import 'package:plante/model/product.dart' as _i6;
-import 'package:plante/model/shop.dart' as _i20;
-import 'package:plante/model/shop_product_range.dart' as _i21;
-import 'package:plante/model/shop_type.dart' as _i22;
+import 'package:plante/model/shop.dart' as _i21;
+import 'package:plante/model/shop_product_range.dart' as _i22;
+import 'package:plante/model/shop_type.dart' as _i23;
 import 'package:plante/model/user_params.dart' as _i10;
 import 'package:plante/model/veg_status.dart' as _i12;
 import 'package:plante/model/viewed_products_storage.dart' as _i18;
@@ -28,9 +28,10 @@ import 'package:plante/outside/backend/backend_product.dart' as _i8;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i13;
 import 'package:plante/outside/backend/backend_shop.dart' as _i14;
 import 'package:plante/outside/map/shops_manager.dart' as _i19;
+import 'package:plante/outside/map/shops_manager_types.dart' as _i20;
 import 'package:plante/outside/products/products_manager.dart' as _i4;
 import 'package:plante/outside/products/products_manager_error.dart' as _i7;
-import 'package:plante/ui/photos_taker.dart' as _i25;
+import 'package:plante/ui/photos_taker.dart' as _i26;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -312,54 +313,60 @@ class MockShopsManager extends _i1.Mock implements _i19.ShopsManager {
   }
 
   @override
-  void addListener(_i19.ShopsManagerListener? listener) =>
+  int get loadedAreasCount =>
+      (super.noSuchMethod(Invocation.getter(#loadedAreasCount), returnValue: 0)
+          as int);
+  @override
+  void addListener(_i20.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#addListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  void removeListener(_i19.ShopsManagerListener? listener) =>
+  void removeListener(_i20.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
   _i5.Future<
-      _i2.Result<Map<String, _i20.Shop>, _i19.ShopsManagerError>> fetchShops(
+      _i2.Result<Map<String, _i21.Shop>, _i20.ShopsManagerError>> fetchShops(
           _i3.Point<double>? northeast, _i3.Point<double>? southwest) =>
       (super.noSuchMethod(
           Invocation.method(#fetchShops, [northeast, southwest]),
           returnValue: Future.value(
-              _FakeResult<Map<String, _i20.Shop>, _i19.ShopsManagerError>())) as _i5
-          .Future<_i2.Result<Map<String, _i20.Shop>, _i19.ShopsManagerError>>);
+              _FakeResult<Map<String, _i21.Shop>, _i20.ShopsManagerError>())) as _i5
+          .Future<_i2.Result<Map<String, _i21.Shop>, _i20.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i21.ShopProductRange, _i19.ShopsManagerError>>
-      fetchShopProductRange(_i20.Shop? shop) => (super.noSuchMethod(
-              Invocation.method(#fetchShopProductRange, [shop]),
-              returnValue: Future.value(
-                  _FakeResult<_i21.ShopProductRange, _i19.ShopsManagerError>()))
-          as _i5.Future<
-              _i2.Result<_i21.ShopProductRange, _i19.ShopsManagerError>>);
+  _i5.Future<_i2.Result<_i22.ShopProductRange, _i20.ShopsManagerError>>
+      fetchShopProductRange(_i21.Shop? shop, {bool? noCache = false}) => (super
+              .noSuchMethod(
+                  Invocation.method(
+                      #fetchShopProductRange, [shop], {#noCache: noCache}),
+                  returnValue: Future.value(
+                      _FakeResult<_i22.ShopProductRange, _i20.ShopsManagerError>()))
+          as _i5
+              .Future<_i2.Result<_i22.ShopProductRange, _i20.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i2.None, _i19.ShopsManagerError>> putProductToShops(
-          _i6.Product? product, List<_i20.Shop>? shops) =>
+  _i5.Future<_i2.Result<_i2.None, _i20.ShopsManagerError>> putProductToShops(
+          _i6.Product? product, List<_i21.Shop>? shops) =>
       (super.noSuchMethod(
               Invocation.method(#putProductToShops, [product, shops]),
               returnValue:
-                  Future.value(_FakeResult<_i2.None, _i19.ShopsManagerError>()))
-          as _i5.Future<_i2.Result<_i2.None, _i19.ShopsManagerError>>);
+                  Future.value(_FakeResult<_i2.None, _i20.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i2.None, _i20.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i20.Shop, _i19.ShopsManagerError>> createShop(
-          {String? name, _i3.Point<double>? coords, _i22.ShopType? type}) =>
+  _i5.Future<_i2.Result<_i21.Shop, _i20.ShopsManagerError>> createShop(
+          {String? name, _i3.Point<double>? coords, _i23.ShopType? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coords: coords, #type: type}),
               returnValue: Future.value(
-                  _FakeResult<_i20.Shop, _i19.ShopsManagerError>()))
-          as _i5.Future<_i2.Result<_i20.Shop, _i19.ShopsManagerError>>);
+                  _FakeResult<_i21.Shop, _i20.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i21.Shop, _i20.ShopsManagerError>>);
 }
 
 /// A class which mocks [LocationController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLocationController extends _i1.Mock
-    implements _i23.LocationController {
+    implements _i24.LocationController {
   MockLocationController() {
     _i1.throwOnMissingStub(this);
   }
@@ -376,7 +383,7 @@ class MockLocationController extends _i1.Mock
           as _i5.Future<_i3.Point<double>?>);
   @override
   void callWhenLastPositionKnown(
-          _i24.ArgCallback<_i3.Point<double>>? callback) =>
+          _i25.ArgCallback<_i3.Point<double>>? callback) =>
       super.noSuchMethod(
           Invocation.method(#callWhenLastPositionKnown, [callback]),
           returnValueForMissingStub: null);
@@ -385,27 +392,27 @@ class MockLocationController extends _i1.Mock
 /// A class which mocks [PhotosTaker].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPhotosTaker extends _i1.Mock implements _i25.PhotosTaker {
+class MockPhotosTaker extends _i1.Mock implements _i26.PhotosTaker {
   MockPhotosTaker() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
   _i5.Future<Uri?> takeAndCropPhoto(
-          _i26.BuildContext? context, _i27.Directory? outFolder) =>
+          _i27.BuildContext? context, _i28.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#takeAndCropPhoto, [context, outFolder]),
           returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
   @override
-  _i5.Future<Uri?> cropPhoto(String? photoPath, _i26.BuildContext? context,
-          _i27.Directory? outFolder) =>
+  _i5.Future<Uri?> cropPhoto(String? photoPath, _i27.BuildContext? context,
+          _i28.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#cropPhoto, [photoPath, context, outFolder]),
           returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
   @override
-  _i5.Future<_i2.Result<Uri, _i28.PlatformException>?> retrieveLostPhoto() =>
+  _i5.Future<_i2.Result<Uri, _i29.PlatformException>?> retrieveLostPhoto() =>
       (super.noSuchMethod(Invocation.method(#retrieveLostPhoto, []),
               returnValue:
-                  Future.value(_FakeResult<Uri, _i28.PlatformException>()))
-          as _i5.Future<_i2.Result<Uri, _i28.PlatformException>?>);
+                  Future.value(_FakeResult<Uri, _i29.PlatformException>()))
+          as _i5.Future<_i2.Result<Uri, _i29.PlatformException>?>);
 }

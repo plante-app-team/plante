@@ -12,6 +12,8 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 
 class ShopProductRangePageModel {
   final ShopsManager _shopsManager;
@@ -155,8 +157,4 @@ class ShopProductRangePageModel {
       _updateCallback.call();
     }
   }
-}
-
-extension _DateTimeExt on DateTime {
-  int get secondsSinceEpoch => (millisecondsSinceEpoch / 1000).round();
 }

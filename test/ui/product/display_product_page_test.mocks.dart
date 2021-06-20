@@ -3,20 +3,20 @@
 // Do not manually edit this file.
 
 import 'dart:async' as _i5;
-import 'dart:io' as _i23;
+import 'dart:io' as _i24;
 import 'dart:math' as _i3;
 
-import 'package:flutter/src/services/message_codec.dart' as _i24;
-import 'package:flutter/src/widgets/framework.dart' as _i22;
+import 'package:flutter/src/services/message_codec.dart' as _i25;
+import 'package:flutter/src/widgets/framework.dart' as _i23;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/base.dart' as _i16;
-import 'package:plante/base/permissions_manager.dart' as _i25;
+import 'package:plante/base/permissions_manager.dart' as _i26;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/location/location_controller.dart' as _i15;
 import 'package:plante/model/product.dart' as _i6;
-import 'package:plante/model/shop.dart' as _i18;
-import 'package:plante/model/shop_product_range.dart' as _i19;
-import 'package:plante/model/shop_type.dart' as _i20;
+import 'package:plante/model/shop.dart' as _i19;
+import 'package:plante/model/shop_product_range.dart' as _i20;
+import 'package:plante/model/shop_type.dart' as _i21;
 import 'package:plante/model/user_params.dart' as _i10;
 import 'package:plante/model/veg_status.dart' as _i12;
 import 'package:plante/outside/backend/backend.dart' as _i9;
@@ -25,9 +25,10 @@ import 'package:plante/outside/backend/backend_product.dart' as _i8;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i13;
 import 'package:plante/outside/backend/backend_shop.dart' as _i14;
 import 'package:plante/outside/map/shops_manager.dart' as _i17;
+import 'package:plante/outside/map/shops_manager_types.dart' as _i18;
 import 'package:plante/outside/products/products_manager.dart' as _i4;
 import 'package:plante/outside/products/products_manager_error.dart' as _i7;
-import 'package:plante/ui/photos_taker.dart' as _i21;
+import 'package:plante/ui/photos_taker.dart' as _i22;
 
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
@@ -239,96 +240,102 @@ class MockShopsManager extends _i1.Mock implements _i17.ShopsManager {
   }
 
   @override
-  void addListener(_i17.ShopsManagerListener? listener) =>
+  int get loadedAreasCount =>
+      (super.noSuchMethod(Invocation.getter(#loadedAreasCount), returnValue: 0)
+          as int);
+  @override
+  void addListener(_i18.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#addListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  void removeListener(_i17.ShopsManagerListener? listener) =>
+  void removeListener(_i18.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
   _i5.Future<
-      _i2.Result<Map<String, _i18.Shop>, _i17.ShopsManagerError>> fetchShops(
+      _i2.Result<Map<String, _i19.Shop>, _i18.ShopsManagerError>> fetchShops(
           _i3.Point<double>? northeast, _i3.Point<double>? southwest) =>
       (super.noSuchMethod(
           Invocation.method(#fetchShops, [northeast, southwest]),
           returnValue: Future.value(
-              _FakeResult<Map<String, _i18.Shop>, _i17.ShopsManagerError>())) as _i5
-          .Future<_i2.Result<Map<String, _i18.Shop>, _i17.ShopsManagerError>>);
+              _FakeResult<Map<String, _i19.Shop>, _i18.ShopsManagerError>())) as _i5
+          .Future<_i2.Result<Map<String, _i19.Shop>, _i18.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i19.ShopProductRange, _i17.ShopsManagerError>>
-      fetchShopProductRange(_i18.Shop? shop) => (super.noSuchMethod(
-              Invocation.method(#fetchShopProductRange, [shop]),
-              returnValue: Future.value(
-                  _FakeResult<_i19.ShopProductRange, _i17.ShopsManagerError>()))
-          as _i5.Future<
-              _i2.Result<_i19.ShopProductRange, _i17.ShopsManagerError>>);
+  _i5.Future<_i2.Result<_i20.ShopProductRange, _i18.ShopsManagerError>>
+      fetchShopProductRange(_i19.Shop? shop, {bool? noCache = false}) => (super
+              .noSuchMethod(
+                  Invocation.method(
+                      #fetchShopProductRange, [shop], {#noCache: noCache}),
+                  returnValue: Future.value(
+                      _FakeResult<_i20.ShopProductRange, _i18.ShopsManagerError>()))
+          as _i5
+              .Future<_i2.Result<_i20.ShopProductRange, _i18.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i2.None, _i17.ShopsManagerError>> putProductToShops(
-          _i6.Product? product, List<_i18.Shop>? shops) =>
+  _i5.Future<_i2.Result<_i2.None, _i18.ShopsManagerError>> putProductToShops(
+          _i6.Product? product, List<_i19.Shop>? shops) =>
       (super.noSuchMethod(
               Invocation.method(#putProductToShops, [product, shops]),
               returnValue:
-                  Future.value(_FakeResult<_i2.None, _i17.ShopsManagerError>()))
-          as _i5.Future<_i2.Result<_i2.None, _i17.ShopsManagerError>>);
+                  Future.value(_FakeResult<_i2.None, _i18.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i2.None, _i18.ShopsManagerError>>);
   @override
-  _i5.Future<_i2.Result<_i18.Shop, _i17.ShopsManagerError>> createShop(
-          {String? name, _i3.Point<double>? coords, _i20.ShopType? type}) =>
+  _i5.Future<_i2.Result<_i19.Shop, _i18.ShopsManagerError>> createShop(
+          {String? name, _i3.Point<double>? coords, _i21.ShopType? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coords: coords, #type: type}),
               returnValue: Future.value(
-                  _FakeResult<_i18.Shop, _i17.ShopsManagerError>()))
-          as _i5.Future<_i2.Result<_i18.Shop, _i17.ShopsManagerError>>);
+                  _FakeResult<_i19.Shop, _i18.ShopsManagerError>()))
+          as _i5.Future<_i2.Result<_i19.Shop, _i18.ShopsManagerError>>);
 }
 
 /// A class which mocks [PhotosTaker].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockPhotosTaker extends _i1.Mock implements _i21.PhotosTaker {
+class MockPhotosTaker extends _i1.Mock implements _i22.PhotosTaker {
   MockPhotosTaker() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
   _i5.Future<Uri?> takeAndCropPhoto(
-          _i22.BuildContext? context, _i23.Directory? outFolder) =>
+          _i23.BuildContext? context, _i24.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#takeAndCropPhoto, [context, outFolder]),
           returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
   @override
-  _i5.Future<Uri?> cropPhoto(String? photoPath, _i22.BuildContext? context,
-          _i23.Directory? outFolder) =>
+  _i5.Future<Uri?> cropPhoto(String? photoPath, _i23.BuildContext? context,
+          _i24.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#cropPhoto, [photoPath, context, outFolder]),
           returnValue: Future.value(_FakeUri())) as _i5.Future<Uri?>);
   @override
-  _i5.Future<_i2.Result<Uri, _i24.PlatformException>?> retrieveLostPhoto() =>
+  _i5.Future<_i2.Result<Uri, _i25.PlatformException>?> retrieveLostPhoto() =>
       (super.noSuchMethod(Invocation.method(#retrieveLostPhoto, []),
               returnValue:
-                  Future.value(_FakeResult<Uri, _i24.PlatformException>()))
-          as _i5.Future<_i2.Result<Uri, _i24.PlatformException>?>);
+                  Future.value(_FakeResult<Uri, _i25.PlatformException>()))
+          as _i5.Future<_i2.Result<Uri, _i25.PlatformException>?>);
 }
 
 /// A class which mocks [PermissionsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockPermissionsManager extends _i1.Mock
-    implements _i25.PermissionsManager {
+    implements _i26.PermissionsManager {
   MockPermissionsManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.Future<_i25.PermissionState> status(_i25.PermissionKind? permission) =>
+  _i5.Future<_i26.PermissionState> status(_i26.PermissionKind? permission) =>
       (super.noSuchMethod(Invocation.method(#status, [permission]),
-              returnValue: Future.value(_i25.PermissionState.granted))
-          as _i5.Future<_i25.PermissionState>);
+              returnValue: Future.value(_i26.PermissionState.granted))
+          as _i5.Future<_i26.PermissionState>);
   @override
-  _i5.Future<_i25.PermissionState> request(_i25.PermissionKind? permission) =>
+  _i5.Future<_i26.PermissionState> request(_i26.PermissionKind? permission) =>
       (super.noSuchMethod(Invocation.method(#request, [permission]),
-              returnValue: Future.value(_i25.PermissionState.granted))
-          as _i5.Future<_i25.PermissionState>);
+              returnValue: Future.value(_i26.PermissionState.granted))
+          as _i5.Future<_i26.PermissionState>);
   @override
   _i5.Future<bool> openAppSettings() =>
       (super.noSuchMethod(Invocation.method(#openAppSettings, []),
