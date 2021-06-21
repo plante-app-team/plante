@@ -75,14 +75,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
-    await tester.pumpAndSettle();
 
     widget.onMarkerClickForTesting([shops[1]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
     verifyNever(shopsManager.putProductToShops(any, any));
@@ -113,6 +109,9 @@ void main() {
         .evaluate().first.widget;
     await tester.tap(find.byWidget(yesButton1));
     await tester.pumpAndSettle();
+    // Open cards again
+    widget.onMarkerClickForTesting([shops[0], shops[1]]);
+    await tester.pumpAndSettle();
     // Scroll to card 2
     final card1 = find.byType(ShopCard).evaluate().first.widget;
     await tester.drag(find.byWidget(card1), const Offset(-3000, 0));
@@ -121,11 +120,6 @@ void main() {
     final yesButton2 = find.text(context.strings.global_yes)
         .evaluate().last.widget;
     await tester.tap(find.byWidget(yesButton2));
-    await tester.pumpAndSettle();
-
-    final cancelButton = find.byKey(const Key('card_cancel_btn'))
-        .evaluate().first.widget;
-    await tester.tap(find.byWidget(cancelButton));
     await tester.pumpAndSettle();
 
     verifyNever(shopsManager.putProductToShops(any, any));
@@ -170,8 +164,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
-    await tester.pumpAndSettle();
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals({shops[0]}));
 
@@ -179,8 +171,6 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_no));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals(<Shop>{}));
@@ -207,8 +197,6 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
     // Cancel
@@ -289,8 +277,6 @@ void main() {
       widget.onMarkerClickForTesting([shop]);
       await tester.pumpAndSettle();
       await tester.tap(find.text(context.strings.global_yes));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('card_cancel_btn')));
       await tester.pumpAndSettle();
     }
     expect(widget.getModeForTesting().selectedShops(), equals(

@@ -87,7 +87,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     } else if (isSold == false) {
       _unselectedShops.add(shop);
     }
-    updateWidget();
+    hideShopsCard();
   }
 
   @override

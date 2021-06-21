@@ -101,11 +101,12 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
                   padding: EdgeInsets.only(
                       left: leftPadding, right: rightPadding, bottom: 12),
                   child: createCardFor(_displayedShops[itemIndex],
-                      (Shop shop) => _hideShopsCard()))
+                      (Shop shop) => hideShopsCard()))
             ])));
   }
 
-  void _hideShopsCard() {
+  @protected
+  void hideShopsCard() {
     _displayedShops.clear();
     updateWidget();
     updateMap();
@@ -115,7 +116,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   @override
   Future<bool> onWillPop() async {
     if (_displayedShops.isNotEmpty) {
-      _hideShopsCard();
+      hideShopsCard();
       return false;
     }
     return true;
