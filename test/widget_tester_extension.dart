@@ -9,6 +9,10 @@ extension WidgetTesterExtension on WidgetTester {
         NavigatorObserver? navigatorObserver,
         EnginePhase phase = EnginePhase.sendSemanticsUpdate}) async {
     late BuildContext _context;
+    // So that WidgetTester.pageBack() could be used
+    const appBar = PreferredSize(
+        preferredSize: Size(1, 1),
+        child: BackButton());
 
     final Widget widgetWrapper = MediaQuery(
         data: const MediaQueryData(),
@@ -17,7 +21,9 @@ extension WidgetTesterExtension on WidgetTester {
           home: Builder(
             builder: (BuildContext context) {
               _context = context;
-              return Scaffold(body: widget);
+              return Scaffold(
+                  appBar: appBar,
+                  body: widget);
             },
           ),
           navigatorObservers: [

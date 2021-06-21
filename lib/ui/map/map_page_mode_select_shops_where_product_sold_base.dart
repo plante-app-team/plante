@@ -139,6 +139,10 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
 
   @override
   Future<bool> onWillPop() async {
+    final superAllowedPop = await super.onWillPop();
+    if (!superAllowedPop) {
+      return superAllowedPop;
+    }
     if (selectedShops().isNotEmpty) {
       _onCancelClick();
       return false;

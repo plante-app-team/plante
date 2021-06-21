@@ -110,4 +110,14 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     updateWidget();
     updateMap();
   }
+
+  @mustCallSuper
+  @override
+  Future<bool> onWillPop() async {
+    if (_displayedShops.isNotEmpty) {
+      _hideShopsCard();
+      return false;
+    }
+    return true;
+  }
 }

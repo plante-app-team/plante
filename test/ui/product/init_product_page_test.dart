@@ -142,6 +142,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(cacheDir.existsSync(), isTrue);
 
+    if (takeImageFront) {
+      verifyNever(photosTaker.takeAndCropPhoto(any, any));
+      await tester.tap(
+          find.byKey(const Key('front_photo')));
+      verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
+      await tester.pumpAndSettle();
+    }
+
     if (nameInput != null) {
       await tester.enterText(
           find.byKey(const Key('name')),
@@ -180,6 +188,8 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    await scrollToBottom(tester);
+
     if (shopsToCancel.isNotEmpty) {
       for (final shopToCancel in shopsToCancel) {
         final key = Key('shop_label_${shopToCancel.osmId}');
@@ -191,16 +201,6 @@ void main() {
         await tester.pumpAndSettle();
       }
     }
-
-    if (takeImageFront) {
-      verifyNever(photosTaker.takeAndCropPhoto(any, any));
-      await tester.tap(
-          find.byKey(const Key('front_photo')));
-      verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
-      await tester.pumpAndSettle();
-    }
-
-    await scrollToBottom(tester);
 
     if (takeImageIngredients) {
       verifyNever(photosTaker.takeAndCropPhoto(any, any));

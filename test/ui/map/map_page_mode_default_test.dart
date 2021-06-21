@@ -143,4 +143,23 @@ void main() {
     expect(find.text(context.strings.shop_card_there_are_products_in_shop),
         findsOneWidget);
   });
+
+  testWidgets('shops card closes on back press', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShopCard), findsNothing);
+
+    widget.onMarkerClickForTesting([shops[0]]);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShopCard), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShopCard), findsNothing);
+  });
 }
