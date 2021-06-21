@@ -41,5 +41,24 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs camera access to scan barcodes</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID</string>
+			</array>
+		</dict>
+	</array>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>The app uses your location to find nearby stores</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>The app uses your location to find nearby stores</string>
 </dict>
 </plist>
