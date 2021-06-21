@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
@@ -22,7 +23,8 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, ShopsManager, LocationController, PhotosTaker])
+@GenerateMocks([ProductsManager, ShopsManager, LocationController, PhotosTaker,
+  PermissionsManager])
 void main() {
   setUp(() async {
     await GetIt.I.reset();
@@ -39,6 +41,7 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage(loadPersistentProducts: false));
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
+    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
     final locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);

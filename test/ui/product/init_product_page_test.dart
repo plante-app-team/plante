@@ -39,6 +39,7 @@ void main() {
   late MockProductsManager productsManager;
   late MockShopsManager shopsManager;
   late MockLocationController locationController;
+  late MockPermissionsManager permissionsManager;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -79,7 +80,11 @@ void main() {
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<LocationController>(locationController);
 
-    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
+    permissionsManager = MockPermissionsManager();
+    when(permissionsManager.status(any)).thenAnswer(
+            (_) async => PermissionState.granted);
+    when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
+    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
 
     GetIt.I.registerSingleton<LatestCameraPosStorage>(
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
@@ -1135,5 +1140,152 @@ void main() {
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     verify(productsManager.createUpdateProduct(captureAny, any));
+  });
+
+  Future<void> takePhotoWhenNoPermissionTest(
+      WidgetTester tester, dynamic Function() takePhotoAction) async {
+    when(permissionsManager.status(any)).thenAnswer(
+            (_) async => PermissionState.denied);
+    when(permissionsManager.request(any)).thenAnswer((_) async {
+      when(permissionsManager.status(any)).thenAnswer(
+              (_) async => PermissionState.granted);
+      return PermissionState.granted;
+    });
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    verifyNever(permissionsManager.request(any));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+
+    await takePhotoAction.call();
+
+    verify(permissionsManager.request(PermissionKind.CAMERA));
+    verify(photosTaker.takeAndCropPhoto(any, any));
+  }
+
+  Future<void>  takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(
+      WidgetTester tester, dynamic Function() takePhotoAction) async {
+    when(permissionsManager.status(any)).thenAnswer(
+            (_) async => PermissionState.denied);
+    var requestsCount = 0;
+    when(permissionsManager.request(any)).thenAnswer((_) async {
+      requestsCount += 1;
+      if (requestsCount <= 1) {
+        return PermissionState.denied;
+      }
+      when(permissionsManager.status(any)).thenAnswer(
+              (_) async => PermissionState.granted);
+      return PermissionState.granted;
+    });
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    verifyNever(permissionsManager.request(any));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+
+    // First attempt with a deny
+    await takePhotoAction.call();
+
+    verify(permissionsManager.request(PermissionKind.CAMERA));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+
+    // Second attempt with permission successfully granted
+    await takePhotoAction.call();
+
+    verify(permissionsManager.request(PermissionKind.CAMERA));
+    verify(photosTaker.takeAndCropPhoto(any, any));
+  }
+
+  Future<void>  takePhotoWhenNoPermissionPermanentlyTest(
+      WidgetTester tester, dynamic Function() takePhotoAction) async {
+    when(permissionsManager.status(any)).thenAnswer(
+            (_) async => PermissionState.denied);
+    when(permissionsManager.request(any)).thenAnswer(
+            (_) async => PermissionState.permanentlyDenied);
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    final context = await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    verifyNever(permissionsManager.request(any));
+    verifyNever(permissionsManager.openAppSettings());
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+    expect(find.text(
+        context.strings.init_user_page_camera_permission_reasoning_settings),
+        findsNothing);
+
+    await takePhotoAction.call();
+
+    verify(permissionsManager.request(any));
+    verifyNever(permissionsManager.openAppSettings());
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+    expect(find.text(
+        context.strings.init_user_page_camera_permission_reasoning_settings),
+        findsOneWidget);
+
+    await tester.tap(find.text(context.strings.global_open_app_settings));
+    await tester.pumpAndSettle();
+
+    verifyNever(permissionsManager.request(any));
+    verify(permissionsManager.openAppSettings());
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+  }
+
+  testWidgets('take front photo when no permission', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionTest(tester, () async {
+      await tester.tap(
+          find.byKey(const Key('front_photo')));
+      await tester.pumpAndSettle();
+    });
+  });
+
+  testWidgets('take front photo when no permission, permission denied again', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester, () async {
+      await tester.tap(
+          find.byKey(const Key('front_photo')));
+      await tester.pumpAndSettle();
+    });
+  });
+
+  testWidgets('take front photo when no permission permanently', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionPermanentlyTest(tester, () async {
+      await tester.tap(
+          find.byKey(const Key('front_photo')));
+      await tester.pumpAndSettle();
+    });
+  });
+
+  testWidgets('take ingredients photo when no permission', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionTest(tester, () async {
+      await scrollToBottom(tester);
+      await tester.tap(
+          find.byKey(const Key('ingredients_photo')));
+      await tester.pumpAndSettle();
+    });
+  });
+
+  testWidgets('take ingredients photo when no permission, permission denied again', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester, () async {
+      await scrollToBottom(tester);
+      await tester.tap(
+          find.byKey(const Key('ingredients_photo')));
+      await tester.pumpAndSettle();
+    });
+  });
+
+  testWidgets('take ingredients photo when no permission permanently', (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionPermanentlyTest(tester, () async {
+      await scrollToBottom(tester);
+      await tester.tap(
+          find.byKey(const Key('ingredients_photo')));
+      await tester.pumpAndSettle();
+    });
   });
 }

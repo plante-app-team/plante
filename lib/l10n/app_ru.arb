@@ -35,6 +35,7 @@
     "init_user_page_i_eat_honey": "Мёд",
     "init_user_page_next_button_title": "Далее",
     "init_user_page_done_button_title": "Готово",
+    "init_user_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
 
     "main_page_bottom_btn_feed": "Новости",
     "main_page_bottom_btn_map": "Карта продуктов",

@@ -13,6 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
+import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
@@ -366,27 +367,11 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   Future<bool> _ensurePermissions() async {
-    var permission = await _permissionsManager.status(PermissionKind.LOCATION);
-    if (permission == PermissionState.granted) {
-      return true;
-    }
-
-    if (permission == PermissionState.denied) {
-      permission = await _permissionsManager.request(PermissionKind.LOCATION);
-      if (permission != PermissionState.permanentlyDenied) {
-        return permission == PermissionState.granted ||
-            permission == PermissionState.limited;
-      }
-    }
-
-    await showDoOrCancelDialog(
+    return await maybeRequestPermission(
         context,
-        context.strings.map_page_location_permission_reasoning_settings,
-        context.strings.global_open_app_settings,
-        _permissionsManager.openAppSettings);
-    permission = await _permissionsManager.status(PermissionKind.LOCATION);
-    return permission == PermissionState.granted ||
-        permission == PermissionState.limited;
+        _permissionsManager,
+        PermissionKind.LOCATION,
+        context.strings.map_page_location_permission_reasoning_settings);
   }
 
   void _onCameraIdle() async {

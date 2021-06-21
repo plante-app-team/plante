@@ -298,7 +298,7 @@ class MockViewedProductsStorage extends _i1.Mock
   @override
   _i4.Stream<void> updates() =>
       (super.noSuchMethod(Invocation.method(#updates, []),
-          returnValue: const Stream<void>.empty()) as _i4.Stream<void>);
+          returnValue: Stream<void>.empty()) as _i4.Stream<void>);
   @override
   _i4.Future<void> loadPersistentProductsForTesting() => (super.noSuchMethod(
       Invocation.method(#loadPersistentProductsForTesting, []),

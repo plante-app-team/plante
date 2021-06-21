@@ -10,6 +10,7 @@ import 'package:flutter/src/services/message_codec.dart' as _i19;
 import 'package:flutter/src/widgets/framework.dart' as _i17;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:plante/base/base.dart' as _i15;
+import 'package:plante/base/permissions_manager.dart' as _i20;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/location/location_controller.dart' as _i14;
 import 'package:plante/model/product.dart' as _i6;
@@ -189,4 +190,29 @@ class MockPhotosTaker extends _i1.Mock implements _i16.PhotosTaker {
               returnValue:
                   Future.value(_FakeResult<Uri, _i19.PlatformException>()))
           as _i5.Future<_i2.Result<Uri, _i19.PlatformException>?>);
+}
+
+/// A class which mocks [PermissionsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPermissionsManager extends _i1.Mock
+    implements _i20.PermissionsManager {
+  MockPermissionsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i20.PermissionState> status(_i20.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#status, [permission]),
+              returnValue: Future.value(_i20.PermissionState.granted))
+          as _i5.Future<_i20.PermissionState>);
+  @override
+  _i5.Future<_i20.PermissionState> request(_i20.PermissionKind? permission) =>
+      (super.noSuchMethod(Invocation.method(#request, [permission]),
+              returnValue: Future.value(_i20.PermissionState.granted))
+          as _i5.Future<_i20.PermissionState>);
+  @override
+  _i5.Future<bool> openAppSettings() =>
+      (super.noSuchMethod(Invocation.method(#openAppSettings, []),
+          returnValue: Future.value(false)) as _i5.Future<bool>);
 }
