@@ -48,14 +48,6 @@ class MockOffApi extends _i1.Mock implements _i6.OffApi {
   }
 
   @override
-  int get imagesCallsCount =>
-      (super.noSuchMethod(Invocation.getter(#imagesCallsCount), returnValue: 0)
-          as int);
-  @override
-  set imagesCallsCount(int? _imagesCallsCount) => super.noSuchMethod(
-      Invocation.setter(#imagesCallsCount, _imagesCallsCount),
-      returnValueForMissingStub: null);
-  @override
   _i7.Future<_i2.ProductResult> getProduct(
           _i8.ProductQueryConfiguration? configuration) =>
       (super.noSuchMethod(Invocation.method(#getProduct, [configuration]),

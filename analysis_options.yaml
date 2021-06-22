@@ -25,6 +25,7 @@ analyzer:
   exclude:
     - "bin/cache/**"
     - "lib/**.g.dart"
+    - "test/**.mocks.dart"
     - "submodules/**"
 
 linter:

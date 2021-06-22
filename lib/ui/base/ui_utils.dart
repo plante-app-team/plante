@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/log.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
