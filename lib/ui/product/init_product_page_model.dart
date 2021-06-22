@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
@@ -11,6 +13,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
@@ -22,6 +25,7 @@ enum InitProductPageOcrState {
 }
 
 class InitProductPageModel {
+  static const OCR_RETRIES_COUNT = 3;
   static const _NO_PHOTO = -1;
   late final dynamic Function() _onProductUpdate;
   late final dynamic Function() _forceReloadAllProductData;
@@ -273,15 +277,26 @@ class InitProductPageModel {
   Future<String?> _ocrIngredientsImpl() async {
     final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
         ProductImageType.INGREDIENTS, product.imageIngredients);
-    final ocrResult = await _productsManager
-        .updateProductAndExtractIngredients(initialProductWithIngredientsPhoto);
+
+    var attemptsCount = 1;
+    Result<ProductWithOCRIngredients, ProductsManagerError> ocrResult =
+        Err(ProductsManagerError.OTHER);
+    while (attemptsCount <= OCR_RETRIES_COUNT &&
+        (ocrResult.isErr || ocrResult.unwrap().ingredients == null)) {
+      attemptsCount += 1;
+      try {
+        ocrResult = await _productsManager
+            .updateProductAndExtractIngredients(
+                initialProductWithIngredientsPhoto)
+            .timeout(const Duration(seconds: 7));
+      } on TimeoutException catch (e) {
+        Log.w('_ocrIngredientsImpl timeout $attemptsCount', ex: e);
+      }
+    }
 
     if (ocrResult.isErr) {
       return null;
     }
-    final ocrSuccess = ocrResult.unwrap();
-    product = product.rebuildWithImage(
-        ProductImageType.INGREDIENTS, ocrSuccess.product.imageIngredients);
-    return ocrSuccess.ingredients;
+    return ocrResult.unwrap().ingredients;
   }
 }
