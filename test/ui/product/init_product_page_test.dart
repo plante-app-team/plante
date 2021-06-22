@@ -26,6 +26,7 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/product/init_product_page_model.dart';
 
 import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
@@ -212,7 +213,9 @@ void main() {
       expect(ocrAttempts, equals(0));
       await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
-      expect(ocrAttempts, equals(1));
+      expect(ocrAttempts, greaterThanOrEqualTo(1));
+      expect(ocrAttempts, lessThanOrEqualTo(
+          InitProductPageModel.OCR_RETRIES_COUNT));
       verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
 
       var performedManualOcrAttempts = 0;
@@ -863,7 +866,10 @@ void main() {
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
-        ocrSuccessfulAttemptNumber: 3, // 2 OCRs attempts will fail (first (auto) and the manual)
+        // 2 OCRs attempts will fail (first (auto) and the manual)
+        // Note that we multiply the value by InitProductPageModel.OCR_RETRIES_COUNT,
+        // because the page auto-retries OCR without user actions.
+        ocrSuccessfulAttemptNumber: 3 * InitProductPageModel.OCR_RETRIES_COUNT,
         requiredManualOcrAttempts: 1, // We'll try to perform restart OCR only once
         ingredientsTextOverride: 'water, lemon' // But will write ingredients manually
     );
@@ -895,7 +901,10 @@ void main() {
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
-        ocrSuccessfulAttemptNumber: 3, // 2 OCRs attempts will fail (first (auto) and the first manual)
+        // 2 OCRs attempts will fail (first (auto) and the first manual).
+        // Note that we multiply the value by InitProductPageModel.OCR_RETRIES_COUNT,
+        // because the page auto-retries OCR without user actions.
+        ocrSuccessfulAttemptNumber: 3 * InitProductPageModel.OCR_RETRIES_COUNT,
         requiredManualOcrAttempts: 2, // We'll try to perform a second OCR!
         ingredientsTextOverride: null // And will NOT write ingredients manually
     );
