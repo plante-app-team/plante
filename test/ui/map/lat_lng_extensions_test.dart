@@ -66,21 +66,32 @@ void main() {
       diff: 3);
   });
 
-  /// Tests for our users on Fiji or Antarctica.
-  /// Tests fail.
-  // test('bounds1 contains bounds2 when longitude1 overflows', () async {
-  //   testImpl(
-  //       southwest1: const LatLng(10, 175),
-  //       northeast1: const LatLng(50, -145),
-  //       diff: 10);
-  // });
-  //
-  // test('bounds1 contains bounds2 when both longitudes overflows', () async {
-  //   testImpl(
-  //       southwest1: const LatLng(10, 175),
-  //       northeast1: const LatLng(30, -145),
-  //       diff: 3);
-  // });
+  test('fiji: bounds1 contains bounds2 when longitude1 overflows', () async {
+    testImpl(
+        southwest1: const LatLng(10, 175),
+        northeast1: const LatLng(50, -145),
+        diff: 10);
+  });
+
+  test('fiji: bounds1 contains bounds2 when both longitudes overflows', () async {
+    testImpl(
+        southwest1: const LatLng(10, 175),
+        northeast1: const LatLng(30, -145),
+        diff: 3);
+  });
+
+  test('england: bounds1 contains bounds2 when longitude1 overflows', () async {
+    testImpl(
+        southwest1: const LatLng(10, -5),
+        northeast1: const LatLng(50, 35),
+        diff: 10);
+  });
+  test('england: bounds1 contains bounds2 when both longitudes overflows', () async {
+    testImpl(
+        southwest1: const LatLng(10, -5),
+        northeast1: const LatLng(30, 35),
+        diff: 3);
+  });
 
   test('make LatLng a square', () async {
     const latLng = LatLng(50, 50);

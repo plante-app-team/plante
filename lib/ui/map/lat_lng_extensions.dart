@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:plante/base/log.dart';
 import 'package:plante/model/shop.dart';
 
 extension LatLngBoundsExt on LatLngBounds {
@@ -19,22 +18,38 @@ extension LatLngBoundsExt on LatLngBounds {
   double get east => northeast.longitude;
   double get south => southwest.latitude;
 
+  /// PLEASE NOTE that this function works properly ONLY
+  /// with small sized bounds and with bounds pairs
+  /// which are close to each other.
+  /// If given bounds size is close to half of Earth's length, or bounds
+  /// are very far away from each other, weird things might happen.
+  /// Concrete examples of weird things are not available as I didn't give
+  /// it much of a thought - the function works properly with Plante's use
+  /// cases and that makes the function good for the app.
   bool containsBounds(LatLngBounds other) {
-    if (east < west || other.east < other.west) {
-      Log.e('East < west, hello 180 meridian. '
-          'You have users either on Fiji or Antarctica, congrats. '
-          'Fix this for them. '
-          'lhs: $this, rhs: $other');
-    }
-
-    final west1 = southwest.longitude;
+    var west1 = southwest.longitude;
     final north1 = northeast.latitude;
-    final east1 = northeast.longitude;
+    var east1 = northeast.longitude;
     final south1 = southwest.latitude;
-    final west2 = other.southwest.longitude;
+    var west2 = other.southwest.longitude;
     final north2 = other.northeast.latitude;
-    final east2 = other.northeast.longitude;
+    var east2 = other.northeast.longitude;
     final south2 = other.southwest.latitude;
+
+    if (east < west || other.east < other.west) {
+      if (west1 < 0) {
+        west1 += 360;
+      }
+      if (west2 < 0) {
+        west2 += 360;
+      }
+      if (east1 < 0) {
+        east1 += 360;
+      }
+      if (east2 < 0) {
+        east2 += 360;
+      }
+    }
 
     return west1 <= west2 &&
         east2 <= east1 &&
