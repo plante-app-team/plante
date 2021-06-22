@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:plante/base/base.dart';
 import 'package:plante/base/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
@@ -15,6 +16,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 
 class ProductWithOCRIngredients {
@@ -41,9 +43,11 @@ class ProductsManager {
   final OffApi _off;
   final Backend _backend;
   final LangCodeHolder _langCodeHolder;
+  final TakenProductsImagesStorage _takenProductsImagesTable;
   final _productsCache = <String, Product>{};
 
-  ProductsManager(this._off, this._backend, this._langCodeHolder);
+  ProductsManager(this._off, this._backend, this._langCodeHolder,
+      this._takenProductsImagesTable);
 
   Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw,
       [String? langCode]) async {
@@ -269,7 +273,13 @@ class ProductsManager {
 
     // OFF front image
 
-    if (product.isFrontImageFile()) {
+    var shouldSendFrontImage = product.isFrontImageFile();
+    if (shouldSendFrontImage) {
+      final alreadyUploaded =
+          await _takenProductsImagesTable.contains(product.imageFront!);
+      shouldSendFrontImage = !alreadyUploaded;
+    }
+    if (shouldSendFrontImage) {
       final image = off.SendImage(
         lang: off.LanguageHelper.fromJson(langCode),
         barcode: product.barcode,
@@ -286,11 +296,18 @@ class ProductsManager {
       if (status.error != null) {
         return Err(ProductsManagerError.OTHER);
       }
+      unawaited(_takenProductsImagesTable.store(product.imageFront!));
     }
 
     // OFF ingredients image
 
-    if (product.isIngredientsImageFile()) {
+    var shouldSendIngredientsImage = product.isIngredientsImageFile();
+    if (shouldSendIngredientsImage) {
+      final alreadyUploaded =
+          await _takenProductsImagesTable.contains(product.imageIngredients!);
+      shouldSendIngredientsImage = !alreadyUploaded;
+    }
+    if (shouldSendIngredientsImage) {
       final image = off.SendImage(
         lang: off.LanguageHelper.fromJson(langCode),
         barcode: product.barcode,
@@ -307,6 +324,7 @@ class ProductsManager {
       if (status.error != null) {
         return Err(ProductsManagerError.OTHER);
       }
+      unawaited(_takenProductsImagesTable.store(product.imageIngredients!));
     }
 
     // Backend product

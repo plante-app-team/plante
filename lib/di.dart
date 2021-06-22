@@ -15,6 +15,7 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
@@ -48,10 +49,13 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<TakenProductsImagesStorage>(
+      TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
       GetIt.I.get<OffApi>(),
       GetIt.I.get<Backend>(),
-      GetIt.I.get<LangCodeHolder>()));
+      GetIt.I.get<LangCodeHolder>(),
+      GetIt.I.get<TakenProductsImagesStorage>()));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());

@@ -49,7 +49,9 @@ class ProductHeaderWidget extends StatelessWidget {
                                 style: TextStyles.headline1White,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1)),
-                      if (product.brands != null && product.brands!.isNotEmpty)
+                      if (imageType == ProductImageType.FRONT &&
+                          product.brands != null &&
+                          product.brands!.isNotEmpty)
                         Row(children: [
                           Text(context.strings.display_product_page_brand,
                               style: TextStyles.normalWhite),

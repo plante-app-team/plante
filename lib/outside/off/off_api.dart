@@ -36,7 +36,7 @@ class OffApi {
     }
     final result = await off.OpenFoodAPIClient.addProductImage(user, image);
     if (result.error != null) {
-      Log.w('OffApi.addProductImage error: ${result.toJson()}');
+      Log.w('OffApi.addProductImage error: ${result.toJson()}, img: $image');
     }
     return result;
   }

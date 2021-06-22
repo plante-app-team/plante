@@ -8,6 +8,7 @@ import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:test/test.dart';
 import 'package:plante/base/result.dart';
@@ -60,12 +61,19 @@ void main() {
 
   late MockOffApi offApi;
   late MockBackend backend;
+  late TakenProductsImagesStorage takenProductsImagesStorage;
   late ProductsManager productsManager;
 
-  setUp(() {
+  setUp(() async {
     offApi = MockOffApi();
     backend = MockBackend();
-    productsManager = ProductsManager(offApi, backend, LangCodeHolder.inited('en'));
+    takenProductsImagesStorage = TakenProductsImagesStorage(
+        fileName: 'products_manager_test_taken_images.json');
+    await takenProductsImagesStorage.clearForTesting();
+
+    productsManager = ProductsManager(
+        offApi, backend, LangCodeHolder.inited('en'),
+        takenProductsImagesStorage);
 
     when(offApi.saveProduct(any, any)).thenAnswer((_) async => off.Status());
     when(offApi.getProduct(any)).thenAnswer((_) async =>
@@ -1044,5 +1052,70 @@ void main() {
     // We expect the backend to not be touched since
     // we already have a backend product.
     verifyNever(backend.requestProduct(any));
+  });
+
+  test('front image is not uploaded again if ingredients '
+       'image upload fails on first save attempt', () async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..name = 'name'
+      ..brands.add('Brand name')
+      ..categories.addAll(['plant', 'lemon'])
+      ..ingredientsText = 'lemon, water'
+      ..imageFront = Uri.file('/tmp/img1.jpg')
+      ..imageIngredients = Uri.file('/tmp/img2.jpg'));
+    ensureProductIsInOFF(product);
+
+    final imageUploadsAttempts = <off.ImageField>[];
+    var failIngredientsImageUploading = true;
+    when(offApi.addProductImage(any, any)).thenAnswer((invc) async {
+      final image = invc.positionalArguments[1] as off.SendImage;
+      imageUploadsAttempts.add(image.imageField);
+      if (image.imageField == off.ImageField.INGREDIENTS) {
+        if (failIngredientsImageUploading) {
+          return off.Status(
+              status: 'bad bad bad', error: 'bad image, very bad!');
+        } else {
+          return off.Status();
+        }
+      } else {
+        // ok
+        return off.Status();
+      }
+    });
+
+    expect(imageUploadsAttempts.length, equals(0));
+
+    var result = await productsManager.createUpdateProduct(product, 'ru');
+    expect(result.isErr, isTrue);
+
+    // Expect the Front image to be uploaded,
+    // the Ingredients image to be not uploaded.
+    expect(imageUploadsAttempts.length, equals(2));
+    expect(imageUploadsAttempts[0], equals(off.ImageField.FRONT));
+    expect(imageUploadsAttempts[1], equals(off.ImageField.INGREDIENTS));
+    // Expect the product was not sent to backend because one of
+    // images savings has failed.
+    verifyNever(backend.createUpdateProduct(any));
+
+    // Second attempt
+    imageUploadsAttempts.clear();
+    failIngredientsImageUploading = false;
+
+    result = await productsManager.createUpdateProduct(product, 'ru');
+    expect(result.isErr, isFalse);
+
+    // Expect the Front image to be NOT uploaded - it was uploaded already.
+    // Expect the Ingredients image to be uploaded this time -
+    // the first attempt has failed.
+    expect(imageUploadsAttempts, equals([off.ImageField.INGREDIENTS]));
+    // Expect the product WAS sent to backend because now all images are uploaded.
+    verify(backend.createUpdateProduct('123',
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative));
   });
 }
