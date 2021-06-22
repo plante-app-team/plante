@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_model.dart';
@@ -307,6 +308,37 @@ void main() {
     final cameraUpdate = verify(mapController.animateCamera(captureAny))
         .captured.first as CameraUpdate;
     expect(_cameraUpdateToPos(cameraUpdate), equals(initialPos));
+  });
+
+  // Testing workaround for https://trello.com/c/D33qHsGn/
+  // (https://github.com/flutter/flutter/issues/40284)
+  testWidgets('map style is reset on hide-show events', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+
+    clearInteractions(mapController);
+
+    final visibilityDetector = find.byKey(
+        const Key('map_page_visibility_detector'))
+        .evaluate().first.widget as VisibilityDetectorPlante;
+
+    // First 'show' event is not expected to trigger style setting
+    var firstCall = true;
+    visibilityDetector.onVisibilityChanged.call(true, firstCall);
+    await tester.pumpAndSettle();
+    verifyNever(mapController.setMapStyle(any));
+
+    // 'Hide' event is not expected to trigger style setting
+    firstCall = false;
+    visibilityDetector.onVisibilityChanged.call(false, firstCall);
+    await tester.pumpAndSettle();
+    verifyNever(mapController.setMapStyle(any));
+
+    // Second 'show' event!
+    firstCall = false;
+    visibilityDetector.onVisibilityChanged.call(true, firstCall);
+    await tester.pumpAndSettle();
+    verify(mapController.setMapStyle(any));
   });
 }
 

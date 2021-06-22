@@ -13,6 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
@@ -195,7 +196,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     _mode = MapPageModeDefault(_model, _hintsController, widgetSource,
         contextSource, updateCallback, updateMapCallback, switchModeCallback);
 
-    _initAsync();
+    _initMapStyle();
     _instances.add(this);
     _instances.forEach((instance) {
       instance.onInstancesChange();
@@ -228,7 +229,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     _mode.onMarkerClick(shops);
   }
 
-  Future<void> _initAsync() async {
+  Future<void> _initMapStyle() async {
     final mapController = await _mapController.future;
     // We'd like to hide all businesses known to Google Maps because
     // we'll how our own list of shops and we don't want 2 lists to conflict.
@@ -338,7 +339,18 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         onWillPop: _mode.onWillPop,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          body: SafeArea(child: content),
+          body: SafeArea(
+              child: VisibilityDetectorPlante(
+            keyStr: 'map_page_visibility_detector',
+            onVisibilityChanged: (visible, firstCall) {
+              // Workaround for https://trello.com/c/D33qHsGn/
+              // (https://github.com/flutter/flutter/issues/40284)
+              if (visible && !firstCall) {
+                _initMapStyle();
+              }
+            },
+            child: content,
+          )),
         ));
   }
 
