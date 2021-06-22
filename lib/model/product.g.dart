@@ -127,59 +127,59 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           break;
         case 'vegetarianStatus':
           result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus;
+              specifiedType: const FullType(VegStatus)) as VegStatus?;
           break;
         case 'vegetarianStatusSource':
           result.vegetarianStatusSource = serializers.deserialize(value,
                   specifiedType: const FullType(VegStatusSource))
-              as VegStatusSource;
+              as VegStatusSource?;
           break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus;
+              specifiedType: const FullType(VegStatus)) as VegStatus?;
           break;
         case 'veganStatusSource':
           result.veganStatusSource = serializers.deserialize(value,
                   specifiedType: const FullType(VegStatusSource))
-              as VegStatusSource;
+              as VegStatusSource?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'brands':
           result.brands.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(String)]))!
-              as BuiltList<Object>);
+              as BuiltList<Object?>);
           break;
         case 'categories':
           result.categories.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(String)]))!
-              as BuiltList<Object>);
+              as BuiltList<Object?>);
           break;
         case 'ingredientsText':
           result.ingredientsText = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'ingredientsAnalyzed':
           result.ingredientsAnalyzed.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(Ingredient)]))!
-              as BuiltList<Object>);
+              as BuiltList<Object?>);
           break;
         case 'imageFront':
           result.imageFront = serializers.deserialize(value,
-              specifiedType: const FullType(Uri)) as Uri;
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
         case 'imageFrontThumb':
           result.imageFrontThumb = serializers.deserialize(value,
-              specifiedType: const FullType(Uri)) as Uri;
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
         case 'imageIngredients':
           result.imageIngredients = serializers.deserialize(value,
-              specifiedType: const FullType(Uri)) as Uri;
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
       }
     }

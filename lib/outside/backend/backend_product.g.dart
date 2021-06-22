@@ -76,7 +76,7 @@ class _$BackendProductSerializer
       switch (key) {
         case 'server_id':
           result.serverId = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int)) as int?;
           break;
         case 'barcode':
           result.barcode = serializers.deserialize(value,
@@ -84,19 +84,19 @@ class _$BackendProductSerializer
           break;
         case 'vegetarian_status':
           result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'vegetarian_status_source':
           result.vegetarianStatusSource = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'vegan_status':
           result.veganStatus = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'vegan_status_source':
           result.veganStatusSource = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }

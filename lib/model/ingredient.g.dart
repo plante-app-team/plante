@@ -56,11 +56,11 @@ class _$IngredientSerializer implements StructuredSerializer<Ingredient> {
           break;
         case 'vegetarianStatus':
           result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus;
+              specifiedType: const FullType(VegStatus)) as VegStatus?;
           break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus;
+              specifiedType: const FullType(VegStatus)) as VegStatus?;
           break;
       }
     }

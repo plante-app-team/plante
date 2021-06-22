@@ -62,7 +62,7 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
           break;
         case 'type':
           result.type = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'latitude':
           result.latitude = serializers.deserialize(value,
