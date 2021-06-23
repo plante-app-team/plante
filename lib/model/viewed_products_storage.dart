@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 
 /// A very simple storage which just stores in a file all

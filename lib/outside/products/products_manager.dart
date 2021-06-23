@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
 

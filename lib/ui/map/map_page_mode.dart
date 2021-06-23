@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -18,6 +19,7 @@ class MapPageModeParams {
   final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
   final ModeSwitchCallback modeSwitchCallback;
+  final Analytics analytics;
   MapPageModeParams(
       this.model,
       this.hintsListController,
@@ -25,18 +27,21 @@ class MapPageModeParams {
       this.contextSource,
       this.updateCallback,
       this.updateMapCallback,
-      this.modeSwitchCallback);
+      this.modeSwitchCallback,
+      this.analytics);
 }
 
 abstract class MapPageMode {
+  final String nameForAnalytics;
   final MapPageModeParams params;
 
-  MapPageMode(this.params);
+  MapPageMode(this.params, {required this.nameForAnalytics});
 
   MapPageModel get model => params.model;
   MapPage get widget => params.widgetSource.call();
   BuildContext get context => params.contextSource.call();
   MapHintsListController get hintsController => params.hintsListController;
+  Analytics get analytics => params.analytics;
 
   void init(MapPageMode? previousMode) {}
   void deinit() {}

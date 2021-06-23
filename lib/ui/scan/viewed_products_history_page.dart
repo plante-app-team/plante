@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -11,6 +11,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -24,7 +25,8 @@ class ViewedProductsHistoryPage extends StatefulWidget {
       _ViewedProductsHistoryPageState();
 }
 
-class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
+class _ViewedProductsHistoryPageState
+    extends PageStatePlante<ViewedProductsHistoryPage> {
   static const _BACKGROUND_COLOR = Color(0xfff5f7fa);
   final ViewedProductsStorage viewedProductsStorage;
   late final StreamSubscription viewedProductsSubscription;
@@ -38,7 +40,8 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
   _ViewedProductsHistoryPageState()
       : viewedProductsStorage = GetIt.I.get<ViewedProductsStorage>(),
         user = GetIt.I.get<UserParamsController>().cachedUserParams!,
-        productsManager = GetIt.I.get<ProductsManager>();
+        productsManager = GetIt.I.get<ProductsManager>(),
+        super('ViewedProductsHistoryPage');
 
   @override
   void initState() {
@@ -58,7 +61,7 @@ class _ViewedProductsHistoryPageState extends State<ViewedProductsHistoryPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         backgroundColor: _BACKGROUND_COLOR,
         body: SafeArea(

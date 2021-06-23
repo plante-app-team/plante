@@ -10,7 +10,9 @@ import 'package:plante/ui/map/map_page_mode.dart';
 abstract class MapPageModeShopsCardBase extends MapPageMode {
   final _displayedShops = <Shop>[];
 
-  MapPageModeShopsCardBase(MapPageModeParams params) : super(params);
+  MapPageModeShopsCardBase(MapPageModeParams params,
+      {required String nameForAnalytics})
+      : super(params, nameForAnalytics: nameForAnalytics);
 
   @protected
   ShopCard createCardFor(Shop shop, ArgCallback<Shop>? cancelCallback);

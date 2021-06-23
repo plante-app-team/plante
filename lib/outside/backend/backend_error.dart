@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 
 enum BackendErrorKind {

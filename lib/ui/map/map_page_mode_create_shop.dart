@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -22,7 +22,7 @@ class MapPageModeCreateShop extends MapPageMode {
   final Set<Shop> _selectedShops = <Shop>{};
   Shop? _shopBeingCreated;
   MapPageModeCreateShop(MapPageModeParams params, this.nextModeMaker)
-      : super(params);
+      : super(params, nameForAnalytics: 'create_shop');
 
   @override
   void init(MapPageMode? previousMode) {

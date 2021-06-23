@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
@@ -19,6 +20,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   bool _showEmptyShops = false;
 
   MapPageModeDefault(
+      Analytics analytics,
       MapPageModel model,
       MapHintsListController hintsController,
       WidgetSource widgetSource,
@@ -26,14 +28,17 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
       ModeSwitchCallback modeSwitchCallback)
-      : super(MapPageModeParams(
-            model,
-            hintsController,
-            widgetSource,
-            contextSource,
-            updateCallback,
-            updateMapCallback,
-            modeSwitchCallback));
+      : super(
+            MapPageModeParams(
+                model,
+                hintsController,
+                widgetSource,
+                contextSource,
+                updateCallback,
+                updateMapCallback,
+                modeSwitchCallback,
+                analytics),
+            nameForAnalytics: 'default');
 
   @override
   void init(MapPageMode? previousMode) {
@@ -74,9 +79,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
                 onTap: () {
-                  _showEmptyShops = !_showEmptyShops;
-                  updateWidget();
-                  updateMap();
+                  _setShopEmptyShops(!_showEmptyShops);
                 },
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   const SizedBox(width: 16),
@@ -85,13 +88,22 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                   CheckboxPlante(
                       value: _showEmptyShops,
                       onChanged: (value) {
-                        _showEmptyShops = value ?? false;
-                        updateWidget();
-                        updateMap();
+                        _setShopEmptyShops(value ?? false);
                       })
                 ]),
               ),
             )));
+  }
+
+  void _setShopEmptyShops(bool value) {
+    _showEmptyShops = value;
+    updateWidget();
+    updateMap();
+    if (_showEmptyShops) {
+      analytics.sendEvent('empty_shops_shown');
+    } else {
+      analytics.sendEvent('empty_shops_hidden');
+    }
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:http/http.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 
 class BackendResponse {
   final Uri? requestUrl;

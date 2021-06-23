@@ -7,8 +7,9 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
-import 'map_page_mode_select_shops_where_product_sold.mocks.dart';
+import 'map_page_mode_select_shops_where_product_sold_test.mocks.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
 
@@ -21,6 +22,7 @@ import 'map_page_modes_test_commons.mocks.dart';
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
+  late FakeAnalytics analytics;
   late List<Shop> shops;
 
   setUp(() async {
@@ -28,6 +30,7 @@ void main() {
     await commons.setUp();
     mapController = commons.mapController;
     shops = commons.shops;
+    analytics = commons.analytics;
   });
 
   testWidgets('can select shops', (WidgetTester tester) async {
@@ -44,8 +47,6 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
     reset(navigationObserver);
@@ -101,5 +102,19 @@ void main() {
 
     final noProductString = context.strings.map_page_is_new_product_sold_q;
     expect(find.text(noProductString), findsOneWidget);
+  });
+
+  testWidgets('select shops mode switch event', (WidgetTester tester) async {
+    expect(analytics.allEvents().length, equals(0));
+
+    await tester.superPump(MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS));
+    await tester.pumpAndSettle();
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.wasEventSent(
+        'map_page_mode_switch_select_shops_where_product_sold'),
+        isTrue);
   });
 }

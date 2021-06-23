@@ -4,6 +4,7 @@ import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
@@ -11,6 +12,7 @@ import 'map_page_modes_test_commons.mocks.dart';
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
+  late FakeAnalytics analytics;
   late List<Shop> shops;
 
   setUp(() async {
@@ -18,6 +20,7 @@ void main() {
     await commons.setUp();
     mapController = commons.mapController;
     shops = commons.shops;
+    analytics = commons.analytics;
   });
 
   testWidgets('empty shops are not displayed by default', (WidgetTester tester) async {
@@ -161,5 +164,23 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ShopCard), findsNothing);
+  });
+
+  testWidgets('empty shops analytics', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(analytics.allEvents(), equals([]));
+
+    await tester.tap(find.text(context.strings.map_page_empty_shops));
+
+    expect(analytics.wasEventSent('empty_shops_shown'), isTrue);
+    analytics.clearEvents();
+
+    await tester.tap(find.text(context.strings.map_page_empty_shops));
+
+    expect(analytics.wasEventSent('empty_shops_hidden'), isTrue);
   });
 }

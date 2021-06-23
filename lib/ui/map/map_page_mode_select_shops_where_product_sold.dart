@@ -5,7 +5,7 @@ import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base
 class MapPageModeSelectShopsWhereProductSold
     extends MapPageModeSelectShopsWhereProductSoldBase {
   MapPageModeSelectShopsWhereProductSold(MapPageModeParams params)
-      : super(params);
+      : super(params, nameForAnalytics: 'select_shops_where_product_sold');
   @override
   void onDoneClick() async {
     model.finishWith(context, selectedShops().toList());

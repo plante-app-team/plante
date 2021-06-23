@@ -23,6 +23,7 @@ import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -47,7 +48,7 @@ class DisplayProductPage extends StatefulWidget {
       _DisplayProductPageState(_initialProduct, productUpdatedCallback);
 }
 
-class _DisplayProductPageState extends State<DisplayProductPage> {
+class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   Product product;
   final UserParams user;
   final ProductUpdatedCallback? productUpdatedCallback;
@@ -60,12 +61,13 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   final menuButtonKey = GlobalKey();
 
   _DisplayProductPageState(this.product, this.productUpdatedCallback)
-      : user = GetIt.I.get<UserParamsController>().cachedUserParams! {
+      : user = GetIt.I.get<UserParamsController>().cachedUserParams!,
+        super('DisplayProductPage') {
     GetIt.I.get<ViewedProductsStorage>().addProduct(product);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -225,6 +227,7 @@ class _DisplayProductPageState extends State<DisplayProductPage> {
   }
 
   void onVegStatusHelpClick() {
+    analytics.sendEvent('help_with_vegan_statuses_started');
     Navigator.push(
       context,
       MaterialPageRoute(

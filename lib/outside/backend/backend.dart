@@ -3,7 +3,8 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/veg_status.dart';
@@ -29,13 +30,15 @@ class BackendObserver {
 
 class Backend {
   late final Backend _fakeBackend;
+  final Analytics _analytics;
   final UserParamsController _userParamsController;
   final HttpClient _http;
   final Settings _settings;
 
   final _observers = <BackendObserver>[];
 
-  Backend(this._userParamsController, this._http, this._settings) {
+  Backend(
+      this._analytics, this._userParamsController, this._http, this._settings) {
     _fakeBackend = FakeBackend(_settings);
   }
 
@@ -169,6 +172,8 @@ class Backend {
 
   Future<Result<None, BackendError>> sendReport(
       String barcode, String reportText) async {
+    _analytics
+        .sendEvent('report_sent', {'barcode': barcode, 'report': reportText});
     if (await _settings.testingBackends()) {
       return await _fakeBackend.sendReport(barcode, reportText);
     }
@@ -274,6 +279,8 @@ class Backend {
 
   Future<Result<None, BackendError>> productPresenceVote(
       String barcode, String osmId, bool positive) async {
+    _analytics.sendEvent('product_presence_vote',
+        {'barcode': barcode, 'shop': osmId, 'vote': positive});
     if (await _settings.testingBackends()) {
       return await _fakeBackend.productPresenceVote(barcode, osmId, positive);
     }

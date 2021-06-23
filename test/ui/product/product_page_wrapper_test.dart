@@ -6,6 +6,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -19,6 +20,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
@@ -28,6 +30,7 @@ import 'product_page_wrapper_test.mocks.dart';
 void main() {
   setUp(() async {
     await GetIt.I.reset();
+    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
     final userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v

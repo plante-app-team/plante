@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 extension SharedPreferencesExt on SharedPreferences {

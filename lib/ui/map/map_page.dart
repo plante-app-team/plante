@@ -14,6 +14,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
@@ -115,7 +116,8 @@ class _TestingStorage {
   GoogleMapController? mapControllerForTesting;
 }
 
-class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
+class _MapPageState extends PageStatePlante<MapPage>
+    with SingleTickerProviderStateMixin {
   static final _instances = <_MapPageState>[];
   final PermissionsManager _permissionsManager;
   late final MapPageModel _model;
@@ -131,7 +133,9 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   bool get _loading => _model.loading;
 
-  _MapPageState() : _permissionsManager = GetIt.I.get<PermissionsManager>();
+  _MapPageState()
+      : _permissionsManager = GetIt.I.get<PermissionsManager>(),
+        super('MapPage');
 
   @override
   void initState() {
@@ -187,14 +191,22 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     final contextSource = () => context;
     final switchModeCallback = (MapPageMode newMode) {
       setState(() {
+        analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
         final oldMode = _mode;
         oldMode.deinit();
         _mode = newMode;
         _mode.init(oldMode);
       });
     };
-    _mode = MapPageModeDefault(_model, _hintsController, widgetSource,
-        contextSource, updateCallback, updateMapCallback, switchModeCallback);
+    _mode = MapPageModeDefault(
+        analytics,
+        _model,
+        _hintsController,
+        widgetSource,
+        contextSource,
+        updateCallback,
+        updateMapCallback,
+        switchModeCallback);
 
     _initMapStyle();
     _instances.add(this);
@@ -226,6 +238,8 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     if (shops.isEmpty) {
       return;
     }
+    analytics.sendEvent(
+        'map_shops_click', {'shops': shops.map((e) => e.osmId).join(', ')});
     _mode.onMarkerClick(shops);
   }
 
@@ -274,7 +288,7 @@ class _MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     var initialPos = _model.initialCameraPosInstant();
     if (initialPos == null) {
       _model.initialCameraPos().then(_moveCameraTo);

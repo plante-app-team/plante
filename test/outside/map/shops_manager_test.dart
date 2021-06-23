@@ -21,6 +21,7 @@ import 'package:test/test.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 
+import '../../fake_analytics.dart';
 import 'shops_manager_test.mocks.dart';
 
 @GenerateMocks([OpenStreetMap, Backend, ProductsManager, ShopsManagerListener])
@@ -28,6 +29,7 @@ void main() {
   late MockOpenStreetMap osm;
   late MockBackend backend;
   late MockProductsManager productsManager;
+  late FakeAnalytics analytics;
   late ShopsManager shopsManager;
 
   final osmShops = [
@@ -82,8 +84,9 @@ void main() {
     osm = MockOpenStreetMap();
     backend = MockBackend();
     productsManager = MockProductsManager();
+    analytics = FakeAnalytics();
     when(backend.putProductToShop(any, any)).thenAnswer((_) async => Ok(None()));
-    shopsManager = ShopsManager(osm, backend, productsManager);
+    shopsManager = ShopsManager(osm, backend, productsManager, analytics);
 
     when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
@@ -411,5 +414,67 @@ void main() {
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(any, any));
     verifyNever(backend.requestShops(any));
+  });
+
+  test('put product to shop analytics', () async {
+    expect(analytics.allEvents(), equals([]));
+
+    // Success
+    await shopsManager
+        .putProductToShops(rangeProducts[2], fullShops.values.toList());
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('product_put_to_shop').second, equals({
+      'barcode': rangeProducts[2].barcode,
+      'shops': fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+    }));
+    analytics.clearEvents();
+
+    // Failure
+    when(backend.putProductToShop(any, any)).thenAnswer((_) async =>
+        Err(BackendError.other()));
+    await shopsManager
+        .putProductToShops(rangeProducts[2], fullShops.values.toList());
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('product_put_to_shop_failure').second, equals({
+      'barcode': rangeProducts[2].barcode,
+      'shops': fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+    }));
+    analytics.clearEvents();
+  });
+
+  test('shop creation analytics', () async {
+    expect(analytics.allEvents(), equals([]));
+
+    // Create a shop successfully
+    await shopsManager.createShop(
+        name: 'New cool shop',
+        coords: const Point<double>(15, 16),
+        type: ShopType.supermarket);
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('create_shop_success').second, equals({
+      'name': 'New cool shop',
+      'lat': 16,
+      'lon': 15,
+    }));
+
+    analytics.clearEvents();
+
+    // Create a shop failure
+    when(backend.createShop(
+        name: anyNamed('name'),
+        coords: anyNamed('coords'),
+        type: anyNamed('type')
+    )).thenAnswer((_) async => Err(BackendError.other()));
+    await shopsManager.createShop(
+        name: 'New cool shop',
+        coords: const Point<double>(15, 16),
+        type: ShopType.supermarket);
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('create_shop_failure').second, equals({
+      'name': 'New cool shop',
+      'lat': 16,
+      'lon': 15,
+    }));
+    analytics.clearEvents();
   });
 }

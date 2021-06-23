@@ -8,6 +8,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
@@ -26,6 +27,7 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
@@ -40,9 +42,12 @@ void main() {
   late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
+  late FakeAnalytics analytics;
 
   setUp(() async {
     await GetIt.I.reset();
+    analytics = FakeAnalytics();
+    GetIt.I.registerSingleton<Analytics>(analytics);
 
     productsManager = MockProductsManager();
     when(productsManager.createUpdateProduct(any, any)).thenAnswer(
@@ -613,5 +618,29 @@ void main() {
     expect(
         find.byKey(const Key('product_ingredients_image_page')),
         findsOneWidget);
+  });
+
+  testWidgets('veg-statuses help button analytics', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.possible
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'Water, salt, sugar');
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    analytics.clearEvents();
+
+    await tester.tap(
+        find.text(context.strings.display_product_page_click_to_help_with_veg_statuses));
+    await tester.pumpAndSettle();
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.wasEventSent('help_with_vegan_statuses_started'), isTrue);
   });
 }

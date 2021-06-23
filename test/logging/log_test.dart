@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:test/test.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 
 void main() {
   setUp(() {

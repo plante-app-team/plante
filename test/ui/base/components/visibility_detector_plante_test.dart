@@ -5,9 +5,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 
 import '../../../fake_app_lifecycle_watcher.dart';
-import '../../../fake_user_params_controller.dart';
 import '../../../widget_tester_extension.dart';
-import 'shop_card_test.mocks.dart';
 
 void main() {
   testWidgets('notified when widget removed from tree and returned', (WidgetTester tester) async {

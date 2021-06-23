@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -16,6 +16,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,7 +26,7 @@ class SettingsPage extends StatefulWidget {
   _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends PageStatePlante<SettingsPage> {
   bool loading = true;
   bool developer = false;
   bool testingBackends = false;
@@ -35,6 +36,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late Settings settings;
   late UserParams user;
   late PackageInfo packageInfo;
+
+  _SettingsPageState() : super('SettingsPage');
 
   @override
   void initState() {
@@ -65,7 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     if (loading) {
       return Container(
         width: double.infinity,

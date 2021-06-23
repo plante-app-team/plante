@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
@@ -11,6 +11,7 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
@@ -27,14 +28,14 @@ class ExternalAuthPage extends StatefulWidget {
   _ExternalAuthPageState createState() => _ExternalAuthPageState(_callback);
 }
 
-class _ExternalAuthPageState extends State<ExternalAuthPage> {
+class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
   bool _loading = false;
   final ExternalAuthCallback _callback;
 
-  _ExternalAuthPageState(this._callback);
+  _ExternalAuthPageState(this._callback) : super('ExternalAuthPage');
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         body: SafeArea(
             child: Column(children: [
@@ -107,10 +108,12 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
       setState(() {
         _loading = true;
       });
+      analytics.sendEvent('google_auth_start');
 
       // Google login
       final googleAccount = await GetIt.I.get<GoogleAuthorizer>().auth();
       if (googleAccount == null) {
+        analytics.sendEvent('google_auth_google_error');
         Log.w('ExternalAuthPage: googleAccount == null');
         showSnackBar(context.strings.global_something_went_wrong, context);
         return;
@@ -120,6 +123,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
       final backend = GetIt.I.get<Backend>();
       final loginResult = await backend.loginOrRegister(googleAccount.idToken);
       if (loginResult.isErr) {
+        analytics.sendEvent('google_auth_backend_error');
         final error = loginResult.unwrapErr();
         if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
           showSnackBar(
@@ -139,6 +143,7 @@ class _ExternalAuthPageState extends State<ExternalAuthPage> {
 
       // Nice!
       await _callback.call(userParams);
+      analytics.sendEvent('google_auth_success');
     } finally {
       setState(() {
         _loading = false;

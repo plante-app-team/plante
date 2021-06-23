@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/outside/identity/google_user.dart';
 
 const CLIENTID_IOS =

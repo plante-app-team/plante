@@ -46,6 +46,9 @@ class _VisibilityDetectorPlanteState extends State<VisibilityDetectorPlante>
     super.initState();
     if (isInTests()) {
       VisibilityDetectorController.instance.updateInterval = Duration.zero;
+    } else {
+      VisibilityDetectorController.instance.updateInterval =
+          const Duration(seconds: 1);
     }
     widget.appLifecycleWatcher.addObserver(this);
   }

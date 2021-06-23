@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/location/ip_location_provider.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -23,6 +24,8 @@ import 'package:plante/user_params_fetcher.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
+  GetIt.I.registerSingleton<Settings>(Settings());
+  GetIt.I.registerSingleton<Analytics>(Analytics(GetIt.I.get<Settings>()));
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
@@ -41,8 +44,8 @@ void initDI() {
       OpenStreetMap(GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
-  GetIt.I.registerSingleton<Settings>(Settings());
   GetIt.I.registerSingleton<Backend>(Backend(
+      GetIt.I.get<Analytics>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<HttpClient>(),
       GetIt.I.get<Settings>()));
@@ -62,5 +65,6 @@ void initDI() {
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
       GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<Backend>(),
-      GetIt.I.get<ProductsManager>()));
+      GetIt.I.get<ProductsManager>(),
+      GetIt.I.get<Analytics>()));
 }

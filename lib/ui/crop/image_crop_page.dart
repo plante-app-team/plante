@@ -5,9 +5,10 @@ import 'dart:ui';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/l10n/strings.dart';
@@ -23,10 +24,12 @@ class ImageCropPage extends StatefulWidget {
   _ImageCropPageState createState() => _ImageCropPageState();
 }
 
-class _ImageCropPageState extends State<ImageCropPage> {
+class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   Uint8List? _originalImage;
   CropController? _cropController;
   bool _loading = true;
+
+  _ImageCropPageState() : super('ImageCropPage');
 
   @override
   void initState() {
@@ -64,7 +67,7 @@ class _ImageCropPageState extends State<ImageCropPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         body: SafeArea(
             child: Container(

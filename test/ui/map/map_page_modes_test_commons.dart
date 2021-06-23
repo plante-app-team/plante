@@ -9,6 +9,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -16,6 +17,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_shared_preferences.dart';
 import 'map_page_modes_test_commons.mocks.dart';
 
@@ -28,6 +30,7 @@ class MapPageModesTestCommons {
   late MockGoogleMapController mapController;
   late FakeSharedPreferences prefs;
   late MockLatestCameraPosStorage latestCameraPosStorage;
+  late FakeAnalytics analytics;
 
   final shopsManagerListeners = <ShopsManagerListener>[];
 
@@ -75,6 +78,8 @@ class MapPageModesTestCommons {
     shopsMap = { for (final shop in shops) shop.osmId: shop };
 
     await GetIt.I.reset();
+    analytics = FakeAnalytics();
+    GetIt.I.registerSingleton<Analytics>(analytics);
 
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -20,8 +20,9 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   final _selectedShops = <Shop>{};
   final _unselectedShops = <Shop>{};
 
-  MapPageModeSelectShopsWhereProductSoldBase(MapPageModeParams params)
-      : super(params) {
+  MapPageModeSelectShopsWhereProductSoldBase(MapPageModeParams params,
+      {required String nameForAnalytics})
+      : super(params, nameForAnalytics: nameForAnalytics) {
     _selectedShops.addAll(widget.initialSelectedShops);
   }
 

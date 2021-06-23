@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -16,6 +16,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -75,8 +76,10 @@ class _TestingStorage {
   VoidCallback? forceReload;
 }
 
-class _ShopProductRangePageState extends State<ShopProductRangePage> {
+class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
+
+  _ShopProductRangePageState() : super('ShopProductRangePage');
 
   @override
   void initState() {
@@ -100,7 +103,7 @@ class _ShopProductRangePageState extends State<ShopProductRangePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     Widget content;
     final errorWrapper = (Widget child) {
       return Padding(

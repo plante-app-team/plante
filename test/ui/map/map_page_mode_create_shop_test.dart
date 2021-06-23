@@ -8,6 +8,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
@@ -16,6 +17,7 @@ void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
   late MockShopsManager shopsManager;
+  late FakeAnalytics analytics;
   late List<Shop> shops;
 
   setUp(() async {
@@ -24,6 +26,7 @@ void main() {
     mapController = commons.mapController;
     shops = commons.shops;
     shopsManager = commons.shopsManager;
+    analytics = commons.analytics;
   });
 
   Future<void> switchMode(WidgetTester tester, MapPage widget, BuildContext context) async {
@@ -163,5 +166,18 @@ void main() {
     await tester.tap(find.byKey(const Key('close_create_shop_button')));
 
     expect(widget.getModeForTesting().runtimeType, equals(MapPageModeSelectShopsWhereProductSold));
+  });
+
+  testWidgets('create shop mode switch event', (WidgetTester tester) async {
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+        initialSelectedShops: [shops[1]]);
+    final context = await tester.superPump(widget);
+
+    analytics.clearEvents();
+    await switchMode(tester, widget, context);
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.wasEventSent('map_page_mode_switch_create_shop'), isTrue);
   });
 }

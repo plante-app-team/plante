@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:http/http.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/outside/http_client.dart';
 
 class IpLocationProvider {

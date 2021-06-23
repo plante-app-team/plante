@@ -12,6 +12,7 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
@@ -24,6 +25,7 @@ void main() {
   late MockPermissionsManager permissionsManager;
   late MockLocationController locationController;
   late MockLatestCameraPosStorage latestCameraPosStorage;
+  late FakeAnalytics analytics;
 
   setUp(() async {
     commons = MapPageModesTestCommons();
@@ -32,6 +34,7 @@ void main() {
     permissionsManager = commons.permissionsManager;
     locationController = commons.locationController;
     latestCameraPosStorage = commons.latestCameraPosStorage;
+    analytics = commons.analytics;
   });
 
   testWidgets('my location when have permission', (WidgetTester tester) async {
@@ -339,6 +342,23 @@ void main() {
     visibilityDetector.onVisibilityChanged.call(true, firstCall);
     await tester.pumpAndSettle();
     verify(mapController.setMapStyle(any));
+  });
+
+  testWidgets('shop click analytics', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    analytics.clearEvents();
+
+    widget.onMarkerClickForTesting(commons.shops);
+    await tester.pumpAndSettle();
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.sentEventParams('map_shops_click'), {
+      'shops': commons.shops.map((e) => e.osmId).join(', ')
+    });
   });
 }
 

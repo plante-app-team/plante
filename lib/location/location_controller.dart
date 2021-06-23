@@ -8,7 +8,7 @@ import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shared_preferences_ext.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 
 const PREF_LAST_KNOWN_POS = 'PREF_LAST_KNOWN_POS2';
 

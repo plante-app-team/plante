@@ -10,6 +10,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -28,6 +29,7 @@ import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
@@ -41,6 +43,7 @@ void main() {
   late MockShopsManager shopsManager;
   late MockLocationController locationController;
   late MockPermissionsManager permissionsManager;
+  late FakeAnalytics analytics;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -54,6 +57,8 @@ void main() {
 
   setUp(() async {
     await GetIt.I.reset();
+    analytics = FakeAnalytics();
+    GetIt.I.registerSingleton<Analytics>(analytics);
 
     photosTaker = MockPhotosTaker();
     when(photosTaker.takeAndCropPhoto(any, any)).thenAnswer((_) async =>
@@ -64,8 +69,9 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     productsManager = MockProductsManager();
-    when(productsManager.createUpdateProduct(any, any)).thenAnswer(
-            (invoc) async => Ok(invoc.positionalArguments[0] as Product));
+    when(productsManager.createUpdateProduct(any, any)).thenAnswer((invoc) async {
+      return Ok(invoc.positionalArguments[0] as Product);
+    });
     when(productsManager.updateProductAndExtractIngredients(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
@@ -237,6 +243,22 @@ void main() {
           break;
         }
       }
+      if (ocrSuccessfulAttemptNumber <= ocrAttempts) {
+        expect(analytics.wasEventSent('ocr_success'), isTrue);
+      } else {
+        expect(analytics.wasEventSent('ocr_success'), isFalse);
+      }
+      if (ocrSuccessfulAttemptNumber == 1) {
+        expect(analytics.wasEventSent('ocr_fail_final'), isFalse);
+        expect(analytics.wasEventSent('ocr_fail_will_retry'), isFalse);
+      } else {
+        expect(analytics.wasEventSent('ocr_fail_final'), isTrue);
+        expect(analytics.wasEventSent('ocr_fail_will_retry'), isTrue);
+      }
+    } else {
+      expect(analytics.wasEventSent('ocr_success'), isFalse);
+      expect(analytics.wasEventSent('ocr_fail_final'), isFalse);
+      expect(analytics.wasEventSent('ocr_fail_will_retry'), isFalse);
     }
 
     if (ingredientsTextOverride != null) {
@@ -314,6 +336,16 @@ void main() {
 
     // If done, cache dir must be deleted
     expect(cacheDir.existsSync(), equals(!done));
+
+    if (done) {
+      expect(analytics.sentEventParams('product_save_success'), equals({
+        'barcode': expectedProductResult!.barcode
+      }));
+      expect(analytics.wasEventSent('product_save_failure'), isFalse);
+      expect(analytics.wasEventSent('product_save_shops_failure'), isFalse);
+    } else {
+      expect(analytics.wasEventSent('product_save_success'), isFalse);
+    }
 
     return done;
   }
@@ -840,6 +872,47 @@ void main() {
     // Even though perfectlyGoodExpectedProduct expected to be stored,
     // page is expected to be not finished, because of shops sending error
     expect(done, isFalse);
+    expect(analytics.sentEventParams('product_save_shops_failure'), equals({
+      'barcode': perfectlyGoodExpectedProduct.barcode
+    }));
+  });
+
+  testWidgets('product saving to server finishes with error but all other things are ok', (WidgetTester tester) async {
+    final perfectlyGoodExpectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    when(productsManager.createUpdateProduct(any, any)).thenAnswer((_) async {
+      return Err(ProductsManagerError.OTHER);
+    });
+
+    final done = await generalTest(
+        tester,
+        expectedProductResult: perfectlyGoodExpectedProduct,
+        nameInput: perfectlyGoodExpectedProduct.name,
+        brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
+        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
+        takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
+        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
+        vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
+    );
+
+    // Even though perfectlyGoodExpectedProduct expected to be stored,
+    // page is expected to be not finished, because of product saving error
+    expect(done, isFalse);
+    expect(analytics.sentEventParams('product_save_failure'), equals({
+      'barcode': perfectlyGoodExpectedProduct.barcode
+    }));
   });
 
   testWidgets('ocr fail and manual ingredients input', (WidgetTester tester) async {

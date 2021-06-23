@@ -1,4 +1,4 @@
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 
 enum Gender { MALE, FEMALE }
 

@@ -12,6 +12,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
 import 'map_page_modes_test_commons.mocks.dart';
@@ -20,6 +21,7 @@ void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
   late MockShopsManager shopsManager;
+  late FakeAnalytics analytics;
   late List<Shop> shops;
   final product = Product((e) => e
     ..barcode = '222'
@@ -31,6 +33,7 @@ void main() {
     mapController = commons.mapController;
     shops = commons.shops;
     shopsManager = commons.shopsManager;
+    analytics = commons.analytics;
   });
 
   testWidgets('empty shops are displayed by default', (WidgetTester tester) async {
@@ -318,5 +321,21 @@ void main() {
         findsOneWidget);
     expect(widget.getModeForTesting().runtimeType,
         equals(MapPageModeCreateShop));
+  });
+
+  testWidgets('add product mode switch event', (WidgetTester tester) async {
+    expect(analytics.allEvents().length, equals(0));
+
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+        product: product,
+        initialSelectedShops: [shops[0]]);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.wasEventSent('map_page_mode_switch_add_product'), isTrue);
   });
 }

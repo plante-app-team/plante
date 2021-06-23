@@ -7,6 +7,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
@@ -31,6 +32,7 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'shop_product_range_page_test.mocks.dart';
@@ -89,6 +91,7 @@ void main() {
 
   setUp(() async {
     await GetIt.I.reset();
+    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);

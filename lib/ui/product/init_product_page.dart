@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -20,6 +20,7 @@ import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/label_cancelable_plante.dart';
 import 'package:plante/ui/base/components/veg_status_selection_panel.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -76,7 +77,7 @@ class InitProductPage extends StatefulWidget {
   }
 }
 
-class _InitProductPageState extends State<InitProductPage>
+class _InitProductPageState extends PageStatePlante<InitProductPage>
     with RestorationMixin {
   late final PermissionsManager _permissionsManager;
   late final InitProductPageModel _model;
@@ -87,6 +88,8 @@ class _InitProductPageState extends State<InitProductPage>
       TextEditingController();
   final TextEditingController _ingredientsTextController =
       TextEditingController();
+
+  _InitProductPageState() : super('InitProductPage');
 
   void onStateUpdated() {
     if (!mounted) {
@@ -123,7 +126,8 @@ class _InitProductPageState extends State<InitProductPage>
         widget.initialShops,
         GetIt.I.get<ProductsManager>(),
         GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<PhotosTaker>());
+        GetIt.I.get<PhotosTaker>(),
+        analytics);
     _ensureCacheDirExistence();
   }
 
@@ -188,7 +192,7 @@ class _InitProductPageState extends State<InitProductPage>
       text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty));
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     final content =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(

@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
@@ -40,6 +41,7 @@ class InitProductPageModel {
   final ProductsManager _productsManager;
   final ShopsManager _shopsManager;
   final PhotosTaker _photosTaker;
+  final Analytics _analytics;
   Product get _initialProduct => _initialProductRestorable.value;
 
   InitProductPageOcrState get ocrState => _ocrState;
@@ -92,7 +94,8 @@ class InitProductPageModel {
       List<Shop> _initialShops,
       this._productsManager,
       this._shopsManager,
-      this._photosTaker)
+      this._photosTaker,
+      this._analytics)
       : _initialProductRestorable = ProductRestorable(initialProduct),
         _productRestorable = ProductRestorable(initialProduct),
         _shopsRestorable = ShopsListRestorable(_initialShops);
@@ -218,6 +221,8 @@ class InitProductPageModel {
         Log.i('InitProductPageModel: saveProduct: product saved');
         product = savedProduct;
       } else {
+        _analytics
+            .sendEvent('product_save_failure', {'barcode': product.barcode});
         return false;
       }
 
@@ -226,11 +231,15 @@ class InitProductPageModel {
         final shopsResult =
             await _shopsManager.putProductToShops(product, shops);
         if (shopsResult.isErr) {
+          _analytics.sendEvent(
+              'product_save_shops_failure', {'barcode': product.barcode});
           Log.i('InitProductPageModel: saveProduct: saving shops fail');
           return false;
         }
       }
 
+      _analytics
+          .sendEvent('product_save_success', {'barcode': product.barcode});
       Log.i('InitProductPageModel: saveProduct: success');
       return true;
     } finally {
@@ -292,10 +301,20 @@ class InitProductPageModel {
       } on TimeoutException catch (e) {
         Log.w('_ocrIngredientsImpl timeout $attemptsCount', ex: e);
       }
+      if (ocrResult.isErr) {
+        if (attemptsCount == OCR_RETRIES_COUNT) {
+          _analytics.sendEvent('ocr_fail_final');
+        } else {
+          _analytics.sendEvent('ocr_fail_will_retry');
+        }
+      }
     }
 
     if (ocrResult.isErr) {
       return null;
+    }
+    if (ocrResult.isOk) {
+      _analytics.sendEvent('ocr_success');
     }
     return ocrResult.unwrap().ingredients;
   }

@@ -9,6 +9,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
@@ -28,6 +29,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
+import '../../fake_analytics.dart';
 import '../../fake_settings.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
@@ -41,9 +43,12 @@ void main() {
   late MockRouteObserver<ModalRoute> routesObserver;
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
+  late FakeAnalytics analytics;
 
   setUp(() async {
     await GetIt.I.reset();
+    analytics = FakeAnalytics();
+    GetIt.I.registerSingleton<Analytics>(analytics);
 
     GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<Settings>(FakeSettings());
@@ -478,6 +483,44 @@ void main() {
     final initProductPage =
       find.byType(InitProductPage).evaluate().first.widget as InitProductPage;
     expect(initProductPage.initialShops, equals([shop]));
+  });
+
+  testWidgets('barcode scan analytics', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+        Ok(Product((e) => e
+          ..barcode = invc.positionalArguments[0] as String)));
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    analytics.clearEvents();
+
+    widget.newScanDataForTesting(_barcode('12345'), byCamera: true);
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.sentEventParams('barcode_scan'), equals({
+      'barcode': '12345'
+    }));
+    expect(analytics.wasEventSent('barcode_manual'), isFalse);
+  });
+
+  testWidgets('barcode manual input analytics', (WidgetTester tester) async {
+    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+        Ok(Product((e) => e
+          ..barcode = invc.positionalArguments[0] as String)));
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    analytics.clearEvents();
+
+    widget.newScanDataForTesting(_barcode('12345'), byCamera: false);
+
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.sentEventParams('barcode_manual'), equals({
+      'barcode': '12345'
+    }));
+    expect(analytics.wasEventSent('barcode_scan'), isFalse);
   });
 }
 

@@ -5,6 +5,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/radio_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -26,7 +27,7 @@ class InitUserPage extends StatefulWidget {
   _InitUserPageState createState() => _InitUserPageState(userParams, callback);
 }
 
-class _InitUserPageState extends State<InitUserPage> {
+class _InitUserPageState extends PageStatePlante<InitUserPage> {
   bool _loading = false;
 
   UserParams _userParams;
@@ -58,7 +59,8 @@ class _InitUserPageState extends State<InitUserPage> {
     });
   }
 
-  _InitUserPageState(this._userParams, this._resultCallback);
+  _InitUserPageState(this._userParams, this._resultCallback)
+      : super('InitUserPage');
 
   @override
   void initState() {
@@ -87,7 +89,7 @@ class _InitUserPageState extends State<InitUserPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(

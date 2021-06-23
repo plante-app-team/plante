@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -16,12 +17,13 @@ import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/switch_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
 import 'package:plante/ui/settings_page.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -38,11 +40,11 @@ class BarcodeScanPage extends StatefulWidget {
   @override
   _BarcodeScanPageState createState() => _BarcodeScanPageState();
 
-  void newScanDataForTesting(qr.Barcode barcode) {
+  void newScanDataForTesting(qr.Barcode barcode, {bool byCamera = true}) {
     if (!isInTests()) {
       throw Exception('newScanDataForTesting not in tests');
     }
-    _testingStorage.newScanDataCallback!.call(barcode);
+    _testingStorage.newScanDataCallback!.call(Pair(barcode, byCamera));
   }
 
   void closeForTesting() {
@@ -54,11 +56,11 @@ class BarcodeScanPage extends StatefulWidget {
 }
 
 class _TestingStorage {
-  ArgCallback<qr.Barcode>? newScanDataCallback;
+  ArgCallback<Pair<qr.Barcode, bool>>? newScanDataCallback;
   VoidCallback? closeCallback;
 }
 
-class _BarcodeScanPageState extends State<BarcodeScanPage>
+class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
     with RouteAware, WidgetsBindingObserver {
   late final BarcodeScanPageModel _model;
 
@@ -69,10 +71,14 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   bool _flashOn = false;
   bool _showCameraInput = true;
 
+  _BarcodeScanPageState() : super('BarcodeScanPage');
+
   @override
   void initState() {
     super.initState();
-    widget._testingStorage.newScanDataCallback = _onNewScanData;
+    widget._testingStorage.newScanDataCallback = (pair) {
+      _onNewScanData(pair.first, byCamera: pair.second);
+    };
     widget._testingStorage.closeCallback = () {
       Navigator.of(context).pop();
     };
@@ -151,7 +157,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
     return Scaffold(
         backgroundColor: _BACKGROUND_COLOR,
         body: SafeArea(
@@ -284,6 +290,7 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
       _onNewScanData(
           qr.Barcode(
               _manualBarcodeTextController.text, qr.BarcodeFormat.unknown, []),
+          byCamera: false,
           forceSearch: true);
       FocusScope.of(context).unfocus();
     };
@@ -328,12 +335,20 @@ class _BarcodeScanPageState extends State<BarcodeScanPage>
     setState(() {
       _qrController = controller;
     });
-    controller.scannedDataStream.listen(_onNewScanData);
+    controller.scannedDataStream.listen((scanData) {
+      _onNewScanData(scanData, byCamera: true);
+    });
   }
 
-  void _onNewScanData(qr.Barcode scanData, {bool forceSearch = false}) async {
+  void _onNewScanData(qr.Barcode scanData,
+      {required bool byCamera, bool forceSearch = false}) async {
     if (_model.barcode == scanData.code && !forceSearch) {
       return;
+    }
+    if (byCamera) {
+      analytics.sendEvent('barcode_scan', {'barcode': scanData.code});
+    } else {
+      analytics.sendEvent('barcode_manual', {'barcode': scanData.code});
     }
     // Note: no await because we don't care about result
     _sendProductScan(scanData);

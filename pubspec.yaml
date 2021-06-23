@@ -45,6 +45,7 @@ dependencies:
   firebase_core: ^1.0.4
   firebase_auth: ^1.1.1
   firebase_crashlytics: ^2.0.4
+  firebase_analytics: ^8.1.2
   device_info: ^2.0.0
   built_value: ^8.0.4
   built_collection: ^5.0.0

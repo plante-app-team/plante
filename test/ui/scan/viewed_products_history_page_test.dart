@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -14,6 +15,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'barcode_scan_page_test.mocks.dart';
@@ -25,6 +27,7 @@ void main() {
 
   setUp(() async {
     await GetIt.I.reset();
+    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
     GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
 

@@ -14,6 +14,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 
+import '../../fake_analytics.dart';
 import '../../fake_http_client.dart';
 import '../../fake_settings.dart';
 import '../../fake_user_params_controller.dart';
@@ -22,14 +23,16 @@ import 'backend_test.mocks.dart';
 @GenerateMocks([BackendObserver])
 void main() {
   final fakeSettings = FakeSettings();
+  late FakeAnalytics analytics;
   
   setUp(() {
+    analytics = FakeAnalytics();
   });
 
   test('successful registration', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
     httpClient.setResponse('.*register_user.*', '''
       {
@@ -48,7 +51,7 @@ void main() {
   test('successful login', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
     httpClient.setResponse('.*register_user.*', '''
       {
@@ -72,7 +75,7 @@ void main() {
   test('check whether logged in', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
     expect(await backend.isLoggedIn(), isFalse);
     await userParamsController.setUserParams(UserParams((v) => v.backendId = '123'));
@@ -90,7 +93,7 @@ void main() {
     final userParamsController = FakeUserParamsController();
     await userParamsController.setUserParams(existingParams);
 
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     final result = await backend.loginOrRegister('google ID');
     expect(result.unwrap(), equals(existingParams));
   });
@@ -98,7 +101,7 @@ void main() {
   test('registration failure - email not verified', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
     httpClient.setResponse('.*register_user.*', '''
       {
@@ -115,7 +118,7 @@ void main() {
   test('registration request not 200', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '', responseCode: 500);
     final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
@@ -124,7 +127,7 @@ void main() {
   test('registration request bad json', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '{{{{bad bad bad}');
     final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
@@ -133,7 +136,7 @@ void main() {
   test('registration request json error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '''
       {
         "error": "some_error"
@@ -146,7 +149,7 @@ void main() {
   test('login request not 200', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
@@ -160,7 +163,7 @@ void main() {
   test('login request bad json', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
@@ -174,7 +177,7 @@ void main() {
   test('login request json error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
@@ -192,7 +195,7 @@ void main() {
   test('registration network error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException('.*register_user.*', const SocketException(''));
     final result = await backend.loginOrRegister('google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
@@ -201,7 +204,7 @@ void main() {
   test('login network error', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '''
       {
         "error": "already_registered"
@@ -215,7 +218,7 @@ void main() {
   test('observer notified about server errors', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     final observer = MockBackendObserver();
     backend.addObserver(observer);
 
@@ -235,7 +238,7 @@ void main() {
     final userParamsController = await _initUserParams();
     final initialParams = userParamsController.cachedUserParams!;
 
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
     final updatedParams = initialParams.rebuild((v) => v
@@ -269,7 +272,7 @@ void main() {
       ..backendClientToken = 'my_token');
     await userParamsController.setUserParams(initialParams);
 
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
     await backend.updateUserParams(initialParams.rebuild((v) => v.name = 'Nora'));
@@ -286,7 +289,7 @@ void main() {
       ..name = 'Bob');
     await userParamsController.setUserParams(initialParams);
 
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*update_user_data.*', ''' { "result": "ok" } ''');
 
     await backend.updateUserParams(initialParams.rebuild((v) => v.name = 'Nora'));
@@ -300,7 +303,7 @@ void main() {
     final userParamsController = await _initUserParams();
     final initialParams = userParamsController.cachedUserParams!;
 
-    final backend = Backend(userParamsController, httpClient, fakeSettings);
+    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException('.*update_user_data.*', const HttpException(''));
 
     final updatedParams = initialParams.rebuild((v) => v
@@ -313,7 +316,7 @@ void main() {
 
   test('request product', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {
        "barcode": "123",
@@ -342,7 +345,7 @@ void main() {
 
   test('request product not found', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {
        "error": "product_not_found"
@@ -356,7 +359,7 @@ void main() {
 
   test('request product http error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '', responseCode: 500);
 
     final result = await backend.requestProduct('123');
@@ -370,7 +373,7 @@ void main() {
 
   test('request product invalid JSON', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*product_data.*', '''
      {{{{{{{{{{{{
        "barcode": "123",
@@ -392,7 +395,7 @@ void main() {
 
   test('request product network exception', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException('.*product_data.*', const SocketException(''));
 
     final result = await backend.requestProduct('123');
@@ -401,7 +404,7 @@ void main() {
 
   test('create update product', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -426,7 +429,7 @@ void main() {
 
   test('create update product vegetarian status only', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -450,7 +453,7 @@ void main() {
 
   test('create update product vegan status only', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_update_product.*',
         ''' { "result": "ok" } ''');
@@ -474,7 +477,7 @@ void main() {
 
   test('create update product http error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*create_update_product.*', '', responseCode: 500);
 
     final result = await backend.createUpdateProduct(
@@ -486,7 +489,7 @@ void main() {
 
   test('create update product invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*create_update_product.*', '{{{{}');
 
     final result = await backend.createUpdateProduct(
@@ -498,7 +501,7 @@ void main() {
 
   test('create update product network error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*create_update_product.*', const SocketException(''));
 
@@ -511,7 +514,7 @@ void main() {
 
   test('send report', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*make_report.*',
         ''' { "result": "ok" } ''');
@@ -522,9 +525,25 @@ void main() {
     expect(result.isOk, isTrue);
   });
 
+  test('send report analytics', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*make_report.*',
+        ''' { "result": "ok" } ''');
+
+    expect(analytics.allEvents(), equals([]));
+    await backend.sendReport('123', "that's a baaaad product");
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('report_sent').second, equals({
+      'barcode': '123',
+      'report': "that's a baaaad product",
+    }));
+  });
+
   test('send report network error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException('.*make_report.*', const SocketException(''));
 
     final result = await backend.sendReport(
@@ -535,7 +554,7 @@ void main() {
 
   test('user data obtaining', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*user_data.*',
         ''' { "name": "Bob Kelso", "user_id": "123" } ''');
@@ -553,7 +572,7 @@ void main() {
 
   test('user data obtaining invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*user_data.*',
         ''' {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } ''');
@@ -564,7 +583,7 @@ void main() {
 
   test('user data obtaining network error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*user_data.*', const SocketException(''));
 
@@ -574,7 +593,7 @@ void main() {
 
   test('requesting products at shops', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -675,7 +694,7 @@ void main() {
 
   test('requesting products at shops empty response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -690,7 +709,7 @@ void main() {
 
   test('requesting products at shops invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -718,7 +737,7 @@ void main() {
 
   test('requesting products at shops JSON without results response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*products_at_shops_data.*',
         '''
@@ -733,7 +752,7 @@ void main() {
 
   test('requesting products at shops network error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*products_at_shops_data.*', const SocketException(''));
 
@@ -743,7 +762,7 @@ void main() {
 
   test('requesting shops', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -783,7 +802,7 @@ void main() {
 
   test('requesting shops empty response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -798,7 +817,7 @@ void main() {
 
   test('requesting shops invalid JSON response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -814,7 +833,7 @@ void main() {
 
   test('requesting shops JSON without results response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*shops_data.*',
         '''
@@ -829,7 +848,7 @@ void main() {
 
   test('requesting shops network error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*shops_data.*', const SocketException(''));
 
@@ -839,19 +858,47 @@ void main() {
 
   test('product presence vote', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*product_presence_vote.*', ''' { "result": "ok" } ''');
 
     var result = await backend.productPresenceVote('123456', '1', true);
     expect(result.isOk, isTrue);
+
     result = await backend.productPresenceVote('123456', '1', false);
     expect(result.isOk, isTrue);
   });
 
+  test('product presence vote analytics events', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse(
+        '.*product_presence_vote.*', ''' { "result": "ok" } ''');
+
+    expect(analytics.allEvents(), equals([]));
+
+    await backend.productPresenceVote('123456', '1', true);
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('product_presence_vote').second, equals({
+      'barcode': '123456',
+      'shop': '1',
+      'vote': true
+    }));
+    analytics.clearEvents();
+
+    await backend.productPresenceVote('123456', '1', false);
+    expect(analytics.allEvents().length, equals(1));
+    expect(analytics.firstSentEvent('product_presence_vote').second, equals({
+      'barcode': '123456',
+      'shop': '1',
+      'vote': false
+    }));
+  });
+
+
   test('product presence vote error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*product_presence_vote.*', const SocketException(''));
 
@@ -861,7 +908,7 @@ void main() {
 
   test('put product to shop', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*put_product_to_shop.*', ''' { "result": "ok" } ''');
 
@@ -871,7 +918,7 @@ void main() {
 
   test('put product to shop error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*put_product_to_shop.*', const SocketException(''));
 
@@ -881,7 +928,7 @@ void main() {
 
   test('create shop', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_shop.*', ''' { "osm_id": "123456" } ''');
 
@@ -896,7 +943,7 @@ void main() {
 
   test('create shop error', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
         '.*create_shop.*', const SocketException(''));
 
@@ -909,7 +956,7 @@ void main() {
 
   test('create shop not expected json response', () async {
     final httpClient = FakeHttpClient();
-    final backend = Backend(await _initUserParams(), httpClient, fakeSettings);
+    final backend = Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse(
         '.*create_shop.*', ''' { "result": "ok" } ''');
 

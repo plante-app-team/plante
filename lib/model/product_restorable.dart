@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 
 class ProductRestorable extends RestorableValue<Product> {

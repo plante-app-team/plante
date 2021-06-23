@@ -4,9 +4,10 @@ import 'package:plante/model/product.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/headline_bordered_plante.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/product/_product_images_helper.dart';
 
-class ProductPhotoPage extends StatelessWidget {
+class ProductPhotoPage extends StatefulWidget {
   final Product product;
   final ProductImageType imageType;
   const ProductPhotoPage(
@@ -14,9 +15,17 @@ class ProductPhotoPage extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  _ProductPhotoPageState createState() => _ProductPhotoPageState();
+}
+
+class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
+  _ProductPhotoPageState() : super('ProductPhotoPage');
+
+  @override
+  Widget buildPage(BuildContext context) {
     final img =
-        ProductImagesHelper.productImageWidget(product, imageType)?.image;
+        ProductImagesHelper.productImageWidget(widget.product, widget.imageType)
+            ?.image;
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -34,7 +43,7 @@ class ProductPhotoPage extends StatelessWidget {
                           child: Center(child: FabPlante.backBtnPopOnClick()),
                         )),
                     const SizedBox(width: 16),
-                    HeadlineBorderedPlante(product.name ?? '???'),
+                    HeadlineBorderedPlante(widget.product.name ?? '???'),
                   ],
                 )
               ],

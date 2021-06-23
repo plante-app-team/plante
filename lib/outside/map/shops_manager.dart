@@ -4,7 +4,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/log.dart';
+import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
@@ -20,6 +21,7 @@ import 'package:plante/base/date_time_extensions.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
 class ShopsManager {
+  final Analytics _analytics;
   final _listeners = <ShopsManagerListener>[];
   final ShopsManagerImpl _impl;
 
@@ -39,7 +41,7 @@ class ShopsManager {
   int get loadedAreasCount => _loadedAreas.length;
 
   ShopsManager(OpenStreetMap openStreetMap, Backend backend,
-      ProductsManager productsManager)
+      ProductsManager productsManager, this._analytics)
       : _impl = ShopsManagerImpl(openStreetMap, backend, productsManager);
 
   void addListener(ShopsManagerListener listener) {
@@ -154,7 +156,12 @@ class ShopsManager {
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
     final result = await _impl.putProductToShops(product, shops);
+    final eventParam = {
+      'barcode': product.barcode,
+      'shops': shops.map((e) => e.osmId).join(', ')
+    };
     if (result.isOk) {
+      _analytics.sendEvent('product_put_to_shop', eventParam);
       for (final shop in shops) {
         var rangeCache = _rangesCache[shop.osmId];
         if (rangeCache != null) {
@@ -176,6 +183,8 @@ class ShopsManager {
         }
       }
       _notifyListeners();
+    } else {
+      _analytics.sendEvent('product_put_to_shop_failure', eventParam);
     }
     return result;
   }
@@ -189,6 +198,8 @@ class ShopsManager {
         await _impl.createShop(name: name, coords: coords, type: type);
     if (result.isOk) {
       final shop = result.unwrap();
+      _analytics.sendEvent('create_shop_success',
+          {'name': name, 'lat': coords.y, 'lon': coords.x});
       _shopsCache[shop.osmId] = shop;
       for (final loadedArea in _loadedAreas.keys) {
         if (loadedArea.containsShop(shop)) {
@@ -196,6 +207,9 @@ class ShopsManager {
         }
       }
       _notifyListeners();
+    } else {
+      _analytics.sendEvent('create_shop_failure',
+          {'name': name, 'lat': coords.y, 'lon': coords.x});
     }
     return result;
   }

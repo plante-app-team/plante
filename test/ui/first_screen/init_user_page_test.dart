@@ -1,12 +1,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 
 void main() {
+  setUp(() async {
+    await GetIt.I.reset();
+    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
+  });
+
   testWidgets('Can fill all data and get user params', (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
