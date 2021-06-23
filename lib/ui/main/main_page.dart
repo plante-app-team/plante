@@ -19,7 +19,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   final selectedPage = RestorableInt(0);
   final pageOptions = [
-    if (enableNewestFeatures()) MapPage(),
+    MapPage(),
     BarcodeScanPage(key: const Key('barcode_scan_page')),
     const ViewedProductsHistoryPage(key: Key('viewed_products_history_page')),
   ];
@@ -49,7 +49,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
         body: IndexedStack(index: selectedPage.value, children: pageOptions),
         bottomNavigationBar: BottomBarPlante(
           svgIcons: [
-            if (enableNewestFeatures()) 'assets/marker_abstract.svg',
+            'assets/marker_abstract.svg',
             'assets/barcode.svg',
             'assets/history.svg'
           ],

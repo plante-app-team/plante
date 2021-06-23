@@ -128,27 +128,26 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                         child: Text(vegStatusHint()!, style: TextStyles.hint),
                       ))),
             const SizedBox(height: 16),
-            if (enableNewestFeatures())
-              Column(children: [
-                Container(
-                    width: double.infinity,
-                    height: 96,
-                    color: ColorsPlante.primary,
-                    child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          key: const Key('mark_on_map'),
-                          overlayColor: MaterialStateProperty.all(
-                              ColorsPlante.splashColor),
-                          onTap: _markOnMap,
-                          child: Center(
-                              child: Text(
-                                  context.strings
-                                      .display_product_page_veg_mark_on_map,
-                                  style: TextStyles.buttonFilled)),
-                        ))),
-                const SizedBox(height: 16),
-              ]),
+            Column(children: [
+              Container(
+                  width: double.infinity,
+                  height: 96,
+                  color: ColorsPlante.primary,
+                  child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        key: const Key('mark_on_map'),
+                        overlayColor:
+                            MaterialStateProperty.all(ColorsPlante.splashColor),
+                        onTap: _markOnMap,
+                        child: Center(
+                            child: Text(
+                                context.strings
+                                    .display_product_page_veg_mark_on_map,
+                                style: TextStyles.buttonFilled)),
+                      ))),
+              const SizedBox(height: 16),
+            ]),
             InkWell(
                 onTap: showProductIngredientsPhoto,
                 child: Padding(

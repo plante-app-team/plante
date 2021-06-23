@@ -249,7 +249,7 @@ class InitProductPageModel {
   }
 
   bool askForShops() {
-    return enableNewestFeatures();
+    return true;
   }
 
   void _onPhotoTaken(ProductImageType imageType, Uri outPath) async {
