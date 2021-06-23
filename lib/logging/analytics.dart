@@ -47,7 +47,6 @@ class Analytics {
     }
     _lastPage = pageName;
     await _analytics.setCurrentScreen(screenName: pageName);
-    await _analytics.logEvent(name: 'page_$pageName');
   }
 
   void onPageHidden(String? pageName) {
@@ -55,14 +54,18 @@ class Analytics {
   }
 
   void _onPageHiddenImpl(String? pageName) async {
-    if (await _settings.testingBackends()) {
-      return;
-    }
-    if (_lastPage != pageName) {
-      return;
-    }
-    Log.i('Analytics page hidden: $pageName');
-    _lastPage = null;
-    await _analytics.setCurrentScreen(screenName: null);
+    // TODO(https://trello.com/c/pQ4q3ets/): keyboard causes PageStatePlante
+    //         to believe it's closed,
+    //         which causes invalid `shown` events to be sent when
+    //         keyboard goes away.
+    // if (await _settings.testingBackends()) {
+    //   return;
+    // }
+    // if (_lastPage != pageName) {
+    //   return;
+    // }
+    // Log.i('Analytics page hidden: $pageName');
+    // _lastPage = null;
+    // await _analytics.setCurrentScreen(screenName: null);
   }
 }
