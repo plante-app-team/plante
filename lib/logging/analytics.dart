@@ -47,6 +47,7 @@ class Analytics {
     }
     _lastPage = pageName;
     await _analytics.setCurrentScreen(screenName: pageName);
+    await _analytics.logEvent(name: 'page_shown_$pageName');
   }
 
   void onPageHidden(String? pageName) {
