@@ -8,6 +8,21 @@ typedef OnVisibilityChanged = Function(bool visible, bool firstNotification);
 /// Wrapper around [VisibilityDetector].
 /// Observes VisibilityDetector, app's background-foreground state and
 /// supports tests.
+///
+/// PLEASE NOTE that unfortunately the events emitted by this widget (and by
+/// [VisibilityDetector]) are PROBABILISTIC, and DO NOT GUARANTY that the
+/// wrapped widget is actually hidden or shown.
+///
+/// For example, on Android when the soft keyboard is shown,
+/// [VisibilityDetector] then fires a pair of 'hidden'-'shown' events if the
+/// device is slow enough, even though the wrapped widget actually was
+/// never hidden.
+///
+/// How to fix the problem is a baffling question.
+/// As of 24th july of 2021 I was not able to find any good solutions to the
+/// problem and left the things as they are.
+///
+/// https://trello.com/c/pQ4q3ets/
 class VisibilityDetectorPlante extends StatefulWidget {
   final String keyStr;
   final Widget child;
@@ -28,6 +43,14 @@ class VisibilityDetectorPlante extends StatefulWidget {
 
 class _VisibilityDetectorPlanteState extends State<VisibilityDetectorPlante>
     implements AppLifecycleObserver {
+  /// [VisibilityDetector] requires its key to be unique and its
+  /// implementation contains a map which has the keys as.. keys.
+  /// But we don't want to be constraint by this requirement, so that ids
+  /// among [VisibilityDetectorPlante] can be reused.
+  /// We achieve that by generating a unique ID piece for each widget.
+  static var _latestUniqueIdPiece = 0;
+  final _uniqueIdPiece = ++_latestUniqueIdPiece;
+
   var _latestVisibleFraction = 0.0;
   var _latestAppState = AppLifecycleState.resumed;
   bool get _overallVisibility {
@@ -62,7 +85,7 @@ class _VisibilityDetectorPlanteState extends State<VisibilityDetectorPlante>
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-        key: Key('${widget.keyStr}_wrapped_impl'),
+        key: Key('${widget.keyStr}_wrapped_impl_$_uniqueIdPiece'),
         onVisibilityChanged: (info) {
           _onVisibilityPieceChange(newFraction: info.visibleFraction);
         },
