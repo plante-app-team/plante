@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -13,6 +17,7 @@ void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
   late FakeAnalytics analytics;
+  late MockShopsManager shopsManager;
   late List<Shop> shops;
 
   setUp(() async {
@@ -21,6 +26,7 @@ void main() {
     mapController = commons.mapController;
     shops = commons.shops;
     analytics = commons.analytics;
+    shopsManager = commons.shopsManager;
   });
 
   testWidgets('empty shops are not displayed by default', (WidgetTester tester) async {
@@ -182,5 +188,162 @@ void main() {
     await tester.tap(find.text(context.strings.map_page_empty_shops));
 
     expect(analytics.wasEventSent('empty_shops_hidden'), isTrue);
+  });
+
+  testWidgets('no shops hint when empty shops are not displayed', (WidgetTester tester) async {
+    // Shops available!
+    commons.fillFetchedShops();
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+
+    // No shops!
+    commons.clearFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+
+    // Fetch shops!
+    commons.fillFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+  });
+
+  testWidgets('no shops hint when empty shops are displayed', (WidgetTester tester) async {
+    // Shops available!
+    commons.fillFetchedShops();
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    // Show empty shops
+    await tester.tap(find.text(context.strings.map_page_empty_shops));
+
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+
+    // No shops!
+    commons.clearFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsOneWidget);
+
+    // Fetch shops!
+    commons.fillFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+  });
+
+  testWidgets('no shops hint dynamic switching', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+
+    // No shops!
+    commons.clearFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    // Hint 1
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+
+    // Show empty shops
+    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.pumpAndSettle();
+
+    // Hint 2
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsOneWidget);
+
+    // Hide empty shops
+    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.pumpAndSettle();
+
+    // Hint 1
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+  });
+
+  testWidgets('no shops hint is not shown until shops are loaded', (WidgetTester tester) async {
+    final completer = Completer<Map<String, Shop>>();
+    when(shopsManager.fetchShops(any, any)).thenAnswer((_) async =>
+        Ok(await completer.future));
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pump(const Duration(milliseconds: 10));
+
+    // No hints yet!
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsNothing);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+
+    // Shops loaded, and there are no shops!
+    completer.complete({});
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_1),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
   });
 }

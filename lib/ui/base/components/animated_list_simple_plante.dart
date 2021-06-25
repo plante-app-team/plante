@@ -1,6 +1,8 @@
 import 'package:diffutil_dart/diffutil.dart';
 import 'package:flutter/material.dart';
 
+/// Note: the class is buggy. Sometimes widgets added/removed from the middle
+/// are not animated.
 class AnimatedListSimplePlante extends StatefulWidget {
   final List<Widget> children;
   final EdgeInsets padding;

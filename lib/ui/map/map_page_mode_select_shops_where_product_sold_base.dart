@@ -44,12 +44,14 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
 
     hintsController.addHint(
         _HINT_ID, context.strings.map_page_click_on_shop_where_product_sold);
+    onDisplayedShopsChange(displayedShops);
   }
 
   @mustCallSuper
   @override
   void deinit() {
     hintsController.removeHint(_HINT_ID);
+    setBottomHint(null);
   }
 
   @override
@@ -149,5 +151,15 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
       return false;
     }
     return true;
+  }
+
+  @override
+  void onDisplayedShopsChange(Iterable<Shop> shops) {
+    if (shops.isEmpty) {
+      setBottomHint(
+          context.strings.map_page_no_shops_hint_in_select_shops_mode);
+    } else {
+      setBottomHint(null);
+    }
   }
 }

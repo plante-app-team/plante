@@ -52,6 +52,9 @@
       "map_page_click_on_shop_where_product_sold": "Click the shop marker, where the product is being sold",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
       "map_page_location_permission_reasoning_settings": "In order for the app to locate you, please give the location permission to the app in the app settings",
+      "map_page_no_shops_hint_default_mode_1": "No shops with products nearby. But you can click \"Empty shops\" and add first product!",
+      "map_page_no_shops_hint_default_mode_2": "Seems we don't know of any shops nearby! You can add a new shop while adding a new product or viewing a known one",
+      "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any shops nearby. But you can add a new one by clicking the round button with a plus on the right!",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

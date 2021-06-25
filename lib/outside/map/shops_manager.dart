@@ -132,9 +132,11 @@ class ShopsManager {
 
     final shops = shopsResult.unwrap();
     _shopsCache.addAll(shops);
-    _loadedAreas[boundsToLoad] =
-        shops.values.map((shop) => shop.osmId).toList();
-    return Ok(shops);
+    final ids = shops.values.map((shop) => shop.osmId).toList();
+    _loadedAreas[boundsToLoad] = ids;
+    final result =
+        ids.map((id) => shops[id]!).where((shop) => bounds.containsShop(shop));
+    return Ok({for (var shop in result) shop.osmId: shop});
   }
 
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(

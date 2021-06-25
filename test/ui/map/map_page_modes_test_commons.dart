@@ -75,7 +75,7 @@ class MapPageModesTestCommons {
   late Map<String, Shop> shopsMap;
 
   Future<void> setUp() async {
-    shopsMap = { for (final shop in shops) shop.osmId: shop };
+    fillFetchedShops();
 
     await GetIt.I.reset();
     analytics = FakeAnalytics();
@@ -138,5 +138,13 @@ class MapPageModesTestCommons {
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.set(any)).thenAnswer((_) async {});
+  }
+
+  void fillFetchedShops() {
+    shopsMap = { for (final shop in shops) shop.osmId: shop };
+  }
+
+  void clearFetchedShops() {
+    shopsMap = {};
   }
 }

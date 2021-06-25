@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
@@ -25,8 +26,10 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       MapHintsListController hintsController,
       WidgetSource widgetSource,
       ContextSource contextSource,
+      DisplayedShopsSource displayedShopsSource,
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
+      ArgCallback<String?> bottomHintCallback,
       ModeSwitchCallback modeSwitchCallback)
       : super(
             MapPageModeParams(
@@ -34,8 +37,10 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 hintsController,
                 widgetSource,
                 contextSource,
+                displayedShopsSource,
                 updateCallback,
                 updateMapCallback,
+                bottomHintCallback,
                 modeSwitchCallback,
                 analytics),
             nameForAnalytics: 'default');
@@ -58,6 +63,11 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         }
         break;
     }
+  }
+
+  @override
+  void deinit() {
+    setBottomHint(null);
   }
 
   @override
@@ -104,6 +114,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
     } else {
       analytics.sendEvent('empty_shops_hidden');
     }
+    onDisplayedShopsChange(displayedShops);
   }
 
   @override
@@ -114,5 +125,18 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   @override
   ShopCard createCardFor(Shop shop, cancelCallback) {
     return ShopCard.forProductRange(shop: shop, cancelCallback: cancelCallback);
+  }
+
+  @override
+  void onDisplayedShopsChange(Iterable<Shop> shops) {
+    if (shops.isEmpty) {
+      if (!_showEmptyShops) {
+        setBottomHint(context.strings.map_page_no_shops_hint_default_mode_1);
+      } else {
+        setBottomHint(context.strings.map_page_no_shops_hint_default_mode_2);
+      }
+    } else {
+      setBottomHint(null);
+    }
   }
 }

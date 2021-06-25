@@ -19,6 +19,7 @@ import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
+import 'package:plante/ui/map/components/map_bottom_hint.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -125,11 +126,13 @@ class _MapPageState extends PageStatePlante<MapPage>
   late MapPageMode _mode;
 
   final _mapController = Completer<GoogleMapController>();
-  var _shopsMarkers = <Marker>{};
+  var _displayedShopsMarkers = <Marker>{};
+  Iterable<Shop> _displayedShops = const [];
   late final ClusterManager _clusterManager;
   Timer? _mapUpdatesTimer;
 
   final _hintsController = MapHintsListController();
+  String? _bottomHint;
 
   bool get _loading => _model.loading;
 
@@ -189,6 +192,12 @@ class _MapPageState extends PageStatePlante<MapPage>
 
     final widgetSource = () => widget;
     final contextSource = () => context;
+    final displayedShopsSource = () => _displayedShops;
+    final updateBottomHintCallback = (String? hint) {
+      setState(() {
+        _bottomHint = hint;
+      });
+    };
     final switchModeCallback = (MapPageMode newMode) {
       setState(() {
         analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
@@ -204,8 +213,10 @@ class _MapPageState extends PageStatePlante<MapPage>
         _hintsController,
         widgetSource,
         contextSource,
+        displayedShopsSource,
         updateCallback,
         updateMapCallback,
+        updateBottomHintCallback,
         switchModeCallback);
 
     _initMapStyle();
@@ -318,7 +329,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         // Couldn't figure out why, probably there's a mistake either in
         // the Google Map lib or in the Clustering lib, but it's easier to
         // just use markers for 1 instance at a time.
-        markers: _instances.last == this ? _shopsMarkers : {},
+        markers: _instances.last == this ? _displayedShopsMarkers : {},
       ),
       Align(
           alignment: Alignment.bottomCenter,
@@ -328,6 +339,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                 child: SizedBox(
                     width: 80,
                     child: AnimatedListSimplePlante(children: _fabs()))),
+            MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(
                 children: _mode.buildBottomActions(context)),
           ])),
@@ -408,8 +420,10 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   void _onShopsUpdated(Iterable<Shop> shops) {
+    _displayedShops = shops;
     widget._testingStorage.displayedShops.clear();
     widget._testingStorage.displayedShops.addAll(shops);
+    _mode.onDisplayedShopsChange(shops);
 
     _clusterManager.setItems(shops
         .map((shop) =>
@@ -438,7 +452,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   void _updateMarkers(Set<Marker> markers) {
     if (mounted) {
       setState(() {
-        _shopsMarkers = markers;
+        _displayedShopsMarkers = markers;
       });
     }
   }

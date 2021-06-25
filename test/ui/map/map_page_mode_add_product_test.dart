@@ -11,6 +11,7 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
@@ -337,5 +338,43 @@ void main() {
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.wasEventSent('map_page_mode_switch_add_product'), isTrue);
+  });
+
+  testWidgets('no shops hint', (WidgetTester tester) async {
+    // Shops available!
+    commons.fillFetchedShops();
+
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+        product: product);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+        findsNothing);
+
+    // No shops!
+    commons.clearFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+        findsOneWidget);
+
+    // Fetch shops!
+    commons.fillFetchedShops();
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+        findsNothing);
   });
 }

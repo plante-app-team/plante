@@ -477,4 +477,42 @@ void main() {
     }));
     analytics.clearEvents();
   });
+
+  test('returned shops are within the requested bounds', () async {
+    final osmShops = [
+      OsmShop((e) => e
+        ..osmId = '1'
+        ..name = 'shop1'
+        ..longitude = 15
+        ..latitude = 15),
+      OsmShop((e) => e
+        ..osmId = '2'
+        ..name = 'shop2'
+        ..longitude = 15.0001
+        ..latitude = 15.0001),
+    ];
+    when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
+    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+
+    const northeast = Point<double>(15, 15);
+    const southwest = Point(14.999, 14.999);
+
+    // First request which shall initialize instance's cache
+    var shopsRes = await shopsManager.fetchShops(northeast, southwest);
+    var shops = shopsRes.unwrap();
+    // Only shop 1 is expected because only it is within the bounds
+    expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
+    // Verify cache was not used
+    verify(osm.fetchShops(any, any));
+
+    clearInteractions(osm);
+
+    // Secind request which shall use instance's cache
+    shopsRes = await shopsManager.fetchShops(northeast, southwest);
+    shops = shopsRes.unwrap();
+    // Again only shop 1 is expected because only it is within the bounds
+    expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
+    // Verify cache WAS used
+    verifyNever(osm.fetchShops(any, any));
+  });
 }
