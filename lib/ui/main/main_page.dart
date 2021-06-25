@@ -45,7 +45,19 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
     GetIt.I.get<LangCodeHolder>().langCode =
         Localizations.localeOf(context).languageCode;
     return Scaffold(
-        body: IndexedStack(index: selectedPage.value, children: pageOptions),
+        body: WillPopScope(
+            onWillPop: () async {
+              if (selectedPage.value == 0) {
+                return true;
+              } else {
+                setState(() {
+                  selectedPage.value = 0;
+                });
+                return false;
+              }
+            },
+            child:
+                IndexedStack(index: selectedPage.value, children: pageOptions)),
         bottomNavigationBar: BottomBarPlante(
           svgIcons: const [
             'assets/marker_abstract.svg',
