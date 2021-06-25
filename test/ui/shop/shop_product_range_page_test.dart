@@ -748,4 +748,149 @@ void main() {
     product1Center = tester.getCenter(find.text(products[1].name!));
     expect(product1Center.dy, lessThan(product0Center.dy));
   });
+
+  testWidgets('voting removes vote options', (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    // YES vote
+
+    var card = find.byType(ProductCard).evaluate().first.widget;
+    var product = products[0];
+
+    // Verify the proper product
+    expect(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(product.name!)), findsOneWidget);
+
+    // Vote
+    await tester.tap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_yes)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_yes)));
+    await tester.pumpAndSettle();
+
+    // Verify the vote options are gone from the card
+    card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_yes)),
+        findsNothing);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_no)),
+        findsNothing);
+
+
+    // NO vote
+
+    card = find.byType(ProductCard).evaluate().last.widget;
+    product = products[1];
+
+    // Verify the proper product
+    expect(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(product.name!)), findsOneWidget);
+
+    // Vote
+    await tester.tap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_no)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_yes)));
+    await tester.pumpAndSettle();
+
+    // Verify the vote options are gone from the card
+    card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_yes)),
+        findsNothing);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_no)),
+        findsNothing);
+  });
+
+  testWidgets('cancelled voting does not remove vote options', (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    // YES vote
+
+    var card = find.byType(ProductCard).evaluate().first.widget;
+    var product = products[0];
+
+    // Verify the proper product
+    expect(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(product.name!)), findsOneWidget);
+
+    // Vote
+    await tester.tap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_yes)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_no)));
+    await tester.pumpAndSettle();
+
+    // Verify the vote options are STILL on the card
+    card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_yes)),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_no)),
+        findsOneWidget);
+
+    // NO vote
+
+    card = find.byType(ProductCard).evaluate().last.widget;
+    product = products[1];
+
+    // Verify the proper product
+    expect(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(product.name!)), findsOneWidget);
+
+    // Tap and verify the vote is sent
+    await tester.tap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_no)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_no)));
+    await tester.pumpAndSettle();
+
+    // Verify the vote options are STILL on the card
+    card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_yes)),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.global_no)),
+        findsOneWidget);
+  });
 }

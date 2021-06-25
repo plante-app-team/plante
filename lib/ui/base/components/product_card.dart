@@ -30,7 +30,8 @@ class ProductCard extends StatefulWidget {
   _ProductCardState createState() => _ProductCardState();
 }
 
-class _ProductCardState extends State<ProductCard> {
+class _ProductCardState extends State<ProductCard>
+    with SingleTickerProviderStateMixin {
   Color? dominantColor;
 
   _ProductCardState();
@@ -107,11 +108,13 @@ class _ProductCardState extends State<ProductCard> {
                               product: widget.product, user: widget.beholder),
                         ])),
                   ]),
-                  if (widget.extraContent != null)
-                    Column(children: [
-                      const SizedBox(height: 16),
-                      widget.extraContent!
-                    ])
+                  AnimatedSize(
+                      duration: DURATION_DEFAULT,
+                      vsync: this,
+                      child: Column(children: [
+                        SizedBox(height: widget.extraContent != null ? 16 : 0),
+                        widget.extraContent ?? const SizedBox.shrink()
+                      ]))
                 ]))));
   }
 

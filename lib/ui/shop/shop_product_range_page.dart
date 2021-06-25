@@ -79,6 +79,7 @@ class _TestingStorage {
 
 class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
+  final _votedProducts = <String>[];
 
   _ShopProductRangePageState() : super('ShopProductRangePage');
 
@@ -223,7 +224,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               hint:
                   '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr',
               beholder: _model.user,
-              extraContent: cardExtraContent,
+              extraContent: _votedProducts.contains(product.barcode)
+                  ? null
+                  : cardExtraContent,
               onTap: () {
                 _openProductPage(product);
               }),
@@ -243,6 +246,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       final result = await _model.productPresenceVote(product, positive);
       if (result.isOk) {
         showSnackBar(context.strings.global_done_thanks, context);
+        setState(() {
+          _votedProducts.add(product.barcode);
+        });
       } else if (result.unwrapErr().errorKind ==
           BackendErrorKind.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
