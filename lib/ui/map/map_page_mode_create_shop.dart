@@ -9,6 +9,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/create_shop_dialog.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -139,6 +140,8 @@ class MapPageModeCreateShop extends MapPageMode {
     if (result.isOk) {
       _selectedShops.add(result.unwrap());
       switchModeTo(nextModeMaker.call());
+      showSnackBar(context.strings.map_page_shop_added_to_map, context,
+          SnackBarStyle.MAP_ACTION_DONE);
     } else {
       if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);

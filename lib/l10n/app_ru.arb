@@ -49,6 +49,7 @@
     "map_page_how_new_shop_is_called_label": "Название магазина",
     "map_page_how_new_shop_is_called_hint": "Пятёрочка",
     "map_page_click_where_new_shop_located": "Кликните на место, где расположен не учтённый магазин",
+    "map_page_shop_added_to_map": "Магазин добавлен на карту",
     "map_page_click_on_shop_where_product_sold": "Кликните на маркер магазина, в котором находится продукт",
     "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
     "map_page_location_permission_reasoning_settings": "Для определения вашего местоположения приложению необходимо системное разрешение",

@@ -11,7 +11,6 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';

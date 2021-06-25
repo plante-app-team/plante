@@ -54,6 +54,12 @@ class TextStyles {
       fontSize: 14,
       color: Color(0xFF192123));
 
+  static const TextStyle headline4Green = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 14,
+      color: ColorsPlante.primary);
+
   static const TextStyle input =
       TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF192123));
   static const TextStyle inputHint =

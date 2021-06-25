@@ -18,6 +18,7 @@ import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/switch_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
 import 'package:plante/ui/settings_page.dart';

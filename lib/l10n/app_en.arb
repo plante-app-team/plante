@@ -49,6 +49,7 @@
       "map_page_how_new_shop_is_called_label": "Shop's name",
       "map_page_how_new_shop_is_called_hint": "Spar",
       "map_page_click_where_new_shop_located": "Click where the new shop is located",
+      "map_page_shop_added_to_map": "The shop is added to the map",
       "map_page_click_on_shop_where_product_sold": "Click the shop marker, where the product is being sold",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
       "map_page_location_permission_reasoning_settings": "In order for the app to locate you, please give the location permission to the app in the app settings",

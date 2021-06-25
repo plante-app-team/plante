@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';

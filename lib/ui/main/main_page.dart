@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -48,7 +47,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
     return Scaffold(
         body: IndexedStack(index: selectedPage.value, children: pageOptions),
         bottomNavigationBar: BottomBarPlante(
-          svgIcons: [
+          svgIcons: const [
             'assets/marker_abstract.svg',
             'assets/barcode.svg',
             'assets/history.svg'

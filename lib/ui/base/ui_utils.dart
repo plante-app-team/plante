@@ -10,13 +10,6 @@ import 'package:intl/intl.dart' as intl;
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
-    String text, BuildContext context) {
-  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  return ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(text)));
-}
-
 Future<T?> showMenuPlante<T>(
     {required GlobalKey target,
     required BuildContext context,
