@@ -40,9 +40,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
                               SvgPicture.asset('assets/map_check_mark.svg'),
                               const SizedBox(width: 16),
                               Text(text, style: TextStyles.headline4Green)
-                            ]
-                        )
-                    ),
+                            ])),
                   ),
                 ),
               )));

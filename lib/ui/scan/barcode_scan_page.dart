@@ -200,16 +200,9 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
               // Top: -2 is a part of a fix for https://github.com/flutter/flutter/issues/14288
               Positioned.fill(
                   top: -2, child: Container(color: _BACKGROUND_COLOR)),
-              Container(
-                width: double.infinity,
-                color: _BACKGROUND_COLOR,
-                child: Column(children: [
-                  const SizedBox(height: 14),
-                  Expanded(child: _contentWidget()),
-                ]),
-              ),
             ])),
-          ])
+          ]),
+          Align(alignment: Alignment.bottomCenter, child: _contentWidget()),
         ])));
   }
 

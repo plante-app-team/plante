@@ -173,10 +173,11 @@ class BarcodeScanPageContentStateNoPermission
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Padding(
+    return Container(
         key: Key(id),
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
+        color: const Color(0xfff5f7fa),
+        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           Text(context.strings.barcode_scan_page_camera_permission_reasoning,
               textAlign: TextAlign.center, style: TextStyles.headline3),
           const SizedBox(height: 18),
@@ -195,10 +196,11 @@ class BarcodeScanPageContentStateCannotAskPermission
 
   @override
   Widget buildWidget(BuildContext context) {
-    return Padding(
+    return Container(
         key: Key(id),
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
+        color: const Color(0xfff5f7fa),
+        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           Text(
               context.strings
                   .barcode_scan_page_camera_permission_reasoning_settings,
