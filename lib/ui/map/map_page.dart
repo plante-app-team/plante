@@ -125,6 +125,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   late final MapPageModel _model;
   var _modeInited = false;
   late MapPageMode _mode;
+  bool _locationPermissionObtained = false;
 
   final _mapController = Completer<GoogleMapController>();
   var _displayedShopsMarkers = <Marker>{};
@@ -220,7 +221,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         updateBottomHintCallback,
         switchModeCallback);
 
-    _initMapStyle();
+    _asyncInit();
     _instances.add(this);
     _instances.forEach((instance) {
       instance.onInstancesChange();
@@ -253,6 +254,16 @@ class _MapPageState extends PageStatePlante<MapPage>
     analytics.sendEvent(
         'map_shops_click', {'shops': shops.map((e) => e.osmId).join(', ')});
     _mode.onMarkerClick(shops);
+  }
+
+  void _asyncInit() async {
+    await _initMapStyle();
+    final permission =
+        await _permissionsManager.status(PermissionKind.LOCATION);
+    setState(() {
+      _locationPermissionObtained = permission == PermissionState.granted ||
+          permission == PermissionState.limited;
+    });
   }
 
   Future<void> _initMapStyle() async {
@@ -309,7 +320,7 @@ class _MapPageState extends PageStatePlante<MapPage>
 
     final content = Stack(children: [
       GoogleMap(
-        myLocationEnabled: true,
+        myLocationEnabled: _locationPermissionObtained,
         mapToolbarEnabled: false,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
@@ -406,11 +417,15 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Future<bool> _ensurePermissions() async {
-    return await maybeRequestPermission(
+    final result = await maybeRequestPermission(
         context,
         _permissionsManager,
         PermissionKind.LOCATION,
         context.strings.map_page_location_permission_reasoning_settings);
+    setState(() {
+      _locationPermissionObtained = result;
+    });
+    return result;
   }
 
   void _onCameraIdle() async {
