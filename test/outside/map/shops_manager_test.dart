@@ -166,7 +166,7 @@ void main() {
     verifyZeroInteractions(osm);
     verifyZeroInteractions(backend);
 
-    // Fetch #1, no await
+    // Fetch without await
     final shopsFuture1 = shopsManager.fetchShops(northeast, southwest);
     final shopsFuture2 = shopsManager.fetchShops(northeast, southwest);
     final shopsFuture3 = shopsManager.fetchShops(northeast, southwest);

@@ -19,11 +19,14 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/product_card.dart';
+import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
@@ -38,13 +41,14 @@ import '../../widget_tester_extension.dart';
 import 'shop_product_range_page_test.mocks.dart';
 
 @GenerateMocks([Backend, ShopsManager, ProductsManager, PermissionsManager,
-  ViewedProductsStorage, PhotosTaker, RouteObserver])
+  ViewedProductsStorage, PhotosTaker, RouteObserver, AddressObtainer])
 void main() {
   late MockBackend backend;
   late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late MockProductsManager productsManager;
   late MockPermissionsManager permissionsManager;
+  late MockAddressObtainer addressObtainer;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -89,6 +93,10 @@ void main() {
     ..products.addAll(products)
     ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
 
+  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
+    ..road = 'Broadway'
+  )));
+
   setUp(() async {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
@@ -106,6 +114,8 @@ void main() {
     GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
+    addressObtainer = MockAddressObtainer();
+    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
@@ -125,6 +135,8 @@ void main() {
         Ok(None()));
     when(productsManager.createUpdateProduct(any, any)).thenAnswer(
             (invoc) async => Ok(invoc.positionalArguments[0] as Product));
+
+    when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
   });
 
   testWidgets('shop name in title', (WidgetTester tester) async {
@@ -892,5 +904,20 @@ void main() {
             of: find.byWidget(card),
             matching: find.text(context.strings.global_no)),
         findsOneWidget);
+  });
+
+  testWidgets('has shop address', (WidgetTester tester) async {
+    final range = ShopProductRange((e) => e
+      ..shop.replace(aShop)
+      ..products.addAll(const []));
+    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    final addressWidget = find.byType(ShopAddressWidget)
+        .evaluate().first.widget as ShopAddressWidget;
+    expect(identical(addressWidget.osmAddress, readyAddress), isTrue);
   });
 }

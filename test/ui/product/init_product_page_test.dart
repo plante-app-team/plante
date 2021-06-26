@@ -17,6 +17,8 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -36,7 +38,7 @@ import '../../widget_tester_extension.dart';
 import 'init_product_page_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, PhotosTaker, ShopsManager, LocationController,
-                PermissionsManager])
+                PermissionsManager, AddressObtainer])
 void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
@@ -44,6 +46,7 @@ void main() {
   late MockLocationController locationController;
   late MockPermissionsManager permissionsManager;
   late FakeAnalytics analytics;
+  late MockAddressObtainer addressObtainer;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -95,6 +98,11 @@ void main() {
 
     GetIt.I.registerSingleton<LatestCameraPosStorage>(
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+
+    addressObtainer = MockAddressObtainer();
+    when(addressObtainer.addressOfShop(any)).thenAnswer((_) async =>
+        Ok(OsmAddress.empty));
+    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {

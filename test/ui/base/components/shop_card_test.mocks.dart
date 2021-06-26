@@ -22,6 +22,9 @@ import 'package:plante/outside/backend/backend_error.dart' as _i14;
 import 'package:plante/outside/backend/backend_product.dart' as _i15;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i17;
 import 'package:plante/outside/backend/backend_shop.dart' as _i18;
+import 'package:plante/outside/map/address_obtainer.dart' as _i24;
+import 'package:plante/outside/map/open_street_map.dart' as _i26;
+import 'package:plante/outside/map/osm_address.dart' as _i25;
 import 'package:plante/outside/map/shops_manager.dart' as _i3;
 import 'package:plante/outside/map/shops_manager_types.dart' as _i4;
 import 'package:plante/outside/products/products_manager.dart' as _i19;
@@ -371,4 +374,22 @@ class MockRouteObserver<R extends _i22.Route<dynamic>> extends _i1.Mock
   void didStopUserGesture() =>
       super.noSuchMethod(Invocation.method(#didStopUserGesture, []),
           returnValueForMissingStub: null);
+}
+
+/// A class which mocks [AddressObtainer].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAddressObtainer extends _i1.Mock implements _i24.AddressObtainer {
+  MockAddressObtainer() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i5.Future<_i2.Result<_i25.OsmAddress, _i26.OpenStreetMapError>>
+      addressOfShop(_i6.Shop? shop) => (super.noSuchMethod(
+          Invocation.method(#addressOfShop, [shop]),
+          returnValue: Future<
+                  _i2.Result<_i25.OsmAddress, _i26.OpenStreetMapError>>.value(
+              _FakeResult<_i25.OsmAddress, _i26.OpenStreetMapError>())) as _i5
+          .Future<_i2.Result<_i25.OsmAddress, _i26.OpenStreetMapError>>);
 }

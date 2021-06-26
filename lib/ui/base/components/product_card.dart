@@ -50,6 +50,9 @@ class _ProductCardState extends State<ProductCard>
       final paletteGenerator =
           await PaletteGenerator.fromImageProvider(provider);
       setState(() {
+        if (!mounted) {
+          return;
+        }
         dominantColor = paletteGenerator.dominantColor?.color ??
             ColorsPlante.primaryDisabled;
         _dominantColorsCache[uri!] = dominantColor!;

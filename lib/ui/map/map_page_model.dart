@@ -11,6 +11,7 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/lat_lng_extensions.dart';
@@ -33,6 +34,7 @@ class MapPageModel implements ShopsManagerListener {
   final VoidCallback _updateCallback;
   final LocationController _locationController;
   final ShopsManager _shopsManager;
+  final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
 
   LatLngBounds? _latestViewPort;
@@ -43,6 +45,7 @@ class MapPageModel implements ShopsManagerListener {
   MapPageModel(
       this._locationController,
       this._shopsManager,
+      this._addressObtainer,
       this._latestCameraPosStorage,
       this._updateShopsCallback,
       this._errorCallback,
@@ -145,6 +148,10 @@ class MapPageModel implements ShopsManagerListener {
         type: ShopType.supermarket,
       );
     });
+  }
+
+  FutureAddress addressOf(Shop shop) async {
+    return await _addressObtainer.addressOfShop(shop);
   }
 
   @override

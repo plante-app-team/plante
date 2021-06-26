@@ -12,6 +12,8 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -22,7 +24,7 @@ import '../../fake_shared_preferences.dart';
 import 'map_page_modes_test_commons.mocks.dart';
 
 @GenerateMocks([PermissionsManager, ShopsManager, LocationController,
-  GoogleMapController, LatestCameraPosStorage])
+  GoogleMapController, LatestCameraPosStorage, AddressObtainer])
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
@@ -31,8 +33,13 @@ class MapPageModesTestCommons {
   late FakeSharedPreferences prefs;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late FakeAnalytics analytics;
+  late MockAddressObtainer addressObtainer;
 
   final shopsManagerListeners = <ShopsManagerListener>[];
+
+  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
+    ..road = 'Broadway'
+  )));
 
   final shops = [
     Shop((e) => e
@@ -91,6 +98,8 @@ class MapPageModesTestCommons {
     prefs = FakeSharedPreferences();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
+    addressObtainer = MockAddressObtainer();
+    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     shopsManagerListeners.clear();
     when(shopsManager.addListener(any)).thenAnswer((invc) {
@@ -134,10 +143,13 @@ class MapPageModesTestCommons {
               ..productsCount = 0))));
     });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
+    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
 
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.set(any)).thenAnswer((_) async {});
+
+    when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
   }
 
   void fillFetchedShops() {

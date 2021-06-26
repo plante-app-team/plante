@@ -3,6 +3,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
@@ -55,7 +56,8 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  ShopCard createCardFor(Shop shop, ArgCallback<Shop>? cancelCallback) {
+  ShopCard createCardFor(
+      Shop shop, FutureAddress address, ArgCallback<Shop>? cancelCallback) {
     final Product product;
     if (widget.product != null) {
       product = widget.product!;
@@ -73,6 +75,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     return ShopCard.askIfProductIsSold(
         product: product,
         shop: shop,
+        address: address,
         isProductSold: isSold,
         onIsProductSoldChanged: _onProductSoldChange,
         cancelCallback: cancelCallback);

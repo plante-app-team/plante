@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
@@ -15,7 +16,8 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
       : super(params, nameForAnalytics: nameForAnalytics);
 
   @protected
-  ShopCard createCardFor(Shop shop, ArgCallback<Shop>? cancelCallback);
+  ShopCard createCardFor(
+      Shop shop, FutureAddress address, ArgCallback<Shop>? cancelCallback);
 
   @mustCallSuper
   @override
@@ -102,7 +104,9 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
               Padding(
                   padding: EdgeInsets.only(
                       left: leftPadding, right: rightPadding, bottom: 12),
-                  child: createCardFor(_displayedShops[itemIndex],
+                  child: createCardFor(
+                      _displayedShops[itemIndex],
+                      model.addressOf(_displayedShops[itemIndex]),
                       (Shop shop) => hideShopsCard()))
             ])));
   }

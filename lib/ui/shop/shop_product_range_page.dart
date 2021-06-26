@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -8,6 +9,8 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -23,6 +26,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 import 'package:plante/ui/scan/barcode_scan_page.dart';
+import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
 class ShopProductRangePage extends StatefulWidget {
@@ -97,6 +101,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<UserParamsController>(),
         GetIt.I.get<Backend>(),
+        GetIt.I.get<AddressObtainer>(),
         widget.shop,
         updateCallback);
     initializeDateFormatting();
@@ -146,7 +151,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         Column(children: [
           Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
-            child: Column(children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   textDirection: TextDirection.rtl,
@@ -154,8 +160,13 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                     FabPlante.closeBtnPopOnClick(
                         key: const Key('close_button')),
                     Expanded(
-                        child: Text(widget.shop.name,
-                            style: TextStyles.headline1)),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Text(widget.shop.name, style: TextStyles.headline1),
+                          const SizedBox(height: 3),
+                          ShopAddressWidget(_model.address()),
+                        ])),
                   ]),
               const SizedBox(height: 28),
               SizedBox(

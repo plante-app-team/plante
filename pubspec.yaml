@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 21.06.231+24
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -150,3 +150,4 @@ flutter:
     - assets/plus_shop.svg
     - assets/cancel_circle_light.svg
     - assets/map_check_mark.svg
+    - assets/location.svg

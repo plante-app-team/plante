@@ -70,8 +70,8 @@ class ShopsManager {
                 northeast: LatLng(northeast.y, northeast.x),
                 southwest: LatLng(southwest.y, southwest.x)),
             attemptNumber: 1);
-        _delayedLoadings.remove(callback);
         completer.complete(result);
+        _delayedLoadings.remove(callback);
       } finally {
         _loadingArea = false;
       }

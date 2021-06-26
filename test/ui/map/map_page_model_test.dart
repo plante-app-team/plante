@@ -6,6 +6,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -14,11 +15,13 @@ import 'package:plante/ui/map/map_page_model.dart';
 
 import 'map_page_model_test.mocks.dart';
 
-@GenerateMocks([LocationController, ShopsManager, LatestCameraPosStorage])
+@GenerateMocks([LocationController, ShopsManager, LatestCameraPosStorage,
+  AddressObtainer])
 void main() {
   late MockLocationController locationController;
   late MockShopsManager shopsManager;
   late MockLatestCameraPosStorage latestCameraPosStorage;
+  late MockAddressObtainer addressObtainer;
   late MapPageModel model;
 
   final shopsManagerListeners = <ShopsManagerListener>[];
@@ -46,6 +49,7 @@ void main() {
     locationController = MockLocationController();
     shopsManager = MockShopsManager();
     latestCameraPosStorage = MockLatestCameraPosStorage();
+    addressObtainer = MockAddressObtainer();
 
     shopsManagerListeners.clear();
     when(shopsManager.addListener(any)).thenAnswer((invc) {
@@ -53,7 +57,7 @@ void main() {
       shopsManagerListeners.add(listener);
     });
 
-    model = MapPageModel(locationController, shopsManager,
+    model = MapPageModel(locationController, shopsManager, addressObtainer,
         latestCameraPosStorage,
         (shops) {
           latestLoadedShops = shops;

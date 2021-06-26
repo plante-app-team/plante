@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
@@ -345,5 +346,21 @@ void main() {
     expect(find.text(
         context.strings.map_page_no_shops_hint_default_mode_2),
         findsNothing);
+  });
+
+  testWidgets('shop address is shown on the shop card', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShopCard), findsNothing);
+    expect(find.byType(ShopAddressWidget), findsNothing);
+
+    widget.onMarkerClickForTesting([shops[1]]);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShopCard), findsOneWidget);
+    expect(find.byType(ShopAddressWidget), findsOneWidget);
   });
 }

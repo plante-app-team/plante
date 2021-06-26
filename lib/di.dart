@@ -11,6 +11,7 @@ import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -42,6 +43,8 @@ void initDI() {
       GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<OpenStreetMap>(
       OpenStreetMap(GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<AddressObtainer>(
+      AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
   GetIt.I.registerSingleton<Backend>(Backend(

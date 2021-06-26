@@ -11,6 +11,9 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -19,8 +22,10 @@ class ShopProductRangePageModel {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
   final Backend _backend;
+  final AddressObtainer _addressObtainer;
 
   final Shop _shop;
+  late final FutureAddress _address;
 
   final VoidCallback _updateCallback;
 
@@ -52,8 +57,9 @@ class ShopProductRangePageModel {
   UserParams get user => _userParamsController.cachedUserParams!;
 
   ShopProductRangePageModel(this._shopsManager, this._userParamsController,
-      this._backend, this._shop, this._updateCallback) {
+      this._backend, this._addressObtainer, this._shop, this._updateCallback) {
     load();
+    _address = _addressObtainer.addressOfShop(_shop);
   }
 
   int lastSeenSecs(Product product) {
@@ -157,4 +163,6 @@ class ShopProductRangePageModel {
       _updateCallback.call();
     }
   }
+
+  FutureAddress address() => _address;
 }

@@ -18,6 +18,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -34,7 +35,7 @@ import '../../widget_tester_extension.dart';
 import 'display_product_page_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, Backend, LocationController, ShopsManager,
-                PhotosTaker, PermissionsManager])
+                PhotosTaker, PermissionsManager, AddressObtainer])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
@@ -43,6 +44,7 @@ void main() {
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
   late FakeAnalytics analytics;
+  late MockAddressObtainer addressObtainer;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -90,6 +92,9 @@ void main() {
     when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
 
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
+
+    addressObtainer = MockAddressObtainer();
+    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

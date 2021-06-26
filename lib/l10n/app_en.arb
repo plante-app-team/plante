@@ -176,5 +176,7 @@
       "shop_card_no_products_in_shop": "This shop doesn't have added products yet",
       "shop_card_there_are_products_in_shop": "There's something interesting in the shop!",
       "shop_card_open_shop_products": "Open products list",
-      "shop_card_add_product": "Add a product"
+      "shop_card_add_product": "Add a product",
+
+      "shop_address_widget_possible_address": "Approximate address: "
 }

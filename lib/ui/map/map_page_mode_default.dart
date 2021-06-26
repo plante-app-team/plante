@@ -5,6 +5,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -123,8 +124,10 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   @override
-  ShopCard createCardFor(Shop shop, cancelCallback) {
-    return ShopCard.forProductRange(shop: shop, cancelCallback: cancelCallback);
+  ShopCard createCardFor(
+      Shop shop, FutureAddress address, ArgCallback<Shop>? cancelCallback) {
+    return ShopCard.forProductRange(
+        shop: shop, address: address, cancelCallback: cancelCallback);
   }
 
   @override
