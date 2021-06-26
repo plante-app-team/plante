@@ -1,0 +1,9 @@
+/* 
+  infoplist.strings
+  Runner
+
+  Created by Johan Vandingenen on 26/06/2021.
+  
+*/
+NSCameraUsageDescription = "The app needs camera access to scan products";
+NSLocationWhenInUseUsageDescription = "While using your location we can find nearby shops!";

@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ru</string>
+		<string>en</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -41,10 +46,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
-    <key>NSCameraUsageDescription</key>
-    <string>This app needs camera access to scan barcodes</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan barcodes</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -56,9 +61,7 @@
 			</array>
 		</dict>
 	</array>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>The app uses your location to find nearby stores</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>The app uses your location to find nearby stores</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The app uses your location to find nearby stores</string>
 </dict>
 </plist>
