@@ -1,0 +1,9 @@
+/* 
+  infoplist.strings
+  Runner
+
+  Created by Johan Vandingenen on 26/06/2021.
+  
+*/
+NSCameraUsageDescription = "Приложению нужен доступ к камере для сканирования штрих-кодов";
+NSLocationWhenInUseUsageDescription = "Приложение использует информацию о вашем местоположении чтобы найти близкие к вам магазины";
