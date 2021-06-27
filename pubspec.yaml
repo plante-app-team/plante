@@ -81,6 +81,7 @@ flutter_icons:
   android: "icon"
   ios: true
   image_path: "icon/icon.png"
+  image_path_ios: "icon/icon_ios.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
