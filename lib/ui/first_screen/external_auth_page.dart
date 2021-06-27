@@ -122,7 +122,8 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
 
       // Backend login
       final backend = GetIt.I.get<Backend>();
-      final loginResult = await backend.loginOrRegister(googleAccount.idToken);
+      final loginResult =
+          await backend.loginOrRegister(googleIdToken: googleAccount.idToken);
       if (loginResult.isErr) {
         analytics.sendEvent('google_auth_backend_error');
         final error = loginResult.unwrapErr();

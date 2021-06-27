@@ -5,14 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
-import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/l10n/strings.dart';
 
-import '../../../fake_app_lifecycle_watcher.dart';
 import '../../../widget_tester_extension.dart';
 
 void main() {

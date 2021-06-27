@@ -12,8 +12,6 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';

@@ -54,9 +54,11 @@ class Backend {
   }
 
   Future<Result<UserParams, BackendError>> loginOrRegister(
-      String googleIdToken) async {
+      {String? googleIdToken, String? appleAuthorizationCode}) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.loginOrRegister(googleIdToken);
+      return await _fakeBackend.loginOrRegister(
+          googleIdToken: googleIdToken,
+          appleAuthorizationCode: appleAuthorizationCode);
     }
 
     if (await isLoggedIn()) {
@@ -66,8 +68,16 @@ class Backend {
 
     // Register
     final deviceId = (await DeviceInfo.get()).deviceID;
-    var jsonRes = await _backendGetJson('register_user/',
-        {'googleIdToken': googleIdToken, 'deviceId': deviceId});
+    final queryParams = {
+      'deviceId': deviceId,
+    };
+    if (googleIdToken != null) {
+      queryParams['googleIdToken'] = googleIdToken;
+    }
+    if (appleAuthorizationCode != null) {
+      queryParams['appleAuthorizationCode'] = appleAuthorizationCode;
+    }
+    var jsonRes = await _backendGetJson('register_user/', queryParams);
     if (jsonRes.isOk) {
       final userParams = UserParams.fromJson(jsonRes.unwrap())!;
       Log.i('Backend: user registered: ${userParams.toString()}');

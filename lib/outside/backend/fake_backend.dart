@@ -62,7 +62,7 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<UserParams, BackendError>> loginOrRegister(
-      String googleIdToken) async {
+      {String? googleIdToken, String? appleAuthorizationCode}) async {
     await _delay();
     return Ok(_userParams);
   }

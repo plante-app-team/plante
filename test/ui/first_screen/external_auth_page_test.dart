@@ -34,7 +34,7 @@ void main() {
   testWidgets('Successful Google Sign in', (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(any)).thenAnswer((_) async => Ok(UserParams()));
+    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken'))).thenAnswer((_) async => Ok(UserParams()));
 
     expect(analytics.allEvents(), equals([]));
 
@@ -77,7 +77,7 @@ void main() {
   testWidgets('Not successful backend sign in', (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(any)).thenAnswer((_) async =>
+    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken'))).thenAnswer((_) async =>
         Err(BackendError.other()));
 
     expect(analytics.allEvents(), equals([]));

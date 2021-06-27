@@ -10,7 +10,6 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';

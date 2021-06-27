@@ -75,8 +75,12 @@ class MockBackend extends _i1.Mock implements _i6.Backend {
           returnValue: Future<bool>.value(false)) as _i4.Future<bool>);
   @override
   _i4.Future<_i2.Result<_i5.UserParams, _i7.BackendError>> loginOrRegister(
-          String? googleIdToken) =>
-      (super.noSuchMethod(Invocation.method(#loginOrRegister, [googleIdToken]),
+          {String? googleIdToken, String? appleAuthorizationCode}) =>
+      (super.noSuchMethod(
+              Invocation.method(#loginOrRegister, [], {
+                #googleIdToken: googleIdToken,
+                #appleAuthorizationCode: appleAuthorizationCode
+              }),
               returnValue:
                   Future<_i2.Result<_i5.UserParams, _i7.BackendError>>.value(
                       _FakeResult<_i5.UserParams, _i7.BackendError>()))

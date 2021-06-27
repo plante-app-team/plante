@@ -41,7 +41,7 @@ void main() {
       }
     ''');
 
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     final expectedParams = UserParams((v) => v
       ..backendId = '123'
       ..backendClientToken = '321');
@@ -65,7 +65,7 @@ void main() {
       }
     ''');
 
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     final expectedParams = UserParams((v) => v
       ..backendId = '123'
       ..backendClientToken = '321');
@@ -94,7 +94,7 @@ void main() {
     await userParamsController.setUserParams(existingParams);
 
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrap(), equals(existingParams));
   });
 
@@ -109,7 +109,7 @@ void main() {
       }
     ''');
 
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(
         result.unwrapErr().errorKind, equals(
         BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED));
@@ -120,7 +120,7 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '', responseCode: 500);
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -129,7 +129,7 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponse('.*register_user.*', '{{{{bad bad bad}');
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -142,7 +142,7 @@ void main() {
         "error": "some_error"
       }
     ''');
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -156,7 +156,7 @@ void main() {
       }
     ''');
     httpClient.setResponse('.*login_user.*', '', responseCode: 500);
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -170,7 +170,7 @@ void main() {
       }
     ''');
     httpClient.setResponse('.*login_user.*', '{{{{bad bad bad}');
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -188,7 +188,7 @@ void main() {
         "error": "some_error"
       }
     ''');
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -197,7 +197,7 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
     httpClient.setResponseException('.*register_user.*', const SocketException(''));
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
@@ -211,7 +211,7 @@ void main() {
       }
     ''');
     httpClient.setResponseException('.*register_user.*', const SocketException(''));
-    final result = await backend.loginOrRegister('google ID');
+    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
@@ -229,7 +229,7 @@ void main() {
     ''');
 
     verifyNever(observer.onBackendError(any));
-    await backend.loginOrRegister('google ID');
+    await backend.loginOrRegister(googleIdToken: 'google ID');
     verify(observer.onBackendError(any));
   });
 
