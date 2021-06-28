@@ -25,7 +25,7 @@ void main() {
   });
 
   test('products have limit', () async {
-    final productsNumber = 2 * ViewedProductsStorage.STORED_PRODUCTS_MAX;
+    const productsNumber = 2 * ViewedProductsStorage.STORED_PRODUCTS_MAX;
     for (var i = 0; i < productsNumber; ++i) {
       storage.addProduct(Product((e) => e.barcode = '$i'));
     }

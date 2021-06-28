@@ -22,6 +22,7 @@ class MapPageModeParams {
   final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
   final ArgCallback<String?> bottomHintCallback;
+  final ArgCallback<Point<double>> moveMapCallback;
   final ModeSwitchCallback modeSwitchCallback;
   final Analytics analytics;
   MapPageModeParams(
@@ -33,6 +34,7 @@ class MapPageModeParams {
       this.updateCallback,
       this.updateMapCallback,
       this.bottomHintCallback,
+      this.moveMapCallback,
       this.modeSwitchCallback,
       this.analytics);
 }
@@ -62,7 +64,8 @@ abstract class MapPageMode {
   Widget buildOverlay(BuildContext context) => const SizedBox.shrink();
   Widget buildHeader(BuildContext context) => const SizedBox.shrink();
   Widget buildTopActions(BuildContext context) => const SizedBox.shrink();
-  List<Widget> buildBottomActions(BuildContext context) => const [];
+  List<Widget> buildBottomActions(BuildContext context) =>
+      const [SizedBox.shrink()];
   List<Widget> buildFABs() => const [];
   void onMarkerClick(Iterable<Shop> shops) {}
   void onShopsUpdated(Map<String, Shop> shops) {}
@@ -72,6 +75,7 @@ abstract class MapPageMode {
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;
 
+  void moveMapTo(Point<double> coords) => params.moveMapCallback.call(coords);
   void updateWidget() => params.updateCallback.call();
   void updateMap() => params.updateMapCallback.call();
   void setBottomHint(String? hint) => params.bottomHintCallback.call(hint);

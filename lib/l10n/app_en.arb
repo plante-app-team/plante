@@ -45,10 +45,8 @@
       "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
       "map_page_is_new_product_sold_q": "Is the product being sold here?",
       "map_page_cancel_putting_product_q": "Cancel putting the product to the map?",
-      "map_page_how_new_shop_is_called": "What is the name of the shop?",
-      "map_page_how_new_shop_is_called_label": "Shop's name",
-      "map_page_how_new_shop_is_called_hint": "Spar",
       "map_page_click_where_new_shop_located": "Click where the new shop is located",
+      "map_page_is_shop_location_correct": "Is the displayed shop location correct?",
       "map_page_shop_added_to_map": "The shop is added to the map",
       "map_page_click_on_shop_where_product_sold": "Click the shop marker, where the product is being sold",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
@@ -56,6 +54,11 @@
       "map_page_no_shops_hint_default_mode_1": "No shops with products nearby. But you can click \"Empty shops\" and add first product!",
       "map_page_no_shops_hint_default_mode_2": "Seems we don't know of any shops nearby! You can add a new shop while adding a new product or viewing a known one",
       "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any shops nearby. But you can add a new one by clicking the round button with a plus on the right!",
+
+      "create_shop_page_how_new_shop_is_called": "What is the name of the shop?",
+      "create_shop_page_how_new_shop_is_called_label": "Shop's name",
+      "create_shop_page_how_new_shop_is_called_hint": "Spar",
+      "create_shop_page_what_type_new_shop_has": "Select shop's type",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

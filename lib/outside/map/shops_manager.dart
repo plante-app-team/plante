@@ -191,7 +191,6 @@ class ShopsManager {
     return result;
   }
 
-  /// Note: currently server doesn't support all shop types
   Future<Result<Shop, ShopsManagerError>> createShop(
       {required String name,
       required Point<double> coords,

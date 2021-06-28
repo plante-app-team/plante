@@ -124,6 +124,7 @@ class MapPageModesTestCommons {
                 northeast: const LatLng(20, 20)));
     when(mapController.dispose()).thenAnswer((_) {});
     when(mapController.setMapStyle(any)).thenAnswer((_) async {});
+    when(mapController.getZoomLevel()).thenAnswer((_) async => 10);
     when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
     when(shopsManager.createShop(
         name: anyNamed('name'),
@@ -150,6 +151,7 @@ class MapPageModesTestCommons {
     when(latestCameraPosStorage.set(any)).thenAnswer((_) async {});
 
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
+    when(addressObtainer.addressOfCoords(any)).thenAnswer((_) => readyAddress);
   }
 
   void fillFetchedShops() {

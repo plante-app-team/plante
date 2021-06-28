@@ -12,6 +12,7 @@ const PRIVACY_POLICY_URL =
 
 typedef ArgCallback<T> = void Function(T argument);
 typedef ResCallback<T> = T Function();
+typedef ArgResCallback<A, R> = R Function(A argument);
 
 final _random = Random();
 

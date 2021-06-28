@@ -6,6 +6,8 @@ import 'package:plante/l10n/strings.dart';
 
 part 'shop_type.g.dart';
 
+// PLEASE NOTE: if a new shop type is added here, it should also be added
+// to the ShopTypes enum on the backend.
 class ShopType extends EnumClass {
   static const ShopType bakery = _$bakery;
   static const ShopType beverages = _$beverages;
@@ -28,6 +30,17 @@ class ShopType extends EnumClass {
   static const ShopType general = _$general;
   static const ShopType supermarket = _$supermarket;
   static const ShopType grocery = _$grocery;
+
+  static List<ShopType> valuesOrderedForUI = [
+    ShopType.supermarket,
+    ShopType.grocery,
+    ShopType.general,
+    ShopType.deli,
+    ShopType.convenience,
+    ShopType.health_food,
+    ShopType.greengrocer,
+    ShopType.organic,
+  ].addIfNotContained(ShopType.values);
 
   const ShopType._(String name) : super(name);
 
@@ -142,5 +155,16 @@ class ShopType extends EnumClass {
       default:
         throw Exception('Unknown shop type: $this');
     }
+  }
+}
+
+extension _ListExt<T> on List<T> {
+  List<T> addIfNotContained(Iterable<T> iterable) {
+    for (final value in iterable) {
+      if (!contains(value)) {
+        add(value);
+      }
+    }
+    return this;
   }
 }

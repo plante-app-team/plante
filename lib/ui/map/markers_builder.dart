@@ -25,7 +25,6 @@ Future<Marker> markersBuilder(
   return Marker(
     markerId: MarkerId(cluster.getId()),
     position: cluster.location,
-    consumeTapEvents: true,
     onTap: () {
       callback(
           cluster.items.where((shop) => shop != null).map((shop) => shop!));

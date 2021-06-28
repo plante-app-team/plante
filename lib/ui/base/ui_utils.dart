@@ -71,8 +71,9 @@ Future<bool?> showYesNoDialog<bool>(
   );
 }
 
-Future<bool?> showDoOrCancelDialog<bool>(BuildContext context, String title,
-    String doWhat, VoidCallback onDo) async {
+Future<bool?> showDoOrCancelDialog<bool>(
+    BuildContext context, String title, String doWhat, VoidCallback onDo,
+    {String? cancelWhat}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -83,7 +84,7 @@ Future<bool?> showDoOrCancelDialog<bool>(BuildContext context, String title,
             SizedBox(
                 width: double.infinity,
                 child: ButtonTextPlante(
-                  context.strings.global_cancel,
+                  cancelWhat ?? context.strings.global_cancel,
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },

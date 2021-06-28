@@ -202,6 +202,13 @@ class _MapPageState extends PageStatePlante<MapPage>
         _bottomHint = hint;
       });
     };
+    final moveMapCallback = (Point<double> coords) async {
+      final mapController = await _mapController.future;
+      await mapController.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(coords.y, coords.x),
+              zoom: await mapController.getZoomLevel())));
+    };
     final switchModeCallback = (MapPageMode newMode) {
       setState(() {
         analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
@@ -221,6 +228,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         updateCallback,
         updateMapCallback,
         updateBottomHintCallback,
+        moveMapCallback,
         switchModeCallback);
 
     _asyncInit();
@@ -457,6 +465,9 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   void _onError(MapPageModelError error) {
+    if (!mounted) {
+      return;
+    }
     switch (error) {
       case MapPageModelError.NETWORK_ERROR:
         showSnackBar(context.strings.global_network_error, context);

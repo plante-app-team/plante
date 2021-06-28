@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
@@ -93,15 +94,26 @@ void main() {
     final context = await tester.superPump(widget);
     await switchMode(tester, widget, context);
 
+    expect(find.text(context.strings.map_page_is_shop_location_correct),
+        findsNothing);
     widget.onMapClickForTesting(const LatLng(10, 20));
     await tester.pumpAndSettle();
+    expect(find.text(context.strings.map_page_is_shop_location_correct),
+        findsOneWidget);
+
+    expect(find.byType(CreateShopPage), findsNothing);
+    await tester.tap(find.text(context.strings.global_yes));
+    await tester.pumpAndSettle();
+    expect(find.byType(CreateShopPage), findsOneWidget);
 
     await tester.enterText(
         find.byKey(const Key('new_shop_name_input')),
         'new shop');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(context.strings.global_add));
+    await tester.tap(find.byKey(const Key('shop_type_dropdown')));
+    await tester.pumpAndSettle();
+    await tester.tapDropDownItem(context.strings.shop_type_supermarket);
     await tester.pumpAndSettle();
 
     verifyNever(shopsManager.createShop(

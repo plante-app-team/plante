@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
       ArgCallback<String?> bottomHintCallback,
+      ArgCallback<Point<double>> moveMapCallback,
       ModeSwitchCallback modeSwitchCallback)
       : super(
             MapPageModeParams(
@@ -42,6 +45,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 updateCallback,
                 updateMapCallback,
                 bottomHintCallback,
+                moveMapCallback,
                 modeSwitchCallback,
                 analytics),
             nameForAnalytics: 'default');

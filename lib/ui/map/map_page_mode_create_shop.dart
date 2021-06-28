@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/components/create_shop_dialog.dart';
+import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
 import 'package:plante/l10n/strings.dart';
@@ -61,31 +60,45 @@ class MapPageModeCreateShop extends MapPageMode {
   @override
   void onMapClick(Point<double> coords) async {
     // Temporary marker
-    _shopBeingCreated = _createShop('', coords);
+    _shopBeingCreated = _createShop('', ShopType.supermarket, coords);
+    moveMapTo(coords);
     updateMap();
 
-    final result = await showDialog<CreateShopDialogResult>(
-      context: context,
-      builder: (BuildContext context) {
-        return const CreateShopDialog();
-      },
+    final yes = await showDoOrCancelDialog(
+        context,
+        context.strings.map_page_is_shop_location_correct,
+        context.strings.global_yes,
+        () {},
+        cancelWhat: context.strings.global_oops_no);
+    if (yes != true) {
+      return;
+    }
+
+    final dialogResult = await Navigator.push<Shop>(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CreateShopPage(shopCoords: coords)),
     );
 
-    if (result != null) {
-      _shopBeingCreated = _createShop(result.name, coords);
-    } else {
-      _shopBeingCreated = null;
+    if (dialogResult != null) {
+      _selectedShops.add(dialogResult);
+      switchModeTo(nextModeMaker.call());
+      showSnackBar(context.strings.map_page_shop_added_to_map, context,
+          SnackBarStyle.MAP_ACTION_DONE);
+      return;
     }
+    _shopBeingCreated = null;
     updateMap();
   }
 
-  Shop _createShop(String name, Point<double> coords) {
+  Shop _createShop(String name, ShopType type, Point<double> coords) {
     return Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
         ..longitude = coords.x
         ..latitude = coords.y
-        ..name = name))
+        ..name = name
+        ..type = type.osmName))
       ..backendShop.replace(BackendShop((e) => e
         ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
         ..productsCount = 0)));
@@ -105,21 +118,6 @@ class MapPageModeCreateShop extends MapPageMode {
             )));
   }
 
-  @override
-  List<Widget> buildBottomActions(BuildContext context) {
-    return [
-      SizedBox(
-          key: const Key('map_page_done'),
-          width: double.infinity,
-          child: Padding(
-              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
-              child: ButtonFilledPlante.withText(context.strings.global_done,
-                  onPressed: _shopBeingCreated != null && !model.loading
-                      ? _onDoneClick
-                      : null))),
-    ];
-  }
-
   void _onCancelClick() async {
     if (_shopBeingCreated == null) {
       switchModeTo(nextModeMaker.call());
@@ -131,23 +129,10 @@ class MapPageModeCreateShop extends MapPageMode {
     });
   }
 
-  void _onDoneClick() async {
-    final shop = _shopBeingCreated!;
-    final result = await model.createShop(
-      shop.name,
-      Point<double>(shop.longitude, shop.latitude),
-    );
-    if (result.isOk) {
-      _selectedShops.add(result.unwrap());
-      switchModeTo(nextModeMaker.call());
-      showSnackBar(context.strings.map_page_shop_added_to_map, context,
-          SnackBarStyle.MAP_ACTION_DONE);
-    } else {
-      if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
-        showSnackBar(context.strings.global_network_error, context);
-      } else {
-        showSnackBar(context.strings.global_something_went_wrong, context);
-      }
-    }
+  @override
+  List<Widget> buildBottomActions(BuildContext context) {
+    // TODO(https://trello.com/c/rb2w42J5/): remove the function after
+    // the ticket from the Trello URL will be fixed.
+    return const [SizedBox.shrink(key: Key('map_page_done'))];
   }
 }

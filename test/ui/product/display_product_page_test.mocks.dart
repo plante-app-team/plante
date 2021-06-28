@@ -376,4 +376,12 @@ class MockAddressObtainer extends _i1.Mock implements _i27.AddressObtainer {
                   _i2.Result<_i28.OsmAddress, _i29.OpenStreetMapError>>.value(
               _FakeResult<_i28.OsmAddress, _i29.OpenStreetMapError>())) as _i4
           .Future<_i2.Result<_i28.OsmAddress, _i29.OpenStreetMapError>>);
+  @override
+  _i4.Future<_i2.Result<_i28.OsmAddress, _i29.OpenStreetMapError>>
+      addressOfCoords(_i14.Point<double>? coords) => (super.noSuchMethod(
+          Invocation.method(#addressOfCoords, [coords]),
+          returnValue: Future<
+                  _i2.Result<_i28.OsmAddress, _i29.OpenStreetMapError>>.value(
+              _FakeResult<_i28.OsmAddress, _i29.OpenStreetMapError>())) as _i4
+          .Future<_i2.Result<_i28.OsmAddress, _i29.OpenStreetMapError>>);
 }

@@ -140,12 +140,12 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<Result<Shop, ShopsManagerError>> createShop(
-      String name, Point<double> coords) async {
+      String name, ShopType type, Point<double> coords) async {
     return await _networkOperation(() async {
       return await _shopsManager.createShop(
         name: name,
         coords: coords,
-        type: ShopType.supermarket,
+        type: type,
       );
     });
   }

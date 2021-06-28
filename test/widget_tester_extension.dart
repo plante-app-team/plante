@@ -36,4 +36,27 @@ extension WidgetTesterExtension on WidgetTester {
     await pumpWidget(widgetWrapper, duration, phase);
     return _context;
   }
+
+  /// Somehow the DropdownButton widget creates 2 widgets for each of the
+  /// items it has.
+  /// This makes it impossible to click this item with WidgetTester.tap()
+  /// because widgets in those pairs are almost identical.
+  /// This function is a avoiding this problem by finding only the first needed
+  /// widget and clicking it, ignoring all the rest.
+  Future<void> tapDropDownItem(String text) async {
+    var foundFirst = false;
+    await tap(find.byWidgetPredicate((widget) {
+      if (foundFirst) {
+        return false;
+      }
+      if (widget is! Text) {
+        return false;
+      }
+      final found = widget.data == text;
+      if (found) {
+        foundFirst = true;
+      }
+      return found;
+    }));
+  }
 }

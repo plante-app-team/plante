@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
@@ -58,5 +59,9 @@ class AddressObtainer {
     }
     _lastRequestTime = DateTime.now();
     return await _osm.fetchAddress(lat, lon);
+  }
+
+  FutureAddress addressOfCoords(Point<double> coords) async {
+    return await _fetchAddress(coords.y, coords.x);
   }
 }
