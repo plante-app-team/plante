@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
@@ -7,6 +8,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -15,6 +17,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
 
@@ -73,6 +76,16 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                                 child: Text('Google',
                                     style: TextStyles.buttonOutlinedEnabled)))
                       ])))),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 120, left: 24, right: 24),
+              child: SignInWithAppleButton(
+                text: context.strings.external_auth_page_continue_with_apple ,
+                borderRadius: BorderRadius.all(Radius.circular(50)),
+                onPressed: _signInWithApple,
+              ),
+            ),
+          ),
           Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -99,6 +112,21 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       )
     ])));
   }
+
+  void _signInWithApple () async {
+  final credential = await SignInWithApple.getAppleIDCredential(
+  scopes: [
+  AppleIDAuthorizationScopes.email,
+  AppleIDAuthorizationScopes.fullName,
+  ],
+  );
+
+  //do backend login
+  final backend = GetIt.I.get<Backend>();
+  final loginResult = await backend.loginOrRegister(appleAuthorizationCode: credential.authorizationCode);
+  print(loginResult);
+  //continue backend login
+}
 
   void _onGoogleAuthClicked() async {
     try {

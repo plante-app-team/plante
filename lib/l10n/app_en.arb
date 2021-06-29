@@ -21,6 +21,7 @@
       "external_auth_page_continue_with": "Continue with",
       "external_auth_page_google_email_not_verified": "Error: Google email is not verified",
       "external_auth_page_privacy_policy": "Privacy policy",
+      "external_auth_page_continue_with_apple": "Continue with apple",
 
       "init_user_page_title": "What is your name?",
       "init_user_page_name_field_title": "Name",
