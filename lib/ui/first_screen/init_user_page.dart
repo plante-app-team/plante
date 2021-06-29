@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
@@ -163,7 +164,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
       });
     };
 
-    final content = Column(mainAxisSize: MainAxisSize.max, children: [
+    final content = ListView(children: [
       SizedBox(
           width: double.infinity,
           child: Text(
@@ -230,38 +231,39 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           height: 48,
           child: Row(children: [
             const SizedBox(width: 10),
-            InkWell(
-                onTap: () {
-                  onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
-                },
-                child: Row(children: [
-                  CheckboxPlante(
-                      value: _userParams.eatsEggs ?? false,
-                      onChanged: onEggsCheckboxClick),
-                  Text(context.strings.init_user_page_i_eat_eggs),
-                ])),
-            const SizedBox(width: 24),
-            InkWell(
-                onTap: () {
-                  onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
-                },
-                child: Row(children: [
-                  CheckboxPlante(
-                      value: _userParams.eatsMilk ?? false,
-                      onChanged: onMilkCheckboxClick),
-                  Text(context.strings.init_user_page_i_eat_milk),
-                ])),
-            const SizedBox(width: 24),
-            InkWell(
-                onTap: () {
-                  onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false));
-                },
-                child: Row(children: [
-                  CheckboxPlante(
-                      value: _userParams.eatsHoney ?? false,
-                      onChanged: onHoneyCheckboxClick),
-                  Text(context.strings.init_user_page_i_eat_honey),
-                ])),
+            Expanded(
+                child: InkWell(
+                    onTap: () {
+                      onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
+                    },
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      CheckboxPlante(
+                          value: _userParams.eatsEggs ?? false,
+                          onChanged: onEggsCheckboxClick),
+                      Text(context.strings.init_user_page_i_eat_eggs),
+                    ]))),
+            Expanded(
+                child: InkWell(
+                    onTap: () {
+                      onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
+                    },
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      CheckboxPlante(
+                          value: _userParams.eatsMilk ?? false,
+                          onChanged: onMilkCheckboxClick),
+                      Text(context.strings.init_user_page_i_eat_milk),
+                    ]))),
+            Expanded(
+                child: InkWell(
+                    onTap: () {
+                      onHoneyCheckboxClick(!(_userParams.eatsHoney ?? false));
+                    },
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      CheckboxPlante(
+                          value: _userParams.eatsHoney ?? false,
+                          onChanged: onHoneyCheckboxClick),
+                      Text(context.strings.init_user_page_i_eat_honey),
+                    ]))),
           ])),
     ]);
 
