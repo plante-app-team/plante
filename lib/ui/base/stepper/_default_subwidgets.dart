@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 // ignore: always_use_package_imports
@@ -39,8 +39,10 @@ Widget defaultIndicatorMaker(int page, PageIndicatorState pageState) {
           border: Border.all(color: borderColor, width: 1),
           shape: BoxShape.circle),
       child: Center(
-          child: Text(text,
-              style: GoogleFonts.exo2(color: borderColor, fontSize: 14))));
+          child: Padding(
+              padding: const EdgeInsets.only(left: 1),
+              child: Text(text,
+                  style: TextStyles.normal.copyWith(color: borderColor)))));
 
   final wrapper =
       SizedBox(width: 24, height: 24, child: Center(child: indicator));

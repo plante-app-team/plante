@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -9,7 +8,6 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -68,14 +66,12 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                                       child: SvgPicture.asset(
                                           'assets/google_icon.svg')),
                                 ])),
-                        SizedBox(
+                        const SizedBox(
                             width: double.infinity,
                             height: double.infinity,
                             child: Center(
                                 child: Text('Google',
-                                    style: GoogleFonts.exo2(
-                                        color: ColorsPlante.primary,
-                                        fontSize: 18))))
+                                    style: TextStyles.buttonOutlinedEnabled)))
                       ])))),
           Align(
               alignment: Alignment.bottomCenter,

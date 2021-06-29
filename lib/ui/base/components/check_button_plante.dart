@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 
 class CheckButtonPlante extends StatelessWidget {
   final bool checked;
@@ -34,9 +34,6 @@ class CheckButtonPlante extends StatelessWidget {
               onChanged.call(!checked);
             },
             child: Text(text,
-                style: checked
-                    ? GoogleFonts.exo2(color: Colors.white, fontSize: 14)
-                    : GoogleFonts.exo2(
-                        color: const Color(0xFF263238), fontSize: 14))));
+                style: checked ? TextStyles.normalWhite : TextStyles.normal)));
   }
 }
