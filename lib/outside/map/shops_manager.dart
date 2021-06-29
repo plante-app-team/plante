@@ -12,6 +12,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/shops_manager_impl.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -135,7 +136,7 @@ class ShopsManager {
     final ids = shops.values.map((shop) => shop.osmId).toList();
     _loadedAreas[boundsToLoad] = ids;
     final result =
-        ids.map((id) => shops[id]!).where((shop) => bounds.containsShop(shop));
+    ids.map((id) => shops[id]!).where((shop) => bounds.containsShop(shop));
     return Ok({for (var shop in result) shop.osmId: shop});
   }
 
@@ -175,13 +176,22 @@ class ShopsManager {
         }
 
         var shopCache = _shopsCache[shop.osmId];
-        var backendShop = shopCache?.backendShop;
-        if (shopCache != null && backendShop != null) {
-          backendShop = backendShop
-              .rebuild((e) => e.productsCount = backendShop!.productsCount + 1);
-          shopCache =
-              shopCache.rebuild((e) => e.backendShop.replace(backendShop!));
+        if (shopCache != null) {
+          var backendShop = shopCache.backendShop;
+          if (backendShop != null) {
+            backendShop = backendShop.rebuild(
+                    (e) => e.productsCount = backendShop!.productsCount + 1);
+          } else {
+            backendShop = BackendShop((e) => e
+              ..osmId = shop.osmId
+              ..productsCount = 1);
+          }
+          shopCache = shopCache.rebuild(
+                  (e) => e.backendShop.replace(backendShop!));
           _shopsCache[shop.osmId] = shopCache;
+        } else {
+          Log.w('A product is put into a shop while there '
+              'was no cache for the shop. Shop: $shop');
         }
       }
       _notifyListeners();
@@ -193,10 +203,10 @@ class ShopsManager {
 
   Future<Result<Shop, ShopsManagerError>> createShop(
       {required String name,
-      required Point<double> coords,
-      required ShopType type}) async {
+        required Point<double> coords,
+        required ShopType type}) async {
     final result =
-        await _impl.createShop(name: name, coords: coords, type: type);
+    await _impl.createShop(name: name, coords: coords, type: type);
     if (result.isOk) {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',

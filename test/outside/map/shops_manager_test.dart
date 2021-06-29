@@ -162,6 +162,59 @@ void main() {
         equals(shops1.values.first.productsCount + 1));
   });
 
+  test('shops products range update changes shops cache when '
+       'the shop had no backend shop before', () async {
+    final osmShops = [
+      OsmShop((e) => e
+        ..osmId = '1'
+        ..name = 'shop1'
+        ..type = 'supermarket'
+        ..longitude = 15
+        ..latitude = 15),
+    ];
+    final backendShops = <BackendShop>[];
+    when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
+    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    final fullShops = {
+      osmShops[0].osmId: Shop((e) => e
+        ..osmShop.replace(osmShops[0])),
+    };
+
+    // Fetch #1
+    final shopsRes1 = await shopsManager.fetchShops(northeast, southwest);
+    final shops1 = shopsRes1.unwrap();
+    expect(shops1, equals(fullShops));
+    expect(shops1.values.first.backendShop, isNull);
+    // Both backends expected to be touched
+    verify(osm.fetchShops(any, any));
+    verify(backend.requestShops(any));
+    // Reset mocks
+    clearInteractions(osm);
+    clearInteractions(backend);
+
+    // A range update
+    final putRes = await shopsManager
+        .putProductToShops(rangeProducts[2], [shops1.values.first]);
+    expect(putRes.isOk, isTrue);
+
+    // Fetch #2
+    final shopsRes2 = await shopsManager.fetchShops(northeast, southwest);
+    // Both backends expected to be NOT touched, cache expected to be used
+    verifyNever(osm.fetchShops(any, any));
+    verifyNever(backend.requestShops(any));
+
+    // Ensure a BackendShop is now created even though it didn't exist before
+    final shops2 = shopsRes2.unwrap();
+    expect(shops2, isNot(equals(shops1)));
+    expect(shops2.values.first.osmId, equals(shops1.values.first.osmId));
+    expect(shops2.values.first.backendShop, isNotNull);
+    expect(shops2.values.first.backendShop, equals(
+      BackendShop((e) => e
+        ..osmId = shops1.values.first.osmId
+        ..productsCount = 1)
+    ));
+  });
+
   test('cache behaviour when multiple shops fetches started at the same time', () async {
     verifyZeroInteractions(osm);
     verifyZeroInteractions(backend);
