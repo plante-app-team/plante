@@ -120,12 +120,14 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
     _textPainter.layout();
     // Magic numbers! Figured out manually, might be wrong
     final double xOffset;
-    if (shops == 4) {
+    if (shops == 2) {
+      xOffset = 21 * devicePixelRatio;
+    } else if (shops == 4) {
       xOffset = 20.5 * devicePixelRatio;
     } else if (shops == 6) {
       xOffset = 20.75 * devicePixelRatio;
     } else if (shops == 8) {
-      xOffset = 21.25 * devicePixelRatio;
+      xOffset = 21 * devicePixelRatio;
     } else if (shops > 9) {
       xOffset = 21 * devicePixelRatio;
     } else {
