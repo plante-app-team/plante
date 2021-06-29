@@ -113,18 +113,27 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
 
   // Text
   if (shops != 1) {
-    _textPainter.text = TextSpan(text: shops.toString(), style: textStyle);
+    if (shops > 99) {
+      shops = 99;
+    }
+    _textPainter.text = TextSpan(text: shops.toString(), style: textStyle.copyWith(fontSize: textStyle.fontSize! * devicePixelRatio));
     _textPainter.layout();
     // Magic numbers! Figured out manually, might be wrong
     final double xOffset;
-    if (shops == 6) {
-      xOffset = 54;
+    if (shops == 4) {
+      xOffset = 20.5 * devicePixelRatio;
+    } else if (shops == 6) {
+      xOffset = 20.75 * devicePixelRatio;
     } else if (shops == 8) {
-      xOffset = 55;
+      xOffset = 21.25 * devicePixelRatio;
+    } else if (shops > 9) {
+      xOffset = 21 * devicePixelRatio;
     } else {
-      xOffset = 56;
+      xOffset = 21.5 * devicePixelRatio;
     }
-    _textPainter.paint(canvas, Offset(xOffset - _textPainter.width / 2, 28));
+
+    final yOffset = 10.5 * devicePixelRatio;
+    _textPainter.paint(canvas, Offset(xOffset - _textPainter.width / 2, yOffset));
   }
 
   final img =

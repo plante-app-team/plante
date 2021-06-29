@@ -94,18 +94,18 @@ class TextStyles {
   static const TextStyle markerFilled = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
-      fontSize: 45,
+      fontSize: 17,
       color: ColorsPlante.primary);
 
   static const TextStyle markerAccented = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
-      fontSize: 45,
+      fontSize: 17,
       color: Color(0xFFF02222));
 
   static const TextStyle markerEmpty = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
-      fontSize: 45,
+      fontSize: 17,
       color: ColorsPlante.grey);
 }
