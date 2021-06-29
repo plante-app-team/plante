@@ -32,11 +32,13 @@ bool enableNewestFeatures() {
 }
 
 void setSystemUIOverlayStyle() {
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark));
+  if (Platform.isAndroid) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.light));
+  }
 }
 
 double degreesToRads(double deg) {
