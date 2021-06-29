@@ -16,6 +16,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/switch_plante.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -61,8 +62,7 @@ class _TestingStorage {
   VoidCallback? closeCallback;
 }
 
-class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
-    with RouteAware, WidgetsBindingObserver {
+class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   late final BarcodeScanPageModel _model;
 
   qr.QRViewController? _qrController;
@@ -71,6 +71,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
 
   bool _flashOn = false;
   bool _showCameraInput = true;
+  bool _wasCameraWidgetEverVisible = false;
 
   _BarcodeScanPageState() : super('BarcodeScanPage');
 
@@ -83,7 +84,6 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
     widget._testingStorage.closeCallback = () {
       Navigator.of(context).pop();
     };
-    WidgetsBinding.instance!.addObserver(this);
 
     final stateChangeCallback = () {
       if (mounted) {
@@ -105,25 +105,6 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
     });
   }
 
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      if (ModalRoute.of(context)?.isCurrent == true) {
-        await _qrController?.resumeCamera();
-      }
-    } else if (state == AppLifecycleState.paused) {
-      await _qrController?.pauseCamera();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    GetIt.I
-        .get<RouteObserver<ModalRoute>>()
-        .subscribe(this, ModalRoute.of(context)!);
-  }
-
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -140,21 +121,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
   void dispose() {
     _model.dispose();
     _qrController?.dispose();
-    GetIt.I.get<RouteObserver<ModalRoute>>().unsubscribe(this);
-    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didPopNext() {
-    if (ModalRoute.of(context)?.isCurrent == true) {
-      _qrController?.resumeCamera();
-    }
-  }
-
-  @override
-  void didPushNext() {
-    _qrController?.pauseCamera();
   }
 
   @override
@@ -210,7 +177,27 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage>
     if (isInTests()) {
       return const SizedBox.shrink();
     }
-    return qr.QRView(key: _qrKey, onQRViewCreated: _onQRViewCreated);
+    return VisibilityDetectorPlante(
+      keyStr: 'barcode_scan_page_qr_widget_visibility',
+      onVisibilityChanged: (visible, firstCall) {
+        setState(() {
+          // qr.QRView enables device's camera when it's created, and we
+          // don't want it to do that, because BarcodeScanPage is more often
+          // exists but hidden than exists and shown.
+          // Enabling camera while the page is hidden will confuse users,
+          // so we have to avoid it.
+          _wasCameraWidgetEverVisible |= visible;
+        });
+        if (visible) {
+          _qrController?.resumeCamera();
+        } else {
+          _qrController?.pauseCamera();
+        }
+      },
+      child: _wasCameraWidgetEverVisible
+          ? qr.QRView(key: _qrKey, onQRViewCreated: _onQRViewCreated)
+          : const SizedBox(width: 10, height: 10),
+    );
   }
 
   Widget _contentWidget() {
