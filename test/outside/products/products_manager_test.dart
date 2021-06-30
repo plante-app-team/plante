@@ -27,33 +27,22 @@ import 'products_manager_test.mocks.dart';
 
 @GenerateMocks([OffApi, Backend])
 void main() {
-  const imagesJson = '''
-  {
-   "front_ru":{
-      "rev":"16",
-      "sizes":{
-         "400":{
-            "h":400,
-            "w":289
-         },
-         "200":{
-            "h":100,
-            "w":75
-         }
-      },
-      "imgid":"1"
-   },
-   "ingredients_ru":{
-      "sizes":{
-         "full":{
-            "w":216,
-            "h":400
-         }
-      },
-      "rev":"19",
-      "imgid":"2"
-   }
-  }
+  const selectedImagesJson = '''
+    {
+       "front":{
+          "display":{
+             "ru":"https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg"
+          },
+          "small":{
+             "ru":"https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg"
+          }
+       },
+       "ingredients":{
+          "display":{
+             "ru":"https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg"
+          }
+       }
+    }
   ''';
   const expectedImageFront = 'https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg';
   const expectedImageFrontThumb = 'https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg';
@@ -109,9 +98,8 @@ void main() {
       'brands_tags': ['Brand name'],
       'categories_tags_translated': ['plant', 'lemon'],
       'ingredients_text_ru': 'lemon, water',
-      'images': jsonDecode(imagesJson),
+      'selected_images': jsonDecode(selectedImagesJson),
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -149,9 +137,8 @@ void main() {
       'brands_tags': ['Brand name'],
       'categories_tags_translated': ['plant', 'lemon'],
       'ingredients_text_ru': 'lemon, water',
-      'images': jsonDecode(imagesJson),
+      'selected_images': jsonDecode(selectedImagesJson),
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -200,9 +187,8 @@ void main() {
       'brands_tags': ['Brand name'],
       'categories_tags_translated': ['plant', 'lemon'],
       'ingredients_text_ru': 'lemon, water',
-      'images': jsonDecode(imagesJson),
+      'selected_images': jsonDecode(selectedImagesJson),
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         throw const SocketException(''));
 
@@ -217,9 +203,8 @@ void main() {
       'brands_tags': ['Brand name'],
       'categories_tags_translated': ['plant', 'lemon'],
       'ingredients_text_ru': 'lemon, water',
-      'images': jsonDecode(imagesJson),
+      'selected_images': jsonDecode(selectedImagesJson),
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -789,7 +774,6 @@ void main() {
         }
       ]
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -813,7 +797,6 @@ void main() {
         }
       ]
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -835,7 +818,6 @@ void main() {
         }
       ]
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -866,7 +848,6 @@ void main() {
         }
       ]
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -886,7 +867,6 @@ void main() {
 
   test('invalid veg statuses from server are treated as community', () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -908,7 +888,6 @@ void main() {
 
   test('invalid veg statuses from server are treated as if they do not exist', () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -928,7 +907,6 @@ void main() {
 
   test('invalid veg statuses from server are treated as if they do not exist', () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -958,7 +936,6 @@ void main() {
         }
       ]
     });
-    off.ProductHelper.createImageUrls(offProduct);
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
 
@@ -1022,7 +999,7 @@ void main() {
       'brands_tags': ['Brand name'],
       'categories_tags_translated': ['plant', 'lemon'],
       'ingredients_text_ru': 'lemon, water',
-      'images': jsonDecode(imagesJson),
+      'selected_images': jsonDecode(selectedImagesJson),
     });
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         off.ProductResult(product: offProduct));
@@ -1117,5 +1094,68 @@ void main() {
     verify(backend.createUpdateProduct('123',
         vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative));
+  });
+
+  test('OFF "images" field is ignored', () async {
+    // This JSON was used in the tests as the images source before
+    // https://trello.com/c/YkrvnTDZ/
+    const imagesJson = '''
+    {
+     "front_ru":{
+        "rev":"16",
+        "sizes":{
+           "400":{
+              "h":400,
+              "w":289
+           },
+           "200":{
+              "h":100,
+              "w":75
+           }
+        },
+        "imgid":"1"
+     },
+     "ingredients_ru":{
+        "sizes":{
+           "full":{
+              "w":216,
+              "h":400
+           }
+        },
+        "rev":"19",
+        "imgid":"2"
+     }
+    }
+    ''';
+    final offProduct = off.Product.fromJson({
+      'code': '123',
+      'product_name_ru': 'name',
+      'ingredients_text_ru': 'lemon, water',
+      'images': jsonDecode(imagesJson),
+    });
+    off.ProductHelper.createImageUrls(offProduct);
+    when(offApi.getProduct(any)).thenAnswer((_) async =>
+        off.ProductResult(product: offProduct));
+
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+
+    final productRes = await productsManager.getProduct('123', 'ru');
+    final product = productRes.unwrap();
+    // No images expected
+    final expectedProduct = Product((v) => v
+      ..barcode = '123'
+      ..vegetarianStatus = null
+      ..vegetarianStatusSource = null
+      ..veganStatus = null
+      ..veganStatusSource = null
+      ..name = 'name'
+      ..ingredientsText = 'lemon, water'
+      ..ingredientsAnalyzed.addAll([])
+      ..brands.addAll([])
+      ..categories.addAll([])
+      ..imageFront = null
+      ..imageFrontThumb = null
+      ..imageIngredients = null);
+    expect(product, equals(expectedProduct));
   });
 }

@@ -36,7 +36,7 @@ class ProductsManager {
     off.ProductField.INGREDIENTS,
     off.ProductField.INGREDIENTS_TEXT,
     off.ProductField.INGREDIENTS_TEXT_TRANSLATED,
-    off.ProductField.IMAGES,
+    off.ProductField.SELECTED_IMAGE,
   ];
   static final _notTranslatedRegex = RegExp(r'^\w\w:.*');
 
@@ -115,7 +115,7 @@ class ProductsManager {
       ..imageFrontThumb = _extractImageUri(
           offProduct, off.ImageField.FRONT, off.ImageSize.SMALL, langCode)
       ..imageIngredients = _extractImageUri(offProduct,
-          off.ImageField.INGREDIENTS, off.ImageSize.ORIGINAL, langCode));
+          off.ImageField.INGREDIENTS, off.ImageSize.DISPLAY, langCode));
 
     if (backendProduct?.vegetarianStatus != null) {
       final vegetarianStatus =
@@ -175,7 +175,7 @@ class ProductsManager {
 
   Uri? _extractImageUri(off.Product offProduct, off.ImageField imageType,
       off.ImageSize size, String langCode) {
-    final images = offProduct.images;
+    final images = offProduct.selectedImages;
     if (images == null) {
       return null;
     }
