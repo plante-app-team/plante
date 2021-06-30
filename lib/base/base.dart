@@ -35,9 +35,9 @@ void setSystemUIOverlayStyle() {
   if (Platform.isAndroid) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.white,
-        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarIconBrightness: Brightness.dark,
         statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.light));
+        statusBarIconBrightness: Brightness.dark));
   }
 }
 
