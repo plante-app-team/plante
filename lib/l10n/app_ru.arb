@@ -21,7 +21,7 @@
     "external_auth_page_continue_with": "Продолжить с",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",
     "external_auth_page_privacy_policy": "Политика конфиденциальности",
-    "external_auth_page_continue_with_apple": "Continue with apple",
+    "external_auth_page_continue_with_apple": "Продолжить с Apple",
 
     "init_user_page_title": "Как к вам обращаться?",
     "init_user_page_name_field_title": "Имя",
