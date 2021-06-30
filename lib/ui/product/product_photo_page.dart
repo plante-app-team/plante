@@ -30,7 +30,8 @@ class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
         backgroundColor: Colors.white,
         body: SafeArea(
             child: Stack(children: [
-          if (img != null) PhotoView(imageProvider: img),
+          if (img != null)
+            PhotoView(imageProvider: img, filterQuality: FilterQuality.high),
           Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
