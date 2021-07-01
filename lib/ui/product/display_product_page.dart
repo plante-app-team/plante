@@ -1,6 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/ui/base/colors_plante.dart';
@@ -23,6 +24,7 @@ import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -149,6 +151,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
             ]),
             InkWell(
                 onTap: showProductIngredientsPhoto,
+                onLongPress: copyIngredientsList,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24),
                     child: Column(children: [
@@ -535,6 +538,14 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                 key: const Key('product_ingredients_image_page'),
                 product: product,
                 imageType: ProductImageType.INGREDIENTS)));
+  }
+
+  void copyIngredientsList() {
+    if (product.ingredientsText != null &&
+        product.ingredientsText!.trim().isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: product.ingredientsText ?? ''));
+      showSnackBar(context.strings.global_copied_to_clipboard, context);
+    }
   }
 
   void showProductMenu() async {
