@@ -9,6 +9,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/http_client.dart';
+import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -46,6 +47,7 @@ void initDI() {
   GetIt.I.registerSingleton<AddressObtainer>(
       AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
+  GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
   GetIt.I.registerSingleton<Backend>(Backend(
       GetIt.I.get<Analytics>(),

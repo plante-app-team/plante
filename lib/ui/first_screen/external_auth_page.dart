@@ -8,8 +8,8 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -17,6 +17,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
@@ -31,10 +32,15 @@ class ExternalAuthPage extends StatefulWidget {
 }
 
 class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
+  final GoogleAuthorizer _googleAuthorizer;
+  final AppleAuthorizer _appleAuthorizer;
   bool _loading = false;
   final ExternalAuthCallback _callback;
 
-  _ExternalAuthPageState(this._callback) : super('ExternalAuthPage');
+  _ExternalAuthPageState(this._callback)
+      : _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>(),
+        _appleAuthorizer = GetIt.I.get<AppleAuthorizer>(),
+        super('ExternalAuthPage');
 
   @override
   Widget buildPage(BuildContext context) {
@@ -53,7 +59,9 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                           context.strings.external_auth_page_continue_with,
                           style: TextStyles.headline1)))),
           Center(
-              child: Padding(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+            if (Platform.isAndroid || isInTests())
+              Padding(
                   padding: const EdgeInsets.only(left: 24, right: 24),
                   child: ButtonOutlinedPlante(
                       onPressed: !_loading ? _onGoogleAuthClicked : null,
@@ -75,18 +83,17 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                             child: Center(
                                 child: Text('Google',
                                     style: TextStyles.buttonOutlinedEnabled)))
-                      ])))),
-          if (Platform.isIOS)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 120, left: 24, right: 24),
+                      ]))),
+            if (Platform.isIOS || isInTests())
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
                 child: SignInWithAppleButton(
                   text: context.strings.external_auth_page_continue_with_apple,
                   borderRadius: const BorderRadius.all(Radius.circular(50)),
-                  onPressed: _signInWithApple,
+                  onPressed: !_loading ? _signInWithApple : () {},
                 ),
               ),
-            ),
+          ])),
           Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -115,19 +122,36 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
   }
 
   void _signInWithApple() async {
-    final credential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-    );
+    try {
+      setState(() {
+        _loading = true;
+      });
+      analytics.sendEvent('apple_auth_start');
 
-    //do backend login
-    final backend = GetIt.I.get<Backend>();
-    final loginResult = await backend.loginOrRegister(
-        appleAuthorizationCode: credential.authorizationCode);
-    print(loginResult);
-    //continue backend login
+      // Apple login
+      final appleUser = await _appleAuthorizer.auth();
+      if (appleUser == null) {
+        analytics.sendEvent('apple_auth_apple_error');
+        Log.w('ExternalAuthPage: Apple auth error');
+        showSnackBar(context.strings.global_something_went_wrong, context);
+        return;
+      }
+
+      // Universal auth logic
+      final userParams = await _authUniversal(appleUser.name ?? '',
+          appleAuthorizationCode: appleUser.authorizationCode);
+      if (userParams == null) {
+        return;
+      }
+
+      // Nice!
+      await _callback.call(userParams);
+      analytics.sendEvent('apple_auth_success');
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   void _onGoogleAuthClicked() async {
@@ -138,7 +162,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       analytics.sendEvent('google_auth_start');
 
       // Google login
-      final googleAccount = await GetIt.I.get<GoogleAuthorizer>().auth();
+      final googleAccount = await _googleAuthorizer.auth();
       if (googleAccount == null) {
         analytics.sendEvent('google_auth_google_error');
         Log.w('ExternalAuthPage: googleAccount == null');
@@ -146,27 +170,11 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
         return;
       }
 
-      // Backend login
-      final backend = GetIt.I.get<Backend>();
-      final loginResult =
-          await backend.loginOrRegister(googleIdToken: googleAccount.idToken);
-      if (loginResult.isErr) {
-        analytics.sendEvent('google_auth_backend_error');
-        final error = loginResult.unwrapErr();
-        if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
-          showSnackBar(
-              context.strings.external_auth_page_google_email_not_verified,
-              context);
-        } else {
-          showSnackBar(context.strings.global_something_went_wrong, context);
-        }
+      // Universal auth logic
+      final userParams = await _authUniversal(googleAccount.name,
+          googleIdToken: googleAccount.idToken);
+      if (userParams == null) {
         return;
-      }
-
-      // Take external name
-      var userParams = loginResult.unwrap();
-      if ((userParams.name ?? '').length < InitUserPage.MIN_NAME_LENGTH) {
-        userParams = userParams.rebuild((e) => e.name = googleAccount.name);
       }
 
       // Nice!
@@ -177,5 +185,33 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
         _loading = false;
       });
     }
+  }
+
+  Future<UserParams?> _authUniversal(String userName,
+      {String? googleIdToken, String? appleAuthorizationCode}) async {
+    // Backend login
+    final backend = GetIt.I.get<Backend>();
+    final loginResult = await backend.loginOrRegister(
+        googleIdToken: googleIdToken,
+        appleAuthorizationCode: appleAuthorizationCode);
+    if (loginResult.isErr) {
+      analytics.sendEvent('auth_backend_error');
+      final error = loginResult.unwrapErr();
+      if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
+        showSnackBar(
+            context.strings.external_auth_page_google_email_not_verified,
+            context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
+      return null;
+    }
+
+    // Take external name
+    var userParams = loginResult.unwrap();
+    if ((userParams.name ?? '').length < InitUserPage.MIN_NAME_LENGTH) {
+      userParams = userParams.rebuild((e) => e.name = userName);
+    }
+    return userParams;
   }
 }

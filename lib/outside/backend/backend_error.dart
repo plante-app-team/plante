@@ -6,7 +6,6 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 
 enum BackendErrorKind {
-  ALREADY_REGISTERED,
   GOOGLE_EMAIL_NOT_VERIFIED,
   NOT_AUTHORIZED,
   PRODUCT_NOT_FOUND,
@@ -30,9 +29,6 @@ class BackendError {
 
     final BackendErrorKind kind;
     switch (json['error']) {
-      case 'already_registered':
-        kind = BackendErrorKind.ALREADY_REGISTERED;
-        break;
       case 'google_email_not_verified':
         kind = BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED;
         break;

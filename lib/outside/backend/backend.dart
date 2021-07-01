@@ -66,7 +66,6 @@ class Backend {
       return Ok(userParams!);
     }
 
-    // Register
     final deviceId = (await DeviceInfo.get()).deviceID;
     final queryParams = {
       'deviceId': deviceId,
@@ -77,30 +76,15 @@ class Backend {
     if (appleAuthorizationCode != null) {
       queryParams['appleAuthorizationCode'] = appleAuthorizationCode;
     }
-    var jsonRes = await _backendGetJson('register_user/', queryParams);
+    final jsonRes =
+        await _backendGetJson('login_or_register_user/', queryParams);
     if (jsonRes.isOk) {
       final userParams = UserParams.fromJson(jsonRes.unwrap())!;
-      Log.i('Backend: user registered: ${userParams.toString()}');
+      Log.i('Backend: user logged in or registered: ${userParams.toString()}');
       return Ok(userParams);
     } else {
-      if (jsonRes.unwrapErr().errorKind !=
-          BackendErrorKind.ALREADY_REGISTERED) {
-        return Err(jsonRes.unwrapErr());
-      } else {
-        // Already registered, need to login
-      }
-    }
-
-    // Login
-
-    jsonRes = await _backendGetJson(
-        'login_user/', {'googleIdToken': googleIdToken, 'deviceId': deviceId});
-    if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
-    final userParams = UserParams.fromJson(jsonRes.unwrap())!;
-    Log.i('Backend: user logged in: ${userParams.toString()}');
-    return Ok(userParams);
   }
 
   Future<Result<bool, BackendError>> updateUserParams(UserParams userParams,

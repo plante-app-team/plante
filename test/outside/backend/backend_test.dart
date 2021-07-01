@@ -29,36 +29,12 @@ void main() {
     analytics = FakeAnalytics();
   });
 
-  test('successful registration', () async {
+  test('successful login/registration', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "user_id": "123",
-        "client_token": "321"
-      }
-    ''');
-
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
-    final expectedParams = UserParams((v) => v
-      ..backendId = '123'
-      ..backendClientToken = '321');
-    expect(result.unwrap(), equals(expectedParams));
-  });
-
-  test('successful login', () async {
-    final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "already_registered"
-      }
-    ''');
-    httpClient.setResponse('.*login_user.*', '''
+    httpClient.setResponse('.*login_or_register_user.*', '''
       {
         "user_id": "123",
         "client_token": "321"
@@ -103,7 +79,7 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
 
-    httpClient.setResponse('.*register_user.*', '''
+    httpClient.setResponse('.*login_or_register_user.*', '''
       {
         "error": "google_email_not_verified"
       }
@@ -119,7 +95,7 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '', responseCode: 500);
+    httpClient.setResponse('.*login_or_register_user.*', '', responseCode: 500);
     final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
@@ -128,7 +104,7 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '{{{{bad bad bad}');
+    httpClient.setResponse('.*login_or_register_user.*', '{{{{bad bad bad}');
     final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
@@ -137,53 +113,7 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "some_error"
-      }
-    ''');
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
-    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
-  });
-
-  test('login request not 200', () async {
-    final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "already_registered"
-      }
-    ''');
-    httpClient.setResponse('.*login_user.*', '', responseCode: 500);
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
-    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
-  });
-
-  test('login request bad json', () async {
-    final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "already_registered"
-      }
-    ''');
-    httpClient.setResponse('.*login_user.*', '{{{{bad bad bad}');
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
-    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
-  });
-
-  test('login request json error', () async {
-    final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "already_registered"
-      }
-    ''');
-    httpClient.setResponse('.*login_user.*', '''
+    httpClient.setResponse('.*login_or_register_user.*', '''
       {
         "error": "some_error"
       }
@@ -196,21 +126,7 @@ void main() {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
     final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponseException('.*register_user.*', const SocketException(''));
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
-    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
-  });
-
-  test('login network error', () async {
-    final httpClient = FakeHttpClient();
-    final userParamsController = FakeUserParamsController();
-    final backend = Backend(analytics, userParamsController, httpClient, fakeSettings);
-    httpClient.setResponse('.*register_user.*', '''
-      {
-        "error": "already_registered"
-      }
-    ''');
-    httpClient.setResponseException('.*register_user.*', const SocketException(''));
+    httpClient.setResponseException('.*login_or_register_user.*', const SocketException(''));
     final result = await backend.loginOrRegister(googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -222,7 +138,7 @@ void main() {
     final observer = MockBackendObserver();
     backend.addObserver(observer);
 
-    httpClient.setResponse('.*register_user.*', '''
+    httpClient.setResponse('.*login_or_register_user.*', '''
       {
         "error": "some_error"
       }
