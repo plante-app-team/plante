@@ -12,6 +12,7 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/identity/google_user.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
@@ -110,13 +111,14 @@ void main() {
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedParams;
-    await tester.superPump(
+    final context = await tester.superPump(
         ExternalAuthPage((params) async {
           obtainedParams = params;
           return true;
         }));
 
-    await tester.tap(find.text('Apple'));
+    await tester.tap(find.text(
+        context.strings.external_auth_page_continue_with_apple));
 
     // We expect the Apple name to be sent to the server
     final expectedParams = UserParams((e) => e.name = 'bob');
@@ -131,13 +133,14 @@ void main() {
     when(appleAuthorizer.auth()).thenAnswer((_) async => null);
 
     UserParams? obtainedResult;
-    await tester.superPump(
+    final context = await tester.superPump(
         ExternalAuthPage((params) async {
           obtainedResult = params;
           return true;
         }));
 
-    await tester.tap(find.text('Apple'));
+    await tester.tap(find.text(
+        context.strings.external_auth_page_continue_with_apple));
     expect(obtainedResult, equals(null));
 
     expect(analytics.allEvents().length, equals(2));
@@ -154,13 +157,14 @@ void main() {
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedResult;
-    await tester.superPump(
+    final context = await tester.superPump(
         ExternalAuthPage((params) async {
           obtainedResult = params;
           return true;
         }));
 
-    await tester.tap(find.text('Apple'));
+    await tester.tap(find.text(
+        context.strings.external_auth_page_continue_with_apple));
     expect(obtainedResult, equals(null));
 
     expect(analytics.allEvents().length, equals(2));
