@@ -21,7 +21,11 @@ int randInt(int min, int max) {
 }
 
 bool isInTests() {
-  return Platform.environment.containsKey('FLUTTER_TEST');
+  try {
+    return Platform.environment.containsKey('FLUTTER_TEST');
+  } catch (e) {
+    return false;
+  }
 }
 
 bool enableNewestFeatures() {
