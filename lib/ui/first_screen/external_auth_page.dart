@@ -84,14 +84,15 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                                   style: TextStyles.buttonOutlinedEnabled)))
                     ]))),
             if (Platform.isIOS || isInTests()) const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24),
-              child: SignInWithAppleButton(
-                text: context.strings.external_auth_page_continue_with_apple,
-                borderRadius: const BorderRadius.all(Radius.circular(50)),
-                onPressed: !_loading ? _signInWithApple : () {},
+            if (Platform.isIOS || isInTests())
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: SignInWithAppleButton(
+                  text: context.strings.external_auth_page_continue_with_apple,
+                  borderRadius: const BorderRadius.all(Radius.circular(50)),
+                  onPressed: !_loading ? _signInWithApple : () {},
+                ),
               ),
-            ),
           ])),
           Align(
               alignment: Alignment.bottomCenter,
