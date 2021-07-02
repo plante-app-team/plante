@@ -10,6 +10,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
+import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 
 class FakeBackend implements Backend {
@@ -190,6 +191,12 @@ class FakeBackend implements Backend {
       ..productsLastSeenUtc.addAll(lastSeen));
     _fakeShops[osmId] = productsAtShop;
     return productsAtShop;
+  }
+
+  @override
+  Future<BackendResponse> customGet(String path,
+      [Map<String, String>? queryParams, Map<String, String>? headers]) {
+    throw UnimplementedError('Not supposed to be used');
   }
 }
 

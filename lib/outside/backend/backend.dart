@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
@@ -21,6 +22,8 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 
 const BACKEND_ADDRESS = 'planteapp.com';
+const _LOCAL_BACKEND_ADDRESS = 'localhost:8080';
+const _CONNECT_TO_LOCAL_SERVER = kIsWeb && kDebugMode;
 
 const PREF_BACKEND_CLIENT_TOKEN = 'BACKEND_CLIENT_TOKEN';
 
@@ -381,7 +384,18 @@ class Backend {
     if (contentType != null) {
       headersReally['Content-Type'] = contentType;
     }
-    final url = Uri.https(BACKEND_ADDRESS, '/backend/$path', params);
+    final String backendAddress;
+    if (_CONNECT_TO_LOCAL_SERVER) {
+      backendAddress = _LOCAL_BACKEND_ADDRESS;
+    } else {
+      backendAddress = BACKEND_ADDRESS;
+    }
+    final Uri url;
+    if (_CONNECT_TO_LOCAL_SERVER) {
+      url = Uri.http(backendAddress, '/$path', params);
+    } else {
+      url = Uri.https(backendAddress, '/backend/$path', params);
+    }
     try {
       final request = http.Request('GET', url);
       request.headers.addAll(headersReally);
@@ -432,6 +446,14 @@ class Backend {
       obs.onBackendError(error);
     });
     return error;
+  }
+
+  Future<BackendResponse> customGet(String path,
+      [Map<String, String>? queryParams, Map<String, String>? headers]) async {
+    if (!kIsWeb) {
+      throw Exception('Backend.customGet must be called only from Web');
+    }
+    return await _backendGet(path, queryParams, headers: headers);
   }
 }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:plante/model/gender.dart';
@@ -63,7 +64,7 @@ class UserParamsController {
       return null;
     }
 
-    if (backendId != null && !_crashlyticsInited && !isInTests()) {
+    if (backendId != null && !_crashlyticsInited && !isInTests() && !kIsWeb) {
       await FirebaseCrashlytics.instance.setUserIdentifier(backendId);
       _crashlyticsInited = true;
     }

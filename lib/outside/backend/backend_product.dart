@@ -6,6 +6,8 @@ part 'backend_product.g.dart';
 
 abstract class BackendProduct
     implements Built<BackendProduct, BackendProductBuilder> {
+  static final BackendProduct empty = BackendProduct();
+
   @BuiltValueField(wireName: 'server_id')
   int? get serverId;
   @BuiltValueField(wireName: 'barcode')
