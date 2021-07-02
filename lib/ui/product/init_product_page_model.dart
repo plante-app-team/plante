@@ -219,7 +219,7 @@ class InitProductPageModel {
           await _productsManager.createUpdateProduct(savedProduct, langCode);
       if (productResult.isOk) {
         Log.i('InitProductPageModel: saveProduct: product saved');
-        product = savedProduct;
+        product = productResult.unwrap();
       } else {
         _analytics
             .sendEvent('product_save_failure', {'barcode': product.barcode});
