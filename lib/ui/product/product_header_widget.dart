@@ -10,11 +10,13 @@ class ProductHeaderWidget extends StatelessWidget {
   final Product product;
   final ProductImageType imageType;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   const ProductHeaderWidget(
       {Key? key,
       required this.product,
       required this.imageType,
-      required this.onTap})
+      required this.onTap,
+      this.onLongPress})
       : super(key: key);
 
   @override
@@ -64,6 +66,7 @@ class ProductHeaderWidget extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: onTap,
+                  onLongPress: onLongPress,
                 )))
       ]),
     );

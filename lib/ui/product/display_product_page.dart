@@ -94,7 +94,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                       key: const Key('product_header'),
                       product: product,
                       imageType: ProductImageType.FRONT,
-                      onTap: showProductPhoto),
+                      onTap: showProductPhoto,
+                      onLongPress: copyProductName),
                 ])),
             const SizedBox(height: 19),
             Padding(
@@ -546,6 +547,11 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
       Clipboard.setData(ClipboardData(text: product.ingredientsText ?? ''));
       showSnackBar(context.strings.global_copied_to_clipboard, context);
     }
+  }
+
+  void copyProductName() {
+    Clipboard.setData(ClipboardData(text: product.name));
+    showSnackBar(context.strings.global_copied_to_clipboard, context);
   }
 
   void showProductMenu() async {
