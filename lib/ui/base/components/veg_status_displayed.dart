@@ -41,7 +41,7 @@ class VegStatusDisplayed extends StatelessWidget {
         if (helpText != null)
           Wrap(children: [_HelpButton(text: helpText!, onPressed: onHelpClick)])
       ]),
-      const SizedBox(height: 4),
+      const SizedBox(height: 6),
       Row(children: [
         _vegStatusSourceImage(),
         const SizedBox(width: 6),
@@ -50,11 +50,6 @@ class VegStatusDisplayed extends StatelessWidget {
                 onTap: onVegStatusSourceClick,
                 child: Text(
                   _vegStatusSourceText(context),
-                  /* _shouldShowModeratorChoiceReasoningOnClicks() ? () {_onVegStatusSourceTextClick(context);} : null,
-                child: Text(_vegStatusSourceText(context),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyles.normalSmall*/
                 )))
       ])
     ]);

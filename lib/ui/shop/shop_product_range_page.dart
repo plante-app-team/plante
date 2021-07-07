@@ -197,7 +197,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     final dateStr = secsSinceEpochToStr(_model.lastSeenSecs(product), context);
 
     final cardExtraContent = Padding(
-        padding: const EdgeInsets.only(left: 6, right: 6, bottom: 4),
+        padding: const EdgeInsets.only(left: 6, right: 6, bottom: 6),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
               context
