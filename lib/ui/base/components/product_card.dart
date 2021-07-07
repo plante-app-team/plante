@@ -95,17 +95,17 @@ class _ProductCardState extends State<ProductCard>
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 2),
                           Text(widget.product.name ?? '???',
                               style: TextStyles.normalBold,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
-                          const SizedBox(height: 4),
                           if (widget.hint != null)
                             Column(children: [
+                              const SizedBox(height: 4),
                               Text(widget.hint!, style: TextStyles.hint),
-                              const SizedBox(height: 8),
                             ]),
+                          const SizedBox(height: 8),
                           VegStatusDisplayed(
                               product: widget.product, user: widget.beholder),
                         ])),
@@ -114,7 +114,7 @@ class _ProductCardState extends State<ProductCard>
                       duration: DURATION_DEFAULT,
                       vsync: this,
                       child: Column(children: [
-                        SizedBox(height: widget.extraContent != null ? 16 : 0),
+                        SizedBox(height: widget.extraContent != null ? 18 : 0),
                         widget.extraContent ?? const SizedBox.shrink()
                       ]))
                 ]))));

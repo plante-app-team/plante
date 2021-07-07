@@ -12,7 +12,8 @@ class DialogPlante extends StatelessWidget {
       this.title,
       required this.content,
       this.actions,
-      this.contentPadding = const EdgeInsets.all(24)})
+      this.contentPadding =
+          const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 16)})
       : super(key: key);
 
   @override

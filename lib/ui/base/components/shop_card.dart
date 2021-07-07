@@ -81,7 +81,7 @@ class ShopCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   onTap: _onCancel,
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     child: SvgPicture.asset(
                       'assets/cancel_circle.svg',
                     ),
@@ -89,7 +89,7 @@ class ShopCard extends StatelessWidget {
                 ),
                 Expanded(
                     child: Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 16),
+                        padding: const EdgeInsets.only(left: 16, top: 8),
                         child: Column(children: [
                           SizedBox(
                               width: double.infinity,
@@ -98,13 +98,13 @@ class ShopCard extends StatelessWidget {
                                   style: TextStyles.headline1,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis)),
+                          const SizedBox(height: 4),
                           ShopAddressWidget(address),
                         ]))),
               ]),
           Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              padding: const EdgeInsets.all(16),
               child: Column(children: [
-                const SizedBox(height: 16),
                 if (checkedProduct == null) _productRangeContent(context),
                 if (checkedProduct != null) _checkIfProductSoldContent(context),
               ]))
@@ -120,7 +120,7 @@ class ShopCard extends StatelessWidget {
                   ? context.strings.shop_card_there_are_products_in_shop
                   : context.strings.shop_card_no_products_in_shop,
               style: TextStyles.normal)),
-      const SizedBox(height: 8),
+      const SizedBox(height: 12),
       SizedBox(
           width: double.infinity,
           child: ButtonFilledPlante.withText(
@@ -147,7 +147,7 @@ class ShopCard extends StatelessWidget {
     return Column(children: [
       SizedBox(
           width: double.infinity, child: Text(title, style: TextStyles.normal)),
-      const SizedBox(height: 8),
+      const SizedBox(height: 12),
       Row(children: [
         Expanded(
             child: SizedBox(

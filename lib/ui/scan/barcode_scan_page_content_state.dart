@@ -143,17 +143,17 @@ class BarcodeScanPageContentStateProductNotFound
       cancelCallback: cancelCallback,
       child: Padding(
           padding:
-              const EdgeInsets.only(left: 10, right: 10, top: 16, bottom: 24),
+              const EdgeInsets.only(left: 10, right: 10, top: 12, bottom: 16),
           child: Column(children: [
             Text(context.strings.barcode_scan_page_product_not_found,
                 textAlign: TextAlign.center, style: TextStyles.headline4),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
                 context.strings.barcode_scan_page_product_not_found_descr
                     .replaceAll('<PRODUCT>', partialProduct.barcode),
                 textAlign: TextAlign.center,
                 style: TextStyles.normal),
-            const SizedBox(height: 18),
+            const SizedBox(height: 12),
             ButtonFilledPlante.withText(
                 context.strings.barcode_scan_page_add_product, onPressed: () {
               tryOpenProductPage(context, shopToAddTo);
@@ -310,15 +310,19 @@ class _CardContainer extends StatelessWidget {
                       ),
                       if (cancelCallback != null)
                         Align(
-                            alignment: Alignment.topRight,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                  key: const Key('card_cancel_btn'),
-                                  onPressed: cancelCallback,
-                                  icon: SvgPicture.asset(
-                                      'assets/cancel_circle.svg')),
-                            ))
+                          alignment: Alignment.topRight,
+                          child: InkWell(
+                            key: const Key('card_cancel_btn'),
+                            borderRadius: BorderRadius.circular(24),
+                            onTap: cancelCallback,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: SvgPicture.asset(
+                                'assets/cancel_circle.svg',
+                              ),
+                            ),
+                          ),
+                        )
                     ])
                   ])))
         ]));
