@@ -181,14 +181,6 @@ void main() {
   });
 
   test('get product when OFF throws network error', () async {
-    final offProduct = off.Product.fromJson({
-      'code': '123',
-      'product_name_ru': 'name',
-      'brands_tags': ['Brand name'],
-      'categories_tags_translated': ['plant', 'lemon'],
-      'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesJson),
-    });
     when(offApi.getProduct(any)).thenAnswer((_) async =>
         throw const SocketException(''));
 

@@ -59,6 +59,32 @@ class _$BackendProductSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.moderatorVegetarianChoiceReason;
+    if (value != null) {
+      result
+        ..add('moderator_vegetarian_choice_reason')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.moderatorVegetarianSourcesText;
+    if (value != null) {
+      result
+        ..add('moderator_vegetarian_sources_text')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.moderatorVeganChoiceReason;
+    if (value != null) {
+      result
+        ..add('moderator_vegan_choice_reason')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.moderatorVeganSourcesText;
+    if (value != null) {
+      result
+        ..add('moderator_vegan_sources_text')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -98,6 +124,22 @@ class _$BackendProductSerializer
           result.veganStatusSource = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'moderator_vegetarian_choice_reason':
+          result.moderatorVegetarianChoiceReason = serializers
+              .deserialize(value, specifiedType: const FullType(int)) as int?;
+          break;
+        case 'moderator_vegetarian_sources_text':
+          result.moderatorVegetarianSourcesText = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'moderator_vegan_choice_reason':
+          result.moderatorVeganChoiceReason = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int?;
+          break;
+        case 'moderator_vegan_sources_text':
+          result.moderatorVeganSourcesText = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
       }
     }
 
@@ -118,6 +160,14 @@ class _$BackendProduct extends BackendProduct {
   final String? veganStatus;
   @override
   final String? veganStatusSource;
+  @override
+  final int? moderatorVegetarianChoiceReason;
+  @override
+  final String? moderatorVegetarianSourcesText;
+  @override
+  final int? moderatorVeganChoiceReason;
+  @override
+  final String? moderatorVeganSourcesText;
 
   factory _$BackendProduct([void Function(BackendProductBuilder)? updates]) =>
       (new BackendProductBuilder()..update(updates)).build();
@@ -128,7 +178,11 @@ class _$BackendProduct extends BackendProduct {
       this.vegetarianStatus,
       this.vegetarianStatusSource,
       this.veganStatus,
-      this.veganStatusSource})
+      this.veganStatusSource,
+      this.moderatorVegetarianChoiceReason,
+      this.moderatorVegetarianSourcesText,
+      this.moderatorVeganChoiceReason,
+      this.moderatorVeganSourcesText})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(barcode, 'BackendProduct', 'barcode');
   }
@@ -150,7 +204,13 @@ class _$BackendProduct extends BackendProduct {
         vegetarianStatus == other.vegetarianStatus &&
         vegetarianStatusSource == other.vegetarianStatusSource &&
         veganStatus == other.veganStatus &&
-        veganStatusSource == other.veganStatusSource;
+        veganStatusSource == other.veganStatusSource &&
+        moderatorVegetarianChoiceReason ==
+            other.moderatorVegetarianChoiceReason &&
+        moderatorVegetarianSourcesText ==
+            other.moderatorVegetarianSourcesText &&
+        moderatorVeganChoiceReason == other.moderatorVeganChoiceReason &&
+        moderatorVeganSourcesText == other.moderatorVeganSourcesText;
   }
 
   @override
@@ -158,11 +218,21 @@ class _$BackendProduct extends BackendProduct {
     return $jf($jc(
         $jc(
             $jc(
-                $jc($jc($jc(0, serverId.hashCode), barcode.hashCode),
-                    vegetarianStatus.hashCode),
-                vegetarianStatusSource.hashCode),
-            veganStatus.hashCode),
-        veganStatusSource.hashCode));
+                $jc(
+                    $jc(
+                        $jc(
+                            $jc(
+                                $jc(
+                                    $jc($jc(0, serverId.hashCode),
+                                        barcode.hashCode),
+                                    vegetarianStatus.hashCode),
+                                vegetarianStatusSource.hashCode),
+                            veganStatus.hashCode),
+                        veganStatusSource.hashCode),
+                    moderatorVegetarianChoiceReason.hashCode),
+                moderatorVegetarianSourcesText.hashCode),
+            moderatorVeganChoiceReason.hashCode),
+        moderatorVeganSourcesText.hashCode));
   }
 
   @override
@@ -173,7 +243,13 @@ class _$BackendProduct extends BackendProduct {
           ..add('vegetarianStatus', vegetarianStatus)
           ..add('vegetarianStatusSource', vegetarianStatusSource)
           ..add('veganStatus', veganStatus)
-          ..add('veganStatusSource', veganStatusSource))
+          ..add('veganStatusSource', veganStatusSource)
+          ..add('moderatorVegetarianChoiceReason',
+              moderatorVegetarianChoiceReason)
+          ..add(
+              'moderatorVegetarianSourcesText', moderatorVegetarianSourcesText)
+          ..add('moderatorVeganChoiceReason', moderatorVeganChoiceReason)
+          ..add('moderatorVeganSourcesText', moderatorVeganSourcesText))
         .toString();
   }
 }
@@ -209,6 +285,28 @@ class BackendProductBuilder
   set veganStatusSource(String? veganStatusSource) =>
       _$this._veganStatusSource = veganStatusSource;
 
+  int? _moderatorVegetarianChoiceReason;
+  int? get moderatorVegetarianChoiceReason =>
+      _$this._moderatorVegetarianChoiceReason;
+  set moderatorVegetarianChoiceReason(int? moderatorVegetarianChoiceReason) =>
+      _$this._moderatorVegetarianChoiceReason = moderatorVegetarianChoiceReason;
+
+  String? _moderatorVegetarianSourcesText;
+  String? get moderatorVegetarianSourcesText =>
+      _$this._moderatorVegetarianSourcesText;
+  set moderatorVegetarianSourcesText(String? moderatorVegetarianSourcesText) =>
+      _$this._moderatorVegetarianSourcesText = moderatorVegetarianSourcesText;
+
+  int? _moderatorVeganChoiceReason;
+  int? get moderatorVeganChoiceReason => _$this._moderatorVeganChoiceReason;
+  set moderatorVeganChoiceReason(int? moderatorVeganChoiceReason) =>
+      _$this._moderatorVeganChoiceReason = moderatorVeganChoiceReason;
+
+  String? _moderatorVeganSourcesText;
+  String? get moderatorVeganSourcesText => _$this._moderatorVeganSourcesText;
+  set moderatorVeganSourcesText(String? moderatorVeganSourcesText) =>
+      _$this._moderatorVeganSourcesText = moderatorVeganSourcesText;
+
   BackendProductBuilder();
 
   BackendProductBuilder get _$this {
@@ -220,6 +318,10 @@ class BackendProductBuilder
       _vegetarianStatusSource = $v.vegetarianStatusSource;
       _veganStatus = $v.veganStatus;
       _veganStatusSource = $v.veganStatusSource;
+      _moderatorVegetarianChoiceReason = $v.moderatorVegetarianChoiceReason;
+      _moderatorVegetarianSourcesText = $v.moderatorVegetarianSourcesText;
+      _moderatorVeganChoiceReason = $v.moderatorVeganChoiceReason;
+      _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
       _$v = null;
     }
     return this;
@@ -246,7 +348,11 @@ class BackendProductBuilder
             vegetarianStatus: vegetarianStatus,
             vegetarianStatusSource: vegetarianStatusSource,
             veganStatus: veganStatus,
-            veganStatusSource: veganStatusSource);
+            veganStatusSource: veganStatusSource,
+            moderatorVegetarianChoiceReason: moderatorVegetarianChoiceReason,
+            moderatorVegetarianSourcesText: moderatorVegetarianSourcesText,
+            moderatorVeganChoiceReason: moderatorVeganChoiceReason,
+            moderatorVeganSourcesText: moderatorVeganSourcesText);
     replace(_$result);
     return _$result;
   }

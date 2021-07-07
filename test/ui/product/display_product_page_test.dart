@@ -11,6 +11,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -647,5 +648,321 @@ void main() {
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.wasEventSent('help_with_vegan_statuses_started'), isTrue);
+  });
+
+  testWidgets('vegan status moderator reasoning and sources are shown on click', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianSourcesText = 'vegetarian source'
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganSourcesText = 'vegan source');
+    final vegan = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    await userParamsController.setUserParams(vegan);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+    expect(find.text(
+        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.localize(context)),
+        findsNothing);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+    expect(find.text('vegan source'), findsNothing);
+    expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsOneWidget);
+    expect(find.text(
+        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.localize(context)),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsOneWidget);
+    expect(find.text('vegan source'), findsOneWidget);
+    expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isTrue);
+  });
+
+  testWidgets('vegetarian status moderator reasoning and sources are shown on click', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianSourcesText = 'vegetarian source'
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganSourcesText = 'vegan source');
+    final vegetarian = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = true
+      ..eatsMilk = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(vegetarian);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+    expect(find.text(
+        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.localize(context)),
+        findsNothing);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+    expect(find.text('vegetarian source'), findsNothing);
+    expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsOneWidget);
+    expect(find.text(
+        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.localize(context)),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsOneWidget);
+    expect(find.text('vegetarian source'), findsOneWidget);
+    expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isTrue);
+  });
+
+  testWidgets('vegan status moderator reasoning without sources', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianSourcesText = 'vegetarian source'
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganSourcesText = null);
+    final vegan = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    await userParamsController.setUserParams(vegan);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+  });
+
+  testWidgets('vegetarian status moderator reasoning without sources', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianSourcesText = null
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganSourcesText = 'vegan source');
+    final vegetarian = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = true
+      ..eatsMilk = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(vegetarian);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsOneWidget);
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_source),
+        findsNothing);
+  });
+
+  testWidgets('vegan status moderator reasoning NOT shown on click '
+              'when veg-source is not moderator', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.community
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+    final vegan = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    await userParamsController.setUserParams(vegan);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_community));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+  });
+
+  testWidgets('vegetarian status moderator reasoning NOT shown on click when veg-source is not moderator', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.community
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+    final vegetarian = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = true
+      ..eatsMilk = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(vegetarian);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_community));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+  });
+
+
+  testWidgets('vegan status moderator reasoning NOT shown on click when it does not exist', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+    final vegan = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    await userParamsController.setUserParams(vegan);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
+  });
+
+  testWidgets('vegetarian status moderator reasoning NOT shown on click when it does not exist', (WidgetTester tester) async {
+    final product = Product((v) => v
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+    final vegetarian = UserParams((v) => v
+      ..backendClientToken = '123'
+      ..backendId = '321'
+      ..name = 'Bob'
+      ..eatsEggs = true
+      ..eatsMilk = true
+      ..eatsHoney = true);
+    await userParamsController.setUserParams(vegetarian);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.pumpAndSettle();
+
+    expect(find.text(
+        context.strings.display_product_page_moderator_comment_dialog_title),
+        findsNothing);
   });
 }

@@ -2,27 +2,28 @@
 // in plante/test/outside/products/products_manager_test.dart.
 // Do not manually edit this file.
 
-import 'dart:async' as _i7;
-import 'dart:math' as _i20;
+import 'dart:async' as _i8;
+import 'dart:math' as _i21;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as _i4;
-import 'package:openfoodfacts/model/Product.dart' as _i10;
+import 'package:openfoodfacts/model/Product.dart' as _i11;
 import 'package:openfoodfacts/model/ProductResult.dart' as _i2;
-import 'package:openfoodfacts/model/SendImage.dart' as _i11;
+import 'package:openfoodfacts/model/SendImage.dart' as _i12;
 import 'package:openfoodfacts/model/Status.dart' as _i3;
-import 'package:openfoodfacts/model/User.dart' as _i9;
-import 'package:openfoodfacts/utils/LanguageHelper.dart' as _i12;
-import 'package:openfoodfacts/utils/ProductQueryConfigurations.dart' as _i8;
+import 'package:openfoodfacts/model/User.dart' as _i10;
+import 'package:openfoodfacts/utils/LanguageHelper.dart' as _i13;
+import 'package:openfoodfacts/utils/ProductQueryConfigurations.dart' as _i9;
 import 'package:plante/base/result.dart' as _i5;
-import 'package:plante/model/user_params.dart' as _i14;
-import 'package:plante/model/veg_status.dart' as _i17;
-import 'package:plante/outside/backend/backend.dart' as _i13;
-import 'package:plante/outside/backend/backend_error.dart' as _i15;
-import 'package:plante/outside/backend/backend_product.dart' as _i16;
-import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i18;
-import 'package:plante/outside/backend/backend_shop.dart' as _i19;
-import 'package:plante/outside/off/off_api.dart' as _i6;
+import 'package:plante/model/user_params.dart' as _i15;
+import 'package:plante/model/veg_status.dart' as _i18;
+import 'package:plante/outside/backend/backend.dart' as _i14;
+import 'package:plante/outside/backend/backend_error.dart' as _i16;
+import 'package:plante/outside/backend/backend_product.dart' as _i17;
+import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i19;
+import 'package:plante/outside/backend/backend_response.dart' as _i6;
+import 'package:plante/outside/backend/backend_shop.dart' as _i20;
+import 'package:plante/outside/off/off_api.dart' as _i7;
 
 // ignore_for_file: avoid_redundant_argument_values
 // ignore_for_file: comment_references
@@ -39,64 +40,66 @@ class _FakeOcrIngredientsResult extends _i1.Fake
 
 class _FakeResult<OK, ERR> extends _i1.Fake implements _i5.Result<OK, ERR> {}
 
+class _FakeBackendResponse extends _i1.Fake implements _i6.BackendResponse {}
+
 /// A class which mocks [OffApi].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockOffApi extends _i1.Mock implements _i6.OffApi {
+class MockOffApi extends _i1.Mock implements _i7.OffApi {
   MockOffApi() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i7.Future<_i2.ProductResult> getProduct(
-          _i8.ProductQueryConfiguration? configuration) =>
+  _i8.Future<_i2.ProductResult> getProduct(
+          _i9.ProductQueryConfiguration? configuration) =>
       (super.noSuchMethod(Invocation.method(#getProduct, [configuration]),
               returnValue:
                   Future<_i2.ProductResult>.value(_FakeProductResult()))
-          as _i7.Future<_i2.ProductResult>);
+          as _i8.Future<_i2.ProductResult>);
   @override
-  _i7.Future<_i3.Status> saveProduct(_i9.User? user, _i10.Product? product) =>
+  _i8.Future<_i3.Status> saveProduct(_i10.User? user, _i11.Product? product) =>
       (super.noSuchMethod(Invocation.method(#saveProduct, [user, product]),
               returnValue: Future<_i3.Status>.value(_FakeStatus()))
-          as _i7.Future<_i3.Status>);
+          as _i8.Future<_i3.Status>);
   @override
-  _i7.Future<_i3.Status> addProductImage(
-          _i9.User? user, _i11.SendImage? image) =>
+  _i8.Future<_i3.Status> addProductImage(
+          _i10.User? user, _i12.SendImage? image) =>
       (super.noSuchMethod(Invocation.method(#addProductImage, [user, image]),
               returnValue: Future<_i3.Status>.value(_FakeStatus()))
-          as _i7.Future<_i3.Status>);
+          as _i8.Future<_i3.Status>);
   @override
-  _i7.Future<_i4.OcrIngredientsResult> extractIngredients(_i9.User? user,
-          String? barcode, _i12.OpenFoodFactsLanguage? language) =>
+  _i8.Future<_i4.OcrIngredientsResult> extractIngredients(_i10.User? user,
+          String? barcode, _i13.OpenFoodFactsLanguage? language) =>
       (super.noSuchMethod(
               Invocation.method(#extractIngredients, [user, barcode, language]),
               returnValue: Future<_i4.OcrIngredientsResult>.value(
                   _FakeOcrIngredientsResult()))
-          as _i7.Future<_i4.OcrIngredientsResult>);
+          as _i8.Future<_i4.OcrIngredientsResult>);
 }
 
 /// A class which mocks [Backend].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBackend extends _i1.Mock implements _i13.Backend {
+class MockBackend extends _i1.Mock implements _i14.Backend {
   MockBackend() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i13.BackendObserver? observer) =>
+  void addObserver(_i14.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i13.BackendObserver? observer) =>
+  void removeObserver(_i14.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i7.Future<bool> isLoggedIn() =>
+  _i8.Future<bool> isLoggedIn() =>
       (super.noSuchMethod(Invocation.method(#isLoggedIn, []),
-          returnValue: Future<bool>.value(false)) as _i7.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i8.Future<bool>);
   @override
-  _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>> loginOrRegister(
+  _i8.Future<_i5.Result<_i15.UserParams, _i16.BackendError>> loginOrRegister(
           {String? googleIdToken, String? appleAuthorizationCode}) =>
       (super.noSuchMethod(
               Invocation.method(#loginOrRegister, [], {
@@ -104,99 +107,107 @@ class MockBackend extends _i1.Mock implements _i13.Backend {
                 #appleAuthorizationCode: appleAuthorizationCode
               }),
               returnValue:
-                  Future<_i5.Result<_i14.UserParams, _i15.BackendError>>.value(
-                      _FakeResult<_i14.UserParams, _i15.BackendError>()))
-          as _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>>);
+                  Future<_i5.Result<_i15.UserParams, _i16.BackendError>>.value(
+                      _FakeResult<_i15.UserParams, _i16.BackendError>()))
+          as _i8.Future<_i5.Result<_i15.UserParams, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<bool, _i15.BackendError>> updateUserParams(
-          _i14.UserParams? userParams,
+  _i8.Future<_i5.Result<bool, _i16.BackendError>> updateUserParams(
+          _i15.UserParams? userParams,
           {String? backendClientTokenOverride}) =>
       (super.noSuchMethod(
               Invocation.method(#updateUserParams, [userParams],
                   {#backendClientTokenOverride: backendClientTokenOverride}),
-              returnValue: Future<_i5.Result<bool, _i15.BackendError>>.value(
-                  _FakeResult<bool, _i15.BackendError>()))
-          as _i7.Future<_i5.Result<bool, _i15.BackendError>>);
+              returnValue: Future<_i5.Result<bool, _i16.BackendError>>.value(
+                  _FakeResult<bool, _i16.BackendError>()))
+          as _i8.Future<_i5.Result<bool, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i16.BackendProduct?, _i15.BackendError>>
+  _i8.Future<_i5.Result<_i17.BackendProduct?, _i16.BackendError>>
       requestProduct(String? barcode) => (super.noSuchMethod(
           Invocation.method(#requestProduct, [barcode]),
           returnValue: Future<
-                  _i5.Result<_i16.BackendProduct?, _i15.BackendError>>.value(
-              _FakeResult<_i16.BackendProduct?, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i16.BackendProduct?, _i15.BackendError>>);
+                  _i5.Result<_i17.BackendProduct?, _i16.BackendError>>.value(
+              _FakeResult<_i17.BackendProduct?, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i17.BackendProduct?, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> createUpdateProduct(
+  _i8.Future<_i5.Result<_i5.None, _i16.BackendError>> createUpdateProduct(
           String? barcode,
-          {_i17.VegStatus? vegetarianStatus,
-          _i17.VegStatus? veganStatus}) =>
+          {_i18.VegStatus? vegetarianStatus,
+          _i18.VegStatus? veganStatus}) =>
       (super.noSuchMethod(
           Invocation.method(#createUpdateProduct, [barcode],
               {#vegetarianStatus: vegetarianStatus, #veganStatus: veganStatus}),
-          returnValue: Future<_i5.Result<_i5.None, _i15.BackendError>>.value(
-              _FakeResult<_i5.None, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i5.None, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<_i5.None, _i16.BackendError>>.value(
+              _FakeResult<_i5.None, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i5.None, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> sendReport(
+  _i8.Future<_i5.Result<_i5.None, _i16.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
-          returnValue: Future<_i5.Result<_i5.None, _i15.BackendError>>.value(
-              _FakeResult<_i5.None, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i5.None, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<_i5.None, _i16.BackendError>>.value(
+              _FakeResult<_i5.None, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i5.None, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> sendProductScan(
+  _i8.Future<_i5.Result<_i5.None, _i16.BackendError>> sendProductScan(
           String? barcode) =>
       (super.noSuchMethod(Invocation.method(#sendProductScan, [barcode]),
-          returnValue: Future<_i5.Result<_i5.None, _i15.BackendError>>.value(
-              _FakeResult<_i5.None, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i5.None, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<_i5.None, _i16.BackendError>>.value(
+              _FakeResult<_i5.None, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i5.None, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>> userData() =>
+  _i8.Future<_i5.Result<_i15.UserParams, _i16.BackendError>> userData() =>
       (super.noSuchMethod(Invocation.method(#userData, []),
               returnValue:
-                  Future<_i5.Result<_i14.UserParams, _i15.BackendError>>.value(
-                      _FakeResult<_i14.UserParams, _i15.BackendError>()))
-          as _i7.Future<_i5.Result<_i14.UserParams, _i15.BackendError>>);
+                  Future<_i5.Result<_i15.UserParams, _i16.BackendError>>.value(
+                      _FakeResult<_i15.UserParams, _i16.BackendError>()))
+          as _i8.Future<_i5.Result<_i15.UserParams, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<List<_i18.BackendProductsAtShop>, _i15.BackendError>>
+  _i8.Future<_i5.Result<List<_i19.BackendProductsAtShop>, _i16.BackendError>>
       requestProductsAtShops(Iterable<String>? osmIds) => (super.noSuchMethod(
           Invocation.method(#requestProductsAtShops, [osmIds]),
-          returnValue: Future<_i5.Result<List<_i18.BackendProductsAtShop>, _i15.BackendError>>.value(
-              _FakeResult<List<_i18.BackendProductsAtShop>,
-                  _i15.BackendError>())) as _i7
-          .Future<_i5.Result<List<_i18.BackendProductsAtShop>, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<List<_i19.BackendProductsAtShop>, _i16.BackendError>>.value(
+              _FakeResult<List<_i19.BackendProductsAtShop>,
+                  _i16.BackendError>())) as _i8
+          .Future<_i5.Result<List<_i19.BackendProductsAtShop>, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<List<_i19.BackendShop>, _i15.BackendError>>
+  _i8.Future<_i5.Result<List<_i20.BackendShop>, _i16.BackendError>>
       requestShops(Iterable<String>? osmIds) => (super.noSuchMethod(
           Invocation.method(#requestShops, [osmIds]),
           returnValue: Future<
-                  _i5.Result<List<_i19.BackendShop>, _i15.BackendError>>.value(
-              _FakeResult<List<_i19.BackendShop>, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<List<_i19.BackendShop>, _i15.BackendError>>);
+                  _i5.Result<List<_i20.BackendShop>, _i16.BackendError>>.value(
+              _FakeResult<List<_i20.BackendShop>, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<List<_i20.BackendShop>, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> productPresenceVote(
+  _i8.Future<_i5.Result<_i5.None, _i16.BackendError>> productPresenceVote(
           String? barcode, String? osmId, bool? positive) =>
       (super.noSuchMethod(
           Invocation.method(#productPresenceVote, [barcode, osmId, positive]),
-          returnValue: Future<_i5.Result<_i5.None, _i15.BackendError>>.value(
-              _FakeResult<_i5.None, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i5.None, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<_i5.None, _i16.BackendError>>.value(
+              _FakeResult<_i5.None, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i5.None, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i5.None, _i15.BackendError>> putProductToShop(
+  _i8.Future<_i5.Result<_i5.None, _i16.BackendError>> putProductToShop(
           String? barcode, String? osmId) =>
       (super.noSuchMethod(
           Invocation.method(#putProductToShop, [barcode, osmId]),
-          returnValue: Future<_i5.Result<_i5.None, _i15.BackendError>>.value(
-              _FakeResult<_i5.None, _i15.BackendError>())) as _i7
-          .Future<_i5.Result<_i5.None, _i15.BackendError>>);
+          returnValue: Future<_i5.Result<_i5.None, _i16.BackendError>>.value(
+              _FakeResult<_i5.None, _i16.BackendError>())) as _i8
+          .Future<_i5.Result<_i5.None, _i16.BackendError>>);
   @override
-  _i7.Future<_i5.Result<_i19.BackendShop, _i15.BackendError>> createShop(
-          {String? name, _i20.Point<double>? coords, String? type}) =>
+  _i8.Future<_i5.Result<_i20.BackendShop, _i16.BackendError>> createShop(
+          {String? name, _i21.Point<double>? coords, String? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coords: coords, #type: type}),
               returnValue:
-                  Future<_i5.Result<_i19.BackendShop, _i15.BackendError>>.value(
-                      _FakeResult<_i19.BackendShop, _i15.BackendError>()))
-          as _i7.Future<_i5.Result<_i19.BackendShop, _i15.BackendError>>);
+                  Future<_i5.Result<_i20.BackendShop, _i16.BackendError>>.value(
+                      _FakeResult<_i20.BackendShop, _i16.BackendError>()))
+          as _i8.Future<_i5.Result<_i20.BackendShop, _i16.BackendError>>);
+  @override
+  _i8.Future<_i6.BackendResponse> customGet(String? path,
+          [Map<String, String>? queryParams, Map<String, String>? headers]) =>
+      (super.noSuchMethod(
+              Invocation.method(#customGet, [path, queryParams, headers]),
+              returnValue:
+                  Future<_i6.BackendResponse>.value(_FakeBackendResponse()))
+          as _i8.Future<_i6.BackendResponse>);
 }

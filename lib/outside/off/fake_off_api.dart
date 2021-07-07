@@ -75,7 +75,7 @@ class FakeOffApi implements OffApi {
     final product = off.Product(
         barcode: configuration.barcode,
         productNameTranslated: _generateName(),
-        images: <off.ProductImage>[
+        selectedImages: <off.ProductImage>[
           off.ProductImage(
               field: off.ImageField.FRONT,
               size: off.ImageSize.DISPLAY,
@@ -83,7 +83,7 @@ class FakeOffApi implements OffApi {
               language: off.OpenFoodFactsLanguage.RUSSIAN),
           off.ProductImage(
               field: off.ImageField.INGREDIENTS,
-              size: off.ImageSize.ORIGINAL,
+              size: off.ImageSize.DISPLAY,
               url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
               language: off.OpenFoodFactsLanguage.RUSSIAN)
         ],

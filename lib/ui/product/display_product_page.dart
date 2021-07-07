@@ -2,9 +2,11 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
@@ -30,6 +32,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_photo_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ignore: always_use_package_imports
 import 'product_header_widget.dart';
@@ -84,7 +87,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                   child: FabPlante.menuBtn(
                       key: menuButtonKey,
                       heroTag: 'right_action',
-                      onPressed: showProductMenu)),
+                      onPressed: _showProductMenu)),
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
@@ -94,27 +97,30 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                       key: const Key('product_header'),
                       product: product,
                       imageType: ProductImageType.FRONT,
-                      onTap: showProductPhoto,
-                      onLongPress: copyProductName),
+                      onTap: _showProductPhoto,
+                      onLongPress: _copyProductName),
                 ])),
             const SizedBox(height: 19),
             Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24),
                 child: Column(children: [
                   InkWell(
-                    onTap: askForVegStatusHelp() ? onVegStatusHelpClick : null,
+                    onTap:
+                        _askForVegStatusHelp() ? _onVegStatusHelpClick : null,
                     child: VegStatusDisplayed(
                         product: product,
                         user: user,
-                        helpText: askForVegStatusHelp()
+                        onVegStatusSourceClick:
+                            _onVegStatusSourceClickCallback(),
+                        helpText: _askForVegStatusHelp()
                             ? context.strings
                                 .display_product_page_click_to_help_with_veg_statuses
                             : null,
-                        onHelpClick: onVegStatusHelpClick),
+                        onHelpClick: _onVegStatusHelpClick),
                   ),
                 ])),
             const SizedBox(height: 16),
-            if (vegStatusHint() != null)
+            if (_vegStatusHint() != null)
               Padding(
                   key: const Key('veg_status_hint'),
                   padding: const EdgeInsets.only(left: 12, right: 12),
@@ -127,7 +133,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                       child: Padding(
                         padding: const EdgeInsets.only(
                             left: 12, top: 8, right: 12, bottom: 8),
-                        child: Text(vegStatusHint()!, style: TextStyles.hint),
+                        child: Text(_vegStatusHint()!, style: TextStyles.hint),
                       ))),
             const SizedBox(height: 16),
             Column(children: [
@@ -151,8 +157,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
               const SizedBox(height: 16),
             ]),
             InkWell(
-                onTap: showProductIngredientsPhoto,
-                onLongPress: copyIngredientsList,
+                onTap: _showProductIngredientsPhoto,
+                onLongPress: _copyIngredientsList,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24),
                     child: Column(children: [
@@ -173,17 +179,17 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                             key: const Key('product_ingredients_photo'),
                             product: product,
                             imageType: ProductImageType.INGREDIENTS,
-                            onTap: showProductIngredientsPhoto),
+                            onTap: _showProductIngredientsPhoto),
                       const SizedBox(height: 24),
                     ]))),
-            if (haveIngredientsAnalysis()) ingredientsAnalysisWidget(),
+            if (_haveIngredientsAnalysis()) _ingredientsAnalysisWidget(),
             const SizedBox(height: 16)
           ]),
         ]))));
   }
 
-  String? vegStatusHint() {
-    switch (vegStatus()) {
+  String? _vegStatusHint() {
+    switch (_vegStatus()) {
       case VegStatus.positive:
         return context.strings.display_product_page_veg_status_positive_warning;
       case VegStatus.negative:
@@ -197,38 +203,38 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     }
   }
 
-  Widget ingredientsAnalysisWidget() {
+  Widget _ingredientsAnalysisWidget() {
     if (product.ingredientsAnalyzed?.length == 1) {
-      return ingredientsAnalysisWidgetWithLines(9999);
+      return _ingredientsAnalysisWidgetWithLines(9999);
     }
     return ExpandablePlante(
-      collapsed: ingredientsAnalysisWidgetWithLines(1),
+      collapsed: _ingredientsAnalysisWidgetWithLines(1),
       expanded: Column(children: [
-        ingredientsAnalysisWidgetWithLines(9999),
+        _ingredientsAnalysisWidgetWithLines(9999),
         const SizedBox(height: 58)
       ]),
     );
   }
 
-  Column ingredientsAnalysisWidgetWithLines(int lines) {
+  Column _ingredientsAnalysisWidgetWithLines(int lines) {
     return Column(children: [
       Padding(
           padding: const EdgeInsets.only(left: 24, right: 24),
           child: Row(children: [
             Text(context.strings.display_product_page_ingredients_analysis,
                 style: TextStyles.normalBold),
-            InfoButtonPlante(onTap: showVegStatusesExplanation)
+            InfoButtonPlante(onTap: _showVegStatusesExplanation)
           ])),
       const SizedBox(height: 16),
-      ingredientsAnalysisTable(lines)
+      _ingredientsAnalysisTable(lines)
     ]);
   }
 
-  bool askForVegStatusHelp() {
-    return vegStatusSource() == VegStatusSource.open_food_facts;
+  bool _askForVegStatusHelp() {
+    return _vegStatusSource() == VegStatusSource.open_food_facts;
   }
 
-  void onVegStatusHelpClick() {
+  void _onVegStatusHelpClick() {
     analytics.sendEvent('help_with_vegan_statuses_started');
     Navigator.push(
       context,
@@ -246,7 +252,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     );
   }
 
-  VegStatus vegStatus() {
+  VegStatus _vegStatus() {
     VegStatus? status;
     if (user.eatsVeggiesOnly ?? true) {
       status = product.veganStatus;
@@ -256,7 +262,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     return status ?? VegStatus.unknown;
   }
 
-  VegStatusSource vegStatusSource() {
+  VegStatusSource _vegStatusSource() {
     VegStatusSource? source;
     if (user.eatsVeggiesOnly ?? true) {
       source = product.veganStatusSource;
@@ -269,26 +275,84 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     return source;
   }
 
-  Widget vegStatusSourceIcon(VegStatusSource vegStatusSource) {
-    switch (vegStatusSource) {
-      case VegStatusSource.open_food_facts:
-        return SvgPicture.asset('assets/veg_status_source_auto.svg');
-      case VegStatusSource.community:
-        return SvgPicture.asset('assets/veg_status_source_community.svg');
-      case VegStatusSource.moderator:
-        return SvgPicture.asset('assets/veg_status_source_moderator.svg');
-      case VegStatusSource.unknown:
-        return SvgPicture.asset('assets/veg_status_source_community.svg');
-      default:
-        throw Exception('Unhandled veg status source: $vegStatusSource');
+  VoidCallback? _onVegStatusSourceClickCallback() {
+    if (_vegStatusSource() != VegStatusSource.moderator ||
+        _vegStatusModeratorChoiceReason() == null) {
+      return null;
+    }
+    return () {
+      _onVegStatusSourceTextClick(context);
+    };
+  }
+
+  ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
+    if (user.eatsVeggiesOnly ?? true) {
+      return product.moderatorVeganChoiceReason;
+    } else {
+      return product.moderatorVegetarianChoiceReason;
     }
   }
 
-  bool haveIngredientsAnalysis() =>
+  String? _vegStatusModeratorChoiceReasonText() {
+    return _vegStatusModeratorChoiceReason()?.localize(context);
+  }
+
+  String? _vegStatusModeratorSourcesText() {
+    if (user.eatsVeggiesOnly ?? true) {
+      return product.moderatorVeganSourcesText;
+    } else {
+      return product.moderatorVegetarianSourcesText;
+    }
+  }
+
+  void _onVegStatusSourceTextClick(BuildContext context) {
+    analytics.sendEvent('moderator_comment_dialog_shown');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DialogPlante(
+            content: Column(children: [
+              Text(
+                  context.strings
+                      .display_product_page_moderator_comment_dialog_title,
+                  style: TextStyles.headline3),
+              const SizedBox(height: 32),
+              Text(_vegStatusModeratorChoiceReasonText()!,
+                  style: TextStyles.normal),
+              if (_vegStatusModeratorSourcesText() != null)
+                Column(children: [
+                  const SizedBox(height: 8),
+                  Text(
+                      context.strings
+                          .display_product_page_moderator_comment_dialog_source,
+                      style: TextStyles.normal),
+                  Linkify(
+                      onOpen: (link) => () {
+                            analytics.sendEvent(
+                                'moderator_comment_source_url_click');
+                            launch(link.url);
+                          },
+                      text: _vegStatusModeratorSourcesText()!)
+                ]),
+            ]),
+            actions: SizedBox(
+                width: double.infinity,
+                child: ButtonOutlinedPlante.withText(
+                  context.strings
+                      .display_product_page_moderator_comment_dialog_close,
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                )));
+      },
+    );
+  }
+
+  bool _haveIngredientsAnalysis() =>
       product.ingredientsAnalyzed != null &&
       product.ingredientsAnalyzed!.isNotEmpty;
 
-  Widget ingredientsAnalysisTable(int maxLines) {
+  Widget _ingredientsAnalysisTable(int maxLines) {
     final rows = <TableRow>[];
     const rowHeight = 30.0;
 
@@ -332,12 +396,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
               style: TextStyles.normal,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
-          center(Text(vegStatusText(ingredient.vegetarianStatus),
+          center(Text(_vegStatusText(ingredient.vegetarianStatus),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
           const SizedBox(width: 12),
-          center(Text(vegStatusText(ingredient.veganStatus),
+          center(Text(_vegStatusText(ingredient.veganStatus),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
@@ -364,7 +428,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
         });
   }
 
-  String vegStatusText(VegStatus? vegStatus) {
+  String _vegStatusText(VegStatus? vegStatus) {
     switch (vegStatus) {
       case VegStatus.positive:
         return context.strings.display_product_page_table_positive;
@@ -380,7 +444,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     }
   }
 
-  void onReportClick() {
+  void _onReportClick() {
     Function()? reportTextListener;
 
     showDialog(
@@ -449,12 +513,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     );
   }
 
-  void showVegStatusesExplanation() {
+  void _showVegStatusesExplanation() {
     final content = Table(
         children: [
           TableRow(
             children: <Widget>[
-              Text(vegStatusText(VegStatus.positive)),
+              Text(_vegStatusText(VegStatus.positive)),
               const SizedBox(width: 16),
               Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -466,7 +530,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              Text(vegStatusText(VegStatus.negative)),
+              Text(_vegStatusText(VegStatus.negative)),
               const SizedBox(width: 16),
               Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -478,7 +542,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              Text(vegStatusText(VegStatus.unknown)),
+              Text(_vegStatusText(VegStatus.unknown)),
               const SizedBox(width: 16),
               Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -490,7 +554,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
           ),
           TableRow(
             children: <Widget>[
-              Text(vegStatusText(VegStatus.possible)),
+              Text(_vegStatusText(VegStatus.possible)),
               const SizedBox(width: 16),
               Text(
                   context.strings
@@ -521,7 +585,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     );
   }
 
-  void showProductPhoto() {
+  void _showProductPhoto() {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -531,7 +595,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                 imageType: ProductImageType.FRONT)));
   }
 
-  void showProductIngredientsPhoto() {
+  void _showProductIngredientsPhoto() {
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -541,7 +605,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                 imageType: ProductImageType.INGREDIENTS)));
   }
 
-  void copyIngredientsList() {
+  void _copyIngredientsList() {
     if (product.ingredientsText != null &&
         product.ingredientsText!.trim().isNotEmpty) {
       Clipboard.setData(ClipboardData(text: product.ingredientsText ?? ''));
@@ -549,12 +613,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     }
   }
 
-  void copyProductName() {
+  void _copyProductName() {
     Clipboard.setData(ClipboardData(text: product.name));
     showSnackBar(context.strings.global_copied_to_clipboard, context);
   }
 
-  void showProductMenu() async {
+  void _showProductMenu() async {
     final selected =
         await showMenuPlante(target: menuButtonKey, context: context, values: [
       1
@@ -566,7 +630,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     ]);
 
     if (selected == 1) {
-      onReportClick();
+      _onReportClick();
     }
   }
 

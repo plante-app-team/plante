@@ -15,13 +15,15 @@ class VegStatusDisplayed extends StatelessWidget {
   final VoidCallback? onHelpClick;
   final Product product;
   final UserParams user;
+  final VoidCallback? onVegStatusSourceClick;
 
   const VegStatusDisplayed(
       {Key? key,
       required this.product,
       required this.user,
       this.helpText,
-      this.onHelpClick})
+      this.onHelpClick,
+      this.onVegStatusSourceClick})
       : super(key: key);
 
   @override
@@ -44,10 +46,16 @@ class VegStatusDisplayed extends StatelessWidget {
         _vegStatusSourceImage(),
         const SizedBox(width: 6),
         Flexible(
-            child: Text(_vegStatusSourceText(context),
+            child: InkWell(
+                onTap: onVegStatusSourceClick,
+                child: Text(
+                  _vegStatusSourceText(context),
+                  /* _shouldShowModeratorChoiceReasoningOnClicks() ? () {_onVegStatusSourceTextClick(context);} : null,
+                child: Text(_vegStatusSourceText(context),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyles.normalSmall))
+                style: TextStyles.normalSmall*/
+                )))
       ])
     ]);
   }

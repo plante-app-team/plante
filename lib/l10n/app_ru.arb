@@ -16,6 +16,14 @@
     "global_try_again": "Попробовать ещё раз",
     "global_done_thanks": "Готово! Спасибо!",
 
+    "moderator_choice_reason_manufacturer_confirmed_animal_product_presence": "Производель подтвердил присутствие ингредиентов животного происхождения",
+    "moderator_choice_reason_manufacturer_confirmed_animal_product_absence": "Производель подтвердил отсутствие ингредиентов животного происхождения",
+    "moderator_choice_reason_manufacturer_confirmed_dead_animal_product_presence": "Производель подтвердил присутствие невегетарианских ингредиентов",
+    "moderator_choice_reason_manufacturer_confirmed_dead_animal_product_absence": "Производель подтвердил отсутствие невегетарианских ингредиентов",
+    "moderator_choice_reason_some_ingredients_are_animal_products": "Некоторые ингредиенты имеют животное происхождение",
+    "moderator_choice_reason_some_ingredients_are_from_dead_animals": "Некоторые ингредиенты невегетарианские",
+    "moderator_choice_reason_tested_on_animals": "Продукт тестировался на животных",
+
     "image_crop_page_title": "Давайте-ка обрежем!",
 
     "external_auth_page_continue_with": "Продолжить с",
@@ -94,6 +102,9 @@
     "display_product_page_veg_status_possible_explanation": "Ингредиент может иметь разный вег-статус в зависимости от способа производства.\nНапример, \"Закваска\" может быть и веганской, и лишь вегетарианской, и не вегетарианской вовсе.",
     "display_product_page_veg_status_explanations_ok": "О как!",
     "display_product_page_veg_mark_on_map": "Указать на карте",
+    "display_product_page_moderator_comment_dialog_title": "Комментарий модератора",
+    "display_product_page_moderator_comment_dialog_source": "Источник:",
+    "display_product_page_moderator_comment_dialog_close": "О как!",
 
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",

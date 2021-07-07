@@ -105,6 +105,13 @@ class ProductsManager {
       ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? '')
       ..veganStatusSource =
           VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? '')
+      ..moderatorVegetarianChoiceReasonId =
+          backendProduct?.moderatorVegetarianChoiceReason
+      ..moderatorVegetarianSourcesText =
+          backendProduct?.moderatorVegetarianSourcesText
+      ..moderatorVeganChoiceReasonId =
+          backendProduct?.moderatorVeganChoiceReason
+      ..moderatorVeganSourcesText = backendProduct?.moderatorVeganSourcesText
       ..name = offProduct.productNameTranslated
       ..brands.addAll(offProduct.brandsTags ?? [])
       ..categories.addAll(offProduct.categoriesTagsTranslated ?? [])

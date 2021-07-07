@@ -16,6 +16,14 @@
       "global_try_again": "Try again",
       "global_done_thanks": "Done! Thank you!",
 
+      "moderator_choice_reason_manufacturer_confirmed_animal_product_presence": "Manufacturer confirmed animal ingredients presence",
+      "moderator_choice_reason_manufacturer_confirmed_animal_product_absence": "Manufacturer confirmed animal ingredients absence",
+      "moderator_choice_reason_manufacturer_confirmed_dead_animal_product_presence": "Manufacturer confirmed non-vegetarian ingredients presence",
+      "moderator_choice_reason_manufacturer_confirmed_dead_animal_product_absence": "Manufacturer confirmed non-vegetarian ingredients absence",
+      "moderator_choice_reason_some_ingredients_are_animal_products": "Some ingredients are of animal origin",
+      "moderator_choice_reason_some_ingredients_are_from_dead_animals": "Some ingredients are non-vegetarian",
+      "moderator_choice_reason_tested_on_animals": "Animal tested product",
+
       "image_crop_page_title": "Let's crop it!",
 
       "external_auth_page_continue_with": "Continue with",
@@ -94,6 +102,9 @@
       "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be vegan, non-vegan but vegetarian, and both non-vegan and not vegetarian",
       "display_product_page_veg_status_explanations_ok": "Alright!",
       "display_product_page_veg_mark_on_map": "Help with location",
+      "display_product_page_moderator_comment_dialog_title": "Moderator's comment",
+      "display_product_page_moderator_comment_dialog_source": "Source:",
+      "display_product_page_moderator_comment_dialog_close": "Alright!",
 
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",

@@ -3,6 +3,7 @@ import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 
@@ -16,6 +17,11 @@ abstract class Product implements Built<Product, ProductBuilder> {
   VegStatusSource? get vegetarianStatusSource;
   VegStatus? get veganStatus;
   VegStatusSource? get veganStatusSource;
+
+  int? get moderatorVegetarianChoiceReasonId;
+  String? get moderatorVegetarianSourcesText;
+  int? get moderatorVeganChoiceReasonId;
+  String? get moderatorVeganSourcesText;
 
   String? get name;
   BuiltList<String>? get brands;
@@ -77,6 +83,16 @@ abstract class Product implements Built<Product, ProductBuilder> {
     // NOTE: a veg status of an ingredient can also be null, that means that
     // the status of the ingredient shoud be ignored
     return VegStatus.positive;
+  }
+
+  ModeratorChoiceReason? get moderatorVegetarianChoiceReason {
+    return moderatorChoiceReasonFromPersistentId(
+        moderatorVegetarianChoiceReasonId ?? -1);
+  }
+
+  ModeratorChoiceReason? get moderatorVeganChoiceReason {
+    return moderatorChoiceReasonFromPersistentId(
+        moderatorVeganChoiceReasonId ?? -1);
   }
 
   bool isFrontImageFile() => isImageFile(ProductImageType.FRONT);

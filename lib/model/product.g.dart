@@ -51,6 +51,32 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(VegStatusSource)));
     }
+    value = object.moderatorVegetarianChoiceReasonId;
+    if (value != null) {
+      result
+        ..add('moderatorVegetarianChoiceReasonId')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.moderatorVegetarianSourcesText;
+    if (value != null) {
+      result
+        ..add('moderatorVegetarianSourcesText')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.moderatorVeganChoiceReasonId;
+    if (value != null) {
+      result
+        ..add('moderatorVeganChoiceReasonId')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
+    value = object.moderatorVeganSourcesText;
+    if (value != null) {
+      result
+        ..add('moderatorVeganSourcesText')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.name;
     if (value != null) {
       result
@@ -143,6 +169,22 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
                   specifiedType: const FullType(VegStatusSource))
               as VegStatusSource?;
           break;
+        case 'moderatorVegetarianChoiceReasonId':
+          result.moderatorVegetarianChoiceReasonId = serializers
+              .deserialize(value, specifiedType: const FullType(int)) as int?;
+          break;
+        case 'moderatorVegetarianSourcesText':
+          result.moderatorVegetarianSourcesText = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'moderatorVeganChoiceReasonId':
+          result.moderatorVeganChoiceReasonId = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int?;
+          break;
+        case 'moderatorVeganSourcesText':
+          result.moderatorVeganSourcesText = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'name':
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
@@ -200,6 +242,14 @@ class _$Product extends Product {
   @override
   final VegStatusSource? veganStatusSource;
   @override
+  final int? moderatorVegetarianChoiceReasonId;
+  @override
+  final String? moderatorVegetarianSourcesText;
+  @override
+  final int? moderatorVeganChoiceReasonId;
+  @override
+  final String? moderatorVeganSourcesText;
+  @override
   final String? name;
   @override
   final BuiltList<String>? brands;
@@ -225,6 +275,10 @@ class _$Product extends Product {
       this.vegetarianStatusSource,
       this.veganStatus,
       this.veganStatusSource,
+      this.moderatorVegetarianChoiceReasonId,
+      this.moderatorVegetarianSourcesText,
+      this.moderatorVeganChoiceReasonId,
+      this.moderatorVeganSourcesText,
       this.name,
       this.brands,
       this.categories,
@@ -253,6 +307,12 @@ class _$Product extends Product {
         vegetarianStatusSource == other.vegetarianStatusSource &&
         veganStatus == other.veganStatus &&
         veganStatusSource == other.veganStatusSource &&
+        moderatorVegetarianChoiceReasonId ==
+            other.moderatorVegetarianChoiceReasonId &&
+        moderatorVegetarianSourcesText ==
+            other.moderatorVegetarianSourcesText &&
+        moderatorVeganChoiceReasonId == other.moderatorVeganChoiceReasonId &&
+        moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
         name == other.name &&
         brands == other.brands &&
         categories == other.categories &&
@@ -276,12 +336,30 @@ class _$Product extends Product {
                                     $jc(
                                         $jc(
                                             $jc(
-                                                $jc($jc(0, barcode.hashCode),
-                                                    vegetarianStatus.hashCode),
-                                                vegetarianStatusSource
+                                                $jc(
+                                                    $jc(
+                                                        $jc(
+                                                            $jc(
+                                                                $jc(
+                                                                    $jc(
+                                                                        0,
+                                                                        barcode
+                                                                            .hashCode),
+                                                                    vegetarianStatus
+                                                                        .hashCode),
+                                                                vegetarianStatusSource
+                                                                    .hashCode),
+                                                            veganStatus
+                                                                .hashCode),
+                                                        veganStatusSource
+                                                            .hashCode),
+                                                    moderatorVegetarianChoiceReasonId
+                                                        .hashCode),
+                                                moderatorVegetarianSourcesText
                                                     .hashCode),
-                                            veganStatus.hashCode),
-                                        veganStatusSource.hashCode),
+                                            moderatorVeganChoiceReasonId
+                                                .hashCode),
+                                        moderatorVeganSourcesText.hashCode),
                                     name.hashCode),
                                 brands.hashCode),
                             categories.hashCode),
@@ -300,6 +378,12 @@ class _$Product extends Product {
           ..add('vegetarianStatusSource', vegetarianStatusSource)
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
+          ..add('moderatorVegetarianChoiceReasonId',
+              moderatorVegetarianChoiceReasonId)
+          ..add(
+              'moderatorVegetarianSourcesText', moderatorVegetarianSourcesText)
+          ..add('moderatorVeganChoiceReasonId', moderatorVeganChoiceReasonId)
+          ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
           ..add('name', name)
           ..add('brands', brands)
           ..add('categories', categories)
@@ -337,6 +421,30 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   VegStatusSource? get veganStatusSource => _$this._veganStatusSource;
   set veganStatusSource(VegStatusSource? veganStatusSource) =>
       _$this._veganStatusSource = veganStatusSource;
+
+  int? _moderatorVegetarianChoiceReasonId;
+  int? get moderatorVegetarianChoiceReasonId =>
+      _$this._moderatorVegetarianChoiceReasonId;
+  set moderatorVegetarianChoiceReasonId(
+          int? moderatorVegetarianChoiceReasonId) =>
+      _$this._moderatorVegetarianChoiceReasonId =
+          moderatorVegetarianChoiceReasonId;
+
+  String? _moderatorVegetarianSourcesText;
+  String? get moderatorVegetarianSourcesText =>
+      _$this._moderatorVegetarianSourcesText;
+  set moderatorVegetarianSourcesText(String? moderatorVegetarianSourcesText) =>
+      _$this._moderatorVegetarianSourcesText = moderatorVegetarianSourcesText;
+
+  int? _moderatorVeganChoiceReasonId;
+  int? get moderatorVeganChoiceReasonId => _$this._moderatorVeganChoiceReasonId;
+  set moderatorVeganChoiceReasonId(int? moderatorVeganChoiceReasonId) =>
+      _$this._moderatorVeganChoiceReasonId = moderatorVeganChoiceReasonId;
+
+  String? _moderatorVeganSourcesText;
+  String? get moderatorVeganSourcesText => _$this._moderatorVeganSourcesText;
+  set moderatorVeganSourcesText(String? moderatorVeganSourcesText) =>
+      _$this._moderatorVeganSourcesText = moderatorVeganSourcesText;
 
   String? _name;
   String? get name => _$this._name;
@@ -388,6 +496,10 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _vegetarianStatusSource = $v.vegetarianStatusSource;
       _veganStatus = $v.veganStatus;
       _veganStatusSource = $v.veganStatusSource;
+      _moderatorVegetarianChoiceReasonId = $v.moderatorVegetarianChoiceReasonId;
+      _moderatorVegetarianSourcesText = $v.moderatorVegetarianSourcesText;
+      _moderatorVeganChoiceReasonId = $v.moderatorVeganChoiceReasonId;
+      _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
       _name = $v.name;
       _brands = $v.brands?.toBuilder();
       _categories = $v.categories?.toBuilder();
@@ -424,6 +536,11 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               vegetarianStatusSource: vegetarianStatusSource,
               veganStatus: veganStatus,
               veganStatusSource: veganStatusSource,
+              moderatorVegetarianChoiceReasonId:
+                  moderatorVegetarianChoiceReasonId,
+              moderatorVegetarianSourcesText: moderatorVegetarianSourcesText,
+              moderatorVeganChoiceReasonId: moderatorVeganChoiceReasonId,
+              moderatorVeganSourcesText: moderatorVeganSourcesText,
               name: name,
               brands: _brands?.build(),
               categories: _categories?.build(),
