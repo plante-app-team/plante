@@ -56,6 +56,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Plante',
         restorationScopeId: 'app',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -67,7 +68,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
           fontFamily: 'Poppins',
         ),
         home:
-            AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
+        AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
   }
 
