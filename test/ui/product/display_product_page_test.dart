@@ -660,9 +660,9 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source');
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -679,7 +679,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
     expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.localize(context)),
+        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.localize(context)),
         findsNothing);
     expect(find.text(
         context.strings.display_product_page_moderator_comment_dialog_source),
@@ -694,7 +694,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
     expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.localize(context)),
+        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.localize(context)),
         findsOneWidget);
     expect(find.text(
         context.strings.display_product_page_moderator_comment_dialog_source),
@@ -713,9 +713,9 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source');
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
@@ -732,7 +732,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
     expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.localize(context)),
+        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.localize(context)),
         findsNothing);
     expect(find.text(
         context.strings.display_product_page_moderator_comment_dialog_source),
@@ -747,7 +747,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
     expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.localize(context)),
+        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.localize(context)),
         findsOneWidget);
     expect(find.text(
         context.strings.display_product_page_moderator_comment_dialog_source),
@@ -766,9 +766,9 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = null);
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -809,9 +809,9 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = null
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source');
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
@@ -853,8 +853,8 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId);
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -884,8 +884,8 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_FROM_DEAD_ANIMALS.persistentId
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId);
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -916,7 +916,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId);
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -946,7 +946,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENTS_ARE_ANIMAL_PRODUCTS.persistentId);
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId);
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
