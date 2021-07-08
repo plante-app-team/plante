@@ -94,9 +94,6 @@
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
       "display_product_page_help_with_veg_statuses": "Help with veg-statuses",
       "display_product_page_report_btn": "Report incorrect information",
-      "display_product_page_report": "Please let us know if you think the product information needs to be edited or extended",
-      "display_product_page_report_send": "Send",
-      "display_product_page_report_sent": "Report sent",
       "display_product_page_brand": "Brand: ",
       "display_product_page_click_to_help_with_veg_statuses": "I can help!",
       "display_product_page_table_column1": "Product",
@@ -116,6 +113,10 @@
       "display_product_page_moderator_comment_dialog_title": "Moderator's comment",
       "display_product_page_moderator_comment_dialog_source": "Source:",
       "display_product_page_moderator_comment_dialog_close": "Alright!",
+
+      "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
+      "product_report_dialog_send": "Send",
+      "product_report_dialog_report_sent": "Report sent",
 
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",

@@ -13,6 +13,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/photos_taker.dart';
@@ -26,7 +27,7 @@ import '../../widget_tester_extension.dart';
 import 'product_page_wrapper_test.mocks.dart';
 
 @GenerateMocks([ProductsManager, ShopsManager, LocationController, PhotosTaker,
-  PermissionsManager])
+  PermissionsManager, Backend])
 void main() {
   setUp(() async {
     await GetIt.I.reset();
@@ -45,6 +46,7 @@ void main() {
     GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage(loadPersistentProducts: false));
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
+    GetIt.I.registerSingleton<Backend>(MockBackend());
     final locationController = MockLocationController();
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);

@@ -11,6 +11,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
@@ -20,7 +21,7 @@ import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 import 'barcode_scan_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager])
+@GenerateMocks([ProductsManager, Backend])
 void main() {
   late MockProductsManager productsManager;
   late ViewedProductsStorage viewedProductsStorage;
@@ -28,6 +29,7 @@ void main() {
   setUp(() async {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
+    GetIt.I.registerSingleton<Backend>(MockBackend());
 
     GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
 

@@ -31,7 +31,10 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
+import 'package:plante/ui/product/moderator_comment_dialog.dart';
 import 'package:plante/ui/product/product_photo_page.dart';
+import 'package:plante/ui/product/product_report_dialog.dart';
+import 'package:plante/ui/product/veg_statuses_explanation_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ignore: always_use_package_imports
@@ -54,18 +57,18 @@ class DisplayProductPage extends StatefulWidget {
 
 class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   Product product;
+  final Backend backend;
   final UserParams user;
   final ProductUpdatedCallback? productUpdatedCallback;
 
-  final reportTextController = TextEditingController();
   final expandController = ExpandableController();
-  bool get reportSendAllowed => reportTextController.text.trim().length > 3;
   bool loading = false;
 
   final menuButtonKey = GlobalKey();
 
   _DisplayProductPageState(this.product, this.productUpdatedCallback)
-      : user = GetIt.I.get<UserParamsController>().cachedUserParams!,
+      : backend = GetIt.I.get<Backend>(),
+        user = GetIt.I.get<UserParamsController>().cachedUserParams!,
         super('DisplayProductPage') {
     GetIt.I.get<ViewedProductsStorage>().addProduct(product);
   }
@@ -308,44 +311,16 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   void _onVegStatusSourceTextClick(BuildContext context) {
     analytics.sendEvent('moderator_comment_dialog_shown');
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return DialogPlante(
-            content: Column(children: [
-              Text(
-                  context.strings
-                      .display_product_page_moderator_comment_dialog_title,
-                  style: TextStyles.headline3),
-              const SizedBox(height: 32),
-              Text(_vegStatusModeratorChoiceReasonText()!,
-                  style: TextStyles.normal),
-              if (_vegStatusModeratorSourcesText() != null)
-                Column(children: [
-                  const SizedBox(height: 8),
-                  Text(
-                      context.strings
-                          .display_product_page_moderator_comment_dialog_source,
-                      style: TextStyles.normal),
-                  Linkify(
-                      onOpen: (link) => () {
-                            analytics.sendEvent(
-                                'moderator_comment_source_url_click');
-                            launch(link.url);
-                          },
-                      text: _vegStatusModeratorSourcesText()!)
-                ]),
-            ]),
-            actions: SizedBox(
-                width: double.infinity,
-                child: ButtonOutlinedPlante.withText(
-                  context.strings
-                      .display_product_page_moderator_comment_dialog_close,
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                )));
-      },
-    );
+        context: context,
+        builder: (BuildContext context) {
+          return ModeratorCommentDialog(
+              user: user,
+              product: product,
+              onSourceUrlClick: (url) {
+                analytics.sendEvent('moderator_comment_source_url_click');
+                launch(url);
+              });
+        });
   }
 
   bool _haveIngredientsAnalysis() =>
@@ -445,142 +420,19 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   }
 
   void _onReportClick() {
-    Function()? reportTextListener;
-
     showDialog(
       context: context,
       builder: (context) {
-        return MyStatefulBuilder(
-          disposer: () {
-            if (reportTextListener != null) {
-              reportTextController.removeListener(reportTextListener!);
-            }
-          },
-          builder: (context, setState) {
-            if (reportTextListener != null) {
-              reportTextController.removeListener(reportTextListener!);
-            }
-            reportTextListener = () {
-              setState(() {
-                // UI update
-              });
-            };
-            reportTextController.addListener(reportTextListener!);
-
-            final onSendClick = () async {
-              setState(() {
-                loading = true;
-              });
-              try {
-                final result = await GetIt.I
-                    .get<Backend>()
-                    .sendReport(product.barcode, reportTextController.text);
-                if (result.isOk) {
-                  reportTextController.clear();
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                          context.strings.display_product_page_report_sent)));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content:
-                          Text(context.strings.global_something_went_wrong)));
-                }
-              } finally {
-                setState(() {
-                  loading = false;
-                });
-              }
-            };
-
-            return DialogPlante(
-              title: Text(context.strings.display_product_page_report),
-              content: Column(children: [
-                if (loading) const CircularProgressIndicator(),
-                InputFieldMultilinePlante(
-                    key: const Key('report_text'),
-                    maxLines: 5,
-                    controller: reportTextController),
-              ]),
-              actions: ButtonFilledPlante.withText(
-                  context.strings.display_product_page_report_send,
-                  onPressed:
-                      reportSendAllowed && !loading ? onSendClick : null),
-            );
-          },
-        );
+        return ProductReportDialog(barcode: product.barcode, backend: backend);
       },
     );
   }
 
   void _showVegStatusesExplanation() {
-    final content = Table(
-        children: [
-          TableRow(
-            children: <Widget>[
-              Text(_vegStatusText(VegStatus.positive)),
-              const SizedBox(width: 16),
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                      context.strings
-                          .display_product_page_veg_status_positive_explanation,
-                      style: TextStyles.normal)),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Text(_vegStatusText(VegStatus.negative)),
-              const SizedBox(width: 16),
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                      context.strings
-                          .display_product_page_veg_status_negative_explanation,
-                      style: TextStyles.normal)),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Text(_vegStatusText(VegStatus.unknown)),
-              const SizedBox(width: 16),
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                      context.strings
-                          .display_product_page_veg_status_unknown_explanation,
-                      style: TextStyles.normal)),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Text(_vegStatusText(VegStatus.possible)),
-              const SizedBox(width: 16),
-              Text(
-                  context.strings
-                      .display_product_page_veg_status_possible_explanation,
-                  style: TextStyles.normal),
-            ],
-          )
-        ],
-        border: TableBorder.all(color: Colors.transparent),
-        columnWidths: const <int, TableColumnWidth>{
-          0: IntrinsicColumnWidth(),
-          1: IntrinsicColumnWidth(),
-          2: FlexColumnWidth(1),
-        });
-
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return DialogPlante(
-          content: content,
-          actions: ButtonFilledPlante.withText(
-              context.strings.display_product_page_veg_status_explanations_ok,
-              onPressed: () {
-            Navigator.of(context).pop();
-          }),
-        );
+        return VegStatusesExplanationDialog(vegStatusText: _vegStatusText);
       },
     );
   }
@@ -625,7 +477,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     ], children: [
       MenuItemPlante(
         title: context.strings.display_product_page_report_btn,
-        description: context.strings.display_product_page_report,
+        description: context.strings.product_report_dialog_title,
       )
     ]);
 

@@ -94,9 +94,6 @@
     "display_product_page_ingredients_analysis": "Автоматический анализ состава",
     "display_product_page_help_with_veg_statuses": "Помочь определить вег-статус",
     "display_product_page_report_btn": "Сообщить о неверных данных",
-    "display_product_page_report": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
-    "display_product_page_report_send": "Отправить",
-    "display_product_page_report_sent": "Жалоба отправлена",
     "display_product_page_brand": "Бренд: ",
     "display_product_page_click_to_help_with_veg_statuses": "Хочу помочь!",
     "display_product_page_table_column1": "Продукт",
@@ -116,6 +113,10 @@
     "display_product_page_moderator_comment_dialog_title": "Комментарий модератора",
     "display_product_page_moderator_comment_dialog_source": "Источник:",
     "display_product_page_moderator_comment_dialog_close": "О как!",
+
+    "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
+    "product_report_dialog_send": "Отправить",
+    "product_report_dialog_report_sent": "Жалоба отправлена",
 
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",

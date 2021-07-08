@@ -317,7 +317,7 @@ void main() {
 
     await tester.enterText(find.byKey(const Key('report_text')), 'Bad, bad product!');
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.display_product_page_report_send));
+    await tester.tap(find.text(context.strings.product_report_dialog_send));
     await tester.pumpAndSettle();
 
     verify(backend.sendReport('123', 'Bad, bad product!')).called(1);
