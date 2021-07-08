@@ -2,12 +2,9 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
-import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
@@ -17,14 +14,11 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
-import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
-import 'package:plante/ui/base/my_stateful_builder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -293,18 +287,6 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
       return product.moderatorVeganChoiceReason;
     } else {
       return product.moderatorVegetarianChoiceReason;
-    }
-  }
-
-  String? _vegStatusModeratorChoiceReasonText() {
-    return _vegStatusModeratorChoiceReason()?.localize(context);
-  }
-
-  String? _vegStatusModeratorSourcesText() {
-    if (user.eatsVeggiesOnly ?? true) {
-      return product.moderatorVeganSourcesText;
-    } else {
-      return product.moderatorVegetarianSourcesText;
     }
   }
 
