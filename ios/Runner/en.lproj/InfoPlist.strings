@@ -5,6 +5,6 @@
   Created by Johan Vandingenen on 26/06/2021.
   
 */
-NSCameraUsageDescription = "The app needs camera access to scan products";
+NSCameraUsageDescription = "With camera access you can scan barcodes to search for products and take pictures to add new products";
 NSLocationWhenInUseUsageDescription = "While using your location we can find nearby shops!";
 NSPhotoLibraryUsageDescription="This app needs access to your library to upload pictures of products";
