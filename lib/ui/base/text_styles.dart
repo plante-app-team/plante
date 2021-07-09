@@ -18,8 +18,8 @@ class TextStyles {
   static const TextStyle normalColored = TextStyle(
       fontFamily: 'OpenSans', fontSize: 14, color: ColorsPlante.primary);
 
-  static const TextStyle normalSmall =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: Color(0xFF192123));
+  static const TextStyle normalSmall = TextStyle(
+      fontFamily: 'OpenSans', fontSize: 12, color: ColorsPlante.mainTextBlack);
 
   static const TextStyle hint =
       TextStyle(fontFamily: 'OpenSans', fontSize: 12, color: ColorsPlante.grey);
@@ -33,6 +33,13 @@ class TextStyles {
       fontWeight: FontWeight.bold,
       color: ColorsPlante.primary);
 
+  static const TextStyle url = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: ColorsPlante.primary,
+      decoration: TextDecoration.underline);
+
   static const TextStyle headline1 = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
@@ -45,8 +52,8 @@ class TextStyles {
       fontSize: 24,
       color: Color(0xFFFFFFFF));
 
-  static const TextStyle headline3 =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 16, color: Color(0xFF192123));
+  static const TextStyle headline3 = TextStyle(
+      fontFamily: 'OpenSans', fontSize: 16, color: ColorsPlante.mainTextBlack);
 
   static const TextStyle headline4 = TextStyle(
       fontFamily: 'Montserrat',
@@ -60,8 +67,8 @@ class TextStyles {
       fontSize: 14,
       color: ColorsPlante.primary);
 
-  static const TextStyle input =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: Color(0xFF192123));
+  static const TextStyle input = TextStyle(
+      fontFamily: 'OpenSans', fontSize: 18, color: ColorsPlante.mainTextBlack);
   static const TextStyle inputHint =
       TextStyle(fontFamily: 'OpenSans', fontSize: 18, color: ColorsPlante.grey);
 

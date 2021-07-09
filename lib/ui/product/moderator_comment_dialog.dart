@@ -4,7 +4,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/ui/base/components/button_outlined_plante.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -27,18 +27,21 @@ class ModeratorCommentDialog extends StatelessWidget {
           Text(
               context
                   .strings.display_product_page_moderator_comment_dialog_title,
-              style: TextStyles.headline3),
-          const SizedBox(height: 32),
+              style: TextStyles.headline4),
+          const SizedBox(height: 12),
           Text(_vegStatusModeratorChoiceReasonText(context)!,
               style: TextStyles.normal),
           if (_vegStatusModeratorSourcesText() != null)
             Column(children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               Text(
                   context.strings
                       .display_product_page_moderator_comment_dialog_source,
-                  style: TextStyles.normal),
-              Linkify(
+                  style: TextStyles.headline4),
+              const SizedBox(height: 12),
+              SelectableLinkify(
+                  style: TextStyles.normal,
+                  linkStyle: TextStyles.url,
                   onOpen: (link) => () {
                         onSourceUrlClick.call(link.url);
                       },
@@ -47,7 +50,7 @@ class ModeratorCommentDialog extends StatelessWidget {
         ]),
         actions: SizedBox(
             width: double.infinity,
-            child: ButtonOutlinedPlante.withText(
+            child: ButtonFilledPlante.withText(
               context
                   .strings.display_product_page_moderator_comment_dialog_close,
               onPressed: () {

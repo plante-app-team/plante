@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 
 class HeadlineBorderedPlante extends StatelessWidget {
   static final _foregroundPaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 2
-    ..color = const Color(0xFF192123);
+    ..color = ColorsPlante.mainTextBlack;
   final String data;
   const HeadlineBorderedPlante(this.data, {Key? key}) : super(key: key);
 

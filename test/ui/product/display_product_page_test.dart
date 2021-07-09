@@ -687,7 +687,7 @@ void main() {
     expect(find.text('vegan source'), findsNothing);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -740,7 +740,7 @@ void main() {
     expect(find.text('vegetarian source'), findsNothing);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -788,7 +788,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -831,7 +831,7 @@ void main() {
         context.strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -866,7 +866,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_community));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -897,7 +897,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_community));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -928,7 +928,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
     expect(find.text(
@@ -958,7 +958,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_veg_status_source_moderator));
+    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(find.text(

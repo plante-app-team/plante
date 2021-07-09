@@ -6,6 +6,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 
 import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';

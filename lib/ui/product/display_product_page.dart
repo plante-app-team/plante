@@ -2,6 +2,7 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/ui/base/colors_plante.dart';
@@ -107,8 +108,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                     child: VegStatusDisplayed(
                         product: product,
                         user: user,
-                        onVegStatusSourceClick:
-                            _onVegStatusSourceClickCallback(),
+                        onVegStatusClick: _onVegStatusSourceClickCallback(),
                         helpText: _askForVegStatusHelp()
                             ? context.strings
                                 .display_product_page_click_to_help_with_veg_statuses

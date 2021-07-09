@@ -19,4 +19,5 @@ class ColorsPlante {
   static const Color primaryDisabled = Color.fromARGB(255, 132, 161, 142);
   static final Color splashColor = primaryMaterial.shade800;
   static const Color grey = Color(0xFF979A9C);
+  static const Color mainTextBlack = Color(0xFF192123);
 }

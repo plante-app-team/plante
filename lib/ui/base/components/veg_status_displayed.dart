@@ -15,7 +15,7 @@ class VegStatusDisplayed extends StatelessWidget {
   final VoidCallback? onHelpClick;
   final Product product;
   final UserParams user;
-  final VoidCallback? onVegStatusSourceClick;
+  final VoidCallback? onVegStatusClick;
 
   const VegStatusDisplayed(
       {Key? key,
@@ -23,34 +23,44 @@ class VegStatusDisplayed extends StatelessWidget {
       required this.user,
       this.helpText,
       this.onHelpClick,
-      this.onVegStatusSourceClick})
+      this.onVegStatusClick})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        _vegStatusImage(),
-        const SizedBox(width: 6),
-        Flexible(
-            fit: FlexFit.tight,
-            child: Text(_vegStatusText(context),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyles.normalSmall)),
-        if (helpText != null)
-          Wrap(children: [_HelpButton(text: helpText!, onPressed: onHelpClick)])
-      ]),
+      InkWell(
+          onTap: onVegStatusClick,
+          child: Row(children: [
+            _vegStatusImage(),
+            const SizedBox(width: 6),
+            Flexible(
+              fit: FlexFit.tight,
+              child: Text(_vegStatusText(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyles.normalSmall.copyWith(
+                      color: _vegStatusColor(),
+                      decoration: onVegStatusClick != null
+                          ? TextDecoration.underline
+                          : null)),
+            ),
+            if (helpText != null)
+              Wrap(children: [
+                _HelpButton(text: helpText!, onPressed: onHelpClick)
+              ])
+          ])),
       const SizedBox(height: 6),
       Row(children: [
         _vegStatusSourceImage(),
         const SizedBox(width: 6),
         Flexible(
-            child: InkWell(
-                onTap: onVegStatusSourceClick,
-                child: Text(
-                  _vegStatusSourceText(context),
-                )))
+            child: Text(
+          _vegStatusSourceText(context),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyles.normalSmall,
+        ))
       ])
     ]);
   }
@@ -137,6 +147,21 @@ class VegStatusDisplayed extends StatelessWidget {
         default:
           throw Exception('Unknown veg status: ${_vegStatus()}');
       }
+    }
+  }
+
+  Color _vegStatusColor() {
+    switch (_vegStatus()) {
+      case VegStatus.positive:
+        return ColorsPlante.primary;
+      case VegStatus.negative:
+        return const Color(0xFFF02222);
+      case VegStatus.possible:
+        return ColorsPlante.mainTextBlack;
+      case VegStatus.unknown:
+        return ColorsPlante.mainTextBlack;
+      default:
+        throw Exception('Unknown veg status: ${_vegStatus()}');
     }
   }
 
