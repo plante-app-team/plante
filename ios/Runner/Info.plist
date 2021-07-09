@@ -41,7 +41,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan barcodes</string>
+	<string>With camera access you can scan barcodes to search for products and take pictures to add new products</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>The app uses your location to find nearby stores</string>
 	<key>NSPhotoLibraryUsageDescription</key>

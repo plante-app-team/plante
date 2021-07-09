@@ -70,7 +70,7 @@
       "map_page_shop_added_to_map": "The shop is added to the map",
       "map_page_click_on_shop_where_product_sold": "Click the shop marker, where the product is being sold",
       "map_page_cancel_shop_creation_q": "Cancel shop creation?",
-      "map_page_location_permission_reasoning_settings": "In order for the app to locate you, please give the location permission to the app in the app settings",
+      "map_page_location_permission_reasoning_settings": "Without the location permission the app can't find shops near to your location. If you would like to see nearby shops you can grant the location permission in the app settings.",
       "map_page_no_shops_hint_default_mode_1": "No shops with products nearby. But you can click \"Empty shops\" and add first product!",
       "map_page_no_shops_hint_default_mode_2": "Seems we don't know of any shops nearby! You can add a new shop while adding a new product or viewing a known one",
       "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any shops nearby. But you can add a new one by clicking the round button with a plus on the right!",
@@ -86,7 +86,7 @@
       "barcode_scan_page_searching_product": "Searching product ",
       "barcode_scan_page_add_product": "Add the product",
       "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
-      "barcode_scan_page_camera_permission_reasoning_settings": "To use the barcodes scanner please give the camera permission to the app in the app settings",
+      "barcode_scan_page_camera_permission_reasoning_settings": "Without the camera permission the app can't scan barcodes. You can grant the camera permission in the app settings or type the barcode manually by the button above.",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
       "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
 
