@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'dart:io';
 
 /// Returns true if permission is obtained, false otherwise.
 Future<bool> maybeRequestPermission(

@@ -2,7 +2,6 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/ui/base/colors_plante.dart';
