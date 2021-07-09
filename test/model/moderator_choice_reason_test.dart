@@ -41,4 +41,11 @@ void main() {
       expect(item.persistentId, equals(idsMap[item]));
     }
   });
+
+  test('all reasons are either vegan or vegetarian', () {
+    final veganAndVegetarianStatuses = (veganModeratorChoiceReasons()
+        + vegetarianModeratorChoiceReasons()).toSet();
+    expect(veganAndVegetarianStatuses,
+        equals(ModeratorChoiceReason.values.toSet()));
+  });
 }

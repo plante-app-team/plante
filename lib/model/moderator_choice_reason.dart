@@ -149,3 +149,39 @@ ModeratorChoiceReason? moderatorChoiceReasonFromPersistentId(int id) {
   }
   return null;
 }
+
+List<ModeratorChoiceReason> veganModeratorChoiceReasons() {
+  return [
+    ModeratorChoiceReason.INFO_FOUND_IN_EXTERNAL_SOURCE,
+    ModeratorChoiceReason.ALL_INGREDIENTS_ARE_VEGAN,
+    ModeratorChoiceReason
+        .AMBIGUOUS_INGREDIENTS_ARE_ALMOST_ALWAYS_VEGAN_IN_MODERN_FOOD_INDUSTRY,
+    ModeratorChoiceReason.MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_ABSENCE,
+    ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN,
+    ModeratorChoiceReason.HONEY_IN_INGREDIENTS,
+    ModeratorChoiceReason.MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_PRESENCE,
+    ModeratorChoiceReason.TESTED_ON_ANIMALS,
+    ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN,
+    ModeratorChoiceReason.SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS,
+    ModeratorChoiceReason.SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN,
+  ];
+}
+
+List<ModeratorChoiceReason> vegetarianModeratorChoiceReasons() {
+  return [
+    ModeratorChoiceReason.INFO_FOUND_IN_EXTERNAL_SOURCE,
+    ModeratorChoiceReason.ALL_INGREDIENTS_ARE_VEGETARIAN,
+    ModeratorChoiceReason
+        .AMBIGUOUS_INGREDIENTS_ARE_ALMOST_ALWAYS_VEGETARIAN_IN_MODERN_FOOD_INDUSTRY,
+    ModeratorChoiceReason
+        .MANUFACTURER_CONFIRMED_NON_VEGETARIAN_INGREDIENTS_ABSENCE,
+    ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN,
+    ModeratorChoiceReason
+        .MANUFACTURER_CONFIRMED_NON_VEGETARIAN_INGREDIENTS_PRESENCE,
+    ModeratorChoiceReason.TESTED_ON_ANIMALS,
+    ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGETARIAN,
+    ModeratorChoiceReason
+        .SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGETARIAN_INGREDIENTS,
+    ModeratorChoiceReason.SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN,
+  ];
+}
