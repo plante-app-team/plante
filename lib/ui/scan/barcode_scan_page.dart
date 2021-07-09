@@ -372,6 +372,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     setState(() {
       _showCameraInput = showCameraInput;
     });
+    _model.manualBarcodeInputShown = !_showCameraInput;
     FocusScope.of(context).unfocus();
   }
 }

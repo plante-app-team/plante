@@ -70,7 +70,7 @@
     "map_page_shop_added_to_map": "Магазин добавлен на карту",
     "map_page_click_on_shop_where_product_sold": "Кликните на маркер магазина, в котором находится продукт",
     "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
-    "map_page_location_permission_reasoning_settings": "Для определения вашего местоположения приложению необходимо системное разрешение",
+    "map_page_location_permission_reasoning_settings": "Без разрешения на определение вашего местоположения приложение не может показать магазины рядом с вами. Вы можете открыть настройки и дать соответствующее разрешение.",
     "map_page_no_shops_hint_default_mode_1": "Рядом пока нет магазинов с продуктами. Но вы можете нажать на \"Пустые магазины\" и добавить первый продукт!",
     "map_page_no_shops_hint_default_mode_2": "Похоже, рядом нет известных магазинов! Вы отметить новый магазин при добавлении или просмотре продукта",
     "map_page_no_shops_hint_in_select_shops_mode": "Рядом нет известных магазинов. Но вы можете отметить новый, кликнув на круглую кнопку с плюсиком справа!",
@@ -86,7 +86,7 @@
     "barcode_scan_page_searching_product": "Ищем продукт ",
     "barcode_scan_page_add_product": "Добавить продукт",
     "barcode_scan_page_camera_permission_reasoning": "Для включения сканера приложению необходимо разрешение на использование камеры",
-    "barcode_scan_page_camera_permission_reasoning_settings": "Для включения сканера приложению необходимо разрешение на использование камеры",
+    "barcode_scan_page_camera_permission_reasoning_settings": "Без разрешения на использование камеры приложение не может сканировать штрихкоды. Вы можете открыть настройки и дать соответствующее разрешение или ввести штрихкод вручную кнопкой выше.",
     "barcode_scan_page_invalid_barcode": "Недействительный штрихкод",
     "barcode_scan_page_is_product_sold_q": "Тут продают «<PRODUCT>» продаётся в магазине «<SHOP>»?",
 
