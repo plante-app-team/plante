@@ -31,12 +31,19 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   String get _langCode => _langCodeHolder.langCode;
   PermissionState? _cameraPermission;
   String _manualBarcode = '';
+  bool _manualBarcodeInputShown = false;
 
   BarcodeScanPage get _widget => _widgetCallback.call();
 
   String? get barcode => _barcode;
   bool get searching => _searching;
   bool get cameraAvailable => _cameraPermission == PermissionState.granted;
+  bool get manualBarcodeInputShown => _manualBarcodeInputShown;
+
+  set manualBarcodeInputShown(bool value) {
+    _manualBarcodeInputShown = value;
+    _widgetCallback.call();
+  }
 
   BarcodeScanPageModel(
       this._onStateChangeCallback,
@@ -87,7 +94,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   BarcodeScanPageContentState get contentState {
     if (_cameraPermission != null &&
         _cameraPermission != PermissionState.granted &&
-        _manualBarcode.isEmpty) {
+        !_manualBarcodeInputShown) {
       if (_cameraPermission == PermissionState.denied) {
         final requestPermission = () async {
           _cameraPermission =

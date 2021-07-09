@@ -217,6 +217,25 @@ void main() {
     verify(permissionsManager.openAppSettings());
   });
 
+  testWidgets('permission request through settings not shown when '
+              'manual barcode search enabled', (WidgetTester tester) async {
+    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.permanentlyDenied);
+
+    final context = await tester.superPump(BarcodeScanPage());
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
+        findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('input_mode_switch')));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
+        findsNothing);
+  });
+
   testWidgets('manual barcode search', (WidgetTester tester) async {
     when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
         Ok(Product((e) => e
