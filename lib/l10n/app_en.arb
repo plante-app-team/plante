@@ -89,9 +89,15 @@
       "barcode_scan_page_searching_product": "Searching product ",
       "barcode_scan_page_add_product": "Add the product",
       "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
-      "barcode_scan_page_camera_permission_reasoning_settings": "Without the camera permission the app can't scan barcodes. You can grant the camera permission in the app settings or type the barcode manually by the button above.",
+      "barcode_scan_page_camera_permission_reasoning_settings": "In order to be able to scan a barcode, the app needs access to the camera. You can grant access in the app settings",
+      "barcode_scan_page_camera_permission_title": "Plante needs access to the camera",
+      "barcode_scan_page_camera_permission_go_to_settings": "Turn on in settings",
+      "barcode_scan_page_camera_permission_cancel_settings": "Keep Camera Permission Off",
+      "barcode_scan_page_scan_product": "Start scanning",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
       "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
+
+
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
