@@ -109,18 +109,21 @@ void main() {
     verifyNever(locationController.currentPosition());
 
     // Verify the user is asked to go to the settings
-    expect(find.text(
-        context.strings.map_page_location_permission_reasoning_settings),
+    expect(
+        find.text(
+            context.strings.map_page_location_permission_reasoning_settings),
         findsOneWidget);
     verifyNever(permissionsManager.openAppSettings());
-    await tester.tap(find.text(context.strings.global_open_app_settings));
+    await tester.tap(
+        find.text(context.strings.map_page_location_permission_go_to_settings));
     await tester.pumpAndSettle();
     verify(permissionsManager.openAppSettings());
 
     // Second request will be granted
-    when(permissionsManager.request(PermissionKind.LOCATION)).thenAnswer((_) async {
-      when(permissionsManager.status(PermissionKind.LOCATION)).thenAnswer(
-              (_) async => PermissionState.granted);
+    when(permissionsManager.request(PermissionKind.LOCATION))
+        .thenAnswer((_) async {
+      when(permissionsManager.status(PermissionKind.LOCATION))
+          .thenAnswer((_) async => PermissionState.granted);
       return PermissionState.granted;
     });
 

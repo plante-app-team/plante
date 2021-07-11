@@ -431,7 +431,12 @@ class _MapPageState extends PageStatePlante<MapPage>
         context,
         _permissionsManager,
         PermissionKind.LOCATION,
-        context.strings.map_page_location_permission_reasoning_settings);
+        context.strings.map_page_location_permission_reasoning_settings,
+        context.strings.map_page_location_permission_go_to_settings,
+        settingsDialogCancelWhat:
+            context.strings.map_page_location_permission_cancel_go_to_settings,
+        settingsDialogTitle:
+            context.strings.map_page_location_permission_title);
     setState(() {
       _locationPermissionObtained = result;
     });

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -10,11 +13,10 @@ import 'package:intl/intl.dart' as intl;
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
-Future<T?> showMenuPlante<T>(
-    {required GlobalKey target,
-    required BuildContext context,
-    required List<T> values,
-    required List<Widget> children}) async {
+Future<T?> showMenuPlante<T>({required GlobalKey target,
+  required BuildContext context,
+  required List<T> values,
+  required List<Widget> children}) async {
   assert(values.length == children.length);
 
   final box = target.currentContext?.findRenderObject() as RenderBox?;
@@ -41,8 +43,7 @@ Future<T?> showMenuPlante<T>(
   );
 }
 
-Future<bool?> showYesNoDialog<bool>(
-    BuildContext context, String title, VoidCallback onYes) async {
+Future<bool?> showYesNoDialog<bool>(BuildContext context, String title, VoidCallback onYes) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -52,16 +53,16 @@ Future<bool?> showYesNoDialog<bool>(
           actions: Row(children: [
             Expanded(
                 child: ButtonOutlinedPlante.withText(
-              context.strings.global_no,
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            )),
+                  context.strings.global_no,
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                )),
             const SizedBox(width: 16),
             Expanded(
                 child: ButtonFilledPlante.withText(
-              context.strings.global_yes,
-              onPressed: () {
+                  context.strings.global_yes,
+                  onPressed: () {
                 Navigator.of(context).pop(true);
                 onYes.call();
               },
@@ -72,14 +73,51 @@ Future<bool?> showYesNoDialog<bool>(
 }
 
 Future<bool?> showDoOrCancelDialog<bool>(
-    BuildContext context, String title, String doWhat, VoidCallback onDo,
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat, String? title}) async {
+  if (Platform.isAndroid) {
+    return _showAndroidDialog(context, content, doWhat, onDo,
+        cancelWhat: cancelWhat);
+  } else {
+    return _showIosDialog(context, title, content, doWhat, onDo,
+        cancelWhat: cancelWhat);
+  }
+}
+
+Future<bool?> _showIosDialog<bool>(BuildContext context, String? title,
+    String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat}) async {
+  await showDialog<bool>(
+    context: context,
+    builder: (_) => CupertinoAlertDialog(
+      title: Text(title ?? ''),
+      content: Text(content),
+      actions: [
+        CupertinoButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+              onDo.call();
+            },
+            child: Text(doWhat)),
+        CupertinoButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text(cancelWhat ?? context.strings.global_cancel))
+      ],
+    ),
+  );
+}
+
+Future<bool?> _showAndroidDialog<bool>(
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return DialogPlante(
           key: const Key('do_or_cancel_dialog'),
-          content: Text(title, style: TextStyles.headline3),
+          content: Text(content, style: TextStyles.headline3),
           actions: Column(children: [
             SizedBox(
                 width: double.infinity,
