@@ -43,7 +43,8 @@ abstract class BarcodeScanPageContentState {
   factory BarcodeScanPageContentState.noPermission(VoidCallback callback) =
       BarcodeScanPageContentStateNoPermission;
   factory BarcodeScanPageContentState.cannotAskPermission(
-          VoidCallback openAppSettingsCallback, PermissionsManager permissionsManager) =
+          VoidCallback openAppSettingsCallback,
+          PermissionsManager permissionsManager) =
       BarcodeScanPageContentStateCannotAskPermission;
   factory BarcodeScanPageContentState.addProductToShop(
           Product product,
@@ -179,7 +180,8 @@ class BarcodeScanPageContentStateNoPermission
         color: const Color(0xfff5f7fa),
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ButtonFilledPlante.withText(context.strings.barcode_scan_page_scan_product,
+          ButtonFilledPlante.withText(
+              context.strings.barcode_scan_page_scan_product,
               onPressed: requestPermission),
         ]));
   }
@@ -189,7 +191,8 @@ class BarcodeScanPageContentStateCannotAskPermission
     extends BarcodeScanPageContentState {
   final VoidCallback openAppSettingsCallback;
   final PermissionsManager permissionsManager;
-  BarcodeScanPageContentStateCannotAskPermission(this.openAppSettingsCallback, this.permissionsManager);
+  BarcodeScanPageContentStateCannotAskPermission(
+      this.openAppSettingsCallback, this.permissionsManager);
   @override
   String get id => 'cannot_ask_permission';
 
@@ -200,9 +203,20 @@ class BarcodeScanPageContentStateCannotAskPermission
         color: const Color(0xfff5f7fa),
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ButtonFilledPlante.withText(context.strings.barcode_scan_page_scan_product,
+          ButtonFilledPlante.withText(
+              context.strings.barcode_scan_page_scan_product,
               onPressed: () async {
-            await showDoOrCancelDialog(context, context.strings.barcode_scan_page_camera_permission_reasoning_settings, context.strings.barcode_scan_page_camera_permission_go_to_settings, openAppSettingsCallback, title: context.strings.barcode_scan_page_camera_permission_title, cancelWhat: context.strings.barcode_scan_page_camera_permission_cancel_settings);
+            await showDoOrCancelDialog(
+                context,
+                context.strings
+                    .barcode_scan_page_camera_permission_reasoning_settings,
+                context
+                    .strings.barcode_scan_page_camera_permission_go_to_settings,
+                openAppSettingsCallback,
+                title:
+                    context.strings.barcode_scan_page_camera_permission_title,
+                cancelWhat: context.strings
+                    .barcode_scan_page_camera_permission_cancel_settings);
           }),
         ]));
   }
