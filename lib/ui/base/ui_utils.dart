@@ -82,7 +82,7 @@ Future<bool?> showDoOrCancelDialog<bool>(
     builder: (BuildContext context) {
       return DialogPlante(
           key: const Key('do_or_cancel_dialog'),
-          content: Text(content, style: TextStyles.headline3),
+          content: Text(title, style: TextStyles.headline3),
           actions: Column(children: [
             SizedBox(
                 width: double.infinity,
