@@ -77,8 +77,41 @@ Future<bool?> showYesNoDialog<bool>(
 Future<bool?> showDoOrCancelDialog<bool>(
     BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat, String? title}) async {
+  return await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return DialogPlante(
+          key: const Key('do_or_cancel_dialog'),
+          content: Text(content, style: TextStyles.headline3),
+          actions: Column(children: [
+            SizedBox(
+                width: double.infinity,
+                child: ButtonTextPlante(
+                  cancelWhat ?? context.strings.global_cancel,
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                )),
+            const SizedBox(height: 8),
+            SizedBox(
+                width: double.infinity,
+                child: ButtonFilledPlante.withText(
+                  doWhat,
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                    onDo.call();
+                  },
+                )),
+          ]));
+    },
+  );
+}
+
+Future<bool?> showSystemDialog<bool>(
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat, String? title}) async {
   if (Platform.isAndroid) {
-    return _showAndroidDialog(context, content, doWhat, onDo,
+    return _showAndroidDialog(context, title, content, doWhat, onDo,
         cancelWhat: cancelWhat);
   } else {
     return _showIosDialog(context, title, content, doWhat, onDo,
@@ -112,36 +145,9 @@ Future<bool?> _showIosDialog<bool>(BuildContext context, String? title,
 }
 
 Future<bool?> _showAndroidDialog<bool>(
-    BuildContext context, String content, String doWhat, VoidCallback onDo,
-    {String? cancelWhat}) async {
-  return await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return DialogPlante(
-          key: const Key('do_or_cancel_dialog'),
-          content: Text(content, style: TextStyles.headline3),
-          actions: Column(children: [
-            SizedBox(
-                width: double.infinity,
-                child: ButtonTextPlante(
-                  cancelWhat ?? context.strings.global_cancel,
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                )),
-            const SizedBox(height: 8),
-            SizedBox(
-                width: double.infinity,
-                child: ButtonFilledPlante.withText(
-                  doWhat,
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                    onDo.call();
-                  },
-                )),
-          ]));
-    },
-  );
+    BuildContext context, String? title, String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat, }) async {
+   return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
 }
 
 String secsSinceEpochToStr(int secs, BuildContext context) {

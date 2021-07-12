@@ -39,7 +39,7 @@ Future<bool> maybeRequestPermission(
     }
   }
 
-  await showDoOrCancelDialog(context, settingsDialogContent,
+  await showSystemDialog(context, settingsDialogContent,
       settingsDialogDoWhat, permissionsManager.openAppSettings,
       cancelWhat: settingsDialogCancelWhat, title: settingsDialogTitle);
   permission = await permissionsManager.status(permissionKind);

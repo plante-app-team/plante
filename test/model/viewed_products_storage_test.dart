@@ -80,7 +80,7 @@ void main() {
     });
     expect(updatesCount, equals(0));
     await anotherStorage.loadPersistentProductsForTesting();
-    await Future.delayed(const Duration(microseconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     expect(updatesCount, equals(1));
   });
 

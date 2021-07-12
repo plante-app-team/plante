@@ -206,7 +206,7 @@ class BarcodeScanPageContentStateCannotAskPermission
           ButtonFilledPlante.withText(
               context.strings.barcode_scan_page_scan_product,
               onPressed: () async {
-            await showDoOrCancelDialog(
+            await showSystemDialog(
                 context,
                 context.strings
                     .barcode_scan_page_camera_permission_reasoning_settings,
