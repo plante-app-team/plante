@@ -75,7 +75,7 @@ Future<bool?> showYesNoDialog<bool>(
 }
 
 Future<bool?> showDoOrCancelDialog<bool>(
-    BuildContext context, String title, String doWhat, VoidCallback onDo,
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat}) async {
   return await showDialog<bool>(
     context: context,
