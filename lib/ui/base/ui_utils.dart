@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -72,14 +75,14 @@ Future<bool?> showYesNoDialog<bool>(
 }
 
 Future<bool?> showDoOrCancelDialog<bool>(
-    BuildContext context, String title, String doWhat, VoidCallback onDo,
-    {String? cancelWhat}) async {
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat, String? title}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return DialogPlante(
           key: const Key('do_or_cancel_dialog'),
-          content: Text(title, style: TextStyles.headline3),
+          content: Text(content, style: TextStyles.headline3),
           actions: Column(children: [
             SizedBox(
                 width: double.infinity,
@@ -101,6 +104,42 @@ Future<bool?> showDoOrCancelDialog<bool>(
                 )),
           ]));
     },
+  );
+}
+
+Future<bool?> showSystemDialog<bool>(
+    BuildContext context, String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat, String? title}) async {
+  if (Platform.isAndroid) {
+    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
+  } else {
+    return _showIosDialog(context, title, content, doWhat, onDo,
+        cancelWhat: cancelWhat);
+  }
+}
+
+Future<bool?> _showIosDialog<bool>(BuildContext context, String? title,
+    String content, String doWhat, VoidCallback onDo,
+    {String? cancelWhat}) async {
+  await showDialog<bool>(
+    context: context,
+    builder: (_) => CupertinoAlertDialog(
+      title: Text(title ?? ''),
+      content: Text(content),
+      actions: [
+        CupertinoButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+              onDo.call();
+            },
+            child: Text(doWhat)),
+        CupertinoButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text(cancelWhat ?? context.strings.global_cancel))
+      ],
+    ),
   );
 }
 

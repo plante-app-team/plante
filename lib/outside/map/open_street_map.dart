@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop_type.dart';
@@ -30,7 +31,7 @@ class OpenStreetMap {
 
   OpenStreetMap(this._http) {
     () async {
-      _packageInfo.complete(await PackageInfo.fromPlatform());
+      _packageInfo.complete(await getPackageInfo());
     }.call();
   }
 

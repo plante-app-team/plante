@@ -104,7 +104,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
         return BarcodeScanPageContentState.noPermission(requestPermission);
       } else {
         return BarcodeScanPageContentState.cannotAskPermission(
-            _permissionsManager.openAppSettings);
+            _permissionsManager.openAppSettings, _permissionsManager);
       }
     } else if (_barcode == null) {
       return BarcodeScanPageContentState.nothingScanned();

@@ -5,7 +5,7 @@ import 'package:fimber_io/fimber_io.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:plante/base/base.dart';
 import 'package:share/share.dart';
 import 'package:plante/base/pair.dart';
 
@@ -75,7 +75,7 @@ class Log {
   }
 
   static Future<Directory> logsDirectory() async {
-    final internalStorage = await getApplicationDocumentsDirectory();
+    final internalStorage = await getAppDir();
     return Directory('${internalStorage.path}/logs');
   }
 

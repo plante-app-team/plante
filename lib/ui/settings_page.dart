@@ -51,7 +51,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
     final userNullable =
         await GetIt.I.get<UserParamsController>().getUserParams();
     user = userNullable!;
-    packageInfo = await PackageInfo.fromPlatform();
+    packageInfo = await getPackageInfo();
     if (kReleaseMode && (user.userGroup == null || user.userGroup == 1)) {
       setState(() {
         loading = false;

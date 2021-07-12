@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/permissions_manager.dart';
@@ -73,7 +72,7 @@ class InitProductPage extends StatefulWidget {
       }
       return Directory(cacheFolderForTest!);
     }
-    final tempDir = await getTemporaryDirectory();
+    final tempDir = await getAppTempDir();
     return Directory('${tempDir.path}/init_product_cache');
   }
 }
@@ -475,7 +474,9 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         context,
         _permissionsManager,
         PermissionKind.CAMERA,
-        context.strings.init_user_page_camera_permission_reasoning_settings);
+        context.strings.init_user_page_camera_permission_reasoning_settings,
+        context.strings.global_open_app_settings,
+        settingsDialogCancelWhat: context.strings.global_cancel);
   }
 
   void _removePhoto(ProductImageType imageType) {

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:plante/base/permissions_manager.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 /// Returns true if permission is obtained, false otherwise.
@@ -10,7 +9,10 @@ Future<bool> maybeRequestPermission(
     BuildContext context,
     PermissionsManager permissionsManager,
     PermissionKind permissionKind,
-    String settingsDialogTitle) async {
+    String settingsDialogContent,
+    String settingsDialogDoWhat,
+    {String? settingsDialogCancelWhat,
+    String? settingsDialogTitle}) async {
   var permission = await permissionsManager.status(permissionKind);
   if (permission == PermissionState.granted) {
     return true;
@@ -37,11 +39,9 @@ Future<bool> maybeRequestPermission(
     }
   }
 
-  await showDoOrCancelDialog(
-      context,
-      settingsDialogTitle,
-      context.strings.global_open_app_settings,
-      permissionsManager.openAppSettings);
+  await showSystemDialog(context, settingsDialogContent,
+      settingsDialogDoWhat, permissionsManager.openAppSettings,
+      cancelWhat: settingsDialogCancelWhat, title: settingsDialogTitle);
   permission = await permissionsManager.status(permissionKind);
   return permission == PermissionState.granted ||
       permission == PermissionState.limited;

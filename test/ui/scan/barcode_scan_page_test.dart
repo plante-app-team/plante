@@ -186,11 +186,7 @@ void main() {
     final context = await tester.superPump(BarcodeScanPage());
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
-        findsOneWidget);
-
-    await tester.tap(find.text(context.strings.global_give_permission));
+    await tester.tap(find.text(context.strings.barcode_scan_page_scan_product));
     await tester.pumpAndSettle();
 
     expect(
@@ -204,17 +200,31 @@ void main() {
     final context = await tester.superPump(BarcodeScanPage());
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
-        findsNothing);
-    expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
-        findsOneWidget);
 
     verifyNever(permissionsManager.openAppSettings());
-    await tester.tap(find.text(context.strings.global_open_app_settings));
+    await tester.tap(find.text(context.strings.barcode_scan_page_scan_product));
+    await tester.pumpAndSettle();
+    expect(
+        find.text(
+            context.strings.barcode_scan_page_camera_permission_go_to_settings),
+        findsOneWidget);
+    await tester.tap(find.text(
+        context.strings.barcode_scan_page_camera_permission_go_to_settings));
     await tester.pumpAndSettle();
     verify(permissionsManager.openAppSettings());
+
+    // Second request will be granted
+    when(permissionsManager.request(PermissionKind.CAMERA))
+        .thenAnswer((_) async {
+      when(permissionsManager.status(PermissionKind.CAMERA))
+          .thenAnswer((_) async => PermissionState.granted);
+      return PermissionState.granted;
+    });
+
+    // Second request
+    await tester.tap(find.text(context.strings.barcode_scan_page_scan_product));
+    await tester.pumpAndSettle();
+    verify(permissionsManager.status(PermissionKind.CAMERA));
   });
 
   testWidgets('permission request through settings not shown when '
@@ -225,14 +235,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
+        find.text(context.strings.barcode_scan_page_scan_product),
         findsOneWidget);
 
     await tester.tap(find.byKey(const Key('input_mode_switch')));
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning_settings),
+        find.text(context.strings.barcode_scan_page_scan_product),
         findsNothing);
   });
 
