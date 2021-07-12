@@ -111,8 +111,7 @@ Future<bool?> showSystemDialog<bool>(
     BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat, String? title}) async {
   if (Platform.isAndroid) {
-    return _showAndroidDialog(context, title, content, doWhat, onDo,
-        cancelWhat: cancelWhat);
+    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
   } else {
     return _showIosDialog(context, title, content, doWhat, onDo,
         cancelWhat: cancelWhat);
@@ -142,12 +141,6 @@ Future<bool?> _showIosDialog<bool>(BuildContext context, String? title,
       ],
     ),
   );
-}
-
-Future<bool?> _showAndroidDialog<bool>(
-    BuildContext context, String? title, String content, String doWhat, VoidCallback onDo,
-    {String? cancelWhat, }) async {
-   return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
 }
 
 String secsSinceEpochToStr(int secs, BuildContext context) {
