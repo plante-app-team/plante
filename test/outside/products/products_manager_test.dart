@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
-import 'package:flutter/widgets.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
@@ -55,8 +54,6 @@ void main() {
   late ProductsManager productsManager;
 
   setUp(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-
     offApi = MockOffApi();
     backend = MockBackend();
     takenProductsImagesStorage = TakenProductsImagesStorage(

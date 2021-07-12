@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/viewed_products_storage.dart';
@@ -7,8 +6,6 @@ void main() {
   late ViewedProductsStorage storage;
 
   setUp(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-
     storage = ViewedProductsStorage(loadPersistentProducts: false);
     await storage.purgeForTesting();
   });
