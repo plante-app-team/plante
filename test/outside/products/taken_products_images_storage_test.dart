@@ -1,12 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:test/test.dart';
 
 void main() {
-  setUp(() {
-  });
+  setUp(WidgetsFlutterBinding.ensureInitialized);
 
   test('save and obtain data', () async {
     const fileName = 'taken_products_images_table_test1';
