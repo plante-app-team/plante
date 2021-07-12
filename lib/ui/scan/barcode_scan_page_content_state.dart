@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
@@ -43,8 +42,7 @@ abstract class BarcodeScanPageContentState {
   factory BarcodeScanPageContentState.noPermission(VoidCallback callback) =
       BarcodeScanPageContentStateNoPermission;
   factory BarcodeScanPageContentState.cannotAskPermission(
-          VoidCallback openAppSettingsCallback,
-          PermissionsManager permissionsManager) =
+          VoidCallback openAppSettingsCallback) =
       BarcodeScanPageContentStateCannotAskPermission;
   factory BarcodeScanPageContentState.addProductToShop(
           Product product,
@@ -190,9 +188,8 @@ class BarcodeScanPageContentStateNoPermission
 class BarcodeScanPageContentStateCannotAskPermission
     extends BarcodeScanPageContentState {
   final VoidCallback openAppSettingsCallback;
-  final PermissionsManager permissionsManager;
   BarcodeScanPageContentStateCannotAskPermission(
-      this.openAppSettingsCallback, this.permissionsManager);
+      this.openAppSettingsCallback);
   @override
   String get id => 'cannot_ask_permission';
 

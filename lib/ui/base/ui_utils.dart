@@ -75,14 +75,14 @@ Future<bool?> showYesNoDialog<bool>(
 }
 
 Future<bool?> showDoOrCancelDialog<bool>(
-    BuildContext context, String content, String doWhat, VoidCallback onDo,
-    {String? cancelWhat, String? title}) async {
+    BuildContext context, String title, String doWhat, VoidCallback onDo,
+    {String? cancelWhat}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return DialogPlante(
           key: const Key('do_or_cancel_dialog'),
-          content: Text(content, style: TextStyles.headline3),
+          content: Text(title, style: TextStyles.headline3),
           actions: Column(children: [
             SizedBox(
                 width: double.infinity,
@@ -111,7 +111,7 @@ Future<bool?> showSystemDialog<bool>(
     BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat, String? title}) async {
   if (Platform.isAndroid) {
-    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
+    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat);
   } else {
     return _showIosDialog(context, title, content, doWhat, onDo,
         cancelWhat: cancelWhat);
