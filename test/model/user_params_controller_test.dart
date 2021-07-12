@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -12,6 +13,7 @@ import 'user_params_controller_test.mocks.dart';
     customMocks: [MockSpec<UserParamsControllerObserver>(returnNullOnMissingStub: true)])
 void main() {
   setUp(() async {
+    WidgetsFlutterBinding.ensureInitialized();
     final controller = UserParamsController();
     await controller.setUserParams(null);
   });

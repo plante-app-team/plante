@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/widgets.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -12,6 +13,8 @@ void main() {
   late OpenStreetMap _osm;
 
   setUp(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
     _http = FakeHttpClient();
     _osm = OpenStreetMap(_http);
   });
