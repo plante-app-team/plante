@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 
@@ -86,7 +85,7 @@ class TakenProductsImagesStorage {
   }
 
   Future<File> _getStorageFile() async {
-    final internalStorage = await getApplicationDocumentsDirectory();
+    final internalStorage = await getAppDir();
     return File('${internalStorage.path}/$fileName');
   }
 

@@ -8,6 +8,7 @@ import 'package:plante/model/shared_preferences_ext.dart';
 
 void main() {
   setUp(() async {
+    SharedPreferences.setMockInitialValues({});
     final controller = UserParamsController();
     await controller.setUserParams(null);
   });

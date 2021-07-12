@@ -1,6 +1,6 @@
-import 'package:flutter/widgets.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test/test.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
@@ -13,7 +13,7 @@ import 'user_params_controller_test.mocks.dart';
     customMocks: [MockSpec<UserParamsControllerObserver>(returnNullOnMissingStub: true)])
 void main() {
   setUp(() async {
-    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
     final controller = UserParamsController();
     await controller.setUserParams(null);
   });

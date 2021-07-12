@@ -13,10 +13,11 @@ import 'package:intl/intl.dart' as intl;
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
-Future<T?> showMenuPlante<T>({required GlobalKey target,
-  required BuildContext context,
-  required List<T> values,
-  required List<Widget> children}) async {
+Future<T?> showMenuPlante<T>(
+    {required GlobalKey target,
+    required BuildContext context,
+    required List<T> values,
+    required List<Widget> children}) async {
   assert(values.length == children.length);
 
   final box = target.currentContext?.findRenderObject() as RenderBox?;
@@ -43,7 +44,8 @@ Future<T?> showMenuPlante<T>({required GlobalKey target,
   );
 }
 
-Future<bool?> showYesNoDialog<bool>(BuildContext context, String title, VoidCallback onYes) async {
+Future<bool?> showYesNoDialog<bool>(
+    BuildContext context, String title, VoidCallback onYes) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -53,16 +55,16 @@ Future<bool?> showYesNoDialog<bool>(BuildContext context, String title, VoidCall
           actions: Row(children: [
             Expanded(
                 child: ButtonOutlinedPlante.withText(
-                  context.strings.global_no,
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                )),
+              context.strings.global_no,
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            )),
             const SizedBox(width: 16),
             Expanded(
                 child: ButtonFilledPlante.withText(
-                  context.strings.global_yes,
-                  onPressed: () {
+              context.strings.global_yes,
+              onPressed: () {
                 Navigator.of(context).pop(true);
                 onYes.call();
               },

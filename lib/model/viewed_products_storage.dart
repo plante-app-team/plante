@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
@@ -60,7 +59,7 @@ class ViewedProductsStorage {
   }
 
   Future<File> _getStorageFile() async {
-    final internalStorage = await getApplicationDocumentsDirectory();
+    final internalStorage = await getAppDir();
     return File('${internalStorage.path}/$_FILE_NAME');
   }
 
