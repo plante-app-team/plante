@@ -76,7 +76,7 @@ Future<bool?> showYesNoDialog<bool>(
 
 Future<bool?> showDoOrCancelDialog<bool>(
     BuildContext context, String content, String doWhat, VoidCallback onDo,
-    {String? cancelWhat, String? title}) async {
+    {String? cancelWhat}) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -111,7 +111,7 @@ Future<bool?> showSystemDialog<bool>(
     BuildContext context, String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat, String? title}) async {
   if (Platform.isAndroid) {
-    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat, title: title);
+    return showDoOrCancelDialog(context, content, doWhat, onDo, cancelWhat: cancelWhat);
   } else {
     return _showIosDialog(context, title, content, doWhat, onDo,
         cancelWhat: cancelWhat);
