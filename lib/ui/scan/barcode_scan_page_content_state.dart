@@ -188,8 +188,7 @@ class BarcodeScanPageContentStateNoPermission
 class BarcodeScanPageContentStateCannotAskPermission
     extends BarcodeScanPageContentState {
   final VoidCallback openAppSettingsCallback;
-  BarcodeScanPageContentStateCannotAskPermission(
-      this.openAppSettingsCallback);
+  BarcodeScanPageContentStateCannotAskPermission(this.openAppSettingsCallback);
   @override
   String get id => 'cannot_ask_permission';
 

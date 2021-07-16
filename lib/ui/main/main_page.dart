@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -42,7 +42,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
 
   @override
   Widget buildPage(BuildContext context) {
-    GetIt.I.get<LangCodeHolder>().langCode =
+    GetIt.I.get<SysLangCodeHolder>().langCode =
         Localizations.localeOf(context).languageCode;
     return Scaffold(
         body: WillPopScope(

@@ -3,11 +3,11 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 
 class ProductsObtainer {
   final ProductsManager _productsManager;
-  final LangCodeHolder _langCodeHolder;
+  final SysLangCodeHolder _langCodeHolder;
 
   ProductsObtainer(this._productsManager, this._langCodeHolder);
 

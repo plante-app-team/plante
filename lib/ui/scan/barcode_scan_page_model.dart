@@ -9,7 +9,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
@@ -21,7 +21,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   final ResCallback<BarcodeScanPage> _widgetCallback;
   final ProductsManager _productsManager;
   final ShopsManager _shopsManager;
-  final LangCodeHolder _langCodeHolder;
+  final SysLangCodeHolder _langCodeHolder;
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
 

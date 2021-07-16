@@ -1,11 +1,11 @@
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late LangCodeHolder langCodeHolder;
+  late SysLangCodeHolder langCodeHolder;
 
   setUp(() async {
-    langCodeHolder = LangCodeHolder();
+    langCodeHolder = SysLangCodeHolder();
   });
 
   test('callWhenInited callbacks', () async {

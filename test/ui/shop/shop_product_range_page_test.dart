@@ -28,7 +28,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/l10n/strings.dart';
@@ -111,7 +111,7 @@ void main() {
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
-    GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
+    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
     addressObtainer = MockAddressObtainer();

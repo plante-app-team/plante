@@ -23,7 +23,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
@@ -50,7 +50,7 @@ void main() {
     analytics = FakeAnalytics();
     GetIt.I.registerSingleton<Analytics>(analytics);
 
-    GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
+    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<Settings>(FakeSettings());
     productsManager = MockProductsManager();
     GetIt.I.registerSingleton<ProductsManager>(productsManager);

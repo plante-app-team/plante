@@ -17,7 +17,7 @@ import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/switch_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -97,7 +97,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
         () => widget,
         GetIt.I.get<ProductsManager>(),
         GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<LangCodeHolder>(),
+        GetIt.I.get<SysLangCodeHolder>(),
         GetIt.I.get<PermissionsManager>(),
         GetIt.I.get<UserParamsController>());
     _manualBarcodeTextController.addListener(() {

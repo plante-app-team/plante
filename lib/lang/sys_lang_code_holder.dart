@@ -1,11 +1,12 @@
 import 'package:plante/base/base.dart';
 
-class LangCodeHolder {
+class SysLangCodeHolder {
   final _initCallbacks = <ArgCallback<String>>[];
   String? _langCode;
 
-  LangCodeHolder();
-  LangCodeHolder.inited(String initialLangCode) : _langCode = initialLangCode;
+  SysLangCodeHolder();
+  SysLangCodeHolder.inited(String initialLangCode)
+      : _langCode = initialLangCode;
 
   String get langCode => _langCode!;
   set langCode(String value) {

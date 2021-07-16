@@ -21,7 +21,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
@@ -85,7 +85,7 @@ void main() {
     await userParamsController.setUserParams(params);
 
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('ru'));
+    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('ru'));
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
 
     final permissionsManager = MockPermissionsManager();

@@ -12,7 +12,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -29,7 +29,7 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<Backend>(MockBackend());
 
-    GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
+    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
 
     productsObtainer = MockProductsObtainer();
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);

@@ -1,12 +1,12 @@
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 
 const INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';
 
 class InputProductsLangStorage {
   final SharedPreferencesHolder _prefsHolder;
-  final LangCodeHolder _langCodeHolder;
+  final SysLangCodeHolder _langCodeHolder;
   LangCode? _langCode;
 
   InputProductsLangStorage(this._prefsHolder, this._langCodeHolder) {
