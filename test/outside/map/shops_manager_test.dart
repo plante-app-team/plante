@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
@@ -14,21 +13,18 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:test/test.dart';
 
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
-import 'shops_manager_test.mocks.dart';
 
-@GenerateMocks([OpenStreetMap, Backend, ProductsManager, ShopsManagerListener])
 void main() {
   late MockOpenStreetMap osm;
   late MockBackend backend;
-  late MockProductsManager productsManager;
+  late MockProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late ShopsManager shopsManager;
 
@@ -83,19 +79,19 @@ void main() {
   setUp(() async {
     osm = MockOpenStreetMap();
     backend = MockBackend();
-    productsManager = MockProductsManager();
+    productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
     when(backend.putProductToShop(any, any)).thenAnswer((_) async => Ok(None()));
-    shopsManager = ShopsManager(osm, backend, productsManager, analytics);
+    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics);
 
     when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    when(productsManager.inflate(rangeBackendProducts[0]))
+    when(productsObtainer.inflate(rangeBackendProducts[0]))
         .thenAnswer((_) async => Ok(rangeProducts[0]));
-    when(productsManager.inflate(rangeBackendProducts[1]))
+    when(productsObtainer.inflate(rangeBackendProducts[1]))
         .thenAnswer((_) async => Ok(rangeProducts[1]));
-    when(productsManager.inflate(rangeBackendProducts[2]))
+    when(productsObtainer.inflate(rangeBackendProducts[2]))
         .thenAnswer((_) async => Ok(rangeProducts[2]));
 
     when(backend.createShop(
@@ -354,10 +350,10 @@ void main() {
 
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsManager.inflate(any));
+    verify(productsObtainer.inflate(any));
 
     clearInteractions(backend);
-    clearInteractions(productsManager);
+    clearInteractions(productsObtainer);
 
     // Second fetch
     final rangeRes2 = await shopsManager.fetchShopProductRange(shop);
@@ -366,7 +362,7 @@ void main() {
 
     // The second fetch DID NOT send request (it used cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsManager.inflate(any));
+    verifyNever(productsObtainer.inflate(any));
 
     // Range update
     verifyNever(backend.putProductToShop(any, any));
@@ -389,7 +385,7 @@ void main() {
 
     // The third fetch DID NOT send request (it used updated cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsManager.inflate(any));
+    verifyNever(productsObtainer.inflate(any));
   });
 
   test('shops products range force reload', () async {
@@ -411,10 +407,10 @@ void main() {
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsManager.inflate(any));
+    verify(productsObtainer.inflate(any));
 
     clearInteractions(backend);
-    clearInteractions(productsManager);
+    clearInteractions(productsObtainer);
 
     // Second fetch
     final rangeRes2 = await shopsManager
@@ -425,7 +421,7 @@ void main() {
     // The second fetch call again DID send requests, because was asked
     // to explicitly
     verify(backend.requestProductsAtShops(any));
-    verify(productsManager.inflate(any));
+    verify(productsObtainer.inflate(any));
   });
 
   test('shop creation', () async {

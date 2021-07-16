@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:plante/logging/analytics.dart';
-import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 
-@GenerateMocks([GoogleAuthorizer, Backend])
 void main() {
   late FakeAnalytics analytics;
 

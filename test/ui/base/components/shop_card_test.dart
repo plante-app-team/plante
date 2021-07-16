@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
@@ -26,13 +25,11 @@ import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
+import '../../../common_mocks.mocks.dart';
 import '../../../fake_analytics.dart';
 import '../../../fake_user_params_controller.dart';
 import '../../../widget_tester_extension.dart';
-import 'shop_card_test.mocks.dart';
 
-@GenerateMocks([ShopsManager, UserParamsController, Backend, ProductsManager,
-  PermissionsManager, RouteObserver, AddressObtainer])
 void main() {
   late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;

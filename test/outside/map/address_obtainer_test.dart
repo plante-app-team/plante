@@ -1,4 +1,3 @@
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
@@ -9,9 +8,8 @@ import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
-import 'address_obtainer_test.mocks.dart';
+import '../../common_mocks.mocks.dart';
 
-@GenerateMocks([OpenStreetMap])
 void main() {
   late MockOpenStreetMap osm;
   late AddressObtainer addressObtainer;

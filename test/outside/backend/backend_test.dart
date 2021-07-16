@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
@@ -14,13 +13,12 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_http_client.dart';
 import '../../fake_settings.dart';
 import '../../fake_user_params_controller.dart';
-import 'backend_test.mocks.dart';
 
-@GenerateMocks([BackendObserver])
 void main() {
   final fakeSettings = FakeSettings();
   late FakeAnalytics analytics;

@@ -237,6 +237,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
       MaterialPageRoute(
           builder: (context) => InitProductPage(product,
                   key: const Key('init_product_page'),
+                  startReason:
+                      InitProductPageStartReason.HELP_WITH_VEG_STATUSES,
                   title: context
                       .strings.display_product_page_help_with_veg_statuses,
                   productUpdatedCallback: (product) {

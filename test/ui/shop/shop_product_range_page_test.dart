@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
@@ -35,13 +36,12 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
+import '../../fake_input_products_lang_storage.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
-import 'shop_product_range_page_test.mocks.dart';
 
-@GenerateMocks([Backend, ShopsManager, ProductsManager, PermissionsManager,
-  ViewedProductsStorage, PhotosTaker, RouteObserver, AddressObtainer])
 void main() {
   late MockBackend backend;
   late MockShopsManager shopsManager;
@@ -116,9 +116,11 @@ void main() {
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
     addressObtainer = MockAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
-
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
+    GetIt.I.registerSingleton<InputProductsLangStorage>(
+        FakeInputProductsLangStorage.fromCode(LangCode.en));
+
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
     final params = UserParams((v) => v

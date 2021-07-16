@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -24,6 +25,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
@@ -31,14 +33,15 @@ import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
+import '../../fake_input_products_lang_storage.dart';
 import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
-import 'init_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, PhotosTaker, ShopsManager, LocationController,
-                PermissionsManager, AddressObtainer])
+const _DEFAULT_TEST_LANG = LangCode.en;
+
 void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
@@ -47,6 +50,7 @@ void main() {
   late MockPermissionsManager permissionsManager;
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
+  late FakeInputProductsLangStorage inputProductsLangStorage;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -103,6 +107,9 @@ void main() {
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) async =>
         Ok(OsmAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
+
+    inputProductsLangStorage = FakeInputProductsLangStorage.fromCode(_DEFAULT_TEST_LANG);
+    GetIt.I.registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -125,7 +132,9 @@ void main() {
         List<Shop> initialShops = const [],
         List<Shop> shopsToCancel = const [],
         int requiredManualOcrAttempts = 0,
-        int ocrSuccessfulAttemptNumber = 1}) async {
+        int ocrSuccessfulAttemptNumber = 1,
+        LangCode? selectedLang = _DEFAULT_TEST_LANG,
+        bool selectLangAtStart = true}) async {
     var ocrAttempts = 0;
     when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
             (invoc) async {
@@ -162,6 +171,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(cacheDir.existsSync(), isTrue);
 
+    final selectLang = () async {
+      if (selectedLang != _DEFAULT_TEST_LANG) {
+        final dropdown = find.byKey(const Key('product_lang'))
+            .evaluate().first.widget as DropdownPlante<LangCode?>;
+        dropdown.onChanged!.call(selectedLang);
+        await tester.pumpAndSettle();
+      }
+    };
+    if (selectLangAtStart) {
+      await selectLang.call();
+    }
+
     if (takeImageFront) {
       verifyNever(photosTaker.takeAndCropPhoto(any, any));
       await tester.tap(
@@ -191,6 +212,8 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    await scrollToBottom(tester);
+
     if (selectedShops != null) {
       expect(find.byType(MapPage), findsNothing);
 
@@ -207,8 +230,6 @@ void main() {
           null);
       await tester.pumpAndSettle();
     }
-
-    await scrollToBottom(tester);
 
     if (shopsToCancel.isNotEmpty) {
       for (final shopToCancel in shopsToCancel) {
@@ -315,16 +336,20 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    if (!selectLangAtStart) {
+      await selectLang.call();
+    }
+
     expect(done, isFalse);
     verifyNever(productsManager.createUpdateProduct(any, any));
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     if (expectedProductResult != null) {
       final finalProduct = verify(
-          productsManager.createUpdateProduct(captureAny, any)).captured.first;
+          productsManager.createUpdateProduct(captureAny, selectedLang?.name ?? '')).captured.first;
       expect(finalProduct, equals(expectedProductResult));
     } else {
-      verifyNever(productsManager.createUpdateProduct(captureAny, any));
+      verifyNever(productsManager.createUpdateProduct(any, any));
     }
 
     final expectedShops = <Shop>[];
@@ -351,14 +376,18 @@ void main() {
       }));
       expect(analytics.wasEventSent('product_save_failure'), isFalse);
       expect(analytics.wasEventSent('product_save_shops_failure'), isFalse);
+      expect(inputProductsLangStorage.selectedCode, equals(selectedLang));
     } else {
       expect(analytics.wasEventSent('product_save_success'), isFalse);
+      expect(inputProductsLangStorage.selectedCode, equals(_DEFAULT_TEST_LANG));
     }
 
     return done;
   }
 
   testWidgets('good flow', (WidgetTester tester) async {
+    expect(_DEFAULT_TEST_LANG, isNot(equals(LangCode.ru)));
+
     final expectedProduct = Product((v) => v
       ..barcode = '123'
       ..name = 'Lemon drink'
@@ -382,7 +411,8 @@ void main() {
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
       vegetarianStatusInput: expectedProduct.vegetarianStatus,
-      selectedShops: [aShop]
+      selectedShops: [aShop],
+      selectedLang: LangCode.ru,
     );
 
     expect(done, isTrue);
@@ -1198,7 +1228,7 @@ void main() {
             (_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
     verifyNever(photosTaker.cropPhoto(any, any, any));
-    verifyNever(productsManager.updateProductAndExtractIngredients(any));
+    verifyNever(productsManager.updateProductAndExtractIngredients(any, any));
 
     final widget = InitProductPage(
         Product((v) => v.barcode = '123'),
@@ -1209,7 +1239,7 @@ void main() {
     verify(photosTaker.cropPhoto(any, any, any));
     // Because the lost photo is an ingredients photo -
     // OCR is expected to be performed.
-    verify(productsManager.updateProductAndExtractIngredients(any));
+    verify(productsManager.updateProductAndExtractIngredients(any, any));
 
     // Now let's fill the product and ensure it's filled enough to be saved
     // The ingredients photo is not taken by us as we expect it to be restored.
@@ -1377,5 +1407,149 @@ void main() {
           find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
     });
+  });
+
+  testWidgets('cannot take picture of ingredients when no lang selected', (WidgetTester tester) async {
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    final context = await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    // Select no lang
+    final dropdown = find.byKey(const Key('product_lang'))
+        .evaluate().first.widget as DropdownPlante<LangCode?>;
+    dropdown.onChanged!.call(null);
+    await tester.pumpAndSettle();
+
+    await scrollToBottom(tester);
+
+    // Verify cannot take a pic of ingredients
+    expect(find.text(context.strings.init_product_page_please_select_lang), findsNothing);
+    await tester.tap(find.byKey(const Key('ingredients_photo')));
+    await tester.pumpAndSettle();
+    verifyNever(photosTaker.takeAndCropPhoto(any, any));
+    expect(find.text(context.strings.init_product_page_please_select_lang), findsOneWidget);
+  });
+
+  testWidgets('cannot restart ocr when no lang selected', (WidgetTester tester) async {
+    // OCR will fail
+    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
+            (invoc) async {
+          return Err(ProductsManagerError.OTHER);
+        });
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    final context = await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    await scrollToBottom(tester);
+
+    // Take ingredients picture
+    await tester.tap(find.byKey(const Key('ingredients_photo')));
+    await tester.pumpAndSettle();
+    verify(photosTaker.takeAndCropPhoto(any, any));
+
+    // Verify OCR failed and retry available
+    expect(find.byKey(const Key('ocr_try_again')), findsOneWidget);
+
+    // Deselect product's lang
+    final dropdown = find.byKey(const Key('product_lang'))
+        .evaluate().first.widget as DropdownPlante<LangCode?>;
+    dropdown.onChanged!.call(null);
+    await tester.pumpAndSettle();
+
+    // Start OCR retry and verify it won't start without a lang
+    expect(find.text(context.strings.init_product_page_please_select_lang), findsNothing);
+    await tester.tap(find.byKey(const Key('ocr_try_again')));
+    await tester.pumpAndSettle();
+    expect(find.text(context.strings.init_product_page_please_select_lang), findsOneWidget);
+  });
+
+  testWidgets('input language change does not immediately affect InputProductsLangStorage', (WidgetTester tester) async {
+    expect(_DEFAULT_TEST_LANG, isNot(equals(LangCode.ru)));
+
+    final widget = InitProductPage(
+        Product((v) => v.barcode = '123'));
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    // Select another lang
+    final dropdown = find.byKey(const Key('product_lang'))
+        .evaluate().first.widget as DropdownPlante<LangCode?>;
+    dropdown.onChanged!.call(LangCode.ru);
+    await tester.pumpAndSettle();
+
+    // Verify the input lang is not changed yet
+    expect(inputProductsLangStorage.selectedCode, equals(_DEFAULT_TEST_LANG));
+  });
+
+  testWidgets('cannot save product when lang is deselected', (WidgetTester tester) async {
+    final perfectlyGoodProduct = Product((v) => v
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..categories = ListBuilder<String>(['Nice', 'category'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.community
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community);
+
+    final done = await generalTest(
+      tester,
+      expectedProductResult: null,
+      nameInput: perfectlyGoodProduct.name,
+      brandInput: perfectlyGoodProduct.brands!.join(', '),
+      categoriesInput: perfectlyGoodProduct.categories!.join(', '),
+      takeImageFront: perfectlyGoodProduct.imageFront != null,
+      takeImageIngredients: perfectlyGoodProduct.imageIngredients != null,
+      veganStatusInput: perfectlyGoodProduct.veganStatus,
+      vegetarianStatusInput: perfectlyGoodProduct.vegetarianStatus,
+      selectedLang: null, // The lang will be deselected...
+      selectLangAtStart: false // ...at the end
+    );
+
+    expect(done, isFalse);
+  });
+
+  testWidgets('when started for default reason every input is shown', (WidgetTester tester) async {
+    final product = Product((v) => v.barcode = '123');
+
+    final widget = InitProductPage(product, startReason: InitProductPageStartReason.DEFAULT);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('product_lang')), findsOneWidget);
+    expect(find.byKey(const Key('front_photo_group')), findsOneWidget);
+    expect(find.byKey(const Key('front_photo')), findsOneWidget);
+    expect(find.byKey(const Key('name_group')), findsOneWidget);
+    expect(find.byKey(const Key('brand_group')), findsOneWidget);
+    expect(find.byKey(const Key('categories_group')), findsOneWidget);
+    expect(find.byKey(const Key('shops_group')), findsOneWidget);
+    expect(find.byKey(const Key('ingredients_group')), findsOneWidget);
+    expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
+  });
+
+  testWidgets('when started for veg statuses only veg statuses are shown', (WidgetTester tester) async {
+    final product = Product((v) => v.barcode = '123');
+
+    final widget = InitProductPage(product, startReason: InitProductPageStartReason.HELP_WITH_VEG_STATUSES);
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('product_lang')), findsNothing);
+    expect(find.byKey(const Key('front_photo_group')), findsNothing);
+    expect(find.byKey(const Key('front_photo')), findsNothing);
+    expect(find.byKey(const Key('name_group')), findsNothing);
+    expect(find.byKey(const Key('brand_group')), findsNothing);
+    expect(find.byKey(const Key('categories_group')), findsNothing);
+    expect(find.byKey(const Key('shops_group')), findsNothing);
+    expect(find.byKey(const Key('ingredients_group')), findsNothing);
+    expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
+    expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
   });
 }

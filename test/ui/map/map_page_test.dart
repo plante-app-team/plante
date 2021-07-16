@@ -12,10 +12,10 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
-import 'map_page_modes_test_commons.mocks.dart';
 
 /// NOTE: this file contains tests only for mechanics
 /// common for all map page modes

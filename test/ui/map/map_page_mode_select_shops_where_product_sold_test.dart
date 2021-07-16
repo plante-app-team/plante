@@ -7,11 +7,11 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_mode_select_shops_where_product_sold_test.mocks.dart';
 import 'map_page_modes_test_commons.dart';
-import 'map_page_modes_test_commons.mocks.dart';
 
 /// NOTE: most of the mode tests are performed in
 /// map_page_mode_add_product_test, because both modes have same

@@ -16,7 +16,6 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
 
 class ProductWithOCRIngredients {
   Product product;
@@ -41,33 +40,29 @@ class ProductsManager {
 
   final OffApi _off;
   final Backend _backend;
-  final LangCodeHolder _langCodeHolder;
   final TakenProductsImagesStorage _takenProductsImagesTable;
   final _productsCache = <String, Product>{};
 
-  ProductsManager(this._off, this._backend, this._langCodeHolder,
-      this._takenProductsImagesTable);
+  ProductsManager(this._off, this._backend, this._takenProductsImagesTable);
 
-  Future<Result<Product?, ProductsManagerError>> getProduct(String barcodeRaw,
-      [String? langCode]) async {
+  Future<Result<Product?, ProductsManagerError>> getProduct(
+      String barcodeRaw, String langCode) async {
     return _getProduct(barcodeRaw: barcodeRaw, langCode: langCode);
   }
 
   Future<Result<Product?, ProductsManagerError>> inflate(
-      BackendProduct backendProduct,
-      [String? langCode]) async {
+      BackendProduct backendProduct, String langCode) async {
     return _getProduct(backendProduct: backendProduct, langCode: langCode);
   }
 
   Future<Result<Product?, ProductsManagerError>> _getProduct(
       {String? barcodeRaw,
       BackendProduct? backendProduct,
-      String? langCode}) async {
+      required String langCode}) async {
     if (barcodeRaw == null && backendProduct == null) {
       Log.e('Invalid getProduct implementation');
     }
     barcodeRaw ??= backendProduct!.barcode;
-    langCode ??= _langCodeHolder.langCode;
 
     final configuration = off.ProductQueryConfiguration(barcodeRaw,
         lc: langCode,
@@ -117,7 +112,7 @@ class ProductsManager {
       ..ingredientsText = offProduct.ingredientsTextTranslated
       ..ingredientsAnalyzed.addAll(_extractIngredientsAnalyzed(offProduct))
       ..imageFront = _extractImageUri(
-          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode!)
+          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY, langCode)
       ..imageFrontThumb = _extractImageUri(
           offProduct, off.ImageField.FRONT, off.ImageSize.SMALL, langCode)
       ..imageIngredients = _extractImageUri(offProduct,
@@ -213,15 +208,12 @@ class ProductsManager {
 
   /// Returns updated product if update was successful
   Future<Result<Product, ProductsManagerError>> createUpdateProduct(
-      Product product,
-      [String? langCode]) async {
+      Product product, String langCode) async {
     // Ensure the product is in our cache if it exists in OFF
-    final getResult = await getProduct(product.barcode);
+    final getResult = await getProduct(product.barcode, langCode);
     if (getResult.isErr) {
       return Err(getResult.unwrapErr());
     }
-
-    langCode ??= _langCodeHolder.langCode;
 
     final cachedProduct = _productsCache[product.barcode];
     if (cachedProduct != null) {
@@ -379,10 +371,8 @@ class ProductsManager {
   }
 
   Future<Result<ProductWithOCRIngredients, ProductsManagerError>>
-      updateProductAndExtractIngredients(Product product,
-          [String? langCode]) async {
-    langCode ??= _langCodeHolder.langCode;
-
+      updateProductAndExtractIngredients(
+          Product product, String langCode) async {
     final productUpdateResult = await createUpdateProduct(product, langCode);
     if (productUpdateResult.isErr) {
       return Err(productUpdateResult.unwrapErr());

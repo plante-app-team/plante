@@ -16,7 +16,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/shops_manager_impl.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/lat_lng_extensions.dart';
 import 'package:plante/base/date_time_extensions.dart';
 
@@ -42,8 +42,8 @@ class ShopsManager {
   int get loadedAreasCount => _loadedAreas.length;
 
   ShopsManager(OpenStreetMap openStreetMap, Backend backend,
-      ProductsManager productsManager, this._analytics)
-      : _impl = ShopsManagerImpl(openStreetMap, backend, productsManager);
+      ProductsObtainer productsObtainer, this._analytics)
+      : _impl = ShopsManagerImpl(openStreetMap, backend, productsObtainer);
 
   void addListener(ShopsManagerListener listener) {
     _listeners.add(listener);

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
@@ -16,20 +15,17 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_impl.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 
-import 'shops_manager_impl_test.mocks.dart';
+import '../../common_mocks.mocks.dart';
 
-@GenerateMocks([OpenStreetMap, Backend, ProductsManager, ShopsManagerListener])
 void main() {
   late MockOpenStreetMap _osm;
   late MockBackend _backend;
-  late MockProductsManager _productsManager;
+  late MockProductsObtainer _productsObtainer;
   late ShopsManagerImpl _shopsManager;
 
   final aShop = Shop((e) => e
@@ -45,8 +41,8 @@ void main() {
   setUp(() async {
     _osm = MockOpenStreetMap();
     _backend = MockBackend();
-    _productsManager = MockProductsManager();
-    _shopsManager = ShopsManagerImpl(_osm, _backend, _productsManager);
+    _productsObtainer = MockProductsObtainer();
+    _shopsManager = ShopsManagerImpl(_osm, _backend, _productsObtainer);
   });
 
   test('fetchProductsAtShops good scenario', () async {
@@ -147,9 +143,9 @@ void main() {
       Product((e) => e.barcode = '123'),
       Product((e) => e.barcode = '124'),
     ];
-    when(_productsManager.inflate(backendProducts[0]))
+    when(_productsObtainer.inflate(backendProducts[0]))
         .thenAnswer((_) async => Ok(products[0]));
-    when(_productsManager.inflate(backendProducts[1]))
+    when(_productsObtainer.inflate(backendProducts[1]))
         .thenAnswer((_) async => Ok(products[1]));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);
@@ -213,10 +209,10 @@ void main() {
     final products = [
       Product((e) => e.barcode = '123'),
     ];
-    when(_productsManager.inflate(backendProducts[0]))
+    when(_productsObtainer.inflate(backendProducts[0]))
         .thenAnswer((_) async => Ok(products[0]));
     // An error here!
-    when(_productsManager.inflate(backendProducts[1]))
+    when(_productsObtainer.inflate(backendProducts[1]))
         .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);
@@ -243,9 +239,9 @@ void main() {
         Ok(backendProductsAtShops));
 
     // All error here!
-    when(_productsManager.inflate(backendProducts[0]))
+    when(_productsObtainer.inflate(backendProducts[0]))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
-    when(_productsManager.inflate(backendProducts[1]))
+    when(_productsObtainer.inflate(backendProducts[1]))
         .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);

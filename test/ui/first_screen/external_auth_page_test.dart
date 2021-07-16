@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
@@ -14,11 +13,10 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
-import 'external_auth_page_test.mocks.dart';
 
-@GenerateMocks([GoogleAuthorizer, AppleAuthorizer, Backend])
 void main() {
   late FakeAnalytics analytics;
   late MockGoogleAuthorizer googleAuthorizer;

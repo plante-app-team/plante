@@ -7,8 +7,8 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -32,7 +32,7 @@ class _ViewedProductsHistoryPageState
   final ViewedProductsStorage viewedProductsStorage;
   late final StreamSubscription viewedProductsSubscription;
   final UserParams user;
-  final ProductsManager productsManager;
+  final ProductsObtainer productsObtainer;
 
   bool loading = false;
 
@@ -41,7 +41,7 @@ class _ViewedProductsHistoryPageState
   _ViewedProductsHistoryPageState()
       : viewedProductsStorage = GetIt.I.get<ViewedProductsStorage>(),
         user = GetIt.I.get<UserParamsController>().cachedUserParams!,
-        productsManager = GetIt.I.get<ProductsManager>(),
+        productsObtainer = GetIt.I.get<ProductsObtainer>(),
         super('ViewedProductsHistoryPage');
 
   @override
@@ -113,7 +113,7 @@ class _ViewedProductsHistoryPageState
     });
     try {
       final productUpdatedResult =
-          await productsManager.getProduct(product.barcode);
+          await productsObtainer.getProduct(product.barcode);
       if (productUpdatedResult.isOk) {
         final productUpdated = productUpdatedResult.unwrap();
         if (productUpdated != null) {

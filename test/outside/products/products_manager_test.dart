@@ -6,26 +6,21 @@ import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
-import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:test/test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 
-import 'products_manager_test.mocks.dart';
+import '../../common_mocks.mocks.dart';
 
-@GenerateMocks([OffApi, Backend])
 void main() {
   const selectedImagesJson = '''
     {
@@ -61,8 +56,7 @@ void main() {
     await takenProductsImagesStorage.clearForTesting();
 
     productsManager = ProductsManager(
-        offApi, backend, LangCodeHolder.inited('en'),
-        takenProductsImagesStorage);
+        offApi, backend, takenProductsImagesStorage);
 
     when(offApi.saveProduct(any, any)).thenAnswer((_) async => off.Status());
     when(offApi.getProduct(any)).thenAnswer((_) async =>
@@ -1002,7 +996,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    final productRes = await productsManager.inflate(backendProduct);
+    final productRes = await productsManager.inflate(backendProduct, 'en');
     final product = productRes.unwrap();
 
     final expectedProduct = Product((v) => v

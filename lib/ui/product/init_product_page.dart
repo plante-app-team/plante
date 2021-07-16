@@ -4,8 +4,11 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
@@ -13,6 +16,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
@@ -33,7 +37,13 @@ import 'init_product_page_model.dart';
 typedef DoneCallback = void Function();
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
+enum InitProductPageStartReason {
+  DEFAULT,
+  HELP_WITH_VEG_STATUSES,
+}
+
 class InitProductPage extends StatefulWidget {
+  final InitProductPageStartReason startReason;
   final Product initialProduct;
   final List<Shop> initialShops;
   final String? title;
@@ -45,6 +55,7 @@ class InitProductPage extends StatefulWidget {
 
   InitProductPage(this.initialProduct,
       {Key? key,
+      this.startReason = InitProductPageStartReason.DEFAULT,
       this.initialShops = const [],
       this.title,
       this.productUpdatedCallback,
@@ -88,6 +99,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
       TextEditingController();
   final TextEditingController _ingredientsTextController =
       TextEditingController();
+  final ScrollController _contentScrollController = ScrollController();
 
   _InitProductPageState() : super('InitProductPage');
 
@@ -120,6 +132,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     super.initState();
     _permissionsManager = GetIt.I.get<PermissionsManager>();
     _model = InitProductPageModel(
+        widget.startReason,
         widget.initialProduct,
         onStateUpdated,
         forceUseModelData,
@@ -127,7 +140,8 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         GetIt.I.get<ProductsManager>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<PhotosTaker>(),
-        analytics);
+        analytics,
+        GetIt.I.get<InputProductsLangStorage>());
     _ensureCacheDirExistence();
   }
 
@@ -203,6 +217,30 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
             textAlign: TextAlign.left,
           )),
       const SizedBox(height: 24),
+      if (_model.askForLanguage())
+        Column(children: [
+          SizedBox(
+              width: double.infinity,
+              child: Text(
+                context.strings.init_product_page_lang_title,
+                style: TextStyles.headline4,
+                textAlign: TextAlign.left,
+              )),
+          const SizedBox(height: 16),
+          DropdownPlante<LangCode?>(
+            key: const Key('product_lang'),
+            value: _model.langCode,
+            values: LangCode.valuesForUI(context),
+            onChanged: (value) {
+              _model.langCode = value;
+            },
+            dropdownItemBuilder: (langCode) {
+              return Text(langCode?.localize(context) ?? '-',
+                  style: TextStyles.normal);
+            },
+          ),
+          const SizedBox(height: 12),
+        ]),
       if (_model.askForFrontPhoto())
         Column(key: const Key('front_photo_group'), children: [
           SizedBox(
@@ -367,6 +405,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                 child: Stack(children: [
                   SingleChildScrollView(
                       key: const Key('content'),
+                      controller: _contentScrollController,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -429,8 +468,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                   style: TextStyles.hint),
               const SizedBox(height: 8),
               ButtonFilledPlante.withText(context.strings.global_try_again,
-                  key: const Key('ocr_try_again'),
-                  onPressed: _model.performOcr),
+                  key: const Key('ocr_try_again'), onPressed: _performOcr),
               const SizedBox(height: 12),
               InputFieldMultilinePlante(
                 key: const Key('ingredients_text'),
@@ -466,7 +504,8 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     if (!await _ensureCameraPermissions()) {
       return;
     }
-    _model.takePhoto(imageType, context);
+    final result = await _model.takePhoto(imageType, context);
+    _handlePossibleError(result);
   }
 
   Future<bool> _ensureCameraPermissions() async {
@@ -504,9 +543,26 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     _ingredientsTextController.text = '';
   }
 
+  void _performOcr() async {
+    final result = await _model.performOcr();
+    _handlePossibleError(result);
+  }
+
+  void _handlePossibleError(Result<None, InitProductPageModelError> result) {
+    if (!result.isErr) {
+      return;
+    }
+    if (result.unwrapErr() == InitProductPageModelError.LANG_CODE_MISSING) {
+      _contentScrollController.animateTo(0,
+          duration: DURATION_DEFAULT, curve: Curves.easeIn);
+      showSnackBar(
+          context.strings.init_product_page_please_select_lang, context);
+    }
+  }
+
   void _saveProduct() async {
     Log.i('InitProductPage: _saveProduct start: ${_model.product}');
-    final ok = await _model.saveProduct(context.langCode);
+    final ok = await _model.saveProduct();
     if (ok) {
       Log.i('InitProductPage: _saveProduct success');
       widget.productUpdatedCallback?.call(_model.product);

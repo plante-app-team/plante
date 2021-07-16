@@ -1,22 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
-import 'map_page_model_test.mocks.dart';
+import '../../common_mocks.mocks.dart';
 
-@GenerateMocks([LocationController, ShopsManager, LatestCameraPosStorage,
-  AddressObtainer])
 void main() {
   late MockLocationController locationController;
   late MockShopsManager shopsManager;

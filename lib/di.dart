@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
@@ -18,6 +19,7 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -31,6 +33,8 @@ void initDI() {
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder());
+  GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
+      GetIt.I.get<SharedPreferencesHolder>(), GetIt.I.get<LangCodeHolder>()));
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
       RouteObserver<ModalRoute>());
@@ -62,14 +66,17 @@ void initDI() {
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
       GetIt.I.get<OffApi>(),
       GetIt.I.get<Backend>(),
-      GetIt.I.get<LangCodeHolder>(),
       GetIt.I.get<TakenProductsImagesStorage>()));
+  GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
+    GetIt.I.get<ProductsManager>(),
+    GetIt.I.get<LangCodeHolder>(),
+  ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
       GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<Backend>(),
-      GetIt.I.get<ProductsManager>(),
+      GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>()));
 }

@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
@@ -16,6 +18,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 enum InitProductPageOcrState {
@@ -25,15 +28,22 @@ enum InitProductPageOcrState {
   FAILURE,
 }
 
+enum InitProductPageModelError {
+  LANG_CODE_MISSING,
+  OTHER,
+}
+
 class InitProductPageModel {
   static const OCR_RETRIES_COUNT = 3;
   static const _NO_PHOTO = -1;
-  late final dynamic Function() _onProductUpdate;
-  late final dynamic Function() _forceReloadAllProductData;
+  final InitProductPageStartReason _startReason;
+  final dynamic Function() _onProductUpdate;
+  final dynamic Function() _forceReloadAllProductData;
   final ProductRestorable _initialProductRestorable;
   final ProductRestorable _productRestorable;
   final ShopsListRestorable _shopsRestorable;
   final RestorableInt _photoBeingTaken = RestorableInt(_NO_PHOTO);
+  final RestorableString _langCode = RestorableString('');
 
   InitProductPageOcrState _ocrState = InitProductPageOcrState.NONE;
 
@@ -42,6 +52,7 @@ class InitProductPageModel {
   final ShopsManager _shopsManager;
   final PhotosTaker _photosTaker;
   final Analytics _analytics;
+  final InputProductsLangStorage _inputProductsLangStorage;
   Product get _initialProduct => _initialProductRestorable.value;
 
   InitProductPageOcrState get ocrState => _ocrState;
@@ -78,6 +89,21 @@ class InitProductPageModel {
     _onProductUpdate.call();
   }
 
+  bool _langCodeInited = false;
+  LangCode? get langCode {
+    if (!_langCodeInited) {
+      _langCode.value = _inputProductsLangStorage.selectedCode?.name ?? '';
+      _langCodeInited = true;
+    }
+    return LangCode.safeValueOf(_langCode.value);
+  }
+
+  set langCode(LangCode? value) {
+    _langCodeInited = true;
+    _langCode.value = value?.name ?? '';
+    _onProductUpdate.call();
+  }
+
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties => {
@@ -85,9 +111,11 @@ class InitProductPageModel {
         'product': _productRestorable,
         'shops': _shopsRestorable,
         'photo_being_taken': _photoBeingTaken,
+        'lang_code': _langCode,
       };
 
   InitProductPageModel(
+      this._startReason,
       Product initialProduct,
       this._onProductUpdate,
       this._forceReloadAllProductData,
@@ -95,7 +123,8 @@ class InitProductPageModel {
       this._productsManager,
       this._shopsManager,
       this._photosTaker,
-      this._analytics)
+      this._analytics,
+      this._inputProductsLangStorage)
       : _initialProductRestorable = ProductRestorable(initialProduct),
         _productRestorable = ProductRestorable(initialProduct),
         _shopsRestorable = ShopsListRestorable(_initialShops);
@@ -136,16 +165,20 @@ class InitProductPageModel {
       }
 
       Log.i('InitProductPageModel cropped photo');
-      _onPhotoTaken(imageType, outPath);
+      await _onPhotoTaken(imageType, outPath);
     } finally {
       _photoBeingTaken.value = _NO_PHOTO;
     }
   }
 
-  void takePhoto(ProductImageType imageType, BuildContext context) async {
+  Future<Result<None, InitProductPageModelError>> takePhoto(
+      ProductImageType imageType, BuildContext context) async {
+    if (imageType == ProductImageType.INGREDIENTS && langCode == null) {
+      return Err(InitProductPageModelError.LANG_CODE_MISSING);
+    }
     if (_cacheDir == null) {
       Log.i('InitProductPageModel: takePhoto return because no cache dir');
-      return;
+      return Err(InitProductPageModelError.OTHER);
     }
     _photoBeingTaken.value = imageType.index;
     try {
@@ -153,40 +186,74 @@ class InitProductPageModel {
       final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!);
       if (outPath == null) {
         Log.i('InitProductPageModel: takePhoto, outPath == null');
-        return;
+        // Cancelled
+        return Ok(None());
       }
       Log.i('InitProductPageModel: takePhoto success');
-      _onPhotoTaken(imageType, outPath);
+      return await _onPhotoTaken(imageType, outPath);
     } finally {
       _photoBeingTaken.value = _NO_PHOTO;
     }
   }
 
+  bool askForLanguage() {
+    return enableNewestFeatures() && !_startedForVegStatuses();
+  }
+
+  bool _startedForVegStatuses() {
+    return _startReason == InitProductPageStartReason.HELP_WITH_VEG_STATUSES;
+  }
+
   bool askForFrontPhoto() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return _initialProduct.imageFront == null;
   }
 
   bool askForName() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return _initialProduct.name == null || _initialProduct.name!.trim().isEmpty;
   }
 
   bool askForBrand() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return _initialProduct.brands == null || _initialProduct.brands!.isEmpty;
   }
 
   bool askForCategories() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return _initialProduct.categories == null ||
         _initialProduct.categories!.isEmpty;
   }
 
   bool askForIngredientsData() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return _initialProduct.ingredientsText == null ||
         _initialProduct.ingredientsText!.trim().isEmpty ||
         _initialProduct.imageIngredients == null;
   }
 
   bool askForIngredientsText() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
     return askForIngredientsData() && product.imageIngredients != null;
+  }
+
+  bool askForShops() {
+    if (_startedForVegStatuses()) {
+      return false;
+    }
+    return true;
   }
 
   bool askForVeganStatus() {
@@ -203,10 +270,11 @@ class InitProductPageModel {
   }
 
   bool canSaveProduct() {
-    return ProductPageWrapper.isProductFilledEnoughForDisplay(product);
+    return ProductPageWrapper.isProductFilledEnoughForDisplay(product) &&
+        langCode != null;
   }
 
-  Future<bool> saveProduct(String langCode) async {
+  Future<bool> saveProduct() async {
     Log.i('InitProductPageModel: saveProduct: start');
     loading = true;
     _onProductUpdate.call();
@@ -215,8 +283,8 @@ class InitProductPageModel {
         ..veganStatusSource = VegStatusSource.community
         ..vegetarianStatusSource = VegStatusSource.community);
 
-      final productResult =
-          await _productsManager.createUpdateProduct(savedProduct, langCode);
+      final productResult = await _productsManager.createUpdateProduct(
+          savedProduct, langCode!.name);
       if (productResult.isOk) {
         Log.i('InitProductPageModel: saveProduct: product saved');
         product = productResult.unwrap();
@@ -238,6 +306,7 @@ class InitProductPageModel {
         }
       }
 
+      _inputProductsLangStorage.selectedCode = langCode;
       _analytics
           .sendEvent('product_save_success', {'barcode': product.barcode});
       Log.i('InitProductPageModel: saveProduct: success');
@@ -248,42 +317,45 @@ class InitProductPageModel {
     }
   }
 
-  bool askForShops() {
-    return true;
-  }
-
-  void _onPhotoTaken(ProductImageType imageType, Uri outPath) async {
+  Future<Result<None, InitProductPageModelError>> _onPhotoTaken(
+      ProductImageType imageType, Uri outPath) async {
     product = product.rebuildWithImage(imageType, outPath);
 
     if (imageType != ProductImageType.INGREDIENTS) {
-      return;
+      return Ok(None());
     }
 
-    performOcr();
+    return performOcr();
   }
 
-  void performOcr() async {
+  Future<Result<None, InitProductPageModelError>> performOcr() async {
+    final langCode = this.langCode;
+    if (langCode == null) {
+      return Err(InitProductPageModelError.LANG_CODE_MISSING);
+    }
     try {
       Log.i('InitProductPage: performOcr start');
       _ocrState = InitProductPageOcrState.IN_PROGRESS;
       _onProductUpdate.call();
 
-      final ingredientsText = await _ocrIngredientsImpl();
+      final ingredientsText = await _ocrIngredientsImpl(langCode);
       if (ingredientsText != null) {
         Log.i('InitProductPage: performOcr success: $ingredientsText');
         _ocrState = InitProductPageOcrState.SUCCESS;
         product = product.rebuild((e) => e.ingredientsText = ingredientsText);
         _forceReloadAllProductData.call();
+        return Ok(None());
       } else {
         Log.i('InitProductPage: performOcr fail');
         _ocrState = InitProductPageOcrState.FAILURE;
+        return Err(InitProductPageModelError.OTHER);
       }
     } finally {
       _onProductUpdate.call();
     }
   }
 
-  Future<String?> _ocrIngredientsImpl() async {
+  Future<String?> _ocrIngredientsImpl(LangCode langCode) async {
     final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
         ProductImageType.INGREDIENTS, product.imageIngredients);
 
@@ -296,7 +368,7 @@ class InitProductPageModel {
       try {
         ocrResult = await _productsManager
             .updateProductAndExtractIngredients(
-                initialProductWithIngredientsPhoto)
+                initialProductWithIngredientsPhoto, langCode.name)
             .timeout(const Duration(seconds: 7));
       } on TimeoutException catch (e) {
         Log.w('_ocrIngredientsImpl timeout $attemptsCount', ex: e);

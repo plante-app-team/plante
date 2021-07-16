@@ -1,18 +1,14 @@
 import 'dart:math';
 
 import 'package:geolocator/geolocator.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
-import 'package:plante/location/geolocator_wrapper.dart';
-import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:test/test.dart';
 
+import '../common_mocks.mocks.dart';
 import '../fake_shared_preferences.dart';
-import 'location_controller_test.mocks.dart';
 
-@GenerateMocks([PermissionsManager, GeolocatorWrapper, IpLocationProvider])
 void main() {
   late MockIpLocationProvider ipLocationProvider;
   late MockPermissionsManager permissionsManager;

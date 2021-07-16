@@ -10,17 +10,17 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 
 class ShopsManagerImpl {
   final _recentlyCreatedShops = <String, Shop>{};
   final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _openStreetMap;
   final Backend _backend;
-  final ProductsManager _productsManager;
+  final ProductsObtainer _productsObtainer;
 
-  ShopsManagerImpl(this._openStreetMap, this._backend, this._productsManager);
+  ShopsManagerImpl(this._openStreetMap, this._backend, this._productsObtainer);
 
   void addListener(ShopsManagerListener listener) {
     _listeners.add(listener);
@@ -77,7 +77,7 @@ class ShopsManagerImpl {
     final products = <Product>[];
     ProductsManagerError? lastProductsError;
     for (final backendProduct in backendProductsAtShop.products) {
-      final productResult = await _productsManager.inflate(backendProduct);
+      final productResult = await _productsObtainer.inflate(backendProduct);
       if (productResult.isErr) {
         lastProductsError = productResult.unwrapErr();
         continue;

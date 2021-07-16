@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
@@ -19,12 +18,10 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_shared_preferences.dart';
-import 'map_page_modes_test_commons.mocks.dart';
 
-@GenerateMocks([PermissionsManager, ShopsManager, LocationController,
-  GoogleMapController, LatestCameraPosStorage, AddressObtainer])
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;

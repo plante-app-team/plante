@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
@@ -29,14 +30,13 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
+import '../../fake_input_products_lang_storage.dart';
 import '../../fake_settings.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
-import 'barcode_scan_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend, RouteObserver, PermissionsManager,
-  ViewedProductsStorage, ShopsManager, LocationController, PhotosTaker])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
@@ -69,6 +69,9 @@ void main() {
     GetIt.I.registerSingleton<LocationController>(locationController);
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
+    GetIt.I.registerSingleton<InputProductsLangStorage>(
+        FakeInputProductsLangStorage.fromCode(LangCode.en));
+
     when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
 
     final userParamsController = FakeUserParamsController();

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
@@ -29,14 +30,13 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
+import '../../fake_input_products_lang_storage.dart';
 import '../../fake_shared_preferences.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
-import 'display_product_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend, LocationController, ShopsManager,
-                PhotosTaker, PermissionsManager, AddressObtainer])
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
@@ -65,6 +65,8 @@ void main() {
 
     GetIt.I.registerSingleton<LatestCameraPosStorage>(
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+    GetIt.I.registerSingleton<InputProductsLangStorage>(
+        FakeInputProductsLangStorage.fromCode(LangCode.en));
 
     userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v

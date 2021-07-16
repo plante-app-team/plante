@@ -9,10 +9,10 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
 import 'map_page_modes_test_commons.dart';
-import 'map_page_modes_test_commons.mocks.dart';
 
 void main() {
   late MapPageModesTestCommons commons;

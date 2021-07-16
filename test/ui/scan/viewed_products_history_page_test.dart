@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
@@ -12,18 +11,17 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/lang_code_holder.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
-import 'barcode_scan_page_test.mocks.dart';
 
-@GenerateMocks([ProductsManager, Backend])
 void main() {
-  late MockProductsManager productsManager;
+  late MockProductsObtainer productsObtainer;
   late ViewedProductsStorage viewedProductsStorage;
 
   setUp(() async {
@@ -33,8 +31,8 @@ void main() {
 
     GetIt.I.registerSingleton<LangCodeHolder>(LangCodeHolder.inited('en'));
 
-    productsManager = MockProductsManager();
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
+    productsObtainer = MockProductsObtainer();
+    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
 
     viewedProductsStorage = ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
@@ -111,7 +109,7 @@ void main() {
   });
 
   testWidgets('product click', (WidgetTester tester) async {
-    when(productsManager.getProduct(any, any)).thenAnswer((invc) async =>
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
         Ok(_makeProduct('${invc.positionalArguments[0] as String} updated')));
 
     final p1 = _makeProduct('1');
@@ -121,14 +119,14 @@ void main() {
 
     // Opened product is obtained from the manager
     // and display product page is shown
-    verifyNever(productsManager.getProduct(any));
+    verifyNever(productsObtainer.getProduct(any));
     expect(find.byKey(const Key('display_product_page')), findsNothing);
     expect(find.text('Product 1 updated'), findsNothing);
 
     await tester.tap(find.text('Product 1'));
     await tester.pumpAndSettle();
 
-    verify(productsManager.getProduct(any));
+    verify(productsObtainer.getProduct(any));
     expect(find.byKey(const Key('display_product_page')), findsOneWidget);
     expect(find.text('Product 1 updated'), findsOneWidget);
   });
