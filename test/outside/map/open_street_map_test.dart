@@ -385,7 +385,8 @@ void main() {
       ..neighbourhood = 'Nice neighbourhood'
       ..road = 'Broadway'
       ..cityDistrict = 'Nice district'
-      ..houseNumber = '4')));
+      ..houseNumber = '4'
+      ..countryCode = 'en')));
   });
 
   test('fetchAddress response without address', () async {
@@ -419,7 +420,8 @@ void main() {
        "address":{
           "house_number":"4",
           "road":"Broadway",
-          "city_district":"Nice district"
+          "city_district":"Nice district",
+          "country_code":"en"
        }
     }
     ''';
@@ -432,7 +434,8 @@ void main() {
       ..neighbourhood = null
       ..road = 'Broadway'
       ..cityDistrict = 'Nice district'
-      ..houseNumber = '4')));
+      ..houseNumber = '4'
+      ..countryCode = 'en')));
   });
 
   test('fetchAddress response without road', () async {
@@ -441,7 +444,8 @@ void main() {
        "address":{
           "house_number":"4",
           "city_district":"Nice district",
-          "neighbourhood":"Nice neighbourhood"
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
        }
     }
     ''';
@@ -454,7 +458,8 @@ void main() {
       ..neighbourhood = 'Nice neighbourhood'
       ..road = null
       ..cityDistrict = 'Nice district'
-      ..houseNumber = '4')));
+      ..houseNumber = '4'
+      ..countryCode = 'en')));
   });
 
   test('fetchAddress response without city district', () async {
@@ -463,7 +468,8 @@ void main() {
        "address":{
           "house_number":"4",
           "road":"Broadway",
-          "neighbourhood":"Nice neighbourhood"
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
        }
     }
     ''';
@@ -476,13 +482,39 @@ void main() {
       ..neighbourhood = 'Nice neighbourhood'
       ..road = 'Broadway'
       ..cityDistrict = null
-      ..houseNumber = '4')));
+      ..houseNumber = '4'
+      ..countryCode = 'en')));
   });
 
   test('fetchAddress response without house number', () async {
     const osmResp = '''
     {
        "address":{
+          "road":"Broadway",
+          "city_district":"Nice district",
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
+       }
+    }
+    ''';
+
+    _http.setResponse('.*', osmResp);
+
+    final addressRes = await _osm.fetchAddress(123, 321);
+    final address = addressRes.unwrap();
+    expect(address, equals(OsmAddress((e) => e
+      ..neighbourhood = 'Nice neighbourhood'
+      ..road = 'Broadway'
+      ..cityDistrict = 'Nice district'
+      ..houseNumber = null
+      ..countryCode = 'en')));
+  });
+
+  test('fetchAddress response without country code', () async {
+    const osmResp = '''
+    {
+       "address":{
+          "house_number":"4",
           "road":"Broadway",
           "city_district":"Nice district",
           "neighbourhood":"Nice neighbourhood"
@@ -498,7 +530,8 @@ void main() {
       ..neighbourhood = 'Nice neighbourhood'
       ..road = 'Broadway'
       ..cityDistrict = 'Nice district'
-      ..houseNumber = null)));
+      ..houseNumber = '4'
+      ..countryCode = null)));
   });
 
   test('fetchAddress not 200', () async {
@@ -507,7 +540,8 @@ void main() {
        "address":{
           "road":"Broadway",
           "city_district":"Nice district",
-          "neighbourhood":"Nice neighbourhood"
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
        }
     }
     ''';
@@ -523,7 +557,8 @@ void main() {
        "address":{
           "road":"Broadway",
           "city_district":"Nice district",
-          "neighbourhood":"Nice neighbourhood"
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
        }
     }
     ''';

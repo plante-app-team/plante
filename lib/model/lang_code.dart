@@ -9,6 +9,7 @@ part 'lang_code.g.dart';
 
 class LangCode extends EnumClass {
   static const LangCode ar = _$ar;
+  static const LangCode be = _$be;
   static const LangCode bg = _$bg;
   static const LangCode ca = _$ca;
   static const LangCode cs = _$cs;
@@ -86,6 +87,8 @@ class LangCode extends EnumClass {
     switch (this) {
       case ar:
         return context.strings.lang_ar;
+      case be:
+        return context.strings.lang_be;
       case bg:
         return context.strings.lang_bg;
       case ca:

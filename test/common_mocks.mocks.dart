@@ -34,6 +34,7 @@ import 'package:openfoodfacts/utils/ProductQueryConfigurations.dart' as _i37;
 import 'package:plante/base/base.dart' as _i35;
 import 'package:plante/base/permissions_manager.dart' as _i43;
 import 'package:plante/base/result.dart' as _i2;
+import 'package:plante/lang/sys_lang_code_holder.dart' as _i58;
 import 'package:plante/location/geolocator_wrapper.dart' as _i24;
 import 'package:plante/location/ip_location_provider.dart' as _i32;
 import 'package:plante/location/location_controller.dart' as _i34;
@@ -42,9 +43,9 @@ import 'package:plante/model/shop.dart' as _i13;
 import 'package:plante/model/shop_product_range.dart' as _i56;
 import 'package:plante/model/shop_type.dart' as _i57;
 import 'package:plante/model/user_params.dart' as _i18;
-import 'package:plante/model/user_params_controller.dart' as _i58;
+import 'package:plante/model/user_params_controller.dart' as _i59;
 import 'package:plante/model/veg_status.dart' as _i21;
-import 'package:plante/model/viewed_products_storage.dart' as _i59;
+import 'package:plante/model/viewed_products_storage.dart' as _i60;
 import 'package:plante/outside/backend/backend.dart' as _i17;
 import 'package:plante/outside/backend/backend_error.dart' as _i19;
 import 'package:plante/outside/backend/backend_product.dart' as _i20;
@@ -781,21 +782,43 @@ class MockShopsManagerListener extends _i1.Mock
           returnValueForMissingStub: null);
 }
 
+/// A class which mocks [SysLangCodeHolder].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSysLangCodeHolder extends _i1.Mock implements _i58.SysLangCodeHolder {
+  MockSysLangCodeHolder() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  String get langCode =>
+      (super.noSuchMethod(Invocation.getter(#langCode), returnValue: '')
+          as String);
+  @override
+  set langCode(String? value) =>
+      super.noSuchMethod(Invocation.setter(#langCode, value),
+          returnValueForMissingStub: null);
+  @override
+  void callWhenInited(_i35.ArgCallback<String>? callback) =>
+      super.noSuchMethod(Invocation.method(#callWhenInited, [callback]),
+          returnValueForMissingStub: null);
+}
+
 /// A class which mocks [UserParamsController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserParamsController extends _i1.Mock
-    implements _i58.UserParamsController {
+    implements _i59.UserParamsController {
   MockUserParamsController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i58.UserParamsControllerObserver? observer) =>
+  void addObserver(_i59.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i58.UserParamsControllerObserver? observer) =>
+  void removeObserver(_i59.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
@@ -814,7 +837,7 @@ class MockUserParamsController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockViewedProductsStorage extends _i1.Mock
-    implements _i59.ViewedProductsStorage {
+    implements _i60.ViewedProductsStorage {
   MockViewedProductsStorage() {
     _i1.throwOnMissingStub(this);
   }

@@ -155,12 +155,14 @@ class OpenStreetMap {
     final neighbourhood = json['address']['neighbourhood']?.toString();
     final road = json['address']['road']?.toString();
     final houseNumber = json['address']['house_number']?.toString();
+    final countryCode = json['address']['country_code']?.toString();
 
     final result = OsmAddress((e) => e
       ..cityDistrict = district
       ..neighbourhood = neighbourhood
       ..road = road
-      ..houseNumber = houseNumber);
+      ..houseNumber = houseNumber
+      ..countryCode = countryCode);
     return Ok(result);
   }
 }

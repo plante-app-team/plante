@@ -2,9 +2,8 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 
-const INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';
-
 class InputProductsLangStorage {
+  static const PREF_INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';
   final SharedPreferencesHolder _prefsHolder;
   final SysLangCodeHolder _langCodeHolder;
   LangCode? _langCode;
@@ -15,7 +14,7 @@ class InputProductsLangStorage {
 
   void _initAsync() async {
     final prefs = await _prefsHolder.get();
-    final strVal = prefs.getString(INPUT_PRODUCTS_LANG_CODE);
+    final strVal = prefs.getString(PREF_INPUT_PRODUCTS_LANG_CODE);
     if (strVal != null) {
       _langCode = LangCode.safeValueOf(strVal);
     } else {
@@ -34,9 +33,9 @@ class InputProductsLangStorage {
   void _setPref(LangCode? value) async {
     final prefs = await _prefsHolder.get();
     if (value != null) {
-      await prefs.setString(INPUT_PRODUCTS_LANG_CODE, value.name);
+      await prefs.setString(PREF_INPUT_PRODUCTS_LANG_CODE, value.name);
     } else {
-      await prefs.remove(INPUT_PRODUCTS_LANG_CODE);
+      await prefs.remove(PREF_INPUT_PRODUCTS_LANG_CODE);
     }
   }
 }

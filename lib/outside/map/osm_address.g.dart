@@ -47,6 +47,13 @@ class _$OsmAddressSerializer implements StructuredSerializer<OsmAddress> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.countryCode;
+    if (value != null) {
+      result
+        ..add('countryCode')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -77,6 +84,10 @@ class _$OsmAddressSerializer implements StructuredSerializer<OsmAddress> {
           result.cityDistrict = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'countryCode':
+          result.countryCode = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
       }
     }
 
@@ -93,12 +104,18 @@ class _$OsmAddress extends OsmAddress {
   final String? neighbourhood;
   @override
   final String? cityDistrict;
+  @override
+  final String? countryCode;
 
   factory _$OsmAddress([void Function(OsmAddressBuilder)? updates]) =>
       (new OsmAddressBuilder()..update(updates)).build();
 
   _$OsmAddress._(
-      {this.houseNumber, this.road, this.neighbourhood, this.cityDistrict})
+      {this.houseNumber,
+      this.road,
+      this.neighbourhood,
+      this.cityDistrict,
+      this.countryCode})
       : super._();
 
   @override
@@ -115,15 +132,18 @@ class _$OsmAddress extends OsmAddress {
         houseNumber == other.houseNumber &&
         road == other.road &&
         neighbourhood == other.neighbourhood &&
-        cityDistrict == other.cityDistrict;
+        cityDistrict == other.cityDistrict &&
+        countryCode == other.countryCode;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc(0, houseNumber.hashCode), road.hashCode),
-            neighbourhood.hashCode),
-        cityDistrict.hashCode));
+        $jc(
+            $jc($jc($jc(0, houseNumber.hashCode), road.hashCode),
+                neighbourhood.hashCode),
+            cityDistrict.hashCode),
+        countryCode.hashCode));
   }
 
   @override
@@ -132,7 +152,8 @@ class _$OsmAddress extends OsmAddress {
           ..add('houseNumber', houseNumber)
           ..add('road', road)
           ..add('neighbourhood', neighbourhood)
-          ..add('cityDistrict', cityDistrict))
+          ..add('cityDistrict', cityDistrict)
+          ..add('countryCode', countryCode))
         .toString();
   }
 }
@@ -157,6 +178,10 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
   String? get cityDistrict => _$this._cityDistrict;
   set cityDistrict(String? cityDistrict) => _$this._cityDistrict = cityDistrict;
 
+  String? _countryCode;
+  String? get countryCode => _$this._countryCode;
+  set countryCode(String? countryCode) => _$this._countryCode = countryCode;
+
   OsmAddressBuilder();
 
   OsmAddressBuilder get _$this {
@@ -166,6 +191,7 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
       _road = $v.road;
       _neighbourhood = $v.neighbourhood;
       _cityDistrict = $v.cityDistrict;
+      _countryCode = $v.countryCode;
       _$v = null;
     }
     return this;
@@ -189,10 +215,11 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
             houseNumber: houseNumber,
             road: road,
             neighbourhood: neighbourhood,
-            cityDistrict: cityDistrict);
+            cityDistrict: cityDistrict,
+            countryCode: countryCode);
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

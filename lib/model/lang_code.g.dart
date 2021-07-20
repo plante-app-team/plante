@@ -7,6 +7,7 @@ part of 'lang_code.dart';
 // **************************************************************************
 
 const LangCode _$ar = const LangCode._('ar');
+const LangCode _$be = const LangCode._('be');
 const LangCode _$bg = const LangCode._('bg');
 const LangCode _$ca = const LangCode._('ca');
 const LangCode _$cs = const LangCode._('cs');
@@ -48,6 +49,8 @@ LangCode _$valueOf(String name) {
   switch (name) {
     case 'ar':
       return _$ar;
+    case 'be':
+      return _$be;
     case 'bg':
       return _$bg;
     case 'ca':
@@ -127,6 +130,7 @@ LangCode _$valueOf(String name) {
 
 final BuiltSet<LangCode> _$values = new BuiltSet<LangCode>(const <LangCode>[
   _$ar,
+  _$be,
   _$bg,
   _$ca,
   _$cs,
@@ -184,4 +188,4 @@ class _$LangCodeSerializer implements PrimitiveSerializer<LangCode> {
       LangCode.valueOf(serialized as String);
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

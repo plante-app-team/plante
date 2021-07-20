@@ -14,7 +14,7 @@ void main() {
   });
 
   test('initial lang in prefs', () async {
-    await prefs.setString(INPUT_PRODUCTS_LANG_CODE, LangCode.ru.name);
+    await prefs.setString(InputProductsLangStorage.PREF_INPUT_PRODUCTS_LANG_CODE, LangCode.ru.name);
     inputProductsLangStorage = InputProductsLangStorage(
         prefs.asHolder(),
         SysLangCodeHolder.inited('en'));

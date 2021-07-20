@@ -11,6 +11,7 @@ abstract class OsmAddress implements Built<OsmAddress, OsmAddressBuilder> {
   String? get road;
   String? get neighbourhood;
   String? get cityDistrict;
+  String? get countryCode;
 
   static OsmAddress? fromJson(Map<String, dynamic> json) {
     return BuildValueHelper.jsonSerializers

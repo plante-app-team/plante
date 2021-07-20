@@ -2,7 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
@@ -36,6 +38,8 @@ void initDI() {
   GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
       GetIt.I.get<SharedPreferencesHolder>(),
       GetIt.I.get<SysLangCodeHolder>()));
+  GetIt.I.registerSingleton<CountriesLangCodesTable>(
+      CountriesLangCodesTable(GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
   GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
       RouteObserver<ModalRoute>());
@@ -51,6 +55,12 @@ void initDI() {
       OpenStreetMap(GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<AddressObtainer>(
       AddressObtainer(GetIt.I.get<OpenStreetMap>()));
+  GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
+      GetIt.I.get<SysLangCodeHolder>(),
+      GetIt.I.get<CountriesLangCodesTable>(),
+      GetIt.I.get<LocationController>(),
+      GetIt.I.get<OpenStreetMap>(),
+      GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());

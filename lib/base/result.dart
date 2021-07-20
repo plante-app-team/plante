@@ -43,6 +43,9 @@ class Ok<OK, ERR> extends Result<OK, ERR> {
 
   @override
   int get hashCode => _value.hashCode;
+
+  @override
+  String toString() => _value.toString();
 }
 
 @immutable
@@ -56,6 +59,9 @@ class Err<OK, ERR> extends Result<OK, ERR> {
 
   @override
   int get hashCode => _value.hashCode;
+
+  @override
+  String toString() => _value.toString();
 }
 
 class None {}
