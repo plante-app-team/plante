@@ -87,7 +87,8 @@ class UserLangsManager {
 
     userLangs = UserLangs((e) => e
       ..auto = true
-      ..codes.addAll(langs));
+      ..sysLang = sysLangCode ?? LangCode.en
+      ..langs.addAll(langs));
     // Async check
     if (await _storage.userLangs() != null) {
       // Already inited by external code
@@ -102,11 +103,10 @@ class UserLangsManager {
 
     var userLangs = await _storage.userLangs();
     if (userLangs != null) {
-      if (sysLangCode != null) {
-        final codes = userLangs.codes.toList();
-        codes.remove(sysLangCode);
+      if (sysLangCode != null && !userLangs.langs.contains(sysLangCode)) {
+        final codes = userLangs.langs.toList();
         codes.insert(0, sysLangCode);
-        userLangs = userLangs.rebuild((e) => e.codes.replace(codes));
+        userLangs = userLangs.rebuild((e) => e.langs.replace(codes));
       }
       return userLangs;
     }
@@ -122,13 +122,17 @@ class UserLangsManager {
       code = LangCode.en;
     }
     return UserLangs((e) => e
-      ..codes.add(code)
+      ..langs.add(code)
+      ..sysLang = code
       ..auto = true);
   }
 
-  Future<void> setManualUserLangs(Set<LangCode> userLangs) async {
+  Future<void> setManualUserLangs(List<LangCode> userLangs) async {
+    final sysLangCode =
+        LangCode.safeValueOf(_sysLangCodeHolder.langCode) ?? LangCode.en;
     await _storage.setUserLangs(UserLangs((e) => e
       ..auto = false
-      ..codes.addAll(userLangs)));
+      ..langs.addAll(userLangs)
+      ..sysLang = sysLangCode));
   }
 }

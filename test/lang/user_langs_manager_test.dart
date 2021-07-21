@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:mockito/annotations.dart';
@@ -71,7 +70,8 @@ void main() {
 
   test('init with existing user langs', () async {
     final existingLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = false);
     when(storage.userLangs()).thenAnswer((_) async => existingLangs);
 
@@ -93,7 +93,8 @@ void main() {
     );
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en, LangCode.nl, LangCode.fr, LangCode.de])
+      ..langs.addAll([LangCode.en, LangCode.nl, LangCode.fr, LangCode.de])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verify(storage.setUserLangs(expectedUserLangs));
@@ -107,7 +108,8 @@ void main() {
     );
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verifyNever(storage.setUserLangs(any));
@@ -121,7 +123,8 @@ void main() {
     );
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verifyNever(storage.setUserLangs(any));
@@ -135,7 +138,8 @@ void main() {
     );
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verifyNever(storage.setUserLangs(any));
@@ -149,7 +153,8 @@ void main() {
     );
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verifyNever(storage.setUserLangs(any));
@@ -162,8 +167,10 @@ void main() {
       sysLangCode: 'invalid_sys_lang',
     );
 
+    // Expected system language is still English because it's the default.
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.nl, LangCode.fr, LangCode.de])
+      ..langs.addAll([LangCode.nl, LangCode.fr, LangCode.de])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verify(storage.setUserLangs(expectedUserLangs));
@@ -173,42 +180,42 @@ void main() {
     await finishSetUp(
       lastPos: const Point<double>(1, 2),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
+      sysLangCode: 'ru',
+    );
+
+    clearInteractions(storage);
+
+    await userLangsManager.setManualUserLangs([LangCode.ru, LangCode.be]);
+
+    final expectedStoredUserLangs = UserLangs((e) => e
+      ..langs.addAll([LangCode.ru, LangCode.be])
+      ..sysLang = LangCode.ru
+      ..auto = false);
+    verify(storage.setUserLangs(expectedStoredUserLangs));
+
+    final expectedUserLangs = UserLangs((e) => e
+      ..langs.addAll([LangCode.ru, LangCode.be])
+      ..sysLang = LangCode.ru
+      ..auto = false);
+    expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
+  });
+
+  test('system language cannot be deselected', () async {
+    await finishSetUp(
+      lastPos: const Point<double>(1, 2),
+      addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
       sysLangCode: 'en',
     );
 
     clearInteractions(storage);
 
-    await userLangsManager.setManualUserLangs({LangCode.ru, LangCode.be});
-
-    final expectedStoredUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.ru, LangCode.be])
-      ..auto = false);
-    verify(storage.setUserLangs(expectedStoredUserLangs));
+    await userLangsManager.setManualUserLangs([LangCode.ru]);
 
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en, LangCode.ru, LangCode.be])
+      ..langs.addAll([LangCode.en, LangCode.ru])
+      ..sysLang = LangCode.en
       ..auto = false);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
-  });
-
-  test('system lang is always of highest priority even when storage has it last', () async {
-    final existingLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.ru, LangCode.en])
-      ..auto = false);
-    when(storage.userLangs()).thenAnswer((_) async => existingLangs);
-
-    await finishSetUp(
-      lastPos: null,
-      addressResp: () => Err(OpenStreetMapError.OTHER),
-      sysLangCode: 'en',
-    );
-
-    final expectedLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en, LangCode.ru])
-      ..auto = false);
-
-    expect(expectedLangs, equals(isNot(existingLangs)));
-    expect(await userLangsManager.getUserLangs(), equals(expectedLangs));
   });
 
   test('getUserLangs behavior when init was unsuccessful and no system lang available', () async {
@@ -220,7 +227,8 @@ void main() {
 
     // EN is the default language used when everything else went wrong
     final expectedUserLangs = UserLangs((e) => e
-      ..codes.addAll([LangCode.en])
+      ..langs.addAll([LangCode.en])
+      ..sysLang = LangCode.en
       ..auto = true);
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
     verifyNever(storage.setUserLangs(expectedUserLangs));

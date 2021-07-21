@@ -18,7 +18,8 @@ void main() {
   test('load with good user langs', () async {
     final langs = UserLangs((e) => e
       ..auto = false
-      ..codes.addAll([LangCode.be, LangCode.en]));
+      ..sysLang = LangCode.en
+      ..langs.addAll([LangCode.be, LangCode.en]));
     await prefs.setString(
         UserLangsStorage.PREF_USER_LANGS,
         jsonEncode(langs.toJson()));
@@ -74,7 +75,8 @@ void main() {
     expect(prefs.getKeys(), equals(<String>{}));
     final langs = UserLangs((e) => e
       ..auto = false
-      ..codes.addAll([LangCode.be, LangCode.en]));
+      ..sysLang = LangCode.en
+      ..langs.addAll([LangCode.be, LangCode.en]));
     await userLangsStorage.setUserLangs(langs);
     expect(prefs.getKeys(), equals({UserLangsStorage.PREF_USER_LANGS}));
 

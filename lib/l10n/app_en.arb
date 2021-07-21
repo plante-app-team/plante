@@ -173,6 +173,7 @@
       "settings_page_title": "Settings",
       "settings_page_your_id": "Your ID: ",
       "settings_page_general": "General",
+      "settings_page_langs_i_know": "Languages I know",
       "settings_page_send_logs": "Send logs",
       "settings_page_erase_user_data": "Clear user data and exit",
       "settings_page_developer_options": "Developer options",
@@ -252,5 +253,7 @@
       "shop_card_open_shop_products": "Open products list",
       "shop_card_add_product": "Add a product",
 
-      "shop_address_widget_possible_address": "Approximate address: "
+      "shop_address_widget_possible_address": "Approximate address: ",
+
+      "user_langs_widget_system_lang": "System language"
 }

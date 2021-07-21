@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/location/location_controller.dart';
@@ -42,6 +43,7 @@ import 'package:plante/ui/photos_taker.dart';
   ShopsManager,
   ShopsManagerListener,
   SysLangCodeHolder,
+  UserLangsManager,
   UserParamsController,
   ViewedProductsStorage,
 ])

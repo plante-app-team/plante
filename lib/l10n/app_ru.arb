@@ -171,6 +171,7 @@
     "settings_page_title": "Настройки",
     "settings_page_your_id": "Ваш ID: ",
     "settings_page_general": "Общее",
+    "settings_page_langs_i_know": "Языки, которые я знаю",
     "settings_page_send_logs": "Отправить логи",
     "settings_page_erase_user_data": "Очистить данные и выйти",
     "settings_page_developer_options": "Опции разработчиков",
@@ -250,5 +251,7 @@
     "shop_card_open_shop_products": "Открыть список продуктов",
     "shop_card_add_product": "Добавить продукт",
 
-    "shop_address_widget_possible_address": "Примерный адрес: "
+    "shop_address_widget_possible_address": "Примерный адрес: ",
+
+    "user_langs_widget_system_lang": "Системный язык"
 }

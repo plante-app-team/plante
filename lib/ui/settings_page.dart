@@ -20,6 +20,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -109,6 +110,20 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                     child: Text(context.strings.settings_page_general,
                         style: TextStyles.headline3)),
                 const SizedBox(height: 12),
+                if (enableNewestFeatures())
+                  Column(children: [
+                    SizedBox(
+                        width: double.infinity,
+                        child: ButtonFilledPlante.withText(
+                            context.strings.settings_page_langs_i_know,
+                            onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const UserLangsPage()));
+                        })),
+                    const SizedBox(height: 12),
+                  ]),
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
@@ -131,9 +146,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                         final paramsController =
                             GetIt.I.get<UserParamsController>();
                         final params = await paramsController.getUserParams();
-                        final newParams = params!
-                            .rebuild((e) => e..name = '😁' // s for "too short"
-                                );
+                        final newParams = params!.rebuild((e) => e.name = '😁');
                         await paramsController.setUserParams(newParams);
 
                         final backend = GetIt.I.get<Backend>();

@@ -18,10 +18,13 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
   Iterable<Object?> serialize(Serializers serializers, UserLangs object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'codes',
-      serializers.serialize(object.codes,
+      'langs',
+      serializers.serialize(object.langs,
           specifiedType:
               const FullType(BuiltList, const [const FullType(LangCode)])),
+      'sysLang',
+      serializers.serialize(object.sysLang,
+          specifiedType: const FullType(LangCode)),
       'auto',
       serializers.serialize(object.auto, specifiedType: const FullType(bool)),
     ];
@@ -40,11 +43,15 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'codes':
-          result.codes.replace(serializers.deserialize(value,
+        case 'langs':
+          result.langs.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(LangCode)]))!
               as BuiltList<Object?>);
+          break;
+        case 'sysLang':
+          result.sysLang = serializers.deserialize(value,
+              specifiedType: const FullType(LangCode)) as LangCode;
           break;
         case 'auto':
           result.auto = serializers.deserialize(value,
@@ -59,15 +66,20 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
 
 class _$UserLangs extends UserLangs {
   @override
-  final BuiltList<LangCode> codes;
+  final BuiltList<LangCode> langs;
+  @override
+  final LangCode sysLang;
   @override
   final bool auto;
 
   factory _$UserLangs([void Function(UserLangsBuilder)? updates]) =>
       (new UserLangsBuilder()..update(updates)).build();
 
-  _$UserLangs._({required this.codes, required this.auto}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(codes, 'UserLangs', 'codes');
+  _$UserLangs._(
+      {required this.langs, required this.sysLang, required this.auto})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(langs, 'UserLangs', 'langs');
+    BuiltValueNullFieldError.checkNotNull(sysLang, 'UserLangs', 'sysLang');
     BuiltValueNullFieldError.checkNotNull(auto, 'UserLangs', 'auto');
   }
 
@@ -81,18 +93,23 @@ class _$UserLangs extends UserLangs {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is UserLangs && codes == other.codes && auto == other.auto;
+    return other is UserLangs &&
+        langs == other.langs &&
+        sysLang == other.sysLang &&
+        auto == other.auto;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, codes.hashCode), auto.hashCode));
+    return $jf(
+        $jc($jc($jc(0, langs.hashCode), sysLang.hashCode), auto.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('UserLangs')
-          ..add('codes', codes)
+          ..add('langs', langs)
+          ..add('sysLang', sysLang)
           ..add('auto', auto))
         .toString();
   }
@@ -101,10 +118,14 @@ class _$UserLangs extends UserLangs {
 class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
   _$UserLangs? _$v;
 
-  ListBuilder<LangCode>? _codes;
-  ListBuilder<LangCode> get codes =>
-      _$this._codes ??= new ListBuilder<LangCode>();
-  set codes(ListBuilder<LangCode>? codes) => _$this._codes = codes;
+  ListBuilder<LangCode>? _langs;
+  ListBuilder<LangCode> get langs =>
+      _$this._langs ??= new ListBuilder<LangCode>();
+  set langs(ListBuilder<LangCode>? langs) => _$this._langs = langs;
+
+  LangCode? _sysLang;
+  LangCode? get sysLang => _$this._sysLang;
+  set sysLang(LangCode? sysLang) => _$this._sysLang = sysLang;
 
   bool? _auto;
   bool? get auto => _$this._auto;
@@ -115,7 +136,8 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
   UserLangsBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _codes = $v.codes.toBuilder();
+      _langs = $v.langs.toBuilder();
+      _sysLang = $v.sysLang;
       _auto = $v.auto;
       _$v = null;
     }
@@ -139,14 +161,16 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
     try {
       _$result = _$v ??
           new _$UserLangs._(
-              codes: codes.build(),
+              langs: langs.build(),
+              sysLang: BuiltValueNullFieldError.checkNotNull(
+                  sysLang, 'UserLangs', 'sysLang'),
               auto: BuiltValueNullFieldError.checkNotNull(
                   auto, 'UserLangs', 'auto'));
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'codes';
-        codes.build();
+        _$failedField = 'langs';
+        langs.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'UserLangs', _$failedField, e.toString());

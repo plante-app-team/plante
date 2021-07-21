@@ -7,7 +7,8 @@ import 'package:plante/model/lang_code.dart';
 part 'user_langs.g.dart';
 
 abstract class UserLangs implements Built<UserLangs, UserLangsBuilder> {
-  BuiltList<LangCode> get codes;
+  BuiltList<LangCode> get langs;
+  LangCode get sysLang;
   bool get auto;
 
   static UserLangs? fromJson(Map<String, dynamic> json) {

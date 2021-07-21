@@ -74,12 +74,18 @@ class LangCode extends EnumClass {
     return result;
   }
 
-  static List<LangCode?> valuesForUI(BuildContext context) {
+  static List<LangCode?> valuesWithNullForUI(BuildContext context) {
     final result = <LangCode?>[];
+    result.addAll(valuesForUI(context));
+    result.insert(0, null);
+    return result;
+  }
+
+  static List<LangCode> valuesForUI(BuildContext context) {
+    final result = <LangCode>[];
     result.addAll(values);
     result.sort(
-        (lhs, rhs) => lhs!.localize(context).compareTo(rhs!.localize(context)));
-    result.insert(0, null);
+        (lhs, rhs) => lhs.localize(context).compareTo(rhs.localize(context)));
     return result;
   }
 

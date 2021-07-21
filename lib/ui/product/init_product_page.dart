@@ -230,7 +230,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
           DropdownPlante<LangCode?>(
             key: const Key('product_lang'),
             value: _model.langCode,
-            values: LangCode.valuesForUI(context),
+            values: LangCode.valuesWithNullForUI(context),
             onChanged: (value) {
               _model.langCode = value;
             },
