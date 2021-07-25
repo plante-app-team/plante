@@ -55,7 +55,7 @@ void main() {
 
     productsManager = MockProductsManager();
     when(productsManager.createUpdateProduct(any)).thenAnswer(
-            (invoc) async => Ok(invoc.positionalArguments[0] as Product));
+        (invoc) async => Ok(invoc.positionalArguments[0] as Product));
     when(productsManager.updateProductAndExtractIngredients(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
@@ -80,7 +80,8 @@ void main() {
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
 
-    viewedProductsStorage = ViewedProductsStorage(loadPersistentProducts: false);
+    viewedProductsStorage =
+        ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
     locationController = MockLocationController();
@@ -93,7 +94,8 @@ void main() {
 
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
+    when(photosTaker.retrieveLostPhoto())
+        .thenAnswer((realInvocation) async => null);
 
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
 
@@ -145,34 +147,38 @@ void main() {
     expect(find.text(product.name!), findsOneWidget);
     expect(find.text(product.ingredientsText!), findsWidgets);
 
-    expect(
-        find.text(context.strings.veg_status_displayed_not_vegan),
+    expect(find.text(context.strings.veg_status_displayed_not_vegan),
         findsOneWidget);
     expect(
-        find.text(context.strings.veg_status_displayed_veg_status_source_moderator),
+        find.text(
+            context.strings.veg_status_displayed_veg_status_source_moderator),
         findsOneWidget);
 
-    final ingredientsAnalysisTable =
-    find.byKey(const Key('ingredients_analysis_table')).evaluate().first.widget as Table;
+    final ingredientsAnalysisTable = find
+        .byKey(const Key('ingredients_analysis_table'))
+        .evaluate()
+        .first
+        .widget as Table;
     // 2 + header
     expect(ingredientsAnalysisTable.children.length, equals(3));
 
     final row1 = ingredientsAnalysisTable.children[1];
-    expect(ingredientsTableColumn(row1, 1), equals(
-        'ingredient1'
-    ));
-    expect(ingredientsTableColumn(row1, 2), equals(context.strings.display_product_page_table_positive));
-    expect(ingredientsTableColumn(row1, 3), equals(context.strings.display_product_page_table_unknown));
+    expect(ingredientsTableColumn(row1, 1), equals('ingredient1'));
+    expect(ingredientsTableColumn(row1, 2),
+        equals(context.strings.display_product_page_table_positive));
+    expect(ingredientsTableColumn(row1, 3),
+        equals(context.strings.display_product_page_table_unknown));
 
     final row2 = ingredientsAnalysisTable.children[2];
-    expect(ingredientsTableColumn(row2, 1), equals(
-        'ingredient2'
-    ));
-    expect(ingredientsTableColumn(row2, 2), equals(context.strings.display_product_page_table_unknown));
-    expect(ingredientsTableColumn(row2, 3), equals(context.strings.display_product_page_table_unknown));
+    expect(ingredientsTableColumn(row2, 1), equals('ingredient2'));
+    expect(ingredientsTableColumn(row2, 2),
+        equals(context.strings.display_product_page_table_unknown));
+    expect(ingredientsTableColumn(row2, 3),
+        equals(context.strings.display_product_page_table_unknown));
   });
 
-  testWidgets('same product for vegan and vegetarian', (WidgetTester tester) async {
+  testWidgets('same product for vegan and vegetarian',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -190,15 +196,17 @@ void main() {
       ..eatsMilk = false
       ..eatsHoney = false);
     await userParamsController.setUserParams(vegan);
-    var context = await tester.superPump(DisplayProductPage(product, key: const Key('page1')));
-    expect(
-        find.text(context.strings.veg_status_displayed_not_vegan),
+    var context = await tester
+        .superPump(DisplayProductPage(product, key: const Key('page1')));
+    expect(find.text(context.strings.veg_status_displayed_not_vegan),
         findsOneWidget);
     expect(
-        find.text(context.strings.veg_status_displayed_veg_status_source_community),
+        find.text(
+            context.strings.veg_status_displayed_veg_status_source_community),
         findsOneWidget);
     expect(
-        find.text(context.strings.veg_status_displayed_vegetarian_status_unknown),
+        find.text(
+            context.strings.veg_status_displayed_vegetarian_status_unknown),
         findsNothing);
     expect(
         find.text(context.strings.veg_status_displayed_veg_status_source_off),
@@ -206,22 +214,25 @@ void main() {
 
     final vegetarian = vegan.rebuild((v) => v.eatsMilk = true);
     await userParamsController.setUserParams(vegetarian);
-    context = await tester.superPump(DisplayProductPage(product, key: const Key('page2')));
-    expect(
-        find.text(context.strings.veg_status_displayed_not_vegan),
+    context = await tester
+        .superPump(DisplayProductPage(product, key: const Key('page2')));
+    expect(find.text(context.strings.veg_status_displayed_not_vegan),
         findsNothing);
     expect(
-        find.text(context.strings.veg_status_displayed_veg_status_source_community),
+        find.text(
+            context.strings.veg_status_displayed_veg_status_source_community),
         findsNothing);
     expect(
-        find.text(context.strings.veg_status_displayed_vegetarian_status_unknown),
+        find.text(
+            context.strings.veg_status_displayed_vegetarian_status_unknown),
         findsOneWidget);
     expect(
         find.text(context.strings.veg_status_displayed_veg_status_source_off),
         findsOneWidget);
   });
 
-  testWidgets('veg-statuses help button not displayed when sources are not OFF', (WidgetTester tester) async {
+  testWidgets('veg-statuses help button not displayed when sources are not OFF',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -238,7 +249,8 @@ void main() {
         findsNothing);
   });
 
-  testWidgets('veg-statuses help button behaviour', (WidgetTester tester) async {
+  testWidgets('veg-statuses help button behaviour',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -253,8 +265,7 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     // Initial status is from OFF
-    expect(
-        find.text(context.strings.veg_status_displayed_not_vegan),
+    expect(find.text(context.strings.veg_status_displayed_not_vegan),
         findsOneWidget);
     expect(
         find.text(context.strings.veg_status_displayed_veg_status_source_off),
@@ -262,19 +273,16 @@ void main() {
 
     // Help button initially exists and init_product_page doesn't
     expect(
-      find.text(context.strings.display_product_page_click_to_help_with_veg_statuses),
-      findsOneWidget);
-    expect(
-        find.byKey(const Key('init_product_page')),
-        findsNothing);
+        find.text(context
+            .strings.display_product_page_click_to_help_with_veg_statuses),
+        findsOneWidget);
+    expect(find.byKey(const Key('init_product_page')), findsNothing);
 
-    await tester.tap(
-        find.text(context.strings.display_product_page_click_to_help_with_veg_statuses));
+    await tester.tap(find.text(
+        context.strings.display_product_page_click_to_help_with_veg_statuses));
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(const Key('init_product_page')),
-        findsWidgets);
+    expect(find.byKey(const Key('init_product_page')), findsWidgets);
 
     await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
     await tester.pumpAndSettle();
@@ -283,19 +291,17 @@ void main() {
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(const Key('init_product_page')),
-        findsNothing);
+    expect(find.byKey(const Key('init_product_page')), findsNothing);
     expect(
         find.text(context.strings.display_product_page_help_with_veg_statuses),
         findsNothing);
 
     // Final veg status is changed and is from community
-    expect(
-        find.text(context.strings.veg_status_displayed_vegan_status_unknown),
+    expect(find.text(context.strings.veg_status_displayed_vegan_status_unknown),
         findsOneWidget);
     expect(
-        find.text(context.strings.veg_status_displayed_veg_status_source_community),
+        find.text(
+            context.strings.veg_status_displayed_veg_status_source_community),
         findsOneWidget);
   });
 
@@ -313,12 +319,14 @@ void main() {
 
     await tester.tap(find.byKey(const Key('options_button')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.display_product_page_report_btn));
+    await tester
+        .tap(find.text(context.strings.display_product_page_report_btn));
     await tester.pumpAndSettle();
 
     verifyNever(backend.sendReport('123', 'Bad, bad product!'));
 
-    await tester.enterText(find.byKey(const Key('report_text')), 'Bad, bad product!');
+    await tester.enterText(
+        find.byKey(const Key('report_text')), 'Bad, bad product!');
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.product_report_dialog_send));
     await tester.pumpAndSettle();
@@ -326,7 +334,8 @@ void main() {
     verify(backend.sendReport('123', 'Bad, bad product!')).called(1);
   });
 
-  testWidgets('viewed product is stored persistently', (WidgetTester tester) async {
+  testWidgets('viewed product is stored persistently',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -363,25 +372,20 @@ void main() {
 
     await tester.superPump(DisplayProductPage(product));
 
+    expect(find.byKey(const Key('product_front_image_page')), findsNothing);
     expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsNothing);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
-        findsNothing);
+        find.byKey(const Key('product_ingredients_image_page')), findsNothing);
 
     await tester.tap(find.byKey(const Key('product_header')));
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('product_front_image_page')), findsOneWidget);
     expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsOneWidget);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
-        findsNothing);
+        find.byKey(const Key('product_ingredients_image_page')), findsNothing);
   });
 
-  testWidgets('click on ingredients opens photo screen', (WidgetTester tester) async {
+  testWidgets('click on ingredients opens photo screen',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -403,21 +407,16 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
+    expect(find.byKey(const Key('product_front_image_page')), findsNothing);
     expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsNothing);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
-        findsNothing);
+        find.byKey(const Key('product_ingredients_image_page')), findsNothing);
 
-    await tester.tap(find.text(context.strings.display_product_page_ingredients));
+    await tester
+        .tap(find.text(context.strings.display_product_page_ingredients));
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsNothing);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
+    expect(find.byKey(const Key('product_front_image_page')), findsNothing);
+    expect(find.byKey(const Key('product_ingredients_image_page')),
         findsOneWidget);
   });
 
@@ -443,11 +442,10 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
+    expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
     expect(
-        find.byKey(const Key('veg_status_hint')),
-        findsOneWidget);
-    expect(
-        find.text(context.strings.display_product_page_veg_status_positive_warning),
+        find.text(
+            context.strings.display_product_page_veg_status_positive_warning),
         findsOneWidget);
   });
 
@@ -473,9 +471,7 @@ void main() {
 
     await tester.superPump(DisplayProductPage(product));
 
-    expect(
-        find.byKey(const Key('veg_status_hint')),
-        findsNothing);
+    expect(find.byKey(const Key('veg_status_hint')), findsNothing);
   });
 
   testWidgets('veg status hint - possible', (WidgetTester tester) async {
@@ -500,11 +496,10 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
+    expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
     expect(
-        find.byKey(const Key('veg_status_hint')),
-        findsOneWidget);
-    expect(
-        find.text(context.strings.display_product_page_veg_status_possible_explanation),
+        find.text(context
+            .strings.display_product_page_veg_status_possible_explanation),
         findsOneWidget);
   });
 
@@ -530,11 +525,10 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
+    expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
     expect(
-        find.byKey(const Key('veg_status_hint')),
-        findsOneWidget);
-    expect(
-        find.text(context.strings.display_product_page_veg_status_unknown_explanation),
+        find.text(context
+            .strings.display_product_page_veg_status_unknown_explanation),
         findsOneWidget);
   });
 
@@ -558,7 +552,8 @@ void main() {
     expect(find.byType(MapPage), findsOneWidget);
   });
 
-  testWidgets('ingredients text displayed when present', (WidgetTester tester) async {
+  testWidgets('ingredients text displayed when present',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -576,7 +571,8 @@ void main() {
     expect(find.byKey(const Key('product_ingredients_photo')), findsNothing);
   });
 
-  testWidgets('ingredients photo displayed when there is no ingredients text', (WidgetTester tester) async {
+  testWidgets('ingredients photo displayed when there is no ingredients text',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -594,7 +590,8 @@ void main() {
     expect(find.byKey(const Key('product_ingredients_photo')), findsOneWidget);
   });
 
-  testWidgets('click on ingredients photo opens photo screen', (WidgetTester tester) async {
+  testWidgets('click on ingredients photo opens photo screen',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -611,25 +608,20 @@ void main() {
     expect(find.text('Water, salt, sugar'), findsNothing);
     expect(find.byKey(const Key('product_ingredients_photo')), findsOneWidget);
 
+    expect(find.byKey(const Key('product_front_image_page')), findsNothing);
     expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsNothing);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
-        findsNothing);
+        find.byKey(const Key('product_ingredients_image_page')), findsNothing);
 
     await tester.tap(find.byKey(const Key('product_ingredients_photo')));
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(const Key('product_front_image_page')),
-        findsNothing);
-    expect(
-        find.byKey(const Key('product_ingredients_image_page')),
+    expect(find.byKey(const Key('product_front_image_page')), findsNothing);
+    expect(find.byKey(const Key('product_ingredients_image_page')),
         findsOneWidget);
   });
 
-  testWidgets('veg-statuses help button analytics', (WidgetTester tester) async {
+  testWidgets('veg-statuses help button analytics',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -645,15 +637,16 @@ void main() {
 
     analytics.clearEvents();
 
-    await tester.tap(
-        find.text(context.strings.display_product_page_click_to_help_with_veg_statuses));
+    await tester.tap(find.text(
+        context.strings.display_product_page_click_to_help_with_veg_statuses));
     await tester.pumpAndSettle();
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.wasEventSent('help_with_vegan_statuses_started'), isTrue);
   });
 
-  testWidgets('vegan status moderator reasoning and sources are shown on click', (WidgetTester tester) async {
+  testWidgets('vegan status moderator reasoning and sources are shown on click',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -663,9 +656,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source').productForTests();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -678,14 +673,17 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
-    expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.localize(context)),
+    expect(
+        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN
+            .localize(context)),
         findsNothing);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
     expect(find.text('vegan source'), findsNothing);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
@@ -693,20 +691,25 @@ void main() {
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
-    expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.localize(context)),
+    expect(
+        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN
+            .localize(context)),
         findsOneWidget);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsOneWidget);
     expect(find.text('vegan source'), findsOneWidget);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isTrue);
   });
 
-  testWidgets('vegetarian status moderator reasoning and sources are shown on click', (WidgetTester tester) async {
+  testWidgets(
+      'vegetarian status moderator reasoning and sources are shown on click',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -716,9 +719,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source').productForTests();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
@@ -731,35 +736,43 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
-    expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.localize(context)),
+    expect(
+        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN
+            .localize(context)),
         findsNothing);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
     expect(find.text('vegetarian source'), findsNothing);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isFalse);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
+    await tester
+        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
-    expect(find.text(
-        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.localize(context)),
+    expect(
+        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN
+            .localize(context)),
         findsOneWidget);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsOneWidget);
     expect(find.text('vegetarian source'), findsOneWidget);
     expect(analytics.wasEventSent('moderator_comment_dialog_shown'), isTrue);
   });
 
-  testWidgets('vegan status moderator reasoning without sources', (WidgetTester tester) async {
+  testWidgets('vegan status moderator reasoning without sources',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -769,9 +782,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = 'vegetarian source'
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = null).productForTests();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -784,25 +799,30 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
 
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
   });
 
-  testWidgets('vegetarian status moderator reasoning without sources', (WidgetTester tester) async {
+  testWidgets('vegetarian status moderator reasoning without sources',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -812,9 +832,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVegetarianSourcesText = null
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
       ..moderatorVeganSourcesText = 'vegan source').productForTests();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
@@ -827,26 +849,32 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
+    await tester
+        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsOneWidget);
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_source),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_source),
         findsNothing);
   });
 
-  testWidgets('vegan status moderator reasoning NOT shown on click '
-              'when veg-source is not moderator', (WidgetTester tester) async {
+  testWidgets(
+      'vegan status moderator reasoning NOT shown on click '
+      'when veg-source is not moderator', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -856,8 +884,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -872,12 +902,15 @@ void main() {
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
   });
 
-  testWidgets('vegetarian status moderator reasoning NOT shown on click when veg-source is not moderator', (WidgetTester tester) async {
+  testWidgets(
+      'vegetarian status moderator reasoning NOT shown on click when veg-source is not moderator',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -887,8 +920,10 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+      ..moderatorVegetarianChoiceReasonId =
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -900,16 +935,19 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
+    await tester
+        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
   });
 
-
-  testWidgets('vegan status moderator reasoning NOT shown on click when it does not exist', (WidgetTester tester) async {
+  testWidgets(
+      'vegan status moderator reasoning NOT shown on click when it does not exist',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -919,7 +957,8 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+      ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -934,12 +973,15 @@ void main() {
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
   });
 
-  testWidgets('vegetarian status moderator reasoning NOT shown on click when it does not exist', (WidgetTester tester) async {
+  testWidgets(
+      'vegetarian status moderator reasoning NOT shown on click when it does not exist',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
@@ -949,7 +991,8 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -961,11 +1004,13 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    await tester.tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
+    await tester
+        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.display_product_page_moderator_comment_dialog_title),
+    expect(
+        find.text(context
+            .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
   });
 }

@@ -8,7 +8,8 @@ import '../../../fake_app_lifecycle_watcher.dart';
 import '../../../widget_tester_extension.dart';
 
 void main() {
-  testWidgets('notified when widget removed from tree and returned', (WidgetTester tester) async {
+  testWidgets('notified when widget removed from tree and returned',
+      (WidgetTester tester) async {
     bool? visible;
     var callsCount = 0;
     final visibilityDetector = VisibilityDetectorPlante(
@@ -44,7 +45,8 @@ void main() {
     expect(callsCount, equals(3));
   });
 
-  testWidgets('notified when app minimized and maximized', (WidgetTester tester) async {
+  testWidgets('notified when app minimized and maximized',
+      (WidgetTester tester) async {
     final fakeLifecycleWatcher = FakeAppLifecycleWatcher();
 
     bool? visible;
@@ -89,7 +91,9 @@ void main() {
     expect(callsCount, equals(3));
   });
 
-  testWidgets('each notification fires once when hidden, minimized, maximized and shown', (WidgetTester tester) async {
+  testWidgets(
+      'each notification fires once when hidden, minimized, maximized and shown',
+      (WidgetTester tester) async {
     final fakeLifecycleWatcher = FakeAppLifecycleWatcher();
     bool? visible;
     var callsCount = 0;
@@ -161,7 +165,8 @@ class _VisibilityDetectorTestHelperCallbacksStorage {
   ArgCallback<int>? _showPageCallback;
 }
 
-class __VisibilityDetectorTestHelperState extends State<_VisibilityDetectorTestHelper> {
+class __VisibilityDetectorTestHelperState
+    extends State<_VisibilityDetectorTestHelper> {
   var _page = 0;
 
   @override

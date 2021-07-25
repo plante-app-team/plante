@@ -8,9 +8,9 @@ import 'package:plante/model/user_params_controller.dart';
 
 import 'user_params_controller_test.mocks.dart';
 
-@GenerateMocks(
-    [],
-    customMocks: [MockSpec<UserParamsControllerObserver>(returnNullOnMissingStub: true)])
+@GenerateMocks([], customMocks: [
+  MockSpec<UserParamsControllerObserver>(returnNullOnMissingStub: true)
+])
 void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
@@ -24,13 +24,13 @@ void main() {
     expect(initialParams, equals(null));
 
     final params = UserParams((v) => v
-        ..name = 'Bob'
-        ..genderStr = Gender.MALE.name
-        ..birthdayStr = '20.07.1993'
-        ..eatsMilk = true
-        ..eatsEggs = false
-        ..eatsHoney = true
-        ..userGroup = 321);
+      ..name = 'Bob'
+      ..genderStr = Gender.MALE.name
+      ..birthdayStr = '20.07.1993'
+      ..eatsMilk = true
+      ..eatsEggs = false
+      ..eatsHoney = true
+      ..userGroup = 321);
     await controller.setUserParams(params);
 
     final finalParams = await controller.getUserParams();
@@ -121,7 +121,9 @@ void main() {
     verify(observer.onUserParamsUpdate(null));
   });
 
-  test('Cached user params throw if obtained immediately after controller creation', () async {
+  test(
+      'Cached user params throw if obtained immediately after controller creation',
+      () async {
     final controller = UserParamsController();
     bool threw = false;
     try {
@@ -132,7 +134,9 @@ void main() {
     expect(threw, isTrue);
   });
 
-  test('Cached user params do not throw if obtained some time after controller creation', () async {
+  test(
+      'Cached user params do not throw if obtained some time after controller creation',
+      () async {
     final controller = UserParamsController();
 
     // Some time!

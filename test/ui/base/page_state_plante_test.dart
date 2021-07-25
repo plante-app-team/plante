@@ -16,7 +16,8 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(analytics);
   });
 
-  testWidgets('notifies analytics about current page', (WidgetTester tester) async {
+  testWidgets('notifies analytics about current page',
+      (WidgetTester tester) async {
     expect(analytics.currentPage, isNull);
     await tester.superPump(const _PageForTesting());
     expect(analytics.currentPage, _PageForTesting.NAME);

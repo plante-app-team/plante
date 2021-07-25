@@ -58,9 +58,8 @@ void main() {
     ..barcode = '123456'
     ..name = 'Product name').productForTests();
 
-  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
-    ..road = 'Broadway'
-  )));
+  final FutureAddress readyAddress =
+      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -73,8 +72,8 @@ void main() {
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
     final addressObtainer = MockAddressObtainer();
-    when(addressObtainer.addressOfShop(any)).thenAnswer((_) async =>
-        Ok(OsmAddress.empty));
+    when(addressObtainer.addressOfShop(any))
+        .thenAnswer((_) async => Ok(OsmAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     final params = UserParams((v) => v
@@ -86,43 +85,58 @@ void main() {
     await userParamsController.setUserParams(params);
 
     GetIt.I.registerSingleton<ProductsObtainer>(MockProductsObtainer());
-    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('ru'));
+    GetIt.I
+        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('ru'));
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
 
     final permissionsManager = MockPermissionsManager();
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
   });
 
-  testWidgets('card for range: card for empty shop', (WidgetTester tester) async {
+  testWidgets('card for range: card for empty shop',
+      (WidgetTester tester) async {
     final shop = shopEmpty;
-    final context = await tester.superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester
+        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
 
     expect(find.text(shop.name), findsOneWidget);
-    expect(find.text(context.strings.shop_card_no_products_in_shop), findsOneWidget);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop), findsNothing);
-    expect(find.text(context.strings.shop_card_open_shop_products), findsNothing);
+    expect(find.text(context.strings.shop_card_no_products_in_shop),
+        findsOneWidget);
+    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        findsNothing);
+    expect(
+        find.text(context.strings.shop_card_open_shop_products), findsNothing);
     expect(find.text(context.strings.shop_card_add_product), findsOneWidget);
   });
 
-  testWidgets('card for range: card for not empty shop', (WidgetTester tester) async {
+  testWidgets('card for range: card for not empty shop',
+      (WidgetTester tester) async {
     final shop = shopWithProduct;
-    final context = await tester.superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester
+        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
 
     expect(find.text(shop.name), findsOneWidget);
-    expect(find.text(context.strings.shop_card_no_products_in_shop), findsNothing);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop), findsOneWidget);
-    expect(find.text(context.strings.shop_card_open_shop_products), findsOneWidget);
+    expect(
+        find.text(context.strings.shop_card_no_products_in_shop), findsNothing);
+    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        findsOneWidget);
+    expect(find.text(context.strings.shop_card_open_shop_products),
+        findsOneWidget);
     expect(find.text(context.strings.shop_card_add_product), findsNothing);
   });
 
-  testWidgets('card for range: open products button click', (WidgetTester tester) async {
+  testWidgets('card for range: open products button click',
+      (WidgetTester tester) async {
     final shop = shopWithProduct;
 
     final range = ShopProductRange((e) => e.shop.replace(shop));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
-    final context = await tester.superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester
+        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
 
     expect(find.byType(ShopProductRangePage), findsNothing);
     await tester.tap(find.text(context.strings.shop_card_open_shop_products));
@@ -130,24 +144,29 @@ void main() {
     expect(find.byType(ShopProductRangePage), findsOneWidget);
   });
 
-  testWidgets('card for range: add product button click', (WidgetTester tester) async {
+  testWidgets('card for range: add product button click',
+      (WidgetTester tester) async {
     final shop = shopEmpty;
 
     final range = ShopProductRange((e) => e.shop.replace(shop));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
-    final context = await tester.superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester
+        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
 
     expect(find.byType(BarcodeScanPage), findsNothing);
     await tester.tap(find.text(context.strings.shop_card_add_product));
     await tester.pumpAndSettle();
     expect(find.byType(BarcodeScanPage), findsOneWidget);
 
-    final scanPage = find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
+    final scanPage =
+        find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
     expect(scanPage.addProductToShop, equals(shop));
   });
 
-  testWidgets('card for product: title for product with name', (WidgetTester tester) async {
+  testWidgets('card for product: title for product with name',
+      (WidgetTester tester) async {
     final productWithName = ProductLangSlice((e) => e
       ..barcode = '123456'
       ..name = 'Cinnamon bun').productForTests();
@@ -161,13 +180,15 @@ void main() {
 
     final String expectedTitle = context.strings.map_page_is_product_sold_q
         .replaceAll('<PRODUCT>', productWithName.name!);
-    final String unexpectedTitle = context.strings.map_page_is_new_product_sold_q;
+    final String unexpectedTitle =
+        context.strings.map_page_is_new_product_sold_q;
 
     expect(find.text(expectedTitle), findsOneWidget);
     expect(find.text(unexpectedTitle), findsNothing);
   });
 
-  testWidgets('card for product: title for product without name', (WidgetTester tester) async {
+  testWidgets('card for product: title for product without name',
+      (WidgetTester tester) async {
     final productWithoutName = ProductLangSlice((e) => e
       ..barcode = '123456'
       ..name = null).productForTests();
@@ -183,7 +204,8 @@ void main() {
     expect(find.text(expectedTitle), findsOneWidget);
   });
 
-  testWidgets('card for product: start with nothing selected', (WidgetTester tester) async {
+  testWidgets('card for product: start with nothing selected',
+      (WidgetTester tester) async {
     bool? isProductSold;
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
@@ -204,7 +226,8 @@ void main() {
     expect(isProductSold, equals(false));
   });
 
-  testWidgets('card for product: start with yes selected', (WidgetTester tester) async {
+  testWidgets('card for product: start with yes selected',
+      (WidgetTester tester) async {
     bool? isProductSold = true;
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
@@ -225,7 +248,8 @@ void main() {
     expect(isProductSold, equals(false));
   });
 
-  testWidgets('card for product: start with no selected', (WidgetTester tester) async {
+  testWidgets('card for product: start with no selected',
+      (WidgetTester tester) async {
     bool? isProductSold = false;
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
@@ -252,8 +276,8 @@ void main() {
       address: readyAddress,
     ));
 
-    final addressWidget = find.byType(ShopAddressWidget)
-        .evaluate().first.widget as ShopAddressWidget;
+    final addressWidget = find.byType(ShopAddressWidget).evaluate().first.widget
+        as ShopAddressWidget;
     expect(identical(addressWidget.osmAddress, readyAddress), isTrue);
   });
 }

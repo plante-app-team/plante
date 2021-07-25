@@ -23,11 +23,11 @@ void main() {
 
   /// NOTE: a better "let's update languages" test is located in user_langs_widget_test
   testWidgets('update languages', (WidgetTester tester) async {
-    when(userLangsManager.getUserLangs()).thenAnswer((_) async => UserLangs((e) => e
-      ..auto = true
-      ..sysLang = LangCode.en
-      ..langs.addAll([LangCode.ru]))
-    );
+    when(userLangsManager.getUserLangs())
+        .thenAnswer((_) async => UserLangs((e) => e
+          ..auto = true
+          ..sysLang = LangCode.en
+          ..langs.addAll([LangCode.ru])));
     final context = await tester.superPump(const UserLangsPage());
     await tester.pumpAndSettle();
 

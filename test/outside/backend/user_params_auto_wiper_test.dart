@@ -23,7 +23,8 @@ void main() {
     verifyNever(userParametersController.setUserParams(any));
 
     // Not authorized error
-    observer!.onBackendError(BackendErrorKind.NOT_AUTHORIZED.toErrorForTesting());
+    observer!
+        .onBackendError(BackendErrorKind.NOT_AUTHORIZED.toErrorForTesting());
     verify(userParametersController.setUserParams(null));
   });
 }

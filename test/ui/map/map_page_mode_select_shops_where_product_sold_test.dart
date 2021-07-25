@@ -17,8 +17,7 @@ import 'map_page_modes_test_commons.dart';
 /// NOTE: most of the mode tests are performed in
 /// map_page_mode_add_product_test, because both modes have same
 /// ancestor.
-@GenerateMocks(
-    [],
+@GenerateMocks([],
     customMocks: [MockSpec<NavigatorObserver>(returnNullOnMissingStub: true)])
 void main() {
   late MapPageModesTestCommons commons;
@@ -39,9 +38,8 @@ void main() {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS);
-    final context = await tester.superPump(
-        widget,
-        navigatorObserver: navigationObserver);
+    final context =
+        await tester.superPump(widget, navigatorObserver: navigationObserver);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
@@ -56,11 +54,13 @@ void main() {
     await tester.pumpAndSettle();
 
     final capturedRoute = verify(navigationObserver.didPop(captureAny, any))
-        .captured.first as Route<dynamic>;
+        .captured
+        .first as Route<dynamic>;
     expect(await capturedRoute.popped, equals([shops[0]]));
   });
 
-  testWidgets('shop selection with provided product', (WidgetTester tester) async {
+  testWidgets('shop selection with provided product',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((e) => e
       ..barcode = '222'
       ..name = 'Product name').productForTests();
@@ -70,9 +70,8 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS,
         product: product);
-    final context = await tester.superPump(
-        widget,
-        navigatorObserver: navigationObserver);
+    final context =
+        await tester.superPump(widget, navigatorObserver: navigationObserver);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
@@ -86,15 +85,15 @@ void main() {
     expect(find.text(noProductString), findsNothing);
   });
 
-  testWidgets('shop selection without provided product', (WidgetTester tester) async {
+  testWidgets('shop selection without provided product',
+      (WidgetTester tester) async {
     final navigationObserver = MockNavigatorObserver();
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS,
         product: null);
-    final context = await tester.superPump(
-        widget,
-        navigatorObserver: navigationObserver);
+    final context =
+        await tester.superPump(widget, navigatorObserver: navigationObserver);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
@@ -114,8 +113,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.wasEventSent(
-        'map_page_mode_switch_select_shops_where_product_sold'),
+    expect(
+        analytics.wasEventSent(
+            'map_page_mode_switch_select_shops_where_product_sold'),
         isTrue);
   });
 }

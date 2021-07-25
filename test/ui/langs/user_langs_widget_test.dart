@@ -19,26 +19,32 @@ void main() {
     // Deselect Russian
     await tester.tap(find.text(LangCode.ru.localize(context)));
     await tester.pumpAndSettle();
-    expect(userLangs, equals(UserLangs((e) => e
-      ..sysLang = LangCode.de
-      ..langs.addAll([LangCode.be, LangCode.de])
-      ..auto = false)));
+    expect(
+        userLangs,
+        equals(UserLangs((e) => e
+          ..sysLang = LangCode.de
+          ..langs.addAll([LangCode.be, LangCode.de])
+          ..auto = false)));
 
     // Attempt to deselect the system language (German)
     await tester.tap(find.text(LangCode.de.localize(context)));
     await tester.pumpAndSettle();
     // Nope
-    expect(userLangs, equals(UserLangs((e) => e
-      ..sysLang = LangCode.de
-      ..langs.addAll([LangCode.be, LangCode.de])
-      ..auto = false)));
+    expect(
+        userLangs,
+        equals(UserLangs((e) => e
+          ..sysLang = LangCode.de
+          ..langs.addAll([LangCode.be, LangCode.de])
+          ..auto = false)));
 
     // Select a new language
     await tester.tap(find.text(LangCode.ar.localize(context)));
     await tester.pumpAndSettle();
-    expect(userLangs, equals(UserLangs((e) => e
-      ..sysLang = LangCode.de
-      ..langs.addAll([LangCode.be, LangCode.de, LangCode.ar])
-      ..auto = false)));
+    expect(
+        userLangs,
+        equals(UserLangs((e) => e
+          ..sysLang = LangCode.de
+          ..langs.addAll([LangCode.be, LangCode.de, LangCode.ar])
+          ..auto = false)));
   });
 }

@@ -30,7 +30,8 @@ void main() {
   });
 
   test('IOException', () async {
-    httpClient.setResponseException('.*ipregistry.*', const SocketException(''));
+    httpClient.setResponseException(
+        '.*ipregistry.*', const SocketException(''));
     final pos = await ipLocationProvider.positionByIP();
     expect(pos, isNull);
   });

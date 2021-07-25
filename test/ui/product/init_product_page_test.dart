@@ -69,11 +69,12 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(analytics);
 
     photosTaker = MockPhotosTaker();
-    when(photosTaker.takeAndCropPhoto(any, any)).thenAnswer((_) async =>
-        Uri.file(File('./test/assets/img.jpg').absolute.path));
-    when(photosTaker.cropPhoto(any, any, any)).thenAnswer((_) async =>
-        Uri.file(File('./test/assets/img.jpg').absolute.path));
-    when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
+    when(photosTaker.takeAndCropPhoto(any, any)).thenAnswer(
+        (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
+    when(photosTaker.cropPhoto(any, any, any)).thenAnswer(
+        (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
+    when(photosTaker.retrieveLostPhoto())
+        .thenAnswer((realInvocation) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     productsManager = MockProductsManager();
@@ -86,7 +87,8 @@ void main() {
 
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
+    when(shopsManager.putProductToShops(any, any))
+        .thenAnswer((_) async => Ok(None()));
 
     GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
 
@@ -96,8 +98,8 @@ void main() {
     GetIt.I.registerSingleton<LocationController>(locationController);
 
     permissionsManager = MockPermissionsManager();
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.granted);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
 
@@ -105,12 +107,14 @@ void main() {
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
 
     addressObtainer = MockAddressObtainer();
-    when(addressObtainer.addressOfShop(any)).thenAnswer((_) async =>
-        Ok(OsmAddress.empty));
+    when(addressObtainer.addressOfShop(any))
+        .thenAnswer((_) async => Ok(OsmAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
-    inputProductsLangStorage = FakeInputProductsLangStorage.fromCode(_DEFAULT_TEST_LANG);
-    GetIt.I.registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
+    inputProductsLangStorage =
+        FakeInputProductsLangStorage.fromCode(_DEFAULT_TEST_LANG);
+    GetIt.I
+        .registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -118,35 +122,33 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<bool> generalTest(
-      WidgetTester tester,
+  Future<bool> generalTest(WidgetTester tester,
       {Product? initialProduct,
-        Product? expectedProductResult,
-        String? nameInput = 'Lemon drink',
-        String? brandInput = 'Nice brand',
-        bool takeImageFront = true,
-        bool takeImageIngredients = true,
-        String? ingredientsTextOverride,
-        VegStatus? veganStatusInput = VegStatus.positive,
-        VegStatus? vegetarianStatusInput = VegStatus.positive,
-        List<Shop>? selectedShops,
-        List<Shop> initialShops = const [],
-        List<Shop> shopsToCancel = const [],
-        int requiredManualOcrAttempts = 0,
-        int ocrSuccessfulAttemptNumber = 1,
-        LangCode? selectedLang = _DEFAULT_TEST_LANG,
-        bool selectLangAtStart = true}) async {
+      Product? expectedProductResult,
+      String? nameInput = 'Lemon drink',
+      String? brandInput = 'Nice brand',
+      bool takeImageFront = true,
+      bool takeImageIngredients = true,
+      String? ingredientsTextOverride,
+      VegStatus? veganStatusInput = VegStatus.positive,
+      VegStatus? vegetarianStatusInput = VegStatus.positive,
+      List<Shop>? selectedShops,
+      List<Shop> initialShops = const [],
+      List<Shop> shopsToCancel = const [],
+      int requiredManualOcrAttempts = 0,
+      int ocrSuccessfulAttemptNumber = 1,
+      LangCode? selectedLang = _DEFAULT_TEST_LANG,
+      bool selectLangAtStart = true}) async {
     var ocrAttempts = 0;
-    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async {
-              ocrAttempts += 1;
-              if (ocrAttempts < ocrSuccessfulAttemptNumber) {
-                return Err(ProductsManagerError.OTHER);
-              }
-              return Ok(ProductWithOCRIngredients(
-                invoc.positionalArguments[0] as Product,
-                'water, lemon'));
-            });
+    when(productsManager.updateProductAndExtractIngredients(any, any))
+        .thenAnswer((invoc) async {
+      ocrAttempts += 1;
+      if (ocrAttempts < ocrSuccessfulAttemptNumber) {
+        return Err(ProductsManagerError.OTHER);
+      }
+      return Ok(ProductWithOCRIngredients(
+          invoc.positionalArguments[0] as Product, 'water, lemon'));
+    });
 
     verifyZeroInteractions(productsManager);
 
@@ -156,13 +158,11 @@ void main() {
     };
 
     initialProduct ??= Product((v) => v
-        ..barcode = '123'
-        ..langsPrioritized.add(selectedLang ?? LangCode.en));
+      ..barcode = '123'
+      ..langsPrioritized.add(selectedLang ?? LangCode.en));
 
-    final widget = InitProductPage(
-        initialProduct,
-        doneCallback: callback,
-        initialShops: initialShops);
+    final widget = InitProductPage(initialProduct,
+        doneCallback: callback, initialShops: initialShops);
 
     final cacheDir = await widget.cacheDir();
     if (cacheDir.existsSync()) {
@@ -178,8 +178,11 @@ void main() {
 
     final selectLang = () async {
       if (selectedLang != _DEFAULT_TEST_LANG) {
-        final dropdown = find.byKey(const Key('product_lang'))
-            .evaluate().first.widget as DropdownPlante<LangCode?>;
+        final dropdown = find
+            .byKey(const Key('product_lang'))
+            .evaluate()
+            .first
+            .widget as DropdownPlante<LangCode?>;
         dropdown.onChanged!.call(selectedLang);
         await tester.pumpAndSettle();
       }
@@ -190,23 +193,18 @@ void main() {
 
     if (takeImageFront) {
       verifyNever(photosTaker.takeAndCropPhoto(any, any));
-      await tester.tap(
-          find.byKey(const Key('front_photo')));
+      await tester.tap(find.byKey(const Key('front_photo')));
       verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
       await tester.pumpAndSettle();
     }
 
     if (nameInput != null) {
-      await tester.enterText(
-          find.byKey(const Key('name')),
-          nameInput);
+      await tester.enterText(find.byKey(const Key('name')), nameInput);
       await tester.pumpAndSettle();
     }
 
     if (brandInput != null) {
-      await tester.enterText(
-          find.byKey(const Key('brand')),
-          brandInput);
+      await tester.enterText(find.byKey(const Key('brand')), brandInput);
       await tester.pumpAndSettle();
     }
 
@@ -215,17 +213,14 @@ void main() {
     if (selectedShops != null) {
       expect(find.byType(MapPage), findsNothing);
 
-      await tester.tap(
-          find.byKey(const Key('shops_btn')));
+      await tester.tap(find.byKey(const Key('shops_btn')));
       await tester.pumpAndSettle();
 
       expect(find.byType(MapPage), findsOneWidget);
 
       final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
       mapPage.finishForTesting(
-          selectedShops.isNotEmpty ?
-          selectedShops + initialShops :
-          null);
+          selectedShops.isNotEmpty ? selectedShops + initialShops : null);
       await tester.pumpAndSettle();
     }
 
@@ -247,8 +242,8 @@ void main() {
       await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
       expect(ocrAttempts, greaterThanOrEqualTo(1));
-      expect(ocrAttempts, lessThanOrEqualTo(
-          InitProductPageModel.OCR_RETRIES_COUNT));
+      expect(ocrAttempts,
+          lessThanOrEqualTo(InitProductPageModel.OCR_RETRIES_COUNT));
       verify(photosTaker.takeAndCropPhoto(any, any)).called(1);
 
       var performedManualOcrAttempts = 0;
@@ -290,8 +285,7 @@ void main() {
 
     if (ingredientsTextOverride != null) {
       await tester.enterText(
-          find.byKey(const Key('ingredients_text')),
-          ingredientsTextOverride);
+          find.byKey(const Key('ingredients_text')), ingredientsTextOverride);
       await tester.pumpAndSettle();
     }
 
@@ -309,7 +303,8 @@ void main() {
           await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
           break;
         case VegStatus.possible:
-          throw Exception('Not supported by VegStatusSelectionPanel, a test is broken');
+          throw Exception(
+              'Not supported by VegStatusSelectionPanel, a test is broken');
         default:
           throw Error();
       }
@@ -327,7 +322,8 @@ void main() {
           await tester.tap(find.byKey(const Key('vegetarian_unknown_btn')));
           break;
         case VegStatus.possible:
-          throw Exception('Not supported by VegStatusSelectionPanel, a test is broken');
+          throw Exception(
+              'Not supported by VegStatusSelectionPanel, a test is broken');
         default:
           throw Error();
       }
@@ -343,8 +339,10 @@ void main() {
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     if (expectedProductResult != null) {
-      final finalProduct = verify(
-          productsManager.createUpdateProduct(captureAny)).captured.first;
+      final finalProduct =
+          verify(productsManager.createUpdateProduct(captureAny))
+              .captured
+              .first;
       expect(finalProduct, equals(expectedProductResult));
     } else {
       verifyNever(productsManager.createUpdateProduct(any));
@@ -357,9 +355,10 @@ void main() {
     }
     expectedShops.removeWhere((shop) => shopsToCancel.contains(shop));
     if (expectedProductResult != null && expectedShops.isNotEmpty) {
-      final sentShops =
-        verify(shopsManager.putProductToShops(expectedProductResult, captureAny))
-            .captured.first as List<Shop>;
+      final sentShops = verify(
+              shopsManager.putProductToShops(expectedProductResult, captureAny))
+          .captured
+          .first as List<Shop>;
       expect(expectedShops.toSet(), equals(sentShops.toSet()));
     } else {
       verifyNever(shopsManager.putProductToShops(any, any));
@@ -369,9 +368,8 @@ void main() {
     expect(cacheDir.existsSync(), equals(!done));
 
     if (done) {
-      expect(analytics.sentEventParams('product_save_success'), equals({
-        'barcode': expectedProductResult!.barcode
-      }));
+      expect(analytics.sentEventParams('product_save_success'),
+          equals({'barcode': expectedProductResult!.barcode}));
       expect(analytics.wasEventSent('product_save_failure'), isFalse);
       expect(analytics.wasEventSent('product_save_shops_failure'), isFalse);
       expect(inputProductsLangStorage.selectedCode, equals(selectedLang));
@@ -415,11 +413,13 @@ void main() {
     expect(done, isTrue);
   });
 
-  testWidgets('front photo not present when product has data', (WidgetTester tester) async {
+  testWidgets('front photo not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_TEST_LANG
-      ..barcode = '123'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
+          ..lang = _DEFAULT_TEST_LANG
+          ..barcode = '123'
+          ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path))
+        .productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsNothing);
@@ -430,7 +430,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('name input field not present when product has data', (WidgetTester tester) async {
+  testWidgets('name input field not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -445,7 +446,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('brand input field not present when product has data', (WidgetTester tester) async {
+  testWidgets('brand input field not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -460,7 +462,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('ingredients group not present when product has data', (WidgetTester tester) async {
+  testWidgets('ingredients group not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -476,7 +479,9 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('ingredients group present when product has no ingredients image but has text', (WidgetTester tester) async {
+  testWidgets(
+      'ingredients group present when product has no ingredients image but has text',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -491,11 +496,15 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('ingredients group present when product has no ingredients text but has image', (WidgetTester tester) async {
+  testWidgets(
+      'ingredients group present when product has no ingredients text but has image',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_TEST_LANG
-      ..barcode = '123'
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
+          ..lang = _DEFAULT_TEST_LANG
+          ..barcode = '123'
+          ..imageIngredients =
+              Uri.file(File('./test/assets/img.jpg').absolute.path))
+        .productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
@@ -506,7 +515,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('vegan group not present when product has data', (WidgetTester tester) async {
+  testWidgets('vegan group not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -522,7 +532,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('vegan group present when product has vegan data from OFF', (WidgetTester tester) async {
+  testWidgets('vegan group present when product has vegan data from OFF',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -538,7 +549,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('vegan group present when product has vegan data without source', (WidgetTester tester) async {
+  testWidgets('vegan group present when product has vegan data without source',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -553,7 +565,8 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('vegetarian group not present when product has data', (WidgetTester tester) async {
+  testWidgets('vegetarian group not present when product has data',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -569,12 +582,15 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsNothing);
   });
 
-  testWidgets('vegetarian group present when product has vegetarian data from OFF', (WidgetTester tester) async {
+  testWidgets(
+      'vegetarian group present when product has vegetarian data from OFF',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_TEST_LANG
-      ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts).productForTests();
+          ..lang = _DEFAULT_TEST_LANG
+          ..barcode = '123'
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.open_food_facts)
+        .productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
@@ -585,7 +601,9 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
-  testWidgets('vegetarian group present when product has vegetarian data without source', (WidgetTester tester) async {
+  testWidgets(
+      'vegetarian group present when product has vegetarian data without source',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -601,7 +619,8 @@ void main() {
   });
 
   testWidgets('cannot save product without name', (WidgetTester tester) async {
-    final done = await generalTest(tester, nameInput: null, expectedProductResult: null);
+    final done =
+        await generalTest(tester, nameInput: null, expectedProductResult: null);
     expect(done, isFalse);
   });
 
@@ -619,31 +638,34 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: null,
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: expectedProduct.veganStatus,
-        vegetarianStatusInput: expectedProduct.vegetarianStatus
-    );
+        vegetarianStatusInput: expectedProduct.vegetarianStatus);
 
     expect(done, isTrue);
   });
 
-  testWidgets('cannot save product without front image', (WidgetTester tester) async {
-    final done = await generalTest(tester, takeImageFront: false, expectedProductResult: null);
+  testWidgets('cannot save product without front image',
+      (WidgetTester tester) async {
+    final done = await generalTest(tester,
+        takeImageFront: false, expectedProductResult: null);
     expect(done, isFalse);
   });
 
-  testWidgets('cannot save product without ingredients image', (WidgetTester tester) async {
-    final done = await generalTest(tester, takeImageIngredients: false, expectedProductResult: null);
+  testWidgets('cannot save product without ingredients image',
+      (WidgetTester tester) async {
+    final done = await generalTest(tester,
+        takeImageIngredients: false, expectedProductResult: null);
     expect(done, isFalse);
   });
 
-  testWidgets('can save product without ingredients text', (WidgetTester tester) async {
+  testWidgets('can save product without ingredients text',
+      (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -657,8 +679,7 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: expectedProduct.brands!.join(', '),
@@ -667,28 +688,31 @@ void main() {
         ingredientsTextOverride: '',
         veganStatusInput: expectedProduct.veganStatus,
         vegetarianStatusInput: expectedProduct.vegetarianStatus,
-        selectedShops: [aShop]
-    );
+        selectedShops: [aShop]);
 
     expect(done, isTrue);
   });
 
-  testWidgets('cannot save product without vegan status', (WidgetTester tester) async {
-    final done = await generalTest(
-        tester,
+  testWidgets('cannot save product without vegan status',
+      (WidgetTester tester) async {
+    final done = await generalTest(tester,
         vegetarianStatusInput: VegStatus.positive,
         veganStatusInput: null,
         expectedProductResult: null);
     expect(done, isFalse);
   });
 
-  testWidgets('cannot save product without vegetarian status', (WidgetTester tester) async {
-    final done = await generalTest(tester, veganStatusInput: VegStatus.unknown,
-        vegetarianStatusInput: null, expectedProductResult: null);
+  testWidgets('cannot save product without vegetarian status',
+      (WidgetTester tester) async {
+    final done = await generalTest(tester,
+        veganStatusInput: VegStatus.unknown,
+        vegetarianStatusInput: null,
+        expectedProductResult: null);
     expect(done, isFalse);
   });
 
-  testWidgets('vegan positive makes vegetarian positive', (WidgetTester tester) async {
+  testWidgets('vegan positive makes vegetarian positive',
+      (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -699,11 +723,9 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community
       ..vegetarianStatus = VegStatus.positive // !!!!!!
-      ..vegetarianStatusSource = VegStatusSource.community
-      ).productForTests();
+      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         brandInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
@@ -711,12 +733,13 @@ void main() {
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: VegStatus.positive,
         vegetarianStatusInput: null // !!!!!!
-    );
+        );
 
     expect(done, isTrue);
   });
 
-  testWidgets('vegetarian negative makes vegan negative', (WidgetTester tester) async {
+  testWidgets('vegetarian negative makes vegan negative',
+      (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -727,24 +750,22 @@ void main() {
       ..vegetarianStatus = VegStatus.negative
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    ).productForTests();
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         brandInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: null, // !!!!!!
-        vegetarianStatusInput: VegStatus.negative
-    );
+        vegetarianStatusInput: VegStatus.negative);
 
     expect(done, isTrue);
   });
 
-  testWidgets('vegetarian unknown makes vegan unknown if it was positive', (WidgetTester tester) async {
+  testWidgets('vegetarian unknown makes vegan unknown if it was positive',
+      (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -755,24 +776,22 @@ void main() {
       ..vegetarianStatus = VegStatus.unknown
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.unknown // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    ).productForTests();
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         brandInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: VegStatus.positive, // !!!!!! positive input
-        vegetarianStatusInput: VegStatus.unknown
-    );
+        vegetarianStatusInput: VegStatus.unknown);
 
     expect(done, isTrue);
   });
 
-  testWidgets("vegetarian unknown doesn't change vegan if was negative", (WidgetTester tester) async {
+  testWidgets("vegetarian unknown doesn't change vegan if was negative",
+      (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -783,19 +802,16 @@ void main() {
       ..vegetarianStatus = VegStatus.unknown
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative // !!!!!!
-      ..veganStatusSource = VegStatusSource.community
-    ).productForTests();
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         brandInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: VegStatus.negative, // !!!!!! negative input
-        vegetarianStatusInput: VegStatus.unknown
-    );
+        vegetarianStatusInput: VegStatus.unknown);
 
     expect(done, isTrue);
   });
@@ -814,8 +830,7 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: expectedProduct.brands!.join(', '),
@@ -824,12 +839,14 @@ void main() {
         veganStatusInput: expectedProduct.veganStatus,
         vegetarianStatusInput: expectedProduct.vegetarianStatus,
         selectedShops: [] // No shop
-    );
+        );
 
     expect(done, isTrue);
   });
 
-  testWidgets('shops sending to server finishes with error but all other things are ok', (WidgetTester tester) async {
+  testWidgets(
+      'shops sending to server finishes with error but all other things are ok',
+      (WidgetTester tester) async {
     final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -843,29 +860,30 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Err(ShopsManagerError.OTHER));
+    when(shopsManager.putProductToShops(any, any))
+        .thenAnswer((_) async => Err(ShopsManagerError.OTHER));
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
-        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        takeImageIngredients:
+            perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
-        selectedShops: [aShop]
-    );
+        selectedShops: [aShop]);
 
     // Even though perfectlyGoodExpectedProduct expected to be stored,
     // page is expected to be not finished, because of shops sending error
     expect(done, isFalse);
-    expect(analytics.sentEventParams('product_save_shops_failure'), equals({
-      'barcode': perfectlyGoodExpectedProduct.barcode
-    }));
+    expect(analytics.sentEventParams('product_save_shops_failure'),
+        equals({'barcode': perfectlyGoodExpectedProduct.barcode}));
   });
 
-  testWidgets('product saving to server finishes with error but all other things are ok', (WidgetTester tester) async {
+  testWidgets(
+      'product saving to server finishes with error but all other things are ok',
+      (WidgetTester tester) async {
     final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -884,25 +902,26 @@ void main() {
     });
 
     final done = await generalTest(
-        tester,
-        expectedProductResult: perfectlyGoodExpectedProduct,
-        nameInput: perfectlyGoodExpectedProduct.name,
-        brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
-        takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
-        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
-        veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
-        vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
+      tester,
+      expectedProductResult: perfectlyGoodExpectedProduct,
+      nameInput: perfectlyGoodExpectedProduct.name,
+      brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
+      takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
+      takeImageIngredients:
+          perfectlyGoodExpectedProduct.imageIngredients != null,
+      veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
+      vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
     );
 
     // Even though perfectlyGoodExpectedProduct expected to be stored,
     // page is expected to be not finished, because of product saving error
     expect(done, isFalse);
-    expect(analytics.sentEventParams('product_save_failure'), equals({
-      'barcode': perfectlyGoodExpectedProduct.barcode
-    }));
+    expect(analytics.sentEventParams('product_save_failure'),
+        equals({'barcode': perfectlyGoodExpectedProduct.barcode}));
   });
 
-  testWidgets('ocr fail and manual ingredients input', (WidgetTester tester) async {
+  testWidgets('ocr fail and manual ingredients input',
+      (WidgetTester tester) async {
     final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -916,22 +935,24 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
-        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        takeImageIngredients:
+            perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
         // 2 OCRs attempts will fail (first (auto) and the manual)
         // Note that we multiply the value by InitProductPageModel.OCR_RETRIES_COUNT,
         // because the page auto-retries OCR without user actions.
         ocrSuccessfulAttemptNumber: 3 * InitProductPageModel.OCR_RETRIES_COUNT,
-        requiredManualOcrAttempts: 1, // We'll try to perform restart OCR only once
-        ingredientsTextOverride: 'water, lemon' // But will write ingredients manually
-    );
+        requiredManualOcrAttempts:
+            1, // We'll try to perform restart OCR only once
+        ingredientsTextOverride:
+            'water, lemon' // But will write ingredients manually
+        );
 
     expect(done, isTrue);
   });
@@ -950,13 +971,13 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
-        takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
+        takeImageIngredients:
+            perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
         // 2 OCRs attempts will fail (first (auto) and the first manual).
@@ -965,7 +986,7 @@ void main() {
         ocrSuccessfulAttemptNumber: 3 * InitProductPageModel.OCR_RETRIES_COUNT,
         requiredManualOcrAttempts: 2, // We'll try to perform a second OCR!
         ingredientsTextOverride: null // And will NOT write ingredients manually
-    );
+        );
 
     expect(done, isTrue);
   });
@@ -984,8 +1005,7 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-        tester,
+    final done = await generalTest(tester,
         expectedProductResult: product,
         nameInput: product.name,
         brandInput: product.brands!.join(', '),
@@ -993,13 +1013,13 @@ void main() {
         takeImageIngredients: product.imageIngredients != null,
         veganStatusInput: product.veganStatus,
         vegetarianStatusInput: product.vegetarianStatus,
-        initialShops: [aShop]
-    );
+        initialShops: [aShop]);
 
     expect(done, isTrue);
   });
 
-  testWidgets('opened with initial shops, then select shops', (WidgetTester tester) async {
+  testWidgets('opened with initial shops, then select shops',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -1035,16 +1055,16 @@ void main() {
     ];
 
     final done = await generalTest(
-        tester,
-        expectedProductResult: product,
-        nameInput: product.name,
-        brandInput: product.brands!.join(', '),
-        takeImageFront: product.imageFront != null,
-        takeImageIngredients: product.imageIngredients != null,
-        veganStatusInput: product.veganStatus,
-        vegetarianStatusInput: product.vegetarianStatus,
-        initialShops: [shops[0]],
-        selectedShops: [shops[1]],
+      tester,
+      expectedProductResult: product,
+      nameInput: product.name,
+      brandInput: product.brands!.join(', '),
+      takeImageFront: product.imageFront != null,
+      takeImageIngredients: product.imageIngredients != null,
+      veganStatusInput: product.veganStatus,
+      vegetarianStatusInput: product.vegetarianStatus,
+      initialShops: [shops[0]],
+      selectedShops: [shops[1]],
     );
 
     expect(done, isTrue);
@@ -1104,23 +1124,24 @@ void main() {
     ];
 
     final done = await generalTest(
-        tester,
-        expectedProductResult: product,
-        nameInput: product.name,
-        brandInput: product.brands!.join(', '),
-        takeImageFront: product.imageFront != null,
-        takeImageIngredients: product.imageIngredients != null,
-        veganStatusInput: product.veganStatus,
-        vegetarianStatusInput: product.vegetarianStatus,
-        initialShops: [shops[0], shops[1]],
-        selectedShops: [shops[2], shops[3]],
-        shopsToCancel: [shops[1], shops[3]],
+      tester,
+      expectedProductResult: product,
+      nameInput: product.name,
+      brandInput: product.brands!.join(', '),
+      takeImageFront: product.imageFront != null,
+      takeImageIngredients: product.imageIngredients != null,
+      veganStatusInput: product.veganStatus,
+      vegetarianStatusInput: product.vegetarianStatus,
+      initialShops: [shops[0], shops[1]],
+      selectedShops: [shops[2], shops[3]],
+      shopsToCancel: [shops[1], shops[3]],
     );
 
     expect(done, isTrue);
   });
 
-  testWidgets('product update does not erase existing veg statuses', (WidgetTester tester) async {
+  testWidgets('product update does not erase existing veg statuses',
+      (WidgetTester tester) async {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
@@ -1160,22 +1181,22 @@ void main() {
     expect(done, isTrue);
   });
 
-  testWidgets('finish taking front photo when restoring', (WidgetTester tester) async {
-    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async => Ok(ProductWithOCRIngredients(
-            invoc.positionalArguments[0] as Product,
-            'water, lemon')));
+  testWidgets('finish taking front photo when restoring',
+      (WidgetTester tester) async {
+    when(productsManager.updateProductAndExtractIngredients(any, any))
+        .thenAnswer((invoc) async => Ok(ProductWithOCRIngredients(
+            invoc.positionalArguments[0] as Product, 'water, lemon')));
 
     // Lost photo exists!
-    when(photosTaker.retrieveLostPhoto()).thenAnswer(
-            (_) async => Ok(Uri.parse('./test/assets/img.jpg')));
+    when(photosTaker.retrieveLostPhoto())
+        .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
     verifyNever(photosTaker.cropPhoto(any, any, any));
 
     final widget = InitProductPage(
         ProductLangSlice((v) => v
-            ..lang = _DEFAULT_TEST_LANG
-            ..barcode = '123').productForTests(),
+          ..lang = _DEFAULT_TEST_LANG
+          ..barcode = '123').productForTests(),
         photoBeingTakenForTests: ProductImageType.FRONT);
     await tester.superPump(widget);
 
@@ -1184,9 +1205,7 @@ void main() {
 
     // Now let's fill the product and ensure it's filled enough to be saved
     // The front photo is not taken by us as we expect it to be restored.
-    await tester.enterText(
-        find.byKey(const Key('name')),
-        'hello there');
+    await tester.enterText(find.byKey(const Key('name')), 'hello there');
     await tester.pumpAndSettle();
 
     await scrollToBottom(tester);
@@ -1203,23 +1222,23 @@ void main() {
     verify(productsManager.createUpdateProduct(captureAny));
   });
 
-  testWidgets('finish taking ingredients photo when restoring', (WidgetTester tester) async {
-    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async => Ok(ProductWithOCRIngredients(
-            invoc.positionalArguments[0] as Product,
-            'water, lemon')));
+  testWidgets('finish taking ingredients photo when restoring',
+      (WidgetTester tester) async {
+    when(productsManager.updateProductAndExtractIngredients(any, any))
+        .thenAnswer((invoc) async => Ok(ProductWithOCRIngredients(
+            invoc.positionalArguments[0] as Product, 'water, lemon')));
 
     // Lost photo exists!
-    when(photosTaker.retrieveLostPhoto()).thenAnswer(
-            (_) async => Ok(Uri.parse('./test/assets/img.jpg')));
+    when(photosTaker.retrieveLostPhoto())
+        .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
     verifyNever(photosTaker.cropPhoto(any, any, any));
     verifyNever(productsManager.updateProductAndExtractIngredients(any, any));
 
     final widget = InitProductPage(
         Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)),
+          ..barcode = '123'
+          ..langsPrioritized.add(_DEFAULT_TEST_LANG)),
         photoBeingTakenForTests: ProductImageType.INGREDIENTS);
     await tester.superPump(widget);
 
@@ -1231,13 +1250,10 @@ void main() {
 
     // Now let's fill the product and ensure it's filled enough to be saved
     // The ingredients photo is not taken by us as we expect it to be restored.
-    await tester.enterText(
-        find.byKey(const Key('name')),
-        'hello there');
+    await tester.enterText(find.byKey(const Key('name')), 'hello there');
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.byKey(const Key('front_photo')));
+    await tester.tap(find.byKey(const Key('front_photo')));
     await tester.pumpAndSettle();
 
     await scrollToBottom(tester);
@@ -1252,18 +1268,17 @@ void main() {
 
   Future<void> takePhotoWhenNoPermissionTest(
       WidgetTester tester, dynamic Function() takePhotoAction) async {
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.denied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
     when(permissionsManager.request(any)).thenAnswer((_) async {
-      when(permissionsManager.status(any)).thenAnswer(
-              (_) async => PermissionState.granted);
+      when(permissionsManager.status(any))
+          .thenAnswer((_) async => PermissionState.granted);
       return PermissionState.granted;
     });
 
-    final widget = InitProductPage(
-        Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1276,25 +1291,24 @@ void main() {
     verify(photosTaker.takeAndCropPhoto(any, any));
   }
 
-  Future<void>  takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(
+  Future<void> takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(
       WidgetTester tester, dynamic Function() takePhotoAction) async {
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.denied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
     var requestsCount = 0;
     when(permissionsManager.request(any)).thenAnswer((_) async {
       requestsCount += 1;
       if (requestsCount <= 1) {
         return PermissionState.denied;
       }
-      when(permissionsManager.status(any)).thenAnswer(
-              (_) async => PermissionState.granted);
+      when(permissionsManager.status(any))
+          .thenAnswer((_) async => PermissionState.granted);
       return PermissionState.granted;
     });
 
-    final widget = InitProductPage(
-        Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1314,25 +1328,25 @@ void main() {
     verify(photosTaker.takeAndCropPhoto(any, any));
   }
 
-  Future<void>  takePhotoWhenNoPermissionPermanentlyTest(
+  Future<void> takePhotoWhenNoPermissionPermanentlyTest(
       WidgetTester tester, dynamic Function() takePhotoAction) async {
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.denied);
-    when(permissionsManager.request(any)).thenAnswer(
-            (_) async => PermissionState.permanentlyDenied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
+    when(permissionsManager.request(any))
+        .thenAnswer((_) async => PermissionState.permanentlyDenied);
 
-    final widget = InitProductPage(
-        Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     verifyNever(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
-    expect(find.text(
-        context.strings.init_user_page_camera_permission_reasoning_settings),
+    expect(
+        find.text(context
+            .strings.init_user_page_camera_permission_reasoning_settings),
         findsNothing);
 
     await takePhotoAction.call();
@@ -1340,8 +1354,9 @@ void main() {
     verify(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
-    expect(find.text(
-        context.strings.init_user_page_camera_permission_reasoning_settings),
+    expect(
+        find.text(context
+            .strings.init_user_page_camera_permission_reasoning_settings),
         findsOneWidget);
 
     await tester.tap(find.text(context.strings.global_open_app_settings));
@@ -1352,94 +1367,106 @@ void main() {
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
   }
 
-  testWidgets('take front photo when no permission', (WidgetTester tester) async {
+  testWidgets('take front photo when no permission',
+      (WidgetTester tester) async {
     await takePhotoWhenNoPermissionTest(tester, () async {
-      await tester.tap(
-          find.byKey(const Key('front_photo')));
+      await tester.tap(find.byKey(const Key('front_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('take front photo when no permission, permission denied again', (WidgetTester tester) async {
-    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester, () async {
-      await tester.tap(
-          find.byKey(const Key('front_photo')));
+  testWidgets('take front photo when no permission, permission denied again',
+      (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester,
+        () async {
+      await tester.tap(find.byKey(const Key('front_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('take front photo when no permission permanently', (WidgetTester tester) async {
+  testWidgets('take front photo when no permission permanently',
+      (WidgetTester tester) async {
     await takePhotoWhenNoPermissionPermanentlyTest(tester, () async {
-      await tester.tap(
-          find.byKey(const Key('front_photo')));
+      await tester.tap(find.byKey(const Key('front_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('take ingredients photo when no permission', (WidgetTester tester) async {
+  testWidgets('take ingredients photo when no permission',
+      (WidgetTester tester) async {
     await takePhotoWhenNoPermissionTest(tester, () async {
       await scrollToBottom(tester);
-      await tester.tap(
-          find.byKey(const Key('ingredients_photo')));
+      await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('take ingredients photo when no permission, permission denied again', (WidgetTester tester) async {
-    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester, () async {
+  testWidgets(
+      'take ingredients photo when no permission, permission denied again',
+      (WidgetTester tester) async {
+    await takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(tester,
+        () async {
       await scrollToBottom(tester);
-      await tester.tap(
-          find.byKey(const Key('ingredients_photo')));
+      await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('take ingredients photo when no permission permanently', (WidgetTester tester) async {
+  testWidgets('take ingredients photo when no permission permanently',
+      (WidgetTester tester) async {
     await takePhotoWhenNoPermissionPermanentlyTest(tester, () async {
       await scrollToBottom(tester);
-      await tester.tap(
-          find.byKey(const Key('ingredients_photo')));
+      await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
     });
   });
 
-  testWidgets('cannot take picture of ingredients when no lang selected', (WidgetTester tester) async {
-    final widget = InitProductPage(
-        Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
+  testWidgets('cannot take picture of ingredients when no lang selected',
+      (WidgetTester tester) async {
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     // Select no lang
-    final dropdown = find.byKey(const Key('product_lang'))
-        .evaluate().first.widget as DropdownPlante<LangCode?>;
+    final dropdown = find
+        .byKey(const Key('product_lang'))
+        .evaluate()
+        .first
+        .widget as DropdownPlante<LangCode?>;
     dropdown.onChanged!.call(null);
     await tester.pumpAndSettle();
 
     await scrollToBottom(tester);
 
     // Verify cannot take a pic of ingredients
-    expect(find.text(context.strings.init_product_page_please_select_lang), findsNothing);
+    expect(find.text(context.strings.init_product_page_please_select_lang),
+        findsNothing);
     await tester.tap(find.byKey(const Key('ingredients_photo')));
     await tester.pumpAndSettle();
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
-    expect(find.text(context.strings.init_product_page_please_select_lang), findsOneWidget);
+    expect(find.text(context.strings.init_product_page_please_select_lang),
+        findsOneWidget);
   });
 
-  testWidgets('input language change does not immediately affect InputProductsLangStorage', (WidgetTester tester) async {
+  testWidgets(
+      'input language change does not immediately affect InputProductsLangStorage',
+      (WidgetTester tester) async {
     expect(_DEFAULT_TEST_LANG, isNot(equals(LangCode.ru)));
 
-    final widget = InitProductPage(
-        Product((v) => v
-            ..barcode = '123'
-            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     // Select another lang
-    final dropdown = find.byKey(const Key('product_lang'))
-        .evaluate().first.widget as DropdownPlante<LangCode?>;
+    final dropdown = find
+        .byKey(const Key('product_lang'))
+        .evaluate()
+        .first
+        .widget as DropdownPlante<LangCode?>;
     dropdown.onChanged!.call(LangCode.ru);
     await tester.pumpAndSettle();
 
@@ -1447,7 +1474,8 @@ void main() {
     expect(inputProductsLangStorage.selectedCode, equals(_DEFAULT_TEST_LANG));
   });
 
-  testWidgets('cannot save product when lang is deselected', (WidgetTester tester) async {
+  testWidgets('cannot save product when lang is deselected',
+      (WidgetTester tester) async {
     final perfectlyGoodProduct = ProductLangSlice((v) => v
       ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
@@ -1461,28 +1489,29 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    final done = await generalTest(
-      tester,
-      expectedProductResult: null,
-      nameInput: perfectlyGoodProduct.name,
-      brandInput: perfectlyGoodProduct.brands!.join(', '),
-      takeImageFront: perfectlyGoodProduct.imageFront != null,
-      takeImageIngredients: perfectlyGoodProduct.imageIngredients != null,
-      veganStatusInput: perfectlyGoodProduct.veganStatus,
-      vegetarianStatusInput: perfectlyGoodProduct.vegetarianStatus,
-      selectedLang: null, // The lang will be deselected...
-      selectLangAtStart: false // ...at the end
-    );
+    final done = await generalTest(tester,
+        expectedProductResult: null,
+        nameInput: perfectlyGoodProduct.name,
+        brandInput: perfectlyGoodProduct.brands!.join(', '),
+        takeImageFront: perfectlyGoodProduct.imageFront != null,
+        takeImageIngredients: perfectlyGoodProduct.imageIngredients != null,
+        veganStatusInput: perfectlyGoodProduct.veganStatus,
+        vegetarianStatusInput: perfectlyGoodProduct.vegetarianStatus,
+        selectedLang: null, // The lang will be deselected...
+        selectLangAtStart: false // ...at the end
+        );
 
     expect(done, isFalse);
   });
 
-  testWidgets('when started for default reason every input is shown', (WidgetTester tester) async {
+  testWidgets('when started for default reason every input is shown',
+      (WidgetTester tester) async {
     final product = Product((v) => v
-        ..barcode = '123'
-        ..langsPrioritized.add(_DEFAULT_TEST_LANG));
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG));
 
-    final widget = InitProductPage(product, startReason: InitProductPageStartReason.DEFAULT);
+    final widget = InitProductPage(product,
+        startReason: InitProductPageStartReason.DEFAULT);
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1497,12 +1526,14 @@ void main() {
     expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
   });
 
-  testWidgets('when started for veg statuses only veg statuses are shown', (WidgetTester tester) async {
+  testWidgets('when started for veg statuses only veg statuses are shown',
+      (WidgetTester tester) async {
     final product = Product((v) => v
-        ..barcode = '123'
-        ..langsPrioritized.add(_DEFAULT_TEST_LANG));
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG));
 
-    final widget = InitProductPage(product, startReason: InitProductPageStartReason.HELP_WITH_VEG_STATUSES);
+    final widget = InitProductPage(product,
+        startReason: InitProductPageStartReason.HELP_WITH_VEG_STATUSES);
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 

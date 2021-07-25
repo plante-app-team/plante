@@ -33,8 +33,8 @@ class FakeHttpClient extends HttpClient {
 
   List<http.BaseRequest> getRequestsMatching(String regex) {
     final regexpr = RegExp(regex);
-    return _requests.where(
-            (element) => regexpr.hasMatch(element.url.toString()))
+    return _requests
+        .where((element) => regexpr.hasMatch(element.url.toString()))
         .toList();
   }
 
@@ -52,6 +52,6 @@ class FakeHttpClient extends HttpClient {
 class _Response {
   final http.Response? httpResponse;
   final Exception? exception;
-  _Response.ok(this.httpResponse): exception = null;
-  _Response.err(this.exception): httpResponse = null;
+  _Response.ok(this.httpResponse) : exception = null;
+  _Response.err(this.exception) : httpResponse = null;
 }

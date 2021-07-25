@@ -14,7 +14,8 @@ import '../../../widget_tester_extension.dart';
 
 void main() {
   String? getText() {
-    final textWidget = find.byType(RichText).evaluate().first.widget as RichText;
+    final textWidget =
+        find.byType(RichText).evaluate().first.widget as RichText;
     final text = textWidget.text.toPlainText();
     // Remove all invisible chars except for whitespaces
     return text.replaceAll(RegExp('[^A-Za-z0-9().,:;? ]'), '').trim();
@@ -26,11 +27,12 @@ void main() {
       ..neighbourhood = 'Nice neighbourhood' // Expected to be not used
       ..road = 'Broadway'
       ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-    );
+      ..houseNumber = '4');
 
-    final context = await tester.superPump(ShopAddressWidget(addressCompleter.future));
-    final expectedStr = '${context.strings.shop_address_widget_possible_address}'
+    final context =
+        await tester.superPump(ShopAddressWidget(addressCompleter.future));
+    final expectedStr =
+        '${context.strings.shop_address_widget_possible_address}'
         'Nice district, Broadway, 4';
 
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
@@ -49,32 +51,33 @@ void main() {
     final address = OsmAddress((e) => e
       ..road = 'Broadway'
       ..cityDistrict = null
-      ..houseNumber = '4'
-    );
+      ..houseNumber = '4');
 
-    final context = await tester.superPump(
-        ShopAddressWidget(Future.value(Ok(address))));
+    final context =
+        await tester.superPump(ShopAddressWidget(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
-    final expectedStr = '${context.strings.shop_address_widget_possible_address}'
+    final expectedStr =
+        '${context.strings.shop_address_widget_possible_address}'
         'Broadway, 4';
     expect(getText(), equals(expectedStr));
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
     expect(find.byKey(const Key('address_placeholder')), findsNothing);
   });
 
-  testWidgets('house number is not used without road', (WidgetTester tester) async {
+  testWidgets('house number is not used without road',
+      (WidgetTester tester) async {
     final address = OsmAddress((e) => e
       ..road = null
       ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-    );
+      ..houseNumber = '4');
 
-    final context = await tester.superPump(
-        ShopAddressWidget(Future.value(Ok(address))));
+    final context =
+        await tester.superPump(ShopAddressWidget(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
-    final expectedStr = '${context.strings.shop_address_widget_possible_address}'
+    final expectedStr =
+        '${context.strings.shop_address_widget_possible_address}'
         'Nice district';
     expect(getText(), equals(expectedStr));
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
@@ -85,11 +88,9 @@ void main() {
     final address = OsmAddress((e) => e
       ..road = null
       ..cityDistrict = null
-      ..houseNumber = null
-    );
+      ..houseNumber = null);
 
-    await tester.superPump(
-        ShopAddressWidget(Future.value(Ok(address))));
+    await tester.superPump(ShopAddressWidget(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
     expect(getText(), equals(''));

@@ -5,7 +5,7 @@ void main() {
   setUp(() async {});
 
   test('valuesOrderedForUI has all the values', () {
-    expect(ShopType.valuesOrderedForUI.toSet(),
-        equals(ShopType.values.toSet()));
+    expect(
+        ShopType.valuesOrderedForUI.toSet(), equals(ShopType.values.toSet()));
   });
 }

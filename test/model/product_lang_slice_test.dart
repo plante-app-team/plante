@@ -8,8 +8,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 
 void main() {
-  setUp(() {
-  });
+  setUp(() {});
 
   test('update product with a slice', () async {
     // A HUUGE product
@@ -22,16 +21,21 @@ void main() {
       ..langsPrioritized.addAll([LangCode.ru, LangCode.de])
       ..nameLangs.addAll({LangCode.ru: 'name ru', LangCode.de: 'name de'})
       ..brands.add('Brand name')
-      ..ingredientsTextLangs.addAll({LangCode.ru: 'voda', LangCode.de: 'wasser'})
+      ..ingredientsTextLangs
+          .addAll({LangCode.ru: 'voda', LangCode.de: 'wasser'})
       ..ingredientsAnalyzedLangs.addAll({
-        LangCode.ru: BuiltList<Ingredient>([Ingredient((v) => v
-          ..name = 'voda'
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatus = VegStatus.possible)]),
-        LangCode.de: BuiltList<Ingredient>([Ingredient((v) => v
-          ..name = 'wasser'
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatus = VegStatus.possible)]),
+        LangCode.ru: BuiltList<Ingredient>([
+          Ingredient((v) => v
+            ..name = 'voda'
+            ..vegetarianStatus = VegStatus.positive
+            ..veganStatus = VegStatus.possible)
+        ]),
+        LangCode.de: BuiltList<Ingredient>([
+          Ingredient((v) => v
+            ..name = 'wasser'
+            ..vegetarianStatus = VegStatus.positive
+            ..veganStatus = VegStatus.possible)
+        ]),
       })
       ..imageFrontLangs.addAll({
         LangCode.ru: Uri.file('/tmp/file1.jpg'),
@@ -56,14 +60,15 @@ void main() {
       ..name = 'name2 ru'
       ..brands.replace(['Brand name 2'])
       ..ingredientsText = 'voda 2'
-      ..ingredientsAnalyzed.replace([Ingredient((v) => v
-        ..name = 'voda2'
-        ..vegetarianStatus = VegStatus.positive
-        ..veganStatus = VegStatus.possible)])
+      ..ingredientsAnalyzed.replace([
+        Ingredient((v) => v
+          ..name = 'voda2'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.possible)
+      ])
       ..imageFront = Uri.file('/tmp/file2.jpg')
       ..imageFrontThumb = Uri.file('/tmp/file2.jpg')
-      ..imageIngredients = Uri.file('/tmp/file2.jpg')
-    );
+      ..imageIngredients = Uri.file('/tmp/file2.jpg'));
 
     // Make a German slice then change a couple of things
     var slice2 = initProduct.sliceFor(LangCode.de);
@@ -74,13 +79,14 @@ void main() {
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name2 de'
       ..ingredientsText = null
-      ..ingredientsAnalyzed.replace([Ingredient((v) => v
-        ..name = 'super wasser'
-        ..vegetarianStatus = VegStatus.positive
-        ..veganStatus = VegStatus.possible)])
+      ..ingredientsAnalyzed.replace([
+        Ingredient((v) => v
+          ..name = 'super wasser'
+          ..vegetarianStatus = VegStatus.positive
+          ..veganStatus = VegStatus.possible)
+      ])
       ..imageFront = Uri.file('/tmp/file3.jpg')
-      ..imageFrontThumb = null
-    );
+      ..imageFrontThumb = null);
 
     // Create a new Netherlands slice
     final slice3 = ProductLangSlice((e) => e
@@ -95,7 +101,8 @@ void main() {
       ..imageIngredients = Uri.file('/tmp/file4.jpg'));
 
     // Apply all the slices!
-    final finalProduct = initProduct.updateWith(slice1).updateWith(slice2).updateWith(slice3);
+    final finalProduct =
+        initProduct.updateWith(slice1).updateWith(slice2).updateWith(slice3);
 
     final expectedFinalProduct = Product((v) => v
       ..barcode = '123'
@@ -112,17 +119,22 @@ void main() {
       ..nameLangs.addAll({
         LangCode.ru: 'name2 ru',
         LangCode.de: 'name2 de',
-        LangCode.nl: 'nl name'})
+        LangCode.nl: 'nl name'
+      })
       ..ingredientsTextLangs.addAll({LangCode.ru: 'voda 2'})
       ..ingredientsAnalyzedLangs.addAll({
-        LangCode.ru: BuiltList<Ingredient>([Ingredient((v) => v
-          ..name = 'voda2'
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatus = VegStatus.possible)]),
-        LangCode.de: BuiltList<Ingredient>([Ingredient((v) => v
-          ..name = 'super wasser'
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatus = VegStatus.possible)]),
+        LangCode.ru: BuiltList<Ingredient>([
+          Ingredient((v) => v
+            ..name = 'voda2'
+            ..vegetarianStatus = VegStatus.positive
+            ..veganStatus = VegStatus.possible)
+        ]),
+        LangCode.de: BuiltList<Ingredient>([
+          Ingredient((v) => v
+            ..name = 'super wasser'
+            ..vegetarianStatus = VegStatus.positive
+            ..veganStatus = VegStatus.possible)
+        ]),
       })
       ..imageFrontLangs.addAll({
         LangCode.ru: Uri.file('/tmp/file2.jpg'),

@@ -33,6 +33,7 @@ class _TestWidget extends StatefulWidget {
     state!.registerForRestoration(property, restorationId);
   }
 }
+
 class __TestWidgetState extends State<_TestWidget> with RestorationMixin {
   @override
   Widget build(BuildContext context) {
@@ -43,13 +44,11 @@ class __TestWidgetState extends State<_TestWidget> with RestorationMixin {
   String? get restorationId => 'cool id';
 
   @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-  }
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {}
 }
 
 void main() {
-  setUp(() async {
-  });
+  setUp(() async {});
 
   testWidgets('ProductRestorable', (WidgetTester tester) async {
     final widget = _TestWidget();
@@ -61,22 +60,35 @@ void main() {
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..vegetarianStatus = VegStatus.negative
       ..vegetarianStatusSource = VegStatusSource.community
-      ..nameLangs.addAll({ LangCode.en: 'hello there', LangCode.ru: 'Privet tut'})
+      ..nameLangs
+          .addAll({LangCode.en: 'hello there', LangCode.ru: 'Privet tut'})
       ..brands.addAll(['Horns', 'Hooves'])
-      ..ingredientsTextLangs.addAll({ LangCode.en: 'Water, lemon', LangCode.ru: 'Voda, lemon' })
-      ..ingredientsAnalyzedLangs.addAll({LangCode.en: BuiltList.from([
-        Ingredient((v) => v
-          ..name = 'water'
-          ..vegetarianStatus = VegStatus.possible),
-        Ingredient((v) => v
-          ..name = 'lemon'
-          ..vegetarianStatus = VegStatus.positive)])})
+      ..ingredientsTextLangs
+          .addAll({LangCode.en: 'Water, lemon', LangCode.ru: 'Voda, lemon'})
+      ..ingredientsAnalyzedLangs.addAll({
+        LangCode.en: BuiltList.from([
+          Ingredient((v) => v
+            ..name = 'water'
+            ..vegetarianStatus = VegStatus.possible),
+          Ingredient((v) => v
+            ..name = 'lemon'
+            ..vegetarianStatus = VegStatus.positive)
+        ])
+      })
       ..imageFrontLangs.addAll({
-        LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png'),
-        LangCode.ru: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png') })
-      ..imageFrontThumbLangs.addAll({ LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')})
-      ..imageIngredientsLangs.addAll({ LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')})
-    );
+        LangCode.en: Uri.parse(
+            'https://en.wikipedia.org/static/apple-touch/wikipedia.png'),
+        LangCode.ru: Uri.parse(
+            'https://en.wikipedia.org/static/apple-touch/wikipedia.png')
+      })
+      ..imageFrontThumbLangs.addAll({
+        LangCode.en: Uri.parse(
+            'https://en.wikipedia.org/static/apple-touch/wikipedia.png')
+      })
+      ..imageIngredientsLangs.addAll({
+        LangCode.en: Uri.parse(
+            'https://en.wikipedia.org/static/apple-touch/wikipedia.png')
+      }));
 
     final restorable = ProductRestorable(Product.empty);
     widget.register(restorable, 'restorable');
@@ -108,11 +120,14 @@ void main() {
           ..vegetarianStatus = VegStatus.possible),
         Ingredient((v) => v
           ..name = 'lemon'
-          ..vegetarianStatus = VegStatus.positive)])
-      ..imageFront = Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
-      ..imageFrontThumb = Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
-      ..imageIngredients = Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
-    );
+          ..vegetarianStatus = VegStatus.positive)
+      ])
+      ..imageFront =
+          Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
+      ..imageFrontThumb =
+          Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
+      ..imageIngredients = Uri.parse(
+          'https://en.wikipedia.org/static/apple-touch/wikipedia.png'));
 
     final restorable = ProductLangSliceRestorable(
         ProductLangSlice.from(Product.empty, LangCode.en));

@@ -15,30 +15,29 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
   });
 
-  testWidgets('Can fill all data and get user params', (WidgetTester tester) async {
+  testWidgets('Can fill all data and get user params',
+      (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
       resultParams = params;
       return true;
     };
-    final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
+    final context = await tester
+        .superPump(InitUserPage(UserParams(), resultParamsCallback));
 
-    await tester.enterText(
-        find.byKey(const Key('name')),
-        'Bob');
+    await tester.enterText(find.byKey(const Key('name')), 'Bob');
 
     await tester.pumpAndSettle();
-    await tester.tap(
-        find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_i_eat_honey));
+    await tester.tap(find.text(context.strings.init_user_page_i_eat_honey));
     await tester.pumpAndSettle();
 
     expect(resultParams, equals(null));
-    await tester.tap(
-        find.text(context.strings.init_user_page_done_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
@@ -49,29 +48,28 @@ void main() {
     expect(resultParams, equals(expectedParams));
   });
 
-  testWidgets('Allows to not fill gender and birthday', (WidgetTester tester) async {
+  testWidgets('Allows to not fill gender and birthday',
+      (WidgetTester tester) async {
     UserParams? resultParams;
     final resultParamsCallback = (UserParams params) async {
       resultParams = params;
       return true;
     };
-    final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
+    final context = await tester
+        .superPump(InitUserPage(UserParams(), resultParamsCallback));
 
-    await tester.enterText(
-        find.byKey(const Key('name')),
-        'Bob');
+    await tester.enterText(find.byKey(const Key('name')), 'Bob');
 
     await tester.pumpAndSettle();
-    await tester.tap(
-        find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_im_vegan));
+    await tester.tap(find.text(context.strings.init_user_page_im_vegan));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_done_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
@@ -89,19 +87,19 @@ void main() {
       return true;
     };
     final initialParams = UserParams((v) => v.name = 'Nora');
-    final context = await tester.superPump(InitUserPage(initialParams, resultParamsCallback));
+    final context = await tester
+        .superPump(InitUserPage(initialParams, resultParamsCallback));
 
     await tester.pumpAndSettle();
-    await tester.tap(
-        find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_im_vegan));
+    await tester.tap(find.text(context.strings.init_user_page_im_vegan));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_done_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
 
     final expectedParams = UserParams((v) => v
@@ -113,16 +111,17 @@ void main() {
   });
 
   testWidgets("Doesn't allow too short names", (WidgetTester tester) async {
-    final resultParamsCallback = (UserParams params) async { return true; };
-    final context = await tester.superPump(InitUserPage(UserParams(), resultParamsCallback));
+    final resultParamsCallback = (UserParams params) async {
+      return true;
+    };
+    final context = await tester
+        .superPump(InitUserPage(UserParams(), resultParamsCallback));
 
-    await tester.enterText(
-        find.byKey(const Key('name')),
-        'Bo');
+    await tester.enterText(find.byKey(const Key('name')), 'Bo');
 
     await tester.pumpAndSettle();
-    await tester.tap(
-        find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
     // Expect next screen to not be open even after
@@ -130,22 +129,24 @@ void main() {
     expect(find.text(context.strings.init_user_page_i_eat_honey), findsNothing);
   });
 
-  testWidgets('Does not finish without vegan or vegetarian selection', (WidgetTester tester) async {
+  testWidgets('Does not finish without vegan or vegetarian selection',
+      (WidgetTester tester) async {
     bool done = false;
     final resultParamsCallback = (UserParams params) async {
       done = true;
       return true;
     };
     final initialParams = UserParams((v) => v.name = 'Nora');
-    final context = await tester.superPump(InitUserPage(initialParams, resultParamsCallback));
+    final context = await tester
+        .superPump(InitUserPage(initialParams, resultParamsCallback));
 
     await tester.pumpAndSettle();
-    await tester.tap(
-        find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    await tester.tap(
-        find.text(context.strings.init_user_page_done_button_title));
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
     await tester.pumpAndSettle();
 
     expect(done, isFalse);

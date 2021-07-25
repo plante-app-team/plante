@@ -72,16 +72,17 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(3));
 
     final expectedShop1 = OsmShop((e) => e
-        ..osmId = '992336735'
-        ..name = 'Spar'
-        ..type = 'supermarket'
-        ..latitude = 56.3202185
-        ..longitude = 44.0097146);
+      ..osmId = '992336735'
+      ..name = 'Spar'
+      ..type = 'supermarket'
+      ..latitude = 56.3202185
+      ..longitude = 44.0097146);
     final expectedShop2 = OsmShop((e) => e
       ..osmId = '1641239353'
       ..name = 'Orehovskiy'
@@ -109,7 +110,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrap().length, equals(0));
   });
 
@@ -123,7 +125,8 @@ void main() {
 
     _http.setResponse('.*', osmResp, responseCode: 400);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -136,7 +139,8 @@ void main() {
     ''';
 
     _http.setResponse('.*', osmResp);
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -149,7 +153,8 @@ void main() {
     ''';
 
     _http.setResponse('.*', osmResp);
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -182,7 +187,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -217,7 +223,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(2));
     expect(shops[0].name, 'Spar');
@@ -267,7 +274,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -303,7 +311,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -339,7 +348,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes = await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -381,12 +391,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood'
-      ..road = 'Broadway'
-      ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-      ..countryCode = 'en')));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = 'en')));
   });
 
   test('fetchAddress response without address', () async {
@@ -430,12 +442,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = null
-      ..road = 'Broadway'
-      ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-      ..countryCode = 'en')));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = null
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = 'en')));
   });
 
   test('fetchAddress response without road', () async {
@@ -454,12 +468,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood'
-      ..road = null
-      ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-      ..countryCode = 'en')));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = null
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = 'en')));
   });
 
   test('fetchAddress response without city district', () async {
@@ -478,12 +494,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood'
-      ..road = 'Broadway'
-      ..cityDistrict = null
-      ..houseNumber = '4'
-      ..countryCode = 'en')));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = null
+          ..houseNumber = '4'
+          ..countryCode = 'en')));
   });
 
   test('fetchAddress response without house number', () async {
@@ -502,12 +520,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood'
-      ..road = 'Broadway'
-      ..cityDistrict = 'Nice district'
-      ..houseNumber = null
-      ..countryCode = 'en')));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = null
+          ..countryCode = 'en')));
   });
 
   test('fetchAddress response without country code', () async {
@@ -526,12 +546,14 @@ void main() {
 
     final addressRes = await _osm.fetchAddress(123, 321);
     final address = addressRes.unwrap();
-    expect(address, equals(OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood'
-      ..road = 'Broadway'
-      ..cityDistrict = 'Nice district'
-      ..houseNumber = '4'
-      ..countryCode = null)));
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = null)));
   });
 
   test('fetchAddress not 200', () async {

@@ -38,16 +38,16 @@ void main() {
   testWidgets('Google: successful Google Sign in', (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken'))).thenAnswer((_) async => Ok(UserParams()));
+    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken')))
+        .thenAnswer((_) async => Ok(UserParams()));
 
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedParams;
-    await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedParams = params;
-          return true;
-        }));
+    await tester.superPump(ExternalAuthPage((params) async {
+      obtainedParams = params;
+      return true;
+    }));
 
     await tester.tap(find.text('Google'));
 
@@ -60,15 +60,15 @@ void main() {
     expect(analytics.wasEventSent('google_auth_success'), isTrue);
   });
 
-  testWidgets('Google: not successful Google Sign in', (WidgetTester tester) async {
+  testWidgets('Google: not successful Google Sign in',
+      (WidgetTester tester) async {
     when(googleAuthorizer.auth()).thenAnswer((_) async => null);
 
     UserParams? obtainedResult;
-    await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedResult = params;
-          return true;
-        }));
+    await tester.superPump(ExternalAuthPage((params) async {
+      obtainedResult = params;
+      return true;
+    }));
 
     await tester.tap(find.text('Google'));
     expect(obtainedResult, equals(null));
@@ -78,20 +78,20 @@ void main() {
     expect(analytics.wasEventSent('google_auth_google_error'), isTrue);
   });
 
-  testWidgets('Google: not successful backend sign in', (WidgetTester tester) async {
+  testWidgets('Google: not successful backend sign in',
+      (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken'))).thenAnswer((_) async =>
-        Err(BackendError.other()));
+    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken')))
+        .thenAnswer((_) async => Err(BackendError.other()));
 
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedResult;
-    await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedResult = params;
-          return true;
-        }));
+    await tester.superPump(ExternalAuthPage((params) async {
+      obtainedResult = params;
+      return true;
+    }));
 
     await tester.tap(find.text('Google'));
     expect(obtainedResult, equals(null));
@@ -104,19 +104,20 @@ void main() {
   testWidgets('Apple: successful Apple Sign in', (WidgetTester tester) async {
     final appleUser = AppleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(appleAuthorizer.auth()).thenAnswer((_) async => appleUser);
-    when(backend.loginOrRegister(appleAuthorizationCode: anyNamed('appleAuthorizationCode'))).thenAnswer((_) async => Ok(UserParams()));
+    when(backend.loginOrRegister(
+            appleAuthorizationCode: anyNamed('appleAuthorizationCode')))
+        .thenAnswer((_) async => Ok(UserParams()));
 
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedParams;
-    final context = await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedParams = params;
-          return true;
-        }));
+    final context = await tester.superPump(ExternalAuthPage((params) async {
+      obtainedParams = params;
+      return true;
+    }));
 
-    await tester.tap(find.text(
-        context.strings.external_auth_page_continue_with_apple));
+    await tester
+        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
 
     // We expect the Apple name to be sent to the server
     final expectedParams = UserParams((e) => e.name = 'bob');
@@ -127,18 +128,18 @@ void main() {
     expect(analytics.wasEventSent('apple_auth_success'), isTrue);
   });
 
-  testWidgets('Apple: not successful Apple Sign in', (WidgetTester tester) async {
+  testWidgets('Apple: not successful Apple Sign in',
+      (WidgetTester tester) async {
     when(appleAuthorizer.auth()).thenAnswer((_) async => null);
 
     UserParams? obtainedResult;
-    final context = await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedResult = params;
-          return true;
-        }));
+    final context = await tester.superPump(ExternalAuthPage((params) async {
+      obtainedResult = params;
+      return true;
+    }));
 
-    await tester.tap(find.text(
-        context.strings.external_auth_page_continue_with_apple));
+    await tester
+        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
     expect(obtainedResult, equals(null));
 
     expect(analytics.allEvents().length, equals(2));
@@ -146,23 +147,24 @@ void main() {
     expect(analytics.wasEventSent('apple_auth_apple_error'), isTrue);
   });
 
-  testWidgets('Apple: not successful backend sign in', (WidgetTester tester) async {
+  testWidgets('Apple: not successful backend sign in',
+      (WidgetTester tester) async {
     final appleUser = AppleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(appleAuthorizer.auth()).thenAnswer((_) async => appleUser);
-    when(backend.loginOrRegister(appleAuthorizationCode: anyNamed('appleAuthorizationCode'))).thenAnswer((_) async =>
-        Err(BackendError.other()));
+    when(backend.loginOrRegister(
+            appleAuthorizationCode: anyNamed('appleAuthorizationCode')))
+        .thenAnswer((_) async => Err(BackendError.other()));
 
     expect(analytics.allEvents(), equals([]));
 
     UserParams? obtainedResult;
-    final context = await tester.superPump(
-        ExternalAuthPage((params) async {
-          obtainedResult = params;
-          return true;
-        }));
+    final context = await tester.superPump(ExternalAuthPage((params) async {
+      obtainedResult = params;
+      return true;
+    }));
 
-    await tester.tap(find.text(
-        context.strings.external_auth_page_continue_with_apple));
+    await tester
+        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
     expect(obtainedResult, equals(null));
 
     expect(analytics.allEvents().length, equals(2));

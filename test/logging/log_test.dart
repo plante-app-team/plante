@@ -4,8 +4,7 @@ import 'package:test/test.dart';
 import 'package:plante/logging/log.dart';
 
 void main() {
-  setUp(() {
-  });
+  setUp(() {});
 
   test('extra logs files properly deleted', () async {
     final rand = DateTime.now().millisecondsSinceEpoch;

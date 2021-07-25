@@ -51,14 +51,11 @@ void main() {
     });
 
     model = MapPageModel(locationController, shopsManager, addressObtainer,
-        latestCameraPosStorage,
-        (shops) {
-          latestLoadedShops = shops;
-        },
-        (error) {
-          latestError = error;
-        },
-        () {});
+        latestCameraPosStorage, (shops) {
+      latestLoadedShops = shops;
+    }, (error) {
+      latestError = error;
+    }, () {});
   });
 
   test('successful shops load', () async {
@@ -87,7 +84,9 @@ void main() {
     clearInteractions(shopsManager);
 
     verifyNever(shopsManager.fetchShops(any, any));
-    shopsManagerListeners.forEach((listener) { listener.onLocalShopsChange(); });
+    shopsManagerListeners.forEach((listener) {
+      listener.onLocalShopsChange();
+    });
     verify(shopsManager.fetchShops(any, any));
   });
 }

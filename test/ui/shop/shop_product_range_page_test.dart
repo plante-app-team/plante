@@ -96,9 +96,8 @@ void main() {
     ..products.addAll(products)
     ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
 
-  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
-    ..road = 'Broadway'
-  )));
+  final FutureAddress readyAddress =
+      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -116,8 +115,10 @@ void main() {
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
-    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
+    GetIt.I
+        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
+    GetIt.I
+        .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
     addressObtainer = MockAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
@@ -136,12 +137,14 @@ void main() {
       ..eatsHoney = false);
     await userParamsController.setUserParams(params);
 
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
-    when(backend.productPresenceVote(any, any, any)).thenAnswer((_) async =>
-        Ok(None()));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
+    when(backend.productPresenceVote(any, any, any))
+        .thenAnswer((_) async => Ok(None()));
     when(productsManager.createUpdateProduct(any)).thenAnswer(
-            (invoc) async => Ok(invoc.positionalArguments[0] as Product));
+        (invoc) async => Ok(invoc.positionalArguments[0] as Product));
 
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
   });
@@ -168,13 +171,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(BarcodeScanPage), findsNothing);
-    await tester.tap(find.text(
-        context.strings.shop_product_range_page_add_product));
+    await tester
+        .tap(find.text(context.strings.shop_product_range_page_add_product));
     await tester.pumpAndSettle();
     expect(find.byType(BarcodeScanPage), findsOneWidget);
 
-    final scanPage = find.byType(BarcodeScanPage)
-        .evaluate().first.widget as BarcodeScanPage;
+    final scanPage =
+        find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
     expect(scanPage.addProductToShop, equals(aShop));
 
     // Now close the scan page
@@ -190,21 +193,25 @@ void main() {
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    final cards = find.byType(ProductCard)
-        .evaluate().map((e) => e.widget).toList();
+    final cards =
+        find.byType(ProductCard).evaluate().map((e) => e.widget).toList();
     for (var i = 0; i < cards.length; ++i) {
-      expect(find.descendant(
-          of: find.byWidget(cards[i]),
-          matching: find.text(products[i].name!)), findsOneWidget);
+      expect(
+          find.descendant(
+              of: find.byWidget(cards[i]),
+              matching: find.text(products[i].name!)),
+          findsOneWidget);
 
-      final expectedDateStr = dateToStr(
-          productsLastSeen[products[i]]!, context);
+      final expectedDateStr =
+          dateToStr(productsLastSeen[products[i]]!, context);
       final expectedLastSeenStr =
           '${context.strings.shop_product_range_page_product_last_seen_here}'
           '$expectedDateStr';
-      expect(find.descendant(
-          of: find.byWidget(cards[i]),
-          matching: find.text(expectedLastSeenStr)), findsOneWidget);
+      expect(
+          find.descendant(
+              of: find.byWidget(cards[i]),
+              matching: find.text(expectedLastSeenStr)),
+          findsOneWidget);
     }
   });
 
@@ -228,19 +235,21 @@ void main() {
     final product = products[0];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Verify the old date
-    final expectedOldDateStr = dateToStr(
-        productsLastSeen[product]!, context);
+    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
     final expectedOldLastSeenStr =
         '${context.strings.shop_product_range_page_product_last_seen_here}'
         '$expectedOldDateStr';
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(expectedOldLastSeenStr)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(expectedOldLastSeenStr)),
+        findsOneWidget);
 
     // Tap and verify the vote is sent
     verifyNever(backend.productPresenceVote(any, any, any));
@@ -257,18 +266,22 @@ void main() {
     // Verify the date is updated
     card = find.byType(ProductCard).evaluate().first.widget;
     // Old date is no more
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(expectedOldLastSeenStr)), findsNothing);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(expectedOldLastSeenStr)),
+        findsNothing);
     // New date has come!
     final now = DateTime.now();
     final expectedNewDateStr = dateToStr(now, context);
     final expectedNewLastSeenStr =
         '${context.strings.shop_product_range_page_product_last_seen_here}'
         '$expectedNewDateStr';
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(expectedNewLastSeenStr)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(expectedNewLastSeenStr)),
+        findsOneWidget);
   });
 
   testWidgets('vote against product presence', (WidgetTester tester) async {
@@ -280,19 +293,21 @@ void main() {
     final product = products[0];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Verify the old date
-    final expectedOldDateStr = dateToStr(
-        productsLastSeen[product]!, context);
+    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
     final expectedOldLastSeenStr =
         '${context.strings.shop_product_range_page_product_last_seen_here}'
         '$expectedOldDateStr';
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(expectedOldLastSeenStr)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(expectedOldLastSeenStr)),
+        findsOneWidget);
 
     // Tap and verify the vote is sent
     verifyNever(backend.productPresenceVote(any, any, any));
@@ -308,24 +323,28 @@ void main() {
 
     // Verify the old date is still in place
     card = find.byType(ProductCard).evaluate().first.widget;
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(expectedOldLastSeenStr)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(expectedOldLastSeenStr)),
+        findsOneWidget);
   });
 
   testWidgets('no products', (WidgetTester tester) async {
     final range = ShopProductRange((e) => e
       ..shop.replace(aShop)
       ..products.addAll(const []));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     // No products title
-    expect(find.text(
-        context.strings.shop_product_range_page_this_shop_has_no_product),
+    expect(
+        find.text(
+            context.strings.shop_product_range_page_this_shop_has_no_product),
         findsOneWidget);
 
     // No products at all
@@ -335,25 +354,23 @@ void main() {
   });
 
   testWidgets('network error', (WidgetTester tester) async {
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async =>
-        Err(ShopsManagerError.NETWORK_ERROR));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Err(ShopsManagerError.NETWORK_ERROR));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     // Network error
-    expect(find.text(
-        context.strings.global_network_error),
-        findsOneWidget);
+    expect(find.text(context.strings.global_network_error), findsOneWidget);
     // No products
     for (final product in products) {
       expect(find.text(product.name!), findsNothing);
     }
 
     // Try again!
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async =>
-        Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
     clearInteractions(shopsManager);
 
     await tester.tap(find.text(context.strings.global_try_again));
@@ -368,17 +385,16 @@ void main() {
   });
 
   testWidgets('other error', (WidgetTester tester) async {
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async =>
-        Err(ShopsManagerError.OTHER));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Err(ShopsManagerError.OTHER));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
     // An error
-    expect(find.text(
-        context.strings.global_something_went_wrong),
-        findsOneWidget);
+    expect(
+        find.text(context.strings.global_something_went_wrong), findsOneWidget);
     // No products
     for (final product in products) {
       expect(find.text(product.name!), findsNothing);
@@ -397,13 +413,16 @@ void main() {
 
     var card = find.byType(ProductCard).evaluate().first.widget;
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(products[0].name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(products[0].name!)),
+        findsOneWidget);
     // Verify initial status
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(context.strings.veg_status_displayed_vegan_status_possible)),
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(
+                context.strings.veg_status_displayed_vegan_status_possible)),
         findsOneWidget);
 
     expect(find.byType(DisplayProductPage), findsNothing);
@@ -425,17 +444,20 @@ void main() {
 
     card = find.byType(ProductCard).evaluate().first.widget;
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(products[0].name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(products[0].name!)),
+        findsOneWidget);
     // Verify the change
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(context.strings.veg_status_displayed_vegan)),
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(context.strings.veg_status_displayed_vegan)),
         findsOneWidget);
   });
 
-  testWidgets('non-vegan products are not shown to a vegan', (WidgetTester tester) async {
+  testWidgets('non-vegan products are not shown to a vegan',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -466,7 +488,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final veganUser = UserParams((v) => v
       ..name = 'Bob'
@@ -484,7 +507,8 @@ void main() {
     expect(find.text(products[1].name!), findsOneWidget);
   });
 
-  testWidgets('non-vegetarian products are not shown to a vegetarian', (WidgetTester tester) async {
+  testWidgets('non-vegetarian products are not shown to a vegetarian',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -515,7 +539,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final veganUser = UserParams((v) => v
       ..name = 'Bob'
@@ -533,7 +558,8 @@ void main() {
     expect(find.text(products[1].name!), findsOneWidget);
   });
 
-  testWidgets('non-vegan products ARE shown to a vegetarian', (WidgetTester tester) async {
+  testWidgets('non-vegan products ARE shown to a vegetarian',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -564,7 +590,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final veganUser = UserParams((v) => v
       ..name = 'Bob'
@@ -582,7 +609,8 @@ void main() {
     expect(find.text(products[1].name!), findsOneWidget);
   });
 
-  testWidgets('products are sorted by their last-seen property (order 1)', (WidgetTester tester) async {
+  testWidgets('products are sorted by their last-seen property (order 1)',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -613,7 +641,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     await tester.superPump(widget);
@@ -624,7 +653,8 @@ void main() {
     expect(product1Center.dy, greaterThan(product0Center.dy));
   });
 
-  testWidgets('products are sorted by their last-seen property (order 2)', (WidgetTester tester) async {
+  testWidgets('products are sorted by their last-seen property (order 2)',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -655,7 +685,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     await tester.superPump(widget);
@@ -666,7 +697,8 @@ void main() {
     expect(product1Center.dy, lessThan(product0Center.dy));
   });
 
-  testWidgets('products reloading changes order only when products set changes', (WidgetTester tester) async {
+  testWidgets('products reloading changes order only when products set changes',
+      (WidgetTester tester) async {
     final products = [
       ProductLangSlice((v) => v
         ..barcode = '123'
@@ -697,7 +729,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     // Create widget
     final widget = ShopProductRangePage.createForTesting(aShop);
@@ -720,7 +753,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     // Force content reload
     clearInteractions(shopsManager);
@@ -735,16 +769,15 @@ void main() {
     expect(product1Center.dy, greaterThan(product0Center.dy));
 
     // Add another product, unrelated to first 2
-    products.add(
-        ProductLangSlice((v) => v
-        ..barcode = '223'
-        ..name = 'Some unrelated product'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.positive
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests());
+    products.add(ProductLangSlice((v) => v
+      ..barcode = '223'
+      ..name = 'Some unrelated product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..ingredientsText = 'Water, salt, sugar').productForTests());
 
     // NOTE: we'll keep the 'last seen' properties same
 
@@ -753,7 +786,8 @@ void main() {
       ..shop.replace(aShop)
       ..products.addAll(products)
       ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     // Force content reload
     clearInteractions(shopsManager);
@@ -779,9 +813,10 @@ void main() {
     var product = products[0];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Vote
     await tester.tap(find.descendant(
@@ -806,16 +841,16 @@ void main() {
             matching: find.text(context.strings.global_no)),
         findsNothing);
 
-
     // NO vote
 
     card = find.byType(ProductCard).evaluate().last.widget;
     product = products[1];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Vote
     await tester.tap(find.descendant(
@@ -841,7 +876,8 @@ void main() {
         findsNothing);
   });
 
-  testWidgets('cancelled voting does not remove vote options', (WidgetTester tester) async {
+  testWidgets('cancelled voting does not remove vote options',
+      (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
@@ -852,9 +888,10 @@ void main() {
     var product = products[0];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Vote
     await tester.tap(find.descendant(
@@ -885,9 +922,10 @@ void main() {
     product = products[1];
 
     // Verify the proper product
-    expect(find.descendant(
-        of: find.byWidget(card),
-        matching: find.text(product.name!)), findsOneWidget);
+    expect(
+        find.descendant(
+            of: find.byWidget(card), matching: find.text(product.name!)),
+        findsOneWidget);
 
     // Tap and verify the vote is sent
     await tester.tap(find.descendant(
@@ -917,14 +955,15 @@ void main() {
     final range = ShopProductRange((e) => e
       ..shop.replace(aShop)
       ..products.addAll(const []));
-    when(shopsManager.fetchShopProductRange(any)).thenAnswer((_) async => Ok(range));
+    when(shopsManager.fetchShopProductRange(any))
+        .thenAnswer((_) async => Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    final addressWidget = find.byType(ShopAddressWidget)
-        .evaluate().first.widget as ShopAddressWidget;
+    final addressWidget = find.byType(ShopAddressWidget).evaluate().first.widget
+        as ShopAddressWidget;
     expect(identical(addressWidget.osmAddress, readyAddress), isTrue);
   });
 }

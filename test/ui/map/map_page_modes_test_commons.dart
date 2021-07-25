@@ -34,9 +34,8 @@ class MapPageModesTestCommons {
 
   final shopsManagerListeners = <ShopsManagerListener>[];
 
-  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
-    ..road = 'Broadway'
-  )));
+  final FutureAddress readyAddress =
+      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
 
   final shops = [
     Shop((e) => e
@@ -108,40 +107,41 @@ class MapPageModesTestCommons {
       shopsManagerListeners.remove(listener);
     });
 
-    when(shopsManager.fetchShops(any, any)).thenAnswer((_) async =>
-        Ok(shopsMap));
+    when(shopsManager.fetchShops(any, any))
+        .thenAnswer((_) async => Ok(shopsMap));
 
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
     when(locationController.currentPosition()).thenAnswer((_) async => null);
-    when(mapController.getVisibleRegion()).thenAnswer(
-            (_) async =>
-            LatLngBounds(
-                southwest: const LatLng(10, 10),
-                northeast: const LatLng(20, 20)));
+    when(mapController.getVisibleRegion()).thenAnswer((_) async => LatLngBounds(
+        southwest: const LatLng(10, 10), northeast: const LatLng(20, 20)));
     when(mapController.dispose()).thenAnswer((_) {});
     when(mapController.setMapStyle(any)).thenAnswer((_) async {});
     when(mapController.getZoomLevel()).thenAnswer((_) async => 10);
-    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
+    when(shopsManager.putProductToShops(any, any))
+        .thenAnswer((_) async => Ok(None()));
     when(shopsManager.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type'))).thenAnswer((invc) async {
-          final name = invc.namedArguments[const Symbol('name')] as String;
-          final coords = invc.namedArguments[const Symbol('coords')] as Point<double>;
-          final id = randInt(100, 500);
-          return Ok(Shop((e) => e
-            ..osmShop.replace(OsmShop((e) => e
-              ..osmId = id.toString()
-              ..longitude = coords.x
-              ..latitude = coords.y
-              ..name = name))
-            ..backendShop.replace(BackendShop((e) => e
-              ..osmId = id.toString()
-              ..productsCount = 0))));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((invc) async {
+      final name = invc.namedArguments[const Symbol('name')] as String;
+      final coords =
+          invc.namedArguments[const Symbol('coords')] as Point<double>;
+      final id = randInt(100, 500);
+      return Ok(Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = id.toString()
+          ..longitude = coords.x
+          ..latitude = coords.y
+          ..name = name))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = id.toString()
+          ..productsCount = 0))));
     });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
 
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
@@ -152,7 +152,7 @@ class MapPageModesTestCommons {
   }
 
   void fillFetchedShops() {
-    shopsMap = { for (final shop in shops) shop.osmId: shop };
+    shopsMap = {for (final shop in shops) shop.osmId: shop};
   }
 
   void clearFetchedShops() {

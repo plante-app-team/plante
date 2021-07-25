@@ -16,27 +16,26 @@ void main() {
     final controller = CustomizableStepperController();
 
     final page1 = StepperPage(
-        const Text('Page 1'),
-        ElevatedButton(
-            onPressed: controller.stepForward,
-            child: const Text('Cool button 1')),
+      const Text('Page 1'),
+      ElevatedButton(
+          onPressed: controller.stepForward,
+          child: const Text('Cool button 1')),
     );
     final page2 = StepperPage(
-        const Text('Page 2'),
-        ElevatedButton(
-            onPressed: controller.stepForward,
-            child: const Text('Cool button 2')),
+      const Text('Page 2'),
+      ElevatedButton(
+          onPressed: controller.stepForward,
+          child: const Text('Cool button 2')),
     );
     final page3 = StepperPage(
-  const       Text('Page 3'),
-        ElevatedButton(
-            onPressed: controller.stepForward,
-            child: const Text('Cool button 3')),
+      const Text('Page 3'),
+      ElevatedButton(
+          onPressed: controller.stepForward,
+          child: const Text('Cool button 3')),
     );
 
     await tester.superPump(CustomizableStepper(
-        pages: [page1, page2, page3],
-        controller: controller));
+        pages: [page1, page2, page3], controller: controller));
 
     return controller;
   }
@@ -132,7 +131,9 @@ void main() {
   testWidgets('Can dynamically update', (WidgetTester tester) async {
     final swapper = ChildrenSwapperController();
     await tester.superPump(StepperChildrenSwapper(
-        controller: swapper, child1: const Text('Text1'), child2: const Text('Text2')));
+        controller: swapper,
+        child1: const Text('Text1'),
+        child2: const Text('Text2')));
 
     expect(find.text('Text1'), findsOneWidget);
     expect(find.text('Text2'), findsNothing);
@@ -172,21 +173,24 @@ void main() {
   });
 }
 
-
 class ChildrenSwapperController {
   void Function()? _swapFn;
   void swap() {
     _swapFn?.call();
   }
 }
+
 class StepperChildrenSwapper extends StatefulWidget {
   final ChildrenSwapperController controller;
   final Widget child1;
   final Widget child2;
-  const StepperChildrenSwapper({required this.controller, required this.child1, required this.child2});
+  const StepperChildrenSwapper(
+      {required this.controller, required this.child1, required this.child2});
   @override
-  _StepperChildrenSwapperState createState() => _StepperChildrenSwapperState(controller, child1, child2);
+  _StepperChildrenSwapperState createState() =>
+      _StepperChildrenSwapperState(controller, child1, child2);
 }
+
 class _StepperChildrenSwapperState extends State<StepperChildrenSwapper> {
   final ChildrenSwapperController controller;
   final Widget child1;
@@ -202,10 +206,8 @@ class _StepperChildrenSwapperState extends State<StepperChildrenSwapper> {
   @override
   Widget build(BuildContext context) {
     final controller = CustomizableStepperController();
-    final page1 = StepperPage(
-        showChild1 ? child1 : child2,
-        const Placeholder()
-    );
+    final page1 =
+        StepperPage(showChild1 ? child1 : child2, const Placeholder());
     return CustomizableStepper(pages: [page1], controller: controller);
   }
 }

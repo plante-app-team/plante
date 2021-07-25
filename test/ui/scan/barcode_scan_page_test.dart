@@ -53,7 +53,8 @@ void main() {
     analytics = FakeAnalytics();
     GetIt.I.registerSingleton<Analytics>(analytics);
 
-    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
+    GetIt.I
+        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<Settings>(FakeSettings());
     productsManager = MockProductsManager();
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
@@ -65,7 +66,8 @@ void main() {
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
-    GetIt.I.registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
+    GetIt.I
+        .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     final locationController = MockLocationController();
@@ -77,7 +79,8 @@ void main() {
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
 
-    when(photosTaker.retrieveLostPhoto()).thenAnswer((realInvocation) async => null);
+    when(photosTaker.retrieveLostPhoto())
+        .thenAnswer((realInvocation) async => null);
 
     final userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v
@@ -89,49 +92,45 @@ void main() {
       ..eatsHoney = false);
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    
+
     when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
-    when(permissionsManager.request(any)).thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
+    when(permissionsManager.request(any))
+        .thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
-    when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Ok(None()));
+    when(shopsManager.putProductToShops(any, any))
+        .thenAnswer((_) async => Ok(None()));
   });
 
   testWidgets('product found', (WidgetTester tester) async {
-    when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(ProductLangSlice((e) => e
-          ..barcode = invc.positionalArguments[0] as String
-          ..name = 'Product name'
-          ..imageFront = Uri.file('/tmp/asd')
-          ..imageIngredients = Uri.file('/tmp/asd')
-          ..ingredientsText = 'beans'
-          ..veganStatus = VegStatus.positive
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatusSource = VegStatusSource.community).productForTests()));
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .productForTests()));
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-    expect(
-        find.text('Product name'),
-        findsNothing);
+    expect(find.text('Product name'), findsNothing);
 
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product name'),
-        findsOneWidget);
+    expect(find.text('Product name'), findsOneWidget);
 
-    expect(
-        find.byType(DisplayProductPage),
-        findsNothing);
+    expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
     await tester.pumpAndSettle();
-    expect(
-        find.byType(DisplayProductPage),
-        findsOneWidget);
+    expect(find.byType(DisplayProductPage), findsOneWidget);
   });
 
   testWidgets('product not found', (WidgetTester tester) async {
@@ -142,31 +141,24 @@ void main() {
 
     const barcode = '12345';
 
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
 
     widget.newScanDataForTesting(_barcode(barcode));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
 
-    expect(
-        find.byType(InitProductPage),
-        findsNothing);
+    expect(find.byType(InitProductPage), findsNothing);
     await tester.tap(find.text(context.strings.barcode_scan_page_add_product));
     await tester.pumpAndSettle();
-    expect(
-        find.byType(InitProductPage),
-        findsOneWidget);
+    expect(find.byType(InitProductPage), findsOneWidget);
   });
 
   testWidgets('scan data sent to backend', (WidgetTester tester) async {
     when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(Product((e) => e
-          ..barcode = invc.positionalArguments[0] as String)));
+        Ok(Product((e) => e..barcode = invc.positionalArguments[0] as String)));
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -177,17 +169,21 @@ void main() {
     verify(backend.sendProductScan(any));
   });
 
-  testWidgets('permission message not shown by default', (WidgetTester tester) async {
+  testWidgets('permission message not shown by default',
+      (WidgetTester tester) async {
     final context = await tester.superPump(BarcodeScanPage());
     expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        find.text(
+            context.strings.barcode_scan_page_camera_permission_reasoning),
         findsNothing);
   });
 
   testWidgets('permission request', (WidgetTester tester) async {
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.denied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
     when(permissionsManager.request(any)).thenAnswer((_) async {
-      when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
+      when(permissionsManager.status(any))
+          .thenAnswer((_) async => PermissionState.granted);
       return PermissionState.granted;
     });
 
@@ -198,16 +194,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.barcode_scan_page_camera_permission_reasoning),
+        find.text(
+            context.strings.barcode_scan_page_camera_permission_reasoning),
         findsNothing);
   });
 
-  testWidgets('permission request through settings', (WidgetTester tester) async {
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.permanentlyDenied);
+  testWidgets('permission request through settings',
+      (WidgetTester tester) async {
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.permanentlyDenied);
 
     final context = await tester.superPump(BarcodeScanPage());
     await tester.pumpAndSettle();
-
 
     verifyNever(permissionsManager.openAppSettings());
     await tester.tap(find.text(context.strings.barcode_scan_page_scan_product));
@@ -235,124 +233,112 @@ void main() {
     verify(permissionsManager.status(PermissionKind.CAMERA));
   });
 
-  testWidgets('permission request through settings not shown when '
-              'manual barcode search enabled', (WidgetTester tester) async {
-    when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.permanentlyDenied);
+  testWidgets(
+      'permission request through settings not shown when '
+      'manual barcode search enabled', (WidgetTester tester) async {
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.permanentlyDenied);
 
     final context = await tester.superPump(BarcodeScanPage());
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_scan_product),
+    expect(find.text(context.strings.barcode_scan_page_scan_product),
         findsOneWidget);
 
     await tester.tap(find.byKey(const Key('input_mode_switch')));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_scan_product),
+    expect(find.text(context.strings.barcode_scan_page_scan_product),
         findsNothing);
   });
 
   testWidgets('manual barcode search', (WidgetTester tester) async {
-    when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(ProductLangSlice((e) => e
-          ..barcode = invc.positionalArguments[0] as String
-          ..name = 'Product name'
-          ..imageFront = Uri.file('/tmp/asd')
-          ..imageIngredients = Uri.file('/tmp/asd')
-          ..ingredientsText = 'beans'
-          ..veganStatus = VegStatus.positive
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatusSource = VegStatusSource.community).productForTests()));
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .productForTests()));
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
-    expect(
-        find.byKey(const Key('manual_barcode_input')),
-        findsNothing);
+    expect(find.byKey(const Key('manual_barcode_input')), findsNothing);
 
     await tester.tap(find.byKey(const Key('input_mode_switch')));
     await tester.pumpAndSettle();
 
-    expect(
-        find.byKey(const Key('manual_barcode_input')),
-        findsWidgets);
-    await tester.enterText(find.byKey(const Key('manual_barcode_input')), '4000417025005');
+    expect(find.byKey(const Key('manual_barcode_input')), findsWidgets);
+    await tester.enterText(
+        find.byKey(const Key('manual_barcode_input')), '4000417025005');
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product name'),
+    expect(find.text('Product name'), findsNothing);
+
+    await tester.tap(find.text(context.strings.global_send));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product name'), findsOneWidget);
+  });
+
+  testWidgets('manual barcode search, but barcode is invalid',
+      (WidgetTester tester) async {
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .productForTests()));
+
+    final widget = BarcodeScanPage();
+    final context = await tester.superPump(widget);
+
+    expect(find.byKey(const Key('manual_barcode_input')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('input_mode_switch')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('manual_barcode_input')), findsWidgets);
+    await tester.enterText(
+        find.byKey(const Key('manual_barcode_input')), '1234567891234');
+    await tester.pumpAndSettle();
+
+    expect(find.text(context.strings.barcode_scan_page_invalid_barcode),
         findsNothing);
 
     await tester.tap(find.text(context.strings.global_send));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product name'),
-        findsOneWidget);
-  });
-
-  testWidgets('manual barcode search, but barcode is invalid', (WidgetTester tester) async {
-    when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(ProductLangSlice((e) => e
-          ..barcode = invc.positionalArguments[0] as String
-          ..name = 'Product name'
-          ..imageFront = Uri.file('/tmp/asd')
-          ..imageIngredients = Uri.file('/tmp/asd')
-          ..ingredientsText = 'beans'
-          ..veganStatus = VegStatus.positive
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatusSource = VegStatusSource.community).productForTests()));
-
-    final widget = BarcodeScanPage();
-    final context = await tester.superPump(widget);
-
-    expect(
-        find.byKey(const Key('manual_barcode_input')),
-        findsNothing);
-
-    await tester.tap(find.byKey(const Key('input_mode_switch')));
-    await tester.pumpAndSettle();
-
-    expect(
-        find.byKey(const Key('manual_barcode_input')),
-        findsWidgets);
-    await tester.enterText(find.byKey(const Key('manual_barcode_input')), '1234567891234');
-    await tester.pumpAndSettle();
-
-    expect(
-        find.text(context.strings.barcode_scan_page_invalid_barcode),
-        findsNothing);
-
-    await tester.tap(find.text(context.strings.global_send));
-    await tester.pumpAndSettle();
-
-    expect(
-        find.text('Product name'),
-        findsNothing);
-    expect(
-        find.text(context.strings.barcode_scan_page_invalid_barcode),
+    expect(find.text('Product name'), findsNothing);
+    expect(find.text(context.strings.barcode_scan_page_invalid_barcode),
         findsWidgets);
   });
-
-
 
   testWidgets('cancel found product card', (WidgetTester tester) async {
-    when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(ProductLangSlice((e) => e
-          ..barcode = invc.positionalArguments[0] as String
-          ..name = 'Product name'
-          ..imageFront = Uri.file('/tmp/asd')
-          ..imageIngredients = Uri.file('/tmp/asd')
-          ..ingredientsText = 'beans'
-          ..veganStatus = VegStatus.positive
-          ..vegetarianStatus = VegStatus.positive
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatusSource = VegStatusSource.community).productForTests()));
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .productForTests()));
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -360,16 +346,12 @@ void main() {
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product name'),
-        findsOneWidget);
+    expect(find.text('Product name'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product name'),
-        findsNothing);
+    expect(find.text('Product name'), findsNothing);
   });
 
   testWidgets('cancel not found product card', (WidgetTester tester) async {
@@ -383,19 +365,18 @@ void main() {
     widget.newScanDataForTesting(_barcode(barcode));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
 
     await tester.tap(find.byKey(const Key('card_cancel_btn')));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
   });
 
-  testWidgets('opened to add a product to shop, existing product', (WidgetTester tester) async {
+  testWidgets('opened to add a product to shop, existing product',
+      (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmId = '1'
@@ -439,7 +420,9 @@ void main() {
     verify(shopsManager.putProductToShops(product, [shop]));
   });
 
-  testWidgets('opened to add a product to shop, existing product, then canceled', (WidgetTester tester) async {
+  testWidgets(
+      'opened to add a product to shop, existing product, then canceled',
+      (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmId = '1'
@@ -483,7 +466,8 @@ void main() {
     verifyNever(shopsManager.putProductToShops(any, any));
   });
 
-  testWidgets('opened to add a product to shop, new product', (WidgetTester tester) async {
+  testWidgets('opened to add a product to shop, new product',
+      (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmId = '1'
@@ -498,13 +482,11 @@ void main() {
     final widget = BarcodeScanPage(addProductToShop: shop);
     final context = await tester.superPump(widget);
 
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
-    expect(
-        find.text(context.strings.barcode_scan_page_product_not_found),
+    expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
 
     expect(find.byType(BarcodeScanPage), findsOneWidget);
@@ -518,14 +500,13 @@ void main() {
     expect(find.byType(InitProductPage), findsOneWidget);
 
     final initProductPage =
-      find.byType(InitProductPage).evaluate().first.widget as InitProductPage;
+        find.byType(InitProductPage).evaluate().first.widget as InitProductPage;
     expect(initProductPage.initialShops, equals([shop]));
   });
 
   testWidgets('barcode scan analytics', (WidgetTester tester) async {
     when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(Product((e) => e
-          ..barcode = invc.positionalArguments[0] as String)));
+        Ok(Product((e) => e..barcode = invc.positionalArguments[0] as String)));
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -535,16 +516,14 @@ void main() {
     widget.newScanDataForTesting(_barcode('12345'), byCamera: true);
 
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.sentEventParams('barcode_scan'), equals({
-      'barcode': '12345'
-    }));
+    expect(analytics.sentEventParams('barcode_scan'),
+        equals({'barcode': '12345'}));
     expect(analytics.wasEventSent('barcode_manual'), isFalse);
   });
 
   testWidgets('barcode manual input analytics', (WidgetTester tester) async {
     when(productsObtainer.getProduct(any)).thenAnswer((invc) async =>
-        Ok(Product((e) => e
-          ..barcode = invc.positionalArguments[0] as String)));
+        Ok(Product((e) => e..barcode = invc.positionalArguments[0] as String)));
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -554,9 +533,8 @@ void main() {
     widget.newScanDataForTesting(_barcode('12345'), byCamera: false);
 
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.sentEventParams('barcode_manual'), equals({
-      'barcode': '12345'
-    }));
+    expect(analytics.sentEventParams('barcode_manual'),
+        equals({'barcode': '12345'}));
     expect(analytics.wasEventSent('barcode_scan'), isFalse);
   });
 }

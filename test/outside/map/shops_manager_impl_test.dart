@@ -65,8 +65,7 @@ void main() {
     final backendShops = [
       BackendShop((e) => e
         ..osmId = '1'
-        ..productsCount = 2
-      ),
+        ..productsCount = 2),
       BackendShop((e) => e
         ..osmId = '2'
         ..productsCount = 1),
@@ -82,27 +81,28 @@ void main() {
         ..backendShop.replace(backendShops[1])),
     };
 
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     final shops = shopsRes.unwrap();
     expect(shops, equals(expectedShops));
   });
 
   test('fetchProductsAtShops osm error', () async {
-    when(_osm.fetchShops(any, any)).thenAnswer((_) async =>
-        Err(OpenStreetMapError.NETWORK));
+    when(_osm.fetchShops(any, any))
+        .thenAnswer((_) async => Err(OpenStreetMapError.NETWORK));
 
     final backendShops = [
       BackendShop((e) => e
         ..osmId = '1'
-        ..productsCount = 2
-      ),
+        ..productsCount = 2),
       BackendShop((e) => e
         ..osmId = '2'
         ..productsCount = 1),
     ];
     when(_backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
 
@@ -116,9 +116,11 @@ void main() {
         ..latitude = 321)
     ];
     when(_osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
-    when(_backend.requestShops(any)).thenAnswer((_) async => Err(BackendError.other()));
+    when(_backend.requestShops(any))
+        .thenAnswer((_) async => Err(BackendError.other()));
 
-    final shopsRes = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes =
+        await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
 
@@ -136,8 +138,8 @@ void main() {
           backendProducts[1].barcode: 123457,
         })),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(_backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     final products = [
       Product((e) => e.barcode = '123'),
@@ -154,14 +156,14 @@ void main() {
     final expectedShopProductRange = ShopProductRange((e) => e
       ..shop.replace(aShop)
       ..products.addAll(products)
-      ..productsLastSeenSecsUtc.addEntries(
-          backendProductsAtShops[0].productsLastSeenUtc.entries));
+      ..productsLastSeenSecsUtc
+          .addEntries(backendProductsAtShops[0].productsLastSeenUtc.entries));
     expect(result.unwrap(), equals(expectedShopProductRange));
   });
 
   test('fetchShopProductRange backend error', () async {
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Err(BackendError.fromResp(BackendResponse.fromError(
+    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Err(
+        BackendError.fromResp(BackendResponse.fromError(
             Exception(''), Uri.parse('https://ya.ru')))));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);
@@ -170,8 +172,8 @@ void main() {
   });
 
   test('fetchShopProductRange backend network error', () async {
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Err(BackendError.fromResp(BackendResponse.fromError(
+    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async => Err(
+        BackendError.fromResp(BackendResponse.fromError(
             const SocketException(''), Uri.parse('https://ya.ru')))));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);
@@ -183,17 +185,20 @@ void main() {
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e.osmId = aShop.osmId),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(_backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     final result = await _shopsManager.fetchShopProductRange(aShop);
     expect(result.isOk, isTrue);
 
-    final expectedShopProductRange = ShopProductRange((e) => e.shop.replace(aShop));
+    final expectedShopProductRange =
+        ShopProductRange((e) => e.shop.replace(aShop));
     expect(result.unwrap(), equals(expectedShopProductRange));
   });
 
-  test('fetchShopProductRange single products manager error while inflating backend products', () async {
+  test(
+      'fetchShopProductRange single products manager error while inflating backend products',
+      () async {
     final backendProducts = [
       BackendProduct((e) => e.barcode = '123'),
       BackendProduct((e) => e.barcode = '124'),
@@ -203,8 +208,8 @@ void main() {
         ..osmId = aShop.osmId
         ..products.addAll([backendProducts[0], backendProducts[1]])),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(_backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     final products = [
       Product((e) => e.barcode = '123'),
@@ -225,7 +230,9 @@ void main() {
     expect(result.unwrap(), equals(expectedShopProductRange));
   });
 
-  test('fetchShopProductRange all products manager errors while inflating backend products', () async {
+  test(
+      'fetchShopProductRange all products manager errors while inflating backend products',
+      () async {
     final backendProducts = [
       BackendProduct((e) => e.barcode = '123'),
       BackendProduct((e) => e.barcode = '124'),
@@ -235,8 +242,8 @@ void main() {
         ..osmId = aShop.osmId
         ..products.addAll([backendProducts[0], backendProducts[1]])),
     ];
-    when(_backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(_backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     // All error here!
     when(_productsObtainer.inflate(backendProducts[0]))
@@ -272,7 +279,8 @@ void main() {
           ..productsCount = 2)))
     ];
 
-    when(_backend.putProductToShop(any, any)).thenAnswer((_) async => Ok(None()));
+    when(_backend.putProductToShop(any, any))
+        .thenAnswer((_) async => Ok(None()));
 
     final listener = MockShopsManagerListener();
     when(listener.onLocalShopsChange()).thenAnswer((_) {});
@@ -355,7 +363,8 @@ void main() {
           ..productsCount = 2)))
     ];
 
-    when(_backend.putProductToShop(any, any)).thenAnswer((_) async => Err(BackendError.other()));
+    when(_backend.putProductToShop(any, any))
+        .thenAnswer((_) async => Err(BackendError.other()));
 
     final listener = MockShopsManagerListener();
     when(listener.onLocalShopsChange()).thenAnswer((_) {});
@@ -372,12 +381,12 @@ void main() {
 
   test('createShop good scenario', () async {
     when(_backend.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type')
-    )).thenAnswer((_) async => Ok(BackendShop((e) => e
-      ..osmId = '123456'
-      ..productsCount = 0)));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((_) async => Ok(BackendShop((e) => e
+          ..osmId = '123456'
+          ..productsCount = 0)));
 
     final listener = MockShopsManagerListener();
     when(listener.onLocalShopsChange()).thenAnswer((_) {});
@@ -407,12 +416,12 @@ void main() {
 
   test('createShop caches created shop', () async {
     when(_backend.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type')
-    )).thenAnswer((_) async => Ok(BackendShop((e) => e
-      ..osmId = '123456'
-      ..productsCount = 0)));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((_) async => Ok(BackendShop((e) => e
+          ..osmId = '123456'
+          ..productsCount = 0)));
 
     final result = await _shopsManager.createShop(
         name: 'Horns and Hooves',
@@ -425,16 +434,17 @@ void main() {
     when(_backend.requestShops(any)).thenAnswer((_) async => Ok(const []));
 
     // But we expect the created shop to be cached and given to us anyways
-    final shops = await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
-    expect(shops.unwrap(), equals({ createdShop.osmId: createdShop }));
+    final shops =
+        await _shopsManager.fetchShops(const Point(0, 0), const Point(1, 1));
+    expect(shops.unwrap(), equals({createdShop.osmId: createdShop}));
   });
 
   test('createShop error', () async {
     when(_backend.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type')
-    )).thenAnswer((_) async => Err(BackendError.other()));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((_) async => Err(BackendError.other()));
 
     final listener = MockShopsManagerListener();
     when(listener.onLocalShopsChange()).thenAnswer((_) {});

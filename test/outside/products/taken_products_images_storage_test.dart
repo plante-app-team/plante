@@ -5,8 +5,7 @@ import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:test/test.dart';
 
 void main() {
-  setUp(() {
-  });
+  setUp(() {});
 
   test('save and obtain data', () async {
     const fileName = 'taken_products_images_table_test1';
@@ -44,7 +43,9 @@ void main() {
     await table1.loadedFuture;
 
     // Store
-    for (var index = 0; index < TakenProductsImagesStorage.MAX_SIZE * 2; ++index) {
+    for (var index = 0;
+        index < TakenProductsImagesStorage.MAX_SIZE * 2;
+        ++index) {
       final file = Uri.file('/tmp/asd$index.jpg');
       await table1.store(file);
     }
@@ -52,7 +53,9 @@ void main() {
     // Retrieve both local and persistent data
     final table2 = TakenProductsImagesStorage(fileName: fileName);
     await table2.loadedFuture;
-    for (var index = 0; index < TakenProductsImagesStorage.MAX_SIZE * 2; ++index) {
+    for (var index = 0;
+        index < TakenProductsImagesStorage.MAX_SIZE * 2;
+        ++index) {
       final file = Uri.file('/tmp/asd$index.jpg');
       if (index < TakenProductsImagesStorage.MAX_SIZE) {
         // Expect the eldest entries to be erased
@@ -70,8 +73,8 @@ void main() {
     final initDelayCompleter = Completer<void>();
 
     const fileName = 'taken_products_images_table_test4';
-    final table = TakenProductsImagesStorage(fileName: fileName,
-        initDelayForTesting: initDelayCompleter.future);
+    final table = TakenProductsImagesStorage(
+        fileName: fileName, initDelayForTesting: initDelayCompleter.future);
 
     // Save
     final file1 = Uri.file('/tmp/asd1.jpg');
@@ -104,8 +107,8 @@ void main() {
     await table1.store(file2);
 
     final initDelayCompleter = Completer<void>();
-    final table2 = TakenProductsImagesStorage(fileName: fileName,
-        initDelayForTesting: initDelayCompleter.future);
+    final table2 = TakenProductsImagesStorage(
+        fileName: fileName, initDelayForTesting: initDelayCompleter.future);
 
     // Ensure the data is not loaded yet
     expect(table2.loaded, isFalse);

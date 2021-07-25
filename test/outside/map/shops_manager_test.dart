@@ -45,19 +45,16 @@ void main() {
   final backendShops = [
     BackendShop((e) => e
       ..osmId = '1'
-      ..productsCount = 2
-    ),
+      ..productsCount = 2),
     BackendShop((e) => e
       ..osmId = '2'
       ..productsCount = 1),
   ];
   final fullShops = {
-    osmShops[0].osmId: Shop((e) => e
-      ..osmShop.replace(osmShops[0])
-      ..backendShop.replace(backendShops[0])),
-    osmShops[1].osmId: Shop((e) => e
-      ..osmShop.replace(osmShops[1])
-      ..backendShop.replace(backendShops[1])),
+    osmShops[0].osmId: Shop((e) =>
+        e..osmShop.replace(osmShops[0])..backendShop.replace(backendShops[0])),
+    osmShops[1].osmId: Shop((e) =>
+        e..osmShop.replace(osmShops[1])..backendShop.replace(backendShops[1])),
   };
 
   const northeast = Point(15.001, 15.001);
@@ -81,7 +78,8 @@ void main() {
     backend = MockBackend();
     productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
-    when(backend.putProductToShop(any, any)).thenAnswer((_) async => Ok(None()));
+    when(backend.putProductToShop(any, any))
+        .thenAnswer((_) async => Ok(None()));
     shopsManager = ShopsManager(osm, backend, productsObtainer, analytics);
 
     when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
@@ -95,12 +93,12 @@ void main() {
         .thenAnswer((_) async => Ok(rangeProducts[2]));
 
     when(backend.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type')
-    )).thenAnswer((_) async => Ok(BackendShop((e) => e
-      ..osmId = randInt(1, 99999).toString()
-      ..productsCount = 0)));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((_) async => Ok(BackendShop((e) => e
+          ..osmId = randInt(1, 99999).toString()
+          ..productsCount = 0)));
   });
 
   test('shops fetched and then cached', () async {
@@ -158,8 +156,9 @@ void main() {
         equals(shops1.values.first.productsCount + 1));
   });
 
-  test('shops products range update changes shops cache when '
-       'the shop had no backend shop before', () async {
+  test(
+      'shops products range update changes shops cache when '
+      'the shop had no backend shop before', () async {
     final osmShops = [
       OsmShop((e) => e
         ..osmId = '1'
@@ -172,8 +171,7 @@ void main() {
     when(osm.fetchShops(any, any)).thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
     final fullShops = {
-      osmShops[0].osmId: Shop((e) => e
-        ..osmShop.replace(osmShops[0])),
+      osmShops[0].osmId: Shop((e) => e..osmShop.replace(osmShops[0])),
     };
 
     // Fetch #1
@@ -204,14 +202,15 @@ void main() {
     expect(shops2, isNot(equals(shops1)));
     expect(shops2.values.first.osmId, equals(shops1.values.first.osmId));
     expect(shops2.values.first.backendShop, isNotNull);
-    expect(shops2.values.first.backendShop, equals(
-      BackendShop((e) => e
-        ..osmId = shops1.values.first.osmId
-        ..productsCount = 1)
-    ));
+    expect(
+        shops2.values.first.backendShop,
+        equals(BackendShop((e) => e
+          ..osmId = shops1.values.first.osmId
+          ..productsCount = 1)));
   });
 
-  test('cache behaviour when multiple shops fetches started at the same time', () async {
+  test('cache behaviour when multiple shops fetches started at the same time',
+      () async {
     verifyZeroInteractions(osm);
     verifyZeroInteractions(backend);
 
@@ -223,8 +222,7 @@ void main() {
 
     // Await all
     final results = await Future.wait(
-        [shopsFuture1, shopsFuture2, shopsFuture3, shopsFuture4]
-    );
+        [shopsFuture1, shopsFuture2, shopsFuture3, shopsFuture4]);
     for (final result in results) {
       expect(result.unwrap(), equals(fullShops));
     }
@@ -335,8 +333,8 @@ void main() {
           rangeBackendProducts[1].barcode: 123457,
         })),
     ];
-    when(backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     // First fetch
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
@@ -366,7 +364,8 @@ void main() {
 
     // Range update
     verifyNever(backend.putProductToShop(any, any));
-    final putRes = await shopsManager.putProductToShops(rangeProducts[2], [shop]);
+    final putRes =
+        await shopsManager.putProductToShops(rangeProducts[2], [shop]);
     expect(putRes.isOk, isTrue);
     verify(backend.putProductToShop(any, any));
 
@@ -399,8 +398,8 @@ void main() {
           rangeBackendProducts[1].barcode: 123457,
         })),
     ];
-    when(backend.requestProductsAtShops(any)).thenAnswer((_) async =>
-        Ok(backendProductsAtShops));
+    when(backend.requestProductsAtShops(any))
+        .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     // First fetch
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
@@ -413,8 +412,8 @@ void main() {
     clearInteractions(productsObtainer);
 
     // Second fetch
-    final rangeRes2 = await shopsManager
-        .fetchShopProductRange(shop, noCache: true);
+    final rangeRes2 =
+        await shopsManager.fetchShopProductRange(shop, noCache: true);
     final range2 = rangeRes2.unwrap();
     expect(range2, equals(range1));
 
@@ -469,25 +468,31 @@ void main() {
     expect(analytics.allEvents(), equals([]));
 
     // Success
-    await shopsManager
-        .putProductToShops(rangeProducts[2], fullShops.values.toList());
+    await shopsManager.putProductToShops(
+        rangeProducts[2], fullShops.values.toList());
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.firstSentEvent('product_put_to_shop').second, equals({
-      'barcode': rangeProducts[2].barcode,
-      'shops': fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
-    }));
+    expect(
+        analytics.firstSentEvent('product_put_to_shop').second,
+        equals({
+          'barcode': rangeProducts[2].barcode,
+          'shops':
+              fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+        }));
     analytics.clearEvents();
 
     // Failure
-    when(backend.putProductToShop(any, any)).thenAnswer((_) async =>
-        Err(BackendError.other()));
-    await shopsManager
-        .putProductToShops(rangeProducts[2], fullShops.values.toList());
+    when(backend.putProductToShop(any, any))
+        .thenAnswer((_) async => Err(BackendError.other()));
+    await shopsManager.putProductToShops(
+        rangeProducts[2], fullShops.values.toList());
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.firstSentEvent('product_put_to_shop_failure').second, equals({
-      'barcode': rangeProducts[2].barcode,
-      'shops': fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
-    }));
+    expect(
+        analytics.firstSentEvent('product_put_to_shop_failure').second,
+        equals({
+          'barcode': rangeProducts[2].barcode,
+          'shops':
+              fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+        }));
     analytics.clearEvents();
   });
 
@@ -500,30 +505,34 @@ void main() {
         coords: const Point<double>(15, 16),
         type: ShopType.supermarket);
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.firstSentEvent('create_shop_success').second, equals({
-      'name': 'New cool shop',
-      'lat': 16,
-      'lon': 15,
-    }));
+    expect(
+        analytics.firstSentEvent('create_shop_success').second,
+        equals({
+          'name': 'New cool shop',
+          'lat': 16,
+          'lon': 15,
+        }));
 
     analytics.clearEvents();
 
     // Create a shop failure
     when(backend.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type')
-    )).thenAnswer((_) async => Err(BackendError.other()));
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((_) async => Err(BackendError.other()));
     await shopsManager.createShop(
         name: 'New cool shop',
         coords: const Point<double>(15, 16),
         type: ShopType.supermarket);
     expect(analytics.allEvents().length, equals(1));
-    expect(analytics.firstSentEvent('create_shop_failure').second, equals({
-      'name': 'New cool shop',
-      'lat': 16,
-      'lon': 15,
-    }));
+    expect(
+        analytics.firstSentEvent('create_shop_failure').second,
+        equals({
+          'name': 'New cool shop',
+          'lat': 16,
+          'lon': 15,
+        }));
     analytics.clearEvents();
   });
 

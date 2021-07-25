@@ -5,8 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
 
 void main() {
-  setUp(() {
-  });
+  setUp(() {});
 
   test('veg statuses when analysis not available', () async {
     final productWithNull = ProductLangSlice((v) => v

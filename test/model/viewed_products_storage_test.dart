@@ -32,7 +32,9 @@ void main() {
     }
 
     final expectedProducts = <Product>[];
-    for (var i = ViewedProductsStorage.STORED_PRODUCTS_MAX; i < productsNumber; ++i) {
+    for (var i = ViewedProductsStorage.STORED_PRODUCTS_MAX;
+        i < productsNumber;
+        ++i) {
       expectedProducts.add(Product((e) => e.barcode = '$i'));
     }
 

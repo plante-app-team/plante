@@ -18,8 +18,7 @@ void main() {
     ..neighbourhood = 'Nice neighborhood'
     ..cityDistrict = 'Nice district'
     ..road = 'Broadway'
-    ..houseNumber = '123'
-  );
+    ..houseNumber = '123');
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
       ..osmId = '1'
@@ -28,8 +27,7 @@ void main() {
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
       ..osmId = '1'
-      ..productsCount = 2))
-  );
+      ..productsCount = 2)));
 
   setUp(() async {
     osm = MockOpenStreetMap();
@@ -57,7 +55,8 @@ void main() {
     verifyZeroInteractions(osm);
   });
 
-  test('cache behaviour when multiple address fetches started at the same time', () async {
+  test('cache behaviour when multiple address fetches started at the same time',
+      () async {
     verifyZeroInteractions(osm);
 
     // Fetch without await
@@ -68,8 +67,7 @@ void main() {
 
     // Await all
     final results = await Future.wait(
-        [addressFuture1, addressFuture2, addressFuture3, addressFuture4]
-    );
+        [addressFuture1, addressFuture2, addressFuture3, addressFuture4]);
     for (final result in results) {
       expect(result.unwrap(), equals(anAddress));
     }
@@ -78,8 +76,8 @@ void main() {
   });
 
   test('address fetch fail', () async {
-    when(osm.fetchAddress(any, any)).thenAnswer((_) async =>
-        Err(OpenStreetMapError.OTHER));
+    when(osm.fetchAddress(any, any))
+        .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
     final addressRes = await addressObtainer.addressOfShop(aShop);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });

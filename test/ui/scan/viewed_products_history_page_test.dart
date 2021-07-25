@@ -30,17 +30,18 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<Backend>(MockBackend());
 
-    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
+    GetIt.I
+        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
 
     productsObtainer = MockProductsObtainer();
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
 
-    viewedProductsStorage = ViewedProductsStorage(loadPersistentProducts: false);
+    viewedProductsStorage =
+        ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
     final userParamsController = FakeUserParamsController();
-    final user = UserParams((v) =>
-    v
+    final user = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
       ..name = 'Bob'
@@ -57,12 +58,8 @@ void main() {
 
     await tester.superPump(const ViewedProductsHistoryPage());
 
-    expect(
-        find.text('Product 1'),
-        findsOneWidget);
-    expect(
-        find.text('Product 2'),
-        findsOneWidget);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsOneWidget);
   });
 
   testWidgets('viewed product added', (WidgetTester tester) async {
@@ -70,25 +67,18 @@ void main() {
 
     await tester.superPump(const ViewedProductsHistoryPage());
 
-    expect(
-        find.text('Product 1'),
-        findsOneWidget);
-    expect(
-        find.text('Product 2'),
-        findsNothing);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
 
     viewedProductsStorage.addProduct(_makeProduct('2'));
     await tester.pumpAndSettle();
 
-    expect(
-        find.text('Product 1'),
-        findsOneWidget);
-    expect(
-        find.text('Product 2'),
-        findsOneWidget);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsOneWidget);
   });
 
-  testWidgets('viewed products order and order change', (WidgetTester tester) async {
+  testWidgets('viewed products order and order change',
+      (WidgetTester tester) async {
     final p1 = _makeProduct('1');
     final p2 = _makeProduct('2');
 

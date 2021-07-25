@@ -23,22 +23,22 @@ void main() {
     geolocatorWrapper = MockGeolocatorWrapper();
     fakeSharedPreferences = FakeSharedPreferences();
 
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.granted);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.granted);
   });
 
   void init() async {
-    locationController = LocationController(
-        ipLocationProvider,
-        permissionsManager,
-        fakeSharedPreferences.asHolder(),
+    locationController = LocationController(ipLocationProvider,
+        permissionsManager, fakeSharedPreferences.asHolder(),
         geolocatorWrapper: geolocatorWrapper);
   }
 
   test('init with current location available', () async {
     const currentPos = Point<double>(10, 20);
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
-    when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => currentPos);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
+    when(geolocatorWrapper.getCurrentPosition())
+        .thenAnswer((_) async => currentPos);
 
     verifyNever(geolocatorWrapper.getCurrentPosition());
 
@@ -65,9 +65,11 @@ void main() {
     expect(fakeSharedPreferences.get(PREF_LAST_KNOWN_POS), isNotNull);
   });
 
-  test('init with last known location when all of above are not available', () async {
+  test('init with last known location when all of above are not available',
+      () async {
     const lastKnownPos = Point<double>(10, 20);
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => lastKnownPos);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => lastKnownPos);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
 
     verifyNever(geolocatorWrapper.getLastKnownPosition());
@@ -97,7 +99,8 @@ void main() {
   });
 
   test('init with IP location when all of above are not available', () async {
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
 
     const ipPos = Point<double>(10, 20);
@@ -128,8 +131,10 @@ void main() {
     expect(fakeSharedPreferences.get(PREF_LAST_KNOWN_POS), isNotNull);
   });
 
-  test('init with prefs location when all of above are not available', () async {
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+  test('init with prefs location when all of above are not available',
+      () async {
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
 
@@ -165,7 +170,8 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
@@ -174,7 +180,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     const newPos = Point<double>(10, 20);
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => newPos);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => newPos);
 
     // Expecting the new position to be returned
     final result = await locationController.lastKnownPosition();
@@ -189,13 +196,14 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
 
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.denied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
 
     init();
     await Future.delayed(const Duration(milliseconds: 10));
@@ -213,7 +221,8 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
@@ -221,8 +230,8 @@ void main() {
     init();
     await Future.delayed(const Duration(milliseconds: 10));
 
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer(
-            (_) async => throw const PermissionDeniedException(''));
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => throw const PermissionDeniedException(''));
 
     // Expecting the initial position to be returned
     final result = await locationController.lastKnownPosition();
@@ -237,7 +246,8 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
@@ -246,7 +256,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     const newPos = Point<double>(10, 20);
-    when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => newPos);
+    when(geolocatorWrapper.getCurrentPosition())
+        .thenAnswer((_) async => newPos);
 
     // Expecting the new position to be returned
     final result = await locationController.currentPosition();
@@ -261,13 +272,14 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
 
-    when(permissionsManager.status(any)).thenAnswer(
-            (_) async => PermissionState.denied);
+    when(permissionsManager.status(any))
+        .thenAnswer((_) async => PermissionState.denied);
 
     init();
     await Future.delayed(const Duration(milliseconds: 10));
@@ -285,7 +297,8 @@ void main() {
     const initialPos = Point<double>(10, 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
     final initialPref = fakeSharedPreferences.get(PREF_LAST_KNOWN_POS);
@@ -293,8 +306,8 @@ void main() {
     init();
     await Future.delayed(const Duration(milliseconds: 10));
 
-    when(geolocatorWrapper.getCurrentPosition()).thenAnswer(
-            (_) async => throw const PermissionDeniedException(''));
+    when(geolocatorWrapper.getCurrentPosition())
+        .thenAnswer((_) async => throw const PermissionDeniedException(''));
 
     // Expecting null to be returned even though there's the initial position
     final result = await locationController.currentPosition();
@@ -305,10 +318,14 @@ void main() {
     expect(finalPref, equals(initialPref));
   });
 
-  test('callWhenLastPositionKnown gives position right away if the controller is initialized', () async {
+  test(
+      'callWhenLastPositionKnown gives position right away if the controller is initialized',
+      () async {
     const currentPos = Point<double>(10, 20);
-    when(geolocatorWrapper.getLastKnownPosition()).thenAnswer((_) async => null);
-    when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => currentPos);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => null);
+    when(geolocatorWrapper.getCurrentPosition())
+        .thenAnswer((_) async => currentPos);
 
     verifyNever(geolocatorWrapper.getCurrentPosition());
 

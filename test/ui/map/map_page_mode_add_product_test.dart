@@ -36,7 +36,8 @@ void main() {
     analytics = commons.analytics;
   });
 
-  testWidgets('empty shops are displayed by default', (WidgetTester tester) async {
+  testWidgets('empty shops are displayed by default',
+      (WidgetTester tester) async {
     expect(shops[0].productsCount, equals(0));
 
     final widget = MapPage(
@@ -52,7 +53,6 @@ void main() {
     expect(displayedShops, containsAll(shops));
   });
 
-
   testWidgets('user hint', (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
@@ -60,8 +60,7 @@ void main() {
         product: product);
     final context = await tester.superPump(widget);
 
-    expect(
-        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+    expect(find.text(context.strings.map_page_click_on_shop_where_product_sold),
         findsOneWidget);
   });
 
@@ -108,8 +107,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Button 1 click
-    final yesButton1 = find.text(context.strings.global_yes)
-        .evaluate().first.widget;
+    final yesButton1 =
+        find.text(context.strings.global_yes).evaluate().first.widget;
     await tester.tap(find.byWidget(yesButton1));
     await tester.pumpAndSettle();
     // Open cards again
@@ -120,8 +119,8 @@ void main() {
     await tester.drag(find.byWidget(card1), const Offset(-3000, 0));
     await tester.pumpAndSettle();
     // Button 2 click
-    final yesButton2 = find.text(context.strings.global_yes)
-        .evaluate().last.widget;
+    final yesButton2 =
+        find.text(context.strings.global_yes).evaluate().last.widget;
     await tester.tap(find.byWidget(yesButton2));
     await tester.pumpAndSettle();
 
@@ -135,7 +134,8 @@ void main() {
     verify(shopsManager.putProductToShops(product, [shops[1], shops[0]]));
   });
 
-  testWidgets('cannot put products to shops when no products are selected', (WidgetTester tester) async {
+  testWidgets('cannot put products to shops when no products are selected',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -187,7 +187,8 @@ void main() {
     verifyNever(shopsManager.putProductToShops(any, any));
   });
 
-  testWidgets('can cancel the mode after shops are selected', (WidgetTester tester) async {
+  testWidgets('can cancel the mode after shops are selected',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -214,7 +215,8 @@ void main() {
     verifyNever(shopsManager.putProductToShops(any, any));
   });
 
-  testWidgets('can cancel the mode when no shops are selected', (WidgetTester tester) async {
+  testWidgets('can cancel the mode when no shops are selected',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -264,9 +266,9 @@ void main() {
           ..osmId = '$i'
           ..productsCount = i))));
     }
-    final shopsMap = { for (final shop in manyShops) shop.osmId: shop };
-    when(shopsManager.fetchShops(any, any)).thenAnswer((_) async =>
-        Ok(shopsMap));
+    final shopsMap = {for (final shop in manyShops) shop.osmId: shop};
+    when(shopsManager.fetchShops(any, any))
+        .thenAnswer((_) async => Ok(shopsMap));
 
     final widget = MapPage(
         mapControllerForTesting: mapController,
@@ -282,12 +284,12 @@ void main() {
       await tester.tap(find.text(context.strings.global_yes));
       await tester.pumpAndSettle();
     }
-    expect(widget.getModeForTesting().selectedShops(), equals(
-      manyShops.take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX).toSet()
-    ));
+    expect(widget.getModeForTesting().selectedShops(),
+        equals(manyShops.take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX).toSet()));
   });
 
-  testWidgets('can provide initially selected shops', (WidgetTester tester) async {
+  testWidgets('can provide initially selected shops',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -300,7 +302,8 @@ void main() {
     expect(widget.getModeForTesting().selectedShops(), equals({shops[0]}));
   });
 
-  testWidgets('can switch mode to the Add Shop Mode', (WidgetTester tester) async {
+  testWidgets('can switch mode to the Add Shop Mode',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -319,8 +322,8 @@ void main() {
 
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsOneWidget);
-    expect(widget.getModeForTesting().runtimeType,
-        equals(MapPageModeCreateShop));
+    expect(
+        widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
   });
 
   testWidgets('add product mode switch event', (WidgetTester tester) async {
@@ -354,8 +357,8 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+    expect(
+        find.text(context.strings.map_page_no_shops_hint_in_select_shops_mode),
         findsNothing);
 
     // No shops!
@@ -363,8 +366,8 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+    expect(
+        find.text(context.strings.map_page_no_shops_hint_in_select_shops_mode),
         findsOneWidget);
 
     // Fetch shops!
@@ -372,8 +375,8 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    expect(find.text(
-        context.strings.map_page_no_shops_hint_in_select_shops_mode),
+    expect(
+        find.text(context.strings.map_page_no_shops_hint_in_select_shops_mode),
         findsNothing);
   });
 }

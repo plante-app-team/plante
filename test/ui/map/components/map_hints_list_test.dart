@@ -16,8 +16,7 @@ void main() {
     controller.addHint('id1', 'hint1');
     controller.addHint('id2', 'hint2');
 
-    await tester.superPump(
-        MapHintsList(controller: controller));
+    await tester.superPump(MapHintsList(controller: controller));
 
     expect(find.text('hint1'), findsOneWidget);
     expect(find.text('hint2'), findsOneWidget);
@@ -28,8 +27,7 @@ void main() {
   });
 
   testWidgets('add and remove hints', (WidgetTester tester) async {
-    await tester.superPump(
-        MapHintsList(controller: controller));
+    await tester.superPump(MapHintsList(controller: controller));
 
     controller.addHint('id1', 'hint1');
     await tester.pumpAndSettle();
@@ -60,8 +58,7 @@ void main() {
   });
 
   testWidgets('add duplicating hints', (WidgetTester tester) async {
-    await tester.superPump(
-        MapHintsList(controller: controller));
+    await tester.superPump(MapHintsList(controller: controller));
 
     controller.addHint('id1', 'hint1');
     await tester.pumpAndSettle();
@@ -87,9 +84,9 @@ void main() {
     expect(center3.dy, lessThan(center1.dy));
   });
 
-  testWidgets('remove a hint by clicking on its cancel button', (WidgetTester tester) async {
-    await tester.superPump(
-        MapHintsList(controller: controller));
+  testWidgets('remove a hint by clicking on its cancel button',
+      (WidgetTester tester) async {
+    await tester.superPump(MapHintsList(controller: controller));
 
     controller.addHint('id1', 'hint1');
     await tester.pumpAndSettle();

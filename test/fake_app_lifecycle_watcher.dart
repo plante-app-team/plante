@@ -15,6 +15,8 @@ class FakeAppLifecycleWatcher implements AppLifecycleWatcher {
   }
 
   void changeAppStateTo(AppLifecycleState state) {
-    _observers.forEach((observer) { observer.onAppStateChange(state); });
+    _observers.forEach((observer) {
+      observer.onAppStateChange(state);
+    });
   }
 }

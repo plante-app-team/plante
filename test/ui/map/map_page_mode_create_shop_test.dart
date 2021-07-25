@@ -30,7 +30,8 @@ void main() {
     analytics = commons.analytics;
   });
 
-  Future<void> switchMode(WidgetTester tester, MapPage widget, BuildContext context) async {
+  Future<void> switchMode(
+      WidgetTester tester, MapPage widget, BuildContext context) async {
     await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
@@ -38,8 +39,8 @@ void main() {
     await tester.tap(find.byKey(const Key('add_shop_fab')));
     await tester.pumpAndSettle();
 
-    expect(widget.getModeForTesting().runtimeType,
-        equals(MapPageModeCreateShop));
+    expect(
+        widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
   }
 
   testWidgets('keeps selected shops', (WidgetTester tester) async {
@@ -107,8 +108,7 @@ void main() {
     expect(find.byType(CreateShopPage), findsOneWidget);
 
     await tester.enterText(
-        find.byKey(const Key('new_shop_name_input')),
-        'new shop');
+        find.byKey(const Key('new_shop_name_input')), 'new shop');
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const Key('shop_type_dropdown')));
@@ -126,15 +126,15 @@ void main() {
 
     // Shop is created
     verify(shopsManager.createShop(
-        name: 'new shop',
-        coords: anyNamed('coords'),
-        type: anyNamed('type')));
+        name: 'new shop', coords: anyNamed('coords'), type: anyNamed('type')));
     // Mode is changed
     expect(widget.getModeForTesting().runtimeType,
         equals(MapPageModeSelectShopsWhereProductSold));
 
     // New mode has the created shop in its selection
-    final selectedCreatedShop = widget.getModeForTesting().selectedShops()
+    final selectedCreatedShop = widget
+        .getModeForTesting()
+        .selectedShops()
         .where((shop) => shop.name == 'new shop');
     expect(selectedCreatedShop.length, equals(1));
   });
@@ -147,25 +147,22 @@ void main() {
     final context = await tester.superPump(widget);
 
     // Old hint
-    expect(
-        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+    expect(find.text(context.strings.map_page_click_on_shop_where_product_sold),
         findsOneWidget);
-    expect(
-        find.text(context.strings.map_page_click_where_new_shop_located),
+    expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsNothing);
 
     await switchMode(tester, widget, context);
 
     // New hint
-    expect(
-        find.text(context.strings.map_page_click_on_shop_where_product_sold),
+    expect(find.text(context.strings.map_page_click_on_shop_where_product_sold),
         findsNothing);
-    expect(
-        find.text(context.strings.map_page_click_where_new_shop_located),
+    expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsOneWidget);
   });
 
-  testWidgets('cancellation returns to previous mode', (WidgetTester tester) async {
+  testWidgets('cancellation returns to previous mode',
+      (WidgetTester tester) async {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS,
@@ -173,11 +170,13 @@ void main() {
     final context = await tester.superPump(widget);
     await switchMode(tester, widget, context);
 
-    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
+    expect(
+        widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
 
     await tester.tap(find.byKey(const Key('close_create_shop_button')));
 
-    expect(widget.getModeForTesting().runtimeType, equals(MapPageModeSelectShopsWhereProductSold));
+    expect(widget.getModeForTesting().runtimeType,
+        equals(MapPageModeSelectShopsWhereProductSold));
   });
 
   testWidgets('create shop mode switch event', (WidgetTester tester) async {

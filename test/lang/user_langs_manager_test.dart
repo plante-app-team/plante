@@ -49,12 +49,15 @@ void main() {
   }) async {
     const initialLastPos = Point<double>(0, 0);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback = invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback =
+          invc.positionalArguments[0] as ArgCallback<Point<double>>;
       callback.call(initialLastPos);
     });
 
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => lastPos);
-    when(osm.fetchAddress(any, any)).thenAnswer((_) async => addressResp.call());
+    when(locationController.lastKnownPosition())
+        .thenAnswer((_) async => lastPos);
+    when(osm.fetchAddress(any, any))
+        .thenAnswer((_) async => addressResp.call());
     sysLangCodeHolder.langCode = sysLangCode;
 
     userLangsManager = UserLangsManager(
@@ -87,7 +90,7 @@ void main() {
 
   test('first init good scenario', () async {
     await finishSetUp(
-        lastPos: const Point<double>(1, 2),
+      lastPos: const Point<double>(1, 2),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
       sysLangCode: 'en',
     );
@@ -218,7 +221,9 @@ void main() {
     expect(await userLangsManager.getUserLangs(), equals(expectedUserLangs));
   });
 
-  test('getUserLangs behavior when init was unsuccessful and no system lang available', () async {
+  test(
+      'getUserLangs behavior when init was unsuccessful and no system lang available',
+      () async {
     await finishSetUp(
       lastPos: null,
       addressResp: () => Err(OpenStreetMapError.OTHER),
@@ -234,14 +239,17 @@ void main() {
     verifyNever(storage.setUserLangs(expectedUserLangs));
   });
 
-  test('first init does not finish until user last pos and system lang are available', () async {
+  test(
+      'first init does not finish until user last pos and system lang are available',
+      () async {
     ArgCallback<Point<double>>? initialPosCallback;
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      initialPosCallback = invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      initialPosCallback =
+          invc.positionalArguments[0] as ArgCallback<Point<double>>;
     });
 
-    when(osm.fetchAddress(any, any)).thenAnswer(
-            (_) async => Ok(OsmAddress((e) => e.countryCode = 'be')));
+    when(osm.fetchAddress(any, any))
+        .thenAnswer((_) async => Ok(OsmAddress((e) => e.countryCode = 'be')));
 
     userLangsManager = UserLangsManager(
       sysLangCodeHolder,
@@ -253,12 +261,14 @@ void main() {
     );
 
     var inited = false;
-    unawaited(userLangsManager.firstInitFutureForTesting.then((_) => inited = true));
+    unawaited(
+        userLangsManager.firstInitFutureForTesting.then((_) => inited = true));
     await Future.delayed(const Duration(milliseconds: 10));
     expect(inited, isFalse);
 
     const lastPos = Point<double>(1, 2);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => lastPos);
+    when(locationController.lastKnownPosition())
+        .thenAnswer((_) async => lastPos);
     initialPosCallback!.call(lastPos);
     await Future.delayed(const Duration(milliseconds: 10));
     expect(inited, isFalse);

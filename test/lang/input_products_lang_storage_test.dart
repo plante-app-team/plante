@@ -14,10 +14,11 @@ void main() {
   });
 
   test('initial lang in prefs', () async {
-    await prefs.setString(InputProductsLangStorage.PREF_INPUT_PRODUCTS_LANG_CODE, LangCode.ru.name);
+    await prefs.setString(
+        InputProductsLangStorage.PREF_INPUT_PRODUCTS_LANG_CODE,
+        LangCode.ru.name);
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(),
-        SysLangCodeHolder.inited('en'));
+        prefs.asHolder(), SysLangCodeHolder.inited('en'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     expect(inputProductsLangStorage.selectedCode, equals(LangCode.ru));
@@ -25,8 +26,7 @@ void main() {
 
   test('no initial lang in prefs', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(),
-        SysLangCodeHolder.inited('en'));
+        prefs.asHolder(), SysLangCodeHolder.inited('en'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     expect(inputProductsLangStorage.selectedCode, equals(LangCode.en));
@@ -34,8 +34,7 @@ void main() {
 
   test('set new stored lang', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(),
-        SysLangCodeHolder.inited('en'));
+        prefs.asHolder(), SysLangCodeHolder.inited('en'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     inputProductsLangStorage.selectedCode = LangCode.nl;
@@ -44,8 +43,7 @@ void main() {
 
   test('erase stored lang', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(),
-        SysLangCodeHolder.inited('en'));
+        prefs.asHolder(), SysLangCodeHolder.inited('en'));
     await Future.delayed(const Duration(milliseconds: 1));
 
     inputProductsLangStorage.selectedCode = null;

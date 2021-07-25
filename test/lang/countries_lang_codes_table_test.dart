@@ -15,8 +15,10 @@ void main() {
 
   test('good scenario', () async {
     expect(table.countryCodeToLangCode('ru'), equals([LangCode.ru]));
-    expect(table.countryCodeToLangCode('by'), equals([LangCode.be, LangCode.ru]));
-    expect(table.countryCodeToLangCode('be'), equals([LangCode.nl, LangCode.fr, LangCode.de]));
+    expect(
+        table.countryCodeToLangCode('by'), equals([LangCode.be, LangCode.ru]));
+    expect(table.countryCodeToLangCode('be'),
+        equals([LangCode.nl, LangCode.fr, LangCode.de]));
     expect(analytics.allEvents(), equals([]));
   });
 

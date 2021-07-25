@@ -26,9 +26,8 @@ void main() {
   late MockShopsManager shopsManager;
   late MockAddressObtainer addressObtainer;
 
-  final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
-    ..road = 'Broadway'
-  )));
+  final FutureAddress readyAddress =
+      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
   const coords = Point(1.2, 3.4);
 
   setUp(() async {
@@ -42,11 +41,13 @@ void main() {
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     when(shopsManager.createShop(
-        name: anyNamed('name'),
-        coords: anyNamed('coords'),
-        type: anyNamed('type'))).thenAnswer((invc) async {
+            name: anyNamed('name'),
+            coords: anyNamed('coords'),
+            type: anyNamed('type')))
+        .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
-      final coords = invc.namedArguments[const Symbol('coords')] as Point<double>;
+      final coords =
+          invc.namedArguments[const Symbol('coords')] as Point<double>;
       final id = randInt(100, 500);
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
@@ -58,17 +59,18 @@ void main() {
           ..osmId = id.toString()
           ..productsCount = 0))));
     });
-    when(addressObtainer.addressOfCoords(any)).thenAnswer(
-            (_) async => readyAddress);
+    when(addressObtainer.addressOfCoords(any))
+        .thenAnswer((_) async => readyAddress);
   });
 
-  Future<void> createShopTestImpl(WidgetTester tester, {String? shopName, ShopType? shopType}) async {
-    final context = await tester.superPump(const CreateShopPage(shopCoords: coords));
+  Future<void> createShopTestImpl(WidgetTester tester,
+      {String? shopName, ShopType? shopType}) async {
+    final context =
+        await tester.superPump(const CreateShopPage(shopCoords: coords));
 
     if (shopName != null) {
       await tester.enterText(
-          find.byKey(const Key('new_shop_name_input')),
-          shopName);
+          find.byKey(const Key('new_shop_name_input')), shopName);
       await tester.pumpAndSettle();
     }
 
@@ -89,19 +91,17 @@ void main() {
         coords: anyNamed('coords'),
         type: anyNamed('type')));
 
-    await createShopTestImpl(tester, shopName: 'new shop', shopType: ShopType.deli);
+    await createShopTestImpl(tester,
+        shopName: 'new shop', shopType: ShopType.deli);
 
     // Shop is created
     verify(shopsManager.createShop(
-        name: 'new shop',
-        coords: coords,
-        type: ShopType.deli));
+        name: 'new shop', coords: coords, type: ShopType.deli));
   });
 
-  testWidgets('cannot create shop when shop name is not set', (WidgetTester tester) async {
-    await createShopTestImpl(tester,
-        shopName: null,
-        shopType: ShopType.deli);
+  testWidgets('cannot create shop when shop name is not set',
+      (WidgetTester tester) async {
+    await createShopTestImpl(tester, shopName: null, shopType: ShopType.deli);
 
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),
@@ -109,10 +109,9 @@ void main() {
         type: anyNamed('type')));
   });
 
-  testWidgets('cannot create shop when shop type is not set', (WidgetTester tester) async {
-    await createShopTestImpl(tester,
-        shopName: 'shop name',
-        shopType: null);
+  testWidgets('cannot create shop when shop type is not set',
+      (WidgetTester tester) async {
+    await createShopTestImpl(tester, shopName: 'shop name', shopType: null);
 
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),

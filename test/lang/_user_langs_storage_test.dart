@@ -21,8 +21,7 @@ void main() {
       ..sysLang = LangCode.en
       ..langs.addAll([LangCode.be, LangCode.en]));
     await prefs.setString(
-        UserLangsStorage.PREF_USER_LANGS,
-        jsonEncode(langs.toJson()));
+        UserLangsStorage.PREF_USER_LANGS, jsonEncode(langs.toJson()));
 
     final userLangsStorage = UserLangsStorage(prefs.asHolder());
     UserLangs? obtainedParams;
@@ -53,8 +52,7 @@ void main() {
 
   test('load with bad user langs', () async {
     await prefs.setString(
-        UserLangsStorage.PREF_USER_LANGS,
-        'that is not a json');
+        UserLangsStorage.PREF_USER_LANGS, 'that is not a json');
 
     final userLangsStorage = UserLangsStorage(prefs.asHolder());
     bool receivedEmptyLangs = false;
