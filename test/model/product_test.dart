@@ -1,3 +1,4 @@
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:test/test.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/product.dart';
@@ -8,21 +9,21 @@ void main() {
   });
 
   test('veg statuses when analysis not available', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
-      ..ingredientsAnalyzed = null);
+      ..ingredientsAnalyzed = null).productForTests();
     expect(productWithNull.vegetarianStatusAnalysis, isNull);
     expect(productWithNull.veganStatusAnalysis, isNull);
 
-    final productWithEmptyAnalysis = Product((v) => v
+    final productWithEmptyAnalysis = ProductLangSlice((v) => v
       ..barcode = '123'
-      ..ingredientsAnalyzed.addAll([]));
+      ..ingredientsAnalyzed.addAll([])).productForTests();
     expect(productWithEmptyAnalysis.vegetarianStatusAnalysis, isNull);
     expect(productWithEmptyAnalysis.veganStatusAnalysis, isNull);
   });
 
   test('vegetarian status positive', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -34,7 +35,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.positive);
     // Expected positive, because all vegan statuses are null -> vegan statuses
     // are not applicable.
@@ -42,7 +43,7 @@ void main() {
   });
 
   test('vegetarian status possible', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -54,7 +55,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.possible);
     // Expected positive, because all vegan statuses are null -> vegan statuses
     // are not applicable.
@@ -62,7 +63,7 @@ void main() {
   });
 
   test('vegetarian status unknown', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -74,7 +75,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.unknown);
     // Expected positive, because all vegan statuses are null -> vegan statuses
     // are not applicable.
@@ -82,7 +83,7 @@ void main() {
   });
 
   test('vegetarian status negative', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -94,7 +95,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..vegetarianStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.vegetarianStatusAnalysis, VegStatus.negative);
     // Expected positive, because all vegan statuses are null -> vegan statuses
     // are not applicable.
@@ -102,7 +103,7 @@ void main() {
   });
 
   test('vegan status positive', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -114,7 +115,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..veganStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.veganStatusAnalysis, VegStatus.positive);
     // Expected positive, because all vegetarian statuses are null ->
     // vegetarian statuses are not applicable.
@@ -122,7 +123,7 @@ void main() {
   });
 
   test('vegan status possible', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -134,7 +135,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..veganStatus = VegStatus.positive)
-      ]));
+      ])).productForTests();
     expect(productWithNull.veganStatusAnalysis, VegStatus.possible);
     // Expected positive, because all vegetarian statuses are null ->
     // vegetarian statuses are not applicable.
@@ -142,7 +143,7 @@ void main() {
   });
 
   test('vegan status unknown', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -154,7 +155,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..veganStatus = VegStatus.unknown)
-      ]));
+      ])).productForTests();
     expect(productWithNull.veganStatusAnalysis, VegStatus.unknown);
     // Expected positive, because all vegetarian statuses are null ->
     // vegetarian statuses are not applicable.
@@ -162,7 +163,7 @@ void main() {
   });
 
   test('vegan status negative', () async {
-    final productWithNull = Product((v) => v
+    final productWithNull = ProductLangSlice((v) => v
       ..barcode = '123'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -174,7 +175,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingr2'
           ..veganStatus = VegStatus.unknown)
-      ]));
+      ])).productForTests();
     expect(productWithNull.veganStatusAnalysis, VegStatus.negative);
     // Expected positive, because all vegetarian statuses are null ->
     // vegetarian statuses are not applicable.

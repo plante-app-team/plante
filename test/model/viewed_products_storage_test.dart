@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 
@@ -93,7 +94,7 @@ void main() {
     storage.addProduct(p3);
     expect(storage.getProducts(), equals([p1, p2, p3]));
 
-    final p2Updated = p2.rebuild((e) => e.name = 'new name');
+    final p2Updated = p2.rebuild((e) => e.nameLangs[LangCode.en] = 'new name');
     storage.addProduct(p2Updated);
     expect(storage.getProducts(), equals([p1, p3, p2Updated]));
   });

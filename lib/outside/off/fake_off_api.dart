@@ -72,32 +72,32 @@ class FakeOffApi implements OffApi {
       return off.ProductResult(
           status: 1, barcode: configuration.barcode, product: null);
     }
-    final product = off.Product(
-        barcode: configuration.barcode,
-        productNameTranslated: _generateName(),
-        selectedImages: <off.ProductImage>[
-          off.ProductImage(
-              field: off.ImageField.FRONT,
-              size: off.ImageSize.DISPLAY,
-              url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
-              language: off.OpenFoodFactsLanguage.RUSSIAN),
-          off.ProductImage(
-              field: off.ImageField.INGREDIENTS,
-              size: off.ImageSize.DISPLAY,
-              url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
-              language: off.OpenFoodFactsLanguage.RUSSIAN)
-        ],
-        ingredientsTextTranslated: 'lemon, water',
-        ingredients: <off.Ingredient>[
-          off.Ingredient(
-              vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
-              vegetarian: off.IngredientSpecialPropertyStatus.POSITIVE,
-              text: 'water'),
-          off.Ingredient(
-              vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
-              vegetarian: off.IngredientSpecialPropertyStatus.POSITIVE,
-              text: 'lemon'),
-        ]);
+    final product =
+        off.Product(barcode: configuration.barcode, productNameInLanguages: {
+      for (var l in configuration.languages) l: _generateName()
+    }, selectedImages: <off.ProductImage>[
+      off.ProductImage(
+          field: off.ImageField.FRONT,
+          size: off.ImageSize.DISPLAY,
+          url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
+          language: off.OpenFoodFactsLanguage.RUSSIAN),
+      off.ProductImage(
+          field: off.ImageField.INGREDIENTS,
+          size: off.ImageSize.DISPLAY,
+          url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
+          language: off.OpenFoodFactsLanguage.RUSSIAN)
+    ], ingredientsTextInLanguages: {
+      for (var l in configuration.languages) l: 'lemon, water'
+    }, ingredients: <off.Ingredient>[
+      off.Ingredient(
+          vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
+          vegetarian: off.IngredientSpecialPropertyStatus.POSITIVE,
+          text: 'water'),
+      off.Ingredient(
+          vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
+          vegetarian: off.IngredientSpecialPropertyStatus.POSITIVE,
+          text: 'lemon'),
+    ]);
     return off.ProductResult(
         status: 1, barcode: configuration.barcode, product: product);
   }

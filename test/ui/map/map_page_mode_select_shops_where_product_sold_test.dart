@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/l10n/strings.dart';
@@ -60,9 +61,9 @@ void main() {
   });
 
   testWidgets('shop selection with provided product', (WidgetTester tester) async {
-    final product = Product((e) => e
+    final product = ProductLangSlice((e) => e
       ..barcode = '222'
-      ..name = 'Product name');
+      ..name = 'Product name').productForTests();
 
     final navigationObserver = MockNavigatorObserver();
     final widget = MapPage(

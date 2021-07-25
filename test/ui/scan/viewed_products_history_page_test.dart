@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
@@ -133,7 +134,7 @@ void main() {
 }
 
 Product _makeProduct(String barcode) {
-  return Product((e) => e
+  return ProductLangSlice((e) => e
     ..barcode = barcode
     ..name = 'Product $barcode'
     ..imageFront = Uri.file('/tmp/asd')
@@ -142,5 +143,5 @@ Product _makeProduct(String barcode) {
     ..veganStatus = VegStatus.positive
     ..vegetarianStatus = VegStatus.positive
     ..veganStatusSource = VegStatusSource.community
-    ..vegetarianStatusSource = VegStatusSource.community);
+    ..vegetarianStatusSource = VegStatusSource.community).productForTests();
 }

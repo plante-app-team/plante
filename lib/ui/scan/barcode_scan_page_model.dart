@@ -7,9 +7,8 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
@@ -19,16 +18,14 @@ enum BarcodeScanPageSearchResult { OK, ERROR_NETWORK, ERROR_OTHER }
 class BarcodeScanPageModel with WidgetsBindingObserver {
   final VoidCallback _onStateChangeCallback;
   final ResCallback<BarcodeScanPage> _widgetCallback;
-  final ProductsManager _productsManager;
+  final ProductsObtainer _productsObtainer;
   final ShopsManager _shopsManager;
-  final SysLangCodeHolder _langCodeHolder;
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
 
   String? _barcode;
   bool _searching = false;
   Product? _foundProduct;
-  String get _langCode => _langCodeHolder.langCode;
   PermissionState? _cameraPermission;
   String _manualBarcode = '';
   bool _manualBarcodeInputShown = false;
@@ -48,9 +45,8 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   BarcodeScanPageModel(
       this._onStateChangeCallback,
       this._widgetCallback,
-      this._productsManager,
+      this._productsObtainer,
       this._shopsManager,
-      this._langCodeHolder,
       this._permissionsManager,
       this._userParamsController) {
     _updateCameraPermission();
@@ -145,8 +141,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
     _searching = true;
     _onStateChangeCallback.call();
 
-    final foundProductResult =
-        await _productsManager.getProduct(barcode, _langCode);
+    final foundProductResult = await _productsObtainer.getProduct(barcode);
 
     final foundProduct = foundProductResult.maybeOk();
     _foundProduct = foundProduct;

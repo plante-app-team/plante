@@ -11,6 +11,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
@@ -26,6 +27,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
@@ -49,6 +51,7 @@ void main() {
   late MockProductsManager productsManager;
   late MockPermissionsManager permissionsManager;
   late MockAddressObtainer addressObtainer;
+  late MockProductsObtainer productsObtainer;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -61,7 +64,7 @@ void main() {
       ..productsCount = 1)));
 
   final products = [
-    Product((v) => v
+    ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'Apple'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -70,8 +73,8 @@ void main() {
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Water, salt, sugar'),
-    Product((v) => v
+      ..ingredientsText = 'Water, salt, sugar').productForTests(),
+    ProductLangSlice((v) => v
       ..barcode = '124'
       ..name = 'Pineapple'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -80,7 +83,7 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Water, salt, sugar'),
+      ..ingredientsText = 'Water, salt, sugar').productForTests(),
   ];
   final productsLastSeen = {
     products[0]: DateTime(2012, 1, 1),
@@ -109,6 +112,8 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     productsManager = MockProductsManager();
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
+    productsObtainer = MockProductsObtainer();
+    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
@@ -135,7 +140,7 @@ void main() {
     when(permissionsManager.status(any)).thenAnswer((_) async => PermissionState.granted);
     when(backend.productPresenceVote(any, any, any)).thenAnswer((_) async =>
         Ok(None()));
-    when(productsManager.createUpdateProduct(any, any)).thenAnswer(
+    when(productsManager.createUpdateProduct(any)).thenAnswer(
             (invoc) async => Ok(invoc.positionalArguments[0] as Product));
 
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
@@ -432,7 +437,7 @@ void main() {
 
   testWidgets('non-vegan products are not shown to a vegan', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Milk apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -440,8 +445,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.negative
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -449,7 +454,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     final productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -481,7 +486,7 @@ void main() {
 
   testWidgets('non-vegetarian products are not shown to a vegetarian', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Meat apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -489,8 +494,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.negative
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -498,7 +503,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     final productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -530,7 +535,7 @@ void main() {
 
   testWidgets('non-vegan products ARE shown to a vegetarian', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Meat apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -538,8 +543,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.negative
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -547,7 +552,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     final productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -579,7 +584,7 @@ void main() {
 
   testWidgets('products are sorted by their last-seen property (order 1)', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -587,8 +592,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -596,7 +601,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     final productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -621,7 +626,7 @@ void main() {
 
   testWidgets('products are sorted by their last-seen property (order 2)', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -629,8 +634,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -638,7 +643,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     final productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -663,7 +668,7 @@ void main() {
 
   testWidgets('products reloading changes order only when products set changes', (WidgetTester tester) async {
     final products = [
-      Product((v) => v
+      ProductLangSlice((v) => v
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -671,8 +676,8 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
-      Product((v) => v
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -680,7 +685,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'),
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
     var productsLastSeen = {
       products[0]: DateTime(2012, 1, 1),
@@ -731,7 +736,7 @@ void main() {
 
     // Add another product, unrelated to first 2
     products.add(
-      Product((v) => v
+        ProductLangSlice((v) => v
         ..barcode = '223'
         ..name = 'Some unrelated product'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -739,7 +744,7 @@ void main() {
         ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar'));
+        ..ingredientsText = 'Water, salt, sugar').productForTests());
 
     // NOTE: we'll keep the 'last seen' properties same
 

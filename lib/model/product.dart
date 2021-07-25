@@ -3,11 +3,18 @@ import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 
 part 'product.g.dart';
+
+enum ProductImageType {
+  FRONT,
+  FRONT_THUMB,
+  INGREDIENTS,
+}
 
 abstract class Product implements Built<Product, ProductBuilder> {
   static final Product empty = Product((e) => e.barcode = '');
@@ -23,18 +30,71 @@ abstract class Product implements Built<Product, ProductBuilder> {
   int? get moderatorVeganChoiceReasonId;
   String? get moderatorVeganSourcesText;
 
-  String? get name;
+  /// Service field to implement single-lang getters
+  /// (in [ProductLangsMechanicsExtension]).
+  BuiltList<LangCode> get langsPrioritized;
+
+  LangCode get mainLang => langsPrioritized.first;
+
+  /// We consider brands to be not translatable.
   BuiltList<String>? get brands;
-  BuiltList<String>? get categories;
-  String? get ingredientsText;
+  BuiltMap<LangCode, String> get nameLangs;
+  BuiltMap<LangCode, String> get ingredientsTextLangs;
 
   /// NOTE: the field is NOT send to any backend, only obtained from them.
-  BuiltList<Ingredient>? get ingredientsAnalyzed;
+  BuiltMap<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs;
 
-  Uri? get imageFront;
-  Uri? get imageFrontThumb;
-  Uri? get imageIngredients;
+  BuiltMap<LangCode, Uri> get imageFrontLangs;
+  BuiltMap<LangCode, Uri> get imageFrontThumbLangs;
+  BuiltMap<LangCode, Uri> get imageIngredientsLangs;
 
+  static Product? fromJson(Map<dynamic, dynamic> json) {
+    return BuildValueHelper.jsonSerializers.deserializeWith(serializer, json);
+  }
+
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
+  factory Product([void Function(ProductBuilder) updates]) = _$Product;
+  Product._();
+  static Serializer<Product> get serializer => _$productSerializer;
+}
+
+extension ProductLangsMechanicsExtension on Product {
+  String? get name => _getPrioritized(nameLangs);
+  String? get ingredientsText => _getPrioritized(ingredientsTextLangs);
+  BuiltList<Ingredient>? get ingredientsAnalyzed =>
+      _getPrioritized(ingredientsAnalyzedLangs);
+  Uri? get imageFront => _getPrioritized(imageFrontLangs);
+  Uri? get imageFrontThumb => _getPrioritized(imageFrontThumbLangs);
+  Uri? get imageIngredients => _getPrioritized(imageIngredientsLangs);
+
+  T? _getPrioritized<T>(BuiltMap<LangCode, T> map) {
+    for (final lang in langsPrioritized) {
+      final value = map[lang];
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+}
+
+extension ProductModeratorChoiceExtension on Product {
+  ModeratorChoiceReason? get moderatorVegetarianChoiceReason {
+    return moderatorChoiceReasonFromPersistentId(
+        moderatorVegetarianChoiceReasonId ?? -1);
+  }
+
+  ModeratorChoiceReason? get moderatorVeganChoiceReason {
+    return moderatorChoiceReasonFromPersistentId(
+        moderatorVeganChoiceReasonId ?? -1);
+  }
+}
+
+extension ProductVegAnalysisExtensions on Product {
   VegStatus? get vegetarianStatusAnalysis {
     final ingredientsAnalyzed = this.ingredientsAnalyzed;
     if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
@@ -84,42 +144,58 @@ abstract class Product implements Built<Product, ProductBuilder> {
     // the status of the ingredient shoud be ignored
     return VegStatus.positive;
   }
+}
 
-  ModeratorChoiceReason? get moderatorVegetarianChoiceReason {
-    return moderatorChoiceReasonFromPersistentId(
-        moderatorVegetarianChoiceReasonId ?? -1);
-  }
+extension ProductImageExtensions on Product {
+  bool isFrontImageFile(LangCode lang) =>
+      isImageFile(ProductImageType.FRONT, lang);
+  bool isFrontImageRemote(LangCode lang) =>
+      isImageRemote(ProductImageType.FRONT, lang);
+  bool isFrontThumbImageFile(LangCode lang) =>
+      isImageFile(ProductImageType.FRONT_THUMB, lang);
+  bool isFrontThumbImageRemote(LangCode lang) =>
+      isImageRemote(ProductImageType.FRONT_THUMB, lang);
+  bool isIngredientsImageFile(LangCode lang) =>
+      isImageFile(ProductImageType.INGREDIENTS, lang);
+  bool isIngredientsImageRemote(LangCode lang) =>
+      isImageRemote(ProductImageType.INGREDIENTS, lang);
 
-  ModeratorChoiceReason? get moderatorVeganChoiceReason {
-    return moderatorChoiceReasonFromPersistentId(
-        moderatorVeganChoiceReasonId ?? -1);
-  }
+  bool isImageFile(ProductImageType imageType, LangCode lang) =>
+      _isImageFile(imageUri(imageType, lang));
+  bool isImageRemote(ProductImageType imageType, LangCode lang) =>
+      _isImageRemote(imageUri(imageType, lang));
 
-  bool isFrontImageFile() => isImageFile(ProductImageType.FRONT);
-  bool isFrontImageRemote() => isImageRemote(ProductImageType.FRONT);
-  bool isFrontThumbImageFile() => isImageFile(ProductImageType.FRONT_THUMB);
-  bool isFrontThumbImageRemote() => isImageRemote(ProductImageType.FRONT_THUMB);
-  bool isIngredientsImageFile() => isImageFile(ProductImageType.INGREDIENTS);
-  bool isIngredientsImageRemote() =>
-      isImageRemote(ProductImageType.INGREDIENTS);
-
-  bool isImageFile(ProductImageType imageType) =>
-      _isImageFile(imageUri(imageType));
-  bool isImageRemote(ProductImageType imageType) =>
-      _isImageRemote(imageUri(imageType));
-
-  Uri? imageUri(ProductImageType imageType) {
+  Uri? imageUri(ProductImageType imageType, LangCode lang) {
     switch (imageType) {
       case ProductImageType.FRONT:
-        return imageFront;
+        return imageFrontLangs[lang];
       case ProductImageType.INGREDIENTS:
-        return imageIngredients;
+        return imageIngredientsLangs[lang];
       case ProductImageType.FRONT_THUMB:
-        return imageFrontThumb;
+        return imageFrontThumbLangs[lang];
       default:
         throw Exception('Unhandled item: $imageType');
     }
   }
+
+  /// First image among images for all langs
+  Uri? firstImageUri(ProductImageType imageType) {
+    for (final lang in langsPrioritized) {
+      final uri = imageUri(imageType, lang);
+      if (uri != null) {
+        return uri;
+      }
+    }
+    return null;
+  }
+
+  /// First image among images for all langs
+  bool isFirstImageFile(ProductImageType imageType) =>
+      _isImageFile(firstImageUri(imageType));
+
+  /// First image among images for all langs
+  bool isFirstImageRemote(ProductImageType imageType) =>
+      _isImageRemote(firstImageUri(imageType));
 
   bool _isImageFile(Uri? uri) {
     if (uri == null) {
@@ -135,35 +211,29 @@ abstract class Product implements Built<Product, ProductBuilder> {
     return !_isImageFile(uri);
   }
 
-  Product rebuildWithImage(ProductImageType imageType, Uri? uri) {
+  Product rebuildWithImage(
+      ProductImageType imageType, Uri? uri, LangCode lang) {
     switch (imageType) {
       case ProductImageType.FRONT:
-        return rebuild((v) => v.imageFront = uri);
+        if (uri != null) {
+          return rebuild((v) => v.imageFrontLangs[lang] = uri);
+        } else {
+          return rebuild((v) => v.imageFrontLangs.remove(lang));
+        }
       case ProductImageType.INGREDIENTS:
-        return rebuild((v) => v.imageIngredients = uri);
+        if (uri != null) {
+          return rebuild((v) => v.imageIngredientsLangs[lang] = uri);
+        } else {
+          return rebuild((v) => v.imageIngredientsLangs.remove(lang));
+        }
       case ProductImageType.FRONT_THUMB:
-        return rebuild((v) => v.imageFrontThumb = uri);
+        if (uri != null) {
+          return rebuild((v) => v.imageFrontThumbLangs[lang] = uri);
+        } else {
+          return rebuild((v) => v.imageFrontThumbLangs.remove(lang));
+        }
       default:
         throw Exception('Unhandled item: $imageType');
     }
   }
-
-  static Product? fromJson(Map<dynamic, dynamic> json) {
-    return BuildValueHelper.jsonSerializers.deserializeWith(serializer, json);
-  }
-
-  Map<String, dynamic> toJson() {
-    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
-        as Map<String, dynamic>;
-  }
-
-  factory Product([void Function(ProductBuilder) updates]) = _$Product;
-  Product._();
-  static Serializer<Product> get serializer => _$productSerializer;
-}
-
-enum ProductImageType {
-  FRONT,
-  FRONT_THUMB,
-  INGREDIENTS,
 }

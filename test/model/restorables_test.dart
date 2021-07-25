@@ -1,4 +1,8 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/product_lang_slice.dart';
+import 'package:plante/model/product_lang_slice_restorable.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_restorable.dart';
@@ -57,9 +61,46 @@ void main() {
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..vegetarianStatus = VegStatus.negative
       ..vegetarianStatusSource = VegStatusSource.community
+      ..nameLangs.addAll({ LangCode.en: 'hello there', LangCode.ru: 'Privet tut'})
+      ..brands.addAll(['Horns', 'Hooves'])
+      ..ingredientsTextLangs.addAll({ LangCode.en: 'Water, lemon', LangCode.ru: 'Voda, lemon' })
+      ..ingredientsAnalyzedLangs.addAll({LangCode.en: BuiltList.from([
+        Ingredient((v) => v
+          ..name = 'water'
+          ..vegetarianStatus = VegStatus.possible),
+        Ingredient((v) => v
+          ..name = 'lemon'
+          ..vegetarianStatus = VegStatus.positive)])})
+      ..imageFrontLangs.addAll({
+        LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png'),
+        LangCode.ru: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png') })
+      ..imageFrontThumbLangs.addAll({ LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')})
+      ..imageIngredientsLangs.addAll({ LangCode.en: Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')})
+    );
+
+    final restorable = ProductRestorable(Product.empty);
+    widget.register(restorable, 'restorable');
+    restorable.value = product;
+
+    final restored = ProductRestorable(Product.empty);
+    widget.register(restored, 'restored');
+    restored.value = restored.fromPrimitives(restorable.toPrimitives());
+
+    expect(restored.value, equals(restorable.value));
+  });
+
+  testWidgets('ProductLangSliceRestorable', (WidgetTester tester) async {
+    final widget = _TestWidget();
+    await tester.superPump(widget);
+
+    final slice = ProductLangSlice((e) => e
+      ..barcode = '123'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..vegetarianStatus = VegStatus.negative
+      ..vegetarianStatusSource = VegStatusSource.community
       ..name = 'hello there'
       ..brands.addAll(['Horns', 'Hooves'])
-      ..categories.addAll(['mac', 'cheese'])
       ..ingredientsText = 'Water, lemon'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
@@ -73,11 +114,13 @@ void main() {
       ..imageIngredients = Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')
     );
 
-    final restorable = ProductRestorable(Product.empty);
+    final restorable = ProductLangSliceRestorable(
+        ProductLangSlice.from(Product.empty, LangCode.en));
     widget.register(restorable, 'restorable');
-    restorable.value = product;
+    restorable.value = slice;
 
-    final restored = ProductRestorable(Product.empty);
+    final restored = ProductLangSliceRestorable(
+        ProductLangSlice.from(Product.empty, LangCode.en));
     widget.register(restored, 'restored');
     restored.value = restored.fromPrimitives(restorable.toPrimitives());
 

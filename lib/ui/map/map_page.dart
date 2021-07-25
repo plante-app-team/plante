@@ -198,6 +198,9 @@ class _MapPageState extends PageStatePlante<MapPage>
     final contextSource = () => context;
     final displayedShopsSource = () => _displayedShops;
     final updateBottomHintCallback = (String? hint) {
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _bottomHint = hint;
       });
