@@ -7,6 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
@@ -17,7 +18,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/l10n/strings.dart';
@@ -53,9 +54,9 @@ void main() {
     ..backendShop.replace(BackendShop((e) => e
       ..osmId = '1'
       ..productsCount = 0)));
-  final product = Product((e) => e
+  final product = ProductLangSlice((e) => e
     ..barcode = '123456'
-    ..name = 'Product name');
+    ..name = 'Product name').productForTests();
 
   final FutureAddress readyAddress = Future.value(Ok(OsmAddress((e) => e
     ..road = 'Broadway'
@@ -84,7 +85,7 @@ void main() {
       ..eatsHoney = false);
     await userParamsController.setUserParams(params);
 
-    GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
+    GetIt.I.registerSingleton<ProductsObtainer>(MockProductsObtainer());
     GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('ru'));
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
 
@@ -147,7 +148,9 @@ void main() {
   });
 
   testWidgets('card for product: title for product with name', (WidgetTester tester) async {
-    final productWithName = product.rebuild((e) => e.name = 'Cinnamon bun');
+    final productWithName = ProductLangSlice((e) => e
+      ..barcode = '123456'
+      ..name = 'Cinnamon bun').productForTests();
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: productWithName,
       shop: shopEmpty,
@@ -165,7 +168,9 @@ void main() {
   });
 
   testWidgets('card for product: title for product without name', (WidgetTester tester) async {
-    final productWithoutName = product.rebuild((e) => e.name = null);
+    final productWithoutName = ProductLangSlice((e) => e
+      ..barcode = '123456'
+      ..name = null).productForTests();
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: productWithoutName,
       shop: shopEmpty,

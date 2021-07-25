@@ -13,6 +13,7 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
@@ -76,7 +77,7 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     productsManager = MockProductsManager();
-    when(productsManager.createUpdateProduct(any, any)).thenAnswer((invoc) async {
+    when(productsManager.createUpdateProduct(any)).thenAnswer((invoc) async {
       return Ok(invoc.positionalArguments[0] as Product);
     });
     when(productsManager.updateProductAndExtractIngredients(any, any))
@@ -119,10 +120,10 @@ void main() {
 
   Future<bool> generalTest(
       WidgetTester tester,
-      {Product? expectedProductResult,
+      {Product? initialProduct,
+        Product? expectedProductResult,
         String? nameInput = 'Lemon drink',
         String? brandInput = 'Nice brand',
-        String? categoriesInput = 'Nice, category',
         bool takeImageFront = true,
         bool takeImageIngredients = true,
         String? ingredientsTextOverride,
@@ -154,8 +155,12 @@ void main() {
       done = true;
     };
 
+    initialProduct ??= Product((v) => v
+        ..barcode = '123'
+        ..langsPrioritized.add(selectedLang ?? LangCode.en));
+
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'),
+        initialProduct,
         doneCallback: callback,
         initialShops: initialShops);
 
@@ -202,13 +207,6 @@ void main() {
       await tester.enterText(
           find.byKey(const Key('brand')),
           brandInput);
-      await tester.pumpAndSettle();
-    }
-
-    if (categoriesInput != null) {
-      await tester.enterText(
-          find.byKey(const Key('categories')),
-          categoriesInput);
       await tester.pumpAndSettle();
     }
 
@@ -341,15 +339,15 @@ void main() {
     }
 
     expect(done, isFalse);
-    verifyNever(productsManager.createUpdateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any));
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     if (expectedProductResult != null) {
       final finalProduct = verify(
-          productsManager.createUpdateProduct(captureAny, selectedLang?.name ?? '')).captured.first;
+          productsManager.createUpdateProduct(captureAny)).captured.first;
       expect(finalProduct, equals(expectedProductResult));
     } else {
-      verifyNever(productsManager.createUpdateProduct(any, any));
+      verifyNever(productsManager.createUpdateProduct(any));
     }
 
     final expectedShops = <Shop>[];
@@ -388,25 +386,24 @@ void main() {
   testWidgets('good flow', (WidgetTester tester) async {
     expect(_DEFAULT_TEST_LANG, isNot(equals(LangCode.ru)));
 
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = LangCode.ru
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
-        tester,
-        expectedProductResult: expectedProduct,
+      tester,
+      expectedProductResult: expectedProduct,
       nameInput: expectedProduct.name,
       brandInput: expectedProduct.brands!.join(', '),
-      categoriesInput: expectedProduct.categories!.join(', '),
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
@@ -419,200 +416,185 @@ void main() {
   });
 
   testWidgets('front photo not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsNothing);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('name input field not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..name = 'Hello there');
+      ..name = 'Hello there').productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsNothing);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('brand input field not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..brands = ListBuilder<String>(['Cool brand']));
+      ..brands = ListBuilder<String>(['Cool brand'])).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsNothing);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
-    expect(find.byKey(const Key('ingredients_group')), findsWidgets);
-    expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
-    expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
-  });
-
-  testWidgets('categories input field not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
-      ..barcode = '123'
-      ..categories = ListBuilder<String>(['Cool category']));
-    await tester.superPump(InitProductPage(initialProduct));
-
-    expect(find.byKey(const Key('front_photo_group')), findsWidgets);
-    expect(find.byKey(const Key('name_group')), findsWidgets);
-    expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsNothing);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Tomato');
+      ..ingredientsText = 'Tomato').productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsNothing);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group present when product has no ingredients image but has text', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..ingredientsText = 'Tomato');
+      ..ingredientsText = 'Tomato').productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('ingredients group present when product has no ingredients text but has image', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path));
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsNothing);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group present when product has vegan data from OFF', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.open_food_facts);
+      ..veganStatusSource = VegStatusSource.open_food_facts).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegan group present when product has vegan data without source', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..veganStatus = VegStatus.positive);
+      ..veganStatus = VegStatus.positive).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegetarian group not present when product has data', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community);
+      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsNothing);
   });
 
   testWidgets('vegetarian group present when product has vegetarian data from OFF', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts);
+      ..vegetarianStatusSource = VegStatusSource.open_food_facts).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
   });
 
   testWidgets('vegetarian group present when product has vegetarian data without source', (WidgetTester tester) async {
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive);
+      ..vegetarianStatus = VegStatus.positive).productForTests();
     await tester.superPump(InitProductPage(initialProduct));
 
     expect(find.byKey(const Key('front_photo_group')), findsWidgets);
     expect(find.byKey(const Key('name_group')), findsWidgets);
     expect(find.byKey(const Key('brand_group')), findsWidgets);
-    expect(find.byKey(const Key('categories_group')), findsWidgets);
     expect(find.byKey(const Key('ingredients_group')), findsWidgets);
     expect(find.byKey(const Key('vegan_status_group')), findsWidgets);
     expect(find.byKey(const Key('vegetarian_status_group')), findsWidgets);
@@ -624,54 +606,24 @@ void main() {
   });
 
   testWidgets('can save product without brand', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = null
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: null,
-        categoriesInput: expectedProduct.categories!.join(', '),
-        takeImageFront: expectedProduct.imageFront != null,
-        takeImageIngredients: expectedProduct.imageIngredients != null,
-        veganStatusInput: expectedProduct.veganStatus,
-        vegetarianStatusInput: expectedProduct.vegetarianStatus
-    );
-
-    expect(done, isTrue);
-  });
-
-  testWidgets('can save product without categories', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
-      ..barcode = '123'
-      ..name = 'Lemon drink'
-      ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = null
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
-
-    final done = await generalTest(
-        tester,
-        expectedProductResult: expectedProduct,
-        nameInput: expectedProduct.name,
-        brandInput: expectedProduct.brands!.join(', '),
-        categoriesInput: null,
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: expectedProduct.veganStatus,
@@ -692,25 +644,24 @@ void main() {
   });
 
   testWidgets('can save product without ingredients text', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = '' // Empty!
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: expectedProduct.brands!.join(', '),
-        categoriesInput: expectedProduct.categories!.join(', '),
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: true,
         ingredientsTextOverride: '',
@@ -732,12 +683,14 @@ void main() {
   });
 
   testWidgets('cannot save product without vegetarian status', (WidgetTester tester) async {
-    final done = await generalTest(tester, veganStatusInput: VegStatus.unknown, vegetarianStatusInput: null, expectedProductResult: null);
+    final done = await generalTest(tester, veganStatusInput: VegStatus.unknown,
+        vegetarianStatusInput: null, expectedProductResult: null);
     expect(done, isFalse);
   });
 
   testWidgets('vegan positive makes vegetarian positive', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -747,12 +700,11 @@ void main() {
       ..veganStatusSource = VegStatusSource.community
       ..vegetarianStatus = VegStatus.positive // !!!!!!
       ..vegetarianStatusSource = VegStatusSource.community
-      );
+      ).productForTests();
 
     final done = await generalTest(
         tester,
         brandInput: null,
-        categoriesInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
@@ -765,7 +717,8 @@ void main() {
   });
 
   testWidgets('vegetarian negative makes vegan negative', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -775,12 +728,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative // !!!!!!
       ..veganStatusSource = VegStatusSource.community
-    );
+    ).productForTests();
 
     final done = await generalTest(
         tester,
         brandInput: null,
-        categoriesInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
@@ -793,7 +745,8 @@ void main() {
   });
 
   testWidgets('vegetarian unknown makes vegan unknown if it was positive', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -803,12 +756,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.unknown // !!!!!!
       ..veganStatusSource = VegStatusSource.community
-    );
+    ).productForTests();
 
     final done = await generalTest(
         tester,
         brandInput: null,
-        categoriesInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
@@ -821,7 +773,8 @@ void main() {
   });
 
   testWidgets("vegetarian unknown doesn't change vegan if was negative", (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -831,12 +784,11 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative // !!!!!!
       ..veganStatusSource = VegStatusSource.community
-    );
+    ).productForTests();
 
     final done = await generalTest(
         tester,
         brandInput: null,
-        categoriesInput: null,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         takeImageFront: expectedProduct.imageFront != null,
@@ -849,25 +801,24 @@ void main() {
   });
 
   testWidgets('no shops selected when map opened', (WidgetTester tester) async {
-    final expectedProduct = Product((v) => v
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: expectedProduct,
         nameInput: expectedProduct.name,
         brandInput: expectedProduct.brands!.join(', '),
-        categoriesInput: expectedProduct.categories!.join(', '),
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: expectedProduct.veganStatus,
@@ -879,18 +830,18 @@ void main() {
   });
 
   testWidgets('shops sending to server finishes with error but all other things are ok', (WidgetTester tester) async {
-    final perfectlyGoodExpectedProduct = Product((v) => v
+    final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     when(shopsManager.putProductToShops(any, any)).thenAnswer((_) async => Err(ShopsManagerError.OTHER));
 
@@ -899,7 +850,6 @@ void main() {
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
-        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
@@ -916,20 +866,20 @@ void main() {
   });
 
   testWidgets('product saving to server finishes with error but all other things are ok', (WidgetTester tester) async {
-    final perfectlyGoodExpectedProduct = Product((v) => v
+    final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    when(productsManager.createUpdateProduct(any, any)).thenAnswer((_) async {
+    when(productsManager.createUpdateProduct(any)).thenAnswer((_) async {
       return Err(ProductsManagerError.OTHER);
     });
 
@@ -938,7 +888,6 @@ void main() {
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
-        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
@@ -954,25 +903,24 @@ void main() {
   });
 
   testWidgets('ocr fail and manual ingredients input', (WidgetTester tester) async {
-    final perfectlyGoodExpectedProduct = Product((v) => v
+    final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
-        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
@@ -989,25 +937,24 @@ void main() {
   });
 
   testWidgets('ocr fail and successful retry', (WidgetTester tester) async {
-    final perfectlyGoodExpectedProduct = Product((v) => v
+    final perfectlyGoodExpectedProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: perfectlyGoodExpectedProduct,
         nameInput: perfectlyGoodExpectedProduct.name,
         brandInput: perfectlyGoodExpectedProduct.brands!.join(', '),
-        categoriesInput: perfectlyGoodExpectedProduct.categories!.join(', '),
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients: perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
@@ -1024,25 +971,24 @@ void main() {
   });
 
   testWidgets('opened with initial shops', (WidgetTester tester) async {
-    final product = Product((v) => v
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
         tester,
         expectedProductResult: product,
         nameInput: product.name,
         brandInput: product.brands!.join(', '),
-        categoriesInput: product.categories!.join(', '),
         takeImageFront: product.imageFront != null,
         takeImageIngredients: product.imageIngredients != null,
         veganStatusInput: product.veganStatus,
@@ -1054,18 +1000,18 @@ void main() {
   });
 
   testWidgets('opened with initial shops, then select shops', (WidgetTester tester) async {
-    final product = Product((v) => v
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final shops = [
       Shop((e) => e
@@ -1093,7 +1039,6 @@ void main() {
         expectedProductResult: product,
         nameInput: product.name,
         brandInput: product.brands!.join(', '),
-        categoriesInput: product.categories!.join(', '),
         takeImageFront: product.imageFront != null,
         takeImageIngredients: product.imageIngredients != null,
         veganStatusInput: product.veganStatus,
@@ -1106,18 +1051,18 @@ void main() {
   });
 
   testWidgets('cancel initial and selected shops', (WidgetTester tester) async {
-    final product = Product((v) => v
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final shops = [
       Shop((e) => e
@@ -1163,7 +1108,6 @@ void main() {
         expectedProductResult: product,
         nameInput: product.name,
         brandInput: product.brands!.join(', '),
-        categoriesInput: product.categories!.join(', '),
         takeImageFront: product.imageFront != null,
         takeImageIngredients: product.imageIngredients != null,
         veganStatusInput: product.veganStatus,
@@ -1171,6 +1115,46 @@ void main() {
         initialShops: [shops[0], shops[1]],
         selectedShops: [shops[2], shops[3]],
         shopsToCancel: [shops[1], shops[3]],
+    );
+
+    expect(done, isTrue);
+  });
+
+  testWidgets('product update does not erase existing veg statuses', (WidgetTester tester) async {
+    final initialProduct = ProductLangSlice((v) => v
+      ..lang = LangCode.ru
+      ..barcode = '123'
+      ..vegetarianStatus = VegStatus.positive
+      ..vegetarianStatusSource = VegStatusSource.moderator
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator).productForTests();
+
+    final expectedProduct = ProductLangSlice((v) => v
+      ..lang = LangCode.ru
+      ..barcode = '123'
+      ..name = 'Lemon drink'
+      ..brands = ListBuilder<String>(['Nice brand'])
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..ingredientsText = 'water, lemon'
+      // Veg statuses and sources are expected to be same as
+      // in the initial product
+      ..vegetarianStatus = initialProduct.vegetarianStatus
+      ..vegetarianStatusSource = initialProduct.vegetarianStatusSource
+      ..veganStatus = initialProduct.veganStatus
+      ..veganStatusSource = initialProduct.veganStatusSource).productForTests();
+
+    final done = await generalTest(
+      tester,
+      initialProduct: initialProduct,
+      expectedProductResult: expectedProduct,
+      nameInput: expectedProduct.name,
+      brandInput: expectedProduct.brands!.join(', '),
+      takeImageFront: expectedProduct.imageFront != null,
+      takeImageIngredients: expectedProduct.imageIngredients != null,
+      veganStatusInput: null,
+      vegetarianStatusInput: null,
+      selectedLang: LangCode.ru,
     );
 
     expect(done, isTrue);
@@ -1189,7 +1173,9 @@ void main() {
     verifyNever(photosTaker.cropPhoto(any, any, any));
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'),
+        ProductLangSlice((v) => v
+            ..lang = _DEFAULT_TEST_LANG
+            ..barcode = '123').productForTests(),
         photoBeingTakenForTests: ProductImageType.FRONT);
     await tester.superPump(widget);
 
@@ -1211,10 +1197,10 @@ void main() {
     await tester.tap(find.byKey(const Key('vegan_positive_btn')));
     await tester.pumpAndSettle();
 
-    verifyNever(productsManager.createUpdateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any));
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
-    verify(productsManager.createUpdateProduct(captureAny, any));
+    verify(productsManager.createUpdateProduct(captureAny));
   });
 
   testWidgets('finish taking ingredients photo when restoring', (WidgetTester tester) async {
@@ -1231,7 +1217,9 @@ void main() {
     verifyNever(productsManager.updateProductAndExtractIngredients(any, any));
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'),
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)),
         photoBeingTakenForTests: ProductImageType.INGREDIENTS);
     await tester.superPump(widget);
 
@@ -1256,10 +1244,10 @@ void main() {
     await tester.tap(find.byKey(const Key('vegan_positive_btn')));
     await tester.pumpAndSettle();
 
-    verifyNever(productsManager.createUpdateProduct(any, any));
+    verifyNever(productsManager.createUpdateProduct(any));
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
-    verify(productsManager.createUpdateProduct(captureAny, any));
+    verify(productsManager.createUpdateProduct(captureAny));
   });
 
   Future<void> takePhotoWhenNoPermissionTest(
@@ -1273,7 +1261,9 @@ void main() {
     });
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1302,7 +1292,9 @@ void main() {
     });
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1330,7 +1322,9 @@ void main() {
             (_) async => PermissionState.permanentlyDenied);
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1411,7 +1405,9 @@ void main() {
 
   testWidgets('cannot take picture of ingredients when no lang selected', (WidgetTester tester) async {
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1431,46 +1427,13 @@ void main() {
     expect(find.text(context.strings.init_product_page_please_select_lang), findsOneWidget);
   });
 
-  testWidgets('cannot restart ocr when no lang selected', (WidgetTester tester) async {
-    // OCR will fail
-    when(productsManager.updateProductAndExtractIngredients(any, any)).thenAnswer(
-            (invoc) async {
-          return Err(ProductsManagerError.OTHER);
-        });
-
-    final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
-    final context = await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    await scrollToBottom(tester);
-
-    // Take ingredients picture
-    await tester.tap(find.byKey(const Key('ingredients_photo')));
-    await tester.pumpAndSettle();
-    verify(photosTaker.takeAndCropPhoto(any, any));
-
-    // Verify OCR failed and retry available
-    expect(find.byKey(const Key('ocr_try_again')), findsOneWidget);
-
-    // Deselect product's lang
-    final dropdown = find.byKey(const Key('product_lang'))
-        .evaluate().first.widget as DropdownPlante<LangCode?>;
-    dropdown.onChanged!.call(null);
-    await tester.pumpAndSettle();
-
-    // Start OCR retry and verify it won't start without a lang
-    expect(find.text(context.strings.init_product_page_please_select_lang), findsNothing);
-    await tester.tap(find.byKey(const Key('ocr_try_again')));
-    await tester.pumpAndSettle();
-    expect(find.text(context.strings.init_product_page_please_select_lang), findsOneWidget);
-  });
-
   testWidgets('input language change does not immediately affect InputProductsLangStorage', (WidgetTester tester) async {
     expect(_DEFAULT_TEST_LANG, isNot(equals(LangCode.ru)));
 
     final widget = InitProductPage(
-        Product((v) => v.barcode = '123'));
+        Product((v) => v
+            ..barcode = '123'
+            ..langsPrioritized.add(_DEFAULT_TEST_LANG)));
     await tester.superPump(widget);
     await tester.pumpAndSettle();
 
@@ -1485,25 +1448,24 @@ void main() {
   });
 
   testWidgets('cannot save product when lang is deselected', (WidgetTester tester) async {
-    final perfectlyGoodProduct = Product((v) => v
+    final perfectlyGoodProduct = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_TEST_LANG
       ..barcode = '123'
       ..name = 'Lemon drink'
       ..brands = ListBuilder<String>(['Nice brand'])
-      ..categories = ListBuilder<String>(['Nice', 'category'])
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
       ..vegetarianStatus = VegStatus.positive
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community);
+      ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final done = await generalTest(
       tester,
       expectedProductResult: null,
       nameInput: perfectlyGoodProduct.name,
       brandInput: perfectlyGoodProduct.brands!.join(', '),
-      categoriesInput: perfectlyGoodProduct.categories!.join(', '),
       takeImageFront: perfectlyGoodProduct.imageFront != null,
       takeImageIngredients: perfectlyGoodProduct.imageIngredients != null,
       veganStatusInput: perfectlyGoodProduct.veganStatus,
@@ -1516,7 +1478,9 @@ void main() {
   });
 
   testWidgets('when started for default reason every input is shown', (WidgetTester tester) async {
-    final product = Product((v) => v.barcode = '123');
+    final product = Product((v) => v
+        ..barcode = '123'
+        ..langsPrioritized.add(_DEFAULT_TEST_LANG));
 
     final widget = InitProductPage(product, startReason: InitProductPageStartReason.DEFAULT);
     await tester.superPump(widget);
@@ -1527,7 +1491,6 @@ void main() {
     expect(find.byKey(const Key('front_photo')), findsOneWidget);
     expect(find.byKey(const Key('name_group')), findsOneWidget);
     expect(find.byKey(const Key('brand_group')), findsOneWidget);
-    expect(find.byKey(const Key('categories_group')), findsOneWidget);
     expect(find.byKey(const Key('shops_group')), findsOneWidget);
     expect(find.byKey(const Key('ingredients_group')), findsOneWidget);
     expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
@@ -1535,7 +1498,9 @@ void main() {
   });
 
   testWidgets('when started for veg statuses only veg statuses are shown', (WidgetTester tester) async {
-    final product = Product((v) => v.barcode = '123');
+    final product = Product((v) => v
+        ..barcode = '123'
+        ..langsPrioritized.add(_DEFAULT_TEST_LANG));
 
     final widget = InitProductPage(product, startReason: InitProductPageStartReason.HELP_WITH_VEG_STATUSES);
     await tester.superPump(widget);
@@ -1546,7 +1511,6 @@ void main() {
     expect(find.byKey(const Key('front_photo')), findsNothing);
     expect(find.byKey(const Key('name_group')), findsNothing);
     expect(find.byKey(const Key('brand_group')), findsNothing);
-    expect(find.byKey(const Key('categories_group')), findsNothing);
     expect(find.byKey(const Key('shops_group')), findsNothing);
     expect(find.byKey(const Key('ingredients_group')), findsNothing);
     expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);

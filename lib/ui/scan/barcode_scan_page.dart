@@ -10,6 +10,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -17,7 +18,6 @@ import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/switch_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -28,7 +28,6 @@ import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import 'package:plante/logging/log.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 const _BACKGROUND_COLOR = Color(0xfff5f7fa);
@@ -95,9 +94,8 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     _model = BarcodeScanPageModel(
         stateChangeCallback,
         () => widget,
-        GetIt.I.get<ProductsManager>(),
+        GetIt.I.get<ProductsObtainer>(),
         GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<SysLangCodeHolder>(),
         GetIt.I.get<PermissionsManager>(),
         GetIt.I.get<UserParamsController>());
     _manualBarcodeTextController.addListener(() {

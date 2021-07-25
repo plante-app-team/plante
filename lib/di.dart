@@ -77,10 +77,11 @@ void initDI() {
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
       GetIt.I.get<OffApi>(),
       GetIt.I.get<Backend>(),
-      GetIt.I.get<TakenProductsImagesStorage>()));
+      GetIt.I.get<TakenProductsImagesStorage>(),
+      GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),
-    GetIt.I.get<SysLangCodeHolder>(),
+    GetIt.I.get<UserLangsManager>(),
   ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));

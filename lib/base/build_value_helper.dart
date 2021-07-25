@@ -1,6 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
@@ -24,6 +25,7 @@ part 'build_value_helper.g.dart';
   VegStatus,
   VegStatusSource,
   Product,
+  ProductLangSlice,
   Ingredient,
   BackendProductsAtShop,
   BackendShop,
@@ -35,8 +37,11 @@ part 'build_value_helper.g.dart';
   UserLangs,
 ])
 final Serializers _serializers = _$_serializers;
-final _jsonSerializers =
-    (_serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();
+final _jsonSerializers = (_serializers.toBuilder()
+      ..addPlugin(StandardJsonPlugin())
+      ..addBuilderFactory(const FullType(BuiltList, [FullType(Ingredient)]),
+          () => ListBuilder<Ingredient>()))
+    .build();
 
 class BuildValueHelper {
   static final Serializers serializers = _serializers;

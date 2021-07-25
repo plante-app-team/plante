@@ -139,6 +139,7 @@ class TakenProductsImagesStorage {
       final file = await _getStorageFile();
       if (await file.exists()) {
         await file.delete(recursive: true);
+        _images.clear();
       }
     });
   }

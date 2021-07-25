@@ -20,9 +20,9 @@ class ProductImagesHelper {
 
   static Image? _takenProductImageWidget(
       Product product, ProductImageType imageType) {
-    final photoTaken = product.isImageFile(imageType);
+    final photoTaken = product.isFirstImageFile(imageType);
     if (photoTaken) {
-      final file = File.fromUri(product.imageUri(imageType)!);
+      final file = File.fromUri(product.firstImageUri(imageType)!);
       if (file.existsSync()) {
         return Image.file(file, fit: BoxFit.cover);
       }
@@ -32,8 +32,8 @@ class ProductImagesHelper {
 
   static Image? _remoteProductImage(
       Product product, ProductImageType imageType) {
-    if (product.isImageRemote(imageType)) {
-      return Image.network(product.imageUri(imageType)!.toString(),
+    if (product.isFirstImageRemote(imageType)) {
+      return Image.network(product.firstImageUri(imageType)!.toString(),
           fit: BoxFit.cover, loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           return child;

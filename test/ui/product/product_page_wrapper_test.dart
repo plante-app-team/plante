@@ -9,6 +9,7 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
@@ -70,7 +71,7 @@ void main() {
 
   testWidgets('init page is not shown when product is filled', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'name'
       ..vegetarianStatus = VegStatus.positive
@@ -79,7 +80,7 @@ void main() {
       ..veganStatusSource = VegStatusSource.community
       ..ingredientsText = '1, 2, 3'
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
@@ -87,7 +88,7 @@ void main() {
 
   testWidgets('init page is not shown when product is filled but lacks ingredients text', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'name'
       ..vegetarianStatus = VegStatus.positive
@@ -96,7 +97,7 @@ void main() {
       ..veganStatusSource = VegStatusSource.community
       ..ingredientsText = null // !!!!!!!!
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
@@ -105,7 +106,7 @@ void main() {
   testWidgets('init_product_page is not shown when '
               'veg-statuses are filled by OFF', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    final initialProduct = Product((v) => v
+    final initialProduct = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'name'
       ..vegetarianStatus = VegStatus.positive
@@ -114,7 +115,7 @@ void main() {
       ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
       ..ingredientsText = '1, 2, 3'
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path));
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)).productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);

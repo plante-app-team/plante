@@ -15,6 +15,7 @@ Serializers _$_serializers = (new Serializers().toBuilder()
       ..add(OsmAddress.serializer)
       ..add(OsmShop.serializer)
       ..add(Product.serializer)
+      ..add(ProductLangSlice.serializer)
       ..add(Shop.serializer)
       ..add(UserLangs.serializer)
       ..add(UserParams.serializer)
@@ -31,8 +32,37 @@ Serializers _$_serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(LangCode)]),
           () => new ListBuilder<LangCode>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(LangCode)]),
+          () => new ListBuilder<LangCode>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(LangCode), const FullType(String)]),
+          () => new MapBuilder<LangCode, String>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(LangCode), const FullType(String)]),
+          () => new MapBuilder<LangCode, String>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap, const [
+            const FullType(LangCode),
+            const FullType(BuiltList, const [const FullType(Ingredient)])
+          ]),
+          () => new MapBuilder<LangCode, BuiltList<Ingredient>>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

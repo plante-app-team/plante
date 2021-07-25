@@ -9,6 +9,8 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
+import 'package:plante/model/product_lang_slice_restorable.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shops_list_restorable.dart';
@@ -40,10 +42,9 @@ class InitProductPageModel {
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
   final ProductRestorable _initialProductRestorable;
-  final ProductRestorable _productRestorable;
+  final ProductLangSliceRestorable _productRestorable;
   final ShopsListRestorable _shopsRestorable;
   final RestorableInt _photoBeingTaken = RestorableInt(_NO_PHOTO);
-  final RestorableString _langCode = RestorableString('');
 
   InitProductPageOcrState _ocrState = InitProductPageOcrState.NONE;
 
@@ -56,8 +57,8 @@ class InitProductPageModel {
   Product get _initialProduct => _initialProductRestorable.value;
 
   InitProductPageOcrState get ocrState => _ocrState;
-  Product get product => _productRestorable.value;
-  set product(Product value) {
+  ProductLangSlice get product => _productRestorable.value;
+  set product(ProductLangSlice value) {
     if (value.veganStatus != product.veganStatus) {
       // Vegan status changed
       if (value.veganStatus == VegStatus.positive) {
@@ -83,36 +84,39 @@ class InitProductPageModel {
     _onProductUpdate.call();
   }
 
+  Product? get productFull =>
+      langCode != null ? _initialProduct.updateWith(product) : null;
+
   List<Shop> get shops => _shopsRestorable.value;
   set shops(List<Shop> value) {
     _shopsRestorable.value = value;
     _onProductUpdate.call();
   }
 
-  bool _langCodeInited = false;
-  LangCode? get langCode {
-    if (!_langCodeInited) {
-      _langCode.value = _inputProductsLangStorage.selectedCode?.name ?? '';
-      _langCodeInited = true;
-    }
-    return LangCode.safeValueOf(_langCode.value);
-  }
+  LangCode? get langCode => product.lang;
 
-  set langCode(LangCode? value) {
-    _langCodeInited = true;
-    _langCode.value = value?.name ?? '';
+  /// NOTE: when lang code is change, all product updates are reset.
+  /// If the user updated any of the product properties, ask them if they're
+  /// sure they want to change the lang before they do change it.
+  set langCode(LangCode? lang) {
+    if (lang != null) {
+      _productRestorable.value = _initialProduct.sliceFor(lang);
+    } else {
+      _productRestorable.value = ProductLangSlice.empty;
+    }
     _onProductUpdate.call();
   }
 
   bool loading = false;
 
-  Map<String, RestorableProperty<Object?>> get restorableProperties => {
-        'initial_product': _initialProductRestorable,
-        'product': _productRestorable,
-        'shops': _shopsRestorable,
-        'photo_being_taken': _photoBeingTaken,
-        'lang_code': _langCode,
-      };
+  Map<String, RestorableProperty<Object?>> get restorableProperties {
+    return {
+      'initial_product': _initialProductRestorable,
+      'product': _productRestorable,
+      'shops': _shopsRestorable,
+      'photo_being_taken': _photoBeingTaken,
+    };
+  }
 
   InitProductPageModel(
       this._startReason,
@@ -126,7 +130,11 @@ class InitProductPageModel {
       this._analytics,
       this._inputProductsLangStorage)
       : _initialProductRestorable = ProductRestorable(initialProduct),
-        _productRestorable = ProductRestorable(initialProduct),
+        _productRestorable = ProductLangSliceRestorable(
+            _inputProductsLangStorage.selectedCode != null
+                ? initialProduct
+                    .sliceFor(_inputProductsLangStorage.selectedCode!)
+                : ProductLangSlice.empty),
         _shopsRestorable = ShopsListRestorable(_initialShops);
 
   void setPhotoBeingTakenForTests(ProductImageType imageType) {
@@ -225,14 +233,6 @@ class InitProductPageModel {
     return _initialProduct.brands == null || _initialProduct.brands!.isEmpty;
   }
 
-  bool askForCategories() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
-    return _initialProduct.categories == null ||
-        _initialProduct.categories!.isEmpty;
-  }
-
   bool askForIngredientsData() {
     if (_startedForVegStatuses()) {
       return false;
@@ -270,39 +270,51 @@ class InitProductPageModel {
   }
 
   bool canSaveProduct() {
-    return ProductPageWrapper.isProductFilledEnoughForDisplay(product) &&
-        langCode != null;
+    return langCode != null &&
+        ProductPageWrapper.isProductFilledEnoughForDisplay(
+            product.buildSingleLangProduct());
   }
 
-  Future<bool> saveProduct() async {
+  Future<Result<Product, InitProductPageModelError>> saveProduct() async {
+    if (langCode == null) {
+      return Err(InitProductPageModelError.LANG_CODE_MISSING);
+    }
     Log.i('InitProductPageModel: saveProduct: start');
     loading = true;
     _onProductUpdate.call();
     try {
-      final savedProduct = product.rebuild((e) => e
-        ..veganStatusSource = VegStatusSource.community
-        ..vegetarianStatusSource = VegStatusSource.community);
+      var savedProductSlice = product;
+      if (askForVeganStatus()) {
+        savedProductSlice = savedProductSlice
+            .rebuild((e) => e.veganStatusSource = VegStatusSource.community);
+      }
+      if (askForVegetarianStatus()) {
+        savedProductSlice = savedProductSlice.rebuild(
+            (e) => e.vegetarianStatusSource = VegStatusSource.community);
+      }
+      var savedProduct = _initialProduct.updateWith(savedProductSlice);
 
-      final productResult = await _productsManager.createUpdateProduct(
-          savedProduct, langCode!.name);
+      final productResult =
+          await _productsManager.createUpdateProduct(savedProduct);
       if (productResult.isOk) {
         Log.i('InitProductPageModel: saveProduct: product saved');
-        product = productResult.unwrap();
+        savedProduct = productResult.unwrap();
+        product = savedProduct.sliceFor(langCode!);
       } else {
         _analytics
             .sendEvent('product_save_failure', {'barcode': product.barcode});
-        return false;
+        return Err(InitProductPageModelError.OTHER);
       }
 
       if (shops.isNotEmpty) {
         Log.i('InitProductPageModel: saveProduct: saving shops');
         final shopsResult =
-            await _shopsManager.putProductToShops(product, shops);
+            await _shopsManager.putProductToShops(savedProduct, shops);
         if (shopsResult.isErr) {
           _analytics.sendEvent(
               'product_save_shops_failure', {'barcode': product.barcode});
           Log.i('InitProductPageModel: saveProduct: saving shops fail');
-          return false;
+          return Err(InitProductPageModelError.OTHER);
         }
       }
 
@@ -310,7 +322,7 @@ class InitProductPageModel {
       _analytics
           .sendEvent('product_save_success', {'barcode': product.barcode});
       Log.i('InitProductPageModel: saveProduct: success');
-      return true;
+      return Ok(savedProduct);
     } finally {
       loading = false;
       _onProductUpdate.call();
@@ -356,8 +368,13 @@ class InitProductPageModel {
   }
 
   Future<String?> _ocrIngredientsImpl(LangCode langCode) async {
-    final initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
-        ProductImageType.INGREDIENTS, product.imageIngredients);
+    var initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
+        ProductImageType.INGREDIENTS, product.imageIngredients, langCode);
+    if (!initialProductWithIngredientsPhoto.langsPrioritized
+        .contains(langCode)) {
+      initialProductWithIngredientsPhoto = initialProductWithIngredientsPhoto
+          .rebuild((e) => e..langsPrioritized.add(langCode));
+    }
 
     var attemptsCount = 1;
     Result<ProductWithOCRIngredients, ProductsManagerError> ocrResult =
@@ -368,7 +385,7 @@ class InitProductPageModel {
       try {
         ocrResult = await _productsManager
             .updateProductAndExtractIngredients(
-                initialProductWithIngredientsPhoto, langCode.name)
+                initialProductWithIngredientsPhoto, langCode)
             .timeout(const Duration(seconds: 7));
       } on TimeoutException catch (e) {
         Log.w('_ocrIngredientsImpl timeout $attemptsCount', ex: e);

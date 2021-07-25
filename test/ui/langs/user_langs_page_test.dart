@@ -6,7 +6,6 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
-import 'package:plante/ui/langs/user_langs_widget.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';

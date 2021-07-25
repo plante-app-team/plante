@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -23,9 +23,9 @@ void main() {
   late MockShopsManager shopsManager;
   late FakeAnalytics analytics;
   late List<Shop> shops;
-  final product = Product((e) => e
+  final product = ProductLangSlice((e) => e
     ..barcode = '222'
-    ..name = 'name');
+    ..name = 'name').productForTests();
 
   setUp(() async {
     commons = MapPageModesTestCommons();

@@ -1,58 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'product.dart';
+part of 'product_lang_slice.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-Serializer<Product> _$productSerializer = new _$ProductSerializer();
+Serializer<ProductLangSlice> _$productLangSliceSerializer =
+    new _$ProductLangSliceSerializer();
 
-class _$ProductSerializer implements StructuredSerializer<Product> {
+class _$ProductLangSliceSerializer
+    implements StructuredSerializer<ProductLangSlice> {
   @override
-  final Iterable<Type> types = const [Product, _$Product];
+  final Iterable<Type> types = const [ProductLangSlice, _$ProductLangSlice];
   @override
-  final String wireName = 'Product';
+  final String wireName = 'ProductLangSlice';
 
   @override
-  Iterable<Object?> serialize(Serializers serializers, Product object,
+  Iterable<Object?> serialize(Serializers serializers, ProductLangSlice object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
       'barcode',
       serializers.serialize(object.barcode,
           specifiedType: const FullType(String)),
-      'langsPrioritized',
-      serializers.serialize(object.langsPrioritized,
+      'ingredientsAnalyzed',
+      serializers.serialize(object.ingredientsAnalyzed,
           specifiedType:
-              const FullType(BuiltList, const [const FullType(LangCode)])),
-      'nameLangs',
-      serializers.serialize(object.nameLangs,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(LangCode), const FullType(String)])),
-      'ingredientsTextLangs',
-      serializers.serialize(object.ingredientsTextLangs,
-          specifiedType: const FullType(BuiltMap,
-              const [const FullType(LangCode), const FullType(String)])),
-      'ingredientsAnalyzedLangs',
-      serializers.serialize(object.ingredientsAnalyzedLangs,
-          specifiedType: const FullType(BuiltMap, const [
-            const FullType(LangCode),
-            const FullType(BuiltList, const [const FullType(Ingredient)])
-          ])),
-      'imageFrontLangs',
-      serializers.serialize(object.imageFrontLangs,
-          specifiedType: const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)])),
-      'imageFrontThumbLangs',
-      serializers.serialize(object.imageFrontThumbLangs,
-          specifiedType: const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)])),
-      'imageIngredientsLangs',
-      serializers.serialize(object.imageIngredientsLangs,
-          specifiedType: const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)])),
+              const FullType(BuiltList, const [const FullType(Ingredient)])),
     ];
     Object? value;
+    value = object.lang;
+    if (value != null) {
+      result
+        ..add('lang')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(LangCode)));
+    }
     value = object.vegetarianStatus;
     if (value != null) {
       result
@@ -115,13 +98,46 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
             specifiedType:
                 const FullType(BuiltList, const [const FullType(String)])));
     }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.ingredientsText;
+    if (value != null) {
+      result
+        ..add('ingredientsText')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.imageFront;
+    if (value != null) {
+      result
+        ..add('imageFront')
+        ..add(serializers.serialize(value, specifiedType: const FullType(Uri)));
+    }
+    value = object.imageFrontThumb;
+    if (value != null) {
+      result
+        ..add('imageFrontThumb')
+        ..add(serializers.serialize(value, specifiedType: const FullType(Uri)));
+    }
+    value = object.imageIngredients;
+    if (value != null) {
+      result
+        ..add('imageIngredients')
+        ..add(serializers.serialize(value, specifiedType: const FullType(Uri)));
+    }
     return result;
   }
 
   @override
-  Product deserialize(Serializers serializers, Iterable<Object?> serialized,
+  ProductLangSlice deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = new ProductBuilder();
+    final result = new ProductLangSliceBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
@@ -129,6 +145,10 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
+        case 'lang':
+          result.lang = serializers.deserialize(value,
+              specifiedType: const FullType(LangCode)) as LangCode?;
+          break;
         case 'barcode':
           result.barcode = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
@@ -167,49 +187,37 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.moderatorVeganSourcesText = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
-        case 'langsPrioritized':
-          result.langsPrioritized.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(
-                      BuiltList, const [const FullType(LangCode)]))!
-              as BuiltList<Object?>);
-          break;
         case 'brands':
           result.brands.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(String)]))!
               as BuiltList<Object?>);
           break;
-        case 'nameLangs':
-          result.nameLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap,
-                  const [const FullType(LangCode), const FullType(String)]))!);
+        case 'name':
+          result.name = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
-        case 'ingredientsTextLangs':
-          result.ingredientsTextLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap,
-                  const [const FullType(LangCode), const FullType(String)]))!);
+        case 'ingredientsText':
+          result.ingredientsText = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
-        case 'ingredientsAnalyzedLangs':
-          result.ingredientsAnalyzedLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap, const [
-                const FullType(LangCode),
-                const FullType(BuiltList, const [const FullType(Ingredient)])
-              ]))!);
+        case 'ingredientsAnalyzed':
+          result.ingredientsAnalyzed.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(Ingredient)]))!
+              as BuiltList<Object?>);
           break;
-        case 'imageFrontLangs':
-          result.imageFrontLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap,
-                  const [const FullType(LangCode), const FullType(Uri)]))!);
+        case 'imageFront':
+          result.imageFront = serializers.deserialize(value,
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
-        case 'imageFrontThumbLangs':
-          result.imageFrontThumbLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap,
-                  const [const FullType(LangCode), const FullType(Uri)]))!);
+        case 'imageFrontThumb':
+          result.imageFrontThumb = serializers.deserialize(value,
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
-        case 'imageIngredientsLangs':
-          result.imageIngredientsLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap,
-                  const [const FullType(LangCode), const FullType(Uri)]))!);
+        case 'imageIngredients':
+          result.imageIngredients = serializers.deserialize(value,
+              specifiedType: const FullType(Uri)) as Uri?;
           break;
       }
     }
@@ -218,7 +226,9 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
   }
 }
 
-class _$Product extends Product {
+class _$ProductLangSlice extends ProductLangSlice {
+  @override
+  final LangCode? lang;
   @override
   final String barcode;
   @override
@@ -238,27 +248,27 @@ class _$Product extends Product {
   @override
   final String? moderatorVeganSourcesText;
   @override
-  final BuiltList<LangCode> langsPrioritized;
-  @override
   final BuiltList<String>? brands;
   @override
-  final BuiltMap<LangCode, String> nameLangs;
+  final String? name;
   @override
-  final BuiltMap<LangCode, String> ingredientsTextLangs;
+  final String? ingredientsText;
   @override
-  final BuiltMap<LangCode, BuiltList<Ingredient>> ingredientsAnalyzedLangs;
+  final BuiltList<Ingredient> ingredientsAnalyzed;
   @override
-  final BuiltMap<LangCode, Uri> imageFrontLangs;
+  final Uri? imageFront;
   @override
-  final BuiltMap<LangCode, Uri> imageFrontThumbLangs;
+  final Uri? imageFrontThumb;
   @override
-  final BuiltMap<LangCode, Uri> imageIngredientsLangs;
+  final Uri? imageIngredients;
 
-  factory _$Product([void Function(ProductBuilder)? updates]) =>
-      (new ProductBuilder()..update(updates)).build();
+  factory _$ProductLangSlice(
+          [void Function(ProductLangSliceBuilder)? updates]) =>
+      (new ProductLangSliceBuilder()..update(updates)).build();
 
-  _$Product._(
-      {required this.barcode,
+  _$ProductLangSlice._(
+      {this.lang,
+      required this.barcode,
       this.vegetarianStatus,
       this.vegetarianStatusSource,
       this.veganStatus,
@@ -267,42 +277,33 @@ class _$Product extends Product {
       this.moderatorVegetarianSourcesText,
       this.moderatorVeganChoiceReasonId,
       this.moderatorVeganSourcesText,
-      required this.langsPrioritized,
       this.brands,
-      required this.nameLangs,
-      required this.ingredientsTextLangs,
-      required this.ingredientsAnalyzedLangs,
-      required this.imageFrontLangs,
-      required this.imageFrontThumbLangs,
-      required this.imageIngredientsLangs})
+      this.name,
+      this.ingredientsText,
+      required this.ingredientsAnalyzed,
+      this.imageFront,
+      this.imageFrontThumb,
+      this.imageIngredients})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(barcode, 'Product', 'barcode');
     BuiltValueNullFieldError.checkNotNull(
-        langsPrioritized, 'Product', 'langsPrioritized');
-    BuiltValueNullFieldError.checkNotNull(nameLangs, 'Product', 'nameLangs');
+        barcode, 'ProductLangSlice', 'barcode');
     BuiltValueNullFieldError.checkNotNull(
-        ingredientsTextLangs, 'Product', 'ingredientsTextLangs');
-    BuiltValueNullFieldError.checkNotNull(
-        ingredientsAnalyzedLangs, 'Product', 'ingredientsAnalyzedLangs');
-    BuiltValueNullFieldError.checkNotNull(
-        imageFrontLangs, 'Product', 'imageFrontLangs');
-    BuiltValueNullFieldError.checkNotNull(
-        imageFrontThumbLangs, 'Product', 'imageFrontThumbLangs');
-    BuiltValueNullFieldError.checkNotNull(
-        imageIngredientsLangs, 'Product', 'imageIngredientsLangs');
+        ingredientsAnalyzed, 'ProductLangSlice', 'ingredientsAnalyzed');
   }
 
   @override
-  Product rebuild(void Function(ProductBuilder) updates) =>
+  ProductLangSlice rebuild(void Function(ProductLangSliceBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  ProductBuilder toBuilder() => new ProductBuilder()..replace(this);
+  ProductLangSliceBuilder toBuilder() =>
+      new ProductLangSliceBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Product &&
+    return other is ProductLangSlice &&
+        lang == other.lang &&
         barcode == other.barcode &&
         vegetarianStatus == other.vegetarianStatus &&
         vegetarianStatusSource == other.vegetarianStatusSource &&
@@ -314,14 +315,13 @@ class _$Product extends Product {
             other.moderatorVegetarianSourcesText &&
         moderatorVeganChoiceReasonId == other.moderatorVeganChoiceReasonId &&
         moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
-        langsPrioritized == other.langsPrioritized &&
         brands == other.brands &&
-        nameLangs == other.nameLangs &&
-        ingredientsTextLangs == other.ingredientsTextLangs &&
-        ingredientsAnalyzedLangs == other.ingredientsAnalyzedLangs &&
-        imageFrontLangs == other.imageFrontLangs &&
-        imageFrontThumbLangs == other.imageFrontThumbLangs &&
-        imageIngredientsLangs == other.imageIngredientsLangs;
+        name == other.name &&
+        ingredientsText == other.ingredientsText &&
+        ingredientsAnalyzed == other.ingredientsAnalyzed &&
+        imageFront == other.imageFront &&
+        imageFrontThumb == other.imageFrontThumb &&
+        imageIngredients == other.imageIngredients;
   }
 
   @override
@@ -344,36 +344,35 @@ class _$Product extends Product {
                                                                 $jc(
                                                                     $jc(
                                                                         0,
-                                                                        barcode
+                                                                        lang
                                                                             .hashCode),
-                                                                    vegetarianStatus
+                                                                    barcode
                                                                         .hashCode),
-                                                                vegetarianStatusSource
+                                                                vegetarianStatus
                                                                     .hashCode),
-                                                            veganStatus
+                                                            vegetarianStatusSource
                                                                 .hashCode),
-                                                        veganStatusSource
-                                                            .hashCode),
-                                                    moderatorVegetarianChoiceReasonId
-                                                        .hashCode),
-                                                moderatorVegetarianSourcesText
+                                                        veganStatus.hashCode),
+                                                    veganStatusSource.hashCode),
+                                                moderatorVegetarianChoiceReasonId
                                                     .hashCode),
-                                            moderatorVeganChoiceReasonId
+                                            moderatorVegetarianSourcesText
                                                 .hashCode),
-                                        moderatorVeganSourcesText.hashCode),
-                                    langsPrioritized.hashCode),
+                                        moderatorVeganChoiceReasonId.hashCode),
+                                    moderatorVeganSourcesText.hashCode),
                                 brands.hashCode),
-                            nameLangs.hashCode),
-                        ingredientsTextLangs.hashCode),
-                    ingredientsAnalyzedLangs.hashCode),
-                imageFrontLangs.hashCode),
-            imageFrontThumbLangs.hashCode),
-        imageIngredientsLangs.hashCode));
+                            name.hashCode),
+                        ingredientsText.hashCode),
+                    ingredientsAnalyzed.hashCode),
+                imageFront.hashCode),
+            imageFrontThumb.hashCode),
+        imageIngredients.hashCode));
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Product')
+    return (newBuiltValueToStringHelper('ProductLangSlice')
+          ..add('lang', lang)
           ..add('barcode', barcode)
           ..add('vegetarianStatus', vegetarianStatus)
           ..add('vegetarianStatusSource', vegetarianStatusSource)
@@ -385,20 +384,24 @@ class _$Product extends Product {
               'moderatorVegetarianSourcesText', moderatorVegetarianSourcesText)
           ..add('moderatorVeganChoiceReasonId', moderatorVeganChoiceReasonId)
           ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
-          ..add('langsPrioritized', langsPrioritized)
           ..add('brands', brands)
-          ..add('nameLangs', nameLangs)
-          ..add('ingredientsTextLangs', ingredientsTextLangs)
-          ..add('ingredientsAnalyzedLangs', ingredientsAnalyzedLangs)
-          ..add('imageFrontLangs', imageFrontLangs)
-          ..add('imageFrontThumbLangs', imageFrontThumbLangs)
-          ..add('imageIngredientsLangs', imageIngredientsLangs))
+          ..add('name', name)
+          ..add('ingredientsText', ingredientsText)
+          ..add('ingredientsAnalyzed', ingredientsAnalyzed)
+          ..add('imageFront', imageFront)
+          ..add('imageFrontThumb', imageFrontThumb)
+          ..add('imageIngredients', imageIngredients))
         .toString();
   }
 }
 
-class ProductBuilder implements Builder<Product, ProductBuilder> {
-  _$Product? _$v;
+class ProductLangSliceBuilder
+    implements Builder<ProductLangSlice, ProductLangSliceBuilder> {
+  _$ProductLangSlice? _$v;
+
+  LangCode? _lang;
+  LangCode? get lang => _$this._lang;
+  set lang(LangCode? lang) => _$this._lang = lang;
 
   String? _barcode;
   String? get barcode => _$this._barcode;
@@ -447,62 +450,46 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   set moderatorVeganSourcesText(String? moderatorVeganSourcesText) =>
       _$this._moderatorVeganSourcesText = moderatorVeganSourcesText;
 
-  ListBuilder<LangCode>? _langsPrioritized;
-  ListBuilder<LangCode> get langsPrioritized =>
-      _$this._langsPrioritized ??= new ListBuilder<LangCode>();
-  set langsPrioritized(ListBuilder<LangCode>? langsPrioritized) =>
-      _$this._langsPrioritized = langsPrioritized;
-
   ListBuilder<String>? _brands;
   ListBuilder<String> get brands =>
       _$this._brands ??= new ListBuilder<String>();
   set brands(ListBuilder<String>? brands) => _$this._brands = brands;
 
-  MapBuilder<LangCode, String>? _nameLangs;
-  MapBuilder<LangCode, String> get nameLangs =>
-      _$this._nameLangs ??= new MapBuilder<LangCode, String>();
-  set nameLangs(MapBuilder<LangCode, String>? nameLangs) =>
-      _$this._nameLangs = nameLangs;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
-  MapBuilder<LangCode, String>? _ingredientsTextLangs;
-  MapBuilder<LangCode, String> get ingredientsTextLangs =>
-      _$this._ingredientsTextLangs ??= new MapBuilder<LangCode, String>();
-  set ingredientsTextLangs(
-          MapBuilder<LangCode, String>? ingredientsTextLangs) =>
-      _$this._ingredientsTextLangs = ingredientsTextLangs;
+  String? _ingredientsText;
+  String? get ingredientsText => _$this._ingredientsText;
+  set ingredientsText(String? ingredientsText) =>
+      _$this._ingredientsText = ingredientsText;
 
-  MapBuilder<LangCode, BuiltList<Ingredient>>? _ingredientsAnalyzedLangs;
-  MapBuilder<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs =>
-      _$this._ingredientsAnalyzedLangs ??=
-          new MapBuilder<LangCode, BuiltList<Ingredient>>();
-  set ingredientsAnalyzedLangs(
-          MapBuilder<LangCode, BuiltList<Ingredient>>?
-              ingredientsAnalyzedLangs) =>
-      _$this._ingredientsAnalyzedLangs = ingredientsAnalyzedLangs;
+  ListBuilder<Ingredient>? _ingredientsAnalyzed;
+  ListBuilder<Ingredient> get ingredientsAnalyzed =>
+      _$this._ingredientsAnalyzed ??= new ListBuilder<Ingredient>();
+  set ingredientsAnalyzed(ListBuilder<Ingredient>? ingredientsAnalyzed) =>
+      _$this._ingredientsAnalyzed = ingredientsAnalyzed;
 
-  MapBuilder<LangCode, Uri>? _imageFrontLangs;
-  MapBuilder<LangCode, Uri> get imageFrontLangs =>
-      _$this._imageFrontLangs ??= new MapBuilder<LangCode, Uri>();
-  set imageFrontLangs(MapBuilder<LangCode, Uri>? imageFrontLangs) =>
-      _$this._imageFrontLangs = imageFrontLangs;
+  Uri? _imageFront;
+  Uri? get imageFront => _$this._imageFront;
+  set imageFront(Uri? imageFront) => _$this._imageFront = imageFront;
 
-  MapBuilder<LangCode, Uri>? _imageFrontThumbLangs;
-  MapBuilder<LangCode, Uri> get imageFrontThumbLangs =>
-      _$this._imageFrontThumbLangs ??= new MapBuilder<LangCode, Uri>();
-  set imageFrontThumbLangs(MapBuilder<LangCode, Uri>? imageFrontThumbLangs) =>
-      _$this._imageFrontThumbLangs = imageFrontThumbLangs;
+  Uri? _imageFrontThumb;
+  Uri? get imageFrontThumb => _$this._imageFrontThumb;
+  set imageFrontThumb(Uri? imageFrontThumb) =>
+      _$this._imageFrontThumb = imageFrontThumb;
 
-  MapBuilder<LangCode, Uri>? _imageIngredientsLangs;
-  MapBuilder<LangCode, Uri> get imageIngredientsLangs =>
-      _$this._imageIngredientsLangs ??= new MapBuilder<LangCode, Uri>();
-  set imageIngredientsLangs(MapBuilder<LangCode, Uri>? imageIngredientsLangs) =>
-      _$this._imageIngredientsLangs = imageIngredientsLangs;
+  Uri? _imageIngredients;
+  Uri? get imageIngredients => _$this._imageIngredients;
+  set imageIngredients(Uri? imageIngredients) =>
+      _$this._imageIngredients = imageIngredients;
 
-  ProductBuilder();
+  ProductLangSliceBuilder();
 
-  ProductBuilder get _$this {
+  ProductLangSliceBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _lang = $v.lang;
       _barcode = $v.barcode;
       _vegetarianStatus = $v.vegetarianStatus;
       _vegetarianStatusSource = $v.vegetarianStatusSource;
@@ -512,38 +499,38 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _moderatorVegetarianSourcesText = $v.moderatorVegetarianSourcesText;
       _moderatorVeganChoiceReasonId = $v.moderatorVeganChoiceReasonId;
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
-      _langsPrioritized = $v.langsPrioritized.toBuilder();
       _brands = $v.brands?.toBuilder();
-      _nameLangs = $v.nameLangs.toBuilder();
-      _ingredientsTextLangs = $v.ingredientsTextLangs.toBuilder();
-      _ingredientsAnalyzedLangs = $v.ingredientsAnalyzedLangs.toBuilder();
-      _imageFrontLangs = $v.imageFrontLangs.toBuilder();
-      _imageFrontThumbLangs = $v.imageFrontThumbLangs.toBuilder();
-      _imageIngredientsLangs = $v.imageIngredientsLangs.toBuilder();
+      _name = $v.name;
+      _ingredientsText = $v.ingredientsText;
+      _ingredientsAnalyzed = $v.ingredientsAnalyzed.toBuilder();
+      _imageFront = $v.imageFront;
+      _imageFrontThumb = $v.imageFrontThumb;
+      _imageIngredients = $v.imageIngredients;
       _$v = null;
     }
     return this;
   }
 
   @override
-  void replace(Product other) {
+  void replace(ProductLangSlice other) {
     ArgumentError.checkNotNull(other, 'other');
-    _$v = other as _$Product;
+    _$v = other as _$ProductLangSlice;
   }
 
   @override
-  void update(void Function(ProductBuilder)? updates) {
+  void update(void Function(ProductLangSliceBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$Product build() {
-    _$Product _$result;
+  _$ProductLangSlice build() {
+    _$ProductLangSlice _$result;
     try {
       _$result = _$v ??
-          new _$Product._(
+          new _$ProductLangSlice._(
+              lang: lang,
               barcode: BuiltValueNullFieldError.checkNotNull(
-                  barcode, 'Product', 'barcode'),
+                  barcode, 'ProductLangSlice', 'barcode'),
               vegetarianStatus: vegetarianStatus,
               vegetarianStatusSource: vegetarianStatusSource,
               veganStatus: veganStatus,
@@ -553,36 +540,24 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               moderatorVegetarianSourcesText: moderatorVegetarianSourcesText,
               moderatorVeganChoiceReasonId: moderatorVeganChoiceReasonId,
               moderatorVeganSourcesText: moderatorVeganSourcesText,
-              langsPrioritized: langsPrioritized.build(),
               brands: _brands?.build(),
-              nameLangs: nameLangs.build(),
-              ingredientsTextLangs: ingredientsTextLangs.build(),
-              ingredientsAnalyzedLangs: ingredientsAnalyzedLangs.build(),
-              imageFrontLangs: imageFrontLangs.build(),
-              imageFrontThumbLangs: imageFrontThumbLangs.build(),
-              imageIngredientsLangs: imageIngredientsLangs.build());
+              name: name,
+              ingredientsText: ingredientsText,
+              ingredientsAnalyzed: ingredientsAnalyzed.build(),
+              imageFront: imageFront,
+              imageFrontThumb: imageFrontThumb,
+              imageIngredients: imageIngredients);
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'langsPrioritized';
-        langsPrioritized.build();
         _$failedField = 'brands';
         _brands?.build();
-        _$failedField = 'nameLangs';
-        nameLangs.build();
-        _$failedField = 'ingredientsTextLangs';
-        ingredientsTextLangs.build();
-        _$failedField = 'ingredientsAnalyzedLangs';
-        ingredientsAnalyzedLangs.build();
-        _$failedField = 'imageFrontLangs';
-        imageFrontLangs.build();
-        _$failedField = 'imageFrontThumbLangs';
-        imageFrontThumbLangs.build();
-        _$failedField = 'imageIngredientsLangs';
-        imageIngredientsLangs.build();
+
+        _$failedField = 'ingredientsAnalyzed';
+        ingredientsAnalyzed.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'Product', _$failedField, e.toString());
+            'ProductLangSlice', _$failedField, e.toString());
       }
       rethrow;
     }

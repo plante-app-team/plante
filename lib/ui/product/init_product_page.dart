@@ -95,8 +95,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
 
   final TextEditingController _nameTextController = TextEditingController();
   final TextEditingController _brandTextController = TextEditingController();
-  final TextEditingController _categoriesTextController =
-      TextEditingController();
   final TextEditingController _ingredientsTextController =
       TextEditingController();
   final ScrollController _contentScrollController = ScrollController();
@@ -122,8 +120,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   void takeModelProductText() {
     _nameTextController.text = _model.product.name ?? '';
     _brandTextController.text = _model.product.brands?.join(', ') ?? '';
-    _categoriesTextController.text =
-        _model.product.categories?.join(', ') ?? '';
     _ingredientsTextController.text = _model.product.ingredientsText ?? '';
   }
 
@@ -176,10 +172,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     _brandTextController.addListener(() {
       _model.product = _model.product.rebuild(
           (e) => e.brands = _textToListBuilder(_brandTextController.text));
-    });
-    _categoriesTextController.addListener(() {
-      _model.product = _model.product.rebuild((e) =>
-          e.categories = _textToListBuilder(_categoriesTextController.text));
     });
     _ingredientsTextController.addListener(() {
       _model.product = _model.product
@@ -276,16 +268,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
             key: const Key('brand'),
             label: context.strings.init_product_page_brand_optional,
             controller: _brandTextController,
-          ),
-          const SizedBox(height: 24),
-        ]),
-      if (_model.askForCategories())
-        Column(key: const Key('categories_group'), children: [
-          InputFieldPlante(
-            key: const Key('categories'),
-            label: context.strings.init_product_page_categories_optional,
-            hint: context.strings.init_product_page_categories_hint,
-            controller: _categoriesTextController,
           ),
           const SizedBox(height: 24),
         ]),
@@ -487,7 +469,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   }
 
   void _cancel() {
-    if (widget.initialProduct == _model.product) {
+    if (widget.initialProduct == _model.productFull) {
       Log.i('InitProductPage: _cancel instant exit');
       Navigator.of(context).pop();
       return;
@@ -548,24 +530,29 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     _handlePossibleError(result);
   }
 
-  void _handlePossibleError(Result<None, InitProductPageModelError> result) {
+  void _handlePossibleError<T>(Result<T, InitProductPageModelError> result) {
     if (!result.isErr) {
       return;
     }
-    if (result.unwrapErr() == InitProductPageModelError.LANG_CODE_MISSING) {
-      _contentScrollController.animateTo(0,
-          duration: DURATION_DEFAULT, curve: Curves.easeIn);
-      showSnackBar(
-          context.strings.init_product_page_please_select_lang, context);
+    switch (result.unwrapErr()) {
+      case InitProductPageModelError.LANG_CODE_MISSING:
+        _contentScrollController.animateTo(0,
+            duration: DURATION_DEFAULT, curve: Curves.easeIn);
+        showSnackBar(
+            context.strings.init_product_page_please_select_lang, context);
+        break;
+      case InitProductPageModelError.OTHER:
+        showSnackBar(context.strings.global_something_went_wrong, context);
+        break;
     }
   }
 
   void _saveProduct() async {
     Log.i('InitProductPage: _saveProduct start: ${_model.product}');
-    final ok = await _model.saveProduct();
-    if (ok) {
+    final result = await _model.saveProduct();
+    if (result.isOk) {
       Log.i('InitProductPage: _saveProduct success');
-      widget.productUpdatedCallback?.call(_model.product);
+      widget.productUpdatedCallback?.call(result.unwrap());
       Navigator.of(context).pop();
       showSnackBar(context.strings.global_done_thanks, context);
       if (!isInTests()) {
@@ -575,7 +562,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
       }
       widget.doneCallback?.call();
     } else {
-      showSnackBar(context.strings.global_something_went_wrong, context);
+      _handlePossibleError(result);
     }
   }
 
