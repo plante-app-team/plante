@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
@@ -17,7 +18,7 @@ void main() {
         callback: (updated) => userLangs = updated));
 
     // Deselect Russian
-    await tester.tap(find.text(LangCode.ru.localize(context)));
+    await tester.tap(find.byKey(Key('cancel_button_${LangCode.ru.name}')));
     await tester.pumpAndSettle();
     expect(
         userLangs,
@@ -26,16 +27,8 @@ void main() {
           ..langs.addAll([LangCode.be, LangCode.de])
           ..auto = false)));
 
-    // Attempt to deselect the system language (German)
-    await tester.tap(find.text(LangCode.de.localize(context)));
-    await tester.pumpAndSettle();
-    // Nope
-    expect(
-        userLangs,
-        equals(UserLangs((e) => e
-          ..sysLang = LangCode.de
-          ..langs.addAll([LangCode.be, LangCode.de])
-          ..auto = false)));
+    // Cannot deselect the system language (German)
+    expect(find.byKey(Key('cancel_button_${LangCode.de.name}')), findsNothing);
 
     // Select a new language
     await tester.tap(find.text(LangCode.ar.localize(context)));

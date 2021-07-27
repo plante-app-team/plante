@@ -1,7 +1,6 @@
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 
 class InputProductsLangStorage {
   static const PREF_INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';

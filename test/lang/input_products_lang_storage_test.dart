@@ -1,6 +1,5 @@
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.dart';

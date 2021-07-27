@@ -63,7 +63,8 @@ void main() {
 
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
-    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(
+        mockUserLangsManagerWith(LangCode.en));
   });
 
   testWidgets('init page is shown when product is not filled',

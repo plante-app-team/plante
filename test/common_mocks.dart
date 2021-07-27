@@ -58,8 +58,8 @@ MockUserLangsManager mockUserLangsManagerWith(LangCode langCode) {
   final userLangsManager = MockUserLangsManager();
   when(userLangsManager.getUserLangs())
       .thenAnswer((_) async => UserLangs((e) => e
-    ..auto = true
-    ..sysLang = langCode
-    ..langs.add(langCode)));
+        ..auto = true
+        ..sysLang = langCode
+        ..langs.add(langCode)));
   return userLangsManager;
 }

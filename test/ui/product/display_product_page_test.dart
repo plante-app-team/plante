@@ -104,7 +104,8 @@ void main() {
     addressObtainer = MockAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
-    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(
+        mockUserLangsManagerWith(LangCode.en));
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

@@ -85,7 +85,7 @@ class _UserLangsWidgetState extends State<UserLangsWidget>
         key: Key(lang.name),
         index: index,
         lang: lang,
-        displayIndex: true,
+        backgroundColor: const Color(0xFFF5F7FA),
         reorderable: true,
         selected: true,
         hint: sysLang ? context.strings.user_langs_widget_system_lang : null,

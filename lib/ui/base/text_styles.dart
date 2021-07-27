@@ -115,4 +115,7 @@ class TextStyles {
       fontWeight: FontWeight.bold,
       fontSize: 17,
       color: ColorsPlante.grey);
+
+  static const TextStyle langName =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
 }

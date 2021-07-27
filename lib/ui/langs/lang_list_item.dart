@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 enum LangListItemAnimationState {
@@ -14,6 +15,8 @@ class LangListItem extends StatefulWidget {
   /// Language use to display a language name
   final LangCode lang;
 
+  final Color backgroundColor;
+
   /// Whether the language is selected (a checkbox is checked)
   final bool selected;
 
@@ -21,14 +24,10 @@ class LangListItem extends StatefulWidget {
   final ArgCallback<bool>? selectedChangeCallback;
 
   /// Index of this item in the list it's being displayed in.
-  /// The property is used to display the index to the user and because
-  /// ReorderableListView ([ReorderableDragStartListener] to be precise)
+  /// The property is used because ReorderableListView
+  /// ([ReorderableDragStartListener] to be precise)
   /// requires an index to be provided.
   final int index;
-
-  /// Whether to display [index] to the user. If [index] is displayed, it
-  /// always is displayed with 1 added to it. E.g. `0` becomes `1`, `1`->`2`...
-  final bool displayIndex;
 
   /// Whether the item should allow to be drag-and-dropped (to be precies,
   /// whether [ReorderableDragStartListener] should be used).
@@ -60,8 +59,8 @@ class LangListItem extends StatefulWidget {
   const LangListItem(
       {Key? key,
       required this.lang,
+      this.backgroundColor = Colors.white,
       required this.index,
-      this.displayIndex = false,
       required this.selected,
       required this.selectedChangeCallback,
       required this.reorderable,
@@ -129,53 +128,69 @@ class _LangListItemState extends State<LangListItem> {
         ? widget.selectedChangeCallback
         : null;
     final selected = widget.selected;
-    final displayIndex = widget.displayIndex;
     final index = widget.index;
     final lang = widget.lang;
     final reorderable = widget.reorderable;
-    final hint = widget.hint;
+    final hint = widget.hint != null ? ' ${widget.hint}' : '';
 
     final tapCallback = widget.selectedChangeCallback == null
         ? null
         : () {
             callback!.call(!selected);
           };
-    final checkboxTapCallback = callback == null
-        ? null
-        : (bool? newVal) {
-            callback.call(newVal ?? false);
-          };
 
-    final result = Material(
-      color: Colors.white,
-      child: InkWell(
-        onTap: tapCallback,
+    final content = InkWell(
+        onTap: selected ? null : tapCallback,
+        child: Row(children: [
+          if (selected && tapCallback != null)
+            Row(children: [
+              const SizedBox(width: 14),
+              Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: Key('cancel_button_${lang.name}'),
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: tapCallback,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: SvgPicture.asset(
+                        'assets/cancel_circle.svg',
+                      ),
+                    ),
+                  )),
+            ])
+          else
+            const SizedBox(width: 24),
+          Text('${lang.localize(context)}$hint', style: TextStyles.langName),
+          if (reorderable)
+            Expanded(
+                child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ReorderableDragStartListener(
+                        index: index,
+                        // Container to make the
+                        // draggable icon larger
+                        child: Container(
+                            width: 71,
+                            height: 40,
+                            color: Colors.transparent,
+                            child: SvgPicture.asset(
+                                'assets/list_drag_n_drop.svg',
+                                fit: BoxFit.none)))))
+        ]));
+
+    final result = Container(
+        color: Colors.white,
         child: Padding(
-            padding:
-                const EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 16),
-            child: Column(children: [
-              Row(children: [
-                if (displayIndex)
-                  Text((index + 1).toString(), style: TextStyles.normal),
-                CheckboxPlante(value: selected, onChanged: checkboxTapCallback),
-                const SizedBox(width: 8),
-                Text(lang.localize(context), style: TextStyles.normal),
-                if (reorderable)
-                  Expanded(
-                      child: Align(
-                          alignment: Alignment.centerRight,
-                          child: ReorderableDragStartListener(
-                            index: index,
-                            child: const Icon(Icons.drag_handle),
-                          )))
-              ]),
-              if (hint != null)
-                SizedBox(
-                    width: double.infinity,
-                    child: Text(hint, style: TextStyles.hint))
-            ])),
-      ),
-    );
+            padding: const EdgeInsets.only(bottom: 1),
+            child: Container(
+              height: 42,
+              color: widget.backgroundColor,
+              child: Material(
+                color: Colors.transparent,
+                child: content,
+              ),
+            )));
 
     if (animationState == LangListItemAnimationState.NONE) {
       return result;

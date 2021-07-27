@@ -16,7 +16,6 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -56,7 +55,6 @@ void main() {
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
   late FakeInputProductsLangStorage inputProductsLangStorage;
-  late MockUserLangsManager userLangsManager;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -121,7 +119,8 @@ void main() {
     GetIt.I
         .registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
 
-    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(_DEFAULT_TEST_LANG));
+    GetIt.I.registerSingleton<UserLangsManager>(
+        mockUserLangsManagerWith(_DEFAULT_TEST_LANG));
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -176,7 +175,7 @@ void main() {
 
     initialProduct ??= Product((v) => v
       ..barcode = '123'
-      ..langsPrioritized.add(selectLang ?? LangCode.en));
+      ..langsPrioritized.add(selectLang));
 
     final widget = InitProductPage(initialProduct,
         doneCallback: callback, initialShops: initialShops);
@@ -463,7 +462,7 @@ void main() {
       {required String filledElementKey,
       required ProductLangSlice initialProduct,
       bool expectedInitiallyDisplayed = false,
-      bool expectedDisplayedAfterLangChange = true }) async {
+      bool expectedDisplayedAfterLangChange = true}) async {
     await tester
         .superPump(InitProductPage(initialProduct.buildSingleLangProduct()));
 

@@ -80,7 +80,8 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
-    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(
+        mockUserLangsManagerWith(LangCode.en));
 
     when(photosTaker.retrieveLostPhoto())
         .thenAnswer((realInvocation) async => null);
