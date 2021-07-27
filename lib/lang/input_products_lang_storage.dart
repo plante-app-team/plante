@@ -1,3 +1,4 @@
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
@@ -5,10 +6,10 @@ import 'package:plante/lang/sys_lang_code_holder.dart';
 class InputProductsLangStorage {
   static const PREF_INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';
   final SharedPreferencesHolder _prefsHolder;
-  final SysLangCodeHolder _langCodeHolder;
+  final UserLangsManager _userLangsManager;
   LangCode? _langCode;
 
-  InputProductsLangStorage(this._prefsHolder, this._langCodeHolder) {
+  InputProductsLangStorage(this._prefsHolder, this._userLangsManager) {
     _initAsync();
   }
 
@@ -18,9 +19,8 @@ class InputProductsLangStorage {
     if (strVal != null) {
       _langCode = LangCode.safeValueOf(strVal);
     } else {
-      _langCodeHolder.callWhenInited((langCode) {
-        _langCode = LangCode.safeValueOf(langCode);
-      });
+      final userLangs = await _userLangsManager.getUserLangs();
+      _langCode = userLangs.langs.first;
     }
   }
 

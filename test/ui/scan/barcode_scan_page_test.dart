@@ -8,6 +8,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
@@ -32,6 +33,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
@@ -78,6 +80,7 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
 
     when(photosTaker.retrieveLostPhoto())
         .thenAnswer((realInvocation) async => null);

@@ -8,6 +8,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/location/location_controller.dart';
@@ -31,6 +32,7 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
@@ -101,6 +103,8 @@ void main() {
 
     addressObtainer = MockAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
+
+    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

@@ -7,6 +7,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
@@ -38,6 +39,7 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
@@ -126,6 +128,7 @@ void main() {
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 

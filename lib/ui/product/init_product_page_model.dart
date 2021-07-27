@@ -41,8 +41,8 @@ class InitProductPageModel {
   final InitProductPageStartReason _startReason;
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
-  final ProductRestorable _initialProductRestorable;
-  final ProductLangSliceRestorable _productRestorable;
+  final ProductRestorable _initialProductRestorableFull;
+  final ProductLangSliceRestorable _productSliceRestorable;
   final ShopsListRestorable _shopsRestorable;
   final RestorableInt _photoBeingTaken = RestorableInt(_NO_PHOTO);
 
@@ -54,18 +54,21 @@ class InitProductPageModel {
   final PhotosTaker _photosTaker;
   final Analytics _analytics;
   final InputProductsLangStorage _inputProductsLangStorage;
-  Product get _initialProduct => _initialProductRestorable.value;
+
+  Product get _initialProductFull => _initialProductRestorableFull.value;
+  ProductLangSlice get _initialProductSlice =>
+      _initialProductFull.sliceFor(langCode);
 
   InitProductPageOcrState get ocrState => _ocrState;
-  ProductLangSlice get product => _productRestorable.value;
-  set product(ProductLangSlice value) {
-    if (value.veganStatus != product.veganStatus) {
+  ProductLangSlice get productSlice => _productSliceRestorable.value;
+  set productSlice(ProductLangSlice value) {
+    if (value.veganStatus != productSlice.veganStatus) {
       // Vegan status changed
       if (value.veganStatus == VegStatus.positive) {
         value = value.rebuild((v) => v.vegetarianStatus = VegStatus.positive);
       }
     }
-    if (value.vegetarianStatus != product.vegetarianStatus) {
+    if (value.vegetarianStatus != productSlice.vegetarianStatus) {
       // Vegetarian status changed
       if (value.vegetarianStatus == VegStatus.negative) {
         value = value.rebuild((v) => v.veganStatus = VegStatus.negative);
@@ -80,12 +83,11 @@ class InitProductPageModel {
         value = value.rebuild((v) => v.veganStatus = VegStatus.unknown);
       }
     }
-    _productRestorable.value = value;
+    _productSliceRestorable.value = value;
     _onProductUpdate.call();
   }
 
-  Product? get productFull =>
-      langCode != null ? _initialProduct.updateWith(product) : null;
+  Product? get productFull => _initialProductFull.updateWith(productSlice);
 
   List<Shop> get shops => _shopsRestorable.value;
   set shops(List<Shop> value) {
@@ -93,26 +95,45 @@ class InitProductPageModel {
     _onProductUpdate.call();
   }
 
-  LangCode? get langCode => product.lang;
+  LangCode get langCode => productSlice.lang ?? LangCode.en;
 
-  /// NOTE: when lang code is change, all product updates are reset.
-  /// If the user updated any of the product properties, ask them if they're
-  /// sure they want to change the lang before they do change it.
-  set langCode(LangCode? lang) {
-    if (lang != null) {
-      _productRestorable.value = _initialProduct.sliceFor(lang);
-    } else {
-      _productRestorable.value = ProductLangSlice.empty;
-    }
-    _onProductUpdate.call();
+  set langCode(LangCode lang) {
+    // Build a new slice and keep all the changes of the current
+    // slice made by user.
+    productSlice = _initialProductFull.sliceFor(lang).rebuild((e) {
+      if (productSlice.veganStatus != _initialProductSlice.veganStatus) {
+        e.veganStatus = productSlice.veganStatus;
+      }
+      if (productSlice.vegetarianStatus !=
+          _initialProductSlice.vegetarianStatus) {
+        e.vegetarianStatus = productSlice.vegetarianStatus;
+      }
+      if (productSlice.name != _initialProductSlice.name) {
+        e.name = productSlice.name;
+      }
+      if (productSlice.ingredientsText !=
+          _initialProductSlice.ingredientsText) {
+        e.ingredientsText = productSlice.ingredientsText;
+      }
+      if (productSlice.brands != _initialProductSlice.brands) {
+        e.brands = productSlice.brands?.toBuilder();
+      }
+      if (productSlice.imageFront != _initialProductSlice.imageFront) {
+        e.imageFront = productSlice.imageFront;
+      }
+      if (productSlice.imageIngredients !=
+          _initialProductSlice.imageIngredients) {
+        e.imageIngredients = productSlice.imageIngredients;
+      }
+    });
   }
 
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties {
     return {
-      'initial_product': _initialProductRestorable,
-      'product': _productRestorable,
+      'initial_product_full': _initialProductRestorableFull,
+      'product_slice': _productSliceRestorable,
       'shops': _shopsRestorable,
       'photo_being_taken': _photoBeingTaken,
     };
@@ -129,8 +150,8 @@ class InitProductPageModel {
       this._photosTaker,
       this._analytics,
       this._inputProductsLangStorage)
-      : _initialProductRestorable = ProductRestorable(initialProduct),
-        _productRestorable = ProductLangSliceRestorable(
+      : _initialProductRestorableFull = ProductRestorable(initialProduct),
+        _productSliceRestorable = ProductLangSliceRestorable(
             _inputProductsLangStorage.selectedCode != null
                 ? initialProduct
                     .sliceFor(_inputProductsLangStorage.selectedCode!)
@@ -181,9 +202,6 @@ class InitProductPageModel {
 
   Future<Result<None, InitProductPageModelError>> takePhoto(
       ProductImageType imageType, BuildContext context) async {
-    if (imageType == ProductImageType.INGREDIENTS && langCode == null) {
-      return Err(InitProductPageModelError.LANG_CODE_MISSING);
-    }
     if (_cacheDir == null) {
       Log.i('InitProductPageModel: takePhoto return because no cache dir');
       return Err(InitProductPageModelError.OTHER);
@@ -216,37 +234,59 @@ class InitProductPageModel {
     if (_startedForVegStatuses()) {
       return false;
     }
-    return _initialProduct.imageFront == null;
+    if (_initialProductSlice.imageFront != productSlice.imageFront) {
+      // Already updated (probably when different lang was chosen), so
+      // we allow further editing.
+      return true;
+    }
+    return _initialProductSlice.imageFront == null;
   }
 
   bool askForName() {
     if (_startedForVegStatuses()) {
       return false;
     }
-    return _initialProduct.name == null || _initialProduct.name!.trim().isEmpty;
+    if (_initialProductSlice.name != productSlice.name) {
+      // Already updated (probably when different lang was chosen), so
+      // we allow further editing.
+      return true;
+    }
+    return _initialProductSlice.name == null ||
+        _initialProductSlice.name!.trim().isEmpty;
   }
 
   bool askForBrand() {
     if (_startedForVegStatuses()) {
       return false;
     }
-    return _initialProduct.brands == null || _initialProduct.brands!.isEmpty;
+    if (_initialProductSlice.brands != productSlice.brands) {
+      // Already updated (probably when different lang was chosen), so
+      // we allow further editing.
+      return true;
+    }
+    return _initialProductSlice.brands == null ||
+        _initialProductSlice.brands!.isEmpty;
   }
 
   bool askForIngredientsData() {
     if (_startedForVegStatuses()) {
       return false;
     }
-    return _initialProduct.ingredientsText == null ||
-        _initialProduct.ingredientsText!.trim().isEmpty ||
-        _initialProduct.imageIngredients == null;
+    if (_initialProductSlice.ingredientsText != productSlice.ingredientsText) {
+      // Already updated (probably when different lang was chosen), so
+      // we allow further editing.
+      return true;
+    }
+    return _initialProductSlice.ingredientsText == null ||
+        _initialProductSlice.ingredientsText!.trim().isEmpty ||
+        _initialProductSlice.imageIngredients == null;
   }
 
   bool askForIngredientsText() {
     if (_startedForVegStatuses()) {
       return false;
     }
-    return askForIngredientsData() && product.imageIngredients != null;
+    return askForIngredientsData() && productSlice.imageIngredients != null;
   }
 
   bool askForShops() {
@@ -257,33 +297,37 @@ class InitProductPageModel {
   }
 
   bool askForVeganStatus() {
-    return _initialProduct.veganStatus == null ||
-        _initialProduct.veganStatusSource == null ||
-        _initialProduct.veganStatusSource == VegStatusSource.open_food_facts;
+    if (_initialProductSlice.veganStatus != productSlice.veganStatus) {
+      return true;
+    }
+    return _initialProductSlice.veganStatus == null ||
+        _initialProductSlice.veganStatusSource == null ||
+        _initialProductSlice.veganStatusSource ==
+            VegStatusSource.open_food_facts;
   }
 
   bool askForVegetarianStatus() {
-    return _initialProduct.vegetarianStatus == null ||
-        _initialProduct.vegetarianStatusSource == null ||
-        _initialProduct.vegetarianStatusSource ==
+    if (_initialProductSlice.vegetarianStatus !=
+        productSlice.vegetarianStatus) {
+      return true;
+    }
+    return _initialProductSlice.vegetarianStatus == null ||
+        _initialProductSlice.vegetarianStatusSource == null ||
+        _initialProductSlice.vegetarianStatusSource ==
             VegStatusSource.open_food_facts;
   }
 
   bool canSaveProduct() {
-    return langCode != null &&
-        ProductPageWrapper.isProductFilledEnoughForDisplay(
-            product.buildSingleLangProduct());
+    return ProductPageWrapper.isProductFilledEnoughForDisplay(
+        productSlice.buildSingleLangProduct());
   }
 
   Future<Result<Product, InitProductPageModelError>> saveProduct() async {
-    if (langCode == null) {
-      return Err(InitProductPageModelError.LANG_CODE_MISSING);
-    }
     Log.i('InitProductPageModel: saveProduct: start');
     loading = true;
     _onProductUpdate.call();
     try {
-      var savedProductSlice = product;
+      var savedProductSlice = productSlice;
       if (askForVeganStatus()) {
         savedProductSlice = savedProductSlice
             .rebuild((e) => e.veganStatusSource = VegStatusSource.community);
@@ -292,17 +336,17 @@ class InitProductPageModel {
         savedProductSlice = savedProductSlice.rebuild(
             (e) => e.vegetarianStatusSource = VegStatusSource.community);
       }
-      var savedProduct = _initialProduct.updateWith(savedProductSlice);
+      var savedProduct = _initialProductFull.updateWith(savedProductSlice);
 
       final productResult =
           await _productsManager.createUpdateProduct(savedProduct);
       if (productResult.isOk) {
         Log.i('InitProductPageModel: saveProduct: product saved');
         savedProduct = productResult.unwrap();
-        product = savedProduct.sliceFor(langCode!);
+        productSlice = savedProduct.sliceFor(langCode);
       } else {
-        _analytics
-            .sendEvent('product_save_failure', {'barcode': product.barcode});
+        _analytics.sendEvent(
+            'product_save_failure', {'barcode': productSlice.barcode});
         return Err(InitProductPageModelError.OTHER);
       }
 
@@ -312,7 +356,7 @@ class InitProductPageModel {
             await _shopsManager.putProductToShops(savedProduct, shops);
         if (shopsResult.isErr) {
           _analytics.sendEvent(
-              'product_save_shops_failure', {'barcode': product.barcode});
+              'product_save_shops_failure', {'barcode': productSlice.barcode});
           Log.i('InitProductPageModel: saveProduct: saving shops fail');
           return Err(InitProductPageModelError.OTHER);
         }
@@ -320,7 +364,7 @@ class InitProductPageModel {
 
       _inputProductsLangStorage.selectedCode = langCode;
       _analytics
-          .sendEvent('product_save_success', {'barcode': product.barcode});
+          .sendEvent('product_save_success', {'barcode': productSlice.barcode});
       Log.i('InitProductPageModel: saveProduct: success');
       return Ok(savedProduct);
     } finally {
@@ -331,7 +375,7 @@ class InitProductPageModel {
 
   Future<Result<None, InitProductPageModelError>> _onPhotoTaken(
       ProductImageType imageType, Uri outPath) async {
-    product = product.rebuildWithImage(imageType, outPath);
+    productSlice = productSlice.rebuildWithImage(imageType, outPath);
 
     if (imageType != ProductImageType.INGREDIENTS) {
       return Ok(None());
@@ -341,10 +385,6 @@ class InitProductPageModel {
   }
 
   Future<Result<None, InitProductPageModelError>> performOcr() async {
-    final langCode = this.langCode;
-    if (langCode == null) {
-      return Err(InitProductPageModelError.LANG_CODE_MISSING);
-    }
     try {
       Log.i('InitProductPage: performOcr start');
       _ocrState = InitProductPageOcrState.IN_PROGRESS;
@@ -354,7 +394,8 @@ class InitProductPageModel {
       if (ingredientsText != null) {
         Log.i('InitProductPage: performOcr success: $ingredientsText');
         _ocrState = InitProductPageOcrState.SUCCESS;
-        product = product.rebuild((e) => e.ingredientsText = ingredientsText);
+        productSlice =
+            productSlice.rebuild((e) => e.ingredientsText = ingredientsText);
         _forceReloadAllProductData.call();
         return Ok(None());
       } else {
@@ -368,12 +409,13 @@ class InitProductPageModel {
   }
 
   Future<String?> _ocrIngredientsImpl(LangCode langCode) async {
-    var initialProductWithIngredientsPhoto = _initialProduct.rebuildWithImage(
-        ProductImageType.INGREDIENTS, product.imageIngredients, langCode);
+    var initialProductWithIngredientsPhoto =
+        _initialProductFull.rebuildWithImage(ProductImageType.INGREDIENTS,
+            productSlice.imageIngredients, langCode);
     if (!initialProductWithIngredientsPhoto.langsPrioritized
         .contains(langCode)) {
       initialProductWithIngredientsPhoto = initialProductWithIngredientsPhoto
-          .rebuild((e) => e..langsPrioritized.add(langCode));
+          .rebuild((e) => e.langsPrioritized.add(langCode));
     }
 
     var attemptsCount = 1;

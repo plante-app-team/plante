@@ -35,9 +35,6 @@ void initDI() {
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());
-  GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
-      GetIt.I.get<SharedPreferencesHolder>(),
-      GetIt.I.get<SysLangCodeHolder>()));
   GetIt.I.registerSingleton<CountriesLangCodesTable>(
       CountriesLangCodesTable(GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
@@ -61,6 +58,8 @@ void initDI() {
       GetIt.I.get<LocationController>(),
       GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<SharedPreferencesHolder>()));
+  GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
+      GetIt.I.get<SharedPreferencesHolder>(), GetIt.I.get<UserLangsManager>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());

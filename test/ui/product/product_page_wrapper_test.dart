@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
@@ -23,6 +24,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
@@ -61,6 +63,7 @@ void main() {
 
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
+    GetIt.I.registerSingleton<UserLangsManager>(mockUserLangsManagerWith(LangCode.en));
   });
 
   testWidgets('init page is shown when product is not filled',

@@ -98,6 +98,7 @@ class UserLangsManager {
     await _storage.setUserLangs(userLangs);
   }
 
+  /// At least 1 language is guaranteed.
   Future<UserLangs> getUserLangs() async {
     final sysLangCode = LangCode.safeValueOf(_sysLangCodeHolder.langCode);
 

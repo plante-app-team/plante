@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/model/lang_code.dart';
@@ -91,6 +92,7 @@ class InitProductPage extends StatefulWidget {
 class _InitProductPageState extends PageStatePlante<InitProductPage>
     with RestorationMixin {
   late final PermissionsManager _permissionsManager;
+  late final UserLangsManager _userLangsManager;
   late final InitProductPageModel _model;
 
   final TextEditingController _nameTextController = TextEditingController();
@@ -98,6 +100,8 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   final TextEditingController _ingredientsTextController =
       TextEditingController();
   final ScrollController _contentScrollController = ScrollController();
+
+  List<LangCode>? _userLangs;
 
   _InitProductPageState() : super('InitProductPage');
 
@@ -118,15 +122,16 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   }
 
   void takeModelProductText() {
-    _nameTextController.text = _model.product.name ?? '';
-    _brandTextController.text = _model.product.brands?.join(', ') ?? '';
-    _ingredientsTextController.text = _model.product.ingredientsText ?? '';
+    _nameTextController.text = _model.productSlice.name ?? '';
+    _brandTextController.text = _model.productSlice.brands?.join(', ') ?? '';
+    _ingredientsTextController.text = _model.productSlice.ingredientsText ?? '';
   }
 
   @override
   void initState() {
     super.initState();
     _permissionsManager = GetIt.I.get<PermissionsManager>();
+    _userLangsManager = GetIt.I.get<UserLangsManager>();
     _model = InitProductPageModel(
         widget.startReason,
         widget.initialProduct,
@@ -138,7 +143,15 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         GetIt.I.get<PhotosTaker>(),
         analytics,
         GetIt.I.get<InputProductsLangStorage>());
+    _initUserLangs();
     _ensureCacheDirExistence();
+  }
+
+  void _initUserLangs() async {
+    final userLangs = await _userLangsManager.getUserLangs();
+    setState(() {
+      _userLangs = userLangs.langs.toList();
+    });
   }
 
   void _ensureCacheDirExistence() async {
@@ -166,15 +179,15 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     takeModelProductText();
 
     _nameTextController.addListener(() {
-      _model.product =
-          _model.product.rebuild((e) => e.name = _nameTextController.text);
+      _model.productSlice =
+          _model.productSlice.rebuild((e) => e.name = _nameTextController.text);
     });
     _brandTextController.addListener(() {
-      _model.product = _model.product.rebuild(
+      _model.productSlice = _model.productSlice.rebuild(
           (e) => e.brands = _textToListBuilder(_brandTextController.text));
     });
     _ingredientsTextController.addListener(() {
-      _model.product = _model.product
+      _model.productSlice = _model.productSlice
           .rebuild((e) => e.ingredientsText = _ingredientsTextController.text);
     });
 
@@ -219,16 +232,17 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                 textAlign: TextAlign.left,
               )),
           const SizedBox(height: 16),
-          DropdownPlante<LangCode?>(
+          DropdownPlante<LangCode>(
             key: const Key('product_lang'),
             value: _model.langCode,
-            values: LangCode.valuesWithNullForUI(context),
+            values: LangCode.valuesForUI(context).movedToHead(_userLangs),
             onChanged: (value) {
-              _model.langCode = value;
+              if (value != null) {
+                _model.langCode = value;
+              }
             },
             dropdownItemBuilder: (langCode) {
-              return Text(langCode?.localize(context) ?? '-',
-                  style: TextStyles.normal);
+              return Text(langCode.localize(context), style: TextStyles.normal);
             },
           ),
           const SizedBox(height: 12),
@@ -249,7 +263,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                 keyButton: const Key('front_photo'),
                 onAddTap: _takeFrontPhoto,
                 onCancelTap: _removeFrontPhoto,
-                existingPhoto: _model.product.imageFront,
+                existingPhoto: _model.productSlice.imageFront,
               )),
           const SizedBox(height: 24),
         ]),
@@ -326,7 +340,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                 keyButton: const Key('ingredients_photo'),
                 onAddTap: _takeIngredientsPhoto,
                 onCancelTap: _removeIngredientsPhoto,
-                existingPhoto: _model.product.imageIngredients,
+                existingPhoto: _model.productSlice.imageIngredients,
               )),
           const SizedBox(height: 16),
           _ingredientsTextGroup(),
@@ -338,11 +352,11 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
             keyNegative: const Key('vegan_negative_btn'),
             keyUnknown: const Key('vegan_unknown_btn'),
             title: context.strings.init_product_page_is_it_vegan,
-            vegStatus: _model.product.veganStatus,
+            vegStatus: _model.productSlice.veganStatus,
             onChanged: (value) {
               setState(() {
-                _model.product =
-                    _model.product.rebuild((e) => e.veganStatus = value);
+                _model.productSlice =
+                    _model.productSlice.rebuild((e) => e.veganStatus = value);
               });
             },
           ),
@@ -355,11 +369,11 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
             keyNegative: const Key('vegetarian_negative_btn'),
             keyUnknown: const Key('vegetarian_unknown_btn'),
             title: context.strings.init_product_page_is_it_vegetarian,
-            vegStatus: _model.product.vegetarianStatus,
+            vegStatus: _model.productSlice.vegetarianStatus,
             onChanged: (value) {
               setState(() {
-                _model.product =
-                    _model.product.rebuild((e) => e.vegetarianStatus = value);
+                _model.productSlice = _model.productSlice
+                    .rebuild((e) => e.vegetarianStatus = value);
               });
             },
           ),
@@ -504,7 +518,8 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     showYesNoDialog(context, context.strings.init_product_page_delete_photo_q,
         () {
       Log.i('InitProductPage: _removePhoto confirmation');
-      _model.product = _model.product.rebuildWithImage(imageType, null);
+      _model.productSlice =
+          _model.productSlice.rebuildWithImage(imageType, null);
     });
   }
 
@@ -548,7 +563,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   }
 
   void _saveProduct() async {
-    Log.i('InitProductPage: _saveProduct start: ${_model.product}');
+    Log.i('InitProductPage: _saveProduct start: ${_model.productSlice}');
     final result = await _model.saveProduct();
     if (result.isOk) {
       Log.i('InitProductPage: _saveProduct success');
@@ -580,5 +595,19 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     }
     Log.i('InitProductPage: _markShopsOnMap success: $shops');
     _model.shops = shops;
+  }
+}
+
+extension _ListExt<T> on List<T> {
+  List<T> movedToHead(List<T>? other) {
+    if (other == null) {
+      return this;
+    }
+    final thisCopy = toList();
+    for (var index = 0; index < other.length; ++index) {
+      thisCopy.remove(other[index]);
+      thisCopy.insert(index, other[index]);
+    }
+    return thisCopy;
   }
 }
