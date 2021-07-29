@@ -94,7 +94,7 @@
     "init_user_page_i_eat_honey": "Мёд",
     "init_user_page_next_button_title": "Далее",
     "init_user_page_done_button_title": "Готово",
-    "init_user_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
+    "init_user_page_langs_explanation": "Выберите языки, которые вы знаете — некоторые продукты продаются во многих странах, и поэтому их упаковки могут быть на разных языках",
 
     "main_page_bottom_btn_feed": "Новости",
     "main_page_bottom_btn_map": "Карта продуктов",
@@ -198,6 +198,7 @@
     "init_product_page_delete_photo_q": "Удалить фото?",
     "init_product_page_where_sold_optional": "Где продаётся (не обязательно)",
     "init_product_page_open_map": "К карте",
+    "init_product_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
 
     "veg_status_displayed_vegan": "Веганский",
     "veg_status_displayed_vegetarian": "Вегетарианский",

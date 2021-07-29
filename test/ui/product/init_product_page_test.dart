@@ -1371,7 +1371,7 @@ void main() {
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
     expect(
         find.text(context
-            .strings.init_user_page_camera_permission_reasoning_settings),
+            .strings.init_product_page_camera_permission_reasoning_settings),
         findsNothing);
 
     await takePhotoAction.call();
@@ -1381,7 +1381,7 @@ void main() {
     verifyNever(photosTaker.takeAndCropPhoto(any, any));
     expect(
         find.text(context
-            .strings.init_user_page_camera_permission_reasoning_settings),
+            .strings.init_product_page_camera_permission_reasoning_settings),
         findsOneWidget);
 
     await tester.tap(find.text(context.strings.global_open_app_settings));

@@ -46,8 +46,6 @@ class CustomizableStepper extends StatelessWidget {
   final DividerMaker _dividerMaker;
   final List<StepperPage> _pages;
 
-  final EdgeInsets _contentPadding;
-
   final PageController _pageViewController;
   final CustomizableStepper2IndicatorsTopController _indicatorController;
   final BackButtonWrapperController _backButtonController;
@@ -58,13 +56,11 @@ class CustomizableStepper extends StatelessWidget {
       required CustomizableStepperController controller,
       PageIndicatorMaker pageIndicatorMaker = defaultIndicatorMaker,
       DividerMaker dividerMaker = defaultDividerMaker,
-      BackButtonMaker backButtonMaker = defaultBackButtonMaker,
-      EdgeInsets contentPadding = EdgeInsets.zero})
+      BackButtonMaker backButtonMaker = defaultBackButtonMaker})
       : _controller = controller,
         _pageIndicatorMaker = pageIndicatorMaker,
         _dividerMaker = dividerMaker,
         _pages = pages,
-        _contentPadding = contentPadding,
         _pageViewController =
             PageController(initialPage: controller._activePage),
         _indicatorController = controller._indicatorsController,
@@ -109,14 +105,6 @@ class CustomizableStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pagesPadding = EdgeInsets.only(
-        left: _contentPadding.left,
-        right: _contentPadding.right,
-        bottom: _contentPadding.bottom);
-    final pages = _pages
-        .map((page) => Container(padding: pagesPadding, child: page))
-        .toList();
-
     return WillPopScope(
         onWillPop: () async {
           if (_controller._activePage == 0) {
@@ -141,7 +129,7 @@ class CustomizableStepper extends StatelessWidget {
               controller: _pageViewController,
               physics: const NeverScrollableScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              children: pages,
+              children: _pages,
             )), // Container with a label
           ],
         ));

@@ -223,7 +223,7 @@ class InitProductPageModel {
   }
 
   bool askForLanguage() {
-    return enableNewestFeatures() && !_startedForVegStatuses();
+    return !_startedForVegStatuses();
   }
 
   bool _startedForVegStatuses() {

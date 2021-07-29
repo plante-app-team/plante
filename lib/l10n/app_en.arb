@@ -94,7 +94,7 @@
       "init_user_page_i_eat_honey": "Honey",
       "init_user_page_next_button_title": "Next",
       "init_user_page_done_button_title": "Done",
-      "init_user_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
+      "init_user_page_langs_explanation": "Select the languages you know — some products are sold in many countries and thus may have packagings in different languages",
 
       "main_page_bottom_btn_feed": "News",
       "main_page_bottom_btn_map": "Products map",
@@ -135,8 +135,6 @@
       "barcode_scan_page_scan_product": "Start scanning",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
       "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
-
-
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
@@ -200,6 +198,7 @@
       "init_product_page_delete_photo_q": "Delete photo?",
       "init_product_page_where_sold_optional": "Where is it sold? (optional)",
       "init_product_page_open_map": "Open map",
+      "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
 
       "veg_status_displayed_vegan": "Vegan",
       "veg_status_displayed_vegetarian": "Vegetarian",

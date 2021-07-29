@@ -509,7 +509,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         context,
         _permissionsManager,
         PermissionKind.CAMERA,
-        context.strings.init_user_page_camera_permission_reasoning_settings,
+        context.strings.init_product_page_camera_permission_reasoning_settings,
         context.strings.global_open_app_settings,
         settingsDialogCancelWhat: context.strings.global_cancel);
   }

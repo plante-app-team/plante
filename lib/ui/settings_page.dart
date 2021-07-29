@@ -110,20 +110,19 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                     child: Text(context.strings.settings_page_general,
                         style: TextStyles.headline3)),
                 const SizedBox(height: 12),
-                if (enableNewestFeatures())
-                  Column(children: [
-                    SizedBox(
-                        width: double.infinity,
-                        child: ButtonFilledPlante.withText(
-                            context.strings.settings_page_langs_i_know,
-                            onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const UserLangsPage()));
-                        })),
-                    const SizedBox(height: 12),
-                  ]),
+                Column(children: [
+                  SizedBox(
+                      width: double.infinity,
+                      child: ButtonFilledPlante.withText(
+                          context.strings.settings_page_langs_i_know,
+                          onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const UserLangsPage()));
+                      })),
+                  const SizedBox(height: 12),
+                ]),
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(

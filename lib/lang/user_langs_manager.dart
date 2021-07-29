@@ -100,7 +100,8 @@ class UserLangsManager {
 
   /// At least 1 language is guaranteed.
   Future<UserLangs> getUserLangs() async {
-    final sysLangCode = LangCode.safeValueOf(_sysLangCodeHolder.langCode);
+    final sysLangCodeStr = await _sysLangCodeHolder.langCodeInited;
+    final sysLangCode = LangCode.safeValueOf(sysLangCodeStr);
 
     var userLangs = await _storage.userLangs();
     if (userLangs != null) {
@@ -129,8 +130,8 @@ class UserLangsManager {
   }
 
   Future<void> setManualUserLangs(List<LangCode> userLangs) async {
-    final sysLangCode =
-        LangCode.safeValueOf(_sysLangCodeHolder.langCode) ?? LangCode.en;
+    final sysLangCodeStr = await _sysLangCodeHolder.langCodeInited;
+    final sysLangCode = LangCode.safeValueOf(sysLangCodeStr) ?? LangCode.en;
     await _storage.setUserLangs(UserLangs((e) => e
       ..auto = false
       ..langs.addAll(userLangs)
