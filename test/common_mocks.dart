@@ -54,12 +54,12 @@ import 'common_mocks.mocks.dart';
 ])
 void unusedFunctionForCommonMocks() {}
 
-MockUserLangsManager mockUserLangsManagerWith(LangCode langCode) {
+MockUserLangsManager mockUserLangsManagerWith(List<LangCode> langCodes) {
   final userLangsManager = MockUserLangsManager();
   when(userLangsManager.getUserLangs())
       .thenAnswer((_) async => UserLangs((e) => e
         ..auto = true
-        ..sysLang = langCode
-        ..langs.add(langCode)));
+        ..sysLang = langCodes.first
+        ..langs.addAll(langCodes)));
   return userLangsManager;
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
@@ -54,6 +55,7 @@ class InitProductPageModel {
   final PhotosTaker _photosTaker;
   final Analytics _analytics;
   final InputProductsLangStorage _inputProductsLangStorage;
+  final UserLangsManager _userLangsManager;
 
   Product get _initialProductFull => _initialProductRestorableFull.value;
   ProductLangSlice get _initialProductSlice =>
@@ -128,6 +130,16 @@ class InitProductPageModel {
     });
   }
 
+  List<LangCode>? _userLangs;
+  List<LangCode> get userLangs {
+    final langs = _userLangs ?? [];
+    if (!langs.contains(langCode)) {
+      // langCode is guaranteed to be not null so return at least it
+      langs.add(langCode);
+    }
+    return langs;
+  }
+
   bool loading = false;
 
   Map<String, RestorableProperty<Object?>> get restorableProperties {
@@ -149,14 +161,20 @@ class InitProductPageModel {
       this._shopsManager,
       this._photosTaker,
       this._analytics,
-      this._inputProductsLangStorage)
+      this._inputProductsLangStorage,
+      this._userLangsManager)
       : _initialProductRestorableFull = ProductRestorable(initialProduct),
         _productSliceRestorable = ProductLangSliceRestorable(
             _inputProductsLangStorage.selectedCode != null
                 ? initialProduct
                     .sliceFor(_inputProductsLangStorage.selectedCode!)
                 : ProductLangSlice.empty),
-        _shopsRestorable = ShopsListRestorable(_initialShops);
+        _shopsRestorable = ShopsListRestorable(_initialShops) {
+    _userLangsManager.getUserLangs().then((value) {
+      _userLangs = value.langs.toList();
+      _onProductUpdate.call();
+    });
+  }
 
   void setPhotoBeingTakenForTests(ProductImageType imageType) {
     if (!isInTests()) {

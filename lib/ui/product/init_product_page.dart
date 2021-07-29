@@ -92,7 +92,6 @@ class InitProductPage extends StatefulWidget {
 class _InitProductPageState extends PageStatePlante<InitProductPage>
     with RestorationMixin {
   late final PermissionsManager _permissionsManager;
-  late final UserLangsManager _userLangsManager;
   late final InitProductPageModel _model;
 
   final TextEditingController _nameTextController = TextEditingController();
@@ -100,8 +99,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   final TextEditingController _ingredientsTextController =
       TextEditingController();
   final ScrollController _contentScrollController = ScrollController();
-
-  List<LangCode>? _userLangs;
 
   _InitProductPageState() : super('InitProductPage');
 
@@ -131,7 +128,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   void initState() {
     super.initState();
     _permissionsManager = GetIt.I.get<PermissionsManager>();
-    _userLangsManager = GetIt.I.get<UserLangsManager>();
     _model = InitProductPageModel(
         widget.startReason,
         widget.initialProduct,
@@ -142,16 +138,9 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<PhotosTaker>(),
         analytics,
-        GetIt.I.get<InputProductsLangStorage>());
-    _initUserLangs();
+        GetIt.I.get<InputProductsLangStorage>(),
+        GetIt.I.get<UserLangsManager>());
     _ensureCacheDirExistence();
-  }
-
-  void _initUserLangs() async {
-    final userLangs = await _userLangsManager.getUserLangs();
-    setState(() {
-      _userLangs = userLangs.langs.toList();
-    });
   }
 
   void _ensureCacheDirExistence() async {
@@ -235,7 +224,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
           DropdownPlante<LangCode>(
             key: const Key('product_lang'),
             value: _model.langCode,
-            values: LangCode.valuesForUI(context).movedToHead(_userLangs),
+            values: _model.userLangs,
             onChanged: (value) {
               if (value != null) {
                 _model.langCode = value;
@@ -595,19 +584,5 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     }
     Log.i('InitProductPage: _markShopsOnMap success: $shops');
     _model.shops = shops;
-  }
-}
-
-extension _ListExt<T> on List<T> {
-  List<T> movedToHead(List<T>? other) {
-    if (other == null) {
-      return this;
-    }
-    final thisCopy = toList();
-    for (var index = 0; index < other.length; ++index) {
-      thisCopy.remove(other[index]);
-      thisCopy.insert(index, other[index]);
-    }
-    return thisCopy;
   }
 }

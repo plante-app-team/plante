@@ -22,7 +22,7 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());
-    userLangsManager = mockUserLangsManagerWith(LangCode.en);
+    userLangsManager = mockUserLangsManagerWith([LangCode.en]);
     GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
   });
 

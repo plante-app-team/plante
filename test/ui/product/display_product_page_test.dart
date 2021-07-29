@@ -105,7 +105,7 @@ void main() {
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     GetIt.I.registerSingleton<UserLangsManager>(
-        mockUserLangsManagerWith(LangCode.en));
+        mockUserLangsManagerWith([LangCode.en]));
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

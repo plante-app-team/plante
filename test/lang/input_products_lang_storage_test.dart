@@ -18,7 +18,7 @@ void main() {
         InputProductsLangStorage.PREF_INPUT_PRODUCTS_LANG_CODE,
         LangCode.ru.name);
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(), mockUserLangsManagerWith(LangCode.en));
+        prefs.asHolder(), mockUserLangsManagerWith([LangCode.en]));
     await Future.delayed(const Duration(milliseconds: 1));
 
     expect(inputProductsLangStorage.selectedCode, equals(LangCode.ru));
@@ -26,7 +26,7 @@ void main() {
 
   test('no initial lang in prefs', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(), mockUserLangsManagerWith(LangCode.en));
+        prefs.asHolder(), mockUserLangsManagerWith([LangCode.en]));
     await Future.delayed(const Duration(milliseconds: 1));
 
     expect(inputProductsLangStorage.selectedCode, equals(LangCode.en));
@@ -34,7 +34,7 @@ void main() {
 
   test('set new stored lang', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(), mockUserLangsManagerWith(LangCode.en));
+        prefs.asHolder(), mockUserLangsManagerWith([LangCode.en]));
     await Future.delayed(const Duration(milliseconds: 1));
 
     inputProductsLangStorage.selectedCode = LangCode.nl;
@@ -43,7 +43,7 @@ void main() {
 
   test('erase stored lang', () async {
     inputProductsLangStorage = InputProductsLangStorage(
-        prefs.asHolder(), mockUserLangsManagerWith(LangCode.en));
+        prefs.asHolder(), mockUserLangsManagerWith([LangCode.en]));
     await Future.delayed(const Duration(milliseconds: 1));
 
     inputProductsLangStorage.selectedCode = null;

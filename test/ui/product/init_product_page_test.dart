@@ -45,6 +45,7 @@ import '../../widget_tester_extension.dart';
 
 const _DEFAULT_TEST_LANG = LangCode.en;
 const _NOT_DEFAULT_TEST_LANG = LangCode.ru;
+const _USER_LANGS = [_DEFAULT_TEST_LANG, _NOT_DEFAULT_TEST_LANG];
 
 void main() {
   late MockPhotosTaker photosTaker;
@@ -120,7 +121,7 @@ void main() {
         .registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
 
     GetIt.I.registerSingleton<UserLangsManager>(
-        mockUserLangsManagerWith(_DEFAULT_TEST_LANG));
+        mockUserLangsManagerWith(_USER_LANGS));
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -1510,5 +1511,22 @@ void main() {
     expect(find.byKey(const Key('ingredients_group')), findsNothing);
     expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
     expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
+  });
+
+  testWidgets('Only languages known to the user are offered',
+      (WidgetTester tester) async {
+    final context = await tester
+        .superPump(InitProductPage(Product((v) => v.barcode = '123')));
+
+    await tester.tap(find.byKey(const Key('product_lang')));
+    await tester.pumpAndSettle();
+
+    for (final langCode in LangCode.values) {
+      if (_USER_LANGS.contains(langCode)) {
+        expect(find.text(langCode.localize(context)), findsWidgets);
+      } else {
+        expect(find.text(langCode.localize(context)), findsNothing);
+      }
+    }
   });
 }
