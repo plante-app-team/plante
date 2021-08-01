@@ -174,7 +174,8 @@ void main() {
       ..birthdayStr = '20.07.1993'
       ..eatsMilk = false
       ..eatsEggs = false
-      ..eatsHoney = true);
+      ..eatsHoney = true
+      ..langsPrioritized.replace(['en', 'nl']));
     final result = await backend.updateUserParams(updatedParams);
     expect(result.isOk, isTrue);
 
@@ -188,6 +189,11 @@ void main() {
     expect(request.url.queryParameters['eatsMilk'], equals('false'));
     expect(request.url.queryParameters['eatsEggs'], equals('false'));
     expect(request.url.queryParameters['eatsHoney'], equals('true'));
+    expect(
+        request.url
+            .toString()
+            .contains('langsPrioritized=en&langsPrioritized=nl'),
+        isTrue);
   });
 
   test('update user params has client token', () async {

@@ -30,7 +30,8 @@ void main() {
       ..eatsMilk = true
       ..eatsEggs = false
       ..eatsHoney = true
-      ..userGroup = 321);
+      ..userGroup = 321
+      ..langsPrioritized.addAll(['en', 'ru']));
     await controller.setUserParams(params);
 
     final finalParams = await controller.getUserParams();
@@ -84,6 +85,10 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.langsPrioritized.addAll(['en', 'ru']));
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
       ..genderStr = Gender.FEMALE.name
@@ -93,7 +98,8 @@ void main() {
       ..eatsHoney = false
       ..backendId = '123'
       ..backendClientToken = '321'
-      ..userGroup = 123);
+      ..userGroup = 123
+      ..langsPrioritized.addAll(['en', 'ru']));
     expect(params, equals(expectedParams));
   });
 

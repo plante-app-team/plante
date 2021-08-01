@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
@@ -61,5 +62,14 @@ MockUserLangsManager mockUserLangsManagerWith(List<LangCode> langCodes) {
         ..auto = true
         ..sysLang = langCodes.first
         ..langs.addAll(langCodes)));
+  when(userLangsManager.setManualUserLangs(any)).thenAnswer((invc) async {
+    final langs = invc.positionalArguments[0] as List<LangCode>;
+    when(userLangsManager.getUserLangs())
+        .thenAnswer((_) async => UserLangs((e) => e
+          ..auto = false
+          ..sysLang = langs.first
+          ..langs.addAll(langs)));
+    return Ok(None());
+  });
   return userLangsManager;
 }

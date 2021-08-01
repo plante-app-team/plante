@@ -22,13 +22,17 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
       serializers.serialize(object.langs,
           specifiedType:
               const FullType(BuiltList, const [const FullType(LangCode)])),
-      'sysLang',
-      serializers.serialize(object.sysLang,
-          specifiedType: const FullType(LangCode)),
       'auto',
       serializers.serialize(object.auto, specifiedType: const FullType(bool)),
     ];
-
+    Object? value;
+    value = object.sysLang;
+    if (value != null) {
+      result
+        ..add('sysLang')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(LangCode)));
+    }
     return result;
   }
 
@@ -51,7 +55,7 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
           break;
         case 'sysLang':
           result.sysLang = serializers.deserialize(value,
-              specifiedType: const FullType(LangCode)) as LangCode;
+              specifiedType: const FullType(LangCode)) as LangCode?;
           break;
         case 'auto':
           result.auto = serializers.deserialize(value,
@@ -68,18 +72,16 @@ class _$UserLangs extends UserLangs {
   @override
   final BuiltList<LangCode> langs;
   @override
-  final LangCode sysLang;
+  final LangCode? sysLang;
   @override
   final bool auto;
 
   factory _$UserLangs([void Function(UserLangsBuilder)? updates]) =>
       (new UserLangsBuilder()..update(updates)).build();
 
-  _$UserLangs._(
-      {required this.langs, required this.sysLang, required this.auto})
+  _$UserLangs._({required this.langs, this.sysLang, required this.auto})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(langs, 'UserLangs', 'langs');
-    BuiltValueNullFieldError.checkNotNull(sysLang, 'UserLangs', 'sysLang');
     BuiltValueNullFieldError.checkNotNull(auto, 'UserLangs', 'auto');
   }
 
@@ -162,8 +164,7 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
       _$result = _$v ??
           new _$UserLangs._(
               langs: langs.build(),
-              sysLang: BuiltValueNullFieldError.checkNotNull(
-                  sysLang, 'UserLangs', 'sysLang'),
+              sysLang: sysLang,
               auto: BuiltValueNullFieldError.checkNotNull(
                   auto, 'UserLangs', 'auto'));
     } catch (_) {

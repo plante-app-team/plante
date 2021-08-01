@@ -81,6 +81,14 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add('rights_group')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
+    value = object.langsPrioritized;
+    if (value != null) {
+      result
+        ..add('langs_prioritized')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
     return result;
   }
 
@@ -131,6 +139,12 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.userGroup = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
           break;
+        case 'langs_prioritized':
+          result.langsPrioritized.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
+              as BuiltList<Object?>);
+          break;
       }
     }
 
@@ -157,6 +171,8 @@ class _$UserParams extends UserParams {
   final bool? eatsHoney;
   @override
   final int? userGroup;
+  @override
+  final BuiltList<String>? langsPrioritized;
 
   factory _$UserParams([void Function(UserParamsBuilder)? updates]) =>
       (new UserParamsBuilder()..update(updates)).build();
@@ -170,7 +186,8 @@ class _$UserParams extends UserParams {
       this.eatsMilk,
       this.eatsEggs,
       this.eatsHoney,
-      this.userGroup})
+      this.userGroup,
+      this.langsPrioritized})
       : super._();
 
   @override
@@ -192,7 +209,8 @@ class _$UserParams extends UserParams {
         eatsMilk == other.eatsMilk &&
         eatsEggs == other.eatsEggs &&
         eatsHoney == other.eatsHoney &&
-        userGroup == other.userGroup;
+        userGroup == other.userGroup &&
+        langsPrioritized == other.langsPrioritized;
   }
 
   @override
@@ -204,15 +222,17 @@ class _$UserParams extends UserParams {
                     $jc(
                         $jc(
                             $jc(
-                                $jc($jc(0, backendId.hashCode),
-                                    backendClientToken.hashCode),
-                                name.hashCode),
-                            genderStr.hashCode),
-                        birthdayStr.hashCode),
-                    eatsMilk.hashCode),
-                eatsEggs.hashCode),
-            eatsHoney.hashCode),
-        userGroup.hashCode));
+                                $jc(
+                                    $jc($jc(0, backendId.hashCode),
+                                        backendClientToken.hashCode),
+                                    name.hashCode),
+                                genderStr.hashCode),
+                            birthdayStr.hashCode),
+                        eatsMilk.hashCode),
+                    eatsEggs.hashCode),
+                eatsHoney.hashCode),
+            userGroup.hashCode),
+        langsPrioritized.hashCode));
   }
 
   @override
@@ -226,7 +246,8 @@ class _$UserParams extends UserParams {
           ..add('eatsMilk', eatsMilk)
           ..add('eatsEggs', eatsEggs)
           ..add('eatsHoney', eatsHoney)
-          ..add('userGroup', userGroup))
+          ..add('userGroup', userGroup)
+          ..add('langsPrioritized', langsPrioritized))
         .toString();
   }
 }
@@ -271,6 +292,12 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   int? get userGroup => _$this._userGroup;
   set userGroup(int? userGroup) => _$this._userGroup = userGroup;
 
+  ListBuilder<String>? _langsPrioritized;
+  ListBuilder<String> get langsPrioritized =>
+      _$this._langsPrioritized ??= new ListBuilder<String>();
+  set langsPrioritized(ListBuilder<String>? langsPrioritized) =>
+      _$this._langsPrioritized = langsPrioritized;
+
   UserParamsBuilder();
 
   UserParamsBuilder get _$this {
@@ -285,6 +312,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _eatsEggs = $v.eatsEggs;
       _eatsHoney = $v.eatsHoney;
       _userGroup = $v.userGroup;
+      _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
     }
     return this;
@@ -303,17 +331,31 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
 
   @override
   _$UserParams build() {
-    final _$result = _$v ??
-        new _$UserParams._(
-            backendId: backendId,
-            backendClientToken: backendClientToken,
-            name: name,
-            genderStr: genderStr,
-            birthdayStr: birthdayStr,
-            eatsMilk: eatsMilk,
-            eatsEggs: eatsEggs,
-            eatsHoney: eatsHoney,
-            userGroup: userGroup);
+    _$UserParams _$result;
+    try {
+      _$result = _$v ??
+          new _$UserParams._(
+              backendId: backendId,
+              backendClientToken: backendClientToken,
+              name: name,
+              genderStr: genderStr,
+              birthdayStr: birthdayStr,
+              eatsMilk: eatsMilk,
+              eatsEggs: eatsEggs,
+              eatsHoney: eatsHoney,
+              userGroup: userGroup,
+              langsPrioritized: _langsPrioritized?.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'langsPrioritized';
+        _langsPrioritized?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'UserParams', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

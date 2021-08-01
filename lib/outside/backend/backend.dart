@@ -97,15 +97,15 @@ class Backend {
           backendClientTokenOverride: backendClientTokenOverride);
     }
 
-    final params = <String, String>{};
+    final params = <String, dynamic>{};
     if (userParams.name != null && userParams.name!.isNotEmpty) {
-      params['name'] = userParams.name!;
+      params['name'] = userParams.name;
     }
     if (userParams.gender != null) {
       params['gender'] = userParams.gender!.name;
     }
     if (userParams.birthday != null) {
-      params['birthday'] = userParams.birthdayStr!;
+      params['birthday'] = userParams.birthdayStr;
     }
     if (userParams.eatsMilk != null) {
       params['eatsMilk'] = userParams.eatsMilk!.toString();
@@ -115,6 +115,10 @@ class Backend {
     }
     if (userParams.eatsHoney != null) {
       params['eatsHoney'] = userParams.eatsHoney!.toString();
+    }
+    if (userParams.langsPrioritized != null &&
+        userParams.langsPrioritized!.isNotEmpty) {
+      params['langsPrioritized'] = userParams.langsPrioritized;
     }
     if (params.isEmpty) {
       return Ok(false);

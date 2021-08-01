@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
+import 'package:plante/l10n/strings.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
@@ -18,6 +20,9 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     userLangsManager = MockUserLangsManager();
+    when(userLangsManager.setManualUserLangs(any)).thenAnswer((invc) async {
+      return Ok(None());
+    });
     GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
   });
 
@@ -34,6 +39,11 @@ void main() {
     verifyNever(userLangsManager.setManualUserLangs(any));
 
     await tester.tap(find.text(LangCode.be.localize(context)));
+    await tester.pumpAndSettle();
+
+    verifyNever(userLangsManager.setManualUserLangs(any));
+
+    await tester.tap(find.text(context.strings.global_save));
     await tester.pumpAndSettle();
 
     verify(userLangsManager.setManualUserLangs([LangCode.ru, LangCode.be]));

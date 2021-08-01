@@ -21,6 +21,9 @@ class FakeUserParamsController implements UserParamsController {
   @override
   Future<void> setUserParams(UserParams? userParams) async {
     _userParams = userParams;
+    _observers.forEach((l) {
+      l.onUserParamsUpdate(userParams);
+    });
   }
 
   @override

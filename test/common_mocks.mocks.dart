@@ -36,6 +36,7 @@ import 'package:plante/base/permissions_manager.dart' as _i44;
 import 'package:plante/base/result.dart' as _i2;
 import 'package:plante/lang/sys_lang_code_holder.dart' as _i60;
 import 'package:plante/lang/user_langs_manager.dart' as _i61;
+import 'package:plante/lang/user_langs_manager_error.dart' as _i62;
 import 'package:plante/location/geolocator_wrapper.dart' as _i25;
 import 'package:plante/location/ip_location_provider.dart' as _i33;
 import 'package:plante/location/location_controller.dart' as _i35;
@@ -46,9 +47,9 @@ import 'package:plante/model/shop_product_range.dart' as _i58;
 import 'package:plante/model/shop_type.dart' as _i59;
 import 'package:plante/model/user_langs.dart' as _i9;
 import 'package:plante/model/user_params.dart' as _i19;
-import 'package:plante/model/user_params_controller.dart' as _i62;
+import 'package:plante/model/user_params_controller.dart' as _i63;
 import 'package:plante/model/veg_status.dart' as _i22;
-import 'package:plante/model/viewed_products_storage.dart' as _i63;
+import 'package:plante/model/viewed_products_storage.dart' as _i64;
 import 'package:plante/outside/backend/backend.dart' as _i18;
 import 'package:plante/outside/backend/backend_error.dart' as _i20;
 import 'package:plante/outside/backend/backend_product.dart' as _i21;
@@ -803,6 +804,10 @@ class MockSysLangCodeHolder extends _i1.Mock implements _i60.SysLangCodeHolder {
       super.noSuchMethod(Invocation.setter(#langCode, value),
           returnValueForMissingStub: null);
   @override
+  _i11.Future<String> get langCodeInited =>
+      (super.noSuchMethod(Invocation.getter(#langCodeInited),
+          returnValue: Future<String>.value('')) as _i11.Future<String>);
+  @override
   void callWhenInited(_i36.ArgCallback<String>? callback) =>
       super.noSuchMethod(Invocation.method(#callWhenInited, [callback]),
           returnValueForMissingStub: null);
@@ -817,8 +822,8 @@ class MockUserLangsManager extends _i1.Mock implements _i61.UserLangsManager {
   }
 
   @override
-  _i11.Future<void> get firstInitFutureForTesting =>
-      (super.noSuchMethod(Invocation.getter(#firstInitFutureForTesting),
+  _i11.Future<void> get initFuture =>
+      (super.noSuchMethod(Invocation.getter(#initFuture),
           returnValue: Future<void>.value()) as _i11.Future<void>);
   @override
   _i11.Future<_i9.UserLangs> getUserLangs() =>
@@ -826,27 +831,30 @@ class MockUserLangsManager extends _i1.Mock implements _i61.UserLangsManager {
               returnValue: Future<_i9.UserLangs>.value(_FakeUserLangs()))
           as _i11.Future<_i9.UserLangs>);
   @override
-  _i11.Future<void> setManualUserLangs(List<_i52.LangCode>? userLangs) =>
-      (super.noSuchMethod(Invocation.method(#setManualUserLangs, [userLangs]),
-          returnValue: Future<void>.value(),
-          returnValueForMissingStub: Future.value()) as _i11.Future<void>);
+  _i11.Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>
+      setManualUserLangs(List<_i52.LangCode>? userLangs) => (super.noSuchMethod(
+          Invocation.method(#setManualUserLangs, [userLangs]),
+          returnValue:
+              Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>.value(
+                  _FakeResult<_i2.None, _i62.UserLangsManagerError>())) as _i11
+          .Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>);
 }
 
 /// A class which mocks [UserParamsController].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserParamsController extends _i1.Mock
-    implements _i62.UserParamsController {
+    implements _i63.UserParamsController {
   MockUserParamsController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i62.UserParamsControllerObserver? observer) =>
+  void addObserver(_i63.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i62.UserParamsControllerObserver? observer) =>
+  void removeObserver(_i63.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
@@ -865,7 +873,7 @@ class MockUserParamsController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockViewedProductsStorage extends _i1.Mock
-    implements _i63.ViewedProductsStorage {
+    implements _i64.ViewedProductsStorage {
   MockViewedProductsStorage() {
     _i1.throwOnMissingStub(this);
   }

@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +26,10 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   bool? get eatsHoney;
   @BuiltValueField(wireName: 'rights_group')
   int? get userGroup;
+
+  /// Please use `UserLangsManager` instead of this field.
+  @BuiltValueField(wireName: 'langs_prioritized')
+  BuiltList<String>? get langsPrioritized;
 
   bool? get eatsVeggiesOnly {
     if (eatsMilk == null && eatsEggs == null && eatsHoney == null) {

@@ -8,7 +8,7 @@ part 'user_langs.g.dart';
 
 abstract class UserLangs implements Built<UserLangs, UserLangsBuilder> {
   BuiltList<LangCode> get langs;
-  LangCode get sysLang;
+  LangCode? get sysLang;
   bool get auto;
 
   static UserLangs? fromJson(Map<String, dynamic> json) {

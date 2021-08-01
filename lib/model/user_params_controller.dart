@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:built_collection/built_collection.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
@@ -19,6 +20,7 @@ const PREF_USER_ID_ON_BACKEND = 'USER_ID_ON_BACKEND2';
 const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
     'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
 const PREF_USER_CLIENT_USER_GROUP = 'PREF_USER_CLIENT_USER_GROUP2';
+const PREF_LANGS_PRIORITIZED = 'PREF_LANGS_PRIORITIZED';
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 
 class UserParamsControllerObserver {
@@ -52,6 +54,7 @@ class UserParamsController {
     final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
     final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
     final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
+    final langsPrioritized = prefs.getStringList(PREF_LANGS_PRIORITIZED);
 
     if (name == null &&
         genderStr == null &&
@@ -60,7 +63,8 @@ class UserParamsController {
         eatsEggs == null &&
         eatsHoney == null &&
         backendId == null &&
-        clientToken == null) {
+        clientToken == null &&
+        langsPrioritized == null) {
       return null;
     }
 
@@ -78,7 +82,9 @@ class UserParamsController {
       ..eatsMilk = eatsMilk
       ..eatsEggs = eatsEggs
       ..eatsHoney = eatsHoney
-      ..userGroup = userGroup);
+      ..userGroup = userGroup
+      ..langsPrioritized =
+          langsPrioritized != null ? ListBuilder(langsPrioritized) : null);
   }
 
   /// Same as [UserParamsController.getUserParams] but will work only
@@ -97,6 +103,7 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
+      await prefs.safeRemove(PREF_LANGS_PRIORITIZED);
       _observers.forEach((obs) {
         obs.onUserParamsUpdate(null);
       });
@@ -157,6 +164,14 @@ class UserParamsController {
     } else {
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
     }
+
+    if (userParams.langsPrioritized != null) {
+      await prefs.setStringList(
+          PREF_LANGS_PRIORITIZED, userParams.langsPrioritized!.toList());
+    } else {
+      await prefs.safeRemove(PREF_LANGS_PRIORITIZED);
+    }
+
     _cachedUserParams = userParams;
     _observers.forEach((obs) {
       obs.onUserParamsUpdate(userParams);

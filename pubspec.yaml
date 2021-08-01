@@ -76,7 +76,7 @@ dev_dependencies:
   json_serializable: ^4.1.3
   built_value_generator: ^8.1.1
   flutter_launcher_icons: ^0.9.0
-
+  trotter: ^2.0.0-dev.1
 
 flutter_icons:
   android: "icon"

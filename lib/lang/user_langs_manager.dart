@@ -1,140 +1,100 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:plante/lang/_user_langs_storage.dart';
+import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
+import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
+import 'package:plante/lang/manual_user_langs_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
+import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
+import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 
 class UserLangsManager {
   final SysLangCodeHolder _sysLangCodeHolder;
-  final CountriesLangCodesTable _langCodesTable;
-  final LocationController _locationController;
-  final OpenStreetMap _osm;
-  final UserLangsStorage _storage;
+  final LocationBasedUserLangsManager _locationUserLangsManager;
+  final ManualUserLangsManager _manualUserLangsManager;
 
-  final _firstInitCompleterForTesting = Completer<void>();
+  final _initCompleter = Completer<void>();
+  Future<void> get initFuture => _initCompleter.future;
 
-  @visibleForTesting
-  Future<void> get firstInitFutureForTesting =>
-      _firstInitCompleterForTesting.future;
-
-  UserLangsManager(this._sysLangCodeHolder, this._langCodesTable,
-      this._locationController, this._osm, SharedPreferencesHolder prefsHolder,
-      {UserLangsStorage? storage})
-      : _storage = storage ?? UserLangsStorage(prefsHolder) {
-    _locationController.callWhenLastPositionKnown((_) {
-      _sysLangCodeHolder.callWhenInited((_) async {
-        try {
-          await _tryFirstInit();
-        } finally {
-          _firstInitCompleterForTesting.complete();
-        }
-      });
-    });
+  UserLangsManager(
+      this._sysLangCodeHolder,
+      CountriesLangCodesTable langCodesTable,
+      LocationController locationController,
+      OpenStreetMap osm,
+      SharedPreferencesHolder prefsHolder,
+      UserParamsController userParamsController,
+      Backend backend)
+      : _locationUserLangsManager = LocationBasedUserLangsManager(
+            langCodesTable, locationController, osm, prefsHolder),
+        _manualUserLangsManager =
+            ManualUserLangsManager(userParamsController, backend) {
+    _initAsync();
   }
 
-  Future<void> _tryFirstInit() async {
-    var userLangs = await _storage.userLangs();
-    if (userLangs != null) {
-      Log.i('User langs known as $userLangs');
-      return;
+  UserLangsManager.forTests(
+      this._sysLangCodeHolder,
+      LocationBasedUserLangsManager locationBasedManager,
+      ManualUserLangsManager manualManager)
+      : _locationUserLangsManager = locationBasedManager,
+        _manualUserLangsManager = manualManager {
+    if (!isInTests()) {
+      throw Exception('UserLangsManager.forTests called not in tests');
     }
+    _initAsync();
+  }
 
-    // We deliberately don't request current position because it
-    // requires the location permission and we want to be able to work
-    // without it.
-    final pos = await _locationController.lastKnownPosition();
-    if (pos == null) {
-      Log.w('Cannot determine user langs - no user position available');
-      return;
-    }
-
-    final addressRes = await _osm.fetchAddress(pos.y, pos.x);
-    if (addressRes.isErr) {
-      Log.w('Cannot determine user langs - OSM error: $addressRes');
-      return;
-    }
-
-    final address = addressRes.unwrap();
-    final countryCode = address.countryCode;
-    if (countryCode == null) {
-      Log.w('Cannot determine user langs - no country code: $address');
-      return;
-    }
-
-    final langs = _langCodesTable.countryCodeToLangCode(countryCode);
-    if (langs == null) {
-      Log.w(
-          'Cannot determine user langs - no langs for country code: $countryCode');
-      return;
-    }
-
-    final sysLangCode = LangCode.safeValueOf(_sysLangCodeHolder.langCode);
-    if (sysLangCode == null) {
-      Log.w(
-          'UserLangsManager._initAsync: sys lang is not parsed: $sysLangCode');
-    }
-    if (sysLangCode != null) {
-      langs.remove(sysLangCode);
-      langs.insert(0, sysLangCode);
-    }
-
-    userLangs = UserLangs((e) => e
-      ..auto = true
-      ..sysLang = sysLangCode ?? LangCode.en
-      ..langs.addAll(langs));
-    // Async check
-    if (await _storage.userLangs() != null) {
-      // Already inited by external code
-      Log.w('UserLangsManager._initAsync: Already inited by external code');
-      return;
-    }
-    await _storage.setUserLangs(userLangs);
+  Future<void> _initAsync() async {
+    await _locationUserLangsManager.initFuture;
+    await _manualUserLangsManager.initFuture;
+    await _sysLangCodeHolder.langCodeInited;
+    _initCompleter.complete();
   }
 
   /// At least 1 language is guaranteed.
   Future<UserLangs> getUserLangs() async {
-    final sysLangCodeStr = await _sysLangCodeHolder.langCodeInited;
-    final sysLangCode = LangCode.safeValueOf(sysLangCodeStr);
+    await initFuture.timeout(const Duration(seconds: 5));
 
-    var userLangs = await _storage.userLangs();
-    if (userLangs != null) {
-      if (sysLangCode != null && !userLangs.langs.contains(sysLangCode)) {
-        final codes = userLangs.langs.toList();
-        codes.insert(0, sysLangCode);
-        userLangs = userLangs.rebuild((e) => e.langs.replace(codes));
-      }
-      return userLangs;
+    var langs = await _manualUserLangsManager.getUserLangs();
+    if (langs != null) {
+      return _constructResult(langs);
     }
-
-    Log.w(
-        'UserLangsManager.getUserLangs: called when no user params available');
-    final LangCode code;
-    if (sysLangCode != null) {
-      code = sysLangCode;
-    } else {
-      Log.w(
-          'UserLangsManager.getUserLangs: sys lang is not parsed: $sysLangCode');
-      code = LangCode.en;
+    langs = await _locationUserLangsManager.getUserLangs();
+    if (langs != null) {
+      return _constructResult(langs);
     }
-    return UserLangs((e) => e
-      ..langs.add(code)
-      ..sysLang = code
-      ..auto = true);
+    Log.w('UserLangsManager.getUserLangs: '
+        'called when no user params available');
+    return _constructResult([]);
   }
 
-  Future<void> setManualUserLangs(List<LangCode> userLangs) async {
-    final sysLangCodeStr = await _sysLangCodeHolder.langCodeInited;
-    final sysLangCode = LangCode.safeValueOf(sysLangCodeStr) ?? LangCode.en;
-    await _storage.setUserLangs(UserLangs((e) => e
+  UserLangs _constructResult(List<LangCode> langs) {
+    final sysLangCode = LangCode.safeValueOf(_sysLangCodeHolder.langCode);
+    if (sysLangCode == null) {
+      Log.w('UserLangsManager._constructResult: '
+          'sys lang is not parsed: $sysLangCode');
+    }
+
+    if (langs.isEmpty) {
+      langs.insert(0, sysLangCode ?? LangCode.en);
+    } else if (sysLangCode != null && !langs.contains(sysLangCode)) {
+      langs.insert(0, sysLangCode);
+    }
+    return UserLangs((e) => e
       ..auto = false
-      ..langs.addAll(userLangs)
-      ..sysLang = sysLangCode));
+      ..langs.addAll(langs)
+      ..sysLang = sysLangCode);
+  }
+
+  Future<Result<None, UserLangsManagerError>> setManualUserLangs(
+      List<LangCode> userLangs) async {
+    return await _manualUserLangsManager.setUserLangs(userLangs);
   }
 }

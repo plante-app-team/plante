@@ -52,14 +52,6 @@ void initDI() {
       OpenStreetMap(GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<AddressObtainer>(
       AddressObtainer(GetIt.I.get<OpenStreetMap>()));
-  GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
-      GetIt.I.get<SysLangCodeHolder>(),
-      GetIt.I.get<CountriesLangCodesTable>(),
-      GetIt.I.get<LocationController>(),
-      GetIt.I.get<OpenStreetMap>(),
-      GetIt.I.get<SharedPreferencesHolder>()));
-  GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
-      GetIt.I.get<SharedPreferencesHolder>(), GetIt.I.get<UserLangsManager>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
@@ -68,6 +60,16 @@ void initDI() {
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<HttpClient>(),
       GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
+      GetIt.I.get<SysLangCodeHolder>(),
+      GetIt.I.get<CountriesLangCodesTable>(),
+      GetIt.I.get<LocationController>(),
+      GetIt.I.get<OpenStreetMap>(),
+      GetIt.I.get<SharedPreferencesHolder>(),
+      GetIt.I.get<UserParamsController>(),
+      GetIt.I.get<Backend>()));
+  GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
+      GetIt.I.get<SharedPreferencesHolder>(), GetIt.I.get<UserLangsManager>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));

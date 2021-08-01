@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:plante/base/base.dart';
-import 'package:plante/lang/_user_langs_storage.dart';
+import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/user_langs.dart';
 import 'package:test/test.dart';
 
 import '../fake_shared_preferences.dart';
@@ -16,15 +15,13 @@ void main() {
   });
 
   test('load with good user langs', () async {
-    final langs = UserLangs((e) => e
-      ..auto = false
-      ..sysLang = LangCode.en
-      ..langs.addAll([LangCode.be, LangCode.en]));
+    final langs = [LangCode.be, LangCode.en];
     await prefs.setString(
-        UserLangsStorage.PREF_USER_LANGS, jsonEncode(langs.toJson()));
+        LocationBasedUserLangsStorage.PREF_LOCATION_BASED_USER_LANGS,
+        jsonEncode(langs.map((e) => e.name).toList()));
 
-    final userLangsStorage = UserLangsStorage(prefs.asHolder());
-    UserLangs? obtainedParams;
+    final userLangsStorage = LocationBasedUserLangsStorage(prefs.asHolder());
+    List<LangCode>? obtainedParams;
     unawaited(userLangsStorage.userLangs().then((value) {
       obtainedParams = value;
     }));
@@ -36,9 +33,10 @@ void main() {
   });
 
   test('load without user langs', () async {
-    await prefs.remove(UserLangsStorage.PREF_USER_LANGS);
+    await prefs
+        .remove(LocationBasedUserLangsStorage.PREF_LOCATION_BASED_USER_LANGS);
 
-    final userLangsStorage = UserLangsStorage(prefs.asHolder());
+    final userLangsStorage = LocationBasedUserLangsStorage(prefs.asHolder());
     bool receivedEmptyLangs = false;
     unawaited(userLangsStorage.userLangs().then((value) {
       receivedEmptyLangs = value == null;
@@ -52,9 +50,10 @@ void main() {
 
   test('load with bad user langs', () async {
     await prefs.setString(
-        UserLangsStorage.PREF_USER_LANGS, 'that is not a json');
+        LocationBasedUserLangsStorage.PREF_LOCATION_BASED_USER_LANGS,
+        'that is not a json');
 
-    final userLangsStorage = UserLangsStorage(prefs.asHolder());
+    final userLangsStorage = LocationBasedUserLangsStorage(prefs.asHolder());
     bool receivedEmptyLangs = false;
     unawaited(userLangsStorage.userLangs().then((value) {
       receivedEmptyLangs = value == null;
@@ -67,24 +66,22 @@ void main() {
   });
 
   test('set user langs', () async {
-    final userLangsStorage = UserLangsStorage(prefs.asHolder());
+    final userLangsStorage = LocationBasedUserLangsStorage(prefs.asHolder());
     await userLangsStorage.userLangs(); // Wait for init finish
 
     expect(prefs.getKeys(), equals(<String>{}));
-    final langs = UserLangs((e) => e
-      ..auto = false
-      ..sysLang = LangCode.en
-      ..langs.addAll([LangCode.be, LangCode.en]));
+    final langs = [LangCode.be, LangCode.en];
     await userLangsStorage.setUserLangs(langs);
-    expect(prefs.getKeys(), equals({UserLangsStorage.PREF_USER_LANGS}));
+    expect(prefs.getKeys(),
+        equals({LocationBasedUserLangsStorage.PREF_LOCATION_BASED_USER_LANGS}));
 
-    final userLangsStorage2 = UserLangsStorage(prefs.asHolder());
+    final userLangsStorage2 = LocationBasedUserLangsStorage(prefs.asHolder());
     expect(await userLangsStorage2.userLangs(), equals(langs));
 
     await userLangsStorage2.setUserLangs(null);
     expect(prefs.getKeys(), equals(<String>{}));
 
-    final userLangsStorage3 = UserLangsStorage(prefs.asHolder());
+    final userLangsStorage3 = LocationBasedUserLangsStorage(prefs.asHolder());
     expect(await userLangsStorage3.userLangs(), isNull);
   });
 }
