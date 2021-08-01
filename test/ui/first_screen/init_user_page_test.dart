@@ -2,8 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
@@ -144,5 +146,61 @@ void main() {
     // "Next" tap (because veg-selection is not made)
     expect(find.text(context.strings.init_user_page_langs_explanation),
         findsNothing);
+  });
+
+  testWidgets('Langs saving error', (WidgetTester tester) async {
+    when(userLangsManager.setManualUserLangs(any))
+        .thenAnswer((_) async => Err(UserLangsManagerError.NETWORK));
+
+    UserParams? resultParams;
+    final resultParamsCallback = (UserParams params) async {
+      resultParams = params;
+      return true;
+    };
+    final context = await tester
+        .superPump(InitUserPage(UserParams(), resultParamsCallback));
+
+    await tester.enterText(find.byKey(const Key('name')), 'Bob');
+
+    await tester.pumpAndSettle();
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(context.strings.init_user_page_i_eat_honey));
+    await tester.pumpAndSettle();
+
+    await tester
+        .tap(find.text(context.strings.init_user_page_next_button_title));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(LangCode.be.localize(context)));
+    await tester.pumpAndSettle();
+
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
+    await tester.pumpAndSettle();
+
+    // Nope, network error
+    expect(resultParams, equals(null));
+    expect(find.text(context.strings.global_network_error), findsWidgets);
+
+    // Network is back!
+    when(userLangsManager.setManualUserLangs(any))
+        .thenAnswer((_) async => Ok(None()));
+
+    await tester
+        .tap(find.text(context.strings.init_user_page_done_button_title));
+    await tester.pumpAndSettle();
+
+    final expectedParams = UserParams((v) => v
+      ..name = 'Bob'
+      ..eatsMilk = false
+      ..eatsEggs = false
+      ..eatsHoney = true);
+    expect(resultParams, equals(expectedParams));
+
+    final expectedLangs = [LangCode.en, LangCode.be];
+    verify(userLangsManager.setManualUserLangs(expectedLangs));
   });
 }

@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -11,6 +12,7 @@ import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/radio_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
 import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -336,7 +338,16 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         setState(() {
           _loading = true;
         });
-        await _userLangsManager.setManualUserLangs(_userLangs!.langs.toList());
+        final langRes = await _userLangsManager
+            .setManualUserLangs(_userLangs!.langs.toList());
+        if (langRes.isErr) {
+          if (langRes.unwrapErr() == UserLangsManagerError.NETWORK) {
+            showSnackBar(context.strings.global_network_error, context);
+          } else {
+            showSnackBar(context.strings.global_something_went_wrong, context);
+          }
+          return;
+        }
         await _resultCallback.call(_userParams);
       } finally {
         setState(() {
