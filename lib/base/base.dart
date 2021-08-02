@@ -81,3 +81,10 @@ Future<PackageInfo> getPackageInfo() async {
   }
   return await PackageInfo.fromPlatform();
 }
+
+String operatingSystem() {
+  if (kIsWeb) {
+    return 'web';
+  }
+  return Platform.operatingSystem;
+}

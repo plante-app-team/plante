@@ -38,7 +38,7 @@ class OpenStreetMap {
   Future<String> _userAgent() async {
     final packageInfo = await _packageInfo.future;
     return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
-        '${Platform.operatingSystem}';
+        '${operatingSystem()}';
   }
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
