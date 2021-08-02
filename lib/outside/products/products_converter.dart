@@ -10,15 +10,15 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 
-class ProductsConverter {
+class ProductsConverterAndCacher {
   static final _notTranslatedRegex = RegExp(r'^\w\w:.*');
   final Analytics _analytics;
   final _productsCache = <String, Product>{};
 
-  ProductsConverter(this._analytics);
+  ProductsConverterAndCacher(this._analytics);
 
-  Product convert(off.Product offProduct, BackendProduct? backendProduct,
-      List<LangCode> langsPrioritized) {
+  Product convertAndCache(off.Product offProduct,
+      BackendProduct? backendProduct, List<LangCode> langsPrioritized) {
     var result = Product((v) => v
       ..langsPrioritized.addAll(langsPrioritized)
       ..barcode = offProduct.barcode
@@ -93,13 +93,7 @@ class ProductsConverter {
     // First store the original product into cache
     _productsCache[offProduct.barcode!] = result;
 
-    // Now filter out not translated values
-    if (result.brands != null) {
-      final brandsFiltered =
-          result.brands!.where((e) => !_notTranslatedRegex.hasMatch(e));
-      result = result.rebuild((v) => v.brands.replace(brandsFiltered));
-    }
-    return result;
+    return _filterOutNotTranslatedValues(result);
   }
 
   MapBuilder<LangCode, T> _castOffLangs<T, O>(
@@ -218,6 +212,23 @@ class ProductsConverter {
       resultConverted[entry.key] = BuiltList.from(entry.value);
     }
     return resultConverted;
+  }
+
+  Product _filterOutNotTranslatedValues(Product result) {
+    if (result.brands != null) {
+      final brandsFiltered =
+          result.brands!.where((e) => !_notTranslatedRegex.hasMatch(e));
+      result = result.rebuild((v) => v.brands.replace(brandsFiltered));
+    }
+    return result;
+  }
+
+  Product? getCached(String barcode) {
+    final result = _productsCache[barcode];
+    if (result == null) {
+      return null;
+    }
+    return _filterOutNotTranslatedValues(result);
   }
 
   /// If returns null, should not send back

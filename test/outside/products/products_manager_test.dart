@@ -25,7 +25,7 @@ import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 
 void main() {
-  const selectedImagesJson = '''
+  const selectedImagesRuDeJson = '''
     {
        "front":{
           "display":{
@@ -83,7 +83,8 @@ void main() {
 
     when(backend.createUpdateProduct(any,
             vegetarianStatus: anyNamed('vegetarianStatus'),
-            veganStatus: anyNamed('veganStatus')))
+            veganStatus: anyNamed('veganStatus'),
+            changedLangs: anyNamed('changedLangs')))
         .thenAnswer((_) async => Ok(None()));
     when(backend.requestProduct(any)).thenAnswer((invc) async => Ok(
         BackendProduct(
@@ -108,7 +109,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesJson),
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -147,7 +148,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesJson),
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -206,7 +207,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesJson),
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -255,7 +256,8 @@ void main() {
     // Backend Product
     verify(backend.createUpdateProduct('123',
             vegetarianStatus: VegStatus.positive,
-            veganStatus: VegStatus.negative))
+            veganStatus: VegStatus.negative,
+            changedLangs: anyNamed('changedLangs')))
         .called(1);
 
     // Off image front
@@ -309,7 +311,8 @@ void main() {
     // Backend Product
     verify(backend.createUpdateProduct('123',
             vegetarianStatus: VegStatus.positive,
-            veganStatus: VegStatus.negative))
+            veganStatus: VegStatus.negative,
+            changedLangs: anyNamed('changedLangs')))
         .called(1);
 
     verifyNever(offApi.addProductImage(any, captureAny));
@@ -351,7 +354,8 @@ void main() {
     // Backend Product
     verify(backend.createUpdateProduct('123',
             vegetarianStatus: VegStatus.positive,
-            veganStatus: VegStatus.negative))
+            veganStatus: VegStatus.negative,
+            changedLangs: anyNamed('changedLangs')))
         .called(1);
 
     // Off image front
@@ -402,7 +406,8 @@ void main() {
     // Backend Product
     verify(backend.createUpdateProduct('123',
             vegetarianStatus: VegStatus.positive,
-            veganStatus: VegStatus.negative))
+            veganStatus: VegStatus.negative,
+            changedLangs: anyNamed('changedLangs')))
         .called(1);
 
     // Off image ingredients
@@ -478,7 +483,8 @@ void main() {
 
     when(backend.createUpdateProduct(any,
             vegetarianStatus: anyNamed('vegetarianStatus'),
-            veganStatus: anyNamed('veganStatus')))
+            veganStatus: anyNamed('veganStatus'),
+            changedLangs: anyNamed('changedLangs')))
         .thenAnswer((_) async =>
             Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
 
@@ -526,7 +532,8 @@ void main() {
     // Backend Product
     verify(backend.createUpdateProduct('123',
             vegetarianStatus: VegStatus.positive,
-            veganStatus: VegStatus.negative))
+            veganStatus: VegStatus.negative,
+            changedLangs: anyNamed('changedLangs')))
         .called(1);
 
     verifyNever(offApi.addProductImage(any, captureAny));
@@ -1137,7 +1144,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesJson),
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -1236,7 +1243,9 @@ void main() {
     expect(imageUploadsAttempts, equals([off.ImageField.INGREDIENTS]));
     // Expect the product WAS sent to backend because now all images are uploaded.
     verify(backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive, veganStatus: VegStatus.negative));
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative,
+        changedLangs: anyNamed('changedLangs')));
   });
 
   test('OFF "images" field is ignored', () async {
@@ -1321,7 +1330,7 @@ void main() {
       'ingredients_tags_ru': ['voda'],
       'ingredients_text_de': 'wasser',
       'ingredients_tags_de': ['wasser'],
-      'selected_images': jsonDecode(selectedImagesJson),
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -1396,6 +1405,12 @@ void main() {
     final result = await productsManager.createUpdateProduct(product);
     expect(result.isOk, isTrue);
 
+    // Verify changed lang
+    verify(backend.createUpdateProduct('123',
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.possible,
+        changedLangs: [LangCode.ru, LangCode.de]));
+
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
         .captured
@@ -1443,5 +1458,76 @@ void main() {
     expect(capturedImage4.imageUri, equals(Uri.file('/tmp/img2_de.jpg')));
     expect(capturedImage4.barcode, equals('123'));
     expect(capturedImage4.lang, equals(off.OpenFoodFactsLanguage.GERMAN));
+  });
+
+  test(
+      'changed langs list when changing 1 and adding 1 lang for a multilingual product',
+      () async {
+    const barcode = '123321';
+    final offProduct = off.Product.fromJson({
+      'code': barcode,
+      'product_name_ru': 'banan',
+      'ingredients_text_ru': 'banan, kojura',
+      'product_name_de': 'banane',
+      'ingredients_text_de': 'banane, schälen',
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
+    });
+    when(offApi.getProduct(any))
+        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+
+    final originalProductRes =
+        await productsManager.getProduct(barcode, [LangCode.ru, LangCode.de]);
+    final originalProduct = originalProductRes.unwrap()!;
+
+    // RU is untouched
+    final updatedProduct = originalProduct.rebuild((e) => e
+      ..vegetarianStatus = VegStatus.positive
+      ..veganStatus = VegStatus.possible
+      ..langsPrioritized.add(LangCode.en)
+      ..nameLangs[LangCode.en] = 'banana'
+      ..ingredientsTextLangs[LangCode.de] = 'banane');
+
+    final result = await productsManager.createUpdateProduct(updatedProduct);
+    expect(result.isOk, isTrue);
+
+    // Verify changed langs
+    verify(backend.createUpdateProduct(barcode,
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.possible,
+        changedLangs: [LangCode.de, LangCode.en]));
+  });
+
+  test('changed langs list when not changing any lang params', () async {
+    const barcode = '123321';
+    final offProduct = off.Product.fromJson({
+      'code': barcode,
+      'product_name_ru': 'banan',
+      'ingredients_text_ru': 'banan, kojura',
+      'product_name_de': 'banane',
+      'ingredients_text_de': 'banane, schälen',
+      'selected_images': jsonDecode(selectedImagesRuDeJson),
+    });
+    when(offApi.getProduct(any))
+        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+
+    final originalProductRes =
+        await productsManager.getProduct(barcode, [LangCode.ru, LangCode.de]);
+    final originalProduct = originalProductRes.unwrap()!;
+
+    // All langs are untouched
+    final updatedProduct = originalProduct.rebuild((e) => e
+      ..vegetarianStatus = VegStatus.positive
+      ..veganStatus = VegStatus.possible);
+
+    final result = await productsManager.createUpdateProduct(updatedProduct);
+    expect(result.isOk, isTrue);
+
+    // Verify not changed langs
+    verify(backend.createUpdateProduct(barcode,
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.possible,
+        changedLangs: []));
   });
 }

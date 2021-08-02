@@ -8,6 +8,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/base/device_info.dart';
@@ -153,19 +154,24 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
-      {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
+      {VegStatus? vegetarianStatus,
+      VegStatus? veganStatus,
+      List<LangCode>? changedLangs}) async {
     if (await _settings.testingBackends()) {
       return await _fakeBackend.createUpdateProduct(barcode,
           vegetarianStatus: vegetarianStatus, veganStatus: veganStatus);
     }
 
-    final params = <String, String>{};
+    final params = <String, dynamic>{};
     params['barcode'] = barcode;
     if (vegetarianStatus != null) {
       params['vegetarianStatus'] = vegetarianStatus.name;
     }
     if (veganStatus != null) {
       params['veganStatus'] = veganStatus.name;
+    }
+    if (changedLangs != null && changedLangs.isNotEmpty) {
+      params['langs'] = changedLangs.map((e) => e.name).toList();
     }
     final response = await _backendGet('create_update_product/', params);
     return _noneOrErrorFrom(response);

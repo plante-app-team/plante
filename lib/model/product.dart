@@ -38,15 +38,17 @@ abstract class Product implements Built<Product, ProductBuilder> {
 
   /// We consider brands to be not translatable.
   BuiltList<String>? get brands;
+
+  // Please consider modifying ProductsManager._langsDiff if
+  // a new langs field is added.
   BuiltMap<LangCode, String> get nameLangs;
   BuiltMap<LangCode, String> get ingredientsTextLangs;
-
-  /// NOTE: the field is NOT send to any backend, only obtained from them.
-  BuiltMap<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs;
-
   BuiltMap<LangCode, Uri> get imageFrontLangs;
   BuiltMap<LangCode, Uri> get imageFrontThumbLangs;
   BuiltMap<LangCode, Uri> get imageIngredientsLangs;
+
+  /// NOTE: the field is NOT send to any backend, only obtained from them.
+  BuiltMap<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs;
 
   static Product? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers.deserializeWith(serializer, json);

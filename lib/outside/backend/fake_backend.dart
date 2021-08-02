@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -50,7 +51,9 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
-      {VegStatus? vegetarianStatus, VegStatus? veganStatus}) async {
+      {VegStatus? vegetarianStatus,
+      VegStatus? veganStatus,
+      List<LangCode>? changedLangs}) async {
     await _delay();
     return Ok(None());
   }

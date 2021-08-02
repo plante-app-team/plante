@@ -33,12 +33,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       serializers.serialize(object.ingredientsTextLangs,
           specifiedType: const FullType(BuiltMap,
               const [const FullType(LangCode), const FullType(String)])),
-      'ingredientsAnalyzedLangs',
-      serializers.serialize(object.ingredientsAnalyzedLangs,
-          specifiedType: const FullType(BuiltMap, const [
-            const FullType(LangCode),
-            const FullType(BuiltList, const [const FullType(Ingredient)])
-          ])),
       'imageFrontLangs',
       serializers.serialize(object.imageFrontLangs,
           specifiedType: const FullType(
@@ -51,6 +45,12 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       serializers.serialize(object.imageIngredientsLangs,
           specifiedType: const FullType(
               BuiltMap, const [const FullType(LangCode), const FullType(Uri)])),
+      'ingredientsAnalyzedLangs',
+      serializers.serialize(object.ingredientsAnalyzedLangs,
+          specifiedType: const FullType(BuiltMap, const [
+            const FullType(LangCode),
+            const FullType(BuiltList, const [const FullType(Ingredient)])
+          ])),
     ];
     Object? value;
     value = object.vegetarianStatus;
@@ -189,13 +189,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
               specifiedType: const FullType(BuiltMap,
                   const [const FullType(LangCode), const FullType(String)]))!);
           break;
-        case 'ingredientsAnalyzedLangs':
-          result.ingredientsAnalyzedLangs.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap, const [
-                const FullType(LangCode),
-                const FullType(BuiltList, const [const FullType(Ingredient)])
-              ]))!);
-          break;
         case 'imageFrontLangs':
           result.imageFrontLangs.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltMap,
@@ -210,6 +203,13 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.imageIngredientsLangs.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltMap,
                   const [const FullType(LangCode), const FullType(Uri)]))!);
+          break;
+        case 'ingredientsAnalyzedLangs':
+          result.ingredientsAnalyzedLangs.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltMap, const [
+                const FullType(LangCode),
+                const FullType(BuiltList, const [const FullType(Ingredient)])
+              ]))!);
           break;
       }
     }
@@ -246,13 +246,13 @@ class _$Product extends Product {
   @override
   final BuiltMap<LangCode, String> ingredientsTextLangs;
   @override
-  final BuiltMap<LangCode, BuiltList<Ingredient>> ingredientsAnalyzedLangs;
-  @override
   final BuiltMap<LangCode, Uri> imageFrontLangs;
   @override
   final BuiltMap<LangCode, Uri> imageFrontThumbLangs;
   @override
   final BuiltMap<LangCode, Uri> imageIngredientsLangs;
+  @override
+  final BuiltMap<LangCode, BuiltList<Ingredient>> ingredientsAnalyzedLangs;
 
   factory _$Product([void Function(ProductBuilder)? updates]) =>
       (new ProductBuilder()..update(updates)).build();
@@ -271,10 +271,10 @@ class _$Product extends Product {
       this.brands,
       required this.nameLangs,
       required this.ingredientsTextLangs,
-      required this.ingredientsAnalyzedLangs,
       required this.imageFrontLangs,
       required this.imageFrontThumbLangs,
-      required this.imageIngredientsLangs})
+      required this.imageIngredientsLangs,
+      required this.ingredientsAnalyzedLangs})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(barcode, 'Product', 'barcode');
     BuiltValueNullFieldError.checkNotNull(
@@ -283,13 +283,13 @@ class _$Product extends Product {
     BuiltValueNullFieldError.checkNotNull(
         ingredientsTextLangs, 'Product', 'ingredientsTextLangs');
     BuiltValueNullFieldError.checkNotNull(
-        ingredientsAnalyzedLangs, 'Product', 'ingredientsAnalyzedLangs');
-    BuiltValueNullFieldError.checkNotNull(
         imageFrontLangs, 'Product', 'imageFrontLangs');
     BuiltValueNullFieldError.checkNotNull(
         imageFrontThumbLangs, 'Product', 'imageFrontThumbLangs');
     BuiltValueNullFieldError.checkNotNull(
         imageIngredientsLangs, 'Product', 'imageIngredientsLangs');
+    BuiltValueNullFieldError.checkNotNull(
+        ingredientsAnalyzedLangs, 'Product', 'ingredientsAnalyzedLangs');
   }
 
   @override
@@ -318,10 +318,10 @@ class _$Product extends Product {
         brands == other.brands &&
         nameLangs == other.nameLangs &&
         ingredientsTextLangs == other.ingredientsTextLangs &&
-        ingredientsAnalyzedLangs == other.ingredientsAnalyzedLangs &&
         imageFrontLangs == other.imageFrontLangs &&
         imageFrontThumbLangs == other.imageFrontThumbLangs &&
-        imageIngredientsLangs == other.imageIngredientsLangs;
+        imageIngredientsLangs == other.imageIngredientsLangs &&
+        ingredientsAnalyzedLangs == other.ingredientsAnalyzedLangs;
   }
 
   @override
@@ -365,10 +365,10 @@ class _$Product extends Product {
                                 brands.hashCode),
                             nameLangs.hashCode),
                         ingredientsTextLangs.hashCode),
-                    ingredientsAnalyzedLangs.hashCode),
-                imageFrontLangs.hashCode),
-            imageFrontThumbLangs.hashCode),
-        imageIngredientsLangs.hashCode));
+                    imageFrontLangs.hashCode),
+                imageFrontThumbLangs.hashCode),
+            imageIngredientsLangs.hashCode),
+        ingredientsAnalyzedLangs.hashCode));
   }
 
   @override
@@ -389,10 +389,10 @@ class _$Product extends Product {
           ..add('brands', brands)
           ..add('nameLangs', nameLangs)
           ..add('ingredientsTextLangs', ingredientsTextLangs)
-          ..add('ingredientsAnalyzedLangs', ingredientsAnalyzedLangs)
           ..add('imageFrontLangs', imageFrontLangs)
           ..add('imageFrontThumbLangs', imageFrontThumbLangs)
-          ..add('imageIngredientsLangs', imageIngredientsLangs))
+          ..add('imageIngredientsLangs', imageIngredientsLangs)
+          ..add('ingredientsAnalyzedLangs', ingredientsAnalyzedLangs))
         .toString();
   }
 }
@@ -471,15 +471,6 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
           MapBuilder<LangCode, String>? ingredientsTextLangs) =>
       _$this._ingredientsTextLangs = ingredientsTextLangs;
 
-  MapBuilder<LangCode, BuiltList<Ingredient>>? _ingredientsAnalyzedLangs;
-  MapBuilder<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs =>
-      _$this._ingredientsAnalyzedLangs ??=
-          new MapBuilder<LangCode, BuiltList<Ingredient>>();
-  set ingredientsAnalyzedLangs(
-          MapBuilder<LangCode, BuiltList<Ingredient>>?
-              ingredientsAnalyzedLangs) =>
-      _$this._ingredientsAnalyzedLangs = ingredientsAnalyzedLangs;
-
   MapBuilder<LangCode, Uri>? _imageFrontLangs;
   MapBuilder<LangCode, Uri> get imageFrontLangs =>
       _$this._imageFrontLangs ??= new MapBuilder<LangCode, Uri>();
@@ -497,6 +488,15 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _$this._imageIngredientsLangs ??= new MapBuilder<LangCode, Uri>();
   set imageIngredientsLangs(MapBuilder<LangCode, Uri>? imageIngredientsLangs) =>
       _$this._imageIngredientsLangs = imageIngredientsLangs;
+
+  MapBuilder<LangCode, BuiltList<Ingredient>>? _ingredientsAnalyzedLangs;
+  MapBuilder<LangCode, BuiltList<Ingredient>> get ingredientsAnalyzedLangs =>
+      _$this._ingredientsAnalyzedLangs ??=
+          new MapBuilder<LangCode, BuiltList<Ingredient>>();
+  set ingredientsAnalyzedLangs(
+          MapBuilder<LangCode, BuiltList<Ingredient>>?
+              ingredientsAnalyzedLangs) =>
+      _$this._ingredientsAnalyzedLangs = ingredientsAnalyzedLangs;
 
   ProductBuilder();
 
@@ -516,10 +516,10 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _brands = $v.brands?.toBuilder();
       _nameLangs = $v.nameLangs.toBuilder();
       _ingredientsTextLangs = $v.ingredientsTextLangs.toBuilder();
-      _ingredientsAnalyzedLangs = $v.ingredientsAnalyzedLangs.toBuilder();
       _imageFrontLangs = $v.imageFrontLangs.toBuilder();
       _imageFrontThumbLangs = $v.imageFrontThumbLangs.toBuilder();
       _imageIngredientsLangs = $v.imageIngredientsLangs.toBuilder();
+      _ingredientsAnalyzedLangs = $v.ingredientsAnalyzedLangs.toBuilder();
       _$v = null;
     }
     return this;
@@ -557,10 +557,10 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               brands: _brands?.build(),
               nameLangs: nameLangs.build(),
               ingredientsTextLangs: ingredientsTextLangs.build(),
-              ingredientsAnalyzedLangs: ingredientsAnalyzedLangs.build(),
               imageFrontLangs: imageFrontLangs.build(),
               imageFrontThumbLangs: imageFrontThumbLangs.build(),
-              imageIngredientsLangs: imageIngredientsLangs.build());
+              imageIngredientsLangs: imageIngredientsLangs.build(),
+              ingredientsAnalyzedLangs: ingredientsAnalyzedLangs.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -572,14 +572,14 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
         nameLangs.build();
         _$failedField = 'ingredientsTextLangs';
         ingredientsTextLangs.build();
-        _$failedField = 'ingredientsAnalyzedLangs';
-        ingredientsAnalyzedLangs.build();
         _$failedField = 'imageFrontLangs';
         imageFrontLangs.build();
         _$failedField = 'imageFrontThumbLangs';
         imageFrontThumbLangs.build();
         _$failedField = 'imageIngredientsLangs';
         imageIngredientsLangs.build();
+        _$failedField = 'ingredientsAnalyzedLangs';
+        ingredientsAnalyzedLangs.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Product', _$failedField, e.toString());

@@ -64,8 +64,8 @@ class MockManualUserLangsManager extends _i1.Mock
           as _i4.Future<List<_i5.LangCode>?>);
   @override
   _i4.Future<_i2.Result<_i2.None, _i8.UserLangsManagerError>> setUserLangs(
-          List<_i5.LangCode>? value) =>
-      (super.noSuchMethod(Invocation.method(#setUserLangs, [value]),
+          List<_i5.LangCode>? langs) =>
+      (super.noSuchMethod(Invocation.method(#setUserLangs, [langs]),
               returnValue:
                   Future<_i2.Result<_i2.None, _i8.UserLangsManagerError>>.value(
                       _FakeResult<_i2.None, _i8.UserLangsManagerError>()))

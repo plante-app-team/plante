@@ -42,11 +42,11 @@ class ProductsManager {
   final OffApi _off;
   final Backend _backend;
   final TakenProductsImagesStorage _takenProductsImagesTable;
-  final ProductsConverter _productsConverter;
+  final ProductsConverterAndCacher _productsConverter;
 
   ProductsManager(this._off, this._backend, this._takenProductsImagesTable,
       Analytics analytics)
-      : _productsConverter = ProductsConverter(analytics);
+      : _productsConverter = ProductsConverterAndCacher(analytics);
 
   Future<Result<Product?, ProductsManagerError>> getProduct(
       String barcodeRaw, List<LangCode> langsPrioritized) async {
@@ -96,7 +96,7 @@ class ProductsManager {
       backendProduct = backendProductResult.unwrap();
     }
 
-    final result = _productsConverter.convert(
+    final result = _productsConverter.convertAndCache(
         offProduct, backendProduct, langsPrioritized);
     return Ok(result);
   }
@@ -140,9 +140,14 @@ class ProductsManager {
 
     // Backend
 
+    final originalProduct = getResult.unwrap();
+    final changedLangs = _langsDiff(
+        product, _productsConverter.getCached(originalProduct?.barcode ?? ''));
+
     final backendResult = await _backend.createUpdateProduct(product.barcode,
         vegetarianStatus: product.vegetarianStatus,
-        veganStatus: product.veganStatus);
+        veganStatus: product.veganStatus,
+        changedLangs: changedLangs);
     if (backendResult.isErr) {
       return _convertBackendError(backendResult);
     }
@@ -157,6 +162,38 @@ class ProductsManager {
     } else {
       return Ok(result.unwrap()!);
     }
+  }
+
+  List<LangCode> _langsDiff(Product? lhs, Product? rhs) {
+    if (lhs == null && rhs != null) {
+      return rhs.langsPrioritized.toList();
+    } else if (lhs != null && rhs == null) {
+      return lhs.langsPrioritized.toList();
+    } else if (lhs == null && rhs == null) {
+      return [];
+    }
+    final langs = <LangCode>{};
+    langs.addAll(lhs!.langsPrioritized);
+    langs.addAll(rhs!.langsPrioritized);
+    final diff = <LangCode>{};
+    for (final lang in langs) {
+      if (lhs.nameLangs[lang] != rhs.nameLangs[lang]) {
+        diff.add(lang);
+      }
+      if (lhs.ingredientsTextLangs[lang] != rhs.ingredientsTextLangs[lang]) {
+        diff.add(lang);
+      }
+      if (lhs.imageFrontLangs[lang] != rhs.imageFrontLangs[lang]) {
+        diff.add(lang);
+      }
+      if (lhs.imageFrontThumbLangs[lang] != rhs.imageFrontThumbLangs[lang]) {
+        diff.add(lang);
+      }
+      if (lhs.imageIngredientsLangs[lang] != rhs.imageIngredientsLangs[lang]) {
+        diff.add(lang);
+      }
+    }
+    return diff.toList();
   }
 
   Future<Result<None, ProductsManagerError>> _uploadImages(

@@ -46,23 +46,23 @@ Serializers _$_serializers = (new Serializers().toBuilder()
               const [const FullType(LangCode), const FullType(String)]),
           () => new MapBuilder<LangCode, String>())
       ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
+          () => new MapBuilder<LangCode, Uri>())
+      ..addBuilderFactory(
           const FullType(BuiltMap, const [
             const FullType(LangCode),
             const FullType(BuiltList, const [const FullType(Ingredient)])
           ]),
           () => new MapBuilder<LangCode, BuiltList<Ingredient>>())
-      ..addBuilderFactory(
-          const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
-          () => new MapBuilder<LangCode, Uri>())
-      ..addBuilderFactory(
-          const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
-          () => new MapBuilder<LangCode, Uri>())
-      ..addBuilderFactory(
-          const FullType(
-              BuiltMap, const [const FullType(LangCode), const FullType(Uri)]),
-          () => new MapBuilder<LangCode, Uri>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

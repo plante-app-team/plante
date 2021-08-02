@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:mockito/mockito.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:test/test.dart';
@@ -355,7 +356,9 @@ void main() {
         .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive, veganStatus: VegStatus.negative);
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative,
+        changedLangs: [LangCode.en, LangCode.ru]);
     expect(result.isOk, isTrue);
 
     final requests =
@@ -366,6 +369,7 @@ void main() {
         equals(VegStatus.positive.name));
     expect(request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
+    expect(request.url.toString().contains('langs=en&langs=ru'), isTrue);
     expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
@@ -408,6 +412,31 @@ void main() {
     expect(request.url.queryParameters['vegetarianStatus'], isNull);
     expect(request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
+    expect(request.headers['Authorization'], equals('Bearer aaa'));
+  });
+
+  test('create update product without langs', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient
+        .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
+
+    final result = await backend.createUpdateProduct('123',
+        vegetarianStatus: VegStatus.positive,
+        veganStatus: VegStatus.negative,
+        changedLangs: []);
+    expect(result.isOk, isTrue);
+
+    final requests =
+        httpClient.getRequestsMatching('.*create_update_product.*');
+    expect(requests.length, equals(1));
+    final request = requests[0];
+    expect(request.url.queryParameters['vegetarianStatus'],
+        equals(VegStatus.positive.name));
+    expect(request.url.queryParameters['veganStatus'],
+        equals(VegStatus.negative.name));
+    expect(request.url.toString().contains('langs'), isFalse);
     expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
