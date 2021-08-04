@@ -8,11 +8,13 @@ import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/manual_user_langs_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:test/test.dart';
 import 'package:trotter/trotter.dart';
 
+import '../common_mocks.mocks.dart';
 import 'user_langs_manager_test.mocks.dart';
 
 @GenerateMocks([LocationBasedUserLangsManager, ManualUserLangsManager])
@@ -279,5 +281,39 @@ void main() {
       ..auto = false);
     expect(
         await userLangsManager.getUserLangs(), equals(expectedStoredUserLangs));
+  });
+
+  test('observer user langs change notifications', () async {
+    await finishSetUp(
+      locationBasedLangs: [LangCode.en, LangCode.nl],
+      manualLangs: [LangCode.en, LangCode.nl],
+      sysLangStr: LangCode.en.name,
+    );
+
+    final observer = MockUserLangsManagerObserver();
+    userLangsManager.addObserver(observer);
+    verifyZeroInteractions(observer);
+
+    // Ok scenario
+    when(manualUserLangsManager.setUserLangs(any)).thenAnswer((invc) async {
+      final langs = invc.positionalArguments[0] as List<LangCode>;
+      when(manualUserLangsManager.getUserLangs())
+          .thenAnswer((_) async => langs);
+      return Ok(None());
+    });
+    await userLangsManager.setManualUserLangs([LangCode.en, LangCode.be]);
+    verify(observer.onUserLangsChange(UserLangs((e) => e
+      ..langs.addAll([LangCode.en, LangCode.be])
+      ..sysLang = LangCode.en
+      ..auto = false)));
+
+    clearInteractions(observer);
+
+    // Error scenario
+    when(manualUserLangsManager.setUserLangs(any)).thenAnswer((invc) async {
+      return Err(UserLangsManagerError.NETWORK);
+    });
+    await userLangsManager.setManualUserLangs([LangCode.de, LangCode.en]);
+    verifyZeroInteractions(observer);
   });
 }

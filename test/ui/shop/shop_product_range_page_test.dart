@@ -39,10 +39,10 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
+import '../../fake_user_langs_manager.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 
@@ -129,7 +129,7 @@ void main() {
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
-        mockUserLangsManagerWith([LangCode.en]));
+        FakeUserLangsManager([LangCode.en]));
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 

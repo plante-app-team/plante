@@ -8,11 +8,11 @@ import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/l10n/strings.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
@@ -24,7 +24,16 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());
-    userLangsManager = mockUserLangsManagerWith([LangCode.en]);
+
+    userLangsManager = MockUserLangsManager();
+    when(userLangsManager.getUserLangs())
+        .thenAnswer((_) async => UserLangs((e) => e
+          ..auto = true
+          ..sysLang = LangCode.en
+          ..langs.add(LangCode.en)));
+    when(userLangsManager.setManualUserLangs(any)).thenAnswer((invc) async {
+      return Ok(None());
+    });
     GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
   });
 

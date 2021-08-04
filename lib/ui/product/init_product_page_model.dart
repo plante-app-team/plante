@@ -172,6 +172,10 @@ class InitProductPageModel {
         _shopsRestorable = ShopsListRestorable(_initialShops) {
     _userLangsManager.getUserLangs().then((value) {
       _userLangs = value.langs.toList();
+      if (productSlice == ProductLangSlice.empty) {
+        productSlice = initialProduct.sliceFor(
+            _inputProductsLangStorage.selectedCode ?? _userLangs!.first);
+      }
       _onProductUpdate.call();
     });
   }

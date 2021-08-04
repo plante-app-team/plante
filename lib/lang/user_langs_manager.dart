@@ -16,10 +16,16 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 
+abstract class UserLangsManagerObserver {
+  void onUserLangsChange(UserLangs userLangs);
+}
+
 class UserLangsManager {
   final SysLangCodeHolder _sysLangCodeHolder;
   final LocationBasedUserLangsManager _locationUserLangsManager;
   final ManualUserLangsManager _manualUserLangsManager;
+
+  final _observers = <UserLangsManagerObserver>[];
 
   final _initCompleter = Completer<void>();
   Future<void> get initFuture => _initCompleter.future;
@@ -58,6 +64,12 @@ class UserLangsManager {
     _initCompleter.complete();
   }
 
+  void addObserver(UserLangsManagerObserver observer) =>
+      _observers.add(observer);
+
+  void removeObserver(UserLangsManagerObserver observer) =>
+      _observers.remove(observer);
+
   /// At least 1 language is guaranteed.
   Future<UserLangs> getUserLangs() async {
     await initFuture.timeout(const Duration(seconds: 5));
@@ -95,6 +107,13 @@ class UserLangsManager {
 
   Future<Result<None, UserLangsManagerError>> setManualUserLangs(
       List<LangCode> userLangs) async {
-    return await _manualUserLangsManager.setUserLangs(userLangs);
+    final result = await _manualUserLangsManager.setUserLangs(userLangs);
+    if (result.isOk) {
+      final userLangs = await getUserLangs();
+      _observers.forEach((o) {
+        o.onUserLangsChange(userLangs);
+      });
+    }
+    return result;
   }
 }

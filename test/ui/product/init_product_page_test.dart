@@ -35,11 +35,11 @@ import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 import '../../fake_input_products_lang_storage.dart';
 import '../../fake_shared_preferences.dart';
+import '../../fake_user_langs_manager.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 
@@ -120,8 +120,8 @@ void main() {
     GetIt.I
         .registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
 
-    GetIt.I.registerSingleton<UserLangsManager>(
-        mockUserLangsManagerWith(_USER_LANGS));
+    GetIt.I
+        .registerSingleton<UserLangsManager>(FakeUserLangsManager(_USER_LANGS));
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -1528,5 +1528,13 @@ void main() {
         expect(find.text(langCode.localize(context)), findsNothing);
       }
     }
+  });
+
+  testWidgets('No crashes when no selected language',
+      (WidgetTester tester) async {
+    inputProductsLangStorage.selectedCode = null;
+    await tester.superPump(InitProductPage(Product((v) => v.barcode = '123')));
+    await tester.pumpAndSettle();
+    expect(find.byType(InitProductPage), findsOneWidget);
   });
 }

@@ -832,6 +832,14 @@ class MockUserLangsManager extends _i1.Mock implements _i61.UserLangsManager {
       (super.noSuchMethod(Invocation.getter(#initFuture),
           returnValue: Future<void>.value()) as _i11.Future<void>);
   @override
+  void addObserver(_i61.UserLangsManagerObserver? observer) =>
+      super.noSuchMethod(Invocation.method(#addObserver, [observer]),
+          returnValueForMissingStub: null);
+  @override
+  void removeObserver(_i61.UserLangsManagerObserver? observer) =>
+      super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
+          returnValueForMissingStub: null);
+  @override
   _i11.Future<_i9.UserLangs> getUserLangs() =>
       (super.noSuchMethod(Invocation.method(#getUserLangs, []),
               returnValue: Future<_i9.UserLangs>.value(_FakeUserLangs()))
@@ -844,6 +852,21 @@ class MockUserLangsManager extends _i1.Mock implements _i61.UserLangsManager {
               Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>.value(
                   _FakeResult<_i2.None, _i62.UserLangsManagerError>())) as _i11
           .Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>);
+}
+
+/// A class which mocks [UserLangsManagerObserver].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUserLangsManagerObserver extends _i1.Mock
+    implements _i61.UserLangsManagerObserver {
+  MockUserLangsManagerObserver() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  void onUserLangsChange(_i9.UserLangs? userLangs) =>
+      super.noSuchMethod(Invocation.method(#onUserLangsChange, [userLangs]),
+          returnValueForMissingStub: null);
 }
 
 /// A class which mocks [UserParamsController].

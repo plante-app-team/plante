@@ -15,7 +15,9 @@ part 'product_lang_slice.g.dart';
 /// Slice of a [Product] object for a specific language.
 abstract class ProductLangSlice
     implements Built<ProductLangSlice, ProductLangSliceBuilder> {
-  static final ProductLangSlice empty = ProductLangSlice((e) => e.barcode = '');
+  static final ProductLangSlice empty = ProductLangSlice((e) => e
+    ..barcode = ''
+    ..lang = LangCode.en);
 
   LangCode? get lang;
   String get barcode;
