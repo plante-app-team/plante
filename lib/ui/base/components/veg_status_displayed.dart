@@ -81,7 +81,7 @@ class VegStatusDisplayed extends StatelessWidget {
       result = product.vegetarianStatusSource ?? VegStatusSource.unknown;
     }
     if (result == VegStatusSource.unknown) {
-      Log.e(
+      Log.w(
           'Unknown veg status source for barcode ${product.barcode}, $product');
     }
     return result;
