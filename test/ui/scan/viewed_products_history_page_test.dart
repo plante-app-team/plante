@@ -32,7 +32,8 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<Backend>(MockBackend());
-    GetIt.I.registerSingleton<UserLangsManager>(FakeUserLangsManager([LangCode.en]));
+    GetIt.I.registerSingleton<UserLangsManager>(
+        FakeUserLangsManager([LangCode.en]));
 
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));

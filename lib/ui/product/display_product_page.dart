@@ -114,25 +114,25 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                 !ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
                     _product, _userLangs!))
               Container(
-                  color: const Color(0xfff5f7fa),
-                  padding: const EdgeInsets.only(
-                      left: 24, right: 24, top: 16, bottom: 12),
-                  child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
+                color: const Color(0xfff5f7fa),
+                padding: const EdgeInsets.only(
+                    left: 24, right: 24, top: 16, bottom: 12),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          context.strings
+                              .display_product_page_no_info_in_your_langs,
+                          style: TextStyles.smallBoldGreen),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                          width: double.infinity,
+                          child: ButtonFilledPlante.withText(
                               context.strings
-                                  .display_product_page_no_info_in_your_langs,
-                              style: TextStyles.smallBoldGreen),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                              width: double.infinity,
-                              child: ButtonFilledPlante.withText(
-                                  context.strings
-                                      .display_product_page_add_info_in_your_langs,
-                                  onPressed: _onAddProductInfoClick))
-                        ]),
-                  ),
+                                  .display_product_page_add_info_in_your_langs,
+                              onPressed: _onAddProductInfoClick))
+                    ]),
+              ),
             Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: Column(children: [
