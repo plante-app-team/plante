@@ -13,6 +13,7 @@ import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 typedef ProductUpdatedCallback = dynamic Function(Product updatedProduct);
@@ -34,6 +35,12 @@ abstract class BarcodeScanPageContentState {
       UserParams beholder,
       ProductUpdatedCallback callback,
       VoidCallback cancelCallback) = BarcodeScanPageContentStateProductFound;
+  factory BarcodeScanPageContentState.productFoundInOtherLangs(
+          Product product,
+          UserParams beholder,
+          ProductUpdatedCallback callback,
+          VoidCallback cancelCallback) =
+      BarcodeScanPageContentStateProductFoundInForeignLangs;
   factory BarcodeScanPageContentState.productNotFound(
       Product product,
       Shop? shopToAddTo,
@@ -95,6 +102,16 @@ abstract class BarcodeScanPageContentAbstractStateWithProduct
         shopToAddTo: shopToAddTo,
         productUpdatedCallback: productUpdatedCallback);
   }
+
+  void openProductPageToAddInfo(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => InitProductPage(productWithUnknownState,
+              key: const Key('init_product_page'),
+              productUpdatedCallback: productUpdatedCallback)),
+    );
+  }
 }
 
 class BarcodeScanPageContentStateProductFound
@@ -120,6 +137,47 @@ class BarcodeScanPageContentStateProductFound
             onTap: () {
               tryOpenProductPage(context);
             }));
+  }
+}
+
+class BarcodeScanPageContentStateProductFoundInForeignLangs
+    extends BarcodeScanPageContentAbstractStateWithProduct {
+  final Product product;
+  final UserParams beholder;
+  final VoidCallback cancelCallback;
+  BarcodeScanPageContentStateProductFoundInForeignLangs(this.product,
+      this.beholder, ProductUpdatedCallback callback, this.cancelCallback)
+      : super(callback);
+  @override
+  String get id => 'product_found_in_foreign_langs';
+  @override
+  Product get productWithUnknownState => product;
+
+  @override
+  Widget buildWidget(BuildContext context) {
+    return _CardContainer(
+        cancelCallback: cancelCallback,
+        child: ProductCard(
+            product: product,
+            beholder: beholder,
+            onTap: () {
+              tryOpenProductPage(context);
+            },
+            extraContentMiddle: Column(children: [
+              const SizedBox(height: 8),
+              Text(context.strings.barcode_scan_page_no_info_in_your_langs,
+                  style: TextStyles.smallBoldGreen),
+            ]),
+            extraContentBottom: Column(children: [
+              const SizedBox(height: 12),
+              SizedBox(
+                  width: double.infinity,
+                  child: ButtonFilledPlante.withText(
+                      context.strings.barcode_scan_page_add_info_in_your_langs,
+                      onPressed: () {
+                    openProductPageToAddInfo(context);
+                  }))
+            ])));
   }
 }
 

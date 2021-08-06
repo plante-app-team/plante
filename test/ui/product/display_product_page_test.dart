@@ -31,6 +31,7 @@ import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
@@ -39,6 +40,8 @@ import '../../fake_shared_preferences.dart';
 import '../../fake_user_langs_manager.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
+
+const _DEFAULT_LANG = LangCode.en;
 
 void main() {
   late MockProductsManager productsManager;
@@ -129,6 +132,7 @@ void main() {
 
   testWidgets('product is displayed', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
@@ -145,7 +149,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -185,13 +189,14 @@ void main() {
   testWidgets('same product for vegan and vegetarian',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.unknown
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -239,13 +244,14 @@ void main() {
   testWidgets('veg-statuses help button not displayed when sources are not OFF',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -257,6 +263,7 @@ void main() {
   testWidgets('veg-statuses help button behaviour',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -265,7 +272,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -312,13 +319,14 @@ void main() {
 
   testWidgets('send report', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -342,13 +350,14 @@ void main() {
   testWidgets('viewed product is stored persistently',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
       ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     expect(viewedProductsStorage.getProducts(), equals([]));
     await tester.superPump(DisplayProductPage(product));
@@ -357,6 +366,7 @@ void main() {
 
   testWidgets('click on photo opens photo screen', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
@@ -373,7 +383,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
 
@@ -392,6 +402,7 @@ void main() {
   testWidgets('click on ingredients opens photo screen',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
@@ -408,7 +419,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -427,6 +438,7 @@ void main() {
 
   testWidgets('veg status hint - positive', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.positive
@@ -443,7 +455,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -456,6 +468,7 @@ void main() {
 
   testWidgets('veg status hint - negative', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.negative
@@ -472,7 +485,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
 
@@ -481,6 +494,7 @@ void main() {
 
   testWidgets('veg status hint - possible', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
@@ -497,7 +511,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -510,6 +524,7 @@ void main() {
 
   testWidgets('veg status hint - unknown', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.unknown
@@ -526,7 +541,7 @@ void main() {
           ..name = 'ingredient2'
           ..vegetarianStatus = null
           ..veganStatus = null),
-      ])).productForTests();
+      ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -539,13 +554,14 @@ void main() {
 
   testWidgets('mark on map button', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.unknown
       ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.unknown
       ..veganStatusSource = VegStatusSource.moderator
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
 
@@ -560,6 +576,7 @@ void main() {
   testWidgets('ingredients text displayed when present',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -568,7 +585,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
     expect(find.byKey(const Key('product_ingredients_text')), findsOneWidget);
@@ -579,6 +596,7 @@ void main() {
   testWidgets('ingredients photo displayed when there is no ingredients text',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -587,7 +605,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = null).productForTests();
+      ..ingredientsText = null).buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
     expect(find.byKey(const Key('product_ingredients_text')), findsNothing);
@@ -598,6 +616,7 @@ void main() {
   testWidgets('click on ingredients photo opens photo screen',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -606,7 +625,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = null).productForTests();
+      ..ingredientsText = null).buildSingleLangProduct();
 
     await tester.superPump(DisplayProductPage(product));
     expect(find.byKey(const Key('product_ingredients_text')), findsNothing);
@@ -628,6 +647,7 @@ void main() {
   testWidgets('veg-statuses help button analytics',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -636,7 +656,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -653,6 +673,7 @@ void main() {
   testWidgets('vegan status moderator reasoning and sources are shown on click',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -666,7 +687,7 @@ void main() {
       ..moderatorVegetarianSourcesText = 'vegetarian source'
       ..moderatorVeganChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
-      ..moderatorVeganSourcesText = 'vegan source').productForTests();
+      ..moderatorVeganSourcesText = 'vegan source').buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -716,6 +737,7 @@ void main() {
       'vegetarian status moderator reasoning and sources are shown on click',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -729,7 +751,7 @@ void main() {
       ..moderatorVegetarianSourcesText = 'vegetarian source'
       ..moderatorVeganChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
-      ..moderatorVeganSourcesText = 'vegan source').productForTests();
+      ..moderatorVeganSourcesText = 'vegan source').buildSingleLangProduct();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -779,6 +801,7 @@ void main() {
   testWidgets('vegan status moderator reasoning without sources',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -792,7 +815,7 @@ void main() {
       ..moderatorVegetarianSourcesText = 'vegetarian source'
       ..moderatorVeganChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
-      ..moderatorVeganSourcesText = null).productForTests();
+      ..moderatorVeganSourcesText = null).buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -829,6 +852,7 @@ void main() {
   testWidgets('vegetarian status moderator reasoning without sources',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -842,7 +866,7 @@ void main() {
       ..moderatorVegetarianSourcesText = null
       ..moderatorVeganChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
-      ..moderatorVeganSourcesText = 'vegan source').productForTests();
+      ..moderatorVeganSourcesText = 'vegan source').buildSingleLangProduct();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -881,6 +905,7 @@ void main() {
       'vegan status moderator reasoning NOT shown on click '
       'when veg-source is not moderator', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -892,7 +917,7 @@ void main() {
       ..moderatorVegetarianChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -917,6 +942,7 @@ void main() {
       'vegetarian status moderator reasoning NOT shown on click when veg-source is not moderator',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -928,7 +954,7 @@ void main() {
       ..moderatorVegetarianChoiceReasonId =
           ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
       ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -954,6 +980,7 @@ void main() {
       'vegan status moderator reasoning NOT shown on click when it does not exist',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -963,7 +990,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..moderatorVegetarianChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -988,6 +1015,7 @@ void main() {
       'vegetarian status moderator reasoning NOT shown on click when it does not exist',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -997,7 +1025,7 @@ void main() {
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).productForTests();
+          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
     final vegetarian = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -1017,5 +1045,57 @@ void main() {
         find.text(context
             .strings.display_product_page_moderator_comment_dialog_title),
         findsNothing);
+  });
+
+  Future<void> knownLanguagesTest(WidgetTester tester,
+      {required LangCode productLang,
+      required bool expectedFullyFilled}) async {
+    final buildProductWith = (LangCode lang) {
+      return ProductLangSlice((v) => v
+            ..lang = lang
+            ..barcode = '123'
+            ..name = 'My product'
+            ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+            ..imageIngredients =
+                Uri.file(File('./test/assets/img.jpg').absolute.path)
+            ..vegetarianStatus = VegStatus.negative
+            ..vegetarianStatusSource = VegStatusSource.moderator
+            ..veganStatus = VegStatus.negative
+            ..veganStatusSource = VegStatusSource.moderator)
+          .buildSingleLangProduct();
+    };
+
+    final product = buildProductWith.call(productLang);
+    final context = await tester.superPump(DisplayProductPage(product));
+    await tester.pumpAndSettle();
+
+    if (expectedFullyFilled) {
+      expect(
+          find.text(context.strings.display_product_page_no_info_in_your_langs),
+          findsNothing);
+    } else {
+      expect(
+          find.text(context.strings.display_product_page_no_info_in_your_langs),
+          findsOneWidget);
+
+      expect(find.byType(InitProductPage), findsNothing);
+      await tester.tap(find
+          .text(context.strings.display_product_page_add_info_in_your_langs));
+      await tester.pumpAndSettle();
+      expect(find.byType(InitProductPage), findsOneWidget);
+    }
+  }
+
+  testWidgets('product with all known to user langs',
+      (WidgetTester tester) async {
+    await knownLanguagesTest(tester,
+        productLang: _DEFAULT_LANG, expectedFullyFilled: true);
+  });
+
+  testWidgets('product without all known to user langs',
+      (WidgetTester tester) async {
+    expect(_DEFAULT_LANG, isNot(equals(LangCode.nl)));
+    await knownLanguagesTest(tester,
+        productLang: LangCode.nl, expectedFullyFilled: false);
   });
 }

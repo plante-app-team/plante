@@ -32,6 +32,11 @@ abstract class Product implements Built<Product, ProductBuilder> {
 
   /// Service field to implement single-lang getters
   /// (in [ProductLangsMechanicsExtension]).
+  ///
+  /// **NOTE** that even if a language is not within the [langsPrioritized] field
+  /// that doesn't mean that there are no values for the language!
+  /// See `ProductPageWrapper.isProductFilledEnoughForDisplayInLangs` and its
+  /// usages to understand what it means.
   BuiltList<LangCode> get langsPrioritized;
 
   LangCode get mainLang => langsPrioritized.first;
@@ -39,8 +44,10 @@ abstract class Product implements Built<Product, ProductBuilder> {
   /// We consider brands to be not translatable.
   BuiltList<String>? get brands;
 
-  // Please consider modifying ProductsManager._langsDiff if
-  // a new langs field is added.
+  // If new langs fields are added please consider modifying:
+  // - lang-related tests in product_test.dart
+  // - ProductsManager._langsDiff
+  // - ProductPageWrapper.isProductFilledEnoughForDisplayInLangs
   BuiltMap<LangCode, String> get nameLangs;
   BuiltMap<LangCode, String> get ingredientsTextLangs;
   BuiltMap<LangCode, Uri> get imageFrontLangs;
@@ -74,11 +81,19 @@ extension ProductLangsMechanicsExtension on Product {
   Uri? get imageIngredients => _getPrioritized(imageIngredientsLangs);
 
   T? _getPrioritized<T>(BuiltMap<LangCode, T> map) {
-    for (final lang in langsPrioritized) {
+    // Add prioritized langs...
+    final langs = langsPrioritized.toList();
+    // ...and the rest of the langs
+    langs.addAll(map.keys);
+    for (final lang in langs) {
       final value = map[lang];
-      if (value != null) {
-        return value;
+      if (value == null) {
+        continue;
       }
+      if (value is String && value.trim().isEmpty) {
+        continue;
+      }
+      return value;
     }
     return null;
   }
@@ -167,23 +182,31 @@ extension ProductImageExtensions on Product {
   bool isImageRemote(ProductImageType imageType, LangCode lang) =>
       _isImageRemote(imageUri(imageType, lang));
 
-  Uri? imageUri(ProductImageType imageType, LangCode lang) {
+  BuiltMap<LangCode, Uri> _imagesMap(ProductImageType imageType) {
     switch (imageType) {
       case ProductImageType.FRONT:
-        return imageFrontLangs[lang];
+        return imageFrontLangs;
       case ProductImageType.INGREDIENTS:
-        return imageIngredientsLangs[lang];
+        return imageIngredientsLangs;
       case ProductImageType.FRONT_THUMB:
-        return imageFrontThumbLangs[lang];
+        return imageFrontThumbLangs;
       default:
         throw Exception('Unhandled item: $imageType');
     }
   }
 
+  Uri? imageUri(ProductImageType imageType, LangCode lang) =>
+      _imagesMap(imageType)[lang];
+
   /// First image among images for all langs
   Uri? firstImageUri(ProductImageType imageType) {
-    for (final lang in langsPrioritized) {
-      final uri = imageUri(imageType, lang);
+    final images = _imagesMap(imageType);
+    // Add prioritized langs...
+    final langs = langsPrioritized.toList();
+    // ...and the rest of the langs
+    langs.addAll(images.keys);
+    for (final lang in langs) {
+      final uri = images[lang];
       if (uri != null) {
         return uri;
       }

@@ -199,6 +199,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     final cardExtraContent = Padding(
         padding: const EdgeInsets.only(left: 6, right: 6, bottom: 6),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const SizedBox(height: 18),
           Text(
               context
                   .strings.shop_product_range_page_have_you_seen_product_here,
@@ -234,7 +235,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               hint:
                   '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr',
               beholder: _model.user,
-              extraContent: _votedProducts.contains(product.barcode)
+              extraContentBottom: _votedProducts.contains(product.barcode)
                   ? null
                   : cardExtraContent,
               onTap: () {

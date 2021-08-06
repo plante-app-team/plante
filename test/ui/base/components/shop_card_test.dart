@@ -4,8 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/gender.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
@@ -28,6 +30,7 @@ import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../fake_analytics.dart';
+import '../../../fake_user_langs_manager.dart';
 import '../../../fake_user_params_controller.dart';
 import '../../../widget_tester_extension.dart';
 
@@ -93,6 +96,8 @@ void main() {
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
+    GetIt.I.registerSingleton<UserLangsManager>(
+        FakeUserLangsManager([LangCode.en]));
   });
 
   testWidgets('card for range: card for empty shop',

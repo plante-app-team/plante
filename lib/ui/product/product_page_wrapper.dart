@@ -1,6 +1,8 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/product/display_product_page.dart';
@@ -92,4 +94,36 @@ class ProductPageWrapper {
       product.veganStatus != null &&
       product.imageFront != null &&
       product.imageIngredients != null;
+
+  static bool isProductFilledEnoughForDisplayInLangs(
+      Product product, List<LangCode> langs) {
+    if (!isProductFilledEnoughForDisplay(product)) {
+      return false;
+    }
+    if (!_langsOverlap(product.nameLangs, langs)) {
+      return false;
+    }
+    if (!_langsOverlap(product.imageFrontLangs, langs)) {
+      return false;
+    }
+    if (!_langsOverlap(product.imageIngredientsLangs, langs)) {
+      return false;
+    }
+    return true;
+  }
+
+  static bool _langsOverlap<T>(
+      BuiltMap<LangCode, T> map, List<LangCode> langs) {
+    for (final langVal in map.entries) {
+      if (!langs.contains(langVal.key)) {
+        continue;
+      }
+      final value = langVal.value;
+      if (value is String && value.trim().isEmpty) {
+        continue;
+      }
+      return true;
+    }
+    return false;
+  }
 }

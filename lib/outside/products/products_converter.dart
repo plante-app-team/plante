@@ -36,18 +36,18 @@ class ProductsConverterAndCacher {
       ..moderatorVeganChoiceReasonId =
           backendProduct?.moderatorVeganChoiceReason
       ..moderatorVeganSourcesText = backendProduct?.moderatorVeganSourcesText
+      ..brands.addAll(offProduct.brandsTags ?? [])
       ..nameLangs =
           _castOffLangs(offProduct.productNameInLanguages, _convertOffStr)
-      ..brands.addAll(offProduct.brandsTags ?? [])
       ..ingredientsTextLangs =
           _castOffLangs(offProduct.ingredientsTextInLanguages, _convertOffStr)
-      ..ingredientsAnalyzedLangs = _extractIngredientsAnalyzed(offProduct)
-      ..imageFrontLangs = _extractImagesUris(offProduct, off.ImageField.FRONT,
-          off.ImageSize.DISPLAY, langsPrioritized)
-      ..imageFrontThumbLangs = _extractImagesUris(offProduct,
-          off.ImageField.FRONT, off.ImageSize.SMALL, langsPrioritized)
-      ..imageIngredientsLangs = _extractImagesUris(offProduct,
-          off.ImageField.INGREDIENTS, off.ImageSize.DISPLAY, langsPrioritized));
+      ..imageFrontLangs = _extractImagesUris(
+          offProduct, off.ImageField.FRONT, off.ImageSize.DISPLAY)
+      ..imageFrontThumbLangs = _extractImagesUris(
+          offProduct, off.ImageField.FRONT, off.ImageSize.SMALL)
+      ..imageIngredientsLangs = _extractImagesUris(
+          offProduct, off.ImageField.INGREDIENTS, off.ImageSize.DISPLAY)
+      ..ingredientsAnalyzedLangs = _extractIngredientsAnalyzed(offProduct));
 
     if (backendProduct?.vegetarianStatus != null) {
       final vegetarianStatus =
@@ -122,34 +122,25 @@ class ProductsConverterAndCacher {
     return offStr;
   }
 
-  MapBuilder<LangCode, Uri> _extractImagesUris(off.Product offProduct,
-      off.ImageField imageType, off.ImageSize size, List<LangCode> langs) {
+  MapBuilder<LangCode, Uri> _extractImagesUris(
+      off.Product offProduct, off.ImageField imageType, off.ImageSize size) {
     final result = MapBuilder<LangCode, Uri>();
-    for (final lang in langs) {
-      final image = _extractImageUri(offProduct, imageType, size, lang.name);
-      if (image != null) {
-        result[lang] = image;
-      }
-    }
-    return result;
-  }
 
-  Uri? _extractImageUri(off.Product offProduct, off.ImageField imageType,
-      off.ImageSize size, String langCode) {
     final images = offProduct.selectedImages;
     if (images == null) {
-      return null;
+      return result;
     }
-    final lang = off.LanguageHelper.fromJson(langCode);
     for (final image in images) {
-      if (image.language != lang || image.url == null) {
+      final lang = LangCode.safeValueOf(image.language?.code ?? '');
+      if (lang == null || image.url == null) {
         continue;
       }
       if (imageType == image.field && size == image.size) {
-        return Uri.parse(image.url!);
+        result[lang] = Uri.parse(image.url!);
       }
     }
-    return null;
+
+    return result;
   }
 
   MapBuilder<LangCode, BuiltList<Ingredient>> _extractIngredientsAnalyzed(

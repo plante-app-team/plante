@@ -41,6 +41,8 @@ import '../../fake_user_langs_manager.dart';
 import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
 
+const _DEFAULT_LANG = LangCode.en;
+
 void main() {
   late MockProductsManager productsManager;
   late MockProductsObtainer productsObtainer;
@@ -81,7 +83,7 @@ void main() {
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
+        FakeUserLangsManager([_DEFAULT_LANG]));
 
     when(photosTaker.retrieveLostPhoto())
         .thenAnswer((realInvocation) async => null);
@@ -110,6 +112,7 @@ void main() {
   testWidgets('product found', (WidgetTester tester) async {
     when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
         ProductLangSlice((e) => e
+              ..lang = _DEFAULT_LANG
               ..barcode = invc.positionalArguments[0] as String
               ..name = 'Product name'
               ..imageFront = Uri.file('/tmp/asd')
@@ -119,10 +122,10 @@ void main() {
               ..vegetarianStatus = VegStatus.positive
               ..veganStatusSource = VegStatusSource.community
               ..vegetarianStatusSource = VegStatusSource.community)
-            .productForTests()));
+            .buildSingleLangProduct()));
 
     final widget = BarcodeScanPage();
-    await tester.superPump(widget);
+    final context = await tester.superPump(widget);
 
     expect(find.text('Product name'), findsNothing);
 
@@ -130,11 +133,60 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
+    expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
+        findsNothing);
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
     await tester.pumpAndSettle();
     expect(find.byType(DisplayProductPage), findsOneWidget);
+  });
+
+  testWidgets('product found in another lang', (WidgetTester tester) async {
+    final anotherLang = LangCode.nl;
+    expect(anotherLang, isNot(equals(_DEFAULT_LANG)));
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..lang = anotherLang
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .buildSingleLangProduct()));
+
+    final widget = BarcodeScanPage();
+    final context = await tester.superPump(widget);
+
+    expect(find.text('Product name'), findsNothing);
+    expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
+        findsNothing);
+
+    widget.newScanDataForTesting(_barcode('12345'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product name'), findsOneWidget);
+    expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
+        findsOneWidget);
+
+    expect(find.byType(DisplayProductPage), findsNothing);
+    await tester.tap(find.text('Product name'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DisplayProductPage), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('back_button')));
+    await tester.pumpAndSettle();
+    expect(find.byType(DisplayProductPage), findsNothing);
+
+    expect(find.byType(InitProductPage), findsNothing);
+    await tester.tap(
+        find.text(context.strings.barcode_scan_page_add_info_in_your_langs));
+    await tester.pumpAndSettle();
+    expect(find.byType(InitProductPage), findsOneWidget);
   });
 
   testWidgets('product not found', (WidgetTester tester) async {

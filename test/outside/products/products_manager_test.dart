@@ -25,31 +25,11 @@ import '../../common_mocks.mocks.dart';
 import '../../fake_analytics.dart';
 
 void main() {
-  const selectedImagesRuDeJson = '''
-    {
-       "front":{
-          "display":{
-             "ru":"https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg",
-             "de":"https://static.openfoodfacts.org/images/products/123/front_de.16.400.jpg"
-          },
-          "small":{
-             "ru":"https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg",
-             "de":"https://static.openfoodfacts.org/images/products/123/front_de.16.200.jpg"
-          }
-       },
-       "ingredients":{
-          "display":{
-             "ru":"https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg",
-             "de":"https://static.openfoodfacts.org/images/products/123/ingredients_de.19.full.jpg"
-          }
-       }
-    }
-  ''';
-  const expectedImageFront =
+  const expectedImageFrontRu =
       'https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg';
-  const expectedImageFrontThumb =
+  const expectedImageFrontThumbRu =
       'https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg';
-  const expectedImageIngredients =
+  const expectedImageIngredientsRu =
       'https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg';
   const expectedImageFrontDe =
       'https://static.openfoodfacts.org/images/products/123/front_de.16.400.jpg';
@@ -57,6 +37,43 @@ void main() {
       'https://static.openfoodfacts.org/images/products/123/front_de.16.200.jpg';
   const expectedImageIngredientsDe =
       'https://static.openfoodfacts.org/images/products/123/ingredients_de.19.full.jpg';
+  const selectedImagesRuDeJson = '''
+    {
+       "front":{
+          "display":{
+             "ru":"$expectedImageFrontRu",
+             "de":"$expectedImageFrontDe"
+          },
+          "small":{
+             "ru":"$expectedImageFrontThumbRu",
+             "de":"$expectedImageFrontThumbDe"
+          }
+       },
+       "ingredients":{
+          "display":{
+             "ru":"$expectedImageIngredientsRu",
+             "de":"$expectedImageIngredientsDe"
+          }
+       }
+    }
+  ''';
+  const selectedImagesRuJson = '''
+    {
+       "front":{
+          "display":{
+             "ru":"$expectedImageFrontRu"
+          },
+          "small":{
+             "ru":"$expectedImageFrontThumbRu"
+          }
+       },
+       "ingredients":{
+          "display":{
+             "ru":"$expectedImageIngredientsRu"
+          }
+       }
+    }
+  ''';
 
   late MockOffApi offApi;
   late MockBackend backend;
@@ -109,7 +126,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesRuDeJson),
+      'selected_images': jsonDecode(selectedImagesRuJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -135,9 +152,9 @@ void main() {
           ..name = 'name'
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
-          ..imageFront = Uri.parse(expectedImageFront)
-          ..imageFrontThumb = Uri.parse(expectedImageFrontThumb)
-          ..imageIngredients = Uri.parse(expectedImageIngredients))
+          ..imageFront = Uri.parse(expectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(expectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(expectedImageIngredientsRu))
         .productForTests();
     expect(product, equals(expectedProduct));
   });
@@ -148,7 +165,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesRuDeJson),
+      'selected_images': jsonDecode(selectedImagesRuJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -168,9 +185,9 @@ void main() {
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
           ..ingredientsAnalyzed.addAll([])
-          ..imageFront = Uri.parse(expectedImageFront)
-          ..imageFrontThumb = Uri.parse(expectedImageFrontThumb)
-          ..imageIngredients = Uri.parse(expectedImageIngredients))
+          ..imageFront = Uri.parse(expectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(expectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(expectedImageIngredientsRu))
         .productForTests();
     expect(product, equals(expectedProduct));
   });
@@ -207,7 +224,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesRuDeJson),
+      'selected_images': jsonDecode(selectedImagesRuJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -1144,7 +1161,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(selectedImagesRuDeJson),
+      'selected_images': jsonDecode(selectedImagesRuJson),
     });
     when(offApi.getProduct(any))
         .thenAnswer((_) async => off.ProductResult(product: offProduct));
@@ -1170,9 +1187,9 @@ void main() {
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
           ..ingredientsAnalyzed.addAll([])
-          ..imageFront = Uri.parse(expectedImageFront)
-          ..imageFrontThumb = Uri.parse(expectedImageFrontThumb)
-          ..imageIngredients = Uri.parse(expectedImageIngredients))
+          ..imageFront = Uri.parse(expectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(expectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(expectedImageIngredientsRu))
         .productForTests();
     expect(product, equals(expectedProduct));
 
@@ -1311,7 +1328,8 @@ void main() {
     expect(product, equals(expectedProduct));
   });
 
-  test('get product with multiple langs', () async {
+  Future<void> getProductWithMultipleLangsTest(
+      List<LangCode> langsPrioritized) async {
     final offProduct = off.Product.fromJson({
       'code': '123',
       'product_name_ru': 'name ru',
@@ -1338,7 +1356,7 @@ void main() {
     when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
 
     final productRes =
-        await productsManager.getProduct('123', [LangCode.ru, LangCode.de]);
+        await productsManager.getProduct('123', langsPrioritized);
     final product = productRes.unwrap();
     final expectedProduct = Product((v) => v
       ..barcode = '123'
@@ -1346,7 +1364,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
-      ..langsPrioritized.addAll([LangCode.ru, LangCode.de])
+      ..langsPrioritized.addAll(langsPrioritized)
       ..nameLangs.addAll({LangCode.ru: 'name ru', LangCode.de: 'name de'})
       ..brands.add('Brand name')
       ..ingredientsTextLangs
@@ -1366,18 +1384,27 @@ void main() {
         ]),
       })
       ..imageFrontLangs.addAll({
-        LangCode.ru: Uri.parse(expectedImageFront),
+        LangCode.ru: Uri.parse(expectedImageFrontRu),
         LangCode.de: Uri.parse(expectedImageFrontDe),
       })
       ..imageFrontThumbLangs.addAll({
-        LangCode.ru: Uri.parse(expectedImageFrontThumb),
+        LangCode.ru: Uri.parse(expectedImageFrontThumbRu),
         LangCode.de: Uri.parse(expectedImageFrontThumbDe),
       })
       ..imageIngredientsLangs.addAll({
-        LangCode.ru: Uri.parse(expectedImageIngredients),
+        LangCode.ru: Uri.parse(expectedImageIngredientsRu),
         LangCode.de: Uri.parse(expectedImageIngredientsDe),
       }));
     expect(product, equals(expectedProduct));
+  }
+
+  test('get product with multiple langs', () async {
+    await getProductWithMultipleLangsTest([LangCode.ru, LangCode.de]);
+  });
+
+  test('get product with multiple langs but only 1 lang is specified',
+      () async {
+    await getProductWithMultipleLangsTest([LangCode.ru]);
   });
 
   test('save product with multiple languages', () async {

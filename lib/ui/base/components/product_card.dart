@@ -15,7 +15,8 @@ class ProductCard extends StatefulWidget {
   final UserParams beholder;
   final String? hint;
   final VoidCallback onTap;
-  final Widget? extraContent;
+  final Widget? extraContentMiddle;
+  final Widget? extraContentBottom;
 
   const ProductCard(
       {Key? key,
@@ -23,7 +24,8 @@ class ProductCard extends StatefulWidget {
       required this.beholder,
       this.hint,
       required this.onTap,
-      this.extraContent})
+      this.extraContentMiddle,
+      this.extraContentBottom})
       : super(key: key);
 
   @override
@@ -31,7 +33,7 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Color? dominantColor;
 
   _ProductCardState();
@@ -108,15 +110,18 @@ class _ProductCardState extends State<ProductCard>
                           const SizedBox(height: 8),
                           VegStatusDisplayed(
                               product: widget.product, user: widget.beholder),
+                          AnimatedSize(
+                              duration: DURATION_DEFAULT,
+                              vsync: this,
+                              child: widget.extraContentMiddle ??
+                                  const SizedBox.shrink()),
                         ])),
                   ]),
                   AnimatedSize(
                       duration: DURATION_DEFAULT,
                       vsync: this,
-                      child: Column(children: [
-                        SizedBox(height: widget.extraContent != null ? 18 : 0),
-                        widget.extraContent ?? const SizedBox.shrink()
-                      ]))
+                      child:
+                          widget.extraContentBottom ?? const SizedBox.shrink())
                 ]))));
   }
 

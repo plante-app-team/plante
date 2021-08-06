@@ -3,7 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
+import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/l10n/strings.dart';
@@ -13,6 +16,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -26,6 +30,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/moderator_comment_dialog.dart';
+import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/product/product_photo_page.dart';
 import 'package:plante/ui/product/product_report_dialog.dart';
 import 'package:plante/ui/product/veg_statuses_explanation_dialog.dart';
@@ -49,22 +54,41 @@ class DisplayProductPage extends StatefulWidget {
       _DisplayProductPageState(_initialProduct, productUpdatedCallback);
 }
 
-class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
-  Product product;
-  final Backend backend;
-  final UserParams user;
-  final ProductUpdatedCallback? productUpdatedCallback;
+class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
+    implements UserLangsManagerObserver {
+  Product _product;
+  final Backend _backend;
+  final UserParams _user;
+  final UserLangsManager _userLangsManager;
+  List<LangCode>? _userLangs;
+  final ProductUpdatedCallback? _productUpdatedCallback;
 
   final expandController = ExpandableController();
   bool loading = false;
 
   final menuButtonKey = GlobalKey();
 
-  _DisplayProductPageState(this.product, this.productUpdatedCallback)
-      : backend = GetIt.I.get<Backend>(),
-        user = GetIt.I.get<UserParamsController>().cachedUserParams!,
+  _DisplayProductPageState(this._product, this._productUpdatedCallback)
+      : _backend = GetIt.I.get<Backend>(),
+        _user = GetIt.I.get<UserParamsController>().cachedUserParams!,
+        _userLangsManager = GetIt.I.get<UserLangsManager>(),
         super('DisplayProductPage') {
-    GetIt.I.get<ViewedProductsStorage>().addProduct(product);
+    GetIt.I.get<ViewedProductsStorage>().addProduct(_product);
+    _userLangsManager.getUserLangs().then(onUserLangsChange);
+    _userLangsManager.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _userLangsManager.removeObserver(this);
+  }
+
+  @override
+  void onUserLangsChange(UserLangs userLangs) {
+    setState(() {
+      _userLangs = userLangs.langs.toList();
+    });
   }
 
   @override
@@ -86,13 +110,36 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                       heroTag: 'right_action',
                       onPressed: _showProductMenu)),
             ),
+            if (_userLangs != null &&
+                !ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
+                    _product, _userLangs!))
+              Container(
+                  color: const Color(0xfff5f7fa),
+                  padding: const EdgeInsets.only(
+                      left: 24, right: 24, top: 16, bottom: 12),
+                  child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              context.strings
+                                  .display_product_page_no_info_in_your_langs,
+                              style: TextStyles.smallBoldGreen),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                              width: double.infinity,
+                              child: ButtonFilledPlante.withText(
+                                  context.strings
+                                      .display_product_page_add_info_in_your_langs,
+                                  onPressed: _onAddProductInfoClick))
+                        ]),
+                  ),
             Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12),
                 child: Column(children: [
                   const SizedBox(height: 12),
                   ProductHeaderWidget(
                       key: const Key('product_header'),
-                      product: product,
+                      product: _product,
                       imageType: ProductImageType.FRONT,
                       onTap: _showProductPhoto,
                       onLongPress: _copyProductName),
@@ -105,8 +152,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                     onTap:
                         _askForVegStatusHelp() ? _onVegStatusHelpClick : null,
                     child: VegStatusDisplayed(
-                        product: product,
-                        user: user,
+                        product: _product,
+                        user: _user,
                         onVegStatusClick: _onVegStatusSourceClickCallback(),
                         helpText: _askForVegStatusHelp()
                             ? context.strings
@@ -164,16 +211,16 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                               context.strings.display_product_page_ingredients,
                               style: TextStyles.normalBold)),
                       const SizedBox(height: 8),
-                      if (product.ingredientsText != null)
+                      if (_product.ingredientsText != null)
                         SizedBox(
                             key: const Key('product_ingredients_text'),
                             width: double.infinity,
-                            child: Text(product.ingredientsText!,
+                            child: Text(_product.ingredientsText!,
                                 style: TextStyles.normal)),
-                      if (product.ingredientsText == null)
+                      if (_product.ingredientsText == null)
                         ProductHeaderWidget(
                             key: const Key('product_ingredients_photo'),
-                            product: product,
+                            product: _product,
                             imageType: ProductImageType.INGREDIENTS,
                             onTap: _showProductIngredientsPhoto),
                       const SizedBox(height: 24),
@@ -182,6 +229,21 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
             const SizedBox(height: 16)
           ]),
         ]))));
+  }
+
+  void _onAddProductInfoClick() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              InitProductPage(_product, key: const Key('init_product_page'),
+                  productUpdatedCallback: (product) {
+                _productUpdatedCallback?.call(product);
+                setState(() {
+                  _product = product;
+                });
+              })),
+    );
   }
 
   String? _vegStatusHint() {
@@ -200,7 +262,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   }
 
   Widget _ingredientsAnalysisWidget() {
-    if (product.ingredientsAnalyzed?.length == 1) {
+    if (_product.ingredientsAnalyzed?.length == 1) {
       return _ingredientsAnalysisWidgetWithLines(9999);
     }
     return ExpandablePlante(
@@ -235,16 +297,16 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => InitProductPage(product,
+          builder: (context) => InitProductPage(_product,
                   key: const Key('init_product_page'),
                   startReason:
                       InitProductPageStartReason.HELP_WITH_VEG_STATUSES,
                   title: context
                       .strings.display_product_page_help_with_veg_statuses,
                   productUpdatedCallback: (product) {
-                productUpdatedCallback?.call(product);
+                _productUpdatedCallback?.call(product);
                 setState(() {
-                  this.product = product;
+                  _product = product;
                 });
               })),
     );
@@ -252,20 +314,20 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
 
   VegStatus _vegStatus() {
     VegStatus? status;
-    if (user.eatsVeggiesOnly ?? true) {
-      status = product.veganStatus;
+    if (_user.eatsVeggiesOnly ?? true) {
+      status = _product.veganStatus;
     } else {
-      status = product.vegetarianStatus;
+      status = _product.vegetarianStatus;
     }
     return status ?? VegStatus.unknown;
   }
 
   VegStatusSource _vegStatusSource() {
     VegStatusSource? source;
-    if (user.eatsVeggiesOnly ?? true) {
-      source = product.veganStatusSource;
+    if (_user.eatsVeggiesOnly ?? true) {
+      source = _product.veganStatusSource;
     } else {
-      source = product.vegetarianStatusSource;
+      source = _product.vegetarianStatusSource;
     }
     if (source == null || source == VegStatusSource.unknown) {
       source = VegStatusSource.community;
@@ -284,10 +346,10 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    if (user.eatsVeggiesOnly ?? true) {
-      return product.moderatorVeganChoiceReason;
+    if (_user.eatsVeggiesOnly ?? true) {
+      return _product.moderatorVeganChoiceReason;
     } else {
-      return product.moderatorVegetarianChoiceReason;
+      return _product.moderatorVegetarianChoiceReason;
     }
   }
 
@@ -297,8 +359,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
         context: context,
         builder: (BuildContext context) {
           return ModeratorCommentDialog(
-              user: user,
-              product: product,
+              user: _user,
+              product: _product,
               onSourceUrlClick: (url) {
                 analytics.sendEvent('moderator_comment_source_url_click');
                 launch(url);
@@ -307,8 +369,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   }
 
   bool _haveIngredientsAnalysis() =>
-      product.ingredientsAnalyzed != null &&
-      product.ingredientsAnalyzed!.isNotEmpty;
+      _product.ingredientsAnalyzed != null &&
+      _product.ingredientsAnalyzed!.isNotEmpty;
 
   Widget _ingredientsAnalysisTable(int maxLines) {
     final rows = <TableRow>[];
@@ -344,7 +406,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
           style: TextStyles.normalBold)),
       const SizedBox(width: 24),
     ], decoration: BoxDecoration(color: nextColor())));
-    final ingredients = product.ingredientsAnalyzed!;
+    final ingredients = _product.ingredientsAnalyzed!;
     var linesCount = 0;
     for (final ingredient in ingredients) {
       rows.add(TableRow(
@@ -406,7 +468,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return ProductReportDialog(barcode: product.barcode, backend: backend);
+        return ProductReportDialog(
+            barcode: _product.barcode, backend: _backend);
       },
     );
   }
@@ -426,7 +489,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
         MaterialPageRoute(
             builder: (context) => ProductPhotoPage(
                 key: const Key('product_front_image_page'),
-                product: product,
+                product: _product,
                 imageType: ProductImageType.FRONT)));
   }
 
@@ -436,20 +499,20 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
         MaterialPageRoute(
             builder: (context) => ProductPhotoPage(
                 key: const Key('product_ingredients_image_page'),
-                product: product,
+                product: _product,
                 imageType: ProductImageType.INGREDIENTS)));
   }
 
   void _copyIngredientsList() {
-    if (product.ingredientsText != null &&
-        product.ingredientsText!.trim().isNotEmpty) {
-      Clipboard.setData(ClipboardData(text: product.ingredientsText ?? ''));
+    if (_product.ingredientsText != null &&
+        _product.ingredientsText!.trim().isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: _product.ingredientsText ?? ''));
       showSnackBar(context.strings.global_copied_to_clipboard, context);
     }
   }
 
   void _copyProductName() {
-    Clipboard.setData(ClipboardData(text: product.name));
+    Clipboard.setData(ClipboardData(text: _product.name));
     showSnackBar(context.strings.global_copied_to_clipboard, context);
   }
 
@@ -475,7 +538,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
         MaterialPageRoute(
           builder: (context) => MapPage(
               requestedMode: MapPageRequestedMode.ADD_PRODUCT,
-              product: product),
+              product: _product),
         ));
   }
 }

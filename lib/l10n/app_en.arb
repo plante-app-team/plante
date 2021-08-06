@@ -136,6 +136,8 @@
       "barcode_scan_page_scan_product": "Start scanning",
       "barcode_scan_page_invalid_barcode": "Invalid barcode",
       "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
+      "barcode_scan_page_no_info_in_your_langs": "No information about the product in your language",
+      "barcode_scan_page_add_info_in_your_langs": "Add information",
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
@@ -160,6 +162,8 @@
       "display_product_page_moderator_comment_dialog_title": "Moderator's comment",
       "display_product_page_moderator_comment_dialog_source": "Source:",
       "display_product_page_moderator_comment_dialog_close": "Alright!",
+      "display_product_page_no_info_in_your_langs": "No information about the product in your language",
+      "display_product_page_add_info_in_your_langs": "Add information",
 
       "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
       "product_report_dialog_send": "Send",

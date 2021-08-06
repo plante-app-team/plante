@@ -27,7 +27,7 @@ class ProductsManager {
   static const _NEEDED_OFF_FIELDS = [
     off.ProductField.BARCODE,
     off.ProductField.NAME,
-    off.ProductField.NAME_IN_LANGUAGES,
+    off.ProductField.NAME_ALL_LANGUAGES,
     off.ProductField.BRANDS_TAGS,
     off.ProductField.CATEGORIES_TAGS,
     off.ProductField.CATEGORIES_TAGS_IN_LANGUAGES,
@@ -35,8 +35,9 @@ class ProductsManager {
     off.ProductField.INGREDIENTS_TAGS,
     off.ProductField.INGREDIENTS_TAGS_IN_LANGUAGES,
     off.ProductField.INGREDIENTS_TEXT,
-    off.ProductField.INGREDIENTS_TEXT_IN_LANGUAGES,
+    off.ProductField.INGREDIENTS_TEXT_ALL_LANGUAGES,
     off.ProductField.SELECTED_IMAGE,
+    off.ProductField.LANGUAGE,
   ];
 
   final OffApi _off;

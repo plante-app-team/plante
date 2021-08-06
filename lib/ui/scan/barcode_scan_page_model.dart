@@ -3,7 +3,10 @@ import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -15,13 +18,16 @@ import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
 
 enum BarcodeScanPageSearchResult { OK, ERROR_NETWORK, ERROR_OTHER }
 
-class BarcodeScanPageModel with WidgetsBindingObserver {
+class BarcodeScanPageModel
+    with WidgetsBindingObserver
+    implements UserLangsManagerObserver {
   final VoidCallback _onStateChangeCallback;
   final ResCallback<BarcodeScanPage> _widgetCallback;
   final ProductsObtainer _productsObtainer;
   final ShopsManager _shopsManager;
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
+  final UserLangsManager _userLangsManager;
 
   String? _barcode;
   bool _searching = false;
@@ -29,6 +35,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
   PermissionState? _cameraPermission;
   String _manualBarcode = '';
   bool _manualBarcodeInputShown = false;
+  List<LangCode>? _userLangs;
 
   BarcodeScanPage get _widget => _widgetCallback.call();
 
@@ -48,9 +55,18 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       this._productsObtainer,
       this._shopsManager,
       this._permissionsManager,
-      this._userParamsController) {
+      this._userParamsController,
+      this._userLangsManager) {
     _updateCameraPermission();
     WidgetsBinding.instance!.addObserver(this);
+    _userLangsManager.addObserver(this);
+    _userLangsManager.getUserLangs().then(onUserLangsChange);
+  }
+
+  @override
+  void onUserLangsChange(UserLangs userLangs) {
+    _userLangs = userLangs.langs.toList();
+    _onStateChangeCallback.call();
   }
 
   void _updateCameraPermission() async {
@@ -74,6 +90,7 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
 
   void dispose() {
     WidgetsBinding.instance!.removeObserver(this);
+    _userLangsManager.removeObserver(this);
   }
 
   void onProductExternalUpdate(Product updatedProduct) {
@@ -108,17 +125,26 @@ class BarcodeScanPageModel with WidgetsBindingObserver {
       return BarcodeScanPageContentState.searchingProduct(_barcode!);
     } else if (_foundProduct != null &&
         ProductPageWrapper.isProductFilledEnoughForDisplay(_foundProduct!)) {
-      if (_widget.addProductToShop == null) {
+      if (_widget.addProductToShop != null) {
+        return BarcodeScanPageContentState.addProductToShop(
+            _foundProduct!,
+            _widget.addProductToShop!,
+            _addProductToShop,
+            _onFoundProductCanceled);
+      } else if (_userLangs == null) {
+        return BarcodeScanPageContentState.searchingProduct(_barcode!);
+      } else if (ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
+          _foundProduct!, _userLangs!)) {
         return BarcodeScanPageContentState.productFound(
             _foundProduct!,
             _userParamsController.cachedUserParams!,
             onProductExternalUpdate,
             _onFoundProductCanceled);
       } else {
-        return BarcodeScanPageContentState.addProductToShop(
+        return BarcodeScanPageContentState.productFoundInOtherLangs(
             _foundProduct!,
-            _widget.addProductToShop!,
-            _addProductToShop,
+            _userParamsController.cachedUserParams!,
+            onProductExternalUpdate,
             _onFoundProductCanceled);
       }
     } else {
