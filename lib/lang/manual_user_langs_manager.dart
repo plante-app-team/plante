@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params.dart';
@@ -13,12 +14,14 @@ import 'package:plante/outside/backend/backend_error.dart';
 class ManualUserLangsManager implements UserParamsControllerObserver {
   final UserParamsController _userParamsController;
   final Backend _backend;
+  final Analytics _analytics;
 
   List<LangCode>? _userLangs;
   final _initCompleter = Completer<List<LangCode>?>();
   Future<void> get initFuture => _initCompleter.future;
 
-  ManualUserLangsManager(this._userParamsController, this._backend) {
+  ManualUserLangsManager(
+      this._userParamsController, this._backend, this._analytics) {
     _initAsync();
     _userParamsController.addObserver(this);
   }
@@ -68,6 +71,13 @@ class ManualUserLangsManager implements UserParamsControllerObserver {
 
   Future<Result<None, UserLangsManagerError>> setUserLangs(
       List<LangCode> langs) async {
+    if (langs.length == 1) {
+      _analytics.sendEvent('single_manual_user_lang');
+    } else if (langs.length > 1) {
+      _analytics.sendEvent('multiple_manual_user_langs');
+    } else {
+      _analytics.sendEvent('zero_manual_user_langs');
+    }
     var params = await _userParamsController.getUserParams();
     if (params == null) {
       Log.e('ManualUserLangsManager.setUserLangs '

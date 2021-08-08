@@ -8,6 +8,7 @@ import 'package:plante/lang/manual_user_langs_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
@@ -37,11 +38,12 @@ class UserLangsManager {
       OpenStreetMap osm,
       SharedPreferencesHolder prefsHolder,
       UserParamsController userParamsController,
-      Backend backend)
+      Backend backend,
+      Analytics analytics)
       : _locationUserLangsManager = LocationBasedUserLangsManager(
-            langCodesTable, locationController, osm, prefsHolder),
+            langCodesTable, locationController, osm, analytics, prefsHolder),
         _manualUserLangsManager =
-            ManualUserLangsManager(userParamsController, backend) {
+            ManualUserLangsManager(userParamsController, backend, analytics) {
     _initAsync();
   }
 

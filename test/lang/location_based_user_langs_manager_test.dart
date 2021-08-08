@@ -23,10 +23,12 @@ void main() {
   late MockLocationController locationController;
   late MockOpenStreetMap osm;
   late MockLocationBasedUserLangsStorage storage;
+  late FakeAnalytics analytics;
   late LocationBasedUserLangsManager userLangsManager;
 
   setUp(() async {
-    countriesLangCodesTable = CountriesLangCodesTable(FakeAnalytics());
+    analytics = FakeAnalytics();
+    countriesLangCodesTable = CountriesLangCodesTable(analytics);
     locationController = MockLocationController();
     osm = MockOpenStreetMap();
     storage = MockLocationBasedUserLangsStorage();
@@ -58,6 +60,7 @@ void main() {
       countriesLangCodesTable,
       locationController,
       osm,
+      analytics,
       FakeSharedPreferences().asHolder(),
       storage: storage,
     );
@@ -142,6 +145,7 @@ void main() {
       countriesLangCodesTable,
       locationController,
       osm,
+      FakeAnalytics(),
       FakeSharedPreferences().asHolder(),
       storage: storage,
     );
@@ -157,5 +161,29 @@ void main() {
     initialPosCallback!.call(lastPos);
     await Future.delayed(const Duration(milliseconds: 10));
     expect(inited, isTrue);
+  });
+
+  test('analytics single-lang country', () async {
+    expect(analytics.allEvents(), isEmpty);
+
+    await finishSetUp(
+      lastPos: const Point<double>(1, 2),
+      addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'ru')),
+    );
+
+    expect(analytics.wasEventSent('single_lang_country'), isTrue);
+    expect(analytics.wasEventSent('multi_lang_country'), isFalse);
+  });
+
+  test('analytics multilingual country', () async {
+    expect(analytics.allEvents(), isEmpty);
+
+    await finishSetUp(
+      lastPos: const Point<double>(1, 2),
+      addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
+    );
+
+    expect(analytics.wasEventSent('single_lang_country'), isFalse);
+    expect(analytics.wasEventSent('multi_lang_country'), isTrue);
   });
 }

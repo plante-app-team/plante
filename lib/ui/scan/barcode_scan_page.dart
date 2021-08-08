@@ -8,6 +8,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -95,11 +96,13 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     _model = BarcodeScanPageModel(
         stateChangeCallback,
         () => widget,
+        () => context,
         GetIt.I.get<ProductsObtainer>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<PermissionsManager>(),
         GetIt.I.get<UserParamsController>(),
-        GetIt.I.get<UserLangsManager>());
+        GetIt.I.get<UserLangsManager>(),
+        GetIt.I.get<Analytics>());
     _manualBarcodeTextController.addListener(() {
       _model.manualBarcodeChanged(_manualBarcodeTextController.text);
     });

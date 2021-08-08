@@ -13,10 +13,7 @@ import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/product/init_product_page.dart';
-import 'package:plante/ui/product/product_page_wrapper.dart';
 
-typedef ProductUpdatedCallback = dynamic Function(Product updatedProduct);
 typedef AddProductToShopCallback = Future<Result<None, ShopsManagerError>>
     Function();
 
@@ -33,18 +30,19 @@ abstract class BarcodeScanPageContentState {
   factory BarcodeScanPageContentState.productFound(
       Product product,
       UserParams beholder,
-      ProductUpdatedCallback callback,
+      VoidCallback openProductPageCallback,
       VoidCallback cancelCallback) = BarcodeScanPageContentStateProductFound;
   factory BarcodeScanPageContentState.productFoundInOtherLangs(
           Product product,
           UserParams beholder,
-          ProductUpdatedCallback callback,
+          VoidCallback openProductPageCallback,
+          VoidCallback openProductPageToAddInfoCallback,
           VoidCallback cancelCallback) =
       BarcodeScanPageContentStateProductFoundInForeignLangs;
   factory BarcodeScanPageContentState.productNotFound(
       Product product,
       Shop? shopToAddTo,
-      ProductUpdatedCallback callback,
+      VoidCallback openProductPageCallback,
       VoidCallback cancelCallback) = BarcodeScanPageContentStateProductNotFound;
   factory BarcodeScanPageContentState.noPermission(VoidCallback callback) =
       BarcodeScanPageContentStateNoPermission;
@@ -86,46 +84,16 @@ class BarcodeScanPageContentStateSearchingProduct
   }
 }
 
-abstract class BarcodeScanPageContentAbstractStateWithProduct
-    extends BarcodeScanPageContentState {
-  final ProductUpdatedCallback productUpdatedCallback;
-
-  BarcodeScanPageContentAbstractStateWithProduct(this.productUpdatedCallback);
-
-  Product get productWithUnknownState;
-
-  void tryOpenProductPage(BuildContext context, [Shop? shopToAddTo]) {
-    if (shopToAddTo != null) {
-      Navigator.of(context).pop();
-    }
-    ProductPageWrapper.show(context, productWithUnknownState,
-        shopToAddTo: shopToAddTo,
-        productUpdatedCallback: productUpdatedCallback);
-  }
-
-  void openProductPageToAddInfo(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => InitProductPage(productWithUnknownState,
-              key: const Key('init_product_page'),
-              productUpdatedCallback: productUpdatedCallback)),
-    );
-  }
-}
-
 class BarcodeScanPageContentStateProductFound
-    extends BarcodeScanPageContentAbstractStateWithProduct {
+    extends BarcodeScanPageContentState {
   final Product product;
   final UserParams beholder;
+  final VoidCallback openProductPageCallback;
   final VoidCallback cancelCallback;
   BarcodeScanPageContentStateProductFound(this.product, this.beholder,
-      ProductUpdatedCallback callback, this.cancelCallback)
-      : super(callback);
+      this.openProductPageCallback, this.cancelCallback);
   @override
   String get id => 'product_found';
-  @override
-  Product get productWithUnknownState => product;
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -134,24 +102,25 @@ class BarcodeScanPageContentStateProductFound
         child: ProductCard(
             product: product,
             beholder: beholder,
-            onTap: () {
-              tryOpenProductPage(context);
-            }));
+            onTap: openProductPageCallback));
   }
 }
 
 class BarcodeScanPageContentStateProductFoundInForeignLangs
-    extends BarcodeScanPageContentAbstractStateWithProduct {
+    extends BarcodeScanPageContentState {
   final Product product;
   final UserParams beholder;
+  final VoidCallback openProductPageCallback;
+  final VoidCallback openProductPageToAddInfoCallback;
   final VoidCallback cancelCallback;
-  BarcodeScanPageContentStateProductFoundInForeignLangs(this.product,
-      this.beholder, ProductUpdatedCallback callback, this.cancelCallback)
-      : super(callback);
+  BarcodeScanPageContentStateProductFoundInForeignLangs(
+      this.product,
+      this.beholder,
+      this.openProductPageCallback,
+      this.openProductPageToAddInfoCallback,
+      this.cancelCallback);
   @override
   String get id => 'product_found_in_foreign_langs';
-  @override
-  Product get productWithUnknownState => product;
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -160,9 +129,7 @@ class BarcodeScanPageContentStateProductFoundInForeignLangs
         child: ProductCard(
             product: product,
             beholder: beholder,
-            onTap: () {
-              tryOpenProductPage(context);
-            },
+            onTap: openProductPageCallback,
             extraContentMiddle: Column(children: [
               const SizedBox(height: 8),
               Text(context.strings.barcode_scan_page_no_info_in_your_langs,
@@ -174,25 +141,21 @@ class BarcodeScanPageContentStateProductFoundInForeignLangs
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
                       context.strings.barcode_scan_page_add_info_in_your_langs,
-                      onPressed: () {
-                    openProductPageToAddInfo(context);
-                  }))
+                      onPressed: openProductPageToAddInfoCallback))
             ])));
   }
 }
 
 class BarcodeScanPageContentStateProductNotFound
-    extends BarcodeScanPageContentAbstractStateWithProduct {
+    extends BarcodeScanPageContentState {
   final Product partialProduct;
   final Shop? shopToAddTo;
+  final VoidCallback openProductPageCallback;
   final VoidCallback cancelCallback;
   BarcodeScanPageContentStateProductNotFound(this.partialProduct,
-      this.shopToAddTo, ProductUpdatedCallback callback, this.cancelCallback)
-      : super(callback);
+      this.shopToAddTo, this.openProductPageCallback, this.cancelCallback);
   @override
   String get id => 'not_found_product';
-  @override
-  Product get productWithUnknownState => partialProduct;
 
   @override
   Widget buildWidget(BuildContext context) {
@@ -213,9 +176,8 @@ class BarcodeScanPageContentStateProductNotFound
                 style: TextStyles.normal),
             const SizedBox(height: 12),
             ButtonFilledPlante.withText(
-                context.strings.barcode_scan_page_add_product, onPressed: () {
-              tryOpenProductPage(context, shopToAddTo);
-            }),
+                context.strings.barcode_scan_page_add_product,
+                onPressed: openProductPageCallback),
           ])),
     );
   }

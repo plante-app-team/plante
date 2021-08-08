@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
@@ -13,13 +14,14 @@ class LocationBasedUserLangsManager {
   final CountriesLangCodesTable _langCodesTable;
   final LocationController _locationController;
   final OpenStreetMap _osm;
+  final Analytics _analytics;
   final LocationBasedUserLangsStorage _storage;
 
   final _initCompleter = Completer<void>();
   Future<void> get initFuture => _initCompleter.future;
 
   LocationBasedUserLangsManager(this._langCodesTable, this._locationController,
-      this._osm, SharedPreferencesHolder prefsHolder,
+      this._osm, this._analytics, SharedPreferencesHolder prefsHolder,
       {LocationBasedUserLangsStorage? storage})
       : _storage = storage ?? LocationBasedUserLangsStorage(prefsHolder) {
     _locationController.callWhenLastPositionKnown((_) async {
@@ -65,6 +67,12 @@ class LocationBasedUserLangsManager {
       Log.w(
           'Cannot determine user langs - no langs for country code: $countryCode');
       return;
+    }
+
+    if (langs.length == 1) {
+      _analytics.sendEvent('single_lang_country');
+    } else if (langs.length > 1) {
+      _analytics.sendEvent('multi_lang_country', {'count': langs.length});
     }
 
     // Async check

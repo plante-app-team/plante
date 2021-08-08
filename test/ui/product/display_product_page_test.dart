@@ -1073,16 +1073,37 @@ void main() {
       expect(
           find.text(context.strings.display_product_page_no_info_in_your_langs),
           findsNothing);
+      expect(analytics.wasEventSent('product_displayed_in_user_lang'), isTrue);
+      expect(
+          analytics.wasEventSent('product_displayed_in_foreign_lang'), isFalse);
+      expect(
+          analytics
+              .wasEventSent('display_product_page_clicked_add_info_in_lang'),
+          isFalse);
     } else {
       expect(
           find.text(context.strings.display_product_page_no_info_in_your_langs),
           findsOneWidget);
+      expect(analytics.wasEventSent('product_displayed_in_user_lang'), isFalse);
+      expect(
+          analytics.wasEventSent('product_displayed_in_foreign_lang'), isTrue);
+      expect(
+          analytics
+              .wasEventSent('display_product_page_clicked_add_info_in_lang'),
+          isFalse);
 
       expect(find.byType(InitProductPage), findsNothing);
       await tester.tap(find
           .text(context.strings.display_product_page_add_info_in_your_langs));
       await tester.pumpAndSettle();
       expect(find.byType(InitProductPage), findsOneWidget);
+      expect(analytics.wasEventSent('product_displayed_in_user_lang'), isFalse);
+      expect(
+          analytics.wasEventSent('product_displayed_in_foreign_lang'), isTrue);
+      expect(
+          analytics
+              .wasEventSent('display_product_page_clicked_add_info_in_lang'),
+          isTrue);
     }
   }
 

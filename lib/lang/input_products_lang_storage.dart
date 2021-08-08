@@ -1,4 +1,5 @@
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_langs.dart';
@@ -7,9 +8,11 @@ class InputProductsLangStorage implements UserLangsManagerObserver {
   static const PREF_INPUT_PRODUCTS_LANG_CODE = 'INPUT_PRODUCTS_LANG_CODE';
   final SharedPreferencesHolder _prefsHolder;
   final UserLangsManager _userLangsManager;
+  final Analytics _analytics;
   LangCode? _langCode;
 
-  InputProductsLangStorage(this._prefsHolder, this._userLangsManager) {
+  InputProductsLangStorage(
+      this._prefsHolder, this._userLangsManager, this._analytics) {
     _initAsync();
   }
 
@@ -34,6 +37,9 @@ class InputProductsLangStorage implements UserLangsManagerObserver {
 
   LangCode? get selectedCode => _langCode;
   set selectedCode(LangCode? value) {
+    if (_langCode != null && value != null) {
+      _analytics.sendEvent('input_products_lang_change');
+    }
     _langCode = value;
     _setPref(value);
   }

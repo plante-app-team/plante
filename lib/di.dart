@@ -67,9 +67,12 @@ void initDI() {
       GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<SharedPreferencesHolder>(),
       GetIt.I.get<UserParamsController>(),
-      GetIt.I.get<Backend>()));
+      GetIt.I.get<Backend>(),
+      GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<InputProductsLangStorage>(InputProductsLangStorage(
-      GetIt.I.get<SharedPreferencesHolder>(), GetIt.I.get<UserLangsManager>()));
+      GetIt.I.get<SharedPreferencesHolder>(),
+      GetIt.I.get<UserLangsManager>(),
+      GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));

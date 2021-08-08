@@ -87,8 +87,22 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   @override
   void onUserLangsChange(UserLangs userLangs) {
     setState(() {
+      final oldUserLangs = _userLangs;
       _userLangs = userLangs.langs.toList();
+      if (oldUserLangs == null) {
+        if (_isProductInForeignLang()) {
+          analytics.sendEvent('product_displayed_in_foreign_lang');
+        } else {
+          analytics.sendEvent('product_displayed_in_user_lang');
+        }
+      }
     });
+  }
+
+  bool _isProductInForeignLang() {
+    return _userLangs != null &&
+        !ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
+            _product, _userLangs!);
   }
 
   @override
@@ -110,9 +124,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                       heroTag: 'right_action',
                       onPressed: _showProductMenu)),
             ),
-            if (_userLangs != null &&
-                !ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
-                    _product, _userLangs!))
+            if (_isProductInForeignLang())
               Container(
                 color: const Color(0xfff5f7fa),
                 padding: const EdgeInsets.only(
@@ -232,6 +244,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   void _onAddProductInfoClick() {
+    analytics.sendEvent('display_product_page_clicked_add_info_in_lang');
     Navigator.push(
       context,
       MaterialPageRoute(

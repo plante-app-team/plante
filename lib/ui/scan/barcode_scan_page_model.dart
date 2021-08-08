@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
@@ -12,6 +14,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page_content_state.dart';
@@ -23,11 +26,13 @@ class BarcodeScanPageModel
     implements UserLangsManagerObserver {
   final VoidCallback _onStateChangeCallback;
   final ResCallback<BarcodeScanPage> _widgetCallback;
+  final ResCallback<BuildContext> _contextCallback;
   final ProductsObtainer _productsObtainer;
   final ShopsManager _shopsManager;
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
   final UserLangsManager _userLangsManager;
+  final Analytics _analytics;
 
   String? _barcode;
   bool _searching = false;
@@ -38,6 +43,7 @@ class BarcodeScanPageModel
   List<LangCode>? _userLangs;
 
   BarcodeScanPage get _widget => _widgetCallback.call();
+  BuildContext get _context => _contextCallback.call();
 
   String? get barcode => _barcode;
   bool get searching => _searching;
@@ -52,11 +58,13 @@ class BarcodeScanPageModel
   BarcodeScanPageModel(
       this._onStateChangeCallback,
       this._widgetCallback,
+      this._contextCallback,
       this._productsObtainer,
       this._shopsManager,
       this._permissionsManager,
       this._userParamsController,
-      this._userLangsManager) {
+      this._userLangsManager,
+      this._analytics) {
     _updateCameraPermission();
     WidgetsBinding.instance!.addObserver(this);
     _userLangsManager.addObserver(this);
@@ -93,7 +101,7 @@ class BarcodeScanPageModel
     _userLangsManager.removeObserver(this);
   }
 
-  void onProductExternalUpdate(Product updatedProduct) {
+  void _onProductExternalUpdate(Product updatedProduct) {
     _foundProduct = updatedProduct;
     _onStateChangeCallback.call();
   }
@@ -138,13 +146,14 @@ class BarcodeScanPageModel
         return BarcodeScanPageContentState.productFound(
             _foundProduct!,
             _userParamsController.cachedUserParams!,
-            onProductExternalUpdate,
+            _tryOpenProductPage,
             _onFoundProductCanceled);
       } else {
         return BarcodeScanPageContentState.productFoundInOtherLangs(
             _foundProduct!,
             _userParamsController.cachedUserParams!,
-            onProductExternalUpdate,
+            _tryOpenProductPage,
+            _openProductPageToAddInfo,
             _onFoundProductCanceled);
       }
     } else {
@@ -155,11 +164,34 @@ class BarcodeScanPageModel
         product = Product((v) => v.barcode = _barcode);
       }
       return BarcodeScanPageContentState.productNotFound(
-          product,
-          _widget.addProductToShop,
-          onProductExternalUpdate,
-          _onFoundProductCanceled);
+          product, _widget.addProductToShop, () {
+        _tryOpenProductPageFor(product);
+      }, _onFoundProductCanceled);
     }
+  }
+
+  void _tryOpenProductPage() {
+    _tryOpenProductPageFor(_foundProduct!);
+  }
+
+  void _tryOpenProductPageFor(Product product) {
+    if (_widget.addProductToShop != null) {
+      Navigator.of(_context).pop();
+    }
+    ProductPageWrapper.show(_context, product,
+        shopToAddTo: _widget.addProductToShop,
+        productUpdatedCallback: _onProductExternalUpdate);
+  }
+
+  void _openProductPageToAddInfo() {
+    _analytics.sendEvent('barcode_scan_page_clicked_add_info_in_lang');
+    Navigator.push(
+      _context,
+      MaterialPageRoute(
+          builder: (context) => InitProductPage(_foundProduct!,
+              key: const Key('init_product_page'),
+              productUpdatedCallback: _onProductExternalUpdate)),
+    );
   }
 
   Future<BarcodeScanPageSearchResult> searchProduct(String barcode) async {
@@ -174,6 +206,15 @@ class BarcodeScanPageModel
     _searching = false;
     _barcode = foundProductResult.isOk ? barcode : null;
     _onStateChangeCallback.call();
+
+    if (foundProduct != null && _userLangs != null) {
+      if (ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
+          foundProduct, _userLangs!)) {
+        _analytics.sendEvent('scanned_product_in_user_lang');
+      } else {
+        _analytics.sendEvent('scanned_product_in_foreign_lang');
+      }
+    }
 
     if (foundProductResult.isErr) {
       if (foundProductResult.unwrapErr() ==

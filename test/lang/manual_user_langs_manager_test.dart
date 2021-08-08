@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend_response.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
+import '../fake_analytics.dart';
 import '../fake_user_params_controller.dart';
 
 void main() {
@@ -29,7 +30,8 @@ void main() {
     await userParamsController.setUserParams(UserParams((e) => e
       ..name = 'Bob'
       ..langsPrioritized.addAll(['en', 'nl'])));
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     final expectedLangs = [LangCode.en, LangCode.nl];
     expect(await userLangsManager.getUserLangs(), equals(expectedLangs));
@@ -39,7 +41,8 @@ void main() {
     await userParamsController.setUserParams(UserParams((e) => e
       ..name = 'Bob'
       ..langsPrioritized = null));
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     expect(await userLangsManager.getUserLangs(), isNull);
   });
@@ -48,7 +51,8 @@ void main() {
     await userParamsController.setUserParams(UserParams((e) => e
       ..name = 'Bob'
       ..langsPrioritized = null));
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     expect(await userLangsManager.getUserLangs(), isNull);
     await userParamsController.setUserParams(UserParams((e) => e
@@ -65,8 +69,8 @@ void main() {
     when(mockUserParamsController.getUserParams())
         .thenAnswer((_) => completer.future);
 
-    userLangsManager =
-        ManualUserLangsManager(mockUserParamsController, backend);
+    userLangsManager = ManualUserLangsManager(
+        mockUserParamsController, backend, FakeAnalytics());
 
     var inited = false;
     unawaited(userLangsManager.initFuture.then((_) => inited = true));
@@ -86,8 +90,8 @@ void main() {
     when(mockUserParamsController.getUserParams())
         .thenAnswer((_) => completer.future);
 
-    userLangsManager =
-        ManualUserLangsManager(mockUserParamsController, backend);
+    userLangsManager = ManualUserLangsManager(
+        mockUserParamsController, backend, FakeAnalytics());
 
     var langsObtained = false;
     unawaited(
@@ -105,7 +109,8 @@ void main() {
     final initialUserParams = UserParams((e) => e.name = 'Bob');
 
     await userParamsController.setUserParams(initialUserParams);
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
 
@@ -126,7 +131,8 @@ void main() {
   test('set langs - network error', () async {
     final initialUserParams = UserParams((e) => e.name = 'Bob');
     await userParamsController.setUserParams(initialUserParams);
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Err(
         BackendError.fromResp(BackendResponse.fromError(
@@ -143,7 +149,8 @@ void main() {
   test('set langs - other error', () async {
     final initialUserParams = UserParams((e) => e.name = 'Bob');
     await userParamsController.setUserParams(initialUserParams);
-    userLangsManager = ManualUserLangsManager(userParamsController, backend);
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
     when(backend.updateUserParams(any))
         .thenAnswer((_) async => Err(BackendError.other()));
@@ -154,5 +161,38 @@ void main() {
     // Verify user params are not changed
     expect(
         await userParamsController.getUserParams(), equals(initialUserParams));
+  });
+
+  test('set langs - analytics', () async {
+    await userParamsController.setUserParams(UserParams((e) => e.name = 'Bob'));
+    final analytics = FakeAnalytics();
+    userLangsManager =
+        ManualUserLangsManager(userParamsController, backend, analytics);
+    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+
+    expect(analytics.allEvents(), isEmpty);
+
+    // Single lang
+    var res = await userLangsManager.setUserLangs([LangCode.en]);
+    expect(res.isOk, isTrue);
+    expect(analytics.wasEventSent('single_manual_user_lang'), isTrue);
+    expect(analytics.wasEventSent('multiple_manual_user_langs'), isFalse);
+    expect(analytics.wasEventSent('zero_manual_user_langs'), isFalse);
+
+    // Multiple langs
+    analytics.clearEvents();
+    res = await userLangsManager.setUserLangs([LangCode.en, LangCode.nl]);
+    expect(res.isOk, isTrue);
+    expect(analytics.wasEventSent('single_manual_user_lang'), isFalse);
+    expect(analytics.wasEventSent('multiple_manual_user_langs'), isTrue);
+    expect(analytics.wasEventSent('zero_manual_user_langs'), isFalse);
+
+    // 0 langs
+    analytics.clearEvents();
+    res = await userLangsManager.setUserLangs([]);
+    expect(res.isOk, isTrue);
+    expect(analytics.wasEventSent('single_manual_user_lang'), isFalse);
+    expect(analytics.wasEventSent('multiple_manual_user_langs'), isFalse);
+    expect(analytics.wasEventSent('zero_manual_user_langs'), isTrue);
   });
 }

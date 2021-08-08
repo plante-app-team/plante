@@ -128,6 +128,8 @@ void main() {
     final context = await tester.superPump(widget);
 
     expect(find.text('Product name'), findsNothing);
+    expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
+    expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
 
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
@@ -135,6 +137,8 @@ void main() {
     expect(find.text('Product name'), findsOneWidget);
     expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
         findsNothing);
+    expect(analytics.wasEventSent('scanned_product_in_user_lang'), isTrue);
+    expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
@@ -165,6 +169,8 @@ void main() {
     expect(find.text('Product name'), findsNothing);
     expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
         findsNothing);
+    expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
+    expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
 
     widget.newScanDataForTesting(_barcode('12345'));
     await tester.pumpAndSettle();
@@ -172,6 +178,8 @@ void main() {
     expect(find.text('Product name'), findsOneWidget);
     expect(find.text(context.strings.barcode_scan_page_no_info_in_your_langs),
         findsOneWidget);
+    expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
+    expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isTrue);
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
@@ -183,10 +191,14 @@ void main() {
     expect(find.byType(DisplayProductPage), findsNothing);
 
     expect(find.byType(InitProductPage), findsNothing);
+    expect(analytics.wasEventSent('barcode_scan_page_clicked_add_info_in_lang'),
+        isFalse);
     await tester.tap(
         find.text(context.strings.barcode_scan_page_add_info_in_your_langs));
     await tester.pumpAndSettle();
     expect(find.byType(InitProductPage), findsOneWidget);
+    expect(analytics.wasEventSent('barcode_scan_page_clicked_add_info_in_lang'),
+        isTrue);
   });
 
   testWidgets('product not found', (WidgetTester tester) async {
