@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
@@ -34,12 +35,14 @@ class ExternalAuthPage extends StatefulWidget {
 class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
   final GoogleAuthorizer _googleAuthorizer;
   final AppleAuthorizer _appleAuthorizer;
+  final SysLangCodeHolder _sysLangCodeHolder;
   bool _loading = false;
   final ExternalAuthCallback _callback;
 
   _ExternalAuthPageState(this._callback)
       : _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>(),
         _appleAuthorizer = GetIt.I.get<AppleAuthorizer>(),
+        _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>(),
         super('ExternalAuthPage');
 
   @override
@@ -100,7 +103,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                   padding: const EdgeInsets.only(bottom: 108),
                   child: InkWell(
                     onTap: () {
-                      launch(PRIVACY_POLICY_URL);
+                      launch(privacyPolicyUrl(_sysLangCodeHolder));
                     },
                     child: Text(
                         context.strings.external_auth_page_privacy_policy,

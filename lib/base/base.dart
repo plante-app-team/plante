@@ -7,10 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/model/user_params_controller.dart';
 
-const PRIVACY_POLICY_URL =
+const _PRIVACY_POLICY_URL_RU =
     'https://docs.google.com/document/d/1fSeiIwDZhcf8d1ad7H8R1YCoffVxaalSIZ35SGuXkec/edit?usp=sharing';
+const _PRIVACY_POLICY_URL_EN =
+    'https://docs.google.com/document/d/1vSWRLKTEsvpVDY8hh8eVH5-Ec7QVpW_6h0s8y03E5y8/edit?usp=sharing';
 
 typedef ArgCallback<T> = void Function(T argument);
 typedef ResCallback<T> = T Function();
@@ -87,4 +90,12 @@ String operatingSystem() {
     return 'web';
   }
   return Platform.operatingSystem;
+}
+
+String privacyPolicyUrl(SysLangCodeHolder langCodeHolder) {
+  if (langCodeHolder.langCodeNullable == 'ru') {
+    return _PRIVACY_POLICY_URL_RU;
+  } else {
+    return _PRIVACY_POLICY_URL_EN;
+  }
 }

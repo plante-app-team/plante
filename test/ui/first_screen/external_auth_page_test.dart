@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
@@ -33,6 +34,8 @@ void main() {
     GetIt.I.registerSingleton<Backend>(backend);
     analytics = FakeAnalytics();
     GetIt.I.registerSingleton<Analytics>(analytics);
+    GetIt.I
+        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
   });
 
   testWidgets('Google: successful Google Sign in', (WidgetTester tester) async {

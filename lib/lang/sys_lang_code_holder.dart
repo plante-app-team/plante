@@ -25,6 +25,8 @@ class SysLangCodeHolder {
     }
   }
 
+  String? get langCodeNullable => _langCode;
+
   Future<String> get langCodeInited =>
       _langCode != null ? Future.value(_langCode) : _langCodeCompleter.future;
 

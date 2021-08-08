@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/user_params.dart';
@@ -36,6 +37,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
   bool offScannedProductEmpty = false;
 
   late Settings settings;
+  late SysLangCodeHolder _sysLangCodeHolder;
   late UserParams user;
   late PackageInfo packageInfo;
 
@@ -45,6 +47,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
   void initState() {
     super.initState();
     settings = GetIt.I.get<Settings>();
+    _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
     initStateImpl();
   }
 
@@ -110,19 +113,17 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                     child: Text(context.strings.settings_page_general,
                         style: TextStyles.headline3)),
                 const SizedBox(height: 12),
-                Column(children: [
-                  SizedBox(
-                      width: double.infinity,
-                      child: ButtonFilledPlante.withText(
-                          context.strings.settings_page_langs_i_know,
-                          onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const UserLangsPage()));
-                      })),
-                  const SizedBox(height: 12),
-                ]),
+                SizedBox(
+                    width: double.infinity,
+                    child: ButtonFilledPlante.withText(
+                        context.strings.settings_page_langs_i_know,
+                        onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserLangsPage()));
+                    })),
+                const SizedBox(height: 12),
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
@@ -196,7 +197,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                 Center(
                     child: InkWell(
                         onTap: () {
-                          launch(PRIVACY_POLICY_URL);
+                          launch(privacyPolicyUrl(_sysLangCodeHolder));
                         },
                         child: Text(
                             context.strings.external_auth_page_privacy_policy,
