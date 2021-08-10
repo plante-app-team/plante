@@ -6,6 +6,7 @@ import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -21,7 +22,7 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     userLangsManager = MockUserLangsManager();
     when(userLangsManager.setManualUserLangs(any)).thenAnswer((invc) async {
-      return Ok(None());
+      return Ok(UserParams());
     });
     GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
   });

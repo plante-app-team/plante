@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend_error.dart';
@@ -24,26 +25,21 @@ import 'package:url_launcher/url_launcher.dart';
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
 
 class ExternalAuthPage extends StatefulWidget {
-  final ExternalAuthCallback _callback;
-
-  const ExternalAuthPage(this._callback, {Key? key}) : super(key: key);
+  const ExternalAuthPage({Key? key}) : super(key: key);
 
   @override
-  _ExternalAuthPageState createState() => _ExternalAuthPageState(_callback);
+  _ExternalAuthPageState createState() => _ExternalAuthPageState();
 }
 
 class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
-  final GoogleAuthorizer _googleAuthorizer;
-  final AppleAuthorizer _appleAuthorizer;
-  final SysLangCodeHolder _sysLangCodeHolder;
+  final _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>();
+  final _appleAuthorizer = GetIt.I.get<AppleAuthorizer>();
+  final _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
+  final _userParamsController = GetIt.I.get<UserParamsController>();
+  final _backend = GetIt.I.get<Backend>();
   bool _loading = false;
-  final ExternalAuthCallback _callback;
 
-  _ExternalAuthPageState(this._callback)
-      : _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>(),
-        _appleAuthorizer = GetIt.I.get<AppleAuthorizer>(),
-        _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>(),
-        super('ExternalAuthPage');
+  _ExternalAuthPageState() : super('ExternalAuthPage');
 
   @override
   Widget buildPage(BuildContext context) {
@@ -148,7 +144,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       }
 
       // Nice!
-      await _callback.call(userParams);
+      await _saveParams(userParams);
       analytics.sendEvent('apple_auth_success');
     } finally {
       setState(() {
@@ -181,7 +177,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       }
 
       // Nice!
-      await _callback.call(userParams);
+      await _saveParams(userParams);
       analytics.sendEvent('google_auth_success');
     } finally {
       setState(() {
@@ -216,5 +212,21 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       userParams = userParams.rebuild((e) => e.name = userName);
     }
     return userParams;
+  }
+
+  Future<void> _saveParams(UserParams params) async {
+    // Update on backend
+    final paramsRes = await _backend.updateUserParams(params,
+        backendClientTokenOverride: params.backendClientToken);
+    if (paramsRes.isErr) {
+      if (paramsRes.unwrapErr().errorKind == BackendErrorKind.NETWORK_ERROR) {
+        showSnackBar(context.strings.global_network_error, context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
+      return;
+    }
+    // Full local update if server said "ok"
+    await _userParamsController.setUserParams(params);
   }
 }

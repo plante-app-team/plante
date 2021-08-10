@@ -13,6 +13,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -107,7 +108,7 @@ class UserLangsManager {
       ..sysLang = sysLangCode);
   }
 
-  Future<Result<None, UserLangsManagerError>> setManualUserLangs(
+  Future<Result<UserParams, UserLangsManagerError>> setManualUserLangs(
       List<LangCode> userLangs) async {
     final result = await _manualUserLangsManager.setUserLangs(userLangs);
     if (result.isOk) {

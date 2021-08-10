@@ -845,13 +845,13 @@ class MockUserLangsManager extends _i1.Mock implements _i61.UserLangsManager {
               returnValue: Future<_i9.UserLangs>.value(_FakeUserLangs()))
           as _i11.Future<_i9.UserLangs>);
   @override
-  _i11.Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>
+  _i11.Future<_i2.Result<_i19.UserParams, _i62.UserLangsManagerError>>
       setManualUserLangs(List<_i23.LangCode>? userLangs) => (super.noSuchMethod(
           Invocation.method(#setManualUserLangs, [userLangs]),
-          returnValue:
-              Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>.value(
-                  _FakeResult<_i2.None, _i62.UserLangsManagerError>())) as _i11
-          .Future<_i2.Result<_i2.None, _i62.UserLangsManagerError>>);
+          returnValue: Future<
+                  _i2.Result<_i19.UserParams, _i62.UserLangsManagerError>>.value(
+              _FakeResult<_i19.UserParams, _i62.UserLangsManagerError>())) as _i11
+          .Future<_i2.Result<_i19.UserParams, _i62.UserLangsManagerError>>);
 }
 
 /// A class which mocks [UserLangsManagerObserver].

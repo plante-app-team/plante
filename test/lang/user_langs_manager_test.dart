@@ -11,6 +11,7 @@ import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:test/test.dart';
 import 'package:trotter/trotter.dart';
 
@@ -239,7 +240,8 @@ void main() {
       final langs = invc.positionalArguments[0] as List<LangCode>;
       when(manualUserLangsManager.getUserLangs())
           .thenAnswer((_) async => langs);
-      return Ok(None());
+      return Ok(UserParams(
+          (e) => e.langsPrioritized.addAll(langs.map((e) => e.name))));
     });
     when(manualUserLangsManager.initFuture).thenAnswer((_) => Future.value());
 
@@ -299,7 +301,8 @@ void main() {
       final langs = invc.positionalArguments[0] as List<LangCode>;
       when(manualUserLangsManager.getUserLangs())
           .thenAnswer((_) async => langs);
-      return Ok(None());
+      return Ok(UserParams(
+          (e) => e.langsPrioritized.addAll(langs.map((e) => e.name))));
     });
     await userLangsManager.setManualUserLangs([LangCode.en, LangCode.be]);
     verify(observer.onUserLangsChange(UserLangs((e) => e

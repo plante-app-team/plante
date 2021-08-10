@@ -5,7 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -38,21 +37,6 @@ class _MyAppWidgetState extends State<MyAppWidget>
         .addObserver(_AppForegroundDetector(setSystemUIOverlayStyle));
   }
 
-  Future<bool> _onUserParamsSpecified(UserParams params) async {
-    Log.i('MyAppWidget._onUserParamsSpecified: $params');
-    final paramsController = GetIt.I.get<UserParamsController>();
-
-    // Update on backend
-    final result = await GetIt.I.get<Backend>().updateUserParams(params,
-        backendClientTokenOverride: params.backendClientToken);
-    if (result.isOk) {
-      // Full local update if server said "ok"
-      await paramsController.setUserParams(params);
-      return true;
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -77,9 +61,9 @@ class _MyAppWidgetState extends State<MyAppWidget>
       return const MainPage();
     }
     if (_userParams != null) {
-      return InitUserPage(_userParams!, _onUserParamsSpecified);
+      return const InitUserPage();
     }
-    return ExternalAuthPage(_onUserParamsSpecified);
+    return const ExternalAuthPage();
   }
 
   bool _allRequiredUserParamsFilled() {

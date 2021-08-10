@@ -5,8 +5,12 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
@@ -25,22 +29,19 @@ typedef UserParamsSpecifiedCallback = Future<bool> Function(
 class InitUserPage extends StatefulWidget {
   static const MIN_NAME_LENGTH = 3;
 
-  final UserParams userParams;
-  final UserParamsSpecifiedCallback callback;
-
-  const InitUserPage(this.userParams, this.callback, {Key? key})
-      : super(key: key);
+  const InitUserPage({Key? key}) : super(key: key);
 
   @override
-  _InitUserPageState createState() => _InitUserPageState(userParams, callback);
+  _InitUserPageState createState() => _InitUserPageState();
 }
 
 class _InitUserPageState extends PageStatePlante<InitUserPage> {
   bool _loading = false;
 
-  UserParams _userParams;
-  final UserParamsSpecifiedCallback _resultCallback;
-  final UserLangsManager _userLangsManager;
+  UserParams _userParams = UserParams();
+  final _userParamsController = GetIt.I.get<UserParamsController>();
+  final _userLangsManager = GetIt.I.get<UserLangsManager>();
+  final _backend = GetIt.I.get<Backend>();
   UserLangs? _userLangs;
 
   final _stepperController = CustomizableStepperController();
@@ -67,21 +68,29 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
     });
   }
 
-  _InitUserPageState(this._userParams, this._resultCallback)
-      : _userLangsManager = GetIt.I.get<UserLangsManager>(),
-        super('InitUserPage');
+  _InitUserPageState() : super('InitUserPage');
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _userParams.name ?? '';
-    _nameController.addListener(() {
-      if (_validateFirstPageInputs()) {
-        _userParams = _userParams.rebuild((v) => v.name = _nameController.text);
-      }
+    _initAsync();
+  }
+
+  void _initAsync() {
+    _longAction(() async {
+      _userParams = await _userParamsController.getUserParams() ?? UserParams();
+
+      _nameController.text = _userParams.name ?? '';
+      _nameController.addListener(() {
+        if (_validateFirstPageInputs()) {
+          _userParams =
+              _userParams.rebuild((v) => v.name = _nameController.text);
+        }
+      });
+
+      _validateFirstPageInputs();
+      _initUserLangs();
     });
-    _validateFirstPageInputs();
-    _initUserLangs();
   }
 
   bool _validateFirstPageInputs() {
@@ -334,10 +343,26 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
     }
 
     final onDoneClicked = () async {
-      try {
-        setState(() {
-          _loading = true;
-        });
+      _longAction(() async {
+        Log.i('InitUserPage, onDoneClicked: $_userParams');
+
+        // Update on backend
+        final paramsRes = await _backend.updateUserParams(_userParams);
+        if (paramsRes.isErr) {
+          if (paramsRes.unwrapErr().errorKind ==
+              BackendErrorKind.NETWORK_ERROR) {
+            showSnackBar(context.strings.global_network_error, context);
+          } else {
+            showSnackBar(context.strings.global_something_went_wrong, context);
+          }
+          return;
+        }
+
+        // Full local update if server said "ok"
+        await _userParamsController.setUserParams(_userParams);
+        _userParams = (await _userParamsController.getUserParams())!;
+
+        // Update langs
         final langRes = await _userLangsManager
             .setManualUserLangs(_userLangs!.langs.toList());
         if (langRes.isErr) {
@@ -348,12 +373,8 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           }
           return;
         }
-        await _resultCallback.call(_userParams);
-      } finally {
-        setState(() {
-          _loading = false;
-        });
-      }
+        _userParams = langRes.unwrap();
+      });
     };
 
     final buttonDone = Padding(
@@ -369,5 +390,20 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonDone);
 
     return StepperPage(content, bottomControls);
+  }
+
+  void _longAction(Future<void> Function() action) async {
+    try {
+      setState(() {
+        _loading = true;
+      });
+      await action.call();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
   }
 }

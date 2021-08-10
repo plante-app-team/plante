@@ -69,7 +69,7 @@ class ManualUserLangsManager implements UserParamsControllerObserver {
     return _userLangs;
   }
 
-  Future<Result<None, UserLangsManagerError>> setUserLangs(
+  Future<Result<UserParams, UserLangsManagerError>> setUserLangs(
       List<LangCode> langs) async {
     if (langs.length == 1) {
       _analytics.sendEvent('single_manual_user_lang');
@@ -95,6 +95,6 @@ class ManualUserLangsManager implements UserParamsControllerObserver {
       }
     }
     await _userParamsController.setUserParams(params);
-    return Ok(None());
+    return Ok(params);
   }
 }
