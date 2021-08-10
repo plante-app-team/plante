@@ -109,9 +109,11 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
 
   void _initUserLangs() async {
     final userLangs = await _userLangsManager.getUserLangs();
-    setState(() {
-      _userLangs = userLangs;
-    });
+    if (mounted) {
+      setState(() {
+        _userLangs = userLangs;
+      });
+    }
   }
 
   @override
@@ -128,7 +130,12 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
                   ? const LinearProgressIndicator()
                   : const SizedBox.shrink()),
           CustomizableStepper(
-            pages: [_page1(), _page2(), _page3()],
+            pages: [
+              _page1(),
+              // vegan-only https://trello.com/c/eUGrj1eH/
+              // _page2(),
+              _page3(),
+            ],
             controller: _stepperController,
           )
         ])));

@@ -64,27 +64,35 @@ class InitProductPageModel {
   InitProductPageOcrState get ocrState => _ocrState;
   ProductLangSlice get productSlice => _productSliceRestorable.value;
   set productSlice(ProductLangSlice value) {
-    if (value.veganStatus != productSlice.veganStatus) {
-      // Vegan status changed
-      if (value.veganStatus == VegStatus.positive) {
-        value = value.rebuild((v) => v.vegetarianStatus = VegStatus.positive);
-      }
+    // vegan-only https://trello.com/c/eUGrj1eH/
+    if (value.vegetarianStatus == null ||
+        value.vegetarianStatusSource == null) {
+      value = value.rebuild((e) => e
+        ..vegetarianStatus = VegStatus.unknown
+        ..vegetarianStatusSource = VegStatusSource.community);
     }
-    if (value.vegetarianStatus != productSlice.vegetarianStatus) {
-      // Vegetarian status changed
-      if (value.vegetarianStatus == VegStatus.negative) {
-        value = value.rebuild((v) => v.veganStatus = VegStatus.negative);
-      }
-      if (value.vegetarianStatus == VegStatus.possible &&
-          value.veganStatus == VegStatus.positive) {
-        value = value.rebuild((v) => v.veganStatus = VegStatus.possible);
-      }
-      if (value.vegetarianStatus == VegStatus.unknown &&
-          [VegStatus.positive, VegStatus.possible]
-              .contains(value.veganStatus)) {
-        value = value.rebuild((v) => v.veganStatus = VegStatus.unknown);
-      }
-    }
+    // vegan-only https://trello.com/c/eUGrj1eH/
+    // if (value.veganStatus != productSlice.veganStatus) {
+    //   // Vegan status changed
+    //   if (value.veganStatus == VegStatus.positive) {
+    //     value = value.rebuild((v) => v.vegetarianStatus = VegStatus.positive);
+    //   }
+    // }
+    // if (value.vegetarianStatus != productSlice.vegetarianStatus) {
+    //   // Vegetarian status changed
+    //   if (value.vegetarianStatus == VegStatus.negative) {
+    //     value = value.rebuild((v) => v.veganStatus = VegStatus.negative);
+    //   }
+    //   if (value.vegetarianStatus == VegStatus.possible &&
+    //       value.veganStatus == VegStatus.positive) {
+    //     value = value.rebuild((v) => v.veganStatus = VegStatus.possible);
+    //   }
+    //   if (value.vegetarianStatus == VegStatus.unknown &&
+    //       [VegStatus.positive, VegStatus.possible]
+    //           .contains(value.veganStatus)) {
+    //     value = value.rebuild((v) => v.veganStatus = VegStatus.unknown);
+    //   }
+    // }
     _productSliceRestorable.value = value;
     _onProductUpdate.call();
   }
@@ -329,6 +337,7 @@ class InitProductPageModel {
   }
 
   bool askForVegetarianStatus() {
+    return false; // vegan-only https://trello.com/c/eUGrj1eH/
     if (_initialProductSlice.vegetarianStatus !=
         productSlice.vegetarianStatus) {
       return true;

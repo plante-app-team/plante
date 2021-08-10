@@ -14,12 +14,17 @@ class UserParamsFetcher {
     if (initialParams == null) {
       return;
     }
-    final backendParams = await _backend.userData();
-    if (backendParams.isErr) {
+    final backendParamsRes = await _backend.userData();
+    if (backendParamsRes.isErr) {
       return;
     }
-    if (initialParams != backendParams.unwrap()) {
-      await _userParamsController.setUserParams(backendParams.unwrap());
+    // Vegan-only https://trello.com/c/eUGrj1eH/
+    final backendParams = backendParamsRes.unwrap().rebuild((e) => e
+      ..eatsEggs = false
+      ..eatsMilk = false
+      ..eatsHoney = false);
+    if (initialParams != backendParams) {
+      await _userParamsController.setUserParams(backendParams);
     }
   }
 }

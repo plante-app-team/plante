@@ -48,13 +48,16 @@ class UserParamsController {
     final name = prefs.getString(PREF_USER_PARAMS_NAME);
     final genderStr = prefs.getString(PREF_USER_PARAMS_GENDER);
     final birthdayStr = prefs.getString(PREF_USER_BIRTHDAY);
-    final eatsMilk = prefs.getBool(PREF_USER_EATS_MILK);
-    final eatsEggs = prefs.getBool(PREF_USER_EATS_EGGS);
-    final eatsHoney = prefs.getBool(PREF_USER_EATS_HONEY);
     final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
     final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
     final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
     final langsPrioritized = prefs.getStringList(PREF_LANGS_PRIORITIZED);
+
+    // Vegan-only https://trello.com/c/eUGrj1eH/
+    final eatsMilk = prefs.getBool(PREF_USER_EATS_MILK) != null ? false : null;
+    final eatsEggs = prefs.getBool(PREF_USER_EATS_EGGS) != null ? false : null;
+    final eatsHoney =
+        prefs.getBool(PREF_USER_EATS_HONEY) != null ? false : null;
 
     if (name == null &&
         genderStr == null &&

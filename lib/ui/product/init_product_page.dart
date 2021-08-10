@@ -367,7 +367,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
             },
           ),
         ]),
-      const SizedBox(height: 36),
+      const SizedBox(height: 24),
       SizedBox(
           width: double.infinity,
           child: ButtonFilledPlante.withText(

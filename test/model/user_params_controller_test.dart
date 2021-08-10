@@ -27,9 +27,9 @@ void main() {
       ..name = 'Bob'
       ..genderStr = Gender.MALE.name
       ..birthdayStr = '20.07.1993'
-      ..eatsMilk = true
+      ..eatsMilk = false
       ..eatsEggs = false
-      ..eatsHoney = true
+      ..eatsHoney = false
       ..userGroup = 321
       ..langsPrioritized.addAll(['en', 'ru']));
     await controller.setUserParams(params);
@@ -57,7 +57,7 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.eatsMilk = true);
+    params = params.rebuild((v) => v.eatsMilk = false);
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
@@ -93,7 +93,7 @@ void main() {
       ..name = 'Bob'
       ..genderStr = Gender.FEMALE.name
       ..birthdayStr = '20.07.1993'
-      ..eatsMilk = true
+      ..eatsMilk = false
       ..eatsEggs = false
       ..eatsHoney = false
       ..backendId = '123'
@@ -112,9 +112,9 @@ void main() {
       ..name = 'Bob'
       ..genderStr = Gender.MALE.name
       ..birthdayStr = '20.07.1993'
-      ..eatsMilk = true
+      ..eatsMilk = false
       ..eatsEggs = false
-      ..eatsHoney = true);
+      ..eatsHoney = false);
 
     verifyNever(observer.onUserParamsUpdate(any));
     await controller.setUserParams(params);
@@ -168,11 +168,38 @@ void main() {
       ..name = 'Bob'
       ..genderStr = Gender.MALE.name
       ..birthdayStr = '20.07.1993'
-      ..eatsMilk = true
+      ..eatsMilk = false
       ..eatsEggs = false
-      ..eatsHoney = true);
+      ..eatsHoney = false);
     await controller.setUserParams(params);
 
     expect(controller.cachedUserParams, equals(params));
+  });
+
+  // https://trello.com/c/eUGrj1eH/
+  test('Vegan-only', () async {
+    final controller = UserParamsController();
+    final initialParams = await controller.getUserParams();
+    expect(initialParams, equals(null));
+
+    final params = UserParams((v) => v
+      ..name = 'Bob'
+      ..genderStr = Gender.MALE.name
+      ..birthdayStr = '20.07.1993'
+      ..eatsMilk = true
+      ..eatsEggs = true
+      ..eatsHoney = true
+      ..userGroup = 321
+      ..langsPrioritized.addAll(['en', 'ru']));
+    await controller.setUserParams(params);
+
+    // We expect the user to be consider vegan even if it's not stored so
+    final expectedParams = params.rebuild((e) => e
+      ..eatsMilk = false
+      ..eatsEggs = false
+      ..eatsHoney = false);
+
+    final finalParams = await controller.getUserParams();
+    expect(finalParams, equals(expectedParams));
   });
 }
