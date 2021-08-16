@@ -21,7 +21,6 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/photos_taker.dart';
-import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 enum InitProductPageOcrState {
@@ -39,7 +38,6 @@ enum InitProductPageModelError {
 class InitProductPageModel {
   static const OCR_RETRIES_COUNT = 3;
   static const _NO_PHOTO = -1;
-  final InitProductPageStartReason _startReason;
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
   final ProductRestorable _initialProductRestorableFull;
@@ -160,7 +158,6 @@ class InitProductPageModel {
   }
 
   InitProductPageModel(
-      this._startReason,
       Product initialProduct,
       this._onProductUpdate,
       this._forceReloadAllProductData,
@@ -253,17 +250,10 @@ class InitProductPageModel {
   }
 
   bool askForLanguage() {
-    return !_startedForVegStatuses();
-  }
-
-  bool _startedForVegStatuses() {
-    return _startReason == InitProductPageStartReason.HELP_WITH_VEG_STATUSES;
+    return true;
   }
 
   bool askForFrontPhoto() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     if (_initialProductSlice.imageFront != productSlice.imageFront) {
       // Already updated (probably when different lang was chosen), so
       // we allow further editing.
@@ -273,9 +263,6 @@ class InitProductPageModel {
   }
 
   bool askForName() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     if (_initialProductSlice.name != productSlice.name) {
       // Already updated (probably when different lang was chosen), so
       // we allow further editing.
@@ -286,9 +273,6 @@ class InitProductPageModel {
   }
 
   bool askForBrand() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     if (_initialProductSlice.brands != productSlice.brands) {
       // Already updated (probably when different lang was chosen), so
       // we allow further editing.
@@ -299,9 +283,6 @@ class InitProductPageModel {
   }
 
   bool askForIngredientsData() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     if (_initialProductSlice.ingredientsText != productSlice.ingredientsText) {
       // Already updated (probably when different lang was chosen), so
       // we allow further editing.
@@ -313,16 +294,10 @@ class InitProductPageModel {
   }
 
   bool askForIngredientsText() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     return askForIngredientsData() && productSlice.imageIngredients != null;
   }
 
   bool askForShops() {
-    if (_startedForVegStatuses()) {
-      return false;
-    }
     return true;
   }
 

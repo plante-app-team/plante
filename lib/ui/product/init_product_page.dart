@@ -38,16 +38,9 @@ import 'init_product_page_model.dart';
 typedef DoneCallback = void Function();
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-enum InitProductPageStartReason {
-  DEFAULT,
-  HELP_WITH_VEG_STATUSES,
-}
-
 class InitProductPage extends StatefulWidget {
-  final InitProductPageStartReason startReason;
   final Product initialProduct;
   final List<Shop> initialShops;
-  final String? title;
   final ProductUpdatedCallback? productUpdatedCallback;
   final VoidCallback? doneCallback;
 
@@ -56,9 +49,7 @@ class InitProductPage extends StatefulWidget {
 
   InitProductPage(this.initialProduct,
       {Key? key,
-      this.startReason = InitProductPageStartReason.DEFAULT,
       this.initialShops = const [],
-      this.title,
       this.productUpdatedCallback,
       this.doneCallback,
       this.photoBeingTakenForTests})
@@ -129,7 +120,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
     super.initState();
     _permissionsManager = GetIt.I.get<PermissionsManager>();
     _model = InitProductPageModel(
-        widget.startReason,
         widget.initialProduct,
         onStateUpdated,
         forceUseModelData,
@@ -206,7 +196,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
       SizedBox(
           width: double.infinity,
           child: Text(
-            widget.title ?? context.strings.init_product_page_title,
+            context.strings.init_product_page_title,
             style: TextStyles.headline1,
             textAlign: TextAlign.left,
           )),

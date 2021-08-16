@@ -28,6 +28,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page.dart';
+import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/moderator_comment_dialog.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -310,12 +311,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => InitProductPage(_product,
-                  key: const Key('init_product_page'),
-                  startReason:
-                      InitProductPageStartReason.HELP_WITH_VEG_STATUSES,
-                  title: context
-                      .strings.display_product_page_help_with_veg_statuses,
+          builder: (context) => HelpWithVegStatusPage(_product,
+                  key: const Key('help_with_veg_status_page'),
                   productUpdatedCallback: (product) {
                 _productUpdatedCallback?.call(product);
                 setState(() {

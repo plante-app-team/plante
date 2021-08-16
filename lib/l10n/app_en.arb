@@ -141,7 +141,6 @@
 
       "display_product_page_ingredients": "Ingredients:",
       "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
-      "display_product_page_help_with_veg_statuses": "Help with veg-statuses",
       "display_product_page_report_btn": "Report incorrect information",
       "display_product_page_brand": "Brand: ",
       "display_product_page_click_to_help_with_veg_statuses": "I can help!",
@@ -172,6 +171,8 @@
       "veg_status_selection_panel_positive": "Yes",
       "veg_status_selection_panel_negative": "No",
       "veg_status_selection_panel_dunno": "Not sure",
+
+      "help_with_veg_status_page_title": "Help with vegan status",
 
       "settings_page_title": "Settings",
       "settings_page_your_id": "Your ID: ",

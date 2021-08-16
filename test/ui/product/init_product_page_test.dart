@@ -1491,52 +1491,6 @@ void main() {
     expect(inputProductsLangStorage.selectedCode, equals(_DEFAULT_TEST_LANG));
   });
 
-  testWidgets('when started for default reason every input is shown',
-      (WidgetTester tester) async {
-    final product = Product((v) => v
-      ..barcode = '123'
-      ..langsPrioritized.add(_DEFAULT_TEST_LANG));
-
-    final widget = InitProductPage(product,
-        startReason: InitProductPageStartReason.DEFAULT);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const Key('product_lang')), findsOneWidget);
-    expect(find.byKey(const Key('front_photo_group')), findsOneWidget);
-    expect(find.byKey(const Key('front_photo')), findsOneWidget);
-    expect(find.byKey(const Key('name_group')), findsOneWidget);
-    expect(find.byKey(const Key('brand_group')), findsOneWidget);
-    expect(find.byKey(const Key('shops_group')), findsOneWidget);
-    expect(find.byKey(const Key('ingredients_group')), findsOneWidget);
-    expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
-  });
-
-  testWidgets('when started for veg statuses only veg statuses are shown',
-      (WidgetTester tester) async {
-    final product = Product((v) => v
-      ..barcode = '123'
-      ..langsPrioritized.add(_DEFAULT_TEST_LANG));
-
-    final widget = InitProductPage(product,
-        startReason: InitProductPageStartReason.HELP_WITH_VEG_STATUSES);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const Key('product_lang')), findsNothing);
-    expect(find.byKey(const Key('front_photo_group')), findsNothing);
-    expect(find.byKey(const Key('front_photo')), findsNothing);
-    expect(find.byKey(const Key('name_group')), findsNothing);
-    expect(find.byKey(const Key('brand_group')), findsNothing);
-    expect(find.byKey(const Key('shops_group')), findsNothing);
-    expect(find.byKey(const Key('ingredients_group')), findsNothing);
-    expect(find.byKey(const Key('vegan_status_group')), findsOneWidget);
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // expect(find.byKey(const Key('vegetarian_status_group')), findsOneWidget);
-  });
-
   testWidgets('Only languages known to the user are offered',
       (WidgetTester tester) async {
     final context = await tester

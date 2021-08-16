@@ -439,8 +439,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('vegan_positive_btn')));
     await tester.pumpAndSettle();
-    await tester.drag(find.byKey(const Key('content')), const Offset(0, -3000));
-    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('back_button')));

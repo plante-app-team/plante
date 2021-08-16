@@ -256,7 +256,8 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(
-        find.text(context.strings.display_product_page_help_with_veg_statuses),
+        find.text(context
+            .strings.display_product_page_click_to_help_with_veg_statuses),
         findsNothing);
   });
 
@@ -283,29 +284,28 @@ void main() {
         find.text(context.strings.veg_status_displayed_veg_status_source_off),
         findsOneWidget);
 
-    // Help button initially exists and init_product_page doesn't
+    // Help button initially exists and help_with_veg_status_page doesn't
     expect(
         find.text(context
             .strings.display_product_page_click_to_help_with_veg_statuses),
         findsOneWidget);
-    expect(find.byKey(const Key('init_product_page')), findsNothing);
+    expect(find.byKey(const Key('help_with_veg_status_page')), findsNothing);
 
     await tester.tap(find.text(
         context.strings.display_product_page_click_to_help_with_veg_statuses));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('init_product_page')), findsWidgets);
+    expect(find.byKey(const Key('help_with_veg_status_page')), findsWidgets);
 
     await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
-    await tester.pumpAndSettle();
-    await tester.drag(find.byKey(const Key('content')), const Offset(0, -3000));
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('init_product_page')), findsNothing);
+    expect(find.byKey(const Key('help_with_veg_status_page')), findsNothing);
     expect(
-        find.text(context.strings.display_product_page_help_with_veg_statuses),
+        find.text(context
+            .strings.display_product_page_click_to_help_with_veg_statuses),
         findsNothing);
 
     // Final veg status is changed and is from community
