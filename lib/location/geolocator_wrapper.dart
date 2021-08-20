@@ -1,15 +1,14 @@
-import 'dart:math';
-
 import 'package:geolocator/geolocator.dart';
+import 'package:plante/model/coord.dart';
 
 /// Wrapper around the geolocator lib mainly for testing purposes
 class GeolocatorWrapper {
-  Future<Point<double>?> getLastKnownPosition() async =>
-      (await Geolocator.getLastKnownPosition())?.toPoint();
-  Future<Point<double>?> getCurrentPosition() async =>
-      (await Geolocator.getCurrentPosition()).toPoint();
+  Future<Coord?> getLastKnownPosition() async =>
+      (await Geolocator.getLastKnownPosition())?.toCoord();
+  Future<Coord?> getCurrentPosition() async =>
+      (await Geolocator.getCurrentPosition()).toCoord();
 }
 
 extension MyPositionExt on Position {
-  Point<double> toPoint() => Point(longitude, latitude);
+  Coord toCoord() => Coord(lat: latitude, lon: longitude);
 }

@@ -16,6 +16,7 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -90,9 +91,11 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
+  GetIt.I.registerSingleton<OsmCacher>(OsmCacher());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
       GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<Backend>(),
       GetIt.I.get<ProductsObtainer>(),
-      GetIt.I.get<Analytics>()));
+      GetIt.I.get<Analytics>(),
+      GetIt.I.get<OsmCacher>()));
 }

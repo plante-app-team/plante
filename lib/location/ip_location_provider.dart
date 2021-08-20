@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:http/http.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/outside/http_client.dart';
 
 class IpLocationProvider {
@@ -11,7 +12,7 @@ class IpLocationProvider {
 
   IpLocationProvider(this._httpClient);
 
-  Future<Point<double>?> positionByIP() async {
+  Future<Coord?> positionByIP() async {
     final Response resp;
     try {
       resp = await _httpClient
@@ -46,6 +47,6 @@ class IpLocationProvider {
       return null;
     }
 
-    return Point<double>(lon.toDouble(), lat.toDouble());
+    return Coord(lat: lat.toDouble(), lon: lon.toDouble());
   }
 }

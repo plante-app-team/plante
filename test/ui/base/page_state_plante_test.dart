@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 
 void main() {
   late FakeAnalytics analytics;

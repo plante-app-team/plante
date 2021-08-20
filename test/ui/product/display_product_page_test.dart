@@ -7,11 +7,12 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
+import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
-import 'package:plante/location/location_controller.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
@@ -30,16 +31,15 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_input_products_lang_storage.dart';
-import '../../fake_shared_preferences.dart';
-import '../../fake_user_langs_manager.dart';
-import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
+import '../../z_fakes/fake_user_langs_manager.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
 

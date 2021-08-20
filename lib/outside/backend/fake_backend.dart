@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -163,7 +162,7 @@ class FakeBackend implements Backend {
   @override
   Future<Result<BackendShop, BackendError>> createShop(
       {required String name,
-      required Point<double> coords,
+      required Coord coord,
       required String type}) async {
     return Ok(_createFakeShopIfNotExists(productsNumber: 0).toShop());
   }

@@ -1,13 +1,12 @@
-import 'dart:math';
-
 import 'package:geolocator/geolocator.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/model/coord.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
-import '../fake_shared_preferences.dart';
+import '../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late MockIpLocationProvider ipLocationProvider;
@@ -34,7 +33,7 @@ void main() {
   }
 
   test('init with current location available', () async {
-    const currentPos = Point<double>(10, 20);
+    final currentPos = Coord(lon: 10, lat: 20);
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition())
@@ -43,7 +42,7 @@ void main() {
     verifyNever(geolocatorWrapper.getCurrentPosition());
 
     init();
-    Point<double>? receivedPosition;
+    Coord? receivedPosition;
     locationController.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
@@ -67,7 +66,7 @@ void main() {
 
   test('init with last known location when all of above are not available',
       () async {
-    const lastKnownPos = Point<double>(10, 20);
+    final lastKnownPos = Coord(lon: 10, lat: 20);
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => lastKnownPos);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
@@ -75,7 +74,7 @@ void main() {
     verifyNever(geolocatorWrapper.getLastKnownPosition());
 
     init();
-    Point<double>? receivedPosition;
+    Coord? receivedPosition;
     locationController.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
@@ -103,11 +102,11 @@ void main() {
         .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
 
-    const ipPos = Point<double>(10, 20);
+    final ipPos = Coord(lon: 10, lat: 20);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => ipPos);
 
     init();
-    Point<double>? receivedPosition;
+    Coord? receivedPosition;
     locationController.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
@@ -138,12 +137,12 @@ void main() {
     when(geolocatorWrapper.getCurrentPosition()).thenAnswer((_) async => null);
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
 
-    const lastKnownPos = Point<double>(10, 20);
+    final lastKnownPos = Coord(lon: 10, lat: 20);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         lastKnownPos, fakeSharedPreferences.asHolder());
 
     init();
-    Point<double>? receivedPosition;
+    Coord? receivedPosition;
     locationController.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
@@ -167,7 +166,7 @@ void main() {
   });
 
   test('lastKnownPosition good scenario', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -179,7 +178,7 @@ void main() {
     init();
     await Future.delayed(const Duration(milliseconds: 10));
 
-    const newPos = Point<double>(10, 20);
+    final newPos = Coord(lon: 10, lat: 20);
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => newPos);
 
@@ -193,7 +192,7 @@ void main() {
   });
 
   test('lastKnownPosition can work without permission', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -218,7 +217,7 @@ void main() {
   });
 
   test('lastKnownPosition on exception', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -243,7 +242,7 @@ void main() {
   });
 
   test('currentPosition good scenario', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -255,7 +254,7 @@ void main() {
     init();
     await Future.delayed(const Duration(milliseconds: 10));
 
-    const newPos = Point<double>(10, 20);
+    final newPos = Coord(lon: 10, lat: 20);
     when(geolocatorWrapper.getCurrentPosition())
         .thenAnswer((_) async => newPos);
 
@@ -269,7 +268,7 @@ void main() {
   });
 
   test('currentPosition cannot work without permission', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -294,7 +293,7 @@ void main() {
   });
 
   test('currentPosition on exception', () async {
-    const initialPos = Point<double>(10, 10);
+    final initialPos = Coord(lon: 10, lat: 10);
     await LocationController.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
@@ -321,7 +320,7 @@ void main() {
   test(
       'callWhenLastPositionKnown gives position right away if the controller is initialized',
       () async {
-    const currentPos = Point<double>(10, 20);
+    final currentPos = Coord(lon: 10, lat: 20);
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
     when(geolocatorWrapper.getCurrentPosition())
@@ -332,7 +331,7 @@ void main() {
     init();
     await Future.delayed(const Duration(milliseconds: 10));
 
-    Point<double>? receivedPosition;
+    Coord? receivedPosition;
     locationController.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });

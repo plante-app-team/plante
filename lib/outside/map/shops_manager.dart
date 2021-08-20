@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
@@ -14,19 +14,23 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_cacher.dart';
+import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_impl.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/map/lat_lng_extensions.dart';
 import 'package:plante/base/date_time_extensions.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
 class ShopsManager {
+  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
+  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
   final Analytics _analytics;
+  late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
   final ShopsManagerImpl _impl;
 
-  static const MAX_SHOPS_LOADS_ATTEMPTS = 3;
+  static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   static final _shopsLoadsAttemptsCooldown = isInTests()
       ? const Duration(milliseconds: 50)
       : const Duration(seconds: 3);
@@ -36,14 +40,16 @@ class ShopsManager {
   final _delayedLoadings = <VoidCallback>[];
 
   final _shopsCache = <String, Shop>{};
-  final _loadedAreas = <LatLngBounds, List<String>>{};
+  final _loadedAreas = <CoordsBounds, List<String>>{};
   final _rangesCache = <String, ShopProductRange>{};
 
   int get loadedAreasCount => _loadedAreas.length;
 
   ShopsManager(OpenStreetMap openStreetMap, Backend backend,
-      ProductsObtainer productsObtainer, this._analytics)
-      : _impl = ShopsManagerImpl(openStreetMap, backend, productsObtainer);
+      ProductsObtainer productsObtainer, this._analytics, OsmCacher _osmCacher)
+      : _impl = ShopsManagerImpl(openStreetMap, backend, productsObtainer) {
+    _fetchShopsHelper = ShopsManagerFetchShopsHelper(_impl, _osmCacher);
+  }
 
   void addListener(ShopsManagerListener listener) {
     _listeners.add(listener);
@@ -60,17 +66,13 @@ class ShopsManager {
   }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
-      Point<double> northeast, Point<double> southwest) async {
+      CoordsBounds bounds) async {
     final completer = Completer<Result<Map<String, Shop>, ShopsManagerError>>();
     VoidCallback? callback;
     callback = () async {
       _loadingArea = true;
       try {
-        final result = await _maybeLoadShops(
-            LatLngBounds(
-                northeast: LatLng(northeast.y, northeast.x),
-                southwest: LatLng(southwest.y, southwest.x)),
-            attemptNumber: 1);
+        final result = await _maybeLoadShops(bounds, attemptNumber: 1);
         completer.complete(result);
         _delayedLoadings.remove(callback);
       } finally {
@@ -88,7 +90,7 @@ class ShopsManager {
   }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
-      LatLngBounds bounds,
+      CoordsBounds bounds,
       {required int attemptNumber}) async {
     for (final loadedArea in _loadedAreas.keys) {
       // Already loaded
@@ -101,42 +103,34 @@ class ShopsManager {
       }
     }
 
-    // +-20 kms
-    var boundsToLoad = bounds.center.makeSquare(20 * 1 / 111);
-    if (boundsToLoad.width < bounds.width ||
-        boundsToLoad.height < bounds.width) {
-      Log.w('Requested bounds are unexpectedly big');
-      boundsToLoad = bounds;
-    }
     final timeSinceLastLoad = DateTime.now().difference(_lastShopsLoadTime);
     if (timeSinceLastLoad < _shopsLoadsAttemptsCooldown) {
       await Future.delayed(_shopsLoadsAttemptsCooldown - timeSinceLastLoad);
     }
-
     _lastShopsLoadTime = DateTime.now();
-    final shopsResult = await _impl.fetchShops(
-        Point(
-            boundsToLoad.northeast.latitude, boundsToLoad.northeast.longitude),
-        Point(
-            boundsToLoad.southwest.latitude, boundsToLoad.southwest.longitude));
 
-    if (shopsResult.isErr) {
-      if (shopsResult.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
-        return Err(shopsResult.unwrapErr());
+    final shopsFetchResult = await _fetchShopsHelper.fetchShops(
+        viewPort: bounds,
+        osmBoundsSizesToRequest: [100, 30],
+        planteBoundsSizeToRequest: 20);
+    if (shopsFetchResult.isErr) {
+      if (shopsFetchResult.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
+        return Err(shopsFetchResult.unwrapErr());
       } else {
         if (attemptNumber >= MAX_SHOPS_LOADS_ATTEMPTS) {
-          return Err(shopsResult.unwrapErr());
+          return Err(shopsFetchResult.unwrapErr());
         }
         return _maybeLoadShops(bounds, attemptNumber: attemptNumber + 1);
       }
     }
 
-    final shops = shopsResult.unwrap();
-    _shopsCache.addAll(shops);
-    final ids = shops.values.map((shop) => shop.osmId).toList();
-    _loadedAreas[boundsToLoad] = ids;
-    final result =
-        ids.map((id) => shops[id]!).where((shop) => bounds.containsShop(shop));
+    final fetchResult = shopsFetchResult.unwrap();
+    _shopsCache.addAll(fetchResult.shops);
+    final ids = fetchResult.shops.values.map((shop) => shop.osmId).toList();
+    _loadedAreas[fetchResult.shopsBounds] = ids;
+    final result = ids
+        .map((id) => fetchResult.shops[id]!)
+        .where((shop) => bounds.containsShop(shop));
     return Ok({for (var shop in result) shop.osmId: shop});
   }
 
@@ -203,14 +197,13 @@ class ShopsManager {
 
   Future<Result<Shop, ShopsManagerError>> createShop(
       {required String name,
-      required Point<double> coords,
+      required Coord coord,
       required ShopType type}) async {
-    final result =
-        await _impl.createShop(name: name, coords: coords, type: type);
+    final result = await _impl.createShop(name: name, coord: coord, type: type);
     if (result.isOk) {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',
-          {'name': name, 'lat': coords.y, 'lon': coords.x});
+          {'name': name, 'lat': coord.lat, 'lon': coord.lon});
       _shopsCache[shop.osmId] = shop;
       for (final loadedArea in _loadedAreas.keys) {
         if (loadedArea.containsShop(shop)) {
@@ -220,8 +213,14 @@ class ShopsManager {
       _notifyListeners();
     } else {
       _analytics.sendEvent('create_shop_failure',
-          {'name': name, 'lat': coords.y, 'lon': coords.x});
+          {'name': name, 'lat': coord.lat, 'lon': coord.lon});
     }
     return result;
+  }
+}
+
+extension _BoundsExt on CoordsBounds {
+  bool containsShop(Shop shop) {
+    return contains(Coord(lat: shop.latitude, lon: shop.longitude));
   }
 }

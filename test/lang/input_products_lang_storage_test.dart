@@ -2,9 +2,9 @@ import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:test/test.dart';
 
-import '../fake_analytics.dart';
-import '../fake_shared_preferences.dart';
-import '../fake_user_langs_manager.dart';
+import '../z_fakes/fake_analytics.dart';
+import '../z_fakes/fake_shared_preferences.dart';
+import '../z_fakes/fake_user_langs_manager.dart';
 
 void main() {
   late FakeSharedPreferences prefs;

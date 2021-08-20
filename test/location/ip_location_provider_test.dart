@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:plante/location/ip_location_provider.dart';
+import 'package:plante/model/coord.dart';
 import 'package:test/test.dart';
 
-import '../fake_http_client.dart';
+import '../z_fakes/fake_http_client.dart';
 
 void main() {
   late FakeHttpClient httpClient;
@@ -26,7 +26,7 @@ void main() {
     ''');
 
     final pos = await ipLocationProvider.positionByIP();
-    expect(pos, equals(const Point<double>(10, 20)));
+    expect(pos, equals(Coord(lat: 20, lon: 10)));
   });
 
   test('IOException', () async {

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
@@ -267,8 +267,7 @@ void main() {
           ..productsCount = i))));
     }
     final shopsMap = {for (final shop in manyShops) shop.osmId: shop};
-    when(shopsManager.fetchShops(any, any))
-        .thenAnswer((_) async => Ok(shopsMap));
+    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shopsMap));
 
     final widget = MapPage(
         mapControllerForTesting: mapController,

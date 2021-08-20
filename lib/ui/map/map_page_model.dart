@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
@@ -8,13 +7,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/ui/map/lat_lng_extensions.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 typedef MapPageModelUpdateShopsCallback = void Function(
@@ -37,7 +37,7 @@ class MapPageModel implements ShopsManagerListener {
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
 
-  LatLngBounds? _latestViewPort;
+  CoordsBounds? _latestViewPort;
   bool _networkOperationInProgress = false;
 
   Map<String, Shop> _shopsCache = {};
@@ -92,8 +92,8 @@ class MapPageModel implements ShopsManagerListener {
     return const CameraPosition(target: DEFAULT_USER_POS, zoom: 15);
   }
 
-  CameraPosition _pointToCameraPos(Point<double> point) {
-    return CameraPosition(target: LatLng(point.y, point.x), zoom: 15);
+  CameraPosition _pointToCameraPos(Coord point) {
+    return CameraPosition(target: point.toLatLng(), zoom: 15);
   }
 
   Future<CameraPosition?> currentUserPos() async {
@@ -103,13 +103,12 @@ class MapPageModel implements ShopsManagerListener {
     }
   }
 
-  Future<void> onCameraMoved(LatLngBounds viewBounds) async {
+  Future<void> onCameraMoved(CoordsBounds viewBounds) async {
     _latestViewPort = viewBounds;
-    unawaited(_latestCameraPosStorage.set(viewBounds.center.toPoint()));
+    unawaited(_latestCameraPosStorage.set(viewBounds.center));
 
     final result = await _networkOperation(() async {
-      return await _shopsManager.fetchShops(
-          viewBounds.northeast.toPoint(), viewBounds.southwest.toPoint());
+      return await _shopsManager.fetchShops(viewBounds);
     });
 
     if (result.isOk) {
@@ -140,11 +139,11 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<Result<Shop, ShopsManagerError>> createShop(
-      String name, ShopType type, Point<double> coords) async {
+      String name, ShopType type, Coord coord) async {
     return await _networkOperation(() async {
       return await _shopsManager.createShop(
         name: name,
-        coords: coords,
+        coord: coord,
         type: type,
       );
     });
@@ -171,7 +170,13 @@ MapPageModelError _convertShopsManagerError(ShopsManagerError error) {
   switch (error) {
     case ShopsManagerError.NETWORK_ERROR:
       return MapPageModelError.NETWORK_ERROR;
+    case ShopsManagerError.OSM_SERVERS_ERROR:
+      return MapPageModelError.OTHER;
     case ShopsManagerError.OTHER:
       return MapPageModelError.OTHER;
   }
+}
+
+extension _CoordExt on Coord {
+  LatLng toLatLng() => LatLng(lat, lon);
 }

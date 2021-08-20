@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 
-import '../../../fake_app_lifecycle_watcher.dart';
 import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_app_lifecycle_watcher.dart';
 
 void main() {
   testWidgets('notified when widget removed from tree and returned',

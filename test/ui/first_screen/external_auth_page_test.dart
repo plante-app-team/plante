@@ -2,8 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
@@ -11,14 +13,12 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/apple_user.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/identity/google_user.dart';
-import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late FakeAnalytics analytics;

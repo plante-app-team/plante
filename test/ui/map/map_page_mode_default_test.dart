@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
@@ -310,7 +310,7 @@ void main() {
   testWidgets('no shops hint is not shown until shops are loaded',
       (WidgetTester tester) async {
     final completer = Completer<Map<String, Shop>>();
-    when(shopsManager.fetchShops(any, any))
+    when(shopsManager.fetchShops(any))
         .thenAnswer((_) async => Ok(await completer.future));
 
     final widget = MapPage(mapControllerForTesting: mapController);

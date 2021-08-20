@@ -2,7 +2,7 @@ import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:test/test.dart';
 
-import '../fake_analytics.dart';
+import '../z_fakes/fake_analytics.dart';
 
 void main() {
   late FakeAnalytics analytics;

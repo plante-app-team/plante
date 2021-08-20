@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
@@ -13,13 +14,12 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_user_langs_manager.dart';
-import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_user_langs_manager.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late FakeUserParamsController userParamsController;

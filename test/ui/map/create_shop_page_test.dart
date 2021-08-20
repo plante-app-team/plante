@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,7 +5,9 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
@@ -16,11 +16,10 @@ import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
-import 'package:plante/l10n/strings.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 
 void main() {
   late MockShopsManager shopsManager;
@@ -28,7 +27,7 @@ void main() {
 
   final FutureAddress readyAddress =
       Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
-  const coords = Point(1.2, 3.4);
+  final coord = Coord(lat: 3.4, lon: 1.2);
 
   setUp(() async {
     await GetIt.I.reset();
@@ -42,18 +41,17 @@ void main() {
 
     when(shopsManager.createShop(
             name: anyNamed('name'),
-            coords: anyNamed('coords'),
+            coord: anyNamed('coord'),
             type: anyNamed('type')))
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
-      final coords =
-          invc.namedArguments[const Symbol('coords')] as Point<double>;
+      final coords = invc.namedArguments[const Symbol('coord')] as Coord;
       final id = randInt(100, 500);
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
           ..osmId = id.toString()
-          ..longitude = coords.x
-          ..latitude = coords.y
+          ..longitude = coords.lon
+          ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
           ..osmId = id.toString()
@@ -65,8 +63,7 @@ void main() {
 
   Future<void> createShopTestImpl(WidgetTester tester,
       {String? shopName, ShopType? shopType}) async {
-    final context =
-        await tester.superPump(const CreateShopPage(shopCoords: coords));
+    final context = await tester.superPump(CreateShopPage(shopCoord: coord));
 
     if (shopName != null) {
       await tester.enterText(
@@ -88,7 +85,7 @@ void main() {
   testWidgets('create shop', (WidgetTester tester) async {
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),
-        coords: anyNamed('coords'),
+        coord: anyNamed('coord'),
         type: anyNamed('type')));
 
     await createShopTestImpl(tester,
@@ -96,7 +93,7 @@ void main() {
 
     // Shop is created
     verify(shopsManager.createShop(
-        name: 'new shop', coords: coords, type: ShopType.deli));
+        name: 'new shop', coord: coord, type: ShopType.deli));
   });
 
   testWidgets('cannot create shop when shop name is not set',
@@ -105,7 +102,7 @@ void main() {
 
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),
-        coords: anyNamed('coords'),
+        coord: anyNamed('coord'),
         type: anyNamed('type')));
   });
 
@@ -115,7 +112,7 @@ void main() {
 
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),
-        coords: anyNamed('coords'),
+        coord: anyNamed('coord'),
         type: anyNamed('type')));
   });
 }

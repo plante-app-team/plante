@@ -22,7 +22,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
+import '../../z_fakes/fake_analytics.dart';
 
 void main() {
   const expectedImageFrontRu =

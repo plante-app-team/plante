@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
@@ -58,10 +57,10 @@ class MapPageModeCreateShop extends MapPageMode {
       _shopBeingCreated != null ? {_shopBeingCreated!} : {};
 
   @override
-  void onMapClick(Point<double> coords) async {
+  void onMapClick(Coord coord) async {
     // Temporary marker
-    _shopBeingCreated = _createShop('', ShopType.supermarket, coords);
-    moveMapTo(coords);
+    _shopBeingCreated = _createShop('', ShopType.supermarket, coord);
+    moveMapTo(coord);
     updateMap();
 
     final yes = await showDoOrCancelDialog(
@@ -76,8 +75,7 @@ class MapPageModeCreateShop extends MapPageMode {
 
     final dialogResult = await Navigator.push<Shop>(
       context,
-      MaterialPageRoute(
-          builder: (context) => CreateShopPage(shopCoords: coords)),
+      MaterialPageRoute(builder: (context) => CreateShopPage(shopCoord: coord)),
     );
 
     if (dialogResult != null) {
@@ -91,12 +89,12 @@ class MapPageModeCreateShop extends MapPageMode {
     updateMap();
   }
 
-  Shop _createShop(String name, ShopType type, Point<double> coords) {
+  Shop _createShop(String name, ShopType type, Coord coords) {
     return Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
-        ..longitude = coords.x
-        ..latitude = coords.y
+        ..longitude = coords.lon
+        ..latitude = coords.lat
         ..name = name
         ..type = type.osmName))
       ..backendShop.replace(BackendShop((e) => e

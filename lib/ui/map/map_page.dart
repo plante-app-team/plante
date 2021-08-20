@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -9,6 +8,8 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -82,7 +83,7 @@ class MapPage extends StatefulWidget {
   }
 
   @visibleForTesting
-  void onMapClickForTesting(LatLng coords) {
+  void onMapClickForTesting(Coord coords) {
     if (!isInTests()) {
       throw Exception('MapPage: not in tests (onMapClickForTesting)');
     }
@@ -112,7 +113,7 @@ class _TestingStorage {
   _TestingFinishCallback? finishCallback;
   VoidCallback? onMapIdleCallback;
   ArgCallback<Iterable<Shop>>? onMarkerClickCallback;
-  ArgCallback<LatLng>? onMapClickCallback;
+  ArgCallback<Coord>? onMapClickCallback;
   ResCallback<MapPageMode>? modeCallback;
   final Set<Shop> displayedShops = {};
 
@@ -151,7 +152,9 @@ class _MapPageState extends PageStatePlante<MapPage>
     };
     widget._testingStorage.onMapIdleCallback = _onCameraIdle;
     widget._testingStorage.onMarkerClickCallback = _onMarkerClick;
-    widget._testingStorage.onMapClickCallback = _onMapTap;
+    widget._testingStorage.onMapClickCallback = (Coord coord) {
+      _onMapTap(LatLng(coord.lat, coord.lon));
+    };
     widget._testingStorage.modeCallback = () {
       return _mode;
     };
@@ -205,11 +208,11 @@ class _MapPageState extends PageStatePlante<MapPage>
         _bottomHint = hint;
       });
     };
-    final moveMapCallback = (Point<double> coords) async {
+    final moveMapCallback = (Coord coord) async {
       final mapController = await _mapController.future;
       await mapController.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(
-              target: LatLng(coords.y, coords.x),
+              target: LatLng(coord.lat, coord.lon),
               zoom: await mapController.getZoomLevel())));
     };
     final switchModeCallback = (MapPageMode newMode) {
@@ -450,7 +453,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
     _updateMap(delay: const Duration(milliseconds: 1000));
-    await _model.onCameraMoved(viewBounds);
+    await _model.onCameraMoved(viewBounds.toCoordsBounds());
   }
 
   void _onShopsUpdated(Iterable<Shop> shops) {
@@ -494,11 +497,16 @@ class _MapPageState extends PageStatePlante<MapPage>
     }
   }
 
-  void _onMapTap(LatLng coords) {
-    _mode.onMapClick(coords.toPoint());
+  void _onMapTap(LatLng coord) {
+    _mode.onMapClick(coord.toCoord());
   }
 }
 
-extension _MyLatLngExt on LatLng {
-  Point<double> toPoint() => Point(longitude, latitude);
+extension _CoordExt on LatLng {
+  Coord toCoord() => Coord(lat: latitude, lon: longitude);
+}
+
+extension _CoordBoundsExt on LatLngBounds {
+  CoordsBounds toCoordsBounds() => CoordsBounds(
+      southwest: southwest.toCoord(), northeast: northeast.toCoord());
 }
