@@ -49,7 +49,7 @@ class LocationBasedUserLangsManager {
       return;
     }
 
-    final addressRes = await _osm.fetchAddress(pos.y, pos.x);
+    final addressRes = await _osm.fetchAddress(pos.lat, pos.lon);
     if (addressRes.isErr) {
       Log.w('Cannot determine user langs - OSM error: $addressRes');
       return;

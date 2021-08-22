@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
@@ -61,7 +61,7 @@ class AddressObtainer {
     return await _osm.fetchAddress(lat, lon);
   }
 
-  FutureAddress addressOfCoords(Point<double> coords) async {
-    return await _fetchAddress(coords.y, coords.x);
+  FutureAddress addressOfCoords(Coord coords) async {
+    return await _fetchAddress(coords.lat, coords.lon);
   }
 }

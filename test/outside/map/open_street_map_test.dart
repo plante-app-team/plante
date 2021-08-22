@@ -1,11 +1,11 @@
-import 'dart:math';
-
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
-import '../../fake_http_client.dart';
+import '../../z_fakes/fake_http_client.dart';
 
 void main() {
   late FakeHttpClient _http;
@@ -72,8 +72,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(3));
 
@@ -110,8 +110,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrap().length, equals(0));
   });
 
@@ -125,8 +125,8 @@ void main() {
 
     _http.setResponse('.*', osmResp, responseCode: 400);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -139,8 +139,8 @@ void main() {
     ''';
 
     _http.setResponse('.*', osmResp);
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -153,8 +153,8 @@ void main() {
     ''';
 
     _http.setResponse('.*', osmResp);
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -187,8 +187,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -223,8 +223,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(2));
     expect(shops[0].name, 'Spar');
@@ -274,8 +274,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -311,8 +311,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -348,8 +348,8 @@ void main() {
 
     _http.setResponse('.*', osmResp);
 
-    final shopsRes =
-        await _osm.fetchShops(const Point(0, 0), const Point(1, 1));
+    final shopsRes = await _osm.fetchShops(CoordsBounds(
+        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');

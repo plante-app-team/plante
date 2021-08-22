@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,14 +6,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 /// NOTE: this file contains tests only for mechanics
@@ -140,8 +140,8 @@ void main() {
 
   testWidgets('start camera pos when it is available',
       (WidgetTester tester) async {
-    const initialPos = Point<double>(10, 20);
-    const notInitialPos = Point<double>(20, 30);
+    final initialPos = Coord(lat: 20, lon: 10);
+    final notInitialPos = Coord(lat: 30, lon: 20);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => initialPos);
     when(latestCameraPosStorage.get()).thenAnswer((_) async => notInitialPos);
     when(locationController.lastKnownPositionInstant())
@@ -151,8 +151,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(notInitialPos);
     });
 
@@ -160,8 +159,8 @@ void main() {
     await tester.superPump(widget);
 
     final map = find.byType(GoogleMap).evaluate().first.widget as GoogleMap;
-    expect(map.initialCameraPosition.target.longitude, initialPos.x);
-    expect(map.initialCameraPosition.target.latitude, initialPos.y);
+    expect(map.initialCameraPosition.target.longitude, initialPos.lon);
+    expect(map.initialCameraPosition.target.latitude, initialPos.lat);
 
     // Ensure that instant start pos was enough
     await tester.pumpAndSettle();
@@ -171,8 +170,8 @@ void main() {
   testWidgets(
       'start camera pos when it is not available but user pos is cached',
       (WidgetTester tester) async {
-    const initialPos = Point<double>(10, 20);
-    const notInitialPos = Point<double>(20, 30);
+    final initialPos = Coord(lat: 20, lon: 10);
+    final notInitialPos = Coord(lat: 30, lon: 20);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.get()).thenAnswer((_) async => notInitialPos);
     when(locationController.lastKnownPositionInstant()).thenReturn(initialPos);
@@ -181,8 +180,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(notInitialPos);
     });
 
@@ -190,8 +188,8 @@ void main() {
     await tester.superPump(widget);
 
     final map = find.byType(GoogleMap).evaluate().first.widget as GoogleMap;
-    expect(map.initialCameraPosition.target.longitude, initialPos.x);
-    expect(map.initialCameraPosition.target.latitude, initialPos.y);
+    expect(map.initialCameraPosition.target.longitude, initialPos.lon);
+    expect(map.initialCameraPosition.target.latitude, initialPos.lat);
 
     // Ensure that instant start pos was enough
     await tester.pumpAndSettle();
@@ -201,7 +199,7 @@ void main() {
   testWidgets(
       'start camera pos when no cache and instant positions are available',
       (WidgetTester tester) async {
-    const notInitialPos = Point<double>(20, 30);
+    final notInitialPos = Coord(lat: 30, lon: 20);
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.get()).thenAnswer((_) async => notInitialPos);
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
@@ -210,8 +208,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(notInitialPos);
     });
 
@@ -231,9 +228,9 @@ void main() {
 
   testWidgets('delayed start camera pos when latest camera pos loaded',
       (WidgetTester tester) async {
-    const initialPos = Point<double>(10, 20);
-    const notInitialPos = Point<double>(20, 30);
-    final initialPosCompleter = Completer<Point<double>>();
+    final initialPos = Coord(lat: 20, lon: 10);
+    final notInitialPos = Coord(lat: 30, lon: 20);
+    final initialPosCompleter = Completer<Coord>();
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.get())
         .thenAnswer((_) async => initialPosCompleter.future);
@@ -243,8 +240,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(notInitialPos);
     });
 
@@ -273,9 +269,9 @@ void main() {
   testWidgets(
       'delayed start camera pos when latest camera pos NOT loaded but '
       'last known pos is available', (WidgetTester tester) async {
-    const initialPos = Point<double>(10, 20);
-    const notInitialPos = Point<double>(20, 30);
-    final initialPosCompleter = Completer<Point<double>>();
+    final initialPos = Coord(lat: 20, lon: 10);
+    final notInitialPos = Coord(lat: 30, lon: 20);
+    final initialPosCompleter = Completer<Coord>();
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
@@ -284,8 +280,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(notInitialPos);
     });
 
@@ -315,9 +310,9 @@ void main() {
       'delayed start camera pos when latest camera pos NOT loaded but '
       'latest user pos eventually becomes available',
       (WidgetTester tester) async {
-    const initialPos = Point<double>(10, 20);
-    const notInitialPos = Point<double>(20, 30);
-    ArgCallback<Point<double>>? initialPosCallback;
+    final initialPos = Coord(lat: 20, lon: 10);
+    final notInitialPos = Coord(lat: 30, lon: 20);
+    ArgCallback<Coord>? initialPosCallback;
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
@@ -325,8 +320,7 @@ void main() {
     when(locationController.currentPosition())
         .thenAnswer((_) async => notInitialPos);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      initialPosCallback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
     final widget = MapPage(mapControllerForTesting: mapController);
@@ -402,9 +396,9 @@ void main() {
   });
 }
 
-Point<double> _cameraUpdateToPos(CameraUpdate cameraUpdate) {
+Coord _cameraUpdateToPos(CameraUpdate cameraUpdate) {
   final json = cameraUpdate.toJson() as dynamic;
   final x = json[1]['target'][1] as double;
   final y = json[1]['target'][0] as double;
-  return Point<double>(x, y);
+  return Coord(lon: x, lat: y);
 }

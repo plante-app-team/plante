@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
@@ -7,14 +5,15 @@ import 'package:plante/base/result.dart';
 import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
-import '../fake_analytics.dart';
-import '../fake_shared_preferences.dart';
+import '../z_fakes/fake_analytics.dart';
+import '../z_fakes/fake_shared_preferences.dart';
 import 'location_based_user_langs_manager_test.mocks.dart';
 
 @GenerateMocks([LocationBasedUserLangsStorage])
@@ -41,13 +40,12 @@ void main() {
   });
 
   Future<void> finishSetUp({
-    required Point<double>? lastPos,
+    required Coord? lastPos,
     required ResCallback<Result<OsmAddress, OpenStreetMapError>> addressResp,
   }) async {
-    const initialLastPos = Point<double>(0, 0);
+    final initialLastPos = Coord(lat: 0, lon: 0);
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(initialLastPos);
     });
 
@@ -82,7 +80,7 @@ void main() {
 
   test('first init good scenario', () async {
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
     );
 
@@ -103,7 +101,7 @@ void main() {
 
   test('first init without osm address (on osm error)', () async {
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Err(OpenStreetMapError.OTHER),
     );
 
@@ -113,7 +111,7 @@ void main() {
 
   test('first init without osm country', () async {
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Ok(OsmAddress((e) => e.houseNumber = '10')),
     );
 
@@ -123,7 +121,7 @@ void main() {
 
   test('first init without lang codes for country', () async {
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'invalid_code')),
     );
 
@@ -132,10 +130,9 @@ void main() {
   });
 
   test('first init does not finish until user last pos is available', () async {
-    ArgCallback<Point<double>>? initialPosCallback;
+    ArgCallback<Coord>? initialPosCallback;
     when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      initialPosCallback =
-          invc.positionalArguments[0] as ArgCallback<Point<double>>;
+      initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
     when(osm.fetchAddress(any, any))
@@ -155,7 +152,7 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
     expect(inited, isFalse);
 
-    const lastPos = Point<double>(1, 2);
+    final lastPos = Coord(lat: 2, lon: 1);
     when(locationController.lastKnownPosition())
         .thenAnswer((_) async => lastPos);
     initialPosCallback!.call(lastPos);
@@ -167,7 +164,7 @@ void main() {
     expect(analytics.allEvents(), isEmpty);
 
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'ru')),
     );
 
@@ -179,7 +176,7 @@ void main() {
     expect(analytics.allEvents(), isEmpty);
 
     await finishSetUp(
-      lastPos: const Point<double>(1, 2),
+      lastPos: Coord(lat: 2, lon: 1),
       addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
     );
 

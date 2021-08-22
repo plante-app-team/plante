@@ -5,7 +5,7 @@ import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:test/test.dart';
 
-import '../fake_shared_preferences.dart';
+import '../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late FakeSharedPreferences prefs;

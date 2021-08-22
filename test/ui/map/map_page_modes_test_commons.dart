@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,6 +7,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -19,8 +18,8 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_shared_preferences.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
@@ -107,8 +106,7 @@ class MapPageModesTestCommons {
       shopsManagerListeners.remove(listener);
     });
 
-    when(shopsManager.fetchShops(any, any))
-        .thenAnswer((_) async => Ok(shopsMap));
+    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shopsMap));
 
     when(locationController.lastKnownPositionInstant()).thenReturn(null);
     when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
@@ -122,18 +120,17 @@ class MapPageModesTestCommons {
         .thenAnswer((_) async => Ok(None()));
     when(shopsManager.createShop(
             name: anyNamed('name'),
-            coords: anyNamed('coords'),
+            coord: anyNamed('coord'),
             type: anyNamed('type')))
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
-      final coords =
-          invc.namedArguments[const Symbol('coords')] as Point<double>;
+      final coords = invc.namedArguments[const Symbol('coord')] as Coord;
       final id = randInt(100, 500);
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
           ..osmId = id.toString()
-          ..longitude = coords.x
-          ..latitude = coords.y
+          ..longitude = coords.lon
+          ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
           ..osmId = id.toString()

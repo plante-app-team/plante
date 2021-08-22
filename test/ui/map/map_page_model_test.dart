@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -59,34 +60,34 @@ void main() {
   });
 
   test('successful shops load', () async {
-    when(shopsManager.fetchShops(any, any)).thenAnswer((_) async => Ok(shops));
+    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shops));
 
     expect(latestLoadedShops, isNull);
     expect(latestError, isNull);
 
-    await model.onCameraMoved(LatLngBounds(
-        southwest: const LatLng(14.999, 14.999),
-        northeast: const LatLng(15.001, 15.001)));
+    await model.onCameraMoved(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
 
     expect(latestLoadedShops, equals(shops));
     expect(latestError, isNull);
   });
 
   test('shops reloaded on shops manager change notification', () async {
-    when(shopsManager.fetchShops(any, any)).thenAnswer((_) async => Ok(shops));
+    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shops));
 
-    verifyNever(shopsManager.fetchShops(any, any));
-    await model.onCameraMoved(LatLngBounds(
-        southwest: const LatLng(14.999, 14.999),
-        northeast: const LatLng(15.001, 15.001)));
-    verify(shopsManager.fetchShops(any, any));
+    verifyNever(shopsManager.fetchShops(any));
+    await model.onCameraMoved(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    verify(shopsManager.fetchShops(any));
 
     clearInteractions(shopsManager);
 
-    verifyNever(shopsManager.fetchShops(any, any));
+    verifyNever(shopsManager.fetchShops(any));
     shopsManagerListeners.forEach((listener) {
       listener.onLocalShopsChange();
     });
-    verify(shopsManager.fetchShops(any, any));
+    verify(shopsManager.fetchShops(any));
   });
 }

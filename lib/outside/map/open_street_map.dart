@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_address.dart';
@@ -42,11 +42,11 @@ class OpenStreetMap {
   }
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
-      Point<double> northeast, Point<double> southwest) async {
-    final val1 = southwest.x;
-    final val2 = southwest.y;
-    final val3 = northeast.x;
-    final val4 = northeast.y;
+      CoordsBounds bounds) async {
+    final val1 = bounds.southwest.lat;
+    final val2 = bounds.southwest.lon;
+    final val3 = bounds.northeast.lat;
+    final val4 = bounds.northeast.lon;
     final typesStr = ShopType.values.map((type) => type.osmName).join('|');
     final cmd = '[out:json];('
         'node[shop~"$typesStr"]($val1,$val2,$val3,$val4);'

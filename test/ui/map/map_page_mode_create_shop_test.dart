@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
@@ -78,7 +78,7 @@ void main() {
     expectedAllShops.addAll(widget.getModeForTesting().additionalShops());
     expect(widget.getDisplayedShopsForTesting(), equals(expectedAllShops));
 
-    widget.onMapClickForTesting(const LatLng(10, 20));
+    widget.onMapClickForTesting(Coord(lat: 10, lon: 20));
     await tester.pumpAndSettle();
 
     expect(widget.getModeForTesting().accentedShops().length, equals(1));
@@ -97,7 +97,7 @@ void main() {
 
     expect(find.text(context.strings.map_page_is_shop_location_correct),
         findsNothing);
-    widget.onMapClickForTesting(const LatLng(10, 20));
+    widget.onMapClickForTesting(Coord(lat: 10, lon: 20));
     await tester.pumpAndSettle();
     expect(find.text(context.strings.map_page_is_shop_location_correct),
         findsOneWidget);
@@ -118,7 +118,7 @@ void main() {
 
     verifyNever(shopsManager.createShop(
         name: anyNamed('name'),
-        coords: anyNamed('coords'),
+        coord: anyNamed('coord'),
         type: anyNamed('type')));
 
     await tester.tap(find.text(context.strings.global_done));
@@ -126,7 +126,7 @@ void main() {
 
     // Shop is created
     verify(shopsManager.createShop(
-        name: 'new shop', coords: anyNamed('coords'), type: anyNamed('type')));
+        name: 'new shop', coord: anyNamed('coord'), type: anyNamed('type')));
     // Mode is changed
     expect(widget.getModeForTesting().runtimeType,
         equals(MapPageModeSelectShopsWhereProductSold));

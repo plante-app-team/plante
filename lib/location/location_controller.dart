@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shared_preferences_ext.dart';
 import 'package:plante/logging/log.dart';
@@ -18,9 +18,9 @@ class LocationController {
   final SharedPreferencesHolder _prefsHolder;
   final GeolocatorWrapper _geolocatorWrapper;
 
-  Point<double>? _lastKnownPositionField;
-  Point<double>? get _lastKnownPosition => _lastKnownPositionField;
-  set _lastKnownPosition(Point<double>? value) {
+  Coord? _lastKnownPositionField;
+  Coord? get _lastKnownPosition => _lastKnownPositionField;
+  set _lastKnownPosition(Coord? value) {
     final wasKnown = _lastKnownPositionField != null;
     _lastKnownPositionField = value;
     final isKnown = _lastKnownPositionField != null;
@@ -32,7 +32,7 @@ class LocationController {
     }
   }
 
-  final _lastKnownPositionCallbacks = <ArgCallback<Point<double>>>[];
+  final _lastKnownPositionCallbacks = <ArgCallback<Coord>>[];
 
   LocationController(
       this._ipLocationProvider, this._permissionsManager, this._prefsHolder,
@@ -45,9 +45,9 @@ class LocationController {
     await _initLastKnownPosition();
   }
 
-  Future<Point<double>?> _tryObtainLastKnownPositionFromPrefs() async {
+  Future<Coord?> _tryObtainLastKnownPositionFromPrefs() async {
     final prefs = await _prefsHolder.get();
-    return prefs.getPoint(PREF_LAST_KNOWN_POS);
+    return Coord.fromPointNullable(prefs.getPoint(PREF_LAST_KNOWN_POS));
   }
 
   Future<void> _initLastKnownPosition() async {
@@ -76,7 +76,7 @@ class LocationController {
 
   @visibleForTesting
   static Future<void> updateLastKnownPrefsPositionForTesting(
-      Point<double> position, SharedPreferencesHolder prefsHolder) async {
+      Coord position, SharedPreferencesHolder prefsHolder) async {
     if (!isInTests()) {
       throw Exception();
     }
@@ -84,25 +84,25 @@ class LocationController {
   }
 
   static Future<void> _updateLastKnownPrefsPosition(
-      Point<double> position, SharedPreferencesHolder prefsHolder) async {
+      Coord position, SharedPreferencesHolder prefsHolder) async {
     final prefs = await prefsHolder.get();
-    await prefs.setPoint(PREF_LAST_KNOWN_POS, position);
+    await prefs.setPoint(PREF_LAST_KNOWN_POS, position.toPoint());
   }
 
   Future<PermissionState> _permissionStatus() async {
     return await _permissionsManager.status(PermissionKind.LOCATION);
   }
 
-  Point<double>? lastKnownPositionInstant() => _lastKnownPosition;
+  Coord? lastKnownPositionInstant() => _lastKnownPosition;
 
   /// Can work without the permission
-  Future<Point<double>?> lastKnownPosition() async {
+  Future<Coord?> lastKnownPosition() async {
     final permissionStatus = await _permissionStatus();
     if (permissionStatus != PermissionState.granted) {
       return _lastKnownPosition;
     }
 
-    final Point<double>? position;
+    final Coord? position;
     try {
       position = await _geolocatorWrapper.getLastKnownPosition();
     } catch (e) {
@@ -123,12 +123,12 @@ class LocationController {
   }
 
   /// Works only if the permission is acquired
-  Future<Point<double>?> currentPosition() async {
+  Future<Coord?> currentPosition() async {
     final permissionStatus = await _permissionStatus();
     if (permissionStatus != PermissionState.granted) {
       return null;
     }
-    final Point<double>? position;
+    final Coord? position;
     try {
       position = await _geolocatorWrapper.getCurrentPosition();
     } catch (e) {
@@ -149,7 +149,7 @@ class LocationController {
     return position;
   }
 
-  void callWhenLastPositionKnown(ArgCallback<Point<double>> callback) {
+  void callWhenLastPositionKnown(ArgCallback<Coord> callback) {
     if (_lastKnownPosition != null) {
       callback.call(_lastKnownPosition!);
     }

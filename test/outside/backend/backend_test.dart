@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:mockito/mockito.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
@@ -15,10 +15,10 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_http_client.dart';
-import '../../fake_settings.dart';
-import '../../fake_user_params_controller.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_http_client.dart';
+import '../../z_fakes/fake_settings.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   final fakeSettings = FakeSettings();
@@ -894,7 +894,7 @@ void main() {
 
     final result = await backend.createShop(
         name: 'hello there',
-        coords: const Point<double>(123, 321),
+        coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
     expect(result.isOk, isTrue);
     expect('123456', equals(result.unwrap().osmId));
@@ -910,7 +910,7 @@ void main() {
 
     final result = await backend.createShop(
         name: 'hello there',
-        coords: const Point<double>(123, 321),
+        coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
     expect(result.isErr, isTrue);
   });
@@ -923,7 +923,7 @@ void main() {
 
     final result = await backend.createShop(
         name: 'hello there',
-        coords: const Point<double>(123, 321),
+        coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
 
     // 'osm_id' was expected, not 'result'

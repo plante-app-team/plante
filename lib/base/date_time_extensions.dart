@@ -10,3 +10,7 @@ extension DateTimeExtensions on DateTime {
 
   int get secondsSinceEpoch => (millisecondsSinceEpoch / 1000).round();
 }
+
+DateTime dateTimeFromSecondsSinceEpoch(int seconds) {
+  return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+}

@@ -8,6 +8,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
@@ -25,21 +26,20 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/photos_taker.dart';
-import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
+import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../common_mocks.mocks.dart';
-import '../../fake_analytics.dart';
-import '../../fake_input_products_lang_storage.dart';
-import '../../fake_settings.dart';
-import '../../fake_user_langs_manager.dart';
-import '../../fake_user_params_controller.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_settings.dart';
+import '../../z_fakes/fake_user_langs_manager.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
 

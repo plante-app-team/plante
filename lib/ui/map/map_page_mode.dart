@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page.dart';
@@ -22,7 +21,7 @@ class MapPageModeParams {
   final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
   final ArgCallback<String?> bottomHintCallback;
-  final ArgCallback<Point<double>> moveMapCallback;
+  final ArgCallback<Coord> moveMapCallback;
   final ModeSwitchCallback modeSwitchCallback;
   final Analytics analytics;
   MapPageModeParams(
@@ -69,13 +68,13 @@ abstract class MapPageMode {
   List<Widget> buildFABs() => const [];
   void onMarkerClick(Iterable<Shop> shops) {}
   void onShopsUpdated(Map<String, Shop> shops) {}
-  void onMapClick(Point<double> coords) {}
+  void onMapClick(Coord coord) {}
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;
 
-  void moveMapTo(Point<double> coords) => params.moveMapCallback.call(coords);
+  void moveMapTo(Coord coord) => params.moveMapCallback.call(coord);
   void updateWidget() => params.updateCallback.call();
   void updateMap() => params.updateMapCallback.call();
   void setBottomHint(String? hint) => params.bottomHintCallback.call(hint);

@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
@@ -33,7 +32,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       VoidCallback updateCallback,
       VoidCallback updateMapCallback,
       ArgCallback<String?> bottomHintCallback,
-      ArgCallback<Point<double>> moveMapCallback,
+      ArgCallback<Coord> moveMapCallback,
       ModeSwitchCallback modeSwitchCallback)
       : super(
             MapPageModeParams(

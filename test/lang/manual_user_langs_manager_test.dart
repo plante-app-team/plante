@@ -13,8 +13,8 @@ import 'package:plante/outside/backend/backend_response.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
-import '../fake_analytics.dart';
-import '../fake_user_params_controller.dart';
+import '../z_fakes/fake_analytics.dart';
+import '../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late FakeUserParamsController userParamsController;

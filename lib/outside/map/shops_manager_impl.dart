@@ -1,12 +1,14 @@
-import 'dart:math';
-
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -30,26 +32,43 @@ class ShopsManagerImpl {
     _listeners.remove(listener);
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
-      Point<double> northeast, Point<double> southwest) async {
-    final osmShopsResult =
-        await _openStreetMap.fetchShops(northeast, southwest);
-    if (osmShopsResult.isErr) {
-      return Err(_convertOsmErr(osmShopsResult.unwrapErr()));
+  Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
+      {required CoordsBounds osmBounds,
+      required CoordsBounds planteBounds,
+      Iterable<OsmShop>? preloadedOsmShops}) async {
+    if (!osmBounds.containsBounds(planteBounds) && osmBounds != planteBounds) {
+      Log.e('Plante bounds are not expected to be bigger than OSM bounds. '
+          'osm bounds: $osmBounds, plante bounds: $planteBounds');
     }
-    final osmShops = osmShopsResult.unwrap();
-    final backendShopsResult =
-        await _backend.requestShops(osmShops.map((e) => e.osmId));
+
+    // Either request OSM shops or use preloaded
+    final Iterable<OsmShop> osmShops;
+    if (preloadedOsmShops == null) {
+      final osmShopsResult = await _openStreetMap.fetchShops(osmBounds);
+      if (osmShopsResult.isErr) {
+        return Err(_convertOsmErr(osmShopsResult.unwrapErr()));
+      }
+      osmShops = osmShopsResult.unwrap();
+    } else {
+      osmShops = preloadedOsmShops;
+    }
+
+    // Request Plante shops
+    final osmShopsToRequestFromPlante =
+        osmShops.where((e) => planteBounds.contains(e.coord));
+    final backendShopsResult = await _backend
+        .requestShops(osmShopsToRequestFromPlante.map((e) => e.osmId));
     if (backendShopsResult.isErr) {
       return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
     }
-    final backendShops = backendShopsResult.unwrap();
 
+    // Combine OSM and Plante shops
+    final backendShops = backendShopsResult.unwrap();
     final backendShopsMap = {
       for (final backendShop in backendShops) backendShop.osmId: backendShop
     };
     final shops = <String, Shop>{};
-    for (final osmShop in osmShops) {
+    for (final osmShop in osmShopsToRequestFromPlante) {
       final backendShopNullable = backendShopsMap[osmShop.osmId];
       var shop = Shop((e) => e.osmShop.replace(osmShop));
       if (backendShopNullable != null) {
@@ -57,8 +76,21 @@ class ShopsManagerImpl {
       }
       shops[osmShop.osmId] = shop;
     }
+
+    // Finish forming the result
+    final osmShopsMap = {
+      for (final osmShop in osmShops) osmShop.osmId: osmShop
+    };
     shops.addAll(_recentlyCreatedShops);
-    return Ok(shops);
+    osmShopsMap.addAll(_recentlyCreatedShops
+        .map((key, value) => MapEntry(key, value.osmShop)));
+
+    return Ok(FetchedShops(
+      shops,
+      planteBounds,
+      osmShopsMap,
+      osmBounds,
+    ));
   }
 
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(
@@ -122,10 +154,10 @@ class ShopsManagerImpl {
 
   Future<Result<Shop, ShopsManagerError>> createShop(
       {required String name,
-      required Point<double> coords,
+      required Coord coord,
       required ShopType type}) async {
-    final res = await _backend.createShop(
-        name: name, coords: coords, type: type.osmName);
+    final res =
+        await _backend.createShop(name: name, coord: coord, type: type.osmName);
     if (res.isOk) {
       final backendShop = res.unwrap();
       final shop = Shop((e) => e
@@ -134,8 +166,8 @@ class ShopsManagerImpl {
           ..osmId = backendShop.osmId
           ..name = name
           ..type = type.osmName
-          ..longitude = coords.x
-          ..latitude = coords.y)));
+          ..longitude = coord.lon
+          ..latitude = coord.lat)));
       _recentlyCreatedShops[shop.osmId] = shop;
       _listeners.forEach((e) {
         e.onLocalShopsChange();
@@ -152,7 +184,7 @@ ShopsManagerError _convertOsmErr(OpenStreetMapError err) {
     case OpenStreetMapError.NETWORK:
       return ShopsManagerError.NETWORK_ERROR;
     case OpenStreetMapError.OTHER:
-      return ShopsManagerError.OTHER;
+      return ShopsManagerError.OSM_SERVERS_ERROR;
   }
 }
 

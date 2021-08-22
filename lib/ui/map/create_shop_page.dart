@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -18,8 +17,8 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
 
 class CreateShopPage extends StatefulWidget {
-  final Point<double> shopCoords;
-  const CreateShopPage({Key? key, required this.shopCoords}) : super(key: key);
+  final Coord shopCoord;
+  const CreateShopPage({Key? key, required this.shopCoord}) : super(key: key);
   @override
   _CreateShopPageState createState() => _CreateShopPageState();
 }
@@ -71,7 +70,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                             style: TextStyles.headline4)),
                     const SizedBox(height: 4),
                     ShopAddressWidget(
-                        _addressObtainer.addressOfCoords(widget.shopCoords))
+                        _addressObtainer.addressOfCoords(widget.shopCoord))
                   ]))
             ],
           )),
@@ -133,7 +132,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
     final result = await _shopsManager.createShop(
       name: _textController.text.trim(),
       type: _shopType!,
-      coords: widget.shopCoords,
+      coord: widget.shopCoord,
     );
     if (result.isOk) {
       Navigator.of(context).pop(result.unwrap());

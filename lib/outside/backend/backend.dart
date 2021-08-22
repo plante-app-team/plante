@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +7,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/backend/backend_error.dart';
@@ -315,16 +315,16 @@ class Backend {
 
   Future<Result<BackendShop, BackendError>> createShop(
       {required String name,
-      required Point<double> coords,
+      required Coord coord,
       required String type}) async {
     if (await _settings.testingBackends()) {
       return await _fakeBackend.createShop(
-          name: name, coords: coords, type: type);
+          name: name, coord: coord, type: type);
     }
 
     final jsonRes = await _backendGetJson('create_shop/', {
-      'lon': coords.x.toString(),
-      'lat': coords.y.toString(),
+      'lon': coord.lon.toString(),
+      'lat': coord.lat.toString(),
       'name': name,
       'type': type
     });
