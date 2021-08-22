@@ -304,7 +304,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
 
   bool _askForVegStatusHelp() {
     if (_vegStatusSource() != VegStatusSource.moderator) {
-      return _vegStatusSource() == VegStatusSource.open_food_facts || _vegStatus() == VegStatus.unknown;
+      return _vegStatusSource() == VegStatusSource.open_food_facts ||
+          _vegStatus() == VegStatus.unknown;
     }
     return false;
   }
@@ -348,7 +349,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-      return _product.moderatorVeganChoiceReason;
+    return _product.moderatorVeganChoiceReason;
   }
 
   void _onVegStatusSourceTextClick(BuildContext context) {
