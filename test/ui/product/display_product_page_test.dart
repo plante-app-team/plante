@@ -241,14 +241,14 @@ void main() {
         findsOneWidget);
   });
 
-  testWidgets('veg-statuses help button not displayed when sources are not OFF',
+  testWidgets('veg-statuses help button not displayed when sources are moderator',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..lang = _DEFAULT_LANG
       ..barcode = '123'
       ..name = 'My product'
       ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.community
+      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
@@ -305,8 +305,7 @@ void main() {
     expect(find.byKey(const Key('help_with_veg_status_page')), findsNothing);
     expect(
         find.text(context
-            .strings.display_product_page_click_to_help_with_veg_statuses),
-        findsNothing);
+            .strings.display_product_page_click_to_help_with_veg_statuses), findsOneWidget);
 
     // Final veg status is changed and is from community
     expect(find.text(context.strings.veg_status_displayed_vegan_status_unknown),
@@ -1003,42 +1002,6 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
-    await tester.pumpAndSettle();
-
-    expect(
-        find.text(context
-            .strings.display_product_page_moderator_comment_dialog_title),
-        findsNothing);
-  });
-
-  testWidgets(
-      'vegetarian status moderator reasoning NOT shown on click when it does not exist',
-      (WidgetTester tester) async {
-    final product = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_LANG
-      ..barcode = '123'
-      ..name = 'My product'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..vegetarianStatus = VegStatus.negative
-      ..vegetarianStatusSource = VegStatusSource.moderator
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
-    final vegetarian = UserParams((v) => v
-      ..backendClientToken = '123'
-      ..backendId = '321'
-      ..name = 'Bob'
-      ..eatsEggs = true
-      ..eatsMilk = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(vegetarian);
-
-    final context = await tester.superPump(DisplayProductPage(product));
-
-    await tester
-        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(
