@@ -9,7 +9,9 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
 
 class UserLangsPage extends StatefulWidget {
   const UserLangsPage({Key? key}) : super(key: key);
@@ -59,16 +61,10 @@ class _UserLangsPageState extends PageStatePlante<UserLangsPage> {
       body: SafeArea(
           child: Stack(children: [
         Column(mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-              padding: const EdgeInsets.only(left: 24, top: 24),
-              child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    context.strings.settings_page_langs_i_know,
-                    style: TextStyles.headline3,
-                    textAlign: TextAlign.left,
-                  ))),
-          const SizedBox(height: 24),
+          HeaderPlante(
+              title: Text(context.strings.settings_page_langs_i_know,
+                  style: TextStyles.headline1),
+              leftAction: FabPlante.backBtnPopOnClick()),
           Expanded(child: langsList),
           Padding(
               padding: const EdgeInsets.only(
