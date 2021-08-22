@@ -28,6 +28,7 @@ class LangCode extends EnumClass {
   static const LangCode iw = _$iw;
   static const LangCode ja = _$ja;
   static const LangCode ko = _$ko;
+  static const LangCode kk = _$kk;
   static const LangCode lt = _$lt;
   static const LangCode lv = _$lv;
   static const LangCode nb = _$nb;
@@ -129,6 +130,8 @@ class LangCode extends EnumClass {
         return context.strings.lang_iw;
       case ja:
         return context.strings.lang_ja;
+      case kk:
+        return context.strings.lang_kk;
       case ko:
         return context.strings.lang_ko;
       case lt:
