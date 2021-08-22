@@ -1,3 +1,4 @@
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
@@ -6,6 +7,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
@@ -21,6 +23,7 @@ import 'package:plante/outside/map/open_street_map.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
+import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late MockOpenStreetMap osm;
@@ -81,6 +84,8 @@ void main() {
   ];
 
   setUp(() async {
+    await GetIt.I.reset();
+    GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
     osm = MockOpenStreetMap();
     backend = MockBackend();
     productsObtainer = MockProductsObtainer();

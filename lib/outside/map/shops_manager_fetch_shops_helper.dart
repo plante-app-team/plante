@@ -1,3 +1,4 @@
+import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -110,8 +111,10 @@ class ShopsManagerFetchShopsHelper {
   }
 
   void _cacheOsmShops(FetchedShops fetchedShops) async {
-    await _osmCacher.cacheShops(DateTime.now(), fetchedShops.osmShopsBounds,
-        fetchedShops.osmShops.values.toList());
+    if (enableNewestFeatures()) {
+      await _osmCacher.cacheShops(DateTime.now(), fetchedShops.osmShopsBounds,
+          fetchedShops.osmShops.values.toList());
+    }
   }
 
   void _deleteOsmShopsCache(
