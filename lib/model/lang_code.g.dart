@@ -26,6 +26,7 @@ const LangCode _$it = const LangCode._('it');
 const LangCode _$iw = const LangCode._('iw');
 const LangCode _$ja = const LangCode._('ja');
 const LangCode _$ko = const LangCode._('ko');
+const LangCode _$kk = const LangCode._('kk');
 const LangCode _$lt = const LangCode._('lt');
 const LangCode _$lv = const LangCode._('lv');
 const LangCode _$nb = const LangCode._('nb');
@@ -87,6 +88,8 @@ LangCode _$valueOf(String name) {
       return _$ja;
     case 'ko':
       return _$ko;
+    case 'kk':
+      return _$kk;
     case 'lt':
       return _$lt;
     case 'lv':
@@ -149,6 +152,7 @@ final BuiltSet<LangCode> _$values = new BuiltSet<LangCode>(const <LangCode>[
   _$iw,
   _$ja,
   _$ko,
+  _$kk,
   _$lt,
   _$lv,
   _$nb,

@@ -146,6 +146,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'kg': ['ky', 'ru'],
   'kh': ['km'],
   'ki': ['en'],
+  'kk': ['kk'],
   'km': ['ar', 'fr', 'sw'],
   'kn': ['en'],
   'kp': ['ko'],
