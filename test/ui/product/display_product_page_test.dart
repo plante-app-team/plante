@@ -297,7 +297,7 @@ void main() {
 
     expect(find.byKey(const Key('help_with_veg_status_page')), findsWidgets);
 
-    await tester.tap(find.byKey(const Key('vegan_unknown_btn')));
+    await tester.tap(find.byKey(const Key('vegan_positive_btn')));
     await tester.pumpAndSettle();
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
@@ -305,10 +305,10 @@ void main() {
     expect(find.byKey(const Key('help_with_veg_status_page')), findsNothing);
     expect(
         find.text(context
-            .strings.display_product_page_click_to_help_with_veg_statuses), findsOneWidget);
+            .strings.display_product_page_click_to_help_with_veg_statuses), findsNothing);
 
     // Final veg status is changed and is from community
-    expect(find.text(context.strings.veg_status_displayed_vegan_status_unknown),
+    expect(find.text(context.strings.veg_status_displayed_vegan),
         findsOneWidget);
     expect(
         find.text(
@@ -929,44 +929,6 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     await tester.tap(find.text(context.strings.veg_status_displayed_not_vegan));
-    await tester.pumpAndSettle();
-
-    expect(
-        find.text(context
-            .strings.display_product_page_moderator_comment_dialog_title),
-        findsNothing);
-  });
-
-  testWidgets(
-      'vegetarian status moderator reasoning NOT shown on click when veg-source is not moderator',
-      (WidgetTester tester) async {
-    final product = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_LANG
-      ..barcode = '123'
-      ..name = 'My product'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..vegetarianStatus = VegStatus.negative
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.community
-      ..moderatorVegetarianChoiceReasonId =
-          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGETARIAN.persistentId
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
-    final vegetarian = UserParams((v) => v
-      ..backendClientToken = '123'
-      ..backendId = '321'
-      ..name = 'Bob'
-      ..eatsEggs = true
-      ..eatsMilk = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(vegetarian);
-
-    final context = await tester.superPump(DisplayProductPage(product));
-
-    await tester
-        .tap(find.text(context.strings.veg_status_displayed_not_vegetarian));
     await tester.pumpAndSettle();
 
     expect(
