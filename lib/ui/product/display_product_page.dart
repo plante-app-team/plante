@@ -303,7 +303,11 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   bool _askForVegStatusHelp() {
-    return _vegStatusSource() == VegStatusSource.open_food_facts;
+    if (_vegStatusSource() != VegStatusSource.moderator) {
+      return _vegStatusSource() == VegStatusSource.open_food_facts ||
+          _vegStatus() == VegStatus.unknown;
+    }
+    return false;
   }
 
   void _onVegStatusHelpClick() {
@@ -323,22 +327,11 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   VegStatus _vegStatus() {
-    VegStatus? status;
-    if (_user.eatsVeggiesOnly ?? true) {
-      status = _product.veganStatus;
-    } else {
-      status = _product.vegetarianStatus;
-    }
-    return status ?? VegStatus.unknown;
+    return _product.veganStatus ?? VegStatus.unknown;
   }
 
   VegStatusSource _vegStatusSource() {
-    VegStatusSource? source;
-    if (_user.eatsVeggiesOnly ?? true) {
-      source = _product.veganStatusSource;
-    } else {
-      source = _product.vegetarianStatusSource;
-    }
+    VegStatusSource? source = _product.veganStatusSource;
     if (source == null || source == VegStatusSource.unknown) {
       source = VegStatusSource.community;
     }
@@ -356,11 +349,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    if (_user.eatsVeggiesOnly ?? true) {
-      return _product.moderatorVeganChoiceReason;
-    } else {
-      return _product.moderatorVegetarianChoiceReason;
-    }
+    return _product.moderatorVeganChoiceReason;
   }
 
   void _onVegStatusSourceTextClick(BuildContext context) {
