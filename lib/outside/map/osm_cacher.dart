@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -28,6 +29,10 @@ const _SHOP_LON = 'lon';
 
 // Just a random number because I don't know what number work better.
 const _BATCH_SIZE = 200;
+
+enum OsmCacherError {
+  TERRITORY_NOT_FOUND,
+}
 
 class OsmCacher {
   final _dbCompleter = Completer<Database>();
@@ -198,6 +203,24 @@ class OsmCacher {
           WHERE $_ID = $territoryId;''');
     });
     _cachedShops.removeWhere((territory) => territory.id == territoryId);
+  }
+
+  Future<Result<OsmCachedTerritory<OsmShop>, OsmCacherError>> addShopToCache(
+      int territoryId, OsmShop shop) async {
+    final territories = _cachedShops.where((e) => e.id == territoryId);
+    if (territories.isEmpty) {
+      return Err(OsmCacherError.TERRITORY_NOT_FOUND);
+    }
+    // Update local cache
+    var territory = territories.first;
+    _cachedShops.remove(territory);
+    territory = territory.add(shop);
+    _cachedShops.add(territory);
+
+    // Update persistent cache
+    final db = await _db;
+    await db.insert(_SHOP_TABLE, shop.columnsValues(territoryId));
+    return Ok(territory);
   }
 }
 

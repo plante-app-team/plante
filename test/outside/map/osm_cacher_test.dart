@@ -77,4 +77,27 @@ void main() {
     final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
     expect(await osmCacher2.getCachedShops(), equals([territory2]));
   });
+
+  test('add shop to cache', () async {
+    await osmCacher.dbForTesting;
+
+    // Store a territory
+    var territory = await osmCacher.cacheShops(
+        dates[0],
+        CoordsBounds(
+            southwest: Coord(lat: 111, lon: 111),
+            northeast: Coord(lat: 223, lon: 223)),
+        [shops[0], shops[1]]);
+    expect(territory.entities, equals([shops[0], shops[1]]));
+
+    // Add a shop to it
+    territory =
+        (await osmCacher.addShopToCache(territory.id, shops[2])).unwrap();
+    expect(territory.entities, equals([shops[0], shops[1], shops[2]]));
+
+    // Create a second cacher with same DB,
+    // verify it has same territories
+    final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
+    expect(await osmCacher2.getCachedShops(), equals([territory]));
+  });
 }
