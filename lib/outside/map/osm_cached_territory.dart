@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -8,8 +10,19 @@ class OsmCachedTerritory<T> {
   final DateTime whenObtained;
   final CoordsBounds bounds;
   final List<T> entities;
-  const OsmCachedTerritory(
+  OsmCachedTerritory(
+      int id, DateTime whenObtained, CoordsBounds bounds, List<T> entities)
+      : this._(id, whenObtained, bounds, entities.toList(growable: false));
+
+  const OsmCachedTerritory._(
       this.id, this.whenObtained, this.bounds, this.entities);
+
+  OsmCachedTerritory<T> add(T entity) {
+    final updatedEntities = entities.toList();
+    updatedEntities.add(entity);
+    return OsmCachedTerritory<T>._(
+        id, whenObtained, bounds, UnmodifiableListView(updatedEntities));
+  }
 
   @override
   int get hashCode => id;

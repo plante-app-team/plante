@@ -130,7 +130,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       // Apple login
       final appleUser = await _appleAuthorizer.auth();
       if (appleUser == null) {
-        analytics.sendEvent('apple_auth_apple_error');
+        analytics.sendEvent('apple_auth_apple_failure');
         Log.w('ExternalAuthPage: Apple auth error');
         showSnackBar(context.strings.global_something_went_wrong, context);
         return;
@@ -163,7 +163,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
       // Google login
       final googleAccount = await _googleAuthorizer.auth();
       if (googleAccount == null) {
-        analytics.sendEvent('google_auth_google_error');
+        analytics.sendEvent('google_auth_google_failure');
         Log.w('ExternalAuthPage: googleAccount == null');
         showSnackBar(context.strings.global_something_went_wrong, context);
         return;
@@ -194,7 +194,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
         googleIdToken: googleIdToken,
         appleAuthorizationCode: appleAuthorizationCode);
     if (loginResult.isErr) {
-      analytics.sendEvent('auth_backend_error');
+      analytics.sendEvent('auth_backend_failure');
       final error = loginResult.unwrapErr();
       if (error.errorKind == BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED) {
         showSnackBar(

@@ -35,34 +35,9 @@ void main() {
 
   const osmId1 = '1';
   const osmId2 = '2';
-  final osmShops = [
-    OsmShop((e) => e
-      ..osmId = osmId1
-      ..name = 'shop1'
-      ..type = 'supermarket'
-      ..longitude = 15
-      ..latitude = 15),
-    OsmShop((e) => e
-      ..osmId = osmId2
-      ..name = 'shop2'
-      ..type = 'convenience'
-      ..longitude = 15
-      ..latitude = 15),
-  ];
-  final backendShops = [
-    BackendShop((e) => e
-      ..osmId = osmId1
-      ..productsCount = 2),
-    BackendShop((e) => e
-      ..osmId = osmId2
-      ..productsCount = 1),
-  ];
-  final fullShops = {
-    osmShops[0].osmId: Shop((e) =>
-        e..osmShop.replace(osmShops[0])..backendShop.replace(backendShops[0])),
-    osmShops[1].osmId: Shop((e) =>
-        e..osmShop.replace(osmShops[1])..backendShop.replace(backendShops[1])),
-  };
+  var osmShops = <OsmShop>[];
+  var backendShops = <BackendShop>[];
+  var fullShops = <String, Shop>{};
 
   final northeast = Coord(lat: 15.001, lon: 15.001);
   final southwest = Coord(lat: 14.999, lon: 14.999);
@@ -84,6 +59,37 @@ void main() {
   ];
 
   setUp(() async {
+    osmShops = [
+      OsmShop((e) => e
+        ..osmId = osmId1
+        ..name = 'shop1'
+        ..type = 'supermarket'
+        ..longitude = 15
+        ..latitude = 15),
+      OsmShop((e) => e
+        ..osmId = osmId2
+        ..name = 'shop2'
+        ..type = 'convenience'
+        ..longitude = 15
+        ..latitude = 15),
+    ];
+    backendShops = [
+      BackendShop((e) => e
+        ..osmId = osmId1
+        ..productsCount = 2),
+      BackendShop((e) => e
+        ..osmId = osmId2
+        ..productsCount = 1),
+    ];
+    fullShops = {
+      osmShops[0].osmId: Shop((e) => e
+        ..osmShop.replace(osmShops[0])
+        ..backendShop.replace(backendShops[0])),
+      osmShops[1].osmId: Shop((e) => e
+        ..osmShop.replace(osmShops[1])
+        ..backendShop.replace(backendShops[1])),
+    };
+
     await GetIt.I.reset();
     GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
     osm = MockOpenStreetMap();
@@ -110,9 +116,13 @@ void main() {
             name: anyNamed('name'),
             coord: anyNamed('coord'),
             type: anyNamed('type')))
-        .thenAnswer((_) async => Ok(BackendShop((e) => e
-          ..osmId = randInt(1, 99999).toString()
-          ..productsCount = 0)));
+        .thenAnswer((_) async {
+      final result = BackendShop((e) => e
+        ..osmId = randInt(1, 99999).toString()
+        ..productsCount = 0);
+      backendShops.add(result);
+      return Ok(result);
+    });
   });
 
   test('shops fetched and then cached', () async {
@@ -615,6 +625,29 @@ void main() {
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(any));
     verifyNever(backend.requestShops(any));
+  });
+
+  test('shop creation adds the shop to persistent OSM cache', () async {
+    // Create a shop
+    final newShopRes = await shopsManager.createShop(
+        name: 'New cool shop',
+        coord: Coord(lat: 15, lon: 15),
+        type: ShopType.supermarket);
+    final newShop = newShopRes.unwrap();
+    expect(newShop.name, equals('New cool shop'));
+
+    // Expecting all previous shops + the new shop
+    final expectedAllShops = Map.from(fullShops);
+    expectedAllShops[newShop.osmId] = newShop;
+    expect((await shopsManager.fetchShops(bounds)).unwrap(),
+        equals(expectedAllShops));
+
+    // Create a NEW shops manager with same persistent cache
+    shopsManager =
+        ShopsManager(osm, backend, productsObtainer, analytics, osmCacher);
+    // Expecting the new shop to be in the cache
+    expect((await shopsManager.fetchShops(bounds)).unwrap(),
+        equals(expectedAllShops));
   });
 
   test('put product to shop analytics', () async {

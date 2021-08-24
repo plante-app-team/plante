@@ -241,7 +241,8 @@ void main() {
         findsOneWidget);
   });
 
-  testWidgets('veg-statuses help button not displayed when sources are moderator',
+  testWidgets(
+      'veg-statuses help button not displayed when sources are moderator',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..lang = _DEFAULT_LANG
@@ -305,11 +306,12 @@ void main() {
     expect(find.byKey(const Key('help_with_veg_status_page')), findsNothing);
     expect(
         find.text(context
-            .strings.display_product_page_click_to_help_with_veg_statuses), findsNothing);
+            .strings.display_product_page_click_to_help_with_veg_statuses),
+        findsNothing);
 
     // Final veg status is changed and is from community
-    expect(find.text(context.strings.veg_status_displayed_vegan),
-        findsOneWidget);
+    expect(
+        find.text(context.strings.veg_status_displayed_vegan), findsOneWidget);
     expect(
         find.text(
             context.strings.veg_status_displayed_veg_status_source_community),

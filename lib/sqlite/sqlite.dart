@@ -10,9 +10,11 @@ Future<Database> openDB(String path,
   if (!isInTests()) {
     return await openDatabase(path, version: version, onUpgrade: onUpgrade);
   } else {
+    final rand = randInt(1, 4294967296);
     sqfliteFfiInit();
     final databaseFactory = databaseFactoryFfi;
-    return await databaseFactory.openDatabase(inMemoryDatabasePath,
+    return await databaseFactory.openDatabase(
+        'file:$path$rand?mode=memory&cache=shared',
         options: OpenDatabaseOptions(version: version, onUpgrade: onUpgrade));
   }
 }

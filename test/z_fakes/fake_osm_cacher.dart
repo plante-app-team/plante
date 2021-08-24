@@ -1,3 +1,4 @@
+import 'package:plante/base/result.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm_cached_territory.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
@@ -27,5 +28,19 @@ class FakeOsmCacher implements OsmCacher {
   @override
   Future<List<OsmCachedTerritory<OsmShop>>> getCachedShops() async {
     return _cachedShops.toList(growable: false);
+  }
+
+  @override
+  Future<Result<OsmCachedTerritory<OsmShop>, OsmCacherError>> addShopToCache(
+      int territoryId, OsmShop shop) async {
+    final territories = _cachedShops.where((e) => e.id == territoryId);
+    if (territories.isEmpty) {
+      return Err(OsmCacherError.TERRITORY_NOT_FOUND);
+    }
+    var territory = territories.first;
+    _cachedShops.remove(territory);
+    territory = territory.add(shop);
+    _cachedShops.add(territory);
+    return Ok(territory);
   }
 }
