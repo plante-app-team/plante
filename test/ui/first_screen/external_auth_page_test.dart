@@ -79,7 +79,7 @@ void main() {
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('google_auth_start'), isTrue);
-    expect(analytics.wasEventSent('google_auth_google_error'), isTrue);
+    expect(analytics.wasEventSent('google_auth_google_failure'), isTrue);
   });
 
   testWidgets('Google: not successful backend sign in',
@@ -99,7 +99,7 @@ void main() {
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('google_auth_start'), isTrue);
-    expect(analytics.wasEventSent('auth_backend_error'), isTrue);
+    expect(analytics.wasEventSent('auth_backend_failure'), isTrue);
   });
 
   testWidgets('Google: not successful backend params update',
@@ -157,7 +157,7 @@ void main() {
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('apple_auth_start'), isTrue);
-    expect(analytics.wasEventSent('apple_auth_apple_error'), isTrue);
+    expect(analytics.wasEventSent('apple_auth_apple_failure'), isTrue);
   });
 
   testWidgets('Apple: not successful backend sign in',
@@ -179,7 +179,7 @@ void main() {
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('apple_auth_start'), isTrue);
-    expect(analytics.wasEventSent('auth_backend_error'), isTrue);
+    expect(analytics.wasEventSent('auth_backend_failure'), isTrue);
   });
 
   testWidgets('Apple: not successful backend params update',

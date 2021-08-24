@@ -50,7 +50,7 @@ void initDI() {
       GetIt.I.get<PermissionsManager>(),
       GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<OpenStreetMap>(
-      OpenStreetMap(GetIt.I.get<HttpClient>()));
+      OpenStreetMap(GetIt.I.get<HttpClient>(), GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<AddressObtainer>(
       AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());

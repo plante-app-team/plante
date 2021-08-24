@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -13,6 +15,9 @@ import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+
+// We use LinkedHashMap because order is important, so:
+// ignore_for_file: prefer_collection_literals
 
 enum OpenStreetMapError { NETWORK, OTHER }
 
@@ -27,18 +32,22 @@ enum OpenStreetMapError { NETWORK, OTHER }
 /// limit requests to 1 per 3 seconds, it also caches requests results.
 class OpenStreetMap {
   final HttpClient _http;
+  final Analytics _analytics;
+
+  /// We use LinkedHashMap because order is important
+  final _osmOverpassUrls = LinkedHashMap<String, String>();
   final _packageInfo = Completer<PackageInfo>();
 
-  OpenStreetMap(this._http) {
+  Map<String, String> get osmOverpassUrls => MapView(_osmOverpassUrls);
+
+  OpenStreetMap(this._http, this._analytics) {
+    _osmOverpassUrls['lz4'] = 'lz4.overpass-api.de';
+    _osmOverpassUrls['z'] = 'z.overpass-api.de';
+    _osmOverpassUrls['kumi'] = 'overpass.kumi.systems';
+    _osmOverpassUrls['taiwan'] = 'overpass.nchc.org.tw';
     () async {
       _packageInfo.complete(await getPackageInfo());
     }.call();
-  }
-
-  Future<String> _userAgent() async {
-    final packageInfo = await _packageInfo.future;
-    return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
-        '${operatingSystem()}';
   }
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
@@ -54,22 +63,12 @@ class OpenStreetMap {
         'way[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
         ');out center;';
 
-    final Response r;
-    try {
-      r = await _http.get(
-          Uri.https('lz4.overpass-api.de', 'api/interpreter', {'data': cmd}),
-          headers: {'User-Agent': await _userAgent()});
-    } on IOException catch (e) {
-      Log.w('OSM overpass network error', ex: e);
-      return Err(OpenStreetMapError.NETWORK);
+    final response = await _sendCmd(cmd);
+    if (response.isErr) {
+      return Err(response.unwrapErr());
     }
 
-    if (r.statusCode != 200) {
-      Log.w('OSM.fetchShops: ${r.statusCode}, body: ${r.body}');
-      return Err(OpenStreetMapError.OTHER);
-    }
-
-    final shopsJson = _jsonDecodeSafe(utf8.decode(r.bodyBytes));
+    final shopsJson = _jsonDecodeSafe(response.unwrap());
     if (shopsJson == null) {
       return Err(OpenStreetMapError.OTHER);
     }
@@ -110,6 +109,42 @@ class OpenStreetMap {
         ..longitude = lon));
     }
     return Ok(result);
+  }
+
+  Future<Result<String, OpenStreetMapError>> _sendCmd(String cmd) async {
+    for (final nameAndUrl in _osmOverpassUrls.entries) {
+      final urlName = nameAndUrl.key;
+      final url = nameAndUrl.value;
+      final Response r;
+      try {
+        r = await _http.get(Uri.https(url, 'api/interpreter', {'data': cmd}),
+            headers: {'User-Agent': await _userAgent()});
+      } on IOException catch (e) {
+        Log.w('OSM overpass network error', ex: e);
+        return Err(OpenStreetMapError.NETWORK);
+      }
+
+      if (r.statusCode != 200) {
+        Log.w('OSM._sendCmd: $cmd, status: ${r.statusCode}, body: ${r.body}');
+        if (r.statusCode == 403) {
+          _analytics.sendEvent('osm_${urlName}_failure_403');
+        } else if (r.statusCode == 429) {
+          _analytics.sendEvent('osm_${urlName}_failure_429');
+        }
+        continue;
+      }
+
+      Log.i('OSM._sendCmd success: $cmd');
+      return Ok(utf8.decode(r.bodyBytes));
+    }
+
+    return Err(OpenStreetMapError.OTHER);
+  }
+
+  Future<String> _userAgent() async {
+    final packageInfo = await _packageInfo.future;
+    return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
+        '${operatingSystem()}, plante.application@gmail.com';
   }
 
   Map<String, dynamic>? _jsonDecodeSafe(String str) {

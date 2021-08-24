@@ -172,7 +172,7 @@ class ProductsConverterAndCacher {
         }
         langs.add(lang);
         if (entry.value.length <= index) {
-          _analytics.sendEvent('error_off_ingredients_tags_breaking_change');
+          _analytics.sendEvent('failure_off_ingredients_tags_breaking_change');
           Log.w(
               'List in ingredientsTagsInLanguages is shorter than ingredientsTags');
           continue;
