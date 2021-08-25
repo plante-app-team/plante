@@ -39,6 +39,7 @@ class ShopsManager {
   bool _loadingArea = false;
   final _delayedLoadings = <VoidCallback>[];
 
+  // If new cache fields are added please update the [clearCache] method.
   final _shopsCache = <String, Shop>{};
   final _loadedAreas = <CoordsBounds, List<String>>{};
   final _rangesCache = <String, ShopProductRange>{};
@@ -216,6 +217,14 @@ class ShopsManager {
           {'name': name, 'lat': coord.lat, 'lon': coord.lon});
     }
     return result;
+  }
+
+  Future<void> clearCache() async {
+    await _fetchShopsHelper.clearCache();
+    _shopsCache.clear();
+    _loadedAreas.clear();
+    _rangesCache.clear();
+    _notifyListeners();
   }
 }
 

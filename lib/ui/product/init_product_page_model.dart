@@ -312,15 +312,7 @@ class InitProductPageModel {
   }
 
   bool askForVegetarianStatus() {
-    return false; // vegan-only https://trello.com/c/eUGrj1eH/
-    if (_initialProductSlice.vegetarianStatus !=
-        productSlice.vegetarianStatus) {
-      return true;
-    }
-    return _initialProductSlice.vegetarianStatus == null ||
-        _initialProductSlice.vegetarianStatusSource == null ||
-        _initialProductSlice.vegetarianStatusSource ==
-            VegStatusSource.open_food_facts;
+    return false;
   }
 
   bool canSaveProduct() {

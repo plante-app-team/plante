@@ -191,7 +191,7 @@ class OsmCacher {
 
   Future<List<OsmCachedTerritory<OsmShop>>> getCachedShops() async {
     await _db;
-    return _cachedShops;
+    return _cachedShops.toList(growable: false);
   }
 
   Future<void> deleteCachedShops(int territoryId) async {

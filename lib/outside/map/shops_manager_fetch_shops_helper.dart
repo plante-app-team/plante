@@ -131,6 +131,13 @@ class ShopsManagerFetchShopsHelper {
     return ShopsManager.DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT <
         DateTime.now().difference(territory.whenObtained).inDays;
   }
+
+  Future<void> clearCache() async {
+    final territories = await _osmCacher.getCachedShops();
+    for (final territory in territories) {
+      await _osmCacher.deleteCachedShops(territory.id);
+    }
+  }
 }
 
 double _kmToGrad(double km) {

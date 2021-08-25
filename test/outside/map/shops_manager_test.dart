@@ -760,4 +760,44 @@ void main() {
     // Verify cache WAS used
     verifyNever(osm.fetchShops(any));
   });
+
+  test('clear cache', () async {
+    verifyZeroInteractions(osm);
+    verifyZeroInteractions(backend);
+
+    // Fetch #1, which will create cache
+    await shopsManager.fetchShops(bounds);
+    // Persistent cache should created too
+    expect(await osmCacher.getCachedShops(), isNotEmpty);
+
+    clearInteractions(osm);
+    clearInteractions(backend);
+
+    // Fetch #2 will use cache and therefore won't touch backends
+    await shopsManager.fetchShops(bounds);
+    verifyZeroInteractions(osm);
+    verifyZeroInteractions(backend);
+
+    // Clear cache
+    await shopsManager.clearCache();
+    // Persistent cache should be cleared too
+    expect(await osmCacher.getCachedShops(), isEmpty);
+
+    // Fetch #3 is run after we cleared cache so backends
+    // are expected to be touched
+    await shopsManager.fetchShops(bounds);
+    verify(osm.fetchShops(any));
+    verify(backend.requestShops(any));
+    // Persistent cache expected to be refilled
+    expect(await osmCacher.getCachedShops(), isNotEmpty);
+  });
+
+  test('clear cache notifies listeners', () async {
+    final listener = MockShopsManagerListener();
+    shopsManager.addListener(listener);
+
+    verifyZeroInteractions(listener);
+    await shopsManager.clearCache();
+    verify(listener.onLocalShopsChange());
+  });
 }

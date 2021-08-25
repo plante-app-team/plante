@@ -180,6 +180,7 @@
     "settings_page_general": "Общее",
     "settings_page_langs_i_know": "Языки, которые я знаю",
     "settings_page_send_logs": "Отправить логи",
+    "settings_page_clear_map_cache": "Очистить кеш карты",
     "settings_page_erase_user_data": "Очистить данные и выйти",
     "settings_page_developer_options": "Опции разработчиков",
     "settings_page_crash_on_errors": "Креш при ошибках",

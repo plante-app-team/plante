@@ -14,6 +14,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -30,51 +31,51 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends PageStatePlante<SettingsPage> {
-  bool loading = true;
-  bool developer = false;
-  bool testingBackends = false;
-  bool testingBackendsQuickAnswers = false;
-  bool offScannedProductEmpty = false;
+  bool _loading = true;
+  bool _developer = false;
+  bool _testingBackends = false;
+  bool _testingBackendsQuickAnswers = false;
+  bool _offScannedProductEmpty = false;
 
-  late Settings settings;
-  late SysLangCodeHolder _sysLangCodeHolder;
-  late UserParams user;
-  late PackageInfo packageInfo;
+  final _settings = GetIt.I.get<Settings>();
+  final _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
+  final _shopsManager = GetIt.I.get<ShopsManager>();
+  late UserParams _user;
+  late PackageInfo _packageInfo;
 
   _SettingsPageState() : super('SettingsPage');
 
   @override
   void initState() {
     super.initState();
-    settings = GetIt.I.get<Settings>();
-    _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
     initStateImpl();
   }
 
   void initStateImpl() async {
     final userNullable =
         await GetIt.I.get<UserParamsController>().getUserParams();
-    user = userNullable!;
-    packageInfo = await getPackageInfo();
-    if (kReleaseMode && (user.userGroup == null || user.userGroup == 1)) {
+    _user = userNullable!;
+    _packageInfo = await getPackageInfo();
+    if (kReleaseMode && (_user.userGroup == null || _user.userGroup == 1)) {
       setState(() {
-        loading = false;
+        _loading = false;
       });
       return;
     }
 
-    developer = true;
-    testingBackends = await settings.testingBackends();
-    testingBackendsQuickAnswers = await settings.testingBackendsQuickAnswers();
-    offScannedProductEmpty = await settings.fakeOffApiProductNotFound();
+    _developer = true;
+    _testingBackends = await _settings.testingBackends();
+    _testingBackendsQuickAnswers =
+        await _settings.testingBackendsQuickAnswers();
+    _offScannedProductEmpty = await _settings.fakeOffApiProductNotFound();
     setState(() {
-      loading = false;
+      _loading = false;
     });
   }
 
   @override
   Widget buildPage(BuildContext context) {
-    if (loading) {
+    if (_loading) {
       return Container(
         width: double.infinity,
         height: double.infinity,
@@ -98,13 +99,13 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                   InkWell(
                       onTap: () {
                         Clipboard.setData(
-                            ClipboardData(text: user.backendId ?? ''));
+                            ClipboardData(text: _user.backendId ?? ''));
                         showSnackBar(context.strings.global_copied_to_clipboard,
                             context);
                       },
                       child: Text(
                           context.strings.settings_page_your_id +
-                              (user.backendId ?? ''),
+                              (_user.backendId ?? ''),
                           style: TextStyles.normal)),
                 ]),
                 const SizedBox(height: 24),
@@ -129,15 +130,21 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                     child: ButtonFilledPlante.withText(
                         context.strings.settings_page_send_logs,
                         onPressed: Log.startLogsSending)),
-                if (developer) const SizedBox(height: 24),
-                if (developer)
+                const SizedBox(height: 12),
+                SizedBox(
+                    width: double.infinity,
+                    child: ButtonFilledPlante.withText(
+                        context.strings.settings_page_clear_map_cache,
+                        onPressed: _clearMapCache)),
+                if (_developer) const SizedBox(height: 24),
+                if (_developer)
                   SizedBox(
                       width: double.infinity,
                       child: Text(
                           context.strings.settings_page_developer_options,
                           style: TextStyles.headline3)),
-                if (developer) const SizedBox(height: 12),
-                if (developer)
+                if (_developer) const SizedBox(height: 12),
+                if (_developer)
                   SizedBox(
                       width: double.infinity,
                       child: ButtonFilledPlante.withText(
@@ -154,42 +161,42 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
 
                         exit(0);
                       })),
-                if (developer)
+                if (_developer)
                   _CheckboxSettings(
                       text: context.strings.settings_page_testing_backends,
-                      value: testingBackends,
+                      value: _testingBackends,
                       onChanged: (value) {
                         setState(() {
-                          testingBackends = value;
-                          settings.setTestingBackends(testingBackends);
+                          _testingBackends = value;
+                          _settings.setTestingBackends(_testingBackends);
                         });
                       }),
-                if (developer)
+                if (_developer)
                   AnimatedSwitcher(
                       duration: DURATION_DEFAULT,
-                      child: !testingBackends
+                      child: !_testingBackends
                           ? const SizedBox.shrink()
                           : Column(children: [
                               _CheckboxSettings(
                                   text: context.strings
                                       .settings_page_fake_off_scanned_product_empty,
-                                  value: offScannedProductEmpty,
+                                  value: _offScannedProductEmpty,
                                   onChanged: (value) {
                                     setState(() {
-                                      offScannedProductEmpty = value;
-                                      settings.setFakeOffApiProductNotFound(
-                                          offScannedProductEmpty);
+                                      _offScannedProductEmpty = value;
+                                      _settings.setFakeOffApiProductNotFound(
+                                          _offScannedProductEmpty);
                                     });
                                   }),
                               _CheckboxSettings(
                                   text: context.strings
                                       .settings_page_testing_backends_quick_answers,
-                                  value: testingBackendsQuickAnswers,
+                                  value: _testingBackendsQuickAnswers,
                                   onChanged: (value) {
                                     setState(() {
-                                      testingBackendsQuickAnswers = value;
-                                      settings.setTestingBackendsQuickAnswers(
-                                          testingBackendsQuickAnswers);
+                                      _testingBackendsQuickAnswers = value;
+                                      _settings.setTestingBackendsQuickAnswers(
+                                          _testingBackendsQuickAnswers);
                                     });
                                   }),
                             ])),
@@ -209,15 +216,20 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                     child: InkWell(
                         onTap: () {
                           Clipboard.setData(
-                              ClipboardData(text: packageInfo.asString()));
+                              ClipboardData(text: _packageInfo.asString()));
                           showSnackBar(
                               context.strings.global_copied_to_clipboard,
                               context);
                         },
-                        child: Text(packageInfo.asString(),
+                        child: Text(_packageInfo.asString(),
                             style: TextStyles.hint))),
               ]))
         ]))));
+  }
+
+  void _clearMapCache() async {
+    await _shopsManager.clearCache();
+    showSnackBar(context.strings.global_done, context);
   }
 }
 

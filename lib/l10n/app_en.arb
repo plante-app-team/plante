@@ -180,6 +180,7 @@
       "settings_page_general": "General",
       "settings_page_langs_i_know": "My languages",
       "settings_page_send_logs": "Send logs",
+      "settings_page_clear_map_cache": "Clear map cache",
       "settings_page_erase_user_data": "Clear user data and exit",
       "settings_page_developer_options": "Developer options",
       "settings_page_crash_on_errors": "Crash on errors",
