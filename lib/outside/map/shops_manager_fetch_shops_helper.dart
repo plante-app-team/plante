@@ -111,10 +111,8 @@ class ShopsManagerFetchShopsHelper {
   }
 
   void _cacheOsmShops(FetchedShops fetchedShops) async {
-    if (enableNewestFeatures()) {
-      await _osmCacher.cacheShops(DateTime.now(), fetchedShops.osmShopsBounds,
-          fetchedShops.osmShops.values.toList());
-    }
+    await _osmCacher.cacheShops(DateTime.now(), fetchedShops.osmShopsBounds,
+        fetchedShops.osmShops.values.toList());
   }
 
   void _deleteOsmShopsCache(
