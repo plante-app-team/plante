@@ -22,18 +22,17 @@ import 'package:plante/ui/map/map_page_model.dart';
 class MapPageModeDefault extends MapPageModeShopsCardBase {
   bool _showEmptyShops = false;
 
-  MapPageModeDefault(
-      Analytics analytics,
-      MapPageModel model,
+  MapPageModeDefault(Analytics analytics, MapPageModel model,
       MapHintsListController hintsController,
-      WidgetSource widgetSource,
-      ContextSource contextSource,
-      DisplayedShopsSource displayedShopsSource,
-      VoidCallback updateCallback,
-      VoidCallback updateMapCallback,
-      ArgCallback<String?> bottomHintCallback,
-      ArgCallback<Coord> moveMapCallback,
-      ModeSwitchCallback modeSwitchCallback)
+      {required ResCallback<MapPage> widgetSource,
+      required ResCallback<BuildContext> contextSource,
+      required ResCallback<Iterable<Shop>> displayedShopsSource,
+      required VoidCallback updateCallback,
+      required VoidCallback updateMapCallback,
+      required ArgCallback<String?> bottomHintCallback,
+      required ArgCallback<Coord> moveMapCallback,
+      required ArgCallback<MapPageMode> modeSwitchCallback,
+      required ResCallback<bool> isLoadingCallback})
       : super(
             MapPageModeParams(
                 model,
@@ -46,6 +45,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 bottomHintCallback,
                 moveMapCallback,
                 modeSwitchCallback,
+                isLoadingCallback,
                 analytics),
             nameForAnalytics: 'default');
 
@@ -134,15 +134,24 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   @override
+  void onLoadingChange() {
+    _updateBottomHint();
+  }
+
+  @override
   void onDisplayedShopsChange(Iterable<Shop> shops) {
-    if (shops.isEmpty) {
-      if (!_showEmptyShops) {
-        setBottomHint(context.strings.map_page_no_shops_hint_default_mode_1);
-      } else {
-        setBottomHint(context.strings.map_page_no_shops_hint_default_mode_2);
-      }
-    } else {
+    _updateBottomHint();
+  }
+
+  void _updateBottomHint() {
+    if (displayedShops.isNotEmpty || loading) {
       setBottomHint(null);
+      return;
+    }
+    if (!_showEmptyShops) {
+      setBottomHint(context.strings.map_page_no_shops_hint_default_mode_1);
+    } else {
+      setBottomHint(context.strings.map_page_no_shops_hint_default_mode_2);
     }
   }
 }

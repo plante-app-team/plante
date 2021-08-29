@@ -173,13 +173,16 @@ class _MapPageState extends PageStatePlante<MapPage>
       allShops.addAll(_mode.additionalShops());
       _onShopsUpdated(_mode.filter(allShops));
     };
+    final loadingChangeCallback = () {
+      _mode.onLoadingChange();
+    };
     _model = MapPageModel(
         GetIt.I.get<LocationController>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<AddressObtainer>(),
         GetIt.I.get<LatestCameraPosStorage>(), (_) {
       updateMapCallback.call();
-    }, _onError, updateCallback);
+    }, _onError, updateCallback, loadingChangeCallback);
 
     /// The clustering library levels logic is complicated.
     ///
@@ -197,9 +200,6 @@ class _MapPageState extends PageStatePlante<MapPage>
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
-    final widgetSource = () => widget;
-    final contextSource = () => context;
-    final displayedShopsSource = () => _displayedShops;
     final updateBottomHintCallback = (String? hint) {
       if (!mounted) {
         return;
@@ -224,18 +224,16 @@ class _MapPageState extends PageStatePlante<MapPage>
         _mode.init(oldMode);
       });
     };
-    _mode = MapPageModeDefault(
-        analytics,
-        _model,
-        _hintsController,
-        widgetSource,
-        contextSource,
-        displayedShopsSource,
-        updateCallback,
-        updateMapCallback,
-        updateBottomHintCallback,
-        moveMapCallback,
-        switchModeCallback);
+    _mode = MapPageModeDefault(analytics, _model, _hintsController,
+        widgetSource: () => widget,
+        contextSource: () => context,
+        displayedShopsSource: () => _displayedShops,
+        updateCallback: updateCallback,
+        updateMapCallback: updateMapCallback,
+        bottomHintCallback: updateBottomHintCallback,
+        moveMapCallback: moveMapCallback,
+        modeSwitchCallback: switchModeCallback,
+        isLoadingCallback: () => _loading);
 
     _asyncInit();
     _instances.add(this);

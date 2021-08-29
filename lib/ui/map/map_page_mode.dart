@@ -7,22 +7,18 @@ import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page.dart';
 import 'package:plante/ui/map/map_page_model.dart';
 
-typedef WidgetSource = MapPage Function();
-typedef ContextSource = BuildContext Function();
-typedef DisplayedShopsSource = Iterable<Shop> Function();
-typedef ModeSwitchCallback = void Function(MapPageMode newMode);
-
 class MapPageModeParams {
   final MapPageModel model;
   final MapHintsListController hintsListController;
-  final WidgetSource widgetSource;
-  final ContextSource contextSource;
-  final DisplayedShopsSource displayedShopsSource;
+  final ResCallback<MapPage> widgetSource;
+  final ResCallback<BuildContext> contextSource;
+  final ResCallback<Iterable<Shop>> displayedShopsSource;
   final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
   final ArgCallback<String?> bottomHintCallback;
   final ArgCallback<Coord> moveMapCallback;
-  final ModeSwitchCallback modeSwitchCallback;
+  final ArgCallback<MapPageMode> modeSwitchCallback;
+  final ResCallback<bool> isLoadingCallback;
   final Analytics analytics;
   MapPageModeParams(
       this.model,
@@ -35,6 +31,7 @@ class MapPageModeParams {
       this.bottomHintCallback,
       this.moveMapCallback,
       this.modeSwitchCallback,
+      this.isLoadingCallback,
       this.analytics);
 }
 
@@ -50,6 +47,7 @@ abstract class MapPageMode {
   MapHintsListController get hintsController => params.hintsListController;
   Analytics get analytics => params.analytics;
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
+  bool get loading => params.isLoadingCallback.call();
 
   void init(MapPageMode? previousMode) {}
   void deinit() {}
@@ -70,6 +68,7 @@ abstract class MapPageMode {
   void onShopsUpdated(Map<String, Shop> shops) {}
   void onMapClick(Coord coord) {}
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
+  void onLoadingChange() {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;

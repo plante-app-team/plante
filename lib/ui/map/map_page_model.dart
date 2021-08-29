@@ -17,10 +17,6 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
-typedef MapPageModelUpdateShopsCallback = void Function(
-    Map<String, Shop> shops);
-typedef MapPageModelErrorCallback = void Function(MapPageModelError error);
-
 enum MapPageModelError {
   NETWORK_ERROR,
   OTHER,
@@ -29,9 +25,10 @@ enum MapPageModelError {
 class MapPageModel implements ShopsManagerListener {
   static const DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
 
-  final MapPageModelUpdateShopsCallback _updateShopsCallback;
-  final MapPageModelErrorCallback _errorCallback;
+  final ArgCallback<Map<String, Shop>> _updateShopsCallback;
+  final ArgCallback<MapPageModelError> _errorCallback;
   final VoidCallback _updateCallback;
+  final VoidCallback _loadingChangeCallback;
   final LocationController _locationController;
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
@@ -49,7 +46,8 @@ class MapPageModel implements ShopsManagerListener {
       this._latestCameraPosStorage,
       this._updateShopsCallback,
       this._errorCallback,
-      this._updateCallback) {
+      this._updateCallback,
+      this._loadingChangeCallback) {
     _shopsManager.addListener(this);
   }
 
@@ -123,11 +121,13 @@ class MapPageModel implements ShopsManagerListener {
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
     _networkOperationInProgress = true;
     _updateCallback.call();
+    _loadingChangeCallback.call();
     try {
       return await operation.call();
     } finally {
       _networkOperationInProgress = false;
       _updateCallback.call();
+      _loadingChangeCallback.call();
     }
   }
 
