@@ -118,4 +118,9 @@ class TextStyles {
 
   static const TextStyle langName =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
+
+  static const TextStyle searchBarText =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
+  static const TextStyle searchBarHint =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: ColorsPlante.grey);
 }

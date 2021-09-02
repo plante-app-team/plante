@@ -124,6 +124,9 @@
       "create_shop_page_how_new_shop_is_called_hint": "Spar",
       "create_shop_page_what_type_new_shop_has": "Select shop's type",
 
+      "map_search_bar_hint": "Search shops and streets",
+      "map_search_bar_button_title": "Search",
+
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
       "barcode_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",

@@ -1,4 +1,3 @@
-import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';

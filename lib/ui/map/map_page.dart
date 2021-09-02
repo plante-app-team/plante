@@ -24,10 +24,12 @@ import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
+import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page_mode.dart';
 import 'package:plante/ui/map/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page_model.dart';
+import 'package:plante/ui/map/map_search_page.dart';
 import 'package:plante/ui/map/markers_builder.dart';
 
 enum MapPageRequestedMode {
@@ -374,6 +376,15 @@ class _MapPageState extends PageStatePlante<MapPage>
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
+              if (enableNewestFeatures())
+                Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: InkWell(
+                      onTap: _onSearchBarTap,
+                      child: const Hero(
+                          tag: 'search_bar',
+                          child: MapSearchBar(enabled: false)),
+                    )),
               AnimatedModeWidget(child: _mode.buildHeader(context)),
               MapHintsList(controller: _hintsController),
               AnimatedModeWidget(child: _mode.buildTopActions(context)),
@@ -497,6 +508,11 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   void _onMapTap(LatLng coord) {
     _mode.onMapClick(coord.toCoord());
+  }
+
+  void _onSearchBarTap() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const MapSearchPage()));
   }
 }
 

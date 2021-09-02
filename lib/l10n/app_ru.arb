@@ -124,6 +124,9 @@
     "create_shop_page_how_new_shop_is_called_hint": "Пятёрочка",
     "create_shop_page_what_type_new_shop_has": "Укажите тип магазина",
 
+    "map_search_bar_hint": "Поиск магазинов и улиц",
+    "map_search_bar_button_title": "Поиск",
+
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
     "barcode_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",

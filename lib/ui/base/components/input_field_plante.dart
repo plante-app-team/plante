@@ -1,16 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
-class InputFieldPlante extends StatelessWidget {
+class InputFieldPlante extends StatefulWidget {
   final String? label;
   final String? hint;
   final TextCapitalization textCapitalization;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final bool? showCursor;
+  final bool readOnly;
+
+  /// [focusNode] and [focusChangeCallback] are mutually exclusive.
+  final FocusNode? focusNode;
+
+  /// [focusNode] and [focusChangeCallback] are mutually exclusive.
+  final ArgCallback<bool>? focusChangeCallback;
 
   const InputFieldPlante(
       {Key? key,
@@ -19,23 +28,51 @@ class InputFieldPlante extends StatelessWidget {
       this.textCapitalization = TextCapitalization.sentences,
       this.controller,
       this.keyboardType,
-      this.inputFormatters})
+      this.inputFormatters,
+      this.showCursor,
+      this.readOnly = false,
+      this.focusNode,
+      this.focusChangeCallback})
       : super(key: key);
+
+  @override
+  _InputFieldPlanteState createState() => _InputFieldPlanteState();
+}
+
+class _InputFieldPlanteState extends State<InputFieldPlante> {
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.focusNode != null && widget.focusChangeCallback != null) {
+      throw ArgumentError('[focusNode] and [focusChangeCallback] are '
+          'mutually exclusive');
+    }
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    } else {
+      _focusNode = FocusNode();
+    }
+    _focusNode.addListener(() {
+      widget.focusChangeCallback?.call(_focusNode.hasFocus);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
         height: 46,
         child: TextField(
-          textCapitalization: textCapitalization,
-          key: key,
+          key: widget.key,
+          textCapitalization: widget.textCapitalization,
           style: TextStyles.input,
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
           decoration: InputDecoration(
-            labelText: label,
+            labelText: widget.label,
             labelStyle: TextStyles.inputLabel,
-            hintText: hint,
+            hintText: widget.hint,
             contentPadding: const EdgeInsets.only(left: 22, right: 22),
             hintStyle: TextStyles.inputHint,
             enabledBorder: const OutlineInputBorder(
@@ -49,7 +86,10 @@ class InputFieldPlante extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(30)),
             ),
           ),
-          controller: controller,
+          controller: widget.controller,
+          focusNode: _focusNode,
+          readOnly: widget.readOnly,
+          showCursor: widget.showCursor,
         ));
   }
 }
