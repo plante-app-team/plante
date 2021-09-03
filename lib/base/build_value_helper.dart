@@ -16,6 +16,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_road.dart';
 
 part 'build_value_helper.g.dart';
 
@@ -30,6 +31,7 @@ part 'build_value_helper.g.dart';
   BackendProductsAtShop,
   BackendShop,
   OsmShop,
+  OsmRoad,
   Shop,
   OsmAddress,
   ModeratorChoiceReason,

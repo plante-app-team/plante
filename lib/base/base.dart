@@ -34,6 +34,9 @@ bool isInTests() {
 }
 
 bool enableNewestFeatures() {
+  if (isInTests()) {
+    return true;
+  }
   final userParamsController = GetIt.I.get<UserParamsController>();
   final user = userParamsController.cachedUserParams;
   final isDev = user != null && user.userGroup != null && user.userGroup! > 1;
@@ -98,4 +101,10 @@ String privacyPolicyUrl(SysLangCodeHolder langCodeHolder) {
   } else {
     return _PRIVACY_POLICY_URL_EN;
   }
+}
+
+Future<String> userAgent() async {
+  final packageInfo = await getPackageInfo();
+  return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
+      '${operatingSystem()}, plante.application@gmail.com';
 }

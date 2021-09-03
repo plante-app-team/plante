@@ -516,6 +516,10 @@ class MockOpenStreetMap extends _i1.Mock implements _i13.OpenStreetMap {
   }
 
   @override
+  Map<String, String> get osmOverpassUrls =>
+      (super.noSuchMethod(Invocation.getter(#osmOverpassUrls),
+          returnValue: <String, String>{}) as Map<String, String>);
+  @override
   _i11.Future<_i2.Result<List<_i44.OsmShop>, _i13.OpenStreetMapError>>
       fetchShops(_i45.CoordsBounds? bounds) => (super.noSuchMethod(
           Invocation.method(#fetchShops, [bounds]),
@@ -523,6 +527,14 @@ class MockOpenStreetMap extends _i1.Mock implements _i13.OpenStreetMap {
                   _i2.Result<List<_i44.OsmShop>, _i13.OpenStreetMapError>>.value(
               _FakeResult<List<_i44.OsmShop>, _i13.OpenStreetMapError>())) as _i11
           .Future<_i2.Result<List<_i44.OsmShop>, _i13.OpenStreetMapError>>);
+  @override
+  _i11.Future<_i2.Result<List<dynamic>, _i13.OpenStreetMapError>> fetchStreet(
+          _i45.CoordsBounds? bounds) =>
+      (super.noSuchMethod(Invocation.method(#fetchStreet, [bounds]),
+              returnValue: Future<
+                      _i2.Result<List<dynamic>, _i13.OpenStreetMapError>>.value(
+                  _FakeResult<List<dynamic>, _i13.OpenStreetMapError>()))
+          as _i11.Future<_i2.Result<List<dynamic>, _i13.OpenStreetMapError>>);
   @override
   _i11.Future<_i2.Result<_i12.OsmAddress, _i13.OpenStreetMapError>>
       fetchAddress(double? lat, double? lon) => (super.noSuchMethod(
@@ -768,6 +780,11 @@ class MockShopsManager extends _i1.Mock implements _i57.ShopsManager {
                   Future<_i2.Result<_i14.Shop, _i58.ShopsManagerError>>.value(
                       _FakeResult<_i14.Shop, _i58.ShopsManagerError>()))
           as _i11.Future<_i2.Result<_i14.Shop, _i58.ShopsManagerError>>);
+  @override
+  _i11.Future<void> clearCache() =>
+      (super.noSuchMethod(Invocation.method(#clearCache, []),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future.value()) as _i11.Future<void>);
 }
 
 /// A class which mocks [ShopsManagerListener].

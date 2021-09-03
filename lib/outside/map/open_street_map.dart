@@ -3,8 +3,8 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
@@ -13,6 +13,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
@@ -36,7 +37,6 @@ class OpenStreetMap {
 
   /// We use LinkedHashMap because order is important
   final _osmOverpassUrls = LinkedHashMap<String, String>();
-  final _packageInfo = Completer<PackageInfo>();
 
   Map<String, String> get osmOverpassUrls => MapView(_osmOverpassUrls);
 
@@ -45,9 +45,6 @@ class OpenStreetMap {
     _osmOverpassUrls['z'] = 'z.overpass-api.de';
     _osmOverpassUrls['kumi'] = 'overpass.kumi.systems';
     _osmOverpassUrls['taiwan'] = 'overpass.nchc.org.tw';
-    () async {
-      _packageInfo.complete(await getPackageInfo());
-    }.call();
   }
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
@@ -118,7 +115,7 @@ class OpenStreetMap {
       final Response r;
       try {
         r = await _http.get(Uri.https(url, 'api/interpreter', {'data': cmd}),
-            headers: {'User-Agent': await _userAgent()});
+            headers: {'User-Agent': await userAgent()});
       } on IOException catch (e) {
         Log.w('OSM overpass network error', ex: e);
         return Err(OpenStreetMapError.NETWORK);
@@ -141,18 +138,26 @@ class OpenStreetMap {
     return Err(OpenStreetMapError.OTHER);
   }
 
-  Future<String> _userAgent() async {
-    final packageInfo = await _packageInfo.future;
-    return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
-        '${operatingSystem()}, plante.application@gmail.com';
-  }
+  Future<Result<List<OsmRoad>, OpenStreetMapError>> fetchRoads(
+      CoordsBounds bounds) async {
+    final val1 = bounds.southwest.lat;
+    final val2 = bounds.southwest.lon;
+    final val3 = bounds.northeast.lat;
+    final val4 = bounds.northeast.lon;
+    final cmd =
+        '[out:json];(way($val1,$val2,$val3,$val4)[highway][name];);out center;';
 
-  Map<String, dynamic>? _jsonDecodeSafe(String str) {
-    try {
-      return jsonDecode(str) as Map<String, dynamic>?;
-    } on FormatException catch (e) {
-      Log.w("OpenStreetMap: couldn't decode safe: %str", ex: e);
-      return null;
+    final response = await _sendCmd(cmd);
+    if (response.isErr) {
+      return Err(response.unwrapErr());
+    }
+
+    final result = await compute(_parseRoads, response.unwrap());
+    if (result.isOk) {
+      return Ok(result.unwrap());
+    } else {
+      Log.w('OSM.fetchRoads: parse roads isolate error: $result');
+      return Err(OpenStreetMapError.OTHER);
     }
   }
 
@@ -166,7 +171,7 @@ class OpenStreetMap {
             'lon': lon.toString(),
             'format': 'json',
           }),
-          headers: {'User-Agent': await _userAgent()});
+          headers: {'User-Agent': await userAgent()});
     } on IOException catch (e) {
       Log.w('OSM nominatim network error', ex: e);
       return Err(OpenStreetMapError.NETWORK);
@@ -200,4 +205,59 @@ class OpenStreetMap {
       ..countryCode = countryCode);
     return Ok(result);
   }
+}
+
+Map<String, dynamic>? _jsonDecodeSafe(String str) {
+  try {
+    return jsonDecode(str) as Map<String, dynamic>?;
+  } on FormatException catch (e) {
+    Log.w("OpenStreetMap: couldn't decode safe: %str", ex: e);
+    return null;
+  }
+}
+
+enum _ParseRoadsErr {
+  INVALID_JSON,
+  NO_ELEMENTS,
+}
+
+Result<List<OsmRoad>, _ParseRoadsErr> _parseRoads(String text) {
+  final roadsJson = _jsonDecodeSafe(text);
+  if (roadsJson == null) {
+    return Err(_ParseRoadsErr.INVALID_JSON);
+  }
+  if (!roadsJson.containsKey('elements')) {
+    return Err(_ParseRoadsErr.NO_ELEMENTS);
+  }
+
+  final result = <OsmRoad>[];
+  for (final roadJson in roadsJson['elements']) {
+    final roadName = roadJson['tags']?['name'] as String?;
+    if (roadName == null) {
+      continue;
+    }
+
+    final id = roadJson['id']?.toString();
+    final double? lat;
+    final double? lon;
+    final center = roadJson['center'] as Map<dynamic, dynamic>?;
+    if (center != null) {
+      lat = center['lat'] as double?;
+      lon = center['lon'] as double?;
+    } else {
+      lat = roadJson['lat'] as double?;
+      lon = roadJson['lon'] as double?;
+    }
+
+    if (id == null || lat == null || lon == null) {
+      continue;
+    }
+
+    result.add(OsmRoad((e) => e
+      ..osmId = id
+      ..name = roadName
+      ..latitude = lat
+      ..longitude = lon));
+  }
+  return Ok(result);
 }
