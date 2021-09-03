@@ -4,6 +4,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
+import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:sqflite/sqlite_api.dart';
 
@@ -26,6 +27,12 @@ const _SHOP_NAME = 'name';
 const _SHOP_TYPE = 'type';
 const _SHOP_LAT = 'lat';
 const _SHOP_LON = 'lon';
+const _ROAD_TABLE = 'road';
+const _ROAD_TERRITORY_ID = 'territory_id';
+const _ROAD_OSM_ID = 'osm_id';
+const _ROAD_NAME = 'name';
+const _ROAD_LAT = 'lat';
+const _ROAD_LON = 'lon';
 
 // Just a random number because I don't know what number work better.
 const _BATCH_SIZE = 200;
@@ -39,6 +46,7 @@ class OsmCacher {
   Future<Database> get _db => _dbCompleter.future;
 
   final List<OsmCachedTerritory<OsmShop>> _cachedShops = [];
+  final List<OsmCachedTerritory<OsmRoad>> _cachedRoads = [];
 
   Future<Database> get dbForTesting {
     if (!isInTests()) {
@@ -59,9 +67,110 @@ class OsmCacher {
     if (db == null) {
       final appDir = await getAppDir();
       db = await openDB('${appDir.path}/osm_cache.sqlite',
-          version: 1, onUpgrade: _onUpgradeDb);
+          version: 2, onUpgrade: _onUpgradeDb);
     }
 
+    final shopsAndTerritoriesIds = await _extractShopsWithTerritoriesIds(db);
+    final roadsAndTerritoriesIds = await _extractRoadsWithTerritoriesIds(db);
+    final emptyTerritories = await _extractTerritories(db);
+
+    for (final territory in emptyTerritories) {
+      final shops = shopsAndTerritoriesIds[territory.id];
+      if (shops != null) {
+        _cachedShops.add(territory.rebuildWith(shops));
+      }
+      final roads = roadsAndTerritoriesIds[territory.id];
+      if (roads != null) {
+        _cachedRoads.add(territory.rebuildWith(roads));
+      }
+    }
+
+    _dbCompleter.complete(db);
+  }
+
+  Future<List<OsmCachedTerritory<None>>> _extractTerritories(
+      Database db) async {
+    final emptyTerritories = <OsmCachedTerritory<None>>[];
+
+    for (var offset = 0; true; offset += _BATCH_SIZE) {
+      final batch =
+          await db.query(_TERRITORY_TABLE, limit: _BATCH_SIZE, offset: offset);
+      if (batch.isEmpty) {
+        break;
+      }
+      for (final column in batch) {
+        final territoryId = column[_ID] as int?;
+        final whenObtained = column[_TERRITORY_WHEN_OBTAINED] as int?;
+        final northeastLat = column[_TERRITORY_NORTHEAST_LAT] as double?;
+        final northeastLon = column[_TERRITORY_NORTHEAST_LON] as double?;
+        final southwestLat = column[_TERRITORY_SOUTHWEST_LAT] as double?;
+        final southwestLon = column[_TERRITORY_SOUTHWEST_LON] as double?;
+        if (territoryId == null ||
+            whenObtained == null ||
+            northeastLat == null ||
+            northeastLon == null ||
+            southwestLat == null ||
+            southwestLon == null) {
+          Log.w('Invalid $_TERRITORY_TABLE column $column');
+          continue;
+        }
+        final whenObtainedDate = dateTimeFromSecondsSinceEpoch(whenObtained);
+        final territory = OsmCachedTerritory<None>(
+            territoryId,
+            whenObtainedDate,
+            CoordsBounds(
+                southwest: Coord(lat: southwestLat, lon: southwestLon),
+                northeast: Coord(lat: northeastLat, lon: northeastLon)),
+            const []);
+        emptyTerritories.add(territory);
+      }
+    }
+    return emptyTerritories;
+  }
+
+  Future<void> _onUpgradeDb(Database db, int oldVersion, int newVersion) async {
+    await db.transaction((txn) async {
+      if (oldVersion < 1) {
+        await txn.execute('''CREATE TABLE $_TERRITORY_TABLE(
+          $_ID INTEGER PRIMARY KEY,
+          $_TERRITORY_WHEN_OBTAINED INTEGER,
+          $_TERRITORY_NORTHEAST_LAT REAL,
+          $_TERRITORY_NORTHEAST_LON REAL,
+          $_TERRITORY_SOUTHWEST_LAT REAL,
+          $_TERRITORY_SOUTHWEST_LON REAL);
+        ''');
+        await txn.execute('''CREATE TABLE $_SHOP_TABLE(
+          $_ID INTEGER PRIMARY KEY,
+          $_SHOP_TERRITORY_ID INTEGER,
+          $_SHOP_OSM_ID TEXT,
+          $_SHOP_NAME TEXT,
+          $_SHOP_TYPE TEXT,
+          $_SHOP_LAT REAL,
+          $_SHOP_LON REAL);
+        ''');
+        await txn.execute('''CREATE INDEX index_shop_territory
+          ON $_SHOP_TABLE($_SHOP_TERRITORY_ID);
+        ''');
+      }
+
+      if (oldVersion < 2) {
+        await txn.execute('''CREATE TABLE $_ROAD_TABLE(
+          $_ID INTEGER PRIMARY KEY,
+          $_ROAD_TERRITORY_ID INTEGER,
+          $_ROAD_OSM_ID TEXT,
+          $_ROAD_NAME TEXT,
+          $_ROAD_LAT REAL,
+          $_ROAD_LON REAL);
+        ''');
+        await txn.execute('''CREATE INDEX index_road_territory
+          ON $_ROAD_TABLE($_ROAD_TERRITORY_ID);
+        ''');
+      }
+    });
+  }
+
+  Future<Map<int, List<OsmShop>>> _extractShopsWithTerritoriesIds(
+      Database db) async {
     final shopsAndTerritoriesIds = <int, List<OsmShop>>{};
     for (var offset = 0; true; offset += _BATCH_SIZE) {
       final batch =
@@ -98,93 +207,72 @@ class OsmCacher {
           ..longitude = lon));
       }
     }
+    return shopsAndTerritoriesIds;
+  }
 
+  Future<Map<int, List<OsmRoad>>> _extractRoadsWithTerritoriesIds(
+      Database db) async {
+    final roadsAndTerritoriesIds = <int, List<OsmRoad>>{};
     for (var offset = 0; true; offset += _BATCH_SIZE) {
       final batch =
-          await db.query(_TERRITORY_TABLE, limit: _BATCH_SIZE, offset: offset);
+          await db.query(_ROAD_TABLE, limit: _BATCH_SIZE, offset: offset);
       if (batch.isEmpty) {
         break;
       }
       for (final column in batch) {
-        final territoryId = column[_ID] as int?;
-        final whenObtained = column[_TERRITORY_WHEN_OBTAINED] as int?;
-        final northeastLat = column[_TERRITORY_NORTHEAST_LAT] as double?;
-        final northeastLon = column[_TERRITORY_NORTHEAST_LON] as double?;
-        final southwestLat = column[_TERRITORY_SOUTHWEST_LAT] as double?;
-        final southwestLon = column[_TERRITORY_SOUTHWEST_LON] as double?;
+        final territoryId = column[_ROAD_TERRITORY_ID] as int?;
+        final osmId = column[_ROAD_OSM_ID] as String?;
+        final name = column[_ROAD_NAME] as String?;
+        final lat = column[_ROAD_LAT] as double?;
+        final lon = column[_ROAD_LON] as double?;
         if (territoryId == null ||
-            whenObtained == null ||
-            northeastLat == null ||
-            northeastLon == null ||
-            southwestLat == null ||
-            southwestLon == null) {
-          Log.w('Invalid $_TERRITORY_TABLE column $column');
+            osmId == null ||
+            name == null ||
+            lat == null ||
+            lon == null) {
+          Log.w('Invalid $_ROAD_TABLE column $column');
           continue;
         }
-        final whenObtainedDate = dateTimeFromSecondsSinceEpoch(whenObtained);
-        final territory = OsmCachedTerritory<OsmShop>(
-            territoryId,
-            whenObtainedDate,
-            CoordsBounds(
-                southwest: Coord(lat: southwestLat, lon: southwestLon),
-                northeast: Coord(lat: northeastLat, lon: northeastLon)),
-            shopsAndTerritoriesIds[territoryId] ?? []);
-        _cachedShops.add(territory);
+        if (!roadsAndTerritoriesIds.containsKey(territoryId)) {
+          roadsAndTerritoriesIds[territoryId] = [];
+        }
+        roadsAndTerritoriesIds[territoryId]!.add(OsmRoad((e) => e
+          ..osmId = osmId
+          ..name = name
+          ..latitude = lat
+          ..longitude = lon));
       }
     }
-
-    _dbCompleter.complete(db);
-  }
-
-  Future<void> _onUpgradeDb(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 1) {
-      await db.transaction((txn) async {
-        await txn.execute('''CREATE TABLE $_TERRITORY_TABLE(
-        $_ID INTEGER PRIMARY KEY,
-        $_TERRITORY_WHEN_OBTAINED INTEGER,
-        $_TERRITORY_NORTHEAST_LAT REAL,
-        $_TERRITORY_NORTHEAST_LON REAL,
-        $_TERRITORY_SOUTHWEST_LAT REAL,
-        $_TERRITORY_SOUTHWEST_LON REAL);
-      ''');
-        await txn.execute('''CREATE TABLE $_SHOP_TABLE(
-        $_ID INTEGER PRIMARY KEY,
-        $_SHOP_TERRITORY_ID INTEGER,
-        $_SHOP_OSM_ID TEXT,
-        $_SHOP_NAME TEXT,
-        $_SHOP_TYPE TEXT,
-        $_SHOP_LAT REAL,
-        $_SHOP_LON REAL);
-      ''');
-        await txn.execute('''CREATE INDEX index_shop_territory
-        ON $_SHOP_TABLE($_SHOP_TERRITORY_ID);
-      ''');
-      });
-    }
+    return roadsAndTerritoriesIds;
   }
 
   Future<OsmCachedTerritory<OsmShop>> cacheShops(
       DateTime whenObtained, CoordsBounds bounds, List<OsmShop> shops) async {
+    return await _cacheTerritory(_SHOP_TABLE, whenObtained, bounds, shops,
+        _shopColumnsValues, _cachedShops);
+  }
+
+  Future<OsmCachedTerritory<T>> _cacheTerritory<T>(
+      String table,
+      DateTime whenObtained,
+      CoordsBounds bounds,
+      List<T> entities,
+      _TerritoriedEntityColumnValues<T> columnsValues,
+      List<OsmCachedTerritory<T>> entitiesLocalCache) async {
     final db = await _db;
     return await db.transaction((txn) async {
-      final territoryValues = {
-        _TERRITORY_WHEN_OBTAINED: whenObtained.secondsSinceEpoch,
-        _TERRITORY_NORTHEAST_LAT: bounds.northeast.lat,
-        _TERRITORY_NORTHEAST_LON: bounds.northeast.lon,
-        _TERRITORY_SOUTHWEST_LAT: bounds.southwest.lat,
-        _TERRITORY_SOUTHWEST_LON: bounds.southwest.lon,
-      };
-      final territoryId = await txn.insert(_TERRITORY_TABLE, territoryValues);
-      for (final shop in shops) {
-        await txn.insert(_SHOP_TABLE, shop.columnsValues(territoryId));
+      final territoryId = await txn.insert(
+          _TERRITORY_TABLE, _territoryValues(whenObtained, bounds));
+      for (final entity in entities) {
+        await txn.insert(table, columnsValues(territoryId, entity));
       }
       final cache = OsmCachedTerritory(
         territoryId,
         whenObtained,
         bounds,
-        shops,
+        entities,
       );
-      _cachedShops.add(cache);
+      entitiesLocalCache.add(cache);
       return cache;
     });
   }
@@ -194,45 +282,97 @@ class OsmCacher {
     return _cachedShops.toList(growable: false);
   }
 
-  Future<void> deleteCachedShops(int territoryId) async {
+  Future<void> deleteCachedTerritory(int territoryId) async {
     final db = await _db;
     await db.transaction((txn) async {
       await txn.execute('''DELETE FROM $_SHOP_TABLE
           WHERE $_SHOP_TERRITORY_ID = $territoryId;''');
+      await txn.execute('''DELETE FROM $_ROAD_TABLE
+          WHERE $_ROAD_TERRITORY_ID = $territoryId;''');
       await txn.execute('''DELETE FROM $_TERRITORY_TABLE
           WHERE $_ID = $territoryId;''');
     });
     _cachedShops.removeWhere((territory) => territory.id == territoryId);
+    _cachedRoads.removeWhere((territory) => territory.id == territoryId);
   }
 
   Future<Result<OsmCachedTerritory<OsmShop>, OsmCacherError>> addShopToCache(
       int territoryId, OsmShop shop) async {
-    final territories = _cachedShops.where((e) => e.id == territoryId);
+    return await _addEntityToCache(
+        _SHOP_TABLE, territoryId, shop, _cachedShops, _shopColumnsValues);
+  }
+
+  Future<Result<OsmCachedTerritory<T>, OsmCacherError>> _addEntityToCache<T>(
+      String table,
+      int territoryId,
+      T entity,
+      List<OsmCachedTerritory<T>> entitiesLocalCache,
+      _TerritoriedEntityColumnValues<T> columnsValues) async {
+    final territories = entitiesLocalCache.where((e) => e.id == territoryId);
     if (territories.isEmpty) {
       return Err(OsmCacherError.TERRITORY_NOT_FOUND);
     }
     // Update local cache
     var territory = territories.first;
-    _cachedShops.remove(territory);
-    territory = territory.add(shop);
-    _cachedShops.add(territory);
+    entitiesLocalCache.remove(territory);
+    territory = territory.add(entity);
+    entitiesLocalCache.add(territory);
 
     // Update persistent cache
     final db = await _db;
-    await db.insert(_SHOP_TABLE, shop.columnsValues(territoryId));
+    await db.insert(table, columnsValues(territoryId, entity));
     return Ok(territory);
+  }
+
+  Future<OsmCachedTerritory<OsmRoad>> cacheRoads(
+      DateTime whenObtained, CoordsBounds bounds, List<OsmRoad> roads) async {
+    return await _cacheTerritory(_ROAD_TABLE, whenObtained, bounds, roads,
+        _roadColumnsValues, _cachedRoads);
+  }
+
+  Future<List<OsmCachedTerritory<OsmRoad>>> getCachedRoads() async {
+    await _db;
+    return _cachedRoads.toList(growable: false);
+  }
+
+  Future<Result<OsmCachedTerritory<OsmRoad>, OsmCacherError>> addRoadToCache(
+      int territoryId, OsmRoad road) async {
+    return await _addEntityToCache(
+        _ROAD_TABLE, territoryId, road, _cachedRoads, _roadColumnsValues);
   }
 }
 
-extension _ShopExt on OsmShop {
-  Map<String, dynamic> columnsValues(int territoryId) {
-    return {
-      _SHOP_TERRITORY_ID: territoryId,
-      _SHOP_OSM_ID: osmId,
-      _SHOP_NAME: name,
-      _SHOP_TYPE: type ?? '',
-      _SHOP_LAT: latitude,
-      _SHOP_LON: longitude,
-    };
-  }
+typedef _TerritoriedEntityColumnValues<T> = Map<String, dynamic> Function(
+    int territoryId, T entity);
+
+Map<String, dynamic> _territoryValues(
+    DateTime whenObtained, CoordsBounds bounds) {
+  return {
+    _TERRITORY_WHEN_OBTAINED: whenObtained.secondsSinceEpoch,
+    _TERRITORY_NORTHEAST_LAT: bounds.northeast.lat,
+    _TERRITORY_NORTHEAST_LON: bounds.northeast.lon,
+    _TERRITORY_SOUTHWEST_LAT: bounds.southwest.lat,
+    _TERRITORY_SOUTHWEST_LON: bounds.southwest.lon,
+  };
+}
+
+Map<String, dynamic> _shopColumnsValues(int territoryId, OsmShop shop) {
+  return {
+    _SHOP_TERRITORY_ID: territoryId,
+    _SHOP_OSM_ID: shop.osmId,
+    _SHOP_NAME: shop.name,
+    _SHOP_TYPE: shop.type ?? '',
+    _SHOP_LAT: shop.latitude,
+    _SHOP_LON: shop.longitude,
+  };
+}
+
+Map<String, dynamic> _roadColumnsValues(int territoryId, OsmRoad road) {
+  return {
+    _ROAD_TERRITORY_ID: territoryId,
+    _ROAD_OSM_ID: road.osmId,
+    _ROAD_NAME: road.name,
+    _ROAD_LAT: road.latitude,
+    _ROAD_LON: road.longitude,
+  };
 }

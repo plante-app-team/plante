@@ -24,6 +24,10 @@ class OsmCachedTerritory<T> {
         id, whenObtained, bounds, UnmodifiableListView(updatedEntities));
   }
 
+  OsmCachedTerritory<T2> rebuildWith<T2>(List<T2> otherEntities) {
+    return OsmCachedTerritory<T2>._(id, whenObtained, bounds, otherEntities);
+  }
+
   @override
   int get hashCode => id;
 

@@ -116,7 +116,7 @@ class ShopsManagerFetchShopsHelper {
 
   void _deleteOsmShopsCache(
       OsmCachedTerritory<OsmShop> osmCachedTerritory) async {
-    await _osmCacher.deleteCachedShops(osmCachedTerritory.id);
+    await _osmCacher.deleteCachedTerritory(osmCachedTerritory.id);
   }
 
   bool _isOld(OsmCachedTerritory territory) {
@@ -130,9 +130,11 @@ class ShopsManagerFetchShopsHelper {
   }
 
   Future<void> clearCache() async {
-    final territories = await _osmCacher.getCachedShops();
-    for (final territory in territories) {
-      await _osmCacher.deleteCachedShops(territory.id);
+    for (final territory in await _osmCacher.getCachedShops()) {
+      await _osmCacher.deleteCachedTerritory(territory.id);
+    }
+    for (final territory in await _osmCacher.getCachedRoads()) {
+      await _osmCacher.deleteCachedTerritory(territory.id);
     }
   }
 }
