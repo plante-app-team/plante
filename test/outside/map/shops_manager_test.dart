@@ -12,6 +12,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -97,8 +98,8 @@ void main() {
     productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager =
-        ShopsManager(osm, backend, productsObtainer, analytics, osmCacher);
+    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
+        osmCacher, OsmInteractionsQueue());
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));
@@ -643,8 +644,8 @@ void main() {
         equals(expectedAllShops));
 
     // Create a NEW shops manager with same persistent cache
-    shopsManager =
-        ShopsManager(osm, backend, productsObtainer, analytics, osmCacher);
+    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
+        osmCacher, OsmInteractionsQueue());
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));

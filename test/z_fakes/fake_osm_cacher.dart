@@ -23,8 +23,10 @@ class FakeOsmCacher implements OsmCacher {
   }
 
   @override
-  Future<void> deleteCachedTerritory(int territoryId) async {
+  Future<void> deleteCachedTerritory(int territoryId) {
     _cachedShops.removeWhere((e) => e.id == territoryId);
+    _cachedRoads.removeWhere((e) => e.id == territoryId);
+    return Future.value();
   }
 
   @override
@@ -47,7 +49,8 @@ class FakeOsmCacher implements OsmCacher {
   }
 
   @override
-  Future<OsmCachedTerritory<OsmRoad>> cacheRoads(DateTime whenObtained, CoordsBounds bounds, List<OsmRoad> roads) async {
+  Future<OsmCachedTerritory<OsmRoad>> cacheRoads(
+      DateTime whenObtained, CoordsBounds bounds, List<OsmRoad> roads) async {
     final result = OsmCachedTerritory(++_lastId, whenObtained, bounds, roads);
     _cachedRoads.add(result);
     return result;
@@ -59,7 +62,8 @@ class FakeOsmCacher implements OsmCacher {
   }
 
   @override
-  Future<Result<OsmCachedTerritory<OsmRoad>, OsmCacherError>> addRoadToCache(int territoryId, OsmRoad road) async {
+  Future<Result<OsmCachedTerritory<OsmRoad>, OsmCacherError>> addRoadToCache(
+      int territoryId, OsmRoad road) async {
     final territories = _cachedRoads.where((e) => e.id == territoryId);
     if (territories.isEmpty) {
       return Err(OsmCacherError.TERRITORY_NOT_FOUND);

@@ -17,6 +17,8 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -51,8 +53,9 @@ void initDI() {
       GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<OpenStreetMap>(
       OpenStreetMap(GetIt.I.get<HttpClient>(), GetIt.I.get<Analytics>()));
-  GetIt.I.registerSingleton<AddressObtainer>(
-      AddressObtainer(GetIt.I.get<OpenStreetMap>()));
+  GetIt.I.registerSingleton<OsmInteractionsQueue>(OsmInteractionsQueue());
+  GetIt.I.registerSingleton<AddressObtainer>(AddressObtainer(
+      GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmInteractionsQueue>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
@@ -97,5 +100,11 @@ void initDI() {
       GetIt.I.get<Backend>(),
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
-      GetIt.I.get<OsmCacher>()));
+      GetIt.I.get<OsmCacher>(),
+      GetIt.I.get<OsmInteractionsQueue>()));
+  GetIt.I.registerSingleton<RoadsManager>(RoadsManager(
+    GetIt.I.get<OpenStreetMap>(),
+    GetIt.I.get<OsmCacher>(),
+    GetIt.I.get<OsmInteractionsQueue>(),
+  ));
 }

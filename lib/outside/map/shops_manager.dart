@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
@@ -15,6 +13,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_impl.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -26,19 +25,12 @@ class ShopsManager {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
   final Analytics _analytics;
+  final OsmInteractionsQueue _osmQueue;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
   final ShopsManagerImpl _impl;
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
-  static final _shopsLoadsAttemptsCooldown = isInTests()
-      ? const Duration(milliseconds: 50)
-      : const Duration(seconds: 3);
-
-  DateTime _lastShopsLoadTime = DateTime(2000);
-  bool _loadingArea = false;
-  final _delayedLoadings = <VoidCallback>[];
-
   // If new cache fields are added please update the [clearCache] method.
   final _shopsCache = <String, Shop>{};
   final _loadedAreas = <CoordsBounds, List<String>>{};
@@ -46,8 +38,13 @@ class ShopsManager {
 
   int get loadedAreasCount => _loadedAreas.length;
 
-  ShopsManager(OpenStreetMap openStreetMap, Backend backend,
-      ProductsObtainer productsObtainer, this._analytics, OsmCacher _osmCacher)
+  ShopsManager(
+      OpenStreetMap openStreetMap,
+      Backend backend,
+      ProductsObtainer productsObtainer,
+      this._analytics,
+      OsmCacher _osmCacher,
+      this._osmQueue)
       : _impl = ShopsManagerImpl(openStreetMap, backend, productsObtainer) {
     _fetchShopsHelper = ShopsManagerFetchShopsHelper(_impl, _osmCacher);
   }
@@ -68,26 +65,8 @@ class ShopsManager {
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
-    final completer = Completer<Result<Map<String, Shop>, ShopsManagerError>>();
-    VoidCallback? callback;
-    callback = () async {
-      _loadingArea = true;
-      try {
-        final result = await _maybeLoadShops(bounds, attemptNumber: 1);
-        completer.complete(result);
-        _delayedLoadings.remove(callback);
-      } finally {
-        _loadingArea = false;
-      }
-      if (_delayedLoadings.isNotEmpty) {
-        _delayedLoadings.first.call();
-      }
-    };
-    _delayedLoadings.add(callback);
-    if (!_loadingArea) {
-      _delayedLoadings.first.call();
-    }
-    return completer.future;
+    return await _osmQueue
+        .enqueue(() => _maybeLoadShops(bounds, attemptNumber: 1));
   }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
@@ -103,12 +82,6 @@ class ShopsManager {
         return Ok({for (var shop in shops) shop.osmId: shop});
       }
     }
-
-    final timeSinceLastLoad = DateTime.now().difference(_lastShopsLoadTime);
-    if (timeSinceLastLoad < _shopsLoadsAttemptsCooldown) {
-      await Future.delayed(_shopsLoadsAttemptsCooldown - timeSinceLastLoad);
-    }
-    _lastShopsLoadTime = DateTime.now();
 
     final shopsFetchResult = await _fetchShopsHelper.fetchShops(
         viewPort: bounds,

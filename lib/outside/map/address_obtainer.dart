@@ -1,67 +1,43 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
 
 typedef AddressResult = Result<OsmAddress, OpenStreetMapError>;
 typedef FutureAddress = Future<AddressResult>;
 
 class AddressObtainer {
-  static final _shopsLoadsAttemptsCooldown = isInTests()
-      ? const Duration(milliseconds: 50)
-      : const Duration(milliseconds: 1500);
-  DateTime _lastRequestTime = DateTime(2000);
-  final _delayedRequests = <VoidCallback>[];
-
   final OpenStreetMap _osm;
+  final OsmInteractionsQueue _osmQueue;
   final _cache = <String, OsmAddress>{};
 
-  AddressObtainer(this._osm);
+  AddressObtainer(this._osm, this._osmQueue);
 
   FutureAddress addressOfShop(Shop shop) async {
     if (_cache.containsKey(shop.osmId)) {
       return Ok(_cache[shop.osmId]!);
     }
-    final completer = Completer<AddressResult>();
-    VoidCallback? callback;
-    callback = () async {
-      final AddressResult result;
-      if (_cache.containsKey(shop.osmId)) {
-        result = Ok(_cache[shop.osmId]!);
-      } else {
-        result = await _fetchAddress(shop.latitude, shop.longitude);
-        if (result.isOk) {
-          _cache[shop.osmId] = result.unwrap();
-        }
-      }
-      completer.complete(result);
-      _delayedRequests.remove(callback);
-      if (_delayedRequests.isNotEmpty) {
-        _delayedRequests.first.call();
-      }
-    };
-    _delayedRequests.add(callback);
-    if (_delayedRequests.length == 1) {
-      _delayedRequests.first.call();
-    }
-    return completer.future;
+    return await _osmQueue.enqueue(
+        () => _fetchAddress(shop.latitude, shop.longitude, shop.osmId));
   }
 
-  FutureAddress _fetchAddress(double lat, double lon) async {
-    final timeSinceLastLoad = DateTime.now().difference(_lastRequestTime);
-    if (timeSinceLastLoad < _shopsLoadsAttemptsCooldown) {
-      await Future.delayed(_shopsLoadsAttemptsCooldown - timeSinceLastLoad);
+  FutureAddress _fetchAddress(double lat, double lon, String? osmId) async {
+    if (osmId != null && _cache.containsKey(osmId)) {
+      return Ok(_cache[osmId]!);
     }
-    _lastRequestTime = DateTime.now();
-    return await _osm.fetchAddress(lat, lon);
+    final result = await _osm.fetchAddress(lat, lon);
+    if (result.isOk && osmId != null) {
+      _cache[osmId] = result.unwrap();
+    }
+    return result;
   }
 
   FutureAddress addressOfCoords(Coord coords) async {
-    return await _fetchAddress(coords.lat, coords.lon);
+    return await _osmQueue
+        .enqueue(() => _fetchAddress(coords.lat, coords.lon, null));
   }
 }

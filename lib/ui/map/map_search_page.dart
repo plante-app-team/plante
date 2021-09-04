@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/base/pair.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/roads_manager.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -17,6 +21,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   static const _ANIMATION_END_AWAIT_DURATION = Duration(milliseconds: 500);
   final _searchBarFocusNode = FocusNode();
 
+  final _foundShops = <Shop>[];
   final _foundRoads = <OsmRoad>[];
 
   _MapSearchPageState() : super('MapSearchPage');
@@ -50,32 +55,82 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                           _ANIMATION_END_AWAIT_DURATION,
                       onSearchTap: _onSearchTap,
                     ))),
-            Expanded(
-                child: ListView(
-                    children: _foundRoads.isNotEmpty
-                        ? _foundRoads.map((e) => Text(e.name)).toList()
-                        : List.filled(100, 'Hello')
-                            .map((e) => Text(e))
-                            .toList()))
+            Expanded(child: ListView(children: _searchResults())),
           ]),
         )));
   }
 
+  List<Widget> _searchResults() {
+    final results = <Widget>[];
+    for (final shop in _foundShops) {
+      results.add(Text(shop.name));
+    }
+    for (final road in _foundRoads) {
+      results.add(Text(road.name));
+    }
+    return results;
+  }
+
   void _onSearchTap(String query) async {
     // TODO: no
-    final osm = GetIt.I.get<OpenStreetMap>();
+    final shopsManager = GetIt.I.get<ShopsManager>();
+    final roadsManager = GetIt.I.get<RoadsManager>();
     final cameraPosStorage = GetIt.I.get<LatestCameraPosStorage>();
-    final roads = await osm
-        .fetchRoads(cameraPosStorage.getCached()!.makeSquare(_kmToGrad(10)));
+    final cameraPos = cameraPosStorage.getCached();
+    if (cameraPos == null) {
+      return;
+    }
+    final searchedBounds = cameraPos.makeSquare(_kmToGrad(30));
+    final shopsRes = await shopsManager.fetchShops(searchedBounds);
     setState(() {
+      _foundShops.clear();
       _foundRoads.clear();
-      if (roads.isOk) {
-        _foundRoads.addAll(roads.unwrap());
-      }
     });
+
+    if (shopsRes.isOk) {
+      final shops = await compute(
+          _searchShops, Pair(shopsRes.unwrap().values.toList(), query));
+      setState(() {
+        _foundShops.addAll(shops);
+      });
+    }
+
+    final roadsRes =
+        await roadsManager.fetchRoadsWithinAndNearby(searchedBounds);
+    if (roadsRes.isOk) {
+      final roads =
+          await compute(_searchRoads, Pair(roadsRes.unwrap().toList(), query));
+      setState(() {
+        _foundRoads.addAll(roads);
+      });
+    }
   }
 }
 
 double _kmToGrad(double km) {
   return km * 1 / 111;
+}
+
+List<Shop> _searchShops(Pair<Iterable<Shop>, String> shopsAndQuery) {
+  final shops = shopsAndQuery.first;
+  final query = shopsAndQuery.second;
+  final result = <Shop>[];
+  for (final shop in shops) {
+    if (shop.name.contains(query)) {
+      result.add(shop);
+    }
+  }
+  return result;
+}
+
+List<OsmRoad> _searchRoads(Pair<Iterable<OsmRoad>, String> roadsAndQuery) {
+  final roads = roadsAndQuery.first;
+  final query = roadsAndQuery.second;
+  final result = <OsmRoad>[];
+  for (final road in roads) {
+    if (road.name.contains(query)) {
+      result.add(road);
+    }
+  }
+  return result;
 }
