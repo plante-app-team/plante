@@ -133,9 +133,6 @@ class ShopsManagerFetchShopsHelper {
     for (final territory in await _osmCacher.getCachedShops()) {
       await _osmCacher.deleteCachedTerritory(territory.id);
     }
-    for (final territory in await _osmCacher.getCachedRoads()) {
-      await _osmCacher.deleteCachedTerritory(territory.id);
-    }
   }
 }
 
