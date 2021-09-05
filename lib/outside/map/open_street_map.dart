@@ -191,6 +191,8 @@ class OpenStreetMap {
       return Err(OpenStreetMapError.OTHER);
     }
 
+    final country = json['address']['country']?.toString();
+    final city = json['address']['city']?.toString();
     final district = json['address']['city_district']?.toString();
     final neighbourhood = json['address']['neighbourhood']?.toString();
     final road = json['address']['road']?.toString();
@@ -202,6 +204,8 @@ class OpenStreetMap {
       ..neighbourhood = neighbourhood
       ..road = road
       ..houseNumber = houseNumber
+      ..city = city
+      ..country = country
       ..countryCode = countryCode);
     return Ok(result);
   }

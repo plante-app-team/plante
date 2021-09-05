@@ -47,6 +47,20 @@ class _$OsmAddressSerializer implements StructuredSerializer<OsmAddress> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.city;
+    if (value != null) {
+      result
+        ..add('city')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.country;
+    if (value != null) {
+      result
+        ..add('country')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.countryCode;
     if (value != null) {
       result
@@ -84,6 +98,14 @@ class _$OsmAddressSerializer implements StructuredSerializer<OsmAddress> {
           result.cityDistrict = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'city':
+          result.city = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'country':
+          result.country = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'countryCode':
           result.countryCode = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
@@ -105,6 +127,10 @@ class _$OsmAddress extends OsmAddress {
   @override
   final String? cityDistrict;
   @override
+  final String? city;
+  @override
+  final String? country;
+  @override
   final String? countryCode;
 
   factory _$OsmAddress([void Function(OsmAddressBuilder)? updates]) =>
@@ -115,6 +141,8 @@ class _$OsmAddress extends OsmAddress {
       this.road,
       this.neighbourhood,
       this.cityDistrict,
+      this.city,
+      this.country,
       this.countryCode})
       : super._();
 
@@ -133,6 +161,8 @@ class _$OsmAddress extends OsmAddress {
         road == other.road &&
         neighbourhood == other.neighbourhood &&
         cityDistrict == other.cityDistrict &&
+        city == other.city &&
+        country == other.country &&
         countryCode == other.countryCode;
   }
 
@@ -140,9 +170,13 @@ class _$OsmAddress extends OsmAddress {
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc($jc($jc(0, houseNumber.hashCode), road.hashCode),
-                neighbourhood.hashCode),
-            cityDistrict.hashCode),
+            $jc(
+                $jc(
+                    $jc($jc($jc(0, houseNumber.hashCode), road.hashCode),
+                        neighbourhood.hashCode),
+                    cityDistrict.hashCode),
+                city.hashCode),
+            country.hashCode),
         countryCode.hashCode));
   }
 
@@ -153,6 +187,8 @@ class _$OsmAddress extends OsmAddress {
           ..add('road', road)
           ..add('neighbourhood', neighbourhood)
           ..add('cityDistrict', cityDistrict)
+          ..add('city', city)
+          ..add('country', country)
           ..add('countryCode', countryCode))
         .toString();
   }
@@ -178,6 +214,14 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
   String? get cityDistrict => _$this._cityDistrict;
   set cityDistrict(String? cityDistrict) => _$this._cityDistrict = cityDistrict;
 
+  String? _city;
+  String? get city => _$this._city;
+  set city(String? city) => _$this._city = city;
+
+  String? _country;
+  String? get country => _$this._country;
+  set country(String? country) => _$this._country = country;
+
   String? _countryCode;
   String? get countryCode => _$this._countryCode;
   set countryCode(String? countryCode) => _$this._countryCode = countryCode;
@@ -191,6 +235,8 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
       _road = $v.road;
       _neighbourhood = $v.neighbourhood;
       _cityDistrict = $v.cityDistrict;
+      _city = $v.city;
+      _country = $v.country;
       _countryCode = $v.countryCode;
       _$v = null;
     }
@@ -216,6 +262,8 @@ class OsmAddressBuilder implements Builder<OsmAddress, OsmAddressBuilder> {
             road: road,
             neighbourhood: neighbourhood,
             cityDistrict: cityDistrict,
+            city: city,
+            country: country,
             countryCode: countryCode);
     replace(_$result);
     return _$result;

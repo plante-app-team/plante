@@ -59,8 +59,10 @@ void main() {
           ..neighbourhood = 'Nice neighbourhood'
           ..road = 'Broadway'
           ..cityDistrict = 'Nice district'
+          ..city = 'City 17'
           ..houseNumber = '4'
-          ..countryCode = 'en')));
+          ..countryCode = 'en'
+          ..country = 'England')));
   });
 
   test('fetchAddress response without address', () async {
@@ -92,6 +94,8 @@ void main() {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "house_number":"4",
           "road":"Broadway",
           "city_district":"Nice district",
@@ -111,13 +115,17 @@ void main() {
           ..road = 'Broadway'
           ..cityDistrict = 'Nice district'
           ..houseNumber = '4'
-          ..countryCode = 'en')));
+          ..countryCode = 'en'
+          ..city = 'City 17'
+          ..country = 'England')));
   });
 
   test('fetchAddress response without road', () async {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "house_number":"4",
           "city_district":"Nice district",
           "neighbourhood":"Nice neighbourhood",
@@ -137,13 +145,17 @@ void main() {
           ..road = null
           ..cityDistrict = 'Nice district'
           ..houseNumber = '4'
-          ..countryCode = 'en')));
+          ..countryCode = 'en'
+          ..city = 'City 17'
+          ..country = 'England')));
   });
 
   test('fetchAddress response without city district', () async {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "house_number":"4",
           "road":"Broadway",
           "neighbourhood":"Nice neighbourhood",
@@ -163,13 +175,17 @@ void main() {
           ..road = 'Broadway'
           ..cityDistrict = null
           ..houseNumber = '4'
-          ..countryCode = 'en')));
+          ..countryCode = 'en'
+          ..city = 'City 17'
+          ..country = 'England')));
   });
 
   test('fetchAddress response without house number', () async {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "road":"Broadway",
           "city_district":"Nice district",
           "neighbourhood":"Nice neighbourhood",
@@ -189,13 +205,17 @@ void main() {
           ..road = 'Broadway'
           ..cityDistrict = 'Nice district'
           ..houseNumber = null
-          ..countryCode = 'en')));
+          ..countryCode = 'en'
+          ..city = 'City 17'
+          ..country = 'England')));
   });
 
   test('fetchAddress response without country code', () async {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "house_number":"4",
           "road":"Broadway",
           "city_district":"Nice district",
@@ -215,13 +235,77 @@ void main() {
           ..road = 'Broadway'
           ..cityDistrict = 'Nice district'
           ..houseNumber = '4'
-          ..countryCode = null)));
+          ..countryCode = null
+          ..city = 'City 17'
+          ..country = 'England')));
+  });
+
+  test('fetchAddress response without city', () async {
+    const osmResp = '''
+    {
+       "address":{
+          "country":"England",
+          "house_number":"4",
+          "road":"Broadway",
+          "city_district":"Nice district",
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
+       }
+    }
+    ''';
+
+    http.setResponse('.*', osmResp);
+
+    final addressRes = await osm.fetchAddress(123, 321);
+    final address = addressRes.unwrap();
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = 'en'
+          ..city = null
+          ..country = 'England')));
+  });
+
+  test('fetchAddress response without country', () async {
+    const osmResp = '''
+    {
+       "address":{
+          "city":"City 17",
+          "house_number":"4",
+          "road":"Broadway",
+          "city_district":"Nice district",
+          "neighbourhood":"Nice neighbourhood",
+          "country_code":"en"
+       }
+    }
+    ''';
+
+    http.setResponse('.*', osmResp);
+
+    final addressRes = await osm.fetchAddress(123, 321);
+    final address = addressRes.unwrap();
+    expect(
+        address,
+        equals(OsmAddress((e) => e
+          ..neighbourhood = 'Nice neighbourhood'
+          ..road = 'Broadway'
+          ..cityDistrict = 'Nice district'
+          ..houseNumber = '4'
+          ..countryCode = 'en'
+          ..city = 'City 17'
+          ..country = null)));
   });
 
   test('fetchAddress not 200', () async {
     const osmResp = '''
     {
        "address":{
+          "city":"City 17",
+          "country":"England",
           "road":"Broadway",
           "city_district":"Nice district",
           "neighbourhood":"Nice neighbourhood",
@@ -239,6 +323,8 @@ void main() {
     const osmResp = '''
     {{{{{{
        "address":{
+          "city":"City 17",
+          "country":"England",
           "road":"Broadway",
           "city_district":"Nice district",
           "neighbourhood":"Nice neighbourhood",
