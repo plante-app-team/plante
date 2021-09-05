@@ -8,7 +8,6 @@ import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
-
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
