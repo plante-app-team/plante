@@ -8,6 +8,7 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -15,22 +16,12 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
-class ShopsManagerImpl {
-  final _recentlyCreatedShops = <String, Shop>{};
-  final _listeners = <ShopsManagerListener>[];
+class ShopsRequester {
   final OpenStreetMap _openStreetMap;
   final Backend _backend;
   final ProductsObtainer _productsObtainer;
 
-  ShopsManagerImpl(this._openStreetMap, this._backend, this._productsObtainer);
-
-  void addListener(ShopsManagerListener listener) {
-    _listeners.add(listener);
-  }
-
-  void removeListener(ShopsManagerListener listener) {
-    _listeners.remove(listener);
-  }
+  ShopsRequester(this._openStreetMap, this._backend, this._productsObtainer);
 
   Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
       {required CoordsBounds osmBounds,
@@ -64,26 +55,13 @@ class ShopsManagerImpl {
 
     // Combine OSM and Plante shops
     final backendShops = backendShopsResult.unwrap();
-    final backendShopsMap = {
-      for (final backendShop in backendShops) backendShop.osmId: backendShop
-    };
-    final shops = <String, Shop>{};
-    for (final osmShop in osmShopsToRequestFromPlante) {
-      final backendShopNullable = backendShopsMap[osmShop.osmId];
-      var shop = Shop((e) => e.osmShop.replace(osmShop));
-      if (backendShopNullable != null) {
-        shop = shop.rebuild((e) => e.backendShop.replace(backendShopNullable));
-      }
-      shops[osmShop.osmId] = shop;
-    }
+    final shops =
+        _combineOsmAndPlanteShops(osmShopsToRequestFromPlante, backendShops);
 
     // Finish forming the result
     final osmShopsMap = {
       for (final osmShop in osmShops) osmShop.osmId: osmShop
     };
-    shops.addAll(_recentlyCreatedShops);
-    osmShopsMap.addAll(_recentlyCreatedShops
-        .map((key, value) => MapEntry(key, value.osmShop)));
 
     return Ok(FetchedShops(
       shops,
@@ -91,6 +69,34 @@ class ShopsManagerImpl {
       osmShopsMap,
       osmBounds,
     ));
+  }
+
+  Map<String, Shop> _combineOsmAndPlanteShops(
+      Iterable<OsmShop> osmShops, List<BackendShop> backendShops) {
+    final backendShopsMap = {
+      for (final backendShop in backendShops) backendShop.osmId: backendShop
+    };
+    final shops = <String, Shop>{};
+    for (final osmShop in osmShops) {
+      final backendShopNullable = backendShopsMap[osmShop.osmId];
+      var shop = Shop((e) => e.osmShop.replace(osmShop));
+      if (backendShopNullable != null) {
+        shop = shop.rebuild((e) => e.backendShop.replace(backendShopNullable));
+      }
+      shops[osmShop.osmId] = shop;
+    }
+    return shops;
+  }
+
+  Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
+      List<OsmShop> osmShops) async {
+    final backendShopsRes =
+        await _backend.requestShops(osmShops.map((e) => e.osmId));
+    if (backendShopsRes.isErr) {
+      return Err(_convertBackendErr(backendShopsRes.unwrapErr()));
+    }
+    final backendShops = backendShopsRes.unwrap();
+    return Ok(_combineOsmAndPlanteShops(osmShops, backendShops));
   }
 
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(
@@ -133,22 +139,12 @@ class ShopsManagerImpl {
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
-    bool someChange = false;
     for (final shop in shops) {
       final res = await _backend.putProductToShop(product.barcode, shop.osmId);
       if (res.isErr) {
-        if (someChange) {
-          _listeners.forEach((e) {
-            e.onLocalShopsChange();
-          });
-        }
         return Err(_convertBackendErr(res.unwrapErr()));
       }
-      someChange = true;
     }
-    _listeners.forEach((e) {
-      e.onLocalShopsChange();
-    });
     return Ok(None());
   }
 
@@ -160,19 +156,14 @@ class ShopsManagerImpl {
         await _backend.createShop(name: name, coord: coord, type: type.osmName);
     if (res.isOk) {
       final backendShop = res.unwrap();
-      final shop = Shop((e) => e
+      return Ok(Shop((e) => e
         ..backendShop.replace(backendShop)
         ..osmShop.replace(OsmShop((e) => e
           ..osmId = backendShop.osmId
           ..name = name
           ..type = type.osmName
           ..longitude = coord.lon
-          ..latitude = coord.lat)));
-      _recentlyCreatedShops[shop.osmId] = shop;
-      _listeners.forEach((e) {
-        e.onLocalShopsChange();
-      });
-      return Ok(shop);
+          ..latitude = coord.lat))));
     } else {
       return Err(_convertBackendErr(res.unwrapErr()));
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -80,11 +81,38 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
     if (cameraPos == null) {
       return;
     }
+    final osm = GetIt.I.get<OpenStreetMap>();
+    final cameraAddressRes =
+        await osm.fetchAddress(cameraPos.lat, cameraPos.lon);
+    if (cameraAddressRes.isErr) {
+      return;
+    }
+    final cameraAddress = cameraAddressRes.unwrap();
+    if (cameraAddress.country == null || cameraAddress.city == null) {
+      return;
+    }
+    final osmSearchRes =
+        await osm.search(cameraAddress.country!, cameraAddress.city!, query);
+    final osmFoundShops = <Shop>[];
+    final osmFoundRoads = <OsmRoad>[];
+    if (osmSearchRes.isOk) {
+      osmFoundRoads.addAll(osmSearchRes.unwrap().roads);
+      final foundInflatedShops =
+          await shopsManager.inflateOsmShops(osmSearchRes.unwrap().shops);
+      if (foundInflatedShops.isOk) {
+        osmFoundShops.addAll(foundInflatedShops.unwrap().values);
+      }
+    }
+
     final searchedBounds = cameraPos.makeSquare(_kmToGrad(30));
     final shopsRes = await shopsManager.fetchShops(searchedBounds);
     setState(() {
       _foundShops.clear();
       _foundRoads.clear();
+    });
+
+    setState(() {
+      _foundShops.addAll(osmFoundShops);
     });
 
     if (shopsRes.isOk) {
@@ -94,6 +122,10 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
         _foundShops.addAll(shops);
       });
     }
+
+    setState(() {
+      _foundRoads.addAll(osmFoundRoads);
+    });
 
     final roadsRes =
         await roadsManager.fetchRoadsWithinAndNearby(searchedBounds);

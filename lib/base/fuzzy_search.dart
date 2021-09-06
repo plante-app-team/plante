@@ -29,7 +29,7 @@ class FuzzySearch {
       {int ratioThreshold = DEFAULT_SEARCH_RATIO_THRESHOLD}) async {
     final ratios = await search(values, toStr, query, sort: true);
     return ratios
-        .where((e) => e.ratio >= DEFAULT_SEARCH_RATIO_THRESHOLD)
+        .where((e) => e.ratio >= ratioThreshold)
         .map((e) => e.value)
         .toList();
   }
@@ -52,12 +52,22 @@ class FuzzySearch {
     final result = <_RatedVal>[];
     for (var index = 0; index < params.values.length; ++index) {
       result.add(
-          _RatedVal(index, weightedRatio(params.values[index], params.query)));
+          _RatedVal(index, _fuzzyRatio(params.values[index], params.query)));
     }
     if (params.sort) {
       result.sort((lhs, rhs) => rhs.ratio - lhs.ratio);
     }
     return result;
+  }
+
+  static int _fuzzyRatio(String lhs, String rhs) {
+    return weightedRatio(lhs, rhs);
+  }
+
+  static bool areSimilar(String lhs, String rhs,
+      {int ratioThreshold = DEFAULT_SEARCH_RATIO_THRESHOLD}) {
+    final ratio = _fuzzyRatio(lhs, rhs);
+    return ratio >= ratioThreshold;
   }
 }
 

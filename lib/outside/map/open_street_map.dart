@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/fuzzy_search.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
@@ -14,6 +15,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
@@ -209,11 +211,112 @@ class OpenStreetMap {
       ..countryCode = countryCode);
     return Ok(result);
   }
+
+  Future<Result<OsmSearchResult, OpenStreetMapError>> search(
+      String country, String city, String query) async {
+    final Response r;
+    try {
+      r = await _http.get(
+          Uri.https('nominatim.openstreetmap.org', 'search', {
+            'q': '$country $city $query',
+            'format': 'json',
+          }),
+          headers: {'User-Agent': await userAgent()});
+    } on IOException catch (e) {
+      Log.w('OSM nominatim network error', ex: e);
+      return Err(OpenStreetMapError.NETWORK);
+    }
+
+    if (r.statusCode != 200) {
+      Log.w('OSM.search: ${r.statusCode}, body: ${r.body}');
+      return Err(OpenStreetMapError.OTHER);
+    }
+
+    final json = _jsonDecodeSafeList(utf8.decode(r.bodyBytes));
+    if (json == null) {
+      return Err(OpenStreetMapError.OTHER);
+    }
+
+    final foundShops = <OsmShop>[];
+    final foundRoads = <OsmRoad>[];
+    final typesOfShops = ShopType.values.map((e) => e.osmName);
+    final foundRoadsFullNames = <String>{};
+    for (final entry in json) {
+      if (entry is! Map<String, dynamic>) {
+        continue;
+      }
+      final type = entry['type']?.toString();
+      final osmClass = entry['class']?.toString();
+      final osmId = entry['osm_id']?.toString();
+      final double? lat = _extractPosPiece('lat', entry);
+      final double? lon = _extractPosPiece('lon', entry);
+      final fullName = entry['display_name']?.toString();
+      final name = fullName?.substringBefore(',');
+      if (type == null ||
+          osmId == null ||
+          lat == null ||
+          lon == null ||
+          name == null ||
+          fullName == null) {
+        continue;
+      }
+      if (typesOfShops.contains(type)) {
+        foundShops.add(OsmShop((e) => e
+          ..osmId = osmId
+          ..name = name
+          ..type = type
+          ..latitude = lat
+          ..longitude = lon));
+      } else if (osmClass == 'highway') {
+        if (_wasNameSeenBefore(foundRoadsFullNames, fullName)) {
+          continue;
+        }
+        foundRoadsFullNames.add(fullName);
+        foundRoads.add(OsmRoad((e) => e
+          ..osmId = osmId
+          ..name = name
+          ..latitude = lat
+          ..longitude = lon));
+      }
+    }
+    return Ok(OsmSearchResult(
+        (e) => e..shops.addAll(foundShops)..roads.addAll(foundRoads)));
+  }
+
+  bool _wasNameSeenBefore(Set<String> foundRoadsFullNames, String fullName) {
+    for (final existingFullName in foundRoadsFullNames) {
+      if (FuzzySearch.areSimilar(existingFullName, fullName)) {
+        // Long roads often contain multiple parts, because a single
+        // road can span through multiple zipcodes, districts, etc.
+        // We want only 1 of the road parts to be found, so we attempt to
+        // ignore roads similar to which are already found.
+        // NOTE: not tested extensively, can be buggy.
+        return true;
+      }
+    }
+    return false;
+  }
+
+  double? _extractPosPiece(String name, Map<String, dynamic> source) {
+    if (source[name] is double) {
+      return source[name] as double;
+    } else {
+      return double.tryParse(source[name]?.toString() ?? '');
+    }
+  }
 }
 
 Map<String, dynamic>? _jsonDecodeSafe(String str) {
+  return _jsonDecodeSafeImpl<Map<String, dynamic>>(str);
+}
+
+List<dynamic>? _jsonDecodeSafeList(String str) {
+  return _jsonDecodeSafeImpl<List<dynamic>>(str);
+}
+
+T? _jsonDecodeSafeImpl<T>(String str) {
   try {
-    return jsonDecode(str) as Map<String, dynamic>?;
+    return jsonDecode(str) as T?;
   } on FormatException catch (e) {
     Log.w("OpenStreetMap: couldn't decode safe: %str", ex: e);
     return null;
@@ -264,4 +367,14 @@ Result<List<OsmRoad>, _ParseRoadsErr> _parseRoads(String text) {
       ..longitude = lon));
   }
   return Ok(result);
+}
+
+extension _StringExt on String {
+  String? substringBefore(String target) {
+    final targetIndex = indexOf(target);
+    if (targetIndex > 0) {
+      return substring(0, targetIndex);
+    }
+    return null;
+  }
 }

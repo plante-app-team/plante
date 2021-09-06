@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
@@ -14,8 +15,9 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
-import 'package:plante/outside/map/shops_manager_impl.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/base/date_time_extensions.dart';
@@ -25,10 +27,11 @@ class ShopsManager {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
   final Analytics _analytics;
+  final OsmCacher _osmCacher;
   final OsmInteractionsQueue _osmQueue;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
-  final ShopsManagerImpl _impl;
+  final ShopsRequester _impl;
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
@@ -43,9 +46,9 @@ class ShopsManager {
       Backend backend,
       ProductsObtainer productsObtainer,
       this._analytics,
-      OsmCacher _osmCacher,
+      this._osmCacher,
       this._osmQueue)
-      : _impl = ShopsManagerImpl(openStreetMap, backend, productsObtainer) {
+      : _impl = ShopsRequester(openStreetMap, backend, productsObtainer) {
     _fetchShopsHelper = ShopsManagerFetchShopsHelper(_impl, _osmCacher);
   }
 
@@ -88,6 +91,8 @@ class ShopsManager {
         osmBoundsSizesToRequest: [100, 30],
         planteBoundsSizeToRequest: 20);
     if (shopsFetchResult.isErr) {
+      Log.w(
+          'ShopsManager._maybeLoadShops err: $shopsFetchResult, attemptNumber: $attemptNumber');
       if (shopsFetchResult.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
         return Err(shopsFetchResult.unwrapErr());
       } else {
@@ -106,6 +111,41 @@ class ShopsManager {
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
     return Ok({for (var shop in result) shop.osmId: shop});
+  }
+
+  Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
+      Iterable<OsmShop> shops) async {
+    final loadedShops = <String, Shop>{};
+    final osmShopsToLoad = <OsmShop>[];
+    for (final osmShop in shops) {
+      final loadedShop = _shopsCache[osmShop.osmId];
+      if (loadedShop != null) {
+        loadedShops[loadedShop.osmId] = loadedShop;
+      } else {
+        osmShopsToLoad.add(osmShop);
+      }
+    }
+
+    if (osmShopsToLoad.isNotEmpty) {
+      final inflateResult = await _impl.inflateOsmShops(osmShopsToLoad);
+      Log.w('ShopsManager.inflateOsmShops err: $inflateResult');
+      if (inflateResult.isErr) {
+        return inflateResult;
+      }
+
+      final inflatedShops = inflateResult.unwrap();
+      loadedShops.addAll(inflatedShops);
+
+      for (final inflatedShop in inflatedShops.values) {
+        _shopsCache[inflatedShop.osmId] = inflatedShop;
+      }
+      // NOTE: we don't put the shop into [_loadedAreas] because the
+      // [_loadedAreas] field is an entire area of already loaded shops -
+      // if a shop was not loaded before [inflateOsmShops], it is not expected
+      // to be within any of the cached areas.
+    }
+
+    return Ok(loadedShops);
   }
 
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(
@@ -182,6 +222,11 @@ class ShopsManager {
       for (final loadedArea in _loadedAreas.keys) {
         if (loadedArea.containsShop(shop)) {
           _loadedAreas[loadedArea]!.add(shop.osmId);
+        }
+      }
+      for (final territory in await _osmCacher.getCachedShops()) {
+        if (territory.bounds.containsShop(shop)) {
+          unawaited(_osmCacher.addShopToCache(territory.id, shop.osmShop));
         }
       }
       _notifyListeners();

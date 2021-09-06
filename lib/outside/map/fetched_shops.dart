@@ -27,4 +27,15 @@ class FetchedShops {
 
   @override
   int get hashCode => hashValues(shopsBounds, osmShopsBounds);
+
+  @override
+  String toString() {
+    return '''{
+      "shops": $shops,
+      "shopsBounds": $shopsBounds,
+      "osmShops": $osmShops,
+      "osmShopsBounds": $osmShopsBounds
+      }
+    ''';
+  }
 }

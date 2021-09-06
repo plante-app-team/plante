@@ -6,12 +6,12 @@ import 'package:plante/outside/map/osm_cached_territory.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/map/shops_manager_impl.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
 // Extracted from ShopsManager logic of shops fetching
 class ShopsManagerFetchShopsHelper {
-  final ShopsManagerImpl _impl;
+  final ShopsRequester _impl;
   final OsmCacher _osmCacher;
 
   ShopsManagerFetchShopsHelper(this._impl, this._osmCacher);
