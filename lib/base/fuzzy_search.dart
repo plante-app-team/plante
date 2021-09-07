@@ -39,8 +39,12 @@ class FuzzySearch {
       List<T> values, ArgResCallback<T, String> toStr, String query,
       {bool sort = false}) async {
     final strs = values.map((val) => toStr.call(val)).toList();
-    final ratedVals =
-        await compute(_searchImpl, _SearchParams(strs, query, sort));
+    final List<_RatedVal> ratedVals;
+    if (!isInTests()) {
+      ratedVals = await compute(_searchImpl, _SearchParams(strs, query, sort));
+    } else {
+      ratedVals = _searchImpl(_SearchParams(strs, query, sort));
+    }
     final result = <FuzzyRated<T>>[];
     for (final ratedVal in ratedVals) {
       result.add(FuzzyRated(ratedVal.ratio, values[ratedVal.indexOld]));

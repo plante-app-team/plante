@@ -39,7 +39,8 @@ void main() {
     verify(backend.requestShops(any));
   });
 
-  test('inflateOsmShops: second call does not touch backend because is cached', () async {
+  test('inflateOsmShops: second call does not touch backend because is cached',
+      () async {
     // First inflate
     var inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
     var inflatedShops = inflateRes.unwrap();

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -52,5 +53,21 @@ extension WidgetTesterExtension on WidgetTester {
       }
       return found;
     }));
+  }
+
+  /// Same as [tap], but also calls [pumpAndSettle].
+  Future<void> superTap(Finder finder,
+      {int? pointer,
+      int buttons = kPrimaryButton,
+      bool warnIfMissed = true}) async {
+    await tap(finder,
+        pointer: pointer, buttons: buttons, warnIfMissed: warnIfMissed);
+    await pumpAndSettle();
+  }
+
+  /// Same as [enterText], but also calls [pumpAndSettle].
+  Future<void> superEnterText(Finder finder, String text) async {
+    await enterText(finder, text);
+    await pumpAndSettle();
   }
 }

@@ -16,6 +16,8 @@
       "global_try_again": "Try again",
       "global_done_thanks": "Done! Thank you!",
       "global_save": "Save",
+      "global_meters": "meters",
+      "global_kilometers": "km",
 
       "lang_ar": "Arabic",
       "lang_be": "Belarusian",
@@ -126,6 +128,12 @@
 
       "map_search_bar_hint": "Search shops and streets",
       "map_search_bar_button_title": "Search",
+
+      "map_search_page_search_hint": "Enter some text and tap Search",
+      "map_search_page_shops_title": "Found shops",
+      "map_search_page_shops_not_found": "Shops not found",
+      "map_search_page_streets_title": "Found streets",
+      "map_search_page_streets_not_found": "Streets not found",
 
       "barcode_scan_page_product_not_found": "Product not found",
       "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",

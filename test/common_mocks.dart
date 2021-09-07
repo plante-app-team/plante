@@ -14,6 +14,7 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -39,6 +40,7 @@ import 'package:plante/ui/photos_taker.dart';
   PhotosTaker,
   ProductsManager,
   ProductsObtainer,
+  RoadsManager,
   RouteObserver,
   ShopsManager,
   ShopsManagerListener,

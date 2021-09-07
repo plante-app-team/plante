@@ -37,6 +37,7 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_location_controller.dart';
 import '../../z_fakes/fake_settings.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -74,9 +75,7 @@ void main() {
         .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-    final locationController = MockLocationController();
-    when(locationController.lastKnownPositionInstant()).thenReturn(null);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
+    final locationController = FakeLocationController();
     GetIt.I.registerSingleton<LocationController>(locationController);
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);

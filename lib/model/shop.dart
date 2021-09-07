@@ -1,6 +1,7 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -25,6 +26,8 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   double get latitude => osmShop.latitude;
   double get longitude => osmShop.longitude;
   int get productsCount => backendShop?.productsCount ?? 0;
+
+  Coord get coord => Coord(lat: latitude, lon: longitude);
 
   static Shop? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers

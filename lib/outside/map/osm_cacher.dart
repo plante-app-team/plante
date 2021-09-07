@@ -35,7 +35,7 @@ const _ROAD_LAT = 'lat';
 const _ROAD_LON = 'lon';
 
 // Just a random number because I don't know what number work better.
-const _BATCH_SIZE = 200;
+const _BATCH_SIZE = 1000;
 
 enum OsmCacherError {
   TERRITORY_NOT_FOUND,
@@ -64,16 +64,19 @@ class OsmCacher {
   }
 
   void _initAsync([Database? db]) async {
+    Log.i('OsmCacher._initAsync start');
     if (db == null) {
       final appDir = await getAppDir();
       db = await openDB('${appDir.path}/osm_cache.sqlite',
           version: 2, onUpgrade: _onUpgradeDb);
     }
+    Log.i('OsmCacher._initAsync db loaded');
 
     final shopsAndTerritoriesIds = await _extractShopsWithTerritoriesIds(db);
     final roadsAndTerritoriesIds = await _extractRoadsWithTerritoriesIds(db);
     final emptyTerritories = await _extractTerritories(db);
 
+    Log.i('OsmCacher._initAsync territories loaded');
     for (final territory in emptyTerritories) {
       final shops = shopsAndTerritoriesIds[territory.id];
       if (shops != null) {
@@ -86,6 +89,7 @@ class OsmCacher {
     }
 
     _dbCompleter.complete(db);
+    Log.i('OsmCacher._initAsync finish');
   }
 
   Future<List<OsmCachedTerritory<None>>> _extractTerritories(
@@ -171,6 +175,7 @@ class OsmCacher {
 
   Future<Map<int, List<OsmShop>>> _extractShopsWithTerritoriesIds(
       Database db) async {
+    Log.i('OsmCacher shops extraction start');
     final shopsAndTerritoriesIds = <int, List<OsmShop>>{};
     for (var offset = 0; true; offset += _BATCH_SIZE) {
       final batch =
@@ -207,11 +212,17 @@ class OsmCacher {
           ..longitude = lon));
       }
     }
+    final territoriesCount = shopsAndTerritoriesIds.length;
+    final shopsCount = shopsAndTerritoriesIds.values
+        .fold<int>(0, (prev, e) => prev + e.length);
+    Log.i(
+        'OsmCacher shops extraction finish, territories: $territoriesCount, shops: $shopsCount');
     return shopsAndTerritoriesIds;
   }
 
   Future<Map<int, List<OsmRoad>>> _extractRoadsWithTerritoriesIds(
       Database db) async {
+    Log.i('OsmCacher roads extraction start');
     final roadsAndTerritoriesIds = <int, List<OsmRoad>>{};
     for (var offset = 0; true; offset += _BATCH_SIZE) {
       final batch =
@@ -243,6 +254,11 @@ class OsmCacher {
           ..longitude = lon));
       }
     }
+    final territoriesCount = roadsAndTerritoriesIds.length;
+    final roadsCount = roadsAndTerritoriesIds.values
+        .fold<int>(0, (prev, e) => prev + e.length);
+    Log.i(
+        'OsmCacher roads extraction finish, territories: $territoriesCount, roads: $roadsCount');
     return roadsAndTerritoriesIds;
   }
 

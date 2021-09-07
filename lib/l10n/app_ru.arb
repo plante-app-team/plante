@@ -16,6 +16,8 @@
     "global_try_again": "Попробовать ещё раз",
     "global_done_thanks": "Готово! Спасибо!",
     "global_save": "Сохранить",
+    "global_meters": "м",
+    "global_kilometers": "км",
 
     "lang_ar": "Арабский",
     "lang_be": "Белорусский",
@@ -126,6 +128,12 @@
 
     "map_search_bar_hint": "Поиск магазинов и улиц",
     "map_search_bar_button_title": "Поиск",
+
+    "map_search_page_search_hint": "Введите текст и нажмите на Поиск",
+    "map_search_page_shops_title": "Найденные магазины",
+    "map_search_page_shops_not_found": "Магазины не найдены",
+    "map_search_page_streets_title": "Найденные улицы",
+    "map_search_page_streets_not_found": "Улицы не найдены",
 
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",

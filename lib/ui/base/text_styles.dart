@@ -123,4 +123,9 @@ class TextStyles {
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
   static const TextStyle searchBarHint =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: ColorsPlante.grey);
+  static const TextStyle searchResultDistance = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 12,
+      color: ColorsPlante.grey,
+      fontWeight: FontWeight.bold);
 }

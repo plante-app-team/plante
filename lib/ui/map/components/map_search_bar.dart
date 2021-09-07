@@ -6,6 +6,11 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
 
+class MapSearchBarQueryView {
+  ResCallback<String>? _query;
+  String get query => _query?.call() ?? '';
+}
+
 class MapSearchBar extends StatefulWidget {
   final bool enabled;
   final bool autofocus;
@@ -13,7 +18,9 @@ class MapSearchBar extends StatefulWidget {
   final String? customPrefixSvgIcon;
   final VoidCallback? onPrefixIconTap;
   final ArgCallback<String>? onSearchTap;
+  final VoidCallback? onCleared;
   final Duration? searchButtonAppearanceDelay;
+  final MapSearchBarQueryView? queryView;
   const MapSearchBar(
       {Key? key,
       this.enabled = true,
@@ -22,7 +29,9 @@ class MapSearchBar extends StatefulWidget {
       this.customPrefixSvgIcon,
       this.onPrefixIconTap,
       this.onSearchTap,
-      this.searchButtonAppearanceDelay})
+      this.onCleared,
+      this.searchButtonAppearanceDelay,
+      this.queryView})
       : super(key: key);
 
   @override
@@ -39,17 +48,24 @@ class _MapSearchBarState extends State<MapSearchBar>
   @override
   void initState() {
     super.initState();
+    widget.queryView?._query = () => _textController.text;
     _textController.addListener(_updateCanSearch);
     _updateCanSearch();
     if (widget.enabled) {
       if (widget.searchButtonAppearanceDelay != null) {
-        Future.delayed(widget.searchButtonAppearanceDelay!, () {
+        final showSearchButton = () {
           if (mounted) {
             setState(() {
               _showSearchButton = true;
             });
           }
-        });
+        };
+
+        if (!isInTests()) {
+          Future.delayed(widget.searchButtonAppearanceDelay!, showSearchButton);
+        } else {
+          showSearchButton.call();
+        }
       } else {
         _showSearchButton = true;
       }
@@ -77,7 +93,11 @@ class _MapSearchBarState extends State<MapSearchBar>
       svg: prefixSvgIcon,
     );
     final suffixIcon = _TextFieldIcon(
-      onTap: _textController.clear,
+      key: const Key('map_search_bar_cancel'),
+      onTap: () {
+        _textController.clear();
+        widget.onCleared?.call();
+      },
       svg: 'assets/cancel_circle.svg',
     );
     return SizedBox(
@@ -90,7 +110,7 @@ class _MapSearchBarState extends State<MapSearchBar>
                       duration: _DURATION,
                       vsync: this,
                       child: TextField(
-                        key: widget.key,
+                        key: const Key('map_search_bar_text_field'),
                         textCapitalization: TextCapitalization.sentences,
                         style: TextStyles.searchBarText,
                         enabled: widget.enabled,

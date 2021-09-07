@@ -1,3 +1,4 @@
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -43,7 +44,7 @@ class ShopsManagerFetchShopsHelper {
     }
 
     final planteShopsBounds =
-        viewPort.center.makeSquare(_kmToGrad(planteBoundsSizeToRequest));
+        viewPort.center.makeSquare(kmToGrad(planteBoundsSizeToRequest));
     final osmCachedTerritory = await _obtainCachedOsmShops(viewPort);
     Result<FetchedShops, ShopsManagerError>? fetchResult;
 
@@ -61,7 +62,7 @@ class ShopsManagerFetchShopsHelper {
     // let's try to query both OSM and Plante servers
     CoordsBounds? osmBounds;
     for (final osmBoundsSize in osmBoundsSizesToRequest) {
-      osmBounds = viewPort.center.makeSquare(_kmToGrad(osmBoundsSize));
+      osmBounds = viewPort.center.makeSquare(kmToGrad(osmBoundsSize));
       fetchResult = await _impl.fetchShops(
         osmBounds: osmBounds,
         planteBounds: planteShopsBounds,
@@ -134,8 +135,4 @@ class ShopsManagerFetchShopsHelper {
       await _osmCacher.deleteCachedTerritory(territory.id);
     }
   }
-}
-
-double _kmToGrad(double km) {
-  return km * 1 / 111;
 }
