@@ -27,7 +27,7 @@ import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/components/map_search_result_entry.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/map/map_search_page_displayed_error.dart';
+import 'package:plante/ui/map/search_page/map_search_page_displayed_error.dart';
 
 class MapSearchPage extends StatefulWidget {
   const MapSearchPage({Key? key}) : super(key: key);

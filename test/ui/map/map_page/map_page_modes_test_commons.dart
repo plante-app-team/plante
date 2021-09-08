@@ -17,9 +17,9 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_shared_preferences.dart';
 
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;

@@ -26,11 +26,11 @@ import 'package:plante/ui/map/components/map_bottom_hint.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
-import 'package:plante/ui/map/map_page_mode.dart';
-import 'package:plante/ui/map/map_page_mode_default.dart';
-import 'package:plante/ui/map/map_page_model.dart';
-import 'package:plante/ui/map/map_search_page.dart';
-import 'package:plante/ui/map/markers_builder.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
+import 'package:plante/ui/map/map_page/map_page_model.dart';
+import 'package:plante/ui/map/search_page/map_search_page.dart';
+import 'package:plante/ui/map/map_page/markers_builder.dart';
 
 enum MapPageRequestedMode {
   DEFAULT,

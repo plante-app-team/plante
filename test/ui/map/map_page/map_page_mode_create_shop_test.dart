@@ -5,13 +5,13 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
-import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/ui/map/map_page_mode_create_shop.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {

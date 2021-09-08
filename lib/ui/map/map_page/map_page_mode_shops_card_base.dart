@@ -6,7 +6,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
 
 abstract class MapPageModeShopsCardBase extends MapPageMode {
   final _displayedShops = <Shop>[];

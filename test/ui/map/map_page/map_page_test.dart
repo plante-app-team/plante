@@ -9,12 +9,12 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
-import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/ui/map/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_model.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 /// NOTE: this file contains tests only for mechanics

@@ -4,8 +4,8 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
-import 'package:plante/ui/map/map_page.dart';
-import 'package:plante/ui/map/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 class MapPageModeParams {
   final MapPageModel model;

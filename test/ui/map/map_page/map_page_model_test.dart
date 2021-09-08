@@ -7,9 +7,9 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/ui/map/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page_model.dart';
 
-import '../../common_mocks.mocks.dart';
+import '../../../common_mocks.mocks.dart';
 
 void main() {
   late MockLocationController locationController;

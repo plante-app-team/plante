@@ -10,8 +10,8 @@ import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
-import 'package:plante/ui/map/map_page_mode.dart';
-import 'package:plante/ui/map/map_page_mode_select_shops_where_product_sold_base.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold_base.dart';
 import 'package:plante/l10n/strings.dart';
 
 class MapPageModeCreateShop extends MapPageMode {

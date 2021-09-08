@@ -27,7 +27,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/moderator_comment_dialog.dart';

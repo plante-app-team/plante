@@ -21,13 +21,13 @@ import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
-import 'package:plante/ui/map/map_search_page.dart';
+import 'package:plante/ui/map/search_page/map_search_page.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_location_controller.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_location_controller.dart';
+import '../../../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late MockShopsManager shopsManager;

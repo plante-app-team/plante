@@ -9,9 +9,9 @@ import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/fab_add_shop.dart';
-import 'package:plante/ui/map/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/map/map_page_mode_shops_card_base.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
 
 const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
 
