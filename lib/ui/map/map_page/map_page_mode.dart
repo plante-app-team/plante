@@ -54,16 +54,18 @@ abstract class MapPageMode {
   Iterable<Shop> filter(Iterable<Shop> shops) => shops;
   Set<Shop> selectedShops() => {};
   Set<Shop> accentedShops() => {};
-  bool shopWhereAmIFAB() => true;
 
   /// Extra shops added to what MapPageModel has
   Set<Shop> additionalShops() => {};
+  bool showWhereAmIFAB() => true;
+
   Widget buildOverlay(BuildContext context) => const SizedBox.shrink();
   Widget buildHeader(BuildContext context) => const SizedBox.shrink();
   Widget buildTopActions(BuildContext context) => const SizedBox.shrink();
   List<Widget> buildBottomActions(BuildContext context) =>
       const [SizedBox.shrink()];
   List<Widget> buildFABs() => const [];
+  void deselectShops() {}
   void onMarkerClick(Iterable<Shop> shops) {}
   void onShopsUpdated(Map<String, Shop> shops) {}
   void onMapClick(Coord coord) {}
@@ -73,10 +75,15 @@ abstract class MapPageMode {
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;
 
+  @protected
   void moveMapTo(Coord coord) => params.moveMapCallback.call(coord);
+  @protected
   void updateWidget() => params.updateCallback.call();
+  @protected
   void updateMap() => params.updateMapCallback.call();
+  @protected
   void setBottomHint(String? hint) => params.bottomHintCallback.call(hint);
+  @protected
   void switchModeTo(MapPageMode mode) {
     params.modeSwitchCallback.call(mode);
     updateWidget();

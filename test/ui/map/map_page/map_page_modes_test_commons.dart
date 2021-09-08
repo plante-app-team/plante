@@ -11,8 +11,10 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -95,6 +97,10 @@ class MapPageModesTestCommons {
     GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
     addressObtainer = MockAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
+    final roadsManager = MockRoadsManager();
+    GetIt.I.registerSingleton<RoadsManager>(roadsManager);
+    final osm = MockOpenStreetMap();
+    GetIt.I.registerSingleton<OpenStreetMap>(osm);
 
     shopsManagerListeners.clear();
     when(shopsManager.addListener(any)).thenAnswer((invc) {
@@ -146,6 +152,11 @@ class MapPageModesTestCommons {
 
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
     when(addressObtainer.addressOfCoords(any)).thenAnswer((_) => readyAddress);
+
+    when(roadsManager.fetchRoadsWithinAndNearby(any))
+        .thenAnswer((_) async => Ok(const []));
+    when(osm.fetchAddress(any, any))
+        .thenAnswer((_) async => Ok(OsmAddress.empty));
   }
 
   void fillFetchedShops() {

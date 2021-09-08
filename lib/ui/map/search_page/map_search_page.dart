@@ -23,6 +23,7 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/search_page/map_search_page_displayed_error.dart';
 import 'package:plante/ui/map/search_page/map_search_page_model.dart';
+import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
 
 class MapSearchPage extends StatefulWidget {
@@ -103,7 +104,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
             child: Container(
                 color: Colors.white,
                 child: Stack(children: [
-                  content,
+                  Material(color: Colors.transparent, child: content),
                   AnimatedSwitcher(
                       duration: DURATION_DEFAULT,
                       child: _model.loading && !isInTests()
@@ -115,45 +116,60 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   List<Widget> _searchResults() {
     final results = <Widget>[];
     if (!_model.loading && _lastSearchResult == null) {
-      results.add(Text(context.strings.map_search_page_search_hint,
-          style: TextStyles.hint));
+      results.add(_itemPadding(Text(context.strings.map_search_page_search_hint,
+          style: TextStyles.hint)));
     } else {
       results.addAll(_convertFoundEntitiesToWidgets(
         _lastSearchResult?.shops,
         context.strings.map_search_page_shops_title,
         context.strings.map_search_page_shops_not_found,
         _shopToWidget,
+        _finishWithShop,
       ));
       results.addAll(_convertFoundEntitiesToWidgets(
         _lastSearchResult?.roads,
         context.strings.map_search_page_streets_title,
         context.strings.map_search_page_streets_not_found,
         _roadToWidget,
+        _finishWithRoad,
       ));
     }
-    return results
-        .map((e) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            child: e))
-        .toList();
+    return results;
   }
 
-  List<Widget> _convertFoundEntitiesToWidgets<T>(Iterable<T>? entities,
-      String title, String notFoundMsg, ArgResCallback<T, Widget> toWidget) {
+  Widget _itemPadding(Widget item) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: item);
+
+  Widget _itemsTitlePadding(Widget item) => Padding(
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
+      child: item);
+
+  List<Widget> _convertFoundEntitiesToWidgets<T>(
+      Iterable<T>? entities,
+      String title,
+      String notFoundMsg,
+      ArgResCallback<T, Widget> toWidget,
+      ArgCallback<T> onTap) {
     final results = <Widget>[];
 
-    results.add(Text(title, style: TextStyles.headline3));
+    results.add(_itemsTitlePadding(Text(title, style: TextStyles.headline3)));
     if (_model.loading || entities == null) {
       if (!isInTests()) {
-        results.add(Wrap(children: const [
-          SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
+        results.add(Wrap(children: [
+          _itemPadding(const SizedBox(
+              width: 24, height: 24, child: CircularProgressIndicator()))
         ]));
       }
     } else if (entities.isEmpty) {
-      results.add(Text(notFoundMsg, style: TextStyles.hint));
+      results.add(_itemPadding(Text(notFoundMsg, style: TextStyles.hint)));
     } else {
       for (final entity in entities) {
-        results.add(toWidget(entity));
+        results.add(InkWell(
+            onTap: () {
+              onTap(entity);
+            },
+            child: _itemPadding(toWidget(entity))));
       }
     }
 
@@ -171,6 +187,14 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
     return MapSearchResultEntry(
         title: road.name,
         distanceMeters: metersBetween(_model.center, road.coord));
+  }
+
+  void _finishWithShop(Shop shop) {
+    Navigator.of(context).pop(MapSearchPageResult.create(shop, null));
+  }
+
+  void _finishWithRoad(OsmRoad road) {
+    Navigator.of(context).pop(MapSearchPageResult.create(null, road));
   }
 
   void _onQueryCleared() {

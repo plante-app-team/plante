@@ -19,7 +19,7 @@ class FuzzySearch {
   /// Current value of [DEFAULT_SEARCH_RATIO_THRESHOLD] is chosen arbitrary
   /// based on manual testing of different threshold values.
   /// Feel free to use a custom value if default doesn't satisfy your needs.
-  static const int DEFAULT_SEARCH_RATIO_THRESHOLD = 60;
+  static const int DEFAULT_SEARCH_RATIO_THRESHOLD = 70;
 
   /// Performs a fuzzy search in a separate isolate, sorts results
   /// according to how similar they are to [query],

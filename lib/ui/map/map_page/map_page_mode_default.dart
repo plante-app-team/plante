@@ -76,8 +76,15 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Iterable<Shop> filter(Iterable<Shop> shops) {
-    return shops
-        .where((shop) => _showEmptyShops ? true : shop.productsCount > 0);
+    if (_showEmptyShops) {
+      return shops;
+    }
+    final shouldShow = (Shop shop) {
+      return shop.productsCount > 0 ||
+          selectedShops().contains(shop) ||
+          accentedShops().contains(shop);
+    };
+    return shops.where(shouldShow);
   }
 
   @override

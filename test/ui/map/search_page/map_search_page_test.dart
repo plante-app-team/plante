@@ -22,6 +22,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
+import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -85,10 +86,10 @@ void main() {
   ];
 
   void setUpFoundEntities(
-      {required List<Shop> localShops,
-      required List<Shop> foundInOsmShops,
-      required List<OsmRoad> localRoads,
-      required List<OsmRoad> foundInOsmRoads}) {
+      {List<Shop> localShops = const [],
+      List<Shop> foundInOsmShops = const [],
+      List<OsmRoad> localRoads = const [],
+      List<OsmRoad> foundInOsmRoads = const []}) {
     when(shopsManager.fetchShops(any))
         .thenAnswer((_) async => Ok(localShops.toMap()));
     when(roadsManager.fetchRoadsWithinAndNearby(any))
@@ -140,8 +141,10 @@ void main() {
         foundInOsmRoads: []);
   });
 
-  Future<BuildContext> pumpAndWaitPreloadFinish(WidgetTester tester) async {
-    final context = await tester.superPump(const MapSearchPage());
+  Future<BuildContext> pumpAndWaitPreloadFinish(WidgetTester tester,
+      {NavigatorObserver? navigatorObserver}) async {
+    final context = await tester.superPump(const MapSearchPage(),
+        navigatorObserver: navigatorObserver);
     await tester.pumpAndSettle();
     return context;
   }
@@ -631,6 +634,66 @@ void main() {
       expectedShops: osmShopsRenamed + localShops,
       expectedRoads: osmRoadsRenamed + localRoads,
     );
+  });
+
+  testWidgets('found shop click', (WidgetTester tester) async {
+    setUpFoundEntities(localShops: localShops);
+
+    final navigatorObserver = MockNavigatorObserver();
+
+    final context = await pumpAndWaitPreloadFinish(tester,
+        navigatorObserver: navigatorObserver);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    verifySearchResults(
+      tester,
+      context,
+      expectedShops: localShops,
+      expectedRoads: [],
+    );
+
+    clearInteractions(navigatorObserver);
+
+    await tester.superTap(find.text(localShops.first.name));
+
+    final capturedRoute = verify(navigatorObserver.didPop(captureAny, any))
+        .captured
+        .first as Route<dynamic>;
+    expect(await capturedRoute.popped,
+        equals(MapSearchPageResult.create(localShops.first, null)));
+  });
+
+  testWidgets('found road click', (WidgetTester tester) async {
+    setUpFoundEntities(localRoads: localRoads);
+
+    final navigatorObserver = MockNavigatorObserver();
+
+    final context = await pumpAndWaitPreloadFinish(tester,
+        navigatorObserver: navigatorObserver);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    verifySearchResults(
+      tester,
+      context,
+      expectedShops: [],
+      expectedRoads: localRoads,
+    );
+
+    clearInteractions(navigatorObserver);
+
+    await tester.superTap(find.text(localRoads.first.name));
+
+    final capturedRoute = verify(navigatorObserver.didPop(captureAny, any))
+        .captured
+        .first as Route<dynamic>;
+    expect(await capturedRoute.popped,
+        equals(MapSearchPageResult.create(null, localRoads.first)));
   });
 }
 

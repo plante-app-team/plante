@@ -51,3 +51,7 @@ import 'package:plante/ui/photos_taker.dart';
   ViewedProductsStorage,
 ])
 void unusedFunctionForCommonMocks() {}
+
+@GenerateMocks([],
+    customMocks: [MockSpec<NavigatorObserver>(returnNullOnMissingStub: true)])
+void unusedFunctionForCommonStubbedMocks() {}

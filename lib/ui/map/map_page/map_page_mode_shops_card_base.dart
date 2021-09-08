@@ -21,7 +21,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
 
   @mustCallSuper
   @override
-  bool shopWhereAmIFAB() => _displayedShops.isEmpty;
+  bool showWhereAmIFAB() => _displayedShops.isEmpty;
 
   @mustCallSuper
   @override
@@ -116,6 +116,11 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     _displayedShops.clear();
     updateWidget();
     updateMap();
+  }
+
+  @override
+  void deselectShops() {
+    hideShopsCard();
   }
 
   @mustCallSuper

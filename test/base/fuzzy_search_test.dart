@@ -35,9 +35,7 @@ void main() {
 
   test('searchSortCut: substring of big string is considered to be match',
       () async {
-    final input = [
-      'very long string with product in the middle and other words on the sides'
-    ];
+    final input = ['with product in middle'];
     final result =
         await FuzzySearch.searchSortCut<String>(input, (e) => e, 'product');
     expect(result, equals(input));

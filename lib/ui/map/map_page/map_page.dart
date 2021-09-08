@@ -31,6 +31,7 @@ import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
+import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
 enum MapPageRequestedMode {
   DEFAULT,
@@ -107,6 +108,14 @@ class MapPage extends StatefulWidget {
     }
     return _testingStorage.displayedShops;
   }
+
+  @visibleForTesting
+  void onSearchResultsForTesting(MapSearchPageResult searchResult) {
+    if (!isInTests()) {
+      throw Exception('MapPage: not in tests (onSearchResultsForTesting)');
+    }
+    return _testingStorage.onSearchResultCallback?.call(searchResult);
+  }
 }
 
 typedef _TestingFinishCallback = dynamic Function(dynamic result);
@@ -117,6 +126,7 @@ class _TestingStorage {
   ArgCallback<Iterable<Shop>>? onMarkerClickCallback;
   ArgCallback<Coord>? onMapClickCallback;
   ResCallback<MapPageMode>? modeCallback;
+  ArgCallback<MapSearchPageResult>? onSearchResultCallback;
   final Set<Shop> displayedShops = {};
 
   GoogleMapController? mapControllerForTesting;
@@ -160,6 +170,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     widget._testingStorage.modeCallback = () {
       return _mode;
     };
+    widget._testingStorage.onSearchResultCallback = _onSearchResult;
 
     final updateCallback = () {
       if (mounted) {
@@ -510,14 +521,36 @@ class _MapPageState extends PageStatePlante<MapPage>
     _mode.onMapClick(coord.toCoord());
   }
 
-  void _onSearchBarTap() {
-    Navigator.push(context,
+  void _onSearchBarTap() async {
+    final result = await Navigator.push(context,
         MaterialPageRoute(builder: (context) => const MapSearchPage()));
+    if (result is MapSearchPageResult) {
+      await _onSearchResult(result);
+    }
+  }
+
+  Future<void> _onSearchResult(MapSearchPageResult result) async {
+    final shop = result.shop;
+    final road = result.road;
+    if (shop != null) {
+      _mode.deselectShops();
+      await _moveCameraTo(
+          CameraPosition(target: shop.coord.toLatLng(), zoom: 17));
+      _onMarkerClick([shop]);
+    } else if (road != null) {
+      _mode.deselectShops();
+      await _moveCameraTo(
+          CameraPosition(target: road.coord.toLatLng(), zoom: 17));
+    }
   }
 }
 
 extension _CoordExt on LatLng {
   Coord toCoord() => Coord(lat: latitude, lon: longitude);
+}
+
+extension _LatLngExt on Coord {
+  LatLng toLatLng() => LatLng(lat, lon);
 }
 
 extension _CoordBoundsExt on LatLngBounds {
