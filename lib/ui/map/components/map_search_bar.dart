@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
@@ -7,8 +9,21 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
 
 class MapSearchBarQueryView {
-  ResCallback<String>? _query;
-  String get query => _query?.call() ?? '';
+  String? _latestQuery;
+  final _queryChangesController = StreamController<String>.broadcast();
+
+  String get query => _latestQuery ?? '';
+  Stream<String> get queryChanges => _queryChangesController.stream;
+
+  MapSearchBarQueryView() {
+    queryChanges.listen((event) {
+      _latestQuery = event;
+    });
+  }
+
+  void dispose() {
+    _queryChangesController.close();
+  }
 }
 
 class MapSearchBar extends StatefulWidget {
@@ -48,9 +63,7 @@ class _MapSearchBarState extends State<MapSearchBar>
   @override
   void initState() {
     super.initState();
-    widget.queryView?._query = () => _textController.text;
-    _textController.addListener(_updateCanSearch);
-    _updateCanSearch();
+    _textController.addListener(_onQueryChange);
     if (widget.enabled) {
       if (widget.searchButtonAppearanceDelay != null) {
         final showSearchButton = () {
@@ -70,6 +83,12 @@ class _MapSearchBarState extends State<MapSearchBar>
         _showSearchButton = true;
       }
     }
+  }
+
+  void _onQueryChange() {
+    _updateCanSearch();
+    final query = _textController.text;
+    widget.queryView?._queryChangesController.add(query);
   }
 
   void _updateCanSearch() {
