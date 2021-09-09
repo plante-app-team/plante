@@ -167,7 +167,7 @@ class MapSearchPageModel {
     // Step #2: search shops locally
     final foundShopsLocally = <Shop>[];
     final fetchShopRes = await _shopsManager.fetchShops(searchedArea);
-    _maybeDisplayError(fetchShopRes.maybeErr()?.convert());
+    _maybeSendError(fetchShopRes.maybeErr()?.convert());
     if (fetchShopRes.isOk) {
       final fuzzyFoundShops =
           await _shopsFuzzySearch(query, fetchShopRes.unwrap().values.toList());
@@ -182,13 +182,15 @@ class MapSearchPageModel {
     final foundShops = <Shop>[];
     foundShops.addAll((foundInOsm?.first ?? []).toList());
     foundShops.addAll(foundShopsLocally);
+    _sortByNameAndDistance(
+        foundShops, (Shop shop) => shop.name, (Shop shop) => shop.coord);
     resultsCallback.call(
         await _resultOrCancel(MapSearchResult.create(foundShops, null), query));
 
     // Step #3: search roads locally
     final foundRoadsLocally = <OsmRoad>[];
     final fetchRoadsRes = await _fetchRoads(searchedArea);
-    _maybeDisplayError(fetchRoadsRes.maybeErr()?.convert());
+    _maybeSendError(fetchRoadsRes.maybeErr()?.convert());
     if (fetchRoadsRes.isOk) {
       final fuzzyFoundRoads =
           await _roadsFuzzySearch(query, fetchRoadsRes.unwrap());
@@ -202,6 +204,8 @@ class MapSearchPageModel {
     final foundRoads = <OsmRoad>[];
     foundRoads.addAll(foundInOsm?.second ?? []);
     foundRoads.addAll(foundRoadsLocally);
+    _sortByNameAndDistance(
+        foundRoads, (OsmRoad road) => road.name, (OsmRoad road) => road.coord);
     resultsCallback.call(await _resultOrCancel(
         MapSearchResult.create(foundShops, foundRoads), query));
   }
@@ -209,7 +213,7 @@ class MapSearchPageModel {
   Future<Pair<List<Shop>, List<OsmRoad>>?> _searchInOsm(String query) async {
     final addressRes = await _fetchAddressCenter();
     if (addressRes.isErr) {
-      _maybeDisplayError(addressRes.unwrapErr().convert());
+      _maybeSendError(addressRes.unwrapErr().convert());
       return null;
     }
     final address = addressRes.unwrap();
@@ -219,14 +223,14 @@ class MapSearchPageModel {
     final osmSearchRes =
         await _osm.search(address.country!, address.city!, query);
     if (osmSearchRes.isErr) {
-      _maybeDisplayError(osmSearchRes.unwrapErr().convert());
+      _maybeSendError(osmSearchRes.unwrapErr().convert());
       return null;
     }
     final foundShops = <Shop>[];
     final foundRoads = osmSearchRes.unwrap().roads.toList();
     final foundInflatedShops =
         await _shopsManager.inflateOsmShops(osmSearchRes.unwrap().shops);
-    _maybeDisplayError(foundInflatedShops.maybeErr()?.convert());
+    _maybeSendError(foundInflatedShops.maybeErr()?.convert());
     if (foundInflatedShops.isOk) {
       foundShops.addAll(foundInflatedShops.unwrap().values);
     }
@@ -244,7 +248,36 @@ class MapSearchPageModel {
         roads, (road) => road.name, query);
   }
 
-  void _maybeDisplayError(MapSearchPageDisplayedError? err) {
+  void _sortByNameAndDistance<T>(List<T> entities,
+      ArgResCallback<T, String> nameFn, ArgResCallback<T, Coord> coordFn) {
+    final result = <T>[];
+    final sortedPiece = <T>[];
+    final moveSortedPieceToResult = () {
+      sortedPiece.sort((lhs, rhs) {
+        final lhsDistance = metersBetween(center, coordFn(lhs));
+        final rhsDistance = metersBetween(center, coordFn(rhs));
+        return lhsDistance.toInt() - rhsDistance.toInt();
+      });
+      result.addAll(sortedPiece);
+      sortedPiece.clear();
+    };
+
+    for (var index = 0; index < entities.length; ++index) {
+      if (sortedPiece.isEmpty ||
+          nameFn(sortedPiece.last).trim() == nameFn(entities[index]).trim()) {
+        sortedPiece.add(entities[index]);
+        continue;
+      }
+      moveSortedPieceToResult();
+      sortedPiece.add(entities[index]);
+    }
+    moveSortedPieceToResult();
+
+    entities.clear();
+    entities.addAll(result);
+  }
+
+  void _maybeSendError(MapSearchPageDisplayedError? err) {
     if (err != null) {
       _errCallback.call(err);
     }

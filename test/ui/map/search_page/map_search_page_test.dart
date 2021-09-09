@@ -695,6 +695,121 @@ void main() {
     expect(await capturedRoute.popped,
         equals(MapSearchPageResult.create(null, localRoads.first)));
   });
+
+  testWidgets('shops with same name are sorted by distance to user',
+      (WidgetTester tester) async {
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon + distanceToEntities + 1
+          ..latitude = userPos.lat + distanceToEntities + 1))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon + distanceToEntities + 3
+          ..latitude = userPos.lat + distanceToEntities + 3))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '3'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon + distanceToEntities + 2
+          ..latitude = userPos.lat + distanceToEntities + 2))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '3'
+          ..productsCount = 2))),
+    ];
+
+    final distances = [
+      metersBetween(userPos, shops[0].coord),
+      metersBetween(userPos, shops[1].coord),
+      metersBetween(userPos, shops[2].coord),
+    ];
+
+    setUpFoundEntities(localShops: shops);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'shop name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    final expectedDistances = [distances[0], distances[2], distances[1]];
+
+    double? prevDistance;
+    for (final distance in expectedDistances) {
+      Offset? prevCenter;
+      if (prevDistance != null) {
+        prevCenter = tester
+            .getCenter(find.text(distanceMetersToStr(prevDistance, context)));
+      }
+      final center =
+          tester.getCenter(find.text(distanceMetersToStr(distance, context)));
+      expect(center.dy, greaterThan(prevCenter?.dy ?? -1));
+      prevDistance = distance;
+    }
+  });
+
+  testWidgets('roads with same name are sorted by distance to user',
+      (WidgetTester tester) async {
+    final roads = [
+      OsmRoad((e) => e
+        ..osmId = '10'
+        ..name = 'road name'
+        ..longitude = userPos.lon + distanceToEntities + 1
+        ..latitude = userPos.lat + distanceToEntities + 1),
+      OsmRoad((e) => e
+        ..osmId = '11'
+        ..name = 'road name'
+        ..longitude = userPos.lon + distanceToEntities + 3
+        ..latitude = userPos.lat + distanceToEntities + 3),
+      OsmRoad((e) => e
+        ..osmId = '12'
+        ..name = 'road name'
+        ..longitude = userPos.lon + distanceToEntities + 2
+        ..latitude = userPos.lat + distanceToEntities + 2),
+    ];
+
+    final distances = [
+      metersBetween(userPos, roads[0].coord),
+      metersBetween(userPos, roads[1].coord),
+      metersBetween(userPos, roads[2].coord),
+    ];
+
+    setUpFoundEntities(localRoads: roads);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'road name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    final expectedDistances = [distances[0], distances[2], distances[1]];
+
+    double? prevDistance;
+    for (final distance in expectedDistances) {
+      Offset? prevCenter;
+      if (prevDistance != null) {
+        prevCenter = tester
+            .getCenter(find.text(distanceMetersToStr(prevDistance, context)));
+      }
+      final center =
+          tester.getCenter(find.text(distanceMetersToStr(distance, context)));
+      expect(center.dy, greaterThan(prevCenter?.dy ?? -1));
+      prevDistance = distance;
+    }
+  });
 }
 
 extension _ShopsListExt on Iterable<Shop> {

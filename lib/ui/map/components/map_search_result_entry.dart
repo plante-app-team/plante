@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/l10n/strings.dart';
 
 class MapSearchResultEntry extends StatelessWidget {
   final String title;
@@ -15,19 +15,11 @@ class MapSearchResultEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String distanceStr;
-    if (distanceMeters < 1000) {
-      distanceStr =
-          '${distanceMeters.round()} ${context.strings.global_meters}';
-    } else {
-      final distanceKms = distanceMeters / 1000;
-      distanceStr =
-          '${distanceKms.toStringAsFixed(1)} ${context.strings.global_kilometers}';
-    }
     return Row(
       textDirection: TextDirection.rtl,
       children: [
-        Text(distanceStr, style: TextStyles.searchResultDistance),
+        Text(distanceMetersToStr(distanceMeters, context),
+            style: TextStyles.searchResultDistance),
         Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
