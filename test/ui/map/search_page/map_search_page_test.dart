@@ -22,6 +22,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
+import 'package:plante/ui/map/search_page/map_search_page_model.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
 import '../../../common_mocks.mocks.dart';
@@ -808,6 +809,120 @@ void main() {
           tester.getCenter(find.text(distanceMetersToStr(distance, context)));
       expect(center.dy, greaterThan(prevCenter?.dy ?? -1));
       prevDistance = distance;
+    }
+  });
+
+  testWidgets('close roads with same names are merged',
+      (WidgetTester tester) async {
+    final roads = [
+      OsmRoad((e) => e
+        ..osmId = '10'
+        ..name = 'road name'
+        ..longitude = userPos.lon + distanceToEntities
+        ..latitude = userPos.lat + distanceToEntities),
+      OsmRoad((e) => e
+        ..osmId = '11'
+        ..name = 'road name'
+        ..longitude = userPos.lon + distanceToEntities + kmToGrad(1)
+        ..latitude = userPos.lat + distanceToEntities + kmToGrad(1)),
+      OsmRoad((e) => e
+        ..osmId = '12'
+        ..name = 'road name'
+        ..longitude = userPos.lon +
+            distanceToEntities +
+            kmToGrad(
+                MapSearchPageModel.MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS * 3)
+        ..latitude = userPos.lat +
+            distanceToEntities +
+            kmToGrad(
+                MapSearchPageModel.MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS * 3)),
+    ];
+
+    final distances = [
+      metersBetween(userPos, roads[0].coord),
+      metersBetween(userPos, roads[1].coord),
+      metersBetween(userPos, roads[2].coord),
+    ];
+
+    setUpFoundEntities(localRoads: roads);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'road name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    final expectedDistances = [distances[0], distances[2]];
+    final notExpectedDistances = [distances[1]];
+
+    for (final distance in expectedDistances) {
+      expect(find.text(distanceMetersToStr(distance, context)), findsOneWidget);
+    }
+    for (final distance in notExpectedDistances) {
+      expect(find.text(distanceMetersToStr(distance, context)), findsNothing);
+    }
+  });
+
+  testWidgets('close shops with same names are NOT merged',
+      (WidgetTester tester) async {
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon + distanceToEntities
+          ..latitude = userPos.lat + distanceToEntities))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon + distanceToEntities + kmToGrad(1)
+          ..latitude = userPos.lat + distanceToEntities + kmToGrad(1)))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '3'
+          ..name = 'shop name'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon +
+              distanceToEntities +
+              kmToGrad(
+                  MapSearchPageModel.MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS * 3)
+          ..latitude = userPos.lat +
+              distanceToEntities +
+              kmToGrad(
+                  MapSearchPageModel.MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS *
+                      3)))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '3'
+          ..productsCount = 2))),
+    ];
+
+    final distances = [
+      metersBetween(userPos, shops[0].coord),
+      metersBetween(userPos, shops[1].coord),
+      metersBetween(userPos, shops[2].coord),
+    ];
+
+    setUpFoundEntities(localShops: shops);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'shop name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    final expectedDistances = [distances[0], distances[1], distances[2]];
+
+    for (final distance in expectedDistances) {
+      expect(find.text(distanceMetersToStr(distance, context)), findsOneWidget);
     }
   });
 }

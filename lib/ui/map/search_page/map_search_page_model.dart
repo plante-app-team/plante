@@ -21,6 +21,7 @@ import 'package:plante/ui/map/search_page/map_search_page_displayed_error.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
 
 class MapSearchPageModel {
+  static const MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS = 5.0;
   final ShopsManager _shopsManager;
   final RoadsManager _roadsManager;
   final LatestCameraPosStorage _cameraPosStorage;
@@ -206,6 +207,7 @@ class MapSearchPageModel {
     foundRoads.addAll(foundRoadsLocally);
     _sortByNameAndDistance(
         foundRoads, (OsmRoad road) => road.name, (OsmRoad road) => road.coord);
+    _mergeCloseRoads(foundRoads);
     resultsCallback.call(await _resultOrCancel(
         MapSearchResult.create(foundShops, foundRoads), query));
   }
@@ -275,6 +277,38 @@ class MapSearchPageModel {
 
     entities.clear();
     entities.addAll(result);
+  }
+
+  void _mergeCloseRoads(List<OsmRoad> roads) {
+    // When roads are closer to each other than closeDistanceMeters, merge them
+    const closeDistanceMeters = MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS * 1000;
+    final result = <OsmRoad>[];
+
+    final mergedPiece = <OsmRoad>[];
+    final merge = () {
+      if (mergedPiece.isNotEmpty) {
+        result.add(mergedPiece.first);
+      }
+      mergedPiece.clear();
+    };
+
+    for (var index = 0; index < roads.length; ++index) {
+      final sameNames = mergedPiece.isNotEmpty &&
+          mergedPiece.first.name.trim() == roads[index].name.trim();
+      final areClose = mergedPiece.isNotEmpty &&
+          metersBetween(mergedPiece.first.coord, roads[index].coord) <=
+              closeDistanceMeters;
+      if (mergedPiece.isEmpty || (sameNames && areClose)) {
+        mergedPiece.add(roads[index]);
+        continue;
+      }
+      merge();
+      mergedPiece.add(roads[index]);
+    }
+    merge();
+
+    roads.clear();
+    roads.addAll(result);
   }
 
   void _maybeSendError(MapSearchPageDisplayedError? err) {
