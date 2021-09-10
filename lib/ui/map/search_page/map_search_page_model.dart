@@ -62,7 +62,7 @@ class MapSearchPageModel {
   }
 
   Coord get center => _lastKnownUserPos ?? _cameraPos!;
-  bool get loading => _loadingImpl;
+  bool get loading => _loading;
 
   MapSearchPageModel(
       this._shopsManager,
