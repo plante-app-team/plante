@@ -38,6 +38,14 @@ class RoadsManager {
           'fetchRoadsWithinAndNearby: bounds $bounds are bigger than $requestedRadios');
     }
 
+    final existingCache = await _fetchCachedRoads(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
+    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds));
+  }
+
+  Future<List<OsmRoad>?> _fetchCachedRoads(CoordsBounds bounds) async {
     final territories = (await _cacher.getCachedRoads()).toList();
     territories.sort((lhs, rhs) =>
         rhs.whenObtained.millisecondsSinceEpoch -
@@ -47,11 +55,10 @@ class RoadsManager {
     for (final territory in territories) {
       if (territory.bounds.containsBounds(bounds)) {
         Log.i('OSM roads from cache are used');
-        return Ok(territory.entities);
+        return territory.entities;
       }
     }
-
-    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds));
+    return null;
   }
 
   void _deleteExtras(List<OsmCachedTerritory<OsmRoad>> territories) {
@@ -81,6 +88,11 @@ class RoadsManager {
 
   Future<Result<List<OsmRoad>, RoadsManagerError>> _fetchRoadsImpl(
       CoordsBounds bounds) async {
+    final existingCache = await _fetchCachedRoads(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
+
     final requestedBounds = bounds.center.makeSquare(requestedRadios);
     final result = await _osm.fetchRoads(requestedBounds);
     if (result.isOk) {

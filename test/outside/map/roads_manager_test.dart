@@ -160,4 +160,24 @@ void main() {
       expect(cachedTerritory.whenObtained, equals(expectedTime));
     }
   });
+
+  test('cache behaviour when multiple road fetches started at the same time',
+      () async {
+    verifyZeroInteractions(osm);
+
+    // Fetch without await
+    final shopsFuture1 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture2 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture3 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture4 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+
+    // Await all
+    final results = await Future.wait(
+        [shopsFuture1, shopsFuture2, shopsFuture3, shopsFuture4]);
+    for (final result in results) {
+      expect(result.unwrap(), equals(fullRoads));
+    }
+    // The backend expected to be touched exactly once
+    verify(osm.fetchRoads(any)).called(1);
+  });
 }
