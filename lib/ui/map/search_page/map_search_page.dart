@@ -9,8 +9,9 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -58,7 +59,8 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       GetIt.I.get<ShopsManager>(),
       GetIt.I.get<RoadsManager>(),
       GetIt.I.get<LatestCameraPosStorage>(),
-      GetIt.I.get<OpenStreetMap>(),
+      GetIt.I.get<AddressObtainer>(),
+      GetIt.I.get<OsmSearcher>(),
       GetIt.I.get<LocationController>(),
       () => _querySource.query,
       _querySource.queryChanges,

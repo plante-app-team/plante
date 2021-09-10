@@ -10,12 +10,14 @@ import 'package:plante/outside/map/osm_interactions_queue.dart';
 typedef AddressResult = Result<OsmAddress, OpenStreetMapError>;
 typedef FutureAddress = Future<AddressResult>;
 
-class AddressObtainer {
-  final OpenStreetMap _osm;
+class AddressObtainer implements OpenStreetMapReceiver {
+  late final OpenStreetMap _osm;
   final OsmInteractionsQueue _osmQueue;
   final _cache = <String, OsmAddress>{};
 
-  AddressObtainer(this._osm, this._osmQueue);
+  AddressObtainer(OpenStreetMapHolder osmHolder, this._osmQueue) {
+    _osm = osmHolder.getOsm(whoAsks: this);
+  }
 
   FutureAddress addressOfShop(Shop shop) async {
     if (_cache.containsKey(shop.osmId)) {

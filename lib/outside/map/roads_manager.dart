@@ -14,7 +14,7 @@ enum RoadsManagerError {
   OTHER,
 }
 
-class RoadsManager {
+class RoadsManager implements OpenStreetMapReceiver {
   // Let's assume new roads don't appear often.
   static const DAYS_BEFORE_CACHE_ANCIENT = 365;
   // Let's not overload the DB with too many roads.
@@ -23,11 +23,13 @@ class RoadsManager {
   static const REQUESTED_RADIUS_KM = 30.0;
   static final requestedRadios = kmToGrad(REQUESTED_RADIUS_KM);
 
-  final OpenStreetMap _osm;
+  late final OpenStreetMap _osm;
   final OsmCacher _cacher;
   final OsmInteractionsQueue _osmQueue;
 
-  RoadsManager(this._osm, this._cacher, this._osmQueue);
+  RoadsManager(OpenStreetMapHolder osmHolder, this._cacher, this._osmQueue) {
+    _osm = osmHolder.getOsm(whoAsks: this);
+  }
 
   /// Fetches roads within the given bounds and nearby them if available.
   /// Given bounds must have sides smaller than [REQUESTED_RADIUS_KM].

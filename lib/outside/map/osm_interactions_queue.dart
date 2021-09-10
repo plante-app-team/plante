@@ -20,6 +20,8 @@ class OsmInteractionsQueue {
   bool _interacting = false;
   final _delayedInteractions = <VoidCallback>[];
 
+  bool get interacting => _interacting;
+
   static final _interactionsCooldown = isInTests()
       ? const Duration(milliseconds: 50)
       : const Duration(seconds: 3);

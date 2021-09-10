@@ -8,6 +8,7 @@ import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
@@ -47,7 +48,7 @@ void main() {
           fullRoads.where((road) => bounds.contains(road.coord)).toList());
     });
 
-    roadsManager = RoadsManager(osm, cacher, OsmInteractionsQueue());
+    roadsManager = RoadsManager(osm.asHolder(), cacher, OsmInteractionsQueue());
   });
 
   test('roads fetched and then cached', () async {

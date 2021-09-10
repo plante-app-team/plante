@@ -11,6 +11,7 @@ import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
@@ -84,8 +85,8 @@ class ShopsManagerTestCommons {
     productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
-        osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
+        analytics, osmCacher, OsmInteractionsQueue());
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));

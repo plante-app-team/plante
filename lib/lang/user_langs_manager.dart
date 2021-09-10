@@ -16,7 +16,7 @@ import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 
 abstract class UserLangsManagerObserver {
   void onUserLangsChange(UserLangs userLangs);
@@ -36,13 +36,17 @@ class UserLangsManager {
       this._sysLangCodeHolder,
       CountriesLangCodesTable langCodesTable,
       LocationController locationController,
-      OpenStreetMap osm,
+      AddressObtainer addressObtainer,
       SharedPreferencesHolder prefsHolder,
       UserParamsController userParamsController,
       Backend backend,
       Analytics analytics)
       : _locationUserLangsManager = LocationBasedUserLangsManager(
-            langCodesTable, locationController, osm, analytics, prefsHolder),
+            langCodesTable,
+            locationController,
+            addressObtainer,
+            analytics,
+            prefsHolder),
         _manualUserLangsManager =
             ManualUserLangsManager(userParamsController, backend, analytics) {
     _initAsync();

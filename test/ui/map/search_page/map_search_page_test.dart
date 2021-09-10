@@ -12,10 +12,12 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
+import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -35,7 +37,8 @@ void main() {
   late MockShopsManager shopsManager;
   late MockRoadsManager roadsManager;
   late LatestCameraPosStorage cameraPosStorage;
-  late MockOpenStreetMap osm;
+  late MockAddressObtainer addressObtainer;
+  late MockOsmSearcher osmSearcher;
   late FakeLocationController locationController;
   late FakeAnalytics analytics;
 
@@ -95,8 +98,8 @@ void main() {
         .thenAnswer((_) async => Ok(localShops.toMap()));
     when(roadsManager.fetchRoadsWithinAndNearby(any))
         .thenAnswer((_) async => Ok(localRoads));
-    when(osm.search(any, any, any)).thenAnswer((_) async => Ok(OsmSearchResult(
-        (e) => e
+    when(osmSearcher.search(any, any, any)).thenAnswer((_) async => Ok(
+        OsmSearchResult((e) => e
           ..shops.addAll(foundInOsmShops.map((e) => e.osmShop))
           ..roads.addAll(foundInOsmRoads))));
 
@@ -119,8 +122,10 @@ void main() {
     cameraPosStorage =
         LatestCameraPosStorage(FakeSharedPreferences().asHolder());
     GetIt.I.registerSingleton<LatestCameraPosStorage>(cameraPosStorage);
-    osm = MockOpenStreetMap();
-    GetIt.I.registerSingleton<OpenStreetMap>(osm);
+    addressObtainer = MockAddressObtainer();
+    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
+    osmSearcher = MockOsmSearcher();
+    GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
     locationController = FakeLocationController();
     GetIt.I.registerSingleton<LocationController>(locationController);
     analytics = FakeAnalytics();
@@ -129,7 +134,7 @@ void main() {
     await cameraPosStorage.set(cameraPos);
     locationController.setCurrentPosition(userPos);
 
-    when(osm.fetchAddress(any, any))
+    when(addressObtainer.addressOfCoords(any))
         .thenAnswer((_) async => Ok(OsmAddress((e) => e
           ..city = 'London'
           ..country = 'England'
@@ -198,14 +203,14 @@ void main() {
   testWidgets('preloaded entities are preloaded', (WidgetTester tester) async {
     verifyNever(shopsManager.fetchShops(any));
     verifyNever(roadsManager.fetchRoadsWithinAndNearby(any));
-    verifyNever(osm.fetchAddress(any, any));
+    verifyNever(addressObtainer.addressOfCoords(any));
 
     await pumpAndWaitPreloadFinish(tester);
 
     verify(shopsManager.fetchShops(any));
     verify(roadsManager.fetchRoadsWithinAndNearby(any));
-    verify(osm.fetchAddress(any, any));
-    verifyNever(osm.search(any, any, any));
+    verify(addressObtainer.addressOfCoords(any));
+    verifyZeroInteractions(osmSearcher);
   });
 
   testWidgets('both shops and streets found', (WidgetTester tester) async {
@@ -299,7 +304,7 @@ void main() {
         localRoads: localRoads,
         foundInOsmRoads: foundInOsmRoads);
 
-    when(osm.search(any, any, any))
+    when(osmSearcher.search(any, any, any))
         .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
 
     final context = await pumpAndWaitPreloadFinish(tester);
@@ -376,7 +381,7 @@ void main() {
         localRoads: localRoads,
         foundInOsmRoads: foundInOsmRoads);
 
-    when(osm.search(any, any, any))
+    when(osmSearcher.search(any, any, any))
         .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
     when(shopsManager.fetchShops(any))
         .thenAnswer((_) async => Err(ShopsManagerError.OTHER));
