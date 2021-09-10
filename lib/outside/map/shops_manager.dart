@@ -68,13 +68,15 @@ class ShopsManager {
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
+    final existingCache = _loadShopsFromCache(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
     return await _osmQueue
         .enqueue(() => _maybeLoadShops(bounds, attemptNumber: 1));
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
-      CoordsBounds bounds,
-      {required int attemptNumber}) async {
+  Map<String, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
     for (final loadedArea in _loadedAreas.keys) {
       // Already loaded
       if (loadedArea.containsBounds(bounds)) {
@@ -82,8 +84,18 @@ class ShopsManager {
         final shops = ids
             .map((id) => _shopsCache[id]!)
             .where((shop) => bounds.containsShop(shop));
-        return Ok({for (var shop in shops) shop.osmId: shop});
+        return {for (var shop in shops) shop.osmId: shop};
       }
+    }
+    return null;
+  }
+
+  Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
+      CoordsBounds bounds,
+      {required int attemptNumber}) async {
+    final existingCache = _loadShopsFromCache(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
     }
 
     final shopsFetchResult = await _fetchShopsHelper.fetchShops(
