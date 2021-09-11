@@ -8,6 +8,7 @@ import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
@@ -47,7 +48,7 @@ void main() {
           fullRoads.where((road) => bounds.contains(road.coord)).toList());
     });
 
-    roadsManager = RoadsManager(osm, cacher, OsmInteractionsQueue());
+    roadsManager = RoadsManager(osm.asHolder(), cacher, OsmInteractionsQueue());
   });
 
   test('roads fetched and then cached', () async {
@@ -159,5 +160,25 @@ void main() {
       final expectedTime = now.subtract(Duration(days: index));
       expect(cachedTerritory.whenObtained, equals(expectedTime));
     }
+  });
+
+  test('cache behaviour when multiple road fetches started at the same time',
+      () async {
+    verifyZeroInteractions(osm);
+
+    // Fetch without await
+    final shopsFuture1 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture2 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture3 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+    final shopsFuture4 = roadsManager.fetchRoadsWithinAndNearby(bounds);
+
+    // Await all
+    final results = await Future.wait(
+        [shopsFuture1, shopsFuture2, shopsFuture3, shopsFuture4]);
+    for (final result in results) {
+      expect(result.unwrap(), equals(fullRoads));
+    }
+    // The backend expected to be touched exactly once
+    verify(osm.fetchRoads(any)).called(1);
   });
 }

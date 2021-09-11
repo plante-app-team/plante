@@ -7,21 +7,25 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 
 /// Please use UserLangsManager instead of this class.
 class LocationBasedUserLangsManager {
   final CountriesLangCodesTable _langCodesTable;
   final LocationController _locationController;
-  final OpenStreetMap _osm;
+  final AddressObtainer _addressObtainer;
   final Analytics _analytics;
   final LocationBasedUserLangsStorage _storage;
 
   final _initCompleter = Completer<void>();
   Future<void> get initFuture => _initCompleter.future;
 
-  LocationBasedUserLangsManager(this._langCodesTable, this._locationController,
-      this._osm, this._analytics, SharedPreferencesHolder prefsHolder,
+  LocationBasedUserLangsManager(
+      this._langCodesTable,
+      this._locationController,
+      this._addressObtainer,
+      this._analytics,
+      SharedPreferencesHolder prefsHolder,
       {LocationBasedUserLangsStorage? storage})
       : _storage = storage ?? LocationBasedUserLangsStorage(prefsHolder) {
     _locationController.callWhenLastPositionKnown((_) async {
@@ -49,7 +53,7 @@ class LocationBasedUserLangsManager {
       return;
     }
 
-    final addressRes = await _osm.fetchAddress(pos.lat, pos.lon);
+    final addressRes = await _addressObtainer.addressOfCoords(pos);
     if (addressRes.isErr) {
       Log.w('Cannot determine user langs - OSM error: $addressRes');
       return;

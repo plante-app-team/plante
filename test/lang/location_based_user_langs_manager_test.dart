@@ -20,7 +20,7 @@ import 'location_based_user_langs_manager_test.mocks.dart';
 void main() {
   late CountriesLangCodesTable countriesLangCodesTable;
   late MockLocationController locationController;
-  late MockOpenStreetMap osm;
+  late MockAddressObtainer addressObtainer;
   late MockLocationBasedUserLangsStorage storage;
   late FakeAnalytics analytics;
   late LocationBasedUserLangsManager userLangsManager;
@@ -29,7 +29,7 @@ void main() {
     analytics = FakeAnalytics();
     countriesLangCodesTable = CountriesLangCodesTable(analytics);
     locationController = MockLocationController();
-    osm = MockOpenStreetMap();
+    addressObtainer = MockAddressObtainer();
     storage = MockLocationBasedUserLangsStorage();
 
     when(storage.userLangs()).thenAnswer((_) async => null);
@@ -51,13 +51,13 @@ void main() {
 
     when(locationController.lastKnownPosition())
         .thenAnswer((_) async => lastPos);
-    when(osm.fetchAddress(any, any))
+    when(addressObtainer.addressOfCoords(any))
         .thenAnswer((_) async => addressResp.call());
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
       locationController,
-      osm,
+      addressObtainer,
       analytics,
       FakeSharedPreferences().asHolder(),
       storage: storage,
@@ -135,13 +135,13 @@ void main() {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
-    when(osm.fetchAddress(any, any))
+    when(addressObtainer.addressOfCoords(any))
         .thenAnswer((_) async => Ok(OsmAddress((e) => e.countryCode = 'be')));
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
       locationController,
-      osm,
+      addressObtainer,
       FakeAnalytics(),
       FakeSharedPreferences().asHolder(),
       storage: storage,

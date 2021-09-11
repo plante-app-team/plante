@@ -23,7 +23,7 @@ import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/base/date_time_extensions.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
-class ShopsManager {
+class ShopsManager implements OpenStreetMapReceiver {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
   final Analytics _analytics;
@@ -31,7 +31,7 @@ class ShopsManager {
   final OsmInteractionsQueue _osmQueue;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
-  final ShopsRequester _impl;
+  late final ShopsRequester _requester;
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
@@ -42,14 +42,15 @@ class ShopsManager {
   int get loadedAreasCount => _loadedAreas.length;
 
   ShopsManager(
-      OpenStreetMap openStreetMap,
+      OpenStreetMapHolder osmHolder,
       Backend backend,
       ProductsObtainer productsObtainer,
       this._analytics,
       this._osmCacher,
-      this._osmQueue)
-      : _impl = ShopsRequester(openStreetMap, backend, productsObtainer) {
-    _fetchShopsHelper = ShopsManagerFetchShopsHelper(_impl, _osmCacher);
+      this._osmQueue) {
+    _requester = ShopsRequester(
+        osmHolder.getOsm(whoAsks: this), backend, productsObtainer);
+    _fetchShopsHelper = ShopsManagerFetchShopsHelper(_requester, _osmCacher);
   }
 
   void addListener(ShopsManagerListener listener) {
@@ -68,13 +69,16 @@ class ShopsManager {
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
-    return await _osmQueue
-        .enqueue(() => _maybeLoadShops(bounds, attemptNumber: 1));
+    final existingCache = _loadShopsFromCache(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
+    return await _osmQueue.enqueue(
+        () => _maybeLoadShops(bounds, attemptNumber: 1),
+        goals: [OsmInteractionsGoal.FETCH_SHOPS]);
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
-      CoordsBounds bounds,
-      {required int attemptNumber}) async {
+  Map<String, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
     for (final loadedArea in _loadedAreas.keys) {
       // Already loaded
       if (loadedArea.containsBounds(bounds)) {
@@ -82,8 +86,18 @@ class ShopsManager {
         final shops = ids
             .map((id) => _shopsCache[id]!)
             .where((shop) => bounds.containsShop(shop));
-        return Ok({for (var shop in shops) shop.osmId: shop});
+        return {for (var shop in shops) shop.osmId: shop};
       }
+    }
+    return null;
+  }
+
+  Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
+      CoordsBounds bounds,
+      {required int attemptNumber}) async {
+    final existingCache = _loadShopsFromCache(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
     }
 
     final shopsFetchResult = await _fetchShopsHelper.fetchShops(
@@ -127,7 +141,7 @@ class ShopsManager {
     }
 
     if (osmShopsToLoad.isNotEmpty) {
-      final inflateResult = await _impl.inflateOsmShops(osmShopsToLoad);
+      final inflateResult = await _requester.inflateOsmShops(osmShopsToLoad);
       Log.w('ShopsManager.inflateOsmShops err: $inflateResult');
       if (inflateResult.isErr) {
         return inflateResult;
@@ -157,7 +171,7 @@ class ShopsManager {
         return Ok(cache);
       }
     }
-    final result = await _impl.fetchShopProductRange(shop);
+    final result = await _requester.fetchShopProductRange(shop);
     if (result.isOk) {
       _rangesCache[shop.osmId] = result.unwrap();
     }
@@ -166,7 +180,7 @@ class ShopsManager {
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
-    final result = await _impl.putProductToShops(product, shops);
+    final result = await _requester.putProductToShops(product, shops);
     final eventParam = {
       'barcode': product.barcode,
       'shops': shops.map((e) => e.osmId).join(', ')
@@ -213,7 +227,8 @@ class ShopsManager {
       {required String name,
       required Coord coord,
       required ShopType type}) async {
-    final result = await _impl.createShop(name: name, coord: coord, type: type);
+    final result =
+        await _requester.createShop(name: name, coord: coord, type: type);
     if (result.isOk) {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',

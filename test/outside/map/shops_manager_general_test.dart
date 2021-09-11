@@ -18,6 +18,7 @@ import 'package:test/test.dart';
 
 import 'package:plante/outside/map/open_street_map.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
@@ -58,8 +59,8 @@ void main() {
     productsObtainer = commons.productsObtainer;
     analytics = commons.analytics;
     osmCacher = commons.osmCacher;
-    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
-        osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
+        analytics, osmCacher, OsmInteractionsQueue());
   });
 
   test('shops fetched and then cached', () async {
@@ -583,8 +584,8 @@ void main() {
         equals(expectedAllShops));
 
     // Create a NEW shops manager with same persistent cache
-    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
-        osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
+        analytics, osmCacher, OsmInteractionsQueue());
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));

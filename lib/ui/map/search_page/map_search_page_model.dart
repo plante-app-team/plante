@@ -11,9 +11,11 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -25,7 +27,8 @@ class MapSearchPageModel {
   final ShopsManager _shopsManager;
   final RoadsManager _roadsManager;
   final LatestCameraPosStorage _cameraPosStorage;
-  final OpenStreetMap _osm;
+  final AddressObtainer _addressObtainer;
+  final OsmSearcher _osmSearcher;
   final LocationController _locationController;
   final ResCallback<String> _querySource;
   final Stream<String> _queryChanges;
@@ -59,13 +62,14 @@ class MapSearchPageModel {
   }
 
   Coord get center => _lastKnownUserPos ?? _cameraPos!;
-  bool get loading => _loadingImpl;
+  bool get loading => _loading;
 
   MapSearchPageModel(
       this._shopsManager,
       this._roadsManager,
       this._cameraPosStorage,
-      this._osm,
+      this._addressObtainer,
+      this._osmSearcher,
       this._locationController,
       this._querySource,
       this._queryChanges,
@@ -112,7 +116,7 @@ class MapSearchPageModel {
     if (_centerAddressCompleter.isCompleted) {
       return Ok(await _centerAddressCompleter.future);
     }
-    final cameraAddressRes = await _osm.fetchAddress(center.lat, center.lon);
+    final cameraAddressRes = await _addressObtainer.addressOfCoords(center);
     if (cameraAddressRes.isOk) {
       _centerAddressCompleter.complete(cameraAddressRes.unwrap());
     }
@@ -223,7 +227,7 @@ class MapSearchPageModel {
       return null;
     }
     final osmSearchRes =
-        await _osm.search(address.country!, address.city!, query);
+        await _osmSearcher.search(address.country!, address.city!, query);
     if (osmSearchRes.isErr) {
       _maybeSendError(osmSearchRes.unwrapErr().convert());
       return null;

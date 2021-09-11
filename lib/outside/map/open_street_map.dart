@@ -14,15 +14,29 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/shops_manager.dart';
 
 // We use LinkedHashMap because order is important, so:
 // ignore_for_file: prefer_collection_literals
 
 enum OpenStreetMapError { NETWORK, OTHER }
+
+/// A class designed to be put into DI to protect [OpenStreetMap] from
+/// being obtained directly.
+/// [OpenStreetMap] should never be used directly, but through instances of
+/// [OpenStreetMapReceiver], because they know how to .
+class OpenStreetMapHolder {
+  final OpenStreetMap _osm;
+  OpenStreetMapHolder(
+      HttpClient http, Analytics analytics, OsmInteractionsQueue queue)
+      : _osm = OpenStreetMap(http, analytics, queue);
+  OpenStreetMap getOsm({required OpenStreetMapReceiver whoAsks}) => _osm;
+}
+
+abstract class OpenStreetMapReceiver {}
 
 /// A wrapper around Open Street Map APIs.
 ///
@@ -30,19 +44,17 @@ enum OpenStreetMapError { NETWORK, OTHER }
 /// because all of the OSM APIs have rate limits and will ban the device
 /// (or the app) if it sends too many requests.
 /// Instead, wrappers for certain purposes should be created.
-///
-/// Also see [ShopsManager] as a good example a wrapper - not only does it
-/// limit requests to 1 per 3 seconds, it also caches requests results.
 class OpenStreetMap {
   final HttpClient _http;
   final Analytics _analytics;
+  final OsmInteractionsQueue _interactionsQueue;
 
   /// We use LinkedHashMap because order is important
   final _osmOverpassUrls = LinkedHashMap<String, String>();
 
   Map<String, String> get osmOverpassUrls => MapView(_osmOverpassUrls);
 
-  OpenStreetMap(this._http, this._analytics) {
+  OpenStreetMap(this._http, this._analytics, this._interactionsQueue) {
     _osmOverpassUrls['lz4'] = 'lz4.overpass-api.de';
     _osmOverpassUrls['z'] = 'z.overpass-api.de';
     _osmOverpassUrls['kumi'] = 'overpass.kumi.systems';
@@ -51,6 +63,10 @@ class OpenStreetMap {
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
       CoordsBounds bounds) async {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_SHOPS.service)) {
+      Log.e('OSM.fetchShops called outside of the queue');
+    }
     final val1 = bounds.southwest.lat;
     final val2 = bounds.southwest.lon;
     final val3 = bounds.northeast.lat;
@@ -142,6 +158,10 @@ class OpenStreetMap {
 
   Future<Result<List<OsmRoad>, OpenStreetMapError>> fetchRoads(
       CoordsBounds bounds) async {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_ROADS.service)) {
+      Log.e('OSM.fetchRoads called outside of the queue');
+    }
     final val1 = bounds.southwest.lat;
     final val2 = bounds.southwest.lon;
     final val3 = bounds.northeast.lat;
@@ -165,6 +185,10 @@ class OpenStreetMap {
 
   Future<Result<OsmAddress, OpenStreetMapError>> fetchAddress(
       double lat, double lon) async {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_ADDRESS.service)) {
+      Log.e('OSM.fetchAddress called outside of the queue');
+    }
     final Response r;
     try {
       r = await _http.get(
@@ -214,6 +238,9 @@ class OpenStreetMap {
 
   Future<Result<OsmSearchResult, OpenStreetMapError>> search(
       String country, String city, String query) async {
+    if (!_interactionsQueue.isInteracting(OsmInteractionsGoal.SEARCH.service)) {
+      Log.e('OSM.search called outside of the queue');
+    }
     final Response r;
     try {
       r = await _http.get(

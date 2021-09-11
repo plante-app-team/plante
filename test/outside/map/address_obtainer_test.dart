@@ -9,6 +9,7 @@ import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 
 void main() {
@@ -33,7 +34,7 @@ void main() {
   setUp(() async {
     osm = MockOpenStreetMap();
     when(osm.fetchAddress(any, any)).thenAnswer((_) async => Ok(anAddress));
-    addressObtainer = AddressObtainer(osm, OsmInteractionsQueue());
+    addressObtainer = AddressObtainer(osm.asHolder(), OsmInteractionsQueue());
   });
 
   test('address fetched and then cached', () async {

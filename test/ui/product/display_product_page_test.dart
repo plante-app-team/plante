@@ -144,7 +144,7 @@ void main() {
         Ingredient((v) => v
           ..name = 'ingredient1'
           ..vegetarianStatus = VegStatus.positive
-          ..veganStatus = VegStatus.unknown),
+          ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
           ..name = 'ingredient2'
           ..vegetarianStatus = null
@@ -175,14 +175,10 @@ void main() {
     expect(ingredientsTableColumn(row1, 1), equals('ingredient1'));
     expect(ingredientsTableColumn(row1, 2),
         equals(context.strings.display_product_page_table_positive));
-    expect(ingredientsTableColumn(row1, 3),
-        equals(context.strings.display_product_page_table_unknown));
 
     final row2 = ingredientsAnalysisTable.children[2];
     expect(ingredientsTableColumn(row2, 1), equals('ingredient2'));
     expect(ingredientsTableColumn(row2, 2),
-        equals(context.strings.display_product_page_table_unknown));
-    expect(ingredientsTableColumn(row2, 3),
         equals(context.strings.display_product_page_table_unknown));
   });
 

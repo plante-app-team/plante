@@ -1,8 +1,20 @@
+import 'package:plante/base/result.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_http_client.dart';
+
+class _FakeAlwaysInteractingOsmQueue implements OsmInteractionsQueue {
+  @override
+  Future<Result<R, E>> enqueue<R, E>(InteractionFn<R, E> interactionFn,
+      {required List<OsmInteractionsGoal> goals}) async {
+    return await interactionFn.call();
+  }
+  @override
+  bool isInteracting(OsmInteractionService service) => true;
+}
 
 class OpenStreetMapTestCommons {
   late FakeHttpClient http;
@@ -12,7 +24,7 @@ class OpenStreetMapTestCommons {
   Future<void> setUp() async {
     http = FakeHttpClient();
     analytics = FakeAnalytics();
-    osm = OpenStreetMap(http, analytics);
+    osm = OpenStreetMap(http, analytics, _FakeAlwaysInteractingOsmQueue());
   }
 
   /// Second, third, ... Overpass URLs are queried when a query to the previous

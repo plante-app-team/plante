@@ -14,7 +14,7 @@ enum RoadsManagerError {
   OTHER,
 }
 
-class RoadsManager {
+class RoadsManager implements OpenStreetMapReceiver {
   // Let's assume new roads don't appear often.
   static const DAYS_BEFORE_CACHE_ANCIENT = 365;
   // Let's not overload the DB with too many roads.
@@ -23,11 +23,13 @@ class RoadsManager {
   static const REQUESTED_RADIUS_KM = 30.0;
   static final requestedRadios = kmToGrad(REQUESTED_RADIUS_KM);
 
-  final OpenStreetMap _osm;
+  late final OpenStreetMap _osm;
   final OsmCacher _cacher;
   final OsmInteractionsQueue _osmQueue;
 
-  RoadsManager(this._osm, this._cacher, this._osmQueue);
+  RoadsManager(OpenStreetMapHolder osmHolder, this._cacher, this._osmQueue) {
+    _osm = osmHolder.getOsm(whoAsks: this);
+  }
 
   /// Fetches roads within the given bounds and nearby them if available.
   /// Given bounds must have sides smaller than [REQUESTED_RADIUS_KM].
@@ -38,6 +40,15 @@ class RoadsManager {
           'fetchRoadsWithinAndNearby: bounds $bounds are bigger than $requestedRadios');
     }
 
+    final existingCache = await _fetchCachedRoads(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
+    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds),
+        goals: [OsmInteractionsGoal.FETCH_ROADS]);
+  }
+
+  Future<List<OsmRoad>?> _fetchCachedRoads(CoordsBounds bounds) async {
     final territories = (await _cacher.getCachedRoads()).toList();
     territories.sort((lhs, rhs) =>
         rhs.whenObtained.millisecondsSinceEpoch -
@@ -47,11 +58,10 @@ class RoadsManager {
     for (final territory in territories) {
       if (territory.bounds.containsBounds(bounds)) {
         Log.i('OSM roads from cache are used');
-        return Ok(territory.entities);
+        return territory.entities;
       }
     }
-
-    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds));
+    return null;
   }
 
   void _deleteExtras(List<OsmCachedTerritory<OsmRoad>> territories) {
@@ -81,6 +91,11 @@ class RoadsManager {
 
   Future<Result<List<OsmRoad>, RoadsManagerError>> _fetchRoadsImpl(
       CoordsBounds bounds) async {
+    final existingCache = await _fetchCachedRoads(bounds);
+    if (existingCache != null) {
+      return Ok(existingCache);
+    }
+
     final requestedBounds = bounds.center.makeSquare(requestedRadios);
     final result = await _osm.fetchRoads(requestedBounds);
     if (result.isOk) {

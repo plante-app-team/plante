@@ -5,6 +5,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
+import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
@@ -27,8 +28,8 @@ void main() {
     productsObtainer = commons.productsObtainer;
     analytics = commons.analytics;
     osmCacher = commons.osmCacher;
-    shopsManager = ShopsManager(osm, backend, productsObtainer, analytics,
-        osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
+        analytics, osmCacher, OsmInteractionsQueue());
   });
 
   test('inflateOsmShops when no shops in cache', () async {

@@ -394,15 +394,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
       const SizedBox(width: 24),
       center(Text(context.strings.display_product_page_table_column1,
           style: TextStyles.normalBold)),
-      center(Text(context.strings.display_product_page_table_column2,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyles.normalBold)),
-      const SizedBox(width: 12),
       center(Text(context.strings.display_product_page_table_column3,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyles.normalBold)),
+          textAlign: TextAlign.center, style: TextStyles.normalBold)),
       const SizedBox(width: 24),
     ], decoration: BoxDecoration(color: nextColor())));
     final ingredients = _product.ingredientsAnalyzed!;
@@ -415,11 +408,6 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
               style: TextStyles.normal,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),
-          center(Text(_vegStatusText(ingredient.vegetarianStatus),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis)),
-          const SizedBox(width: 12),
           center(Text(_vegStatusText(ingredient.veganStatus),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -440,10 +428,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
         columnWidths: const <int, TableColumnWidth>{
           0: IntrinsicColumnWidth(),
           1: FlexColumnWidth(10),
-          2: FlexColumnWidth(4),
+          2: FlexColumnWidth(6),
           3: IntrinsicColumnWidth(),
-          4: FlexColumnWidth(4),
-          5: IntrinsicColumnWidth(),
         });
   }
 
