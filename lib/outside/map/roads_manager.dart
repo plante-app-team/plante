@@ -44,7 +44,8 @@ class RoadsManager implements OpenStreetMapReceiver {
     if (existingCache != null) {
       return Ok(existingCache);
     }
-    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds));
+    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds),
+        goals: [OsmInteractionsGoal.FETCH_ROADS]);
   }
 
   Future<List<OsmRoad>?> _fetchCachedRoads(CoordsBounds bounds) async {

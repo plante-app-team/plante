@@ -24,7 +24,8 @@ class AddressObtainer implements OpenStreetMapReceiver {
       return Ok(_cache[shop.osmId]!);
     }
     return await _osmQueue.enqueue(
-        () => _fetchAddress(shop.latitude, shop.longitude, shop.osmId));
+        () => _fetchAddress(shop.latitude, shop.longitude, shop.osmId),
+        goals: [OsmInteractionsGoal.FETCH_ADDRESS]);
   }
 
   FutureAddress _fetchAddress(double lat, double lon, String? osmId) async {
@@ -39,7 +40,8 @@ class AddressObtainer implements OpenStreetMapReceiver {
   }
 
   FutureAddress addressOfCoords(Coord coords) async {
-    return await _osmQueue
-        .enqueue(() => _fetchAddress(coords.lat, coords.lon, null));
+    return await _osmQueue.enqueue(
+        () => _fetchAddress(coords.lat, coords.lon, null),
+        goals: [OsmInteractionsGoal.FETCH_ADDRESS]);
   }
 }

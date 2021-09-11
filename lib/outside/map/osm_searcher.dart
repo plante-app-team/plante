@@ -13,6 +13,7 @@ class OsmSearcher implements OpenStreetMapReceiver {
 
   Future<Result<OsmSearchResult, OpenStreetMapError>> search(
       String country, String city, String query) async {
-    return _osmQueue.enqueue(() async => _osm.search(country, city, query));
+    return _osmQueue.enqueue(() async => _osm.search(country, city, query),
+        goals: [OsmInteractionsGoal.SEARCH]);
   }
 }

@@ -63,7 +63,8 @@ class OpenStreetMap {
 
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
       CoordsBounds bounds) async {
-    if (!_interactionsQueue.interacting) {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_SHOPS.service)) {
       Log.e('OSM.fetchShops called outside of the queue');
     }
     final val1 = bounds.southwest.lat;
@@ -157,7 +158,8 @@ class OpenStreetMap {
 
   Future<Result<List<OsmRoad>, OpenStreetMapError>> fetchRoads(
       CoordsBounds bounds) async {
-    if (!_interactionsQueue.interacting) {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_ROADS.service)) {
       Log.e('OSM.fetchRoads called outside of the queue');
     }
     final val1 = bounds.southwest.lat;
@@ -183,7 +185,8 @@ class OpenStreetMap {
 
   Future<Result<OsmAddress, OpenStreetMapError>> fetchAddress(
       double lat, double lon) async {
-    if (!_interactionsQueue.interacting) {
+    if (!_interactionsQueue
+        .isInteracting(OsmInteractionsGoal.FETCH_ADDRESS.service)) {
       Log.e('OSM.fetchAddress called outside of the queue');
     }
     final Response r;
@@ -235,7 +238,7 @@ class OpenStreetMap {
 
   Future<Result<OsmSearchResult, OpenStreetMapError>> search(
       String country, String city, String query) async {
-    if (!_interactionsQueue.interacting) {
+    if (!_interactionsQueue.isInteracting(OsmInteractionsGoal.SEARCH.service)) {
       Log.e('OSM.search called outside of the queue');
     }
     final Response r;

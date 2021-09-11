@@ -73,8 +73,9 @@ class ShopsManager implements OpenStreetMapReceiver {
     if (existingCache != null) {
       return Ok(existingCache);
     }
-    return await _osmQueue
-        .enqueue(() => _maybeLoadShops(bounds, attemptNumber: 1));
+    return await _osmQueue.enqueue(
+        () => _maybeLoadShops(bounds, attemptNumber: 1),
+        goals: [OsmInteractionsGoal.FETCH_SHOPS]);
   }
 
   Map<String, Shop>? _loadShopsFromCache(CoordsBounds bounds) {

@@ -395,8 +395,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
       center(Text(context.strings.display_product_page_table_column1,
           style: TextStyles.normalBold)),
       center(Text(context.strings.display_product_page_table_column3,
-          textAlign: TextAlign.center,
-          style: TextStyles.normalBold)),
+          textAlign: TextAlign.center, style: TextStyles.normalBold)),
       const SizedBox(width: 24),
     ], decoration: BoxDecoration(color: nextColor())));
     final ingredients = _product.ingredientsAnalyzed!;

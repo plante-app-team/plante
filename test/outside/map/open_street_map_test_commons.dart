@@ -8,12 +8,12 @@ import '../../z_fakes/fake_http_client.dart';
 
 class _FakeAlwaysInteractingOsmQueue implements OsmInteractionsQueue {
   @override
-  Future<Result<R, E>> enqueue<R, E>(InteractionFn<R, E> interactionFn) async {
+  Future<Result<R, E>> enqueue<R, E>(InteractionFn<R, E> interactionFn,
+      {required List<OsmInteractionsGoal> goals}) async {
     return await interactionFn.call();
   }
-
   @override
-  bool get interacting => true;
+  bool isInteracting(OsmInteractionService service) => true;
 }
 
 class OpenStreetMapTestCommons {
