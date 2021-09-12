@@ -15,12 +15,15 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page_displayed_error.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
+
+const _ONLINE_SEARCH_TIMEOUT = Duration(seconds: 5);
 
 class MapSearchPageModel {
   static const MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS = 5.0;
@@ -226,8 +229,16 @@ class MapSearchPageModel {
     if (address.country == null || address.city == null) {
       return null;
     }
-    final osmSearchRes =
-        await _osmSearcher.search(address.country!, address.city!, query);
+    Result<OsmSearchResult, OpenStreetMapError> osmSearchRes;
+    try {
+      osmSearchRes = await _osmSearcher
+          .search(address.country!, address.city!, query)
+          .timeout(_ONLINE_SEARCH_TIMEOUT);
+    } on TimeoutException {
+      // Network timeout - we won't show online result
+      _maybeSendError(MapSearchPageDisplayedError.NETWORK);
+      osmSearchRes = Ok(OsmSearchResult.empty);
+    }
     if (osmSearchRes.isErr) {
       _maybeSendError(osmSearchRes.unwrapErr().convert());
       return null;

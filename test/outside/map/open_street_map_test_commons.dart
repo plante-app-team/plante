@@ -12,6 +12,7 @@ class _FakeAlwaysInteractingOsmQueue implements OsmInteractionsQueue {
       {required List<OsmInteractionsGoal> goals}) async {
     return await interactionFn.call();
   }
+
   @override
   bool isInteracting(OsmInteractionService service) => true;
 }

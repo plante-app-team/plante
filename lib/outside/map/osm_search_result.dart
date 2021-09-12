@@ -9,6 +9,8 @@ part 'osm_search_result.g.dart';
 
 abstract class OsmSearchResult
     implements Built<OsmSearchResult, OsmSearchResultBuilder> {
+  static OsmSearchResult empty = OsmSearchResult();
+
   BuiltList<OsmShop> get shops;
   BuiltList<OsmRoad> get roads;
 
