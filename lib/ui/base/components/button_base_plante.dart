@@ -40,7 +40,7 @@ class ButtonBasePlante extends StatelessWidget {
                         : backgroundColorDisabled),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30))),
+                            borderRadius: BorderRadius.circular(8))),
                     side: side != null
                         ? MaterialStateProperty.all<BorderSide>(side!)
                         : null),

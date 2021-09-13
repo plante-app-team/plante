@@ -29,7 +29,7 @@ class CheckButtonPlante extends StatelessWidget {
                     checked ? ColorsPlante.primary : const Color(0xFFF5F7FA)),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)))),
+                        borderRadius: BorderRadius.circular(8)))),
             onPressed: () {
               onChanged.call(!checked);
             },

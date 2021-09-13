@@ -87,7 +87,7 @@ class _ExpandingButton extends StatelessWidget {
                     const EdgeInsets.only(left: 10, right: 6)),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)))),
+                        borderRadius: BorderRadius.circular(8)))),
             onPressed: onPressed,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Text(text),

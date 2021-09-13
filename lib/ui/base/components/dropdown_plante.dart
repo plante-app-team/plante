@@ -37,7 +37,7 @@ class _DropdownPlanteState<T> extends State<DropdownPlante<T>> {
                 color: widget.onChanged != null
                     ? ColorsPlante.primary
                     : ColorsPlante.primaryDisabled),
-            borderRadius: const BorderRadius.all(Radius.circular(30)),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
         ),
         child: Padding(

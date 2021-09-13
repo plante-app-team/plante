@@ -86,7 +86,7 @@ class _SwitchPlanteState extends State<SwitchPlante>
           height: widget.height,
           decoration: BoxDecoration(
             color: widget.colorBackground,
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(8),
             boxShadow: widget.boxShadow != null ? [widget.boxShadow!] : null,
           ),
         ),
@@ -99,7 +99,7 @@ class _SwitchPlanteState extends State<SwitchPlante>
                 height: widget.height,
                 decoration: BoxDecoration(
                   color: widget.colorActive,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(8),
                 ))),
         SizedBox(
             height: widget.height,
@@ -117,7 +117,7 @@ class _SwitchPlanteState extends State<SwitchPlante>
               overlayColor: MaterialStateProperty.all(
                   ColorsPlante.splashColor.withAlpha(50)),
               onTap: switchClicked,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(8),
             ))
       ]),
     );

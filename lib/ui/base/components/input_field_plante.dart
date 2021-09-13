@@ -78,12 +78,12 @@ class _InputFieldPlanteState extends State<InputFieldPlante> {
             enabledBorder: const OutlineInputBorder(
               gapPadding: 2,
               borderSide: BorderSide(color: Color.fromARGB(255, 28, 32, 44)),
-              borderRadius: BorderRadius.all(Radius.circular(30)),
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             focusedBorder: const OutlineInputBorder(
               gapPadding: 2,
               borderSide: BorderSide(color: ColorsPlante.primary, width: 2),
-              borderRadius: BorderRadius.all(Radius.circular(30)),
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
           controller: widget.controller,
