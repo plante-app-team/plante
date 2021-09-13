@@ -158,3 +158,4 @@ flutter:
     - assets/location.svg
     - assets/list_drag_n_drop.svg
     - assets/search.svg
+    - assets/empty.svg

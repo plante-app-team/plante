@@ -150,6 +150,8 @@ class _MapPageState extends PageStatePlante<MapPage>
   final _hintsController = MapHintsListController();
   String? _bottomHint;
 
+  MapSearchPageResult? _latestSearchResult;
+
   bool get _loading => _model.loading;
 
   _MapPageState()
@@ -389,13 +391,19 @@ class _MapPageState extends PageStatePlante<MapPage>
             child: Column(children: [
               if (enableNewestFeatures())
                 Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: InkWell(
-                      onTap: _onSearchBarTap,
-                      child: const Hero(
-                          tag: 'search_bar',
-                          child: MapSearchBar(enabled: false)),
-                    )),
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Hero(
+                      tag: 'search_bar',
+                      child: MapSearchBar(
+                          queryOverride: _latestSearchResult?.query,
+                          enabled: false,
+                          onDisabledTap: _onSearchBarTap,
+                          onCleared: () {
+                            setState(() {
+                              _latestSearchResult = null;
+                            });
+                          })),
+                ),
               AnimatedModeWidget(child: _mode.buildHeader(context)),
               MapHintsList(controller: _hintsController),
               AnimatedModeWidget(child: _mode.buildTopActions(context)),
@@ -410,7 +418,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     ]);
 
     return WillPopScope(
-        onWillPop: _mode.onWillPop,
+        onWillPop: _onWillPop,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: SafeArea(
@@ -522,16 +530,25 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   void _onSearchBarTap() async {
-    final result = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const MapSearchPage()));
-    if (result is MapSearchPageResult) {
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                MapSearchPage(initialState: _latestSearchResult)));
+    if (result is MapSearchPageResult?) {
       await _onSearchResult(result);
     }
   }
 
-  Future<void> _onSearchResult(MapSearchPageResult result) async {
-    final shop = result.shop;
-    final road = result.road;
+  Future<void> _onSearchResult(MapSearchPageResult? result) async {
+    setState(() {
+      _latestSearchResult = result;
+    });
+    if (result == null) {
+      return;
+    }
+    final shop = result.chosenShop;
+    final road = result.chosenRoad;
     if (shop != null) {
       _mode.deselectShops();
       await _moveCameraTo(
@@ -542,6 +559,14 @@ class _MapPageState extends PageStatePlante<MapPage>
       await _moveCameraTo(
           CameraPosition(target: road.coord.toLatLng(), zoom: 17));
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_latestSearchResult != null) {
+      _onSearchBarTap();
+      return false;
+    }
+    return await _mode.onWillPop();
   }
 }
 

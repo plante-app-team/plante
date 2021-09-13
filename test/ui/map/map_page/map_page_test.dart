@@ -8,14 +8,9 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
-import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
-import 'package:plante/ui/map/search_page/map_search_page.dart';
-import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -23,7 +18,8 @@ import '../../../z_fakes/fake_analytics.dart';
 import 'map_page_modes_test_commons.dart';
 
 /// NOTE: this file contains tests only for mechanics
-/// common for all map page modes
+/// common for all map page modes or which couldn't be extracted to
+/// a separate file because they're too much unrelated
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
@@ -398,57 +394,6 @@ void main() {
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('map_shops_click'),
         {'shops': commons.shops.map((e) => e.osmId).join(', ')});
-  });
-
-  testWidgets('searchbar click opens search page', (WidgetTester tester) async {
-    when(latestCameraPosStorage.getCached())
-        .thenAnswer((_) => Coord(lat: 20, lon: 10));
-    when(latestCameraPosStorage.get())
-        .thenAnswer((_) async => Coord(lat: 20, lon: 10));
-
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-
-    expect(find.byType(MapSearchPage), findsNothing);
-    await tester.superTap(find.byType(MapSearchBar));
-    expect(find.byType(MapSearchPage), findsOneWidget);
-  });
-
-  testWidgets('shop found', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-
-    verifyNever(mapController.animateCamera(any));
-    expect(find.byType(ShopCard), findsNothing);
-
-    final shop = commons.shops.first;
-    widget.onSearchResultsForTesting(MapSearchPageResult.create(shop, null));
-    await tester.pumpAndSettle();
-
-    verify(mapController.animateCamera(any));
-    expect(find.byType(ShopCard), findsOneWidget);
-  });
-
-  testWidgets('road found', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-
-    verifyNever(mapController.animateCamera(any));
-
-    final road = OsmRoad((e) => e
-      ..osmId = '123321'
-      ..name = 'road'
-      ..latitude = 11.321
-      ..longitude = 11.321);
-    widget.onSearchResultsForTesting(MapSearchPageResult.create(null, road));
-    await tester.pumpAndSettle();
-
-    verify(mapController.animateCamera(any));
-    expect(find.byType(ShopCard), findsNothing);
   });
 }
 

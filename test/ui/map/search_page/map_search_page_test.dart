@@ -26,6 +26,7 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_model.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
+import 'package:plante/ui/map/search_page/map_search_result.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -148,8 +149,10 @@ void main() {
   });
 
   Future<BuildContext> pumpAndWaitPreloadFinish(WidgetTester tester,
-      {NavigatorObserver? navigatorObserver}) async {
-    final context = await tester.superPump(const MapSearchPage(),
+      {NavigatorObserver? navigatorObserver,
+      MapSearchPageResult? initialState}) async {
+    final context = await tester.superPump(
+        MapSearchPage(initialState: initialState),
         navigatorObserver: navigatorObserver);
     await tester.pumpAndSettle();
     return context;
@@ -668,8 +671,9 @@ void main() {
     final capturedRoute = verify(navigatorObserver.didPop(captureAny, any))
         .captured
         .first as Route<dynamic>;
-    expect(await capturedRoute.popped,
-        equals(MapSearchPageResult.create(localShops.first, null)));
+
+    final pageResult = await capturedRoute.popped as MapSearchPageResult;
+    expect(pageResult.chosenShop, localShops.first);
   });
 
   testWidgets('found road click', (WidgetTester tester) async {
@@ -698,8 +702,8 @@ void main() {
     final capturedRoute = verify(navigatorObserver.didPop(captureAny, any))
         .captured
         .first as Route<dynamic>;
-    expect(await capturedRoute.popped,
-        equals(MapSearchPageResult.create(null, localRoads.first)));
+    final pageResult = await capturedRoute.popped as MapSearchPageResult;
+    expect(pageResult.chosenRoad, localRoads.first);
   });
 
   testWidgets('shops with same name are sorted by distance to user',
@@ -929,6 +933,26 @@ void main() {
     for (final distance in expectedDistances) {
       expect(find.text(distanceMetersToStr(distance, context)), findsOneWidget);
     }
+  });
+
+  testWidgets('search page creation with initial state',
+      (WidgetTester tester) async {
+    final searchResults = MapSearchPageResult.create(
+        chosenRoad: localRoads[0],
+        query: 'cool query',
+        allFound: MapSearchResult.create(
+            localShops + foundInOsmShops, localRoads + foundInOsmRoads));
+
+    final context =
+        await pumpAndWaitPreloadFinish(tester, initialState: searchResults);
+
+    verifySearchResults(
+      tester,
+      context,
+      expectedShops: localShops + foundInOsmShops,
+      expectedRoads: localRoads + foundInOsmRoads,
+    );
+    expect(find.text('cool query'), findsOneWidget);
   });
 }
 

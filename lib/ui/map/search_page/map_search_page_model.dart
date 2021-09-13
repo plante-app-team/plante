@@ -43,9 +43,9 @@ class MapSearchPageModel {
   String _lastQuery = '';
 
   Coord? _cameraPos;
-  Future<CoordsBounds> get _searchedArea async {
+  CoordsBounds get _searchedArea {
     // Camera pos is not expected to change while the screen is opened
-    _cameraPos ??= await _cameraPosStorage.get();
+    _cameraPos ??= _cameraPosStorage.getCached();
     if (_cameraPos == null) {
       const msg = 'MapSearchPage is opened when there is no camera pos';
       Log.e(msg);
@@ -64,7 +64,11 @@ class MapSearchPageModel {
     _updateUi.call();
   }
 
-  Coord get center => _lastKnownUserPos ?? _cameraPos!;
+  Coord get center {
+    _searchedArea; // Ensure cache existence
+    return _lastKnownUserPos ?? _cameraPos!;
+  }
+
   bool get loading => _loading;
 
   MapSearchPageModel(
@@ -93,9 +97,8 @@ class MapSearchPageModel {
 
   void _initAsync() async {
     // Preload as much as possible
-    final searchedArea = await _searchedArea;
-    unawaited(_fetchRoads(searchedArea));
-    unawaited(_shopsManager.fetchShops(searchedArea));
+    unawaited(_fetchRoads(_searchedArea));
+    unawaited(_shopsManager.fetchShops(_searchedArea));
     unawaited(_fetchAddressCenter());
     _updateLastKnownUserPos();
   }
@@ -170,11 +173,9 @@ class MapSearchPageModel {
       foundOsmEntitiesIds.addAll(foundInOsm.second.map((e) => e.osmId));
     }
 
-    final searchedArea = await _searchedArea;
-
     // Step #2: search shops locally
     final foundShopsLocally = <Shop>[];
-    final fetchShopRes = await _shopsManager.fetchShops(searchedArea);
+    final fetchShopRes = await _shopsManager.fetchShops(_searchedArea);
     _maybeSendError(fetchShopRes.maybeErr()?.convert());
     if (fetchShopRes.isOk) {
       final fuzzyFoundShops =
@@ -197,7 +198,7 @@ class MapSearchPageModel {
 
     // Step #3: search roads locally
     final foundRoadsLocally = <OsmRoad>[];
-    final fetchRoadsRes = await _fetchRoads(searchedArea);
+    final fetchRoadsRes = await _fetchRoads(_searchedArea);
     _maybeSendError(fetchRoadsRes.maybeErr()?.convert());
     if (fetchRoadsRes.isOk) {
       final fuzzyFoundRoads =

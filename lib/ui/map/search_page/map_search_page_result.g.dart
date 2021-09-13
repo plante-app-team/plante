@@ -23,21 +23,44 @@ class _$MapSearchPageResultSerializer
   Iterable<Object?> serialize(
       Serializers serializers, MapSearchPageResult object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[];
+    final result = <Object?>[
+      'foundShops',
+      serializers.serialize(object.foundShops,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(Shop)])),
+      'foundRoads',
+      serializers.serialize(object.foundRoads,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(OsmRoad)])),
+    ];
     Object? value;
-    value = object.shop;
+    value = object.chosenShop;
     if (value != null) {
       result
-        ..add('shop')
+        ..add('chosenShop')
         ..add(
             serializers.serialize(value, specifiedType: const FullType(Shop)));
     }
-    value = object.road;
+    value = object.chosenRoad;
     if (value != null) {
       result
-        ..add('road')
+        ..add('chosenRoad')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(OsmRoad)));
+    }
+    value = object.query;
+    if (value != null) {
+      result
+        ..add('query')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.scrollOffset;
+    if (value != null) {
+      result
+        ..add('scrollOffset')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(double)));
     }
     return result;
   }
@@ -54,13 +77,33 @@ class _$MapSearchPageResultSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'shop':
-          result.shop.replace(serializers.deserialize(value,
+        case 'chosenShop':
+          result.chosenShop.replace(serializers.deserialize(value,
               specifiedType: const FullType(Shop))! as Shop);
           break;
-        case 'road':
-          result.road.replace(serializers.deserialize(value,
+        case 'chosenRoad':
+          result.chosenRoad.replace(serializers.deserialize(value,
               specifiedType: const FullType(OsmRoad))! as OsmRoad);
+          break;
+        case 'foundShops':
+          result.foundShops.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(Shop)]))!
+              as BuiltList<Object?>);
+          break;
+        case 'foundRoads':
+          result.foundRoads.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(OsmRoad)]))!
+              as BuiltList<Object?>);
+          break;
+        case 'query':
+          result.query = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'scrollOffset':
+          result.scrollOffset = serializers.deserialize(value,
+              specifiedType: const FullType(double)) as double?;
           break;
       }
     }
@@ -71,15 +114,35 @@ class _$MapSearchPageResultSerializer
 
 class _$MapSearchPageResult extends MapSearchPageResult {
   @override
-  final Shop? shop;
+  final Shop? chosenShop;
   @override
-  final OsmRoad? road;
+  final OsmRoad? chosenRoad;
+  @override
+  final BuiltList<Shop> foundShops;
+  @override
+  final BuiltList<OsmRoad> foundRoads;
+  @override
+  final String? query;
+  @override
+  final double? scrollOffset;
 
   factory _$MapSearchPageResult(
           [void Function(MapSearchPageResultBuilder)? updates]) =>
       (new MapSearchPageResultBuilder()..update(updates)).build();
 
-  _$MapSearchPageResult._({this.shop, this.road}) : super._();
+  _$MapSearchPageResult._(
+      {this.chosenShop,
+      this.chosenRoad,
+      required this.foundShops,
+      required this.foundRoads,
+      this.query,
+      this.scrollOffset})
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        foundShops, 'MapSearchPageResult', 'foundShops');
+    BuiltValueNullFieldError.checkNotNull(
+        foundRoads, 'MapSearchPageResult', 'foundRoads');
+  }
 
   @override
   MapSearchPageResult rebuild(
@@ -94,20 +157,35 @@ class _$MapSearchPageResult extends MapSearchPageResult {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is MapSearchPageResult &&
-        shop == other.shop &&
-        road == other.road;
+        chosenShop == other.chosenShop &&
+        chosenRoad == other.chosenRoad &&
+        foundShops == other.foundShops &&
+        foundRoads == other.foundRoads &&
+        query == other.query &&
+        scrollOffset == other.scrollOffset;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, shop.hashCode), road.hashCode));
+    return $jf($jc(
+        $jc(
+            $jc(
+                $jc($jc($jc(0, chosenShop.hashCode), chosenRoad.hashCode),
+                    foundShops.hashCode),
+                foundRoads.hashCode),
+            query.hashCode),
+        scrollOffset.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('MapSearchPageResult')
-          ..add('shop', shop)
-          ..add('road', road))
+          ..add('chosenShop', chosenShop)
+          ..add('chosenRoad', chosenRoad)
+          ..add('foundShops', foundShops)
+          ..add('foundRoads', foundRoads)
+          ..add('query', query)
+          ..add('scrollOffset', scrollOffset))
         .toString();
   }
 }
@@ -116,21 +194,45 @@ class MapSearchPageResultBuilder
     implements Builder<MapSearchPageResult, MapSearchPageResultBuilder> {
   _$MapSearchPageResult? _$v;
 
-  ShopBuilder? _shop;
-  ShopBuilder get shop => _$this._shop ??= new ShopBuilder();
-  set shop(ShopBuilder? shop) => _$this._shop = shop;
+  ShopBuilder? _chosenShop;
+  ShopBuilder get chosenShop => _$this._chosenShop ??= new ShopBuilder();
+  set chosenShop(ShopBuilder? chosenShop) => _$this._chosenShop = chosenShop;
 
-  OsmRoadBuilder? _road;
-  OsmRoadBuilder get road => _$this._road ??= new OsmRoadBuilder();
-  set road(OsmRoadBuilder? road) => _$this._road = road;
+  OsmRoadBuilder? _chosenRoad;
+  OsmRoadBuilder get chosenRoad => _$this._chosenRoad ??= new OsmRoadBuilder();
+  set chosenRoad(OsmRoadBuilder? chosenRoad) => _$this._chosenRoad = chosenRoad;
+
+  ListBuilder<Shop>? _foundShops;
+  ListBuilder<Shop> get foundShops =>
+      _$this._foundShops ??= new ListBuilder<Shop>();
+  set foundShops(ListBuilder<Shop>? foundShops) =>
+      _$this._foundShops = foundShops;
+
+  ListBuilder<OsmRoad>? _foundRoads;
+  ListBuilder<OsmRoad> get foundRoads =>
+      _$this._foundRoads ??= new ListBuilder<OsmRoad>();
+  set foundRoads(ListBuilder<OsmRoad>? foundRoads) =>
+      _$this._foundRoads = foundRoads;
+
+  String? _query;
+  String? get query => _$this._query;
+  set query(String? query) => _$this._query = query;
+
+  double? _scrollOffset;
+  double? get scrollOffset => _$this._scrollOffset;
+  set scrollOffset(double? scrollOffset) => _$this._scrollOffset = scrollOffset;
 
   MapSearchPageResultBuilder();
 
   MapSearchPageResultBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _shop = $v.shop?.toBuilder();
-      _road = $v.road?.toBuilder();
+      _chosenShop = $v.chosenShop?.toBuilder();
+      _chosenRoad = $v.chosenRoad?.toBuilder();
+      _foundShops = $v.foundShops.toBuilder();
+      _foundRoads = $v.foundRoads.toBuilder();
+      _query = $v.query;
+      _scrollOffset = $v.scrollOffset;
       _$v = null;
     }
     return this;
@@ -153,14 +255,23 @@ class MapSearchPageResultBuilder
     try {
       _$result = _$v ??
           new _$MapSearchPageResult._(
-              shop: _shop?.build(), road: _road?.build());
+              chosenShop: _chosenShop?.build(),
+              chosenRoad: _chosenRoad?.build(),
+              foundShops: foundShops.build(),
+              foundRoads: foundRoads.build(),
+              query: query,
+              scrollOffset: scrollOffset);
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'shop';
-        _shop?.build();
-        _$failedField = 'road';
-        _road?.build();
+        _$failedField = 'chosenShop';
+        _chosenShop?.build();
+        _$failedField = 'chosenRoad';
+        _chosenRoad?.build();
+        _$failedField = 'foundShops';
+        foundShops.build();
+        _$failedField = 'foundRoads';
+        foundRoads.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'MapSearchPageResult', _$failedField, e.toString());

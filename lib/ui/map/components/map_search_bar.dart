@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -33,9 +34,12 @@ class MapSearchBar extends StatefulWidget {
   final String? customPrefixSvgIcon;
   final VoidCallback? onPrefixIconTap;
   final ArgCallback<String>? onSearchTap;
+  final VoidCallback? onDisabledTap;
   final VoidCallback? onCleared;
   final Duration? searchButtonAppearanceDelay;
+  final String? queryInitial;
   final MapSearchBarQueryView? queryView;
+  final String? queryOverride;
   const MapSearchBar(
       {Key? key,
       this.enabled = true,
@@ -44,9 +48,12 @@ class MapSearchBar extends StatefulWidget {
       this.customPrefixSvgIcon,
       this.onPrefixIconTap,
       this.onSearchTap,
+      this.onDisabledTap,
       this.onCleared,
       this.searchButtonAppearanceDelay,
-      this.queryView})
+      this.queryInitial,
+      this.queryView,
+      this.queryOverride})
       : super(key: key);
 
   @override
@@ -55,14 +62,27 @@ class MapSearchBar extends StatefulWidget {
 
 class _MapSearchBarState extends State<MapSearchBar>
     with TickerProviderStateMixin {
+  static const _SIZE = 46.0;
   static const _DURATION = Duration(milliseconds: 200);
   var _canSearch = false;
   var _showSearchButton = false;
   final _textController = TextEditingController();
+  String? previousQueryOverride;
 
   @override
   void initState() {
     super.initState();
+    if (widget.queryOverride != null && widget.queryInitial != null) {
+      Log.e('Providing both query override and '
+          'initial values does not makes sense');
+    }
+    if (widget.queryOverride != null) {
+      _textController.text = widget.queryOverride!;
+    } else if (widget.queryInitial != null) {
+      _textController.text = widget.queryInitial!;
+    }
+    previousQueryOverride = widget.queryOverride;
+
     _textController.addListener(_onQueryChange);
     if (widget.enabled) {
       if (widget.searchButtonAppearanceDelay != null) {
@@ -102,6 +122,12 @@ class _MapSearchBarState extends State<MapSearchBar>
   @override
   void didUpdateWidget(MapSearchBar oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.queryOverride != null) {
+      _textController.text = widget.queryOverride!;
+    } else if (previousQueryOverride != null) {
+      _textController.text = '';
+    }
+    previousQueryOverride = widget.queryOverride;
   }
 
   @override
@@ -111,61 +137,83 @@ class _MapSearchBarState extends State<MapSearchBar>
       onTap: widget.onPrefixIconTap,
       svg: prefixSvgIcon,
     );
-    final suffixIcon = _TextFieldIcon(
-      key: const Key('map_search_bar_cancel'),
-      onTap: () {
-        _textController.clear();
-        widget.onCleared?.call();
-      },
-      svg: 'assets/cancel_circle.svg',
-    );
+
+    final showSuffixIcon = _textController.text.isNotEmpty;
+    // Why [suffixIconEmpty] and [suffixIconReally] instead of
+    // a single suffixIcon:
+    // - Sometimes we want to show a disabled search bar,
+    // - when a [TextField] is disabled, it ignores all clicks,
+    // - "all clicks" include clicks on all of its icons,
+    // - as a result, we cannot listen to clicks on icons while
+    //   the widget is disabled,
+    // - but we want to listen to such clicks,
+    // - so we put a fake icon onto the [TextField] so that the field's text
+    //   would be cut when it approaches the icon,
+    // - and we put a real icon on top of this fake icon,
+    // - the real icon's clickability is not limited by anything.
+    const suffixIconEmpty = _TextFieldIcon(svg: 'assets/empty.svg');
+    final suffixIconReally = SizedBox(
+        width: _SIZE,
+        height: _SIZE,
+        child: _TextFieldIcon(
+          key: const Key('map_search_bar_cancel'),
+          onTap: () {
+            _textController.clear();
+            widget.onCleared?.call();
+          },
+          svg: 'assets/cancel_circle.svg',
+        ));
+    final textField = Stack(children: [
+      InkWell(
+          onTap: !widget.enabled ? widget.onDisabledTap : null,
+          child: AnimatedSize(
+              duration: _DURATION,
+              vsync: this,
+              child: TextField(
+                key: const Key('map_search_bar_text_field'),
+                textCapitalization: TextCapitalization.sentences,
+                style: TextStyles.searchBarText,
+                enabled: widget.enabled,
+                autofocus: widget.autofocus,
+                focusNode: widget.focusNode,
+                decoration: InputDecoration(
+                  prefixIcon: prefixIcon,
+                  suffixIcon: showSuffixIcon ? suffixIconEmpty : null,
+                  hintText: context.strings.map_search_bar_hint,
+                  contentPadding: EdgeInsets.zero,
+                  hintStyle: TextStyles.searchBarHint,
+                  fillColor: Colors.white,
+                  filled: true,
+                  disabledBorder: const OutlineInputBorder(
+                    gapPadding: 2,
+                    borderSide: BorderSide(width: 1, color: ColorsPlante.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  enabledBorder: const OutlineInputBorder(
+                    gapPadding: 2,
+                    borderSide:
+                        BorderSide(width: 1, color: ColorsPlante.primary),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    gapPadding: 2,
+                    borderSide:
+                        BorderSide(width: 1, color: ColorsPlante.primary),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+                controller: _textController,
+              ))),
+      if (showSuffixIcon)
+        Align(alignment: Alignment.centerRight, child: suffixIconReally),
+    ]);
+
     return SizedBox(
-        height: 46,
+        height: _SIZE,
         child: Material(
             color: Colors.transparent,
             child: Row(children: [
-              Expanded(
-                  child: AnimatedSize(
-                      duration: _DURATION,
-                      vsync: this,
-                      child: TextField(
-                        key: const Key('map_search_bar_text_field'),
-                        textCapitalization: TextCapitalization.sentences,
-                        style: TextStyles.searchBarText,
-                        enabled: widget.enabled,
-                        autofocus: widget.autofocus,
-                        focusNode: widget.focusNode,
-                        decoration: InputDecoration(
-                          prefixIcon: prefixIcon,
-                          suffixIcon: _textController.text.isNotEmpty
-                              ? suffixIcon
-                              : null,
-                          hintText: context.strings.map_search_bar_hint,
-                          contentPadding: EdgeInsets.zero,
-                          hintStyle: TextStyles.searchBarHint,
-                          fillColor: Colors.white,
-                          filled: true,
-                          disabledBorder: const OutlineInputBorder(
-                            gapPadding: 2,
-                            borderSide:
-                                BorderSide(width: 1, color: ColorsPlante.grey),
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                          enabledBorder: const OutlineInputBorder(
-                            gapPadding: 2,
-                            borderSide: BorderSide(
-                                width: 1, color: ColorsPlante.primary),
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                          focusedBorder: const OutlineInputBorder(
-                            gapPadding: 2,
-                            borderSide: BorderSide(
-                                width: 1, color: ColorsPlante.primary),
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        controller: _textController,
-                      ))),
+              Expanded(child: textField),
               AnimatedSize(
                   duration: _DURATION,
                   vsync: this,
@@ -190,7 +238,7 @@ class _MapSearchBarState extends State<MapSearchBar>
 class _TextFieldIcon extends StatelessWidget {
   final VoidCallback? onTap;
   final String svg;
-  const _TextFieldIcon({Key? key, required this.onTap, required this.svg})
+  const _TextFieldIcon({Key? key, this.onTap, required this.svg})
       : super(key: key);
 
   @override

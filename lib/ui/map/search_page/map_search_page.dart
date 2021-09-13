@@ -28,7 +28,8 @@ import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
 
 class MapSearchPage extends StatefulWidget {
-  const MapSearchPage({Key? key}) : super(key: key);
+  final MapSearchPageResult? initialState;
+  const MapSearchPage({Key? key, this.initialState}) : super(key: key);
 
   @override
   _MapSearchPageState createState() => _MapSearchPageState();
@@ -40,6 +41,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   final _analytics = GetIt.I.get<Analytics>();
   final _searchBarFocusNode = FocusNode();
   final _querySource = MapSearchBarQueryView();
+  late final ScrollController _scrollController;
 
   late final MapSearchPageModel _model;
   MapSearchResult? _lastSearchResult;
@@ -64,9 +66,20 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       GetIt.I.get<LocationController>(),
       () => _querySource.query,
       _querySource.queryChanges,
-      () => setState(() {}),
+      () => () {
+        if (mounted) {
+          setState(() {});
+        }
+      },
       _displayError,
     );
+    final initialState = widget.initialState;
+    if (initialState != null) {
+      _lastSearchResult = MapSearchResult.create(
+          initialState.foundShops, initialState.foundRoads);
+    }
+    _scrollController = ScrollController(
+        initialScrollOffset: initialState?.scrollOffset ?? 0.0);
   }
 
   @override
@@ -89,6 +102,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                   Navigator.of(context).pop();
                 },
                 focusNode: _searchBarFocusNode,
+                queryInitial: widget.initialState?.query,
                 queryView: _querySource,
                 searchButtonAppearanceDelay: _ANIMATION_END_AWAIT_DURATION,
                 onSearchTap: _onSearchTap,
@@ -97,7 +111,10 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       Expanded(
           child: Padding(
               padding: const EdgeInsets.only(top: 12),
-              child: ListView(children: _searchResults()))),
+              child: ListView(
+                controller: _scrollController,
+                children: _searchResults(),
+              ))),
     ]);
 
     return Scaffold(
@@ -192,11 +209,19 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   }
 
   void _finishWithShop(Shop shop) {
-    Navigator.of(context).pop(MapSearchPageResult.create(shop, null));
+    Navigator.of(context).pop(MapSearchPageResult.create(
+        query: _querySource.query,
+        chosenShop: shop,
+        allFound: _lastSearchResult,
+        scrollOffset: _scrollController.offset));
   }
 
   void _finishWithRoad(OsmRoad road) {
-    Navigator.of(context).pop(MapSearchPageResult.create(null, road));
+    Navigator.of(context).pop(MapSearchPageResult.create(
+        query: _querySource.query,
+        chosenRoad: road,
+        allFound: _lastSearchResult,
+        scrollOffset: _scrollController.offset));
   }
 
   void _onQueryCleared() {

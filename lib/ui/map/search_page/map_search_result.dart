@@ -7,6 +7,7 @@ import 'package:plante/outside/map/osm_road.dart';
 
 part 'map_search_result.g.dart';
 
+/// All results found by the search mechanism.
 abstract class MapSearchResult
     implements Built<MapSearchResult, MapSearchResultBuilder> {
   /// When null then search is still in progress
