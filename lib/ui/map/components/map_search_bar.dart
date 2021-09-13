@@ -6,6 +6,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -176,6 +177,9 @@ class _MapSearchBarState extends State<MapSearchBar>
                 enabled: widget.enabled,
                 autofocus: widget.autofocus,
                 focusNode: widget.focusNode,
+                onSubmitted: (query) {
+                  widget.onSearchTap?.call(query);
+                },
                 decoration: InputDecoration(
                   prefixIcon: prefixIcon,
                   suffixIcon: showSuffixIcon ? suffixIconEmpty : null,
