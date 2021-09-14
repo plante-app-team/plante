@@ -33,7 +33,7 @@ class ButtonBasePlante extends StatelessWidget {
             child: OutlinedButton(
                 style: ButtonStyle(
                     padding: MaterialStateProperty.all(
-                        const EdgeInsets.only(left: 24, right: 24)),
+                        const EdgeInsets.only(left: 10, right: 10)),
                     overlayColor: MaterialStateProperty.all(overlayColor),
                     backgroundColor: MaterialStateProperty.all(onPressed != null
                         ? backgroundColorEnabled
