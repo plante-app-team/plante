@@ -389,21 +389,20 @@ class _MapPageState extends PageStatePlante<MapPage>
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
-              if (enableNewestFeatures())
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Hero(
-                      tag: 'search_bar',
-                      child: MapSearchBar(
-                          queryOverride: _latestSearchResult?.query,
-                          enabled: false,
-                          onDisabledTap: _onSearchBarTap,
-                          onCleared: () {
-                            setState(() {
-                              _latestSearchResult = null;
-                            });
-                          })),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Hero(
+                    tag: 'search_bar',
+                    child: MapSearchBar(
+                        queryOverride: _latestSearchResult?.query,
+                        enabled: false,
+                        onDisabledTap: _onSearchBarTap,
+                        onCleared: () {
+                          setState(() {
+                            _latestSearchResult = null;
+                          });
+                        })),
+              ),
               AnimatedModeWidget(child: _mode.buildHeader(context)),
               MapHintsList(controller: _hintsController),
               AnimatedModeWidget(child: _mode.buildTopActions(context)),
