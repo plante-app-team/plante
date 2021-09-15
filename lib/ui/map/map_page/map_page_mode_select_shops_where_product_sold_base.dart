@@ -56,8 +56,8 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  ShopCard createCardFor(
-      Shop shop, FutureAddress address, ArgCallback<Shop>? cancelCallback) {
+  ShopCard createCardFor(Shop shop, FutureShortAddress address,
+      ArgCallback<Shop>? cancelCallback) {
     final Product product;
     if (widget.product != null) {
       product = widget.product!;

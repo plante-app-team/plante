@@ -17,7 +17,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
 
   @protected
   ShopCard createCardFor(
-      Shop shop, FutureAddress address, ArgCallback<Shop>? cancelCallback);
+      Shop shop, FutureShortAddress address, ArgCallback<Shop>? cancelCallback);
 
   @mustCallSuper
   @override

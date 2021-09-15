@@ -14,6 +14,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -35,8 +36,7 @@ class MapPageModesTestCommons {
 
   final shopsManagerListeners = <ShopsManagerListener>[];
 
-  final FutureAddress readyAddress =
-      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
+  final readyAddress = OsmAddress((e) => e.road = 'Broadway');
 
   final shops = [
     Shop((e) => e
@@ -150,8 +150,12 @@ class MapPageModesTestCommons {
     when(latestCameraPosStorage.getCached()).thenAnswer((_) => null);
     when(latestCameraPosStorage.set(any)).thenAnswer((_) async {});
 
-    when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
-    when(addressObtainer.addressOfCoords(any)).thenAnswer((_) => readyAddress);
+    when(addressObtainer.addressOfShop(any))
+        .thenAnswer((_) async => Ok(readyAddress.toShort()));
+    when(addressObtainer.addressOfCoords(any))
+        .thenAnswer((_) async => Ok(readyAddress));
+    when(addressObtainer.shortAddressOfCoords(any))
+        .thenAnswer((_) async => Ok(readyAddress.toShort()));
 
     when(roadsManager.fetchRoadsWithinAndNearby(any))
         .thenAnswer((_) async => Ok(const []));

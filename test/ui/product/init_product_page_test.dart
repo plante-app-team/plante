@@ -24,6 +24,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -112,7 +113,7 @@ void main() {
 
     addressObtainer = MockAddressObtainer();
     when(addressObtainer.addressOfShop(any))
-        .thenAnswer((_) async => Ok(OsmAddress.empty));
+        .thenAnswer((_) async => Ok(OsmShortAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     inputProductsLangStorage =

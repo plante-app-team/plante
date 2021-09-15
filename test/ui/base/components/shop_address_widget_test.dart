@@ -7,6 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -22,18 +23,17 @@ void main() {
   }
 
   testWidgets('good scenario', (WidgetTester tester) async {
-    final addressCompleter = Completer<AddressResult>();
-    final address = OsmAddress((e) => e
-      ..neighbourhood = 'Nice neighbourhood' // Expected to be not used
+    final addressCompleter = Completer<ShortAddressResult>();
+    final address = OsmShortAddress((e) => e
+      ..city = 'Nice city'
       ..road = 'Broadway'
-      ..cityDistrict = 'Nice district'
       ..houseNumber = '4');
 
     final context =
         await tester.superPump(ShopAddressWidget(addressCompleter.future));
     final expectedStr =
         '${context.strings.shop_address_widget_possible_address}'
-        'Nice district, Broadway, 4';
+        'Broadway, 4';
 
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
     expect(find.byKey(const Key('address_placeholder')), findsOneWidget);
@@ -48,10 +48,7 @@ void main() {
   });
 
   testWidgets('partial address', (WidgetTester tester) async {
-    final address = OsmAddress((e) => e
-      ..road = 'Broadway'
-      ..cityDistrict = null
-      ..houseNumber = '4');
+    final address = OsmShortAddress((e) => e..road = 'Broadway');
 
     final context =
         await tester.superPump(ShopAddressWidget(Future.value(Ok(address))));
@@ -59,7 +56,7 @@ void main() {
 
     final expectedStr =
         '${context.strings.shop_address_widget_possible_address}'
-        'Broadway, 4';
+        'Broadway';
     expect(getText(), equals(expectedStr));
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
     expect(find.byKey(const Key('address_placeholder')), findsNothing);
@@ -67,9 +64,9 @@ void main() {
 
   testWidgets('house number is not used without road',
       (WidgetTester tester) async {
-    final address = OsmAddress((e) => e
+    final address = OsmShortAddress((e) => e
+      ..city = 'Nice city'
       ..road = null
-      ..cityDistrict = 'Nice district'
       ..houseNumber = '4');
 
     final context =
@@ -78,16 +75,16 @@ void main() {
 
     final expectedStr =
         '${context.strings.shop_address_widget_possible_address}'
-        'Nice district';
+        'Nice city';
     expect(getText(), equals(expectedStr));
     expect(find.byKey(const Key('location_icon')), findsOneWidget);
     expect(find.byKey(const Key('address_placeholder')), findsNothing);
   });
 
   testWidgets('empty address', (WidgetTester tester) async {
-    final address = OsmAddress((e) => e
+    final address = OsmShortAddress((e) => e
       ..road = null
-      ..cityDistrict = null
+      ..city = null
       ..houseNumber = null);
 
     await tester.superPump(ShopAddressWidget(Future.value(Ok(address))));

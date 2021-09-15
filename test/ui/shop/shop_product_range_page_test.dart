@@ -27,6 +27,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -98,8 +99,8 @@ void main() {
     ..products.addAll(products)
     ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
 
-  final FutureAddress readyAddress =
-      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
+  final FutureShortAddress readyAddress =
+      Future.value(Ok(OsmShortAddress((e) => e.road = 'Broadway')));
 
   setUp(() async {
     await GetIt.I.reset();

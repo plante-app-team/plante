@@ -21,6 +21,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/shop_address_widget.dart';
@@ -61,8 +62,8 @@ void main() {
     ..barcode = '123456'
     ..name = 'Product name').productForTests();
 
-  final FutureAddress readyAddress =
-      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
+  final FutureShortAddress readyAddress =
+      Future.value(Ok(OsmShortAddress((e) => e.road = 'Broadway')));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -76,7 +77,7 @@ void main() {
     GetIt.I.registerSingleton<Backend>(backend);
     final addressObtainer = MockAddressObtainer();
     when(addressObtainer.addressOfShop(any))
-        .thenAnswer((_) async => Ok(OsmAddress.empty));
+        .thenAnswer((_) async => Ok(OsmShortAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     final params = UserParams((v) => v

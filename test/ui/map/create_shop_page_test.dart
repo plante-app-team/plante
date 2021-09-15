@@ -25,8 +25,7 @@ void main() {
   late MockShopsManager shopsManager;
   late MockAddressObtainer addressObtainer;
 
-  final FutureAddress readyAddress =
-      Future.value(Ok(OsmAddress((e) => e..road = 'Broadway')));
+  final readyAddress = OsmAddress((e) => e..road = 'Broadway');
   final coord = Coord(lat: 3.4, lon: 1.2);
 
   setUp(() async {
@@ -58,7 +57,9 @@ void main() {
           ..productsCount = 0))));
     });
     when(addressObtainer.addressOfCoords(any))
-        .thenAnswer((_) async => readyAddress);
+        .thenAnswer((_) async => Ok(readyAddress));
+    when(addressObtainer.shortAddressOfCoords(any))
+        .thenAnswer((_) async => Ok(readyAddress.toShort()));
   });
 
   Future<void> createShopTestImpl(WidgetTester tester,

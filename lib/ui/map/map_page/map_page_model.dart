@@ -149,7 +149,7 @@ class MapPageModel implements ShopsManagerListener {
     });
   }
 
-  FutureAddress addressOf(Shop shop) async {
+  FutureShortAddress addressOf(Shop shop) async {
     return await _addressObtainer.addressOfShop(shop);
   }
 

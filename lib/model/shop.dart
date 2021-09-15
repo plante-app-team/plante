@@ -29,6 +29,10 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
 
   Coord get coord => Coord(lat: latitude, lon: longitude);
 
+  String? get city => osmShop.city;
+  String? get road => osmShop.road;
+  String? get houseNumber => osmShop.houseNumber;
+
   static Shop? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(Shop.serializer, json);

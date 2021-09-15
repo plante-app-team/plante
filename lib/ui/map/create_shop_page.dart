@@ -70,7 +70,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                             style: TextStyles.headline4)),
                     const SizedBox(height: 4),
                     ShopAddressWidget(
-                        _addressObtainer.addressOfCoords(widget.shopCoord))
+                        _addressObtainer.shortAddressOfCoords(widget.shopCoord))
                   ]))
             ],
           )),

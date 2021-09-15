@@ -1,6 +1,7 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 
 part 'osm_address.g.dart';
 
@@ -14,6 +15,11 @@ abstract class OsmAddress implements Built<OsmAddress, OsmAddressBuilder> {
   String? get city;
   String? get country;
   String? get countryCode;
+
+  OsmShortAddress toShort() => OsmShortAddress((e) => e
+    ..city = city
+    ..road = road
+    ..houseNumber = houseNumber);
 
   static OsmAddress? fromJson(Map<String, dynamic> json) {
     return BuildValueHelper.jsonSerializers

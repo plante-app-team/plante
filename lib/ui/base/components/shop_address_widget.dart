@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -9,7 +10,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/l10n/strings.dart';
 
 class ShopAddressWidget extends StatefulWidget {
-  final FutureAddress osmAddress;
+  final FutureShortAddress osmAddress;
   const ShopAddressWidget(this.osmAddress, {Key? key}) : super(key: key);
 
   @override
@@ -18,7 +19,7 @@ class ShopAddressWidget extends StatefulWidget {
 
 class _ShopAddressWidgetState extends State<ShopAddressWidget>
     with SingleTickerProviderStateMixin {
-  AddressResult? _loadedResult;
+  ShortAddressResult? _loadedResult;
 
   @override
   void initState() {
@@ -107,23 +108,19 @@ class _ShopAddressWidgetState extends State<ShopAddressWidget>
     final osmAddress = _loadedResult!.unwrap();
     final String result;
     if (osmAddress.road != null) {
-      result = [
-        osmAddress.cityDistrict ?? '',
+      return [
         osmAddress.road ?? '',
         osmAddress.houseNumber ?? '',
       ].where((e) => e.isNotEmpty).join(', ');
     } else {
-      result =
-          [osmAddress.cityDistrict ?? ''].where((e) => e.isNotEmpty).join(', ');
+      result = [osmAddress.city ?? ''].where((e) => e.isNotEmpty).join(', ');
     }
     return result.isNotEmpty ? result : null;
   }
 }
 
-extension _OsmAddressExt on OsmAddress {
+extension _OsmShortAddressExt on OsmShortAddress {
   bool isEmpty() {
-    return (cityDistrict ?? '').trim().isEmpty &&
-        (road ?? '').trim().isEmpty &&
-        (houseNumber ?? '').trim().isEmpty;
+    return (road ?? '').trim().isEmpty && (houseNumber ?? '').trim().isEmpty;
   }
 }

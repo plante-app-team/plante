@@ -23,7 +23,7 @@ class ShopProductRangePageModel {
   final AddressObtainer _addressObtainer;
 
   final Shop _shop;
-  late final FutureAddress _address;
+  late final FutureShortAddress _address;
 
   final VoidCallback _updateCallback;
 
@@ -162,5 +162,5 @@ class ShopProductRangePageModel {
     }
   }
 
-  FutureAddress address() => _address;
+  FutureShortAddress address() => _address;
 }

@@ -17,7 +17,7 @@ typedef ShopCardProductSoldChangeCallback = dynamic Function(
 
 class ShopCard extends StatelessWidget {
   final Shop shop;
-  final FutureAddress address;
+  final FutureShortAddress address;
   final ArgCallback<Shop>? cancelCallback;
 
   final Product? checkedProduct;
@@ -37,7 +37,7 @@ class ShopCard extends StatelessWidget {
   factory ShopCard.forProductRange(
       {Key? key,
       required Shop shop,
-      required FutureAddress address,
+      required FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback}) {
     return ShopCard._(
         key: key,
@@ -51,7 +51,7 @@ class ShopCard extends StatelessWidget {
       {Key? key,
       required Product product,
       required Shop shop,
-      required FutureAddress address,
+      required FutureShortAddress address,
       required bool? isProductSold,
       required ShopCardProductSoldChangeCallback onIsProductSoldChanged,
       ArgCallback<Shop>? cancelCallback}) {
