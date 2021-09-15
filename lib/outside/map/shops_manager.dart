@@ -14,7 +14,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_requester.dart';
@@ -23,14 +23,14 @@ import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/base/date_time_extensions.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
-class ShopsManager implements OpenStreetMapReceiver {
+class ShopsManager {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
   final Analytics _analytics;
   final OsmCacher _osmCacher;
-  final OsmInteractionsQueue _osmQueue;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
+  final OpenStreetMap _osm;
   late final ShopsRequester _requester;
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
@@ -41,15 +41,9 @@ class ShopsManager implements OpenStreetMapReceiver {
 
   int get loadedAreasCount => _loadedAreas.length;
 
-  ShopsManager(
-      OpenStreetMapHolder osmHolder,
-      Backend backend,
-      ProductsObtainer productsObtainer,
-      this._analytics,
-      this._osmCacher,
-      this._osmQueue) {
-    _requester = ShopsRequester(
-        osmHolder.getOsm(whoAsks: this), backend, productsObtainer);
+  ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
+      this._analytics, this._osmCacher)
+      : _requester = ShopsRequester(backend, productsObtainer) {
     _fetchShopsHelper = ShopsManagerFetchShopsHelper(_requester, _osmCacher);
   }
 
@@ -73,9 +67,8 @@ class ShopsManager implements OpenStreetMapReceiver {
     if (existingCache != null) {
       return Ok(existingCache);
     }
-    return await _osmQueue.enqueue(
-        () => _maybeLoadShops(bounds, attemptNumber: 1),
-        goals: [OsmInteractionsGoal.FETCH_SHOPS]);
+    return await _osm.withOverpass((overpass) async =>
+        await _maybeLoadShops(overpass, bounds, attemptNumber: 1));
   }
 
   Map<String, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
@@ -93,14 +86,14 @@ class ShopsManager implements OpenStreetMapReceiver {
   }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
-      CoordsBounds bounds,
+      OsmOverpass overpass, CoordsBounds bounds,
       {required int attemptNumber}) async {
     final existingCache = _loadShopsFromCache(bounds);
     if (existingCache != null) {
       return Ok(existingCache);
     }
 
-    final shopsFetchResult = await _fetchShopsHelper.fetchShops(
+    final shopsFetchResult = await _fetchShopsHelper.fetchShops(overpass,
         viewPort: bounds,
         osmBoundsSizesToRequest: [100, 30],
         planteBoundsSizeToRequest: 20);
@@ -113,7 +106,8 @@ class ShopsManager implements OpenStreetMapReceiver {
         if (attemptNumber >= MAX_SHOPS_LOADS_ATTEMPTS) {
           return Err(shopsFetchResult.unwrapErr());
         }
-        return _maybeLoadShops(bounds, attemptNumber: attemptNumber + 1);
+        return _maybeLoadShops(overpass, bounds,
+            attemptNumber: attemptNumber + 1);
       }
     }
 

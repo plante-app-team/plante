@@ -5,34 +5,31 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm_nominatim.dart';
 
 typedef AddressResult = Result<OsmAddress, OpenStreetMapError>;
 typedef FutureAddress = Future<AddressResult>;
 
-class AddressObtainer implements OpenStreetMapReceiver {
+class AddressObtainer {
   late final OpenStreetMap _osm;
-  final OsmInteractionsQueue _osmQueue;
   final _cache = <String, OsmAddress>{};
 
-  AddressObtainer(OpenStreetMapHolder osmHolder, this._osmQueue) {
-    _osm = osmHolder.getOsm(whoAsks: this);
-  }
+  AddressObtainer(this._osm);
 
   FutureAddress addressOfShop(Shop shop) async {
     if (_cache.containsKey(shop.osmId)) {
       return Ok(_cache[shop.osmId]!);
     }
-    return await _osmQueue.enqueue(
-        () => _fetchAddress(shop.latitude, shop.longitude, shop.osmId),
-        goals: [OsmInteractionsGoal.FETCH_ADDRESS]);
+    return await _osm.withNominatim((nominatim) async => await _fetchAddress(
+        nominatim, shop.latitude, shop.longitude, shop.osmId));
   }
 
-  FutureAddress _fetchAddress(double lat, double lon, String? osmId) async {
+  FutureAddress _fetchAddress(
+      OsmNominatim nominatim, double lat, double lon, String? osmId) async {
     if (osmId != null && _cache.containsKey(osmId)) {
       return Ok(_cache[osmId]!);
     }
-    final result = await _osm.fetchAddress(lat, lon);
+    final result = await nominatim.fetchAddress(lat, lon);
     if (result.isOk && osmId != null) {
       _cache[osmId] = result.unwrap();
     }
@@ -40,8 +37,7 @@ class AddressObtainer implements OpenStreetMapReceiver {
   }
 
   FutureAddress addressOfCoords(Coord coords) async {
-    return await _osmQueue.enqueue(
-        () => _fetchAddress(coords.lat, coords.lon, null),
-        goals: [OsmInteractionsGoal.FETCH_ADDRESS]);
+    return await _osm.withNominatim((nominatim) async =>
+        await _fetchAddress(nominatim, coords.lat, coords.lon, null));
   }
 }

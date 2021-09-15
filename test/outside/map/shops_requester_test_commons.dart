@@ -5,7 +5,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import '../../common_mocks.mocks.dart';
 
 class ShopsRequesterTestCommons {
-  late MockOpenStreetMap osm;
+  late MockOsmOverpass osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
 
@@ -55,7 +55,7 @@ class ShopsRequesterTestCommons {
         ..backendShop.replace(someBackendShops['2']!)),
     };
 
-    osm = MockOpenStreetMap();
+    osm = MockOsmOverpass();
     backend = MockBackend();
     productsObtainer = MockProductsObtainer();
   }

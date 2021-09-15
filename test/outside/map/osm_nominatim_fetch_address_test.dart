@@ -1,5 +1,6 @@
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_nominatim.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_http_client.dart';
@@ -8,13 +9,13 @@ import 'open_street_map_test_commons.dart';
 void main() {
   late OpenStreetMapTestCommons commons;
   late FakeHttpClient http;
-  late OpenStreetMap osm;
+  late OsmNominatim nominatim;
 
   setUp(() async {
     commons = OpenStreetMapTestCommons();
     await commons.setUp();
     http = commons.http;
-    osm = commons.osm;
+    nominatim = commons.nominatim;
   });
 
   test('fetchAddress good scenario', () async {
@@ -51,7 +52,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -86,7 +87,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -106,7 +107,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -136,7 +137,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -166,7 +167,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -196,7 +197,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -226,7 +227,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -256,7 +257,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -286,7 +287,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     final address = addressRes.unwrap();
     expect(
         address,
@@ -315,7 +316,7 @@ void main() {
     ''';
     http.setResponse('.*', osmResp, responseCode: 400);
 
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 
@@ -333,7 +334,7 @@ void main() {
     }
     ''';
     http.setResponse('.*', osmResp);
-    final addressRes = await osm.fetchAddress(123, 321);
+    final addressRes = await nominatim.fetchAddress(123, 321);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
 }

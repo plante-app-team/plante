@@ -5,6 +5,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm_cached_territory.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_requester.dart';
@@ -30,6 +31,7 @@ class ShopsManagerFetchShopsHelper {
   /// Seconds size will be requested if first size request has failed.
   /// Third is the same as the second, and fourth, and so on.
   Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
+      OsmOverpass overpass,
       {required CoordsBounds viewPort,
       required List<double> osmBoundsSizesToRequest,
       required double planteBoundsSizeToRequest}) async {
@@ -50,7 +52,7 @@ class ShopsManagerFetchShopsHelper {
 
     // At first let's try to use cached OSM territory
     if (osmCachedTerritory != null && !_isOld(osmCachedTerritory)) {
-      fetchResult = await _impl.fetchShops(
+      fetchResult = await _impl.fetchShops(overpass,
           osmBounds: osmCachedTerritory.bounds,
           planteBounds: planteShopsBounds,
           preloadedOsmShops: osmCachedTerritory.entities);
@@ -64,6 +66,7 @@ class ShopsManagerFetchShopsHelper {
     for (final osmBoundsSize in osmBoundsSizesToRequest) {
       osmBounds = viewPort.center.makeSquare(kmToGrad(osmBoundsSize));
       fetchResult = await _impl.fetchShops(
+        overpass,
         osmBounds: osmBounds,
         planteBounds: planteShopsBounds,
         preloadedOsmShops: null,
@@ -85,7 +88,7 @@ class ShopsManagerFetchShopsHelper {
     // Let's use cached territory even if it's old, or.. or return the error
     // if there's no cache.
     if (osmCachedTerritory != null) {
-      fetchResult = await _impl.fetchShops(
+      fetchResult = await _impl.fetchShops(overpass,
           osmBounds: osmCachedTerritory.bounds,
           planteBounds: planteShopsBounds,
           preloadedOsmShops: osmCachedTerritory.entities);

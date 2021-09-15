@@ -13,7 +13,8 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_nominatim.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -23,8 +24,6 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
-
-import 'common_mocks.mocks.dart';
 
 @GenerateMocks([
   AddressObtainer,
@@ -38,7 +37,8 @@ import 'common_mocks.mocks.dart';
   LatestCameraPosStorage,
   LocationController,
   OffApi,
-  OpenStreetMap,
+  OsmNominatim,
+  OsmOverpass,
   OsmSearcher,
   PermissionsManager,
   PhotosTaker,
@@ -59,14 +59,3 @@ void unusedFunctionForCommonMocks() {}
 @GenerateMocks([],
     customMocks: [MockSpec<NavigatorObserver>(returnNullOnMissingStub: true)])
 void unusedFunctionForCommonStubbedMocks() {}
-
-extension OsmMockExt on MockOpenStreetMap {
-  OpenStreetMapHolder asHolder() => _FakeOpenStreetMapHolder(this);
-}
-
-class _FakeOpenStreetMapHolder implements OpenStreetMapHolder {
-  final OpenStreetMap _osm;
-  _FakeOpenStreetMapHolder(this._osm);
-  @override
-  OpenStreetMap getOsm({required OpenStreetMapReceiver whoAsks}) => _osm;
-}

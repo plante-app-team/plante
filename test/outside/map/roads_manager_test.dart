@@ -2,18 +2,17 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
 void main() {
-  late MockOpenStreetMap osm;
+  late MockOsmOverpass osm;
   late OsmCacher cacher;
   late RoadsManager roadsManager;
 
@@ -39,7 +38,7 @@ void main() {
   ];
 
   setUp(() async {
-    osm = MockOpenStreetMap();
+    osm = MockOsmOverpass();
     cacher = FakeOsmCacher();
 
     when(osm.fetchRoads(any)).thenAnswer((invc) async {
@@ -48,7 +47,8 @@ void main() {
           fullRoads.where((road) => bounds.contains(road.coord)).toList());
     });
 
-    roadsManager = RoadsManager(osm.asHolder(), cacher, OsmInteractionsQueue());
+    roadsManager =
+        RoadsManager(OpenStreetMap.forTesting(overpass: osm), cacher);
   });
 
   test('roads fetched and then cached', () async {

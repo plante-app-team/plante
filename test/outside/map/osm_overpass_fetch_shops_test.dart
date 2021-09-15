@@ -1,6 +1,7 @@
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
@@ -12,40 +13,15 @@ void main() {
   late OpenStreetMapTestCommons commons;
   late FakeHttpClient http;
   late FakeAnalytics analytics;
-  late OpenStreetMap osm;
+  late OsmOverpass overpass;
 
   setUp(() async {
     commons = OpenStreetMapTestCommons();
     await commons.setUp();
     http = commons.http;
     analytics = commons.analytics;
-    osm = commons.osm;
+    overpass = commons.overpass;
   });
-
-  /// Second, third, ... Overpass URLs are queried when a query to the previous
-  /// has failed in a specific case.
-  /// All overpass URLs would be expected to be queried when there are a lot
-  /// of such failures.
-  void expectAllOverpassUrlsQueried() {
-    final forcedOrdered = osm.osmOverpassUrls.values.toList();
-    for (var index = 0; index < forcedOrdered.length; ++index) {
-      expect(http.getRequestsMatching('.*${forcedOrdered[index]}.*').length,
-          equals(1));
-    }
-  }
-
-  /// Other than the first Overpass URL are queried only on specific errors
-  /// of the first URL.
-  /// So if such a specific failure did not occur, or no failure occurred
-  /// at all, then only a single URL would be expected to be queried.
-  void expectSingleOverpassUrlQueried() {
-    final forcedOrdered = osm.osmOverpassUrls.values.toList();
-    for (var index = 0; index < forcedOrdered.length; ++index) {
-      final expectedCount = index == 0 ? 1 : 0;
-      expect(http.getRequestsMatching('.*${forcedOrdered[index]}.*').length,
-          equals(expectedCount));
-    }
-  }
 
   test('fetchShops good scenario', () async {
     const osmResp = '''
@@ -103,7 +79,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(3));
@@ -130,7 +106,7 @@ void main() {
     expect(shops, contains(expectedShop2));
     expect(shops, contains(expectedShop3));
 
-    expectSingleOverpassUrlQueried(); // See function comment
+    commons.expectSingleOverpassUrlQueried(); // See function comment
   });
 
   test('fetchShops empty response', () async {
@@ -143,12 +119,12 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrap().length, equals(0));
 
     // Empty response is still a successful response
-    expectSingleOverpassUrlQueried(); // See function comment
+    commons.expectSingleOverpassUrlQueried(); // See function comment
   });
 
   test('fetchShops not 200', () async {
@@ -161,12 +137,12 @@ void main() {
 
     http.setResponse('.*', osmResp, responseCode: 400);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // On HTTP errors all Overpass URLs expected to be queried 1 by 1
-    expectAllOverpassUrlsQueried(); // See function comment
+    commons.expectAllOverpassUrlsQueried(); // See function comment
   });
 
   test('fetchShops 400 for 1st and 2nd URLs and 200 for 3rd', () async {
@@ -177,7 +153,7 @@ void main() {
     }
     ''';
 
-    final forcedOrderedUrls = osm.osmOverpassUrls.values.toList();
+    final forcedOrderedUrls = overpass.urls.values.toList();
     http.setResponse('.*${forcedOrderedUrls[0]}.*', okOsmResp,
         responseCode: 400);
     http.setResponse('.*${forcedOrderedUrls[1]}.*', okOsmResp,
@@ -187,7 +163,7 @@ void main() {
     http.setResponse('.*${forcedOrderedUrls[3]}.*', okOsmResp,
         responseCode: 400);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.isOk, isTrue);
 
@@ -209,19 +185,18 @@ void main() {
       http.reset();
       http.setResponse('.*', '', responseCode: httpResponseCode);
 
-      await osm.fetchShops(CoordsBounds(
+      await overpass.fetchShops(CoordsBounds(
           southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
 
       // We expect analytics event only in case of 2 error codes
       if (httpResponseCode == 403 || httpResponseCode == 429) {
-        for (final urlName in osm.osmOverpassUrls.keys) {
+        for (final urlName in overpass.urls.keys) {
           expect(
               analytics
                   .wasEventSent('osm_${urlName}_failure_$httpResponseCode'),
               isTrue);
         }
-        expect(
-            analytics.allEvents().length, equals(osm.osmOverpassUrls.length));
+        expect(analytics.allEvents().length, equals(overpass.urls.length));
       } else {
         expect(analytics.allEvents(), isEmpty);
       }
@@ -237,12 +212,12 @@ void main() {
     ''';
 
     http.setResponse('.*', osmResp);
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // Response with an invalid JSON is still a successful response
-    expectSingleOverpassUrlQueried(); // See function comment
+    commons.expectSingleOverpassUrlQueried(); // See function comment
   });
 
   test('fetchShops no elements in json', () async {
@@ -254,12 +229,12 @@ void main() {
     ''';
 
     http.setResponse('.*', osmResp);
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // Empty response is still a successful response
-    expectSingleOverpassUrlQueried(); // See function comment
+    commons.expectSingleOverpassUrlQueried(); // See function comment
   });
 
   test('fetchShops shop without name', () async {
@@ -291,7 +266,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
@@ -327,7 +302,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(2));
@@ -378,7 +353,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
@@ -415,7 +390,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
@@ -452,7 +427,7 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await osm.fetchShops(CoordsBounds(
+    final shopsRes = await overpass.fetchShops(CoordsBounds(
         southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
@@ -461,9 +436,9 @@ void main() {
 
   test('fetchShops overpass URLs order', () async {
     // Note: in a general case testing order of items of a map is weird.
-    // But [osmOverpassUrls] is prioritized - first URLs are of highest priority
+    // But [urls] is prioritized - first URLs are of highest priority
     // and we need to make sure order doesn't suddenly change.
-    final forcedOrdered = osm.osmOverpassUrls.keys.toList();
+    final forcedOrdered = overpass.urls.keys.toList();
     expect(forcedOrdered, equals(['lz4', 'z', 'kumi', 'taiwan']));
   });
 }

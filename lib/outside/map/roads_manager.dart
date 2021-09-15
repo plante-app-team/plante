@@ -6,7 +6,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cached_territory.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_road.dart';
 
 enum RoadsManagerError {
@@ -14,7 +14,7 @@ enum RoadsManagerError {
   OTHER,
 }
 
-class RoadsManager implements OpenStreetMapReceiver {
+class RoadsManager {
   // Let's assume new roads don't appear often.
   static const DAYS_BEFORE_CACHE_ANCIENT = 365;
   // Let's not overload the DB with too many roads.
@@ -23,13 +23,10 @@ class RoadsManager implements OpenStreetMapReceiver {
   static const REQUESTED_RADIUS_KM = 30.0;
   static final requestedRadios = kmToGrad(REQUESTED_RADIUS_KM);
 
-  late final OpenStreetMap _osm;
+  final OpenStreetMap _osm;
   final OsmCacher _cacher;
-  final OsmInteractionsQueue _osmQueue;
 
-  RoadsManager(OpenStreetMapHolder osmHolder, this._cacher, this._osmQueue) {
-    _osm = osmHolder.getOsm(whoAsks: this);
-  }
+  RoadsManager(this._osm, this._cacher);
 
   /// Fetches roads within the given bounds and nearby them if available.
   /// Given bounds must have sides smaller than [REQUESTED_RADIUS_KM].
@@ -44,8 +41,8 @@ class RoadsManager implements OpenStreetMapReceiver {
     if (existingCache != null) {
       return Ok(existingCache);
     }
-    return _osmQueue.enqueue(() => _fetchRoadsImpl(bounds),
-        goals: [OsmInteractionsGoal.FETCH_ROADS]);
+    return _osm.withOverpass(
+        (overpass) async => await _fetchRoadsImpl(overpass, bounds));
   }
 
   Future<List<OsmRoad>?> _fetchCachedRoads(CoordsBounds bounds) async {
@@ -90,14 +87,14 @@ class RoadsManager implements OpenStreetMapReceiver {
   }
 
   Future<Result<List<OsmRoad>, RoadsManagerError>> _fetchRoadsImpl(
-      CoordsBounds bounds) async {
+      OsmOverpass overpass, CoordsBounds bounds) async {
     final existingCache = await _fetchCachedRoads(bounds);
     if (existingCache != null) {
       return Ok(existingCache);
     }
 
     final requestedBounds = bounds.center.makeSquare(requestedRadios);
-    final result = await _osm.fetchRoads(requestedBounds);
+    final result = await overpass.fetchRoads(requestedBounds);
     if (result.isOk) {
       final roads = result.unwrap();
       unawaited(_cacher.cacheRoads(DateTime.now(), requestedBounds, roads));

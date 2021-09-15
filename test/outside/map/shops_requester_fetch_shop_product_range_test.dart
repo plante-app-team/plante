@@ -19,7 +19,6 @@ import 'shops_requester_test_commons.dart';
 
 void main() {
   late ShopsRequesterTestCommons commons;
-  late MockOpenStreetMap osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
   late ShopsRequester shopsRequester;
@@ -28,11 +27,10 @@ void main() {
 
   setUp(() async {
     commons = ShopsRequesterTestCommons();
-    osm = commons.osm;
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     aShop = commons.aShop;
-    shopsRequester = ShopsRequester(osm, backend, productsObtainer);
+    shopsRequester = ShopsRequester(backend, productsObtainer);
   });
 
   test('fetchShopProductRange good scenario', () async {

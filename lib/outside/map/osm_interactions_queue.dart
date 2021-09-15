@@ -56,15 +56,7 @@ class OsmInteractionsQueue {
   }
 
   Future<Result<R, E>> enqueue<R, E>(InteractionFn<R, E> interactionFn,
-      {required List<OsmInteractionsGoal> goals}) async {
-    final services = goals.map((e) => e.service).toSet();
-    if (services.length > 1) {
-      throw ArgumentError(
-          'Simultaneous requests to multiple OSM services are not supported. '
-          'Please either split your interaction into several distinct ones, '
-          'or add the support to OsmInteractionsQueue by modifying it');
-    }
-    final service = services.first;
+      {required OsmInteractionService service}) async {
     final impl = _impls[service]!;
     return await impl.enqueue(interactionFn);
   }

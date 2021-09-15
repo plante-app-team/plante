@@ -11,19 +11,20 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 class ShopsRequester {
-  final OpenStreetMap _openStreetMap;
   final Backend _backend;
   final ProductsObtainer _productsObtainer;
 
-  ShopsRequester(this._openStreetMap, this._backend, this._productsObtainer);
+  ShopsRequester(this._backend, this._productsObtainer);
 
   Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
+      OsmOverpass overpass,
       {required CoordsBounds osmBounds,
       required CoordsBounds planteBounds,
       Iterable<OsmShop>? preloadedOsmShops}) async {
@@ -35,7 +36,7 @@ class ShopsRequester {
     // Either request OSM shops or use preloaded
     final Iterable<OsmShop> osmShops;
     if (preloadedOsmShops == null) {
-      final osmShopsResult = await _openStreetMap.fetchShops(osmBounds);
+      final osmShopsResult = await overpass.fetchShops(osmBounds);
       if (osmShopsResult.isErr) {
         return Err(_convertOsmErr(osmShopsResult.unwrapErr()));
       }

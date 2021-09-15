@@ -9,8 +9,13 @@ abstract class OsmShop implements Built<OsmShop, OsmShopBuilder> {
   String get osmId;
   String get name;
   String? get type;
+
   double get latitude;
   double get longitude;
+
+  String? get city;
+  String? get road;
+  String? get houseNumber;
 
   Coord get coord => Coord(lat: latitude, lon: longitude);
 

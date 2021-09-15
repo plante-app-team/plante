@@ -7,17 +7,16 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
 class ShopsManagerTestCommons {
-  late MockOpenStreetMap osm;
+  late MockOsmOverpass osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
@@ -80,13 +79,13 @@ class ShopsManagerTestCommons {
         ..backendShop.replace(backendShops[1])),
     };
 
-    osm = MockOpenStreetMap();
+    osm = MockOsmOverpass();
     backend = MockBackend();
     productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
-        analytics, osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(OpenStreetMap.forTesting(overpass: osm),
+        backend, productsObtainer, analytics, osmCacher);
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));

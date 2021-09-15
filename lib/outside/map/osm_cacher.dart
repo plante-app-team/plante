@@ -14,12 +14,14 @@ import 'package:plante/outside/map/osm_cached_territory.dart';
 import 'package:plante/sqlite/sqlite.dart';
 
 const _ID = 'id';
+
 const _TERRITORY_TABLE = 'territory';
 const _TERRITORY_WHEN_OBTAINED = 'when_obtained';
 const _TERRITORY_SOUTHWEST_LAT = 'southwest_lat';
 const _TERRITORY_SOUTHWEST_LON = 'southwest_lon';
 const _TERRITORY_NORTHEAST_LAT = 'northeast_lat';
 const _TERRITORY_NORTHEAST_LON = 'northeast_lon';
+
 const _SHOP_TABLE = 'shop';
 const _SHOP_TERRITORY_ID = 'territory_id';
 const _SHOP_OSM_ID = 'osm_id';
@@ -27,6 +29,10 @@ const _SHOP_NAME = 'name';
 const _SHOP_TYPE = 'type';
 const _SHOP_LAT = 'lat';
 const _SHOP_LON = 'lon';
+const _SHOP_CITY = 'city';
+const _SHOP_ROAD = 'road';
+const _SHOP_HOUSE_NUMBER = 'house_number';
+
 const _ROAD_TABLE = 'road';
 const _ROAD_TERRITORY_ID = 'territory_id';
 const _ROAD_OSM_ID = 'osm_id';
@@ -68,7 +74,7 @@ class OsmCacher {
     if (db == null) {
       final appDir = await getAppDir();
       db = await openDB('${appDir.path}/osm_cache.sqlite',
-          version: 2, onUpgrade: _onUpgradeDb);
+          version: 3, onUpgrade: _onUpgradeDb);
     }
     Log.i('OsmCacher._initAsync db loaded');
 
@@ -170,6 +176,15 @@ class OsmCacher {
           ON $_ROAD_TABLE($_ROAD_TERRITORY_ID);
         ''');
       }
+
+      if (oldVersion < 3) {
+        await txn.execute(
+            "ALTER TABLE $_SHOP_TABLE ADD COLUMN $_SHOP_CITY TEXT DEFAULT ''");
+        await txn.execute(
+            "ALTER TABLE $_SHOP_TABLE ADD COLUMN $_SHOP_ROAD TEXT DEFAULT ''");
+        await txn.execute(
+            "ALTER TABLE $_SHOP_TABLE ADD COLUMN $_SHOP_HOUSE_NUMBER TEXT DEFAULT ''");
+      }
     });
   }
 
@@ -187,10 +202,10 @@ class OsmCacher {
         final territoryId = column[_SHOP_TERRITORY_ID] as int?;
         final osmId = column[_SHOP_OSM_ID] as String?;
         final name = column[_SHOP_NAME] as String?;
-        var type = column[_SHOP_TYPE] as String?;
-        if (type != null && type.isEmpty) {
-          type = null;
-        }
+        final type = _strColumnToNullableStr(column, _SHOP_TYPE);
+        final city = _strColumnToNullableStr(column, _SHOP_CITY);
+        final road = _strColumnToNullableStr(column, _SHOP_ROAD);
+        final houseNumber = _strColumnToNullableStr(column, _SHOP_HOUSE_NUMBER);
         final lat = column[_SHOP_LAT] as double?;
         final lon = column[_SHOP_LON] as double?;
         if (territoryId == null ||
@@ -209,7 +224,10 @@ class OsmCacher {
           ..name = name
           ..type = type
           ..latitude = lat
-          ..longitude = lon));
+          ..longitude = lon
+          ..city = city
+          ..road = road
+          ..houseNumber = houseNumber));
       }
     }
     final territoriesCount = shopsAndTerritoriesIds.length;
@@ -218,6 +236,14 @@ class OsmCacher {
     Log.i(
         'OsmCacher shops extraction finish, territories: $territoriesCount, shops: $shopsCount');
     return shopsAndTerritoriesIds;
+  }
+
+  String? _strColumnToNullableStr(Map<String, dynamic> column, String name) {
+    final str = column[name] as String?;
+    if (str != null && str.isNotEmpty) {
+      return str;
+    }
+    return null;
   }
 
   Future<Map<int, List<OsmRoad>>> _extractRoadsWithTerritoriesIds(
@@ -380,6 +406,9 @@ Map<String, dynamic> _shopColumnsValues(int territoryId, OsmShop shop) {
     _SHOP_TYPE: shop.type ?? '',
     _SHOP_LAT: shop.latitude,
     _SHOP_LON: shop.longitude,
+    _SHOP_CITY: shop.city ?? '',
+    _SHOP_ROAD: shop.road ?? '',
+    _SHOP_HOUSE_NUMBER: shop.houseNumber ?? '',
   };
 }
 

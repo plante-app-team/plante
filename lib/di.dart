@@ -17,7 +17,6 @@ import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -52,14 +51,12 @@ void initDI() {
       GetIt.I.get<IpLocationProvider>(),
       GetIt.I.get<PermissionsManager>(),
       GetIt.I.get<SharedPreferencesHolder>()));
-  GetIt.I.registerSingleton<OsmInteractionsQueue>(OsmInteractionsQueue());
-  GetIt.I.registerSingleton<OpenStreetMapHolder>(OpenStreetMapHolder(
+  GetIt.I.registerSingleton<OpenStreetMap>(OpenStreetMap(
     GetIt.I.get<HttpClient>(),
     GetIt.I.get<Analytics>(),
-    GetIt.I.get<OsmInteractionsQueue>(),
   ));
-  GetIt.I.registerSingleton<AddressObtainer>(AddressObtainer(
-      GetIt.I.get<OpenStreetMapHolder>(), GetIt.I.get<OsmInteractionsQueue>()));
+  GetIt.I.registerSingleton<AddressObtainer>(
+      AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
@@ -100,17 +97,13 @@ void initDI() {
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
   GetIt.I.registerSingleton<OsmCacher>(OsmCacher());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
-      GetIt.I.get<OpenStreetMapHolder>(),
+      GetIt.I.get<OpenStreetMap>(),
       GetIt.I.get<Backend>(),
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
-      GetIt.I.get<OsmCacher>(),
-      GetIt.I.get<OsmInteractionsQueue>()));
-  GetIt.I.registerSingleton<RoadsManager>(RoadsManager(
-    GetIt.I.get<OpenStreetMapHolder>(),
-    GetIt.I.get<OsmCacher>(),
-    GetIt.I.get<OsmInteractionsQueue>(),
-  ));
-  GetIt.I.registerSingleton<OsmSearcher>(OsmSearcher(
-      GetIt.I.get<OpenStreetMapHolder>(), GetIt.I.get<OsmInteractionsQueue>()));
+      GetIt.I.get<OsmCacher>()));
+  GetIt.I.registerSingleton<RoadsManager>(
+      RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
+  GetIt.I.registerSingleton<OsmSearcher>(
+      OsmSearcher(GetIt.I.get<OpenStreetMap>()));
 }

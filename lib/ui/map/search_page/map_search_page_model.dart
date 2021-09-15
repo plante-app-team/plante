@@ -131,6 +131,7 @@ class MapSearchPageModel {
 
   void _updateLastKnownUserPos() async {
     _lastKnownUserPos = await _locationController.currentPosition();
+    _lastKnownUserPos ??= await _locationController.lastKnownPosition();
   }
 
   /// [resultsCallback] will be called multiple times.

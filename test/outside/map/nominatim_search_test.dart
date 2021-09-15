@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_nominatim.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -12,13 +12,13 @@ import 'open_street_map_test_commons.dart';
 void main() {
   late OpenStreetMapTestCommons commons;
   late FakeHttpClient http;
-  late OpenStreetMap osm;
+  late OsmNominatim nominatim;
 
   setUp(() async {
     commons = OpenStreetMapTestCommons();
     await commons.setUp();
     http = commons.http;
-    osm = commons.osm;
+    nominatim = commons.nominatim;
   });
 
   String removeSearchResponseKeys(String response, String key) {
@@ -38,27 +38,49 @@ void main() {
         "osm_id": 318119915,
         "lat": "56.3232248",
         "lon": "44.0103222",
-        "display_name": "Broadway Street, Broadway, South Somerset, Jefferson City, South West England, England, TA19 9RX, United States",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London"
+        }
       },
       {
         "osm_type": "way",
         "osm_id": 437497419,
         "lat": "56.3213453",
         "lon": "44.0187501",
-        "display_name": "Broadway Street, Wow such a City, Cole County, Missouri, 65102, United Kingdom",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Bad district",
+          "city": "London"
+        }
       },
       {
         "osm_type": "node",
         "osm_id": 6266574214,
         "lat": "56.321002",
         "lon": "44.0143096",
-        "display_name": "Broadway shop, Jefferson City, Cole County, Missouri, 65102, United States",
         "class": "shop",
-        "type": "supermarket"
+        "type": "supermarket",
+        "namedetails": {
+          "name": "Broadway shop"
+        },
+        "address": {
+          "house_number": "34A",
+          "road": "Broadway Street",
+          "city_district": "Bad district",
+          "city": "London"
+        }
       }
     ]
     ''';
@@ -66,7 +88,7 @@ void main() {
     http.setResponse('.*', osmResp);
 
     final searchResRes =
-        await osm.search('United States', 'Jefferson City', 'Broadway');
+        await nominatim.search('United States', 'London', 'Broadway');
     final searchRes = searchResRes.unwrap();
 
     final expectedSearchRes = OsmSearchResult(
@@ -89,7 +111,10 @@ void main() {
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
-            ..longitude = 44.0143096),
+            ..longitude = 44.0143096
+            ..city = 'London'
+            ..road = 'Broadway Street'
+            ..houseNumber = '34A'),
         ]),
     );
 
@@ -99,21 +124,29 @@ void main() {
   Future<void> testFoundShopWithoutField(String field) async {
     const validOsmResp = '''
     [
-      {
+{
         "osm_type": "node",
         "osm_id": 6266574214,
         "lat": "56.321002",
         "lon": "44.0143096",
-        "display_name": "Broadway shop, Jefferson City, Cole County, Missouri, 65102, United States",
         "class": "shop",
-        "type": "supermarket"
+        "type": "supermarket",
+        "namedetails": {
+          "name": "Broadway shop"
+        },
+        "address": {
+          "house_number": "34A",
+          "road": "Broadway Street",
+          "city_district": "Bad district",
+          "city": "London"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', validOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .shops,
         isNotEmpty);
@@ -122,7 +155,7 @@ void main() {
 
     http.setResponse('.*', invalidOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .shops,
         isEmpty);
@@ -133,7 +166,7 @@ void main() {
   });
 
   test('searched and found shop has no name', () async {
-    await testFoundShopWithoutField('display_name');
+    await testFoundShopWithoutField('namedetails');
   });
 
   test('searched and found shop has no type', () async {
@@ -156,16 +189,23 @@ void main() {
         "osm_id": 318119915,
         "lat": "56.3232248",
         "lon": "44.0103222",
-        "display_name": "Broadway Street, Broadway, South Somerset, Jefferson City, South West England, England, TA19 9RX, United States",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', validOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .roads,
         isNotEmpty);
@@ -174,7 +214,7 @@ void main() {
 
     http.setResponse('.*', invalidOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .roads,
         isEmpty);
@@ -185,7 +225,7 @@ void main() {
   });
 
   test('searched and found road has no name', () async {
-    await testFoundRoadWithoutField('display_name');
+    await testFoundRoadWithoutField('namedetails');
   });
 
   test('searched and found road has no class', () async {
@@ -208,23 +248,30 @@ void main() {
         "osm_id": 318119915,
         "lat": "56.3232248",
         "lon": "44.0103222",
-        "display_name": "Broadway Street, Broadway, South Somerset, Jefferson City, South West England, England, TA19 9RX, United States",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', validOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .roads,
         isNotEmpty);
 
     http.setResponse('.*', validOsmResp, responseCode: 500);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway')).isErr,
+        (await nominatim.search('United States', 'London', 'Broadway')).isErr,
         isTrue);
   });
 
@@ -236,16 +283,23 @@ void main() {
         "osm_id": 318119915,
         "lat": "56.3232248",
         "lon": "44.0103222",
-        "display_name": "Broadway Street, Broadway, South Somerset, Jefferson City, South West England, England, TA19 9RX, United States",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', validOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway'))
+        (await nominatim.search('United States', 'London', 'Broadway'))
             .unwrap()
             .roads,
         isNotEmpty);
@@ -253,37 +307,53 @@ void main() {
     const invalidOsmResp = '$validOsmResp}}}}}}}}}}';
     http.setResponse('.*', invalidOsmResp);
     expect(
-        (await osm.search('United States', 'Jefferson City', 'Broadway')).isErr,
+        (await nominatim.search('United States', 'London', 'Broadway')).isErr,
         isTrue);
   });
 
-  test('found roads have similar names', () async {
+  test('found roads have similar locations', () async {
     const osmResp = '''
     [
       {
         "osm_type": "way",
         "osm_id": 318119915,
-        "lat": "56.3213453",
-        "lon": "44.0187501",
-        "display_name": "Broadway Street, Jefferson City, Cole County, Missouri, 65102, United States",
+        "lat": "56.3232248",
+        "lon": "44.0103222",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London",
+          "postcode": "654001"
+        }
       },
       {
         "osm_type": "way",
         "osm_id": 437497419,
         "lat": "56.3213453",
         "lon": "44.0187501",
-        "display_name": "Broadway Street, Jefferson City, Cole County, Missouri, 65103, United States",
         "class": "highway",
-        "type": "residential"
+        "type": "residential",
+        "namedetails": {
+          "name": "Broadway Street"
+        },
+        "address": {
+          "road": "Broadway Street",
+          "city_district": "Nice district",
+          "city": "London",
+          "postcode": "654002"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', osmResp);
     final searchResRes =
-        await osm.search('United States', 'Jefferson City', 'Broadway');
+        await nominatim.search('United States', 'London', 'Broadway');
     final searchRes = searchResRes.unwrap();
 
     // We expect the second road to be not included in the result
@@ -294,15 +364,15 @@ void main() {
           OsmRoad((e) => e
             ..osmId = '318119915'
             ..name = 'Broadway Street'
-            ..latitude = 56.3213453
-            ..longitude = 44.0187501),
+            ..latitude = 56.3232248
+            ..longitude = 44.0103222),
         ]),
     );
 
     expect(searchRes, equals(expectedSearchRes));
   });
 
-  test('found shops have similar names', () async {
+  test('found shops have similar locations', () async {
     const osmResp = '''
     [
       {
@@ -310,25 +380,41 @@ void main() {
         "osm_id": 6266574214,
         "lat": "56.321002",
         "lon": "44.0143096",
-        "display_name": "Broadway shop, Jefferson City, Cole County, Missouri, 65101, United States",
         "class": "shop",
-        "type": "supermarket"
+        "type": "supermarket",
+        "address": {
+          "house_number": "34A",
+          "road": "Broadway Street",
+          "city_district": "Bad district",
+          "city": "London"
+        },
+        "namedetails": {
+          "name": "Broadway shop"
+        }
       },
       {
         "osm_type": "node",
         "osm_id": 6266574215,
         "lat": "56.321002",
         "lon": "44.0143096",
-        "display_name": "Broadway shop, Jefferson City, Cole County, Missouri, 65101, United States",
         "class": "shop",
-        "type": "supermarket"
+        "type": "supermarket",
+        "address": {
+          "house_number": "34A",
+          "road": "Broadway Street",
+          "city_district": "Bad district",
+          "city": "London"
+        },
+        "namedetails": {
+          "name": "Broadway shop"
+        }
       }
     ]
     ''';
 
     http.setResponse('.*', osmResp);
     final searchResRes =
-        await osm.search('United States', 'Jefferson City', 'Broadway');
+        await nominatim.search('United States', 'London', 'Broadway');
     final searchRes = searchResRes.unwrap();
 
     // We expect BOTH shops to be found even thought their names are identical.
@@ -342,13 +428,19 @@ void main() {
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
-            ..longitude = 44.0143096),
+            ..longitude = 44.0143096
+            ..city = 'London'
+            ..road = 'Broadway Street'
+            ..houseNumber = '34A'),
           OsmShop((e) => e
             ..osmId = '6266574215'
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
-            ..longitude = 44.0143096),
+            ..longitude = 44.0143096
+            ..city = 'London'
+            ..road = 'Broadway Street'
+            ..houseNumber = '34A'),
         ]),
     );
 

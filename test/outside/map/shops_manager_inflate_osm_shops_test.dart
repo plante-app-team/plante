@@ -1,35 +1,22 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_osm_cacher.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
-  late MockOpenStreetMap osm;
   late MockBackend backend;
-  late MockProductsObtainer productsObtainer;
-  late FakeAnalytics analytics;
-  late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
 
   setUp(() async {
     commons = ShopsManagerTestCommons();
 
-    osm = commons.osm;
     backend = commons.backend;
-    productsObtainer = commons.productsObtainer;
-    analytics = commons.analytics;
-    osmCacher = commons.osmCacher;
-    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
-        analytics, osmCacher, OsmInteractionsQueue());
+    shopsManager = commons.shopsManager;
   });
 
   test('inflateOsmShops when no shops in cache', () async {

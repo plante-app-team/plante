@@ -38,6 +38,27 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.city;
+    if (value != null) {
+      result
+        ..add('city')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.road;
+    if (value != null) {
+      result
+        ..add('road')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.houseNumber;
+    if (value != null) {
+      result
+        ..add('houseNumber')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -72,6 +93,18 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
           result.longitude = serializers.deserialize(value,
               specifiedType: const FullType(double)) as double;
           break;
+        case 'city':
+          result.city = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'road':
+          result.road = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'houseNumber':
+          result.houseNumber = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
       }
     }
 
@@ -90,6 +123,12 @@ class _$OsmShop extends OsmShop {
   final double latitude;
   @override
   final double longitude;
+  @override
+  final String? city;
+  @override
+  final String? road;
+  @override
+  final String? houseNumber;
 
   factory _$OsmShop([void Function(OsmShopBuilder)? updates]) =>
       (new OsmShopBuilder()..update(updates)).build();
@@ -99,7 +138,10 @@ class _$OsmShop extends OsmShop {
       required this.name,
       this.type,
       required this.latitude,
-      required this.longitude})
+      required this.longitude,
+      this.city,
+      this.road,
+      this.houseNumber})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(osmId, 'OsmShop', 'osmId');
     BuiltValueNullFieldError.checkNotNull(name, 'OsmShop', 'name');
@@ -122,15 +164,26 @@ class _$OsmShop extends OsmShop {
         name == other.name &&
         type == other.type &&
         latitude == other.latitude &&
-        longitude == other.longitude;
+        longitude == other.longitude &&
+        city == other.city &&
+        road == other.road &&
+        houseNumber == other.houseNumber;
   }
 
   @override
   int get hashCode {
     return $jf($jc(
-        $jc($jc($jc($jc(0, osmId.hashCode), name.hashCode), type.hashCode),
-            latitude.hashCode),
-        longitude.hashCode));
+        $jc(
+            $jc(
+                $jc(
+                    $jc(
+                        $jc($jc($jc(0, osmId.hashCode), name.hashCode),
+                            type.hashCode),
+                        latitude.hashCode),
+                    longitude.hashCode),
+                city.hashCode),
+            road.hashCode),
+        houseNumber.hashCode));
   }
 
   @override
@@ -140,7 +193,10 @@ class _$OsmShop extends OsmShop {
           ..add('name', name)
           ..add('type', type)
           ..add('latitude', latitude)
-          ..add('longitude', longitude))
+          ..add('longitude', longitude)
+          ..add('city', city)
+          ..add('road', road)
+          ..add('houseNumber', houseNumber))
         .toString();
   }
 }
@@ -168,6 +224,18 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   double? get longitude => _$this._longitude;
   set longitude(double? longitude) => _$this._longitude = longitude;
 
+  String? _city;
+  String? get city => _$this._city;
+  set city(String? city) => _$this._city = city;
+
+  String? _road;
+  String? get road => _$this._road;
+  set road(String? road) => _$this._road = road;
+
+  String? _houseNumber;
+  String? get houseNumber => _$this._houseNumber;
+  set houseNumber(String? houseNumber) => _$this._houseNumber = houseNumber;
+
   OsmShopBuilder();
 
   OsmShopBuilder get _$this {
@@ -178,6 +246,9 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
       _type = $v.type;
       _latitude = $v.latitude;
       _longitude = $v.longitude;
+      _city = $v.city;
+      _road = $v.road;
+      _houseNumber = $v.houseNumber;
       _$v = null;
     }
     return this;
@@ -206,7 +277,10 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
             latitude: BuiltValueNullFieldError.checkNotNull(
                 latitude, 'OsmShop', 'latitude'),
             longitude: BuiltValueNullFieldError.checkNotNull(
-                longitude, 'OsmShop', 'longitude'));
+                longitude, 'OsmShop', 'longitude'),
+            city: city,
+            road: road,
+            houseNumber: houseNumber);
     replace(_$result);
     return _$result;
   }

@@ -27,7 +27,10 @@ void main() {
       ..name = 'third shop'
       ..type = 'type3'
       ..latitude = 333.321
-      ..longitude = 333.321),
+      ..longitude = 333.321
+      ..city = 'London'
+      ..road = 'Baker street'
+      ..houseNumber = '221b'),
   ];
   final roads = [
     OsmRoad((e) => e

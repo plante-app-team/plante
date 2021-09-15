@@ -9,7 +9,6 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -18,7 +17,6 @@ import 'package:test/test.dart';
 
 import 'package:plante/outside/map/open_street_map.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
@@ -27,7 +25,7 @@ import 'shops_manager_test_commons.dart';
 // TODO: please try to decouple tests in this file into many smaller files
 void main() {
   late ShopsManagerTestCommons commons;
-  late MockOpenStreetMap osm;
+  late MockOsmOverpass osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
@@ -59,8 +57,7 @@ void main() {
     productsObtainer = commons.productsObtainer;
     analytics = commons.analytics;
     osmCacher = commons.osmCacher;
-    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
-        analytics, osmCacher, OsmInteractionsQueue());
+    shopsManager = commons.shopsManager;
   });
 
   test('shops fetched and then cached', () async {
@@ -584,8 +581,8 @@ void main() {
         equals(expectedAllShops));
 
     // Create a NEW shops manager with same persistent cache
-    shopsManager = ShopsManager(osm.asHolder(), backend, productsObtainer,
-        analytics, osmCacher, OsmInteractionsQueue());
+    shopsManager = ShopsManager(OpenStreetMap.forTesting(overpass: osm),
+        backend, productsObtainer, analytics, osmCacher);
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));

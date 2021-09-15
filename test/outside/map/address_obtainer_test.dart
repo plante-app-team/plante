@@ -5,15 +5,13 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.dart';
 import '../../common_mocks.mocks.dart';
 
 void main() {
-  late MockOpenStreetMap osm;
+  late MockOsmNominatim nominatim;
   late AddressObtainer addressObtainer;
 
   final anAddress = OsmAddress((e) => e
@@ -32,34 +30,36 @@ void main() {
       ..productsCount = 2)));
 
   setUp(() async {
-    osm = MockOpenStreetMap();
-    when(osm.fetchAddress(any, any)).thenAnswer((_) async => Ok(anAddress));
-    addressObtainer = AddressObtainer(osm.asHolder(), OsmInteractionsQueue());
+    nominatim = MockOsmNominatim();
+    when(nominatim.fetchAddress(any, any))
+        .thenAnswer((_) async => Ok(anAddress));
+    addressObtainer =
+        AddressObtainer(OpenStreetMap.forTesting(nominatim: nominatim));
   });
 
   test('address fetched and then cached', () async {
-    verifyZeroInteractions(osm);
+    verifyZeroInteractions(nominatim);
 
     // Fetch #1
     final addressRes = await addressObtainer.addressOfShop(aShop);
     final address = addressRes.unwrap();
     expect(address, equals(anAddress));
     // OSM expected to be touched
-    verify(osm.fetchAddress(any, any));
+    verify(nominatim.fetchAddress(any, any));
 
-    clearInteractions(osm);
+    clearInteractions(nominatim);
 
     // Fetch #2
     final addressRes2 = await addressObtainer.addressOfShop(aShop);
     final address2 = addressRes2.unwrap();
     expect(address2, equals(anAddress));
     // OSM is NOT expected to be touched! Cache expected to be used!
-    verifyZeroInteractions(osm);
+    verifyZeroInteractions(nominatim);
   });
 
   test('cache behaviour when multiple address fetches started at the same time',
       () async {
-    verifyZeroInteractions(osm);
+    verifyZeroInteractions(nominatim);
 
     // Fetch without await
     final addressFuture1 = addressObtainer.addressOfShop(aShop);
@@ -74,11 +74,11 @@ void main() {
       expect(result.unwrap(), equals(anAddress));
     }
     // OSM expected to be touched exactly once
-    verify(osm.fetchAddress(any, any)).called(1);
+    verify(nominatim.fetchAddress(any, any)).called(1);
   });
 
   test('address fetch fail', () async {
-    when(osm.fetchAddress(any, any))
+    when(nominatim.fetchAddress(any, any))
         .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
     final addressRes = await addressObtainer.addressOfShop(aShop);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
