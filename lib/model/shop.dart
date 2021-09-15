@@ -5,6 +5,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 
 part 'shop.g.dart';
 
@@ -32,6 +33,11 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   String? get city => osmShop.city;
   String? get road => osmShop.road;
   String? get houseNumber => osmShop.houseNumber;
+
+  OsmShortAddress get address => OsmShortAddress((e) => e
+    ..city = city
+    ..road = road
+    ..houseNumber = houseNumber);
 
   static Shop? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers

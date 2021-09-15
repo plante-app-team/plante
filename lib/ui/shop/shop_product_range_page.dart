@@ -164,7 +164,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                             children: [
                           Text(widget.shop.name, style: TextStyles.headline1),
                           const SizedBox(height: 3),
-                          ShopAddressWidget(_model.address()),
+                          ShopAddressWidget(widget.shop, _model.address()),
                         ])),
                   ]),
               const SizedBox(height: 28),

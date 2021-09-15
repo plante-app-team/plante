@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -10,8 +10,10 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/l10n/strings.dart';
 
 class ShopAddressWidget extends StatefulWidget {
+  final Shop? shop;
   final FutureShortAddress osmAddress;
-  const ShopAddressWidget(this.osmAddress, {Key? key}) : super(key: key);
+  const ShopAddressWidget(this.shop, this.osmAddress, {Key? key})
+      : super(key: key);
 
   @override
   _ShopAddressWidgetState createState() => _ShopAddressWidgetState();
@@ -60,7 +62,7 @@ class _ShopAddressWidgetState extends State<ShopAddressWidget>
       return const SizedBox.shrink();
     }
 
-    final addressStr = _addressString();
+    final addressStr = _addressString(context);
     return RichText(
       text: TextSpan(
         style: TextStyles.hint,
@@ -78,8 +80,7 @@ class _ShopAddressWidgetState extends State<ShopAddressWidget>
           const TextSpan(text: ' '),
           if (addressStr != null)
             TextSpan(
-              text:
-                  '${context.strings.shop_address_widget_possible_address}$addressStr',
+              text: addressStr,
             ),
           if (addressStr == null)
             WidgetSpan(
@@ -98,7 +99,7 @@ class _ShopAddressWidgetState extends State<ShopAddressWidget>
     );
   }
 
-  String? _addressString() {
+  String? _addressString(BuildContext context) {
     if (_loadedResult == null) {
       return null;
     } else if (_loadedResult!.isErr) {
@@ -108,12 +109,20 @@ class _ShopAddressWidgetState extends State<ShopAddressWidget>
     final osmAddress = _loadedResult!.unwrap();
     final String result;
     if (osmAddress.road != null) {
-      return [
+      result = [
         osmAddress.road ?? '',
         osmAddress.houseNumber ?? '',
       ].where((e) => e.isNotEmpty).join(', ');
     } else {
       result = [osmAddress.city ?? ''].where((e) => e.isNotEmpty).join(', ');
+    }
+    if (result.isNotEmpty) {
+      if (osmAddress == widget.shop?.address) {
+        // Address is precise because it's a part of the shop
+        return result;
+      } else {
+        return '${context.strings.shop_address_widget_possible_address}$result';
+      }
     }
     return result.isNotEmpty ? result : null;
   }

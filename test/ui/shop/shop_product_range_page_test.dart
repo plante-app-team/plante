@@ -25,7 +25,6 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';

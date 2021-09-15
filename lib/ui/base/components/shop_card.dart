@@ -99,7 +99,7 @@ class ShopCard extends StatelessWidget {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis)),
                           const SizedBox(height: 4),
-                          ShopAddressWidget(address),
+                          ShopAddressWidget(shop, address),
                         ]))),
               ]),
           Padding(
