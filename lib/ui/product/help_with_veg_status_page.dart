@@ -146,6 +146,7 @@ class _HelpWithVegStatusPageState
       widget.productUpdatedCallback?.call(savedProduct);
       widget.doneCallback?.call();
       Navigator.of(context).pop();
+      showSnackBar(context.strings.global_done_thanks, context);
     } finally {
       setState(() {
         _loading = false;
