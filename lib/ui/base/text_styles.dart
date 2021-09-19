@@ -46,6 +46,12 @@ class TextStyles {
       fontSize: 24,
       color: Color(0xFF192123));
 
+  static const TextStyle headline2 = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+      color: ColorsPlante.mainTextBlack);
+
   static const TextStyle headline1White = TextStyle(
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
@@ -67,6 +73,12 @@ class TextStyles {
       fontSize: 14,
       color: ColorsPlante.primary);
 
+  static const TextStyle tag = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+      color: ColorsPlante.mainTextBlack);
+
   static const TextStyle input = TextStyle(
       fontFamily: 'OpenSans', fontSize: 18, color: ColorsPlante.mainTextBlack);
   static const TextStyle inputHint =
@@ -78,6 +90,12 @@ class TextStyles {
       fontFamily: 'Montserrat',
       fontWeight: FontWeight.bold,
       fontSize: 16,
+      color: Colors.white);
+
+  static const TextStyle buttonFilledSmall = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 14,
       color: Colors.white);
 
   static const TextStyle buttonOutlinedEnabled = TextStyle(
