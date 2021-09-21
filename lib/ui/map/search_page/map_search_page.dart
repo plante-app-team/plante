@@ -14,6 +14,7 @@ import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -109,12 +110,10 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                 onCleared: _onQueryCleared,
               ))),
       Expanded(
-          child: Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: ListView(
-                controller: _scrollController,
-                children: _searchResults(),
-              ))),
+          child: ListView(
+        controller: _scrollController,
+        children: _searchResults(),
+      )),
     ]);
 
     return Scaffold(
@@ -135,60 +134,80 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   List<Widget> _searchResults() {
     final results = <Widget>[];
     if (!_model.loading && _lastSearchResult == null) {
-      results.add(_itemPadding(Text(context.strings.map_search_page_search_hint,
-          style: TextStyles.hint)));
+      results.add(Padding(
+          padding:
+              const EdgeInsets.only(top: 24, bottom: 18, left: 24, right: 24),
+          child: Text(context.strings.map_search_page_search_hint,
+              style: TextStyles.hint)));
     } else {
       results.addAll(_convertFoundEntitiesToWidgets(
-        _lastSearchResult?.shops,
-        context.strings.map_search_page_shops_title,
-        context.strings.map_search_page_shops_not_found,
-        _shopToWidget,
-        _finishWithShop,
+        entities: _lastSearchResult?.shops,
+        entityPadding:
+            const EdgeInsets.only(top: 12, bottom: 12, left: 24, right: 24),
+        title: context.strings.map_search_page_shops_title,
+        titlePadding:
+            const EdgeInsets.only(top: 24, bottom: 6, left: 24, right: 24),
+        notFoundMsg: context.strings.map_search_page_shops_not_found,
+        toWidget: _shopToWidget,
+        onTap: _finishWithShop,
       ));
       results.addAll(_convertFoundEntitiesToWidgets(
-        _lastSearchResult?.roads,
-        context.strings.map_search_page_streets_title,
-        context.strings.map_search_page_streets_not_found,
-        _roadToWidget,
-        _finishWithRoad,
+        entities: _lastSearchResult?.roads,
+        entityPadding:
+            const EdgeInsets.only(top: 18, bottom: 18, left: 24, right: 24),
+        title: context.strings.map_search_page_streets_title,
+        titlePadding:
+            const EdgeInsets.only(top: 20, bottom: 0, left: 24, right: 24),
+        notFoundMsg: context.strings.map_search_page_streets_not_found,
+        toWidget: _roadToWidget,
+        onTap: _finishWithRoad,
       ));
     }
     return results;
   }
 
-  Widget _itemPadding(Widget item) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: item);
+  // Widget _itemPadding(Widget item) => Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+  //     child: item);
 
-  Widget _itemsTitlePadding(Widget item) => Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
-      child: item);
+  // Widget _itemsTitlePadding(Widget item) => Padding(
+  //     padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
+  //     child: item);
 
   List<Widget> _convertFoundEntitiesToWidgets<T>(
-      Iterable<T>? entities,
-      String title,
-      String notFoundMsg,
-      ArgResCallback<T, Widget> toWidget,
-      ArgCallback<T> onTap) {
+      {required Iterable<T>? entities,
+      required EdgeInsets entityPadding,
+      required String title,
+      required EdgeInsets titlePadding,
+      required String notFoundMsg,
+      required ArgResCallback<T, Widget> toWidget,
+      required ArgCallback<T> onTap}) {
     final results = <Widget>[];
 
-    results.add(_itemsTitlePadding(Text(title, style: TextStyles.headline3)));
+    results.add(Padding(
+        padding: titlePadding,
+        child: Text(title,
+            style: TextStyles.headline3.copyWith(color: ColorsPlante.grey))));
     if (_model.loading || entities == null) {
       if (!isInTests()) {
         results.add(Wrap(children: [
-          _itemPadding(const SizedBox(
-              width: 24, height: 24, child: CircularProgressIndicator()))
+          Padding(
+              padding: entityPadding,
+              child: const SizedBox(
+                  width: 24, height: 24, child: CircularProgressIndicator()))
         ]));
       }
     } else if (entities.isEmpty) {
-      results.add(_itemPadding(Text(notFoundMsg, style: TextStyles.hint)));
+      results.add(Padding(
+          padding: entityPadding,
+          child: Text(notFoundMsg, style: TextStyles.hint)));
     } else {
       for (final entity in entities) {
         results.add(InkWell(
             onTap: () {
               onTap(entity);
             },
-            child: _itemPadding(toWidget(entity))));
+            child: Padding(padding: entityPadding, child: toWidget(entity))));
       }
     }
 
