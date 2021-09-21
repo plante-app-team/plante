@@ -6,7 +6,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
-import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -144,17 +144,11 @@ class _AddressWidgetState extends State<AddressWidget>
               text: addressStr,
             ),
           if (addressStr == null)
-            WidgetSpan(
-              child: Container(
-                key: const Key('address_placeholder'),
-                width: 100,
-                height: 13,
-                decoration: const BoxDecoration(
-                  color: ColorsPlante.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
-              ),
-            ),
+            const WidgetSpan(
+                child: SizedBox(
+                    width: 200,
+                    height: 14,
+                    child: GradientSpinner(key: Key('address_placeholder'))))
         ],
       ),
     );
