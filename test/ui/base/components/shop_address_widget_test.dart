@@ -5,12 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/l10n/strings.dart';
 
 import '../../../widget_tester_extension.dart';
@@ -39,7 +38,7 @@ void main() {
         ..name = 'Spar')));
 
     final context = await tester.superPump(
-        ShopAddressWidget(shopWithoutAddress, addressCompleter.future));
+        AddressWidget.forShop(shopWithoutAddress, addressCompleter.future));
     final expectedStr =
         '${context.strings.shop_address_widget_possible_address}'
         'Broadway, 4';
@@ -73,7 +72,7 @@ void main() {
         ..houseNumber = address.houseNumber)));
 
     final context = await tester.superPump(
-        ShopAddressWidget(shopWithAddress, Future.value(Ok(address))));
+        AddressWidget.forShop(shopWithAddress, Future.value(Ok(address))));
 
     // We expect a string without the 'possible' word because the address
     // is precise - it's a part of the shop.
@@ -91,7 +90,7 @@ void main() {
     final address = OsmShortAddress((e) => e..road = 'Broadway');
 
     final context = await tester
-        .superPump(ShopAddressWidget(null, Future.value(Ok(address))));
+        .superPump(AddressWidget.forFutureCoords(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
     final expectedStr =
@@ -110,7 +109,7 @@ void main() {
       ..houseNumber = '4');
 
     final context = await tester
-        .superPump(ShopAddressWidget(null, Future.value(Ok(address))));
+        .superPump(AddressWidget.forFutureCoords(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
     final expectedStr =
@@ -127,7 +126,8 @@ void main() {
       ..city = null
       ..houseNumber = null);
 
-    await tester.superPump(ShopAddressWidget(null, Future.value(Ok(address))));
+    await tester
+        .superPump(AddressWidget.forFutureCoords(Future.value(Ok(address))));
     await tester.pumpAndSettle();
 
     expect(getText(), equals(''));
@@ -136,8 +136,8 @@ void main() {
   });
 
   testWidgets('address error', (WidgetTester tester) async {
-    await tester.superPump(
-        ShopAddressWidget(null, Future.value(Err(OpenStreetMapError.OTHER))));
+    await tester.superPump(AddressWidget.forFutureCoords(
+        Future.value(Err(OpenStreetMapError.OTHER))));
     await tester.pumpAndSettle();
 
     expect(getText(), equals(''));

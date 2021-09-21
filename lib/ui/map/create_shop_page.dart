@@ -10,7 +10,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -69,8 +69,8 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                                 .create_shop_page_how_new_shop_is_called,
                             style: TextStyles.headline4)),
                     const SizedBox(height: 4),
-                    ShopAddressWidget(null,
-                        _addressObtainer.shortAddressOfCoords(widget.shopCoord))
+                    AddressWidget.forFutureCoords(_addressObtainer
+                        .shortAddressOfCoords(widget.shopCoord)),
                   ]))
             ],
           )),

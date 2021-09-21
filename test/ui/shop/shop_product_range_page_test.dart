@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -32,13 +33,14 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/product_card.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 
+import '../../common_finders_extension.dart';
 import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
@@ -98,8 +100,8 @@ void main() {
     ..products.addAll(products)
     ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
 
-  final FutureShortAddress readyAddress =
-      Future.value(Ok(OsmShortAddress((e) => e.road = 'Broadway')));
+  final address = OsmShortAddress((e) => e.road = 'Broadway');
+  final FutureShortAddress readyAddress = Future.value(Ok(address));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -960,12 +962,14 @@ void main() {
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
 
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
+    final addressCompleter = Completer<void>();
 
-    final addressWidget = find.byType(ShopAddressWidget).evaluate().first.widget
-        as ShopAddressWidget;
-    expect(identical(addressWidget.osmAddress, readyAddress), isTrue);
+    final widget = ShopProductRangePage.createForTesting(aShop,
+        addressLoadFinishCallback: addressCompleter.complete);
+    final context = await tester.superPump(widget);
+    await tester.awaitableFutureFrom(addressCompleter.future);
+
+    final expectedStr = AddressWidget.addressString(address, false, context)!;
+    expect(find.richTextContaining(expectedStr), findsWidgets);
   });
 }

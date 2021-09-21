@@ -25,20 +25,25 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 import 'package:plante/ui/scan/barcode_scan_page.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
+  final VoidCallback? addressLoadFinishCallback;
   final _testingStorage = _TestingStorage();
-  ShopProductRangePage._({Key? key, required this.shop}) : super(key: key);
+  ShopProductRangePage._(
+      {Key? key, required this.shop, this.addressLoadFinishCallback})
+      : super(key: key);
 
   @visibleForTesting
-  static ShopProductRangePage createForTesting(Shop shop) {
+  static ShopProductRangePage createForTesting(Shop shop,
+      {VoidCallback? addressLoadFinishCallback}) {
     if (!isInTests()) {
       throw Exception('!isInTests()');
     }
-    return ShopProductRangePage._(shop: shop);
+    return ShopProductRangePage._(
+        shop: shop, addressLoadFinishCallback: addressLoadFinishCallback);
   }
 
   static void show(
@@ -164,7 +169,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                             children: [
                           Text(widget.shop.name, style: TextStyles.headline1),
                           const SizedBox(height: 3),
-                          ShopAddressWidget(widget.shop, _model.address()),
+                          AddressWidget.forShop(widget.shop, _model.address(),
+                              loadCompletedCallback:
+                                  widget.addressLoadFinishCallback),
                         ])),
                   ]),
               const SizedBox(height: 28),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -23,11 +25,12 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 
+import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
@@ -61,8 +64,8 @@ void main() {
     ..barcode = '123456'
     ..name = 'Product name').productForTests();
 
-  final FutureShortAddress readyAddress =
-      Future.value(Ok(OsmShortAddress((e) => e.road = 'Broadway')));
+  final OsmShortAddress address = OsmShortAddress((e) => e.road = 'Broadway');
+  final FutureShortAddress addressFuture = Future.value(Ok(address));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -103,8 +106,8 @@ void main() {
   testWidgets('card for range: card for empty shop',
       (WidgetTester tester) async {
     final shop = shopEmpty;
-    final context = await tester
-        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester.superPump(
+        ShopCard.forProductRange(shop: shop, address: addressFuture));
 
     expect(find.text(shop.name), findsOneWidget);
     expect(find.text(context.strings.shop_card_no_products_in_shop),
@@ -119,8 +122,8 @@ void main() {
   testWidgets('card for range: card for not empty shop',
       (WidgetTester tester) async {
     final shop = shopWithProduct;
-    final context = await tester
-        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester.superPump(
+        ShopCard.forProductRange(shop: shop, address: addressFuture));
 
     expect(find.text(shop.name), findsOneWidget);
     expect(
@@ -140,8 +143,8 @@ void main() {
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
 
-    final context = await tester
-        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester.superPump(
+        ShopCard.forProductRange(shop: shop, address: addressFuture));
 
     expect(find.byType(ShopProductRangePage), findsNothing);
     await tester.tap(find.text(context.strings.shop_card_open_shop_products));
@@ -157,8 +160,8 @@ void main() {
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
 
-    final context = await tester
-        .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
+    final context = await tester.superPump(
+        ShopCard.forProductRange(shop: shop, address: addressFuture));
 
     expect(find.byType(BarcodeScanPage), findsNothing);
     await tester.tap(find.text(context.strings.shop_card_add_product));
@@ -178,7 +181,7 @@ void main() {
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: productWithName,
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
       isProductSold: null,
       onIsProductSoldChanged: (_a, _b) {},
     ));
@@ -200,7 +203,7 @@ void main() {
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: productWithoutName,
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
       isProductSold: null,
       onIsProductSoldChanged: (_a, _b) {},
     ));
@@ -215,7 +218,7 @@ void main() {
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
       isProductSold: isProductSold,
       onIsProductSoldChanged: (_a, isSold) {
         isProductSold = isSold;
@@ -237,7 +240,7 @@ void main() {
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
       isProductSold: isProductSold,
       onIsProductSoldChanged: (_a, isSold) {
         isProductSold = isSold;
@@ -259,7 +262,7 @@ void main() {
     final context = await tester.superPump(ShopCard.askIfProductIsSold(
       product: product,
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
       isProductSold: isProductSold,
       onIsProductSoldChanged: (_a, isSold) {
         isProductSold = isSold;
@@ -276,13 +279,16 @@ void main() {
   });
 
   testWidgets('shop address', (WidgetTester tester) async {
-    await tester.superPump(ShopCard.forProductRange(
+    final loadCompleter = Completer<void>();
+    final context = await tester.superPump(ShopCard.forProductRange(
       shop: shopEmpty,
-      address: readyAddress,
+      address: addressFuture,
+      loadCompletedCallback: loadCompleter.complete,
     ));
 
-    final addressWidget = find.byType(ShopAddressWidget).evaluate().first.widget
-        as ShopAddressWidget;
-    expect(identical(addressWidget.osmAddress, readyAddress), isTrue);
+    await tester.awaitableFutureFrom(loadCompleter.future);
+
+    final expectedStr = AddressWidget.addressString(address, false, context)!;
+    expect(find.richTextContaining(expectedStr), findsWidgets);
   });
 }
