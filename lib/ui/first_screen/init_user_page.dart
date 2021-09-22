@@ -12,9 +12,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
-import 'package:plante/ui/base/components/radio_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
@@ -48,25 +46,6 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   final _nameController = TextEditingController();
 
   var _firstPageHasData = false;
-  bool? get isVegan => _userParams.eatsVeggiesOnly;
-  set isVegan(bool? value) {
-    if (isVegan == value) {
-      return;
-    }
-    setState(() {
-      if (value == null) {
-        _userParams = _userParams.rebuild((e) => e
-          ..eatsEggs = null
-          ..eatsMilk = null
-          ..eatsHoney = null);
-      } else {
-        _userParams = _userParams.rebuild((e) => e
-          ..eatsEggs = !value
-          ..eatsMilk = !value
-          ..eatsHoney = !value);
-      }
-    });
-  }
 
   _InitUserPageState() : super('InitUserPage');
 
@@ -132,9 +111,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           CustomizableStepper(
             pages: [
               _page1(),
-              // vegan-only https://trello.com/c/eUGrj1eH/
-              // _page2(),
-              _page3(),
+              _page2(),
             ],
             controller: _stepperController,
           )
@@ -186,152 +163,6 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   }
 
   StepperPage _page2() {
-    final onMilkCheckboxClick = (bool? value) {
-      setState(() {
-        _userParams = _userParams.rebuild((v) => v..eatsMilk = value ?? false);
-      });
-    };
-    final onEggsCheckboxClick = (bool? value) {
-      setState(() {
-        _userParams = _userParams.rebuild((v) => v..eatsEggs = value ?? false);
-      });
-    };
-    final onHoneyCheckboxClick = (bool? value) {
-      setState(() {
-        _userParams = _userParams.rebuild((v) => v..eatsHoney = value ?? false);
-      });
-    };
-
-    final content = Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: ListView(children: [
-          SizedBox(
-              width: double.infinity,
-              child: Text(
-                  context.strings.init_user_page_nice_to_meet_you +
-                      _nameController.text,
-                  style: TextStyles.headline1)),
-          const SizedBox(height: 12),
-          SizedBox(
-              width: double.infinity,
-              child: Text(context.strings.init_user_page_tell_about_yourself,
-                  style: TextStyles.headline4)),
-          const SizedBox(height: 16),
-          InkWell(
-            onTap: () {
-              isVegan = true;
-            },
-            child: Container(
-                color: const Color(0xFFF6F7FA),
-                height: 48,
-                child: Row(children: [
-                  const SizedBox(width: 10),
-                  RadioPlante<bool>(
-                      value: true,
-                      groupValue: isVegan,
-                      onChanged: (bool? value) {
-                        isVegan = value;
-                      }),
-                  Text(context.strings.init_user_page_im_vegan,
-                      style: TextStyles.normal)
-                ])),
-          ),
-          const SizedBox(height: 7),
-          InkWell(
-            onTap: () {
-              isVegan = false;
-            },
-            child: Container(
-                color: const Color(0xFFF6F7FA),
-                height: 48,
-                child: Row(children: [
-                  const SizedBox(width: 10),
-                  RadioPlante<bool>(
-                      value: false,
-                      groupValue: isVegan,
-                      onChanged: (bool? value) {
-                        if (value == null) {
-                          isVegan = null;
-                        } else {
-                          isVegan = value;
-                        }
-                      }),
-                  Text(context.strings.init_user_page_im_vegetarian,
-                      style: TextStyles.normal)
-                ])),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-              width: double.infinity,
-              child: Text(context.strings.init_user_page_what_do_you_eat,
-                  style: TextStyles.headline4)),
-          const SizedBox(height: 21),
-          Container(
-              color: const Color(0xFFF6F7FA),
-              height: 48,
-              child: Row(children: [
-                const SizedBox(width: 10),
-                Expanded(
-                    child: InkWell(
-                        onTap: () {
-                          onEggsCheckboxClick(!(_userParams.eatsEggs ?? false));
-                        },
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          CheckboxPlante(
-                              value: _userParams.eatsEggs ?? false,
-                              onChanged: onEggsCheckboxClick),
-                          Text(context.strings.init_user_page_i_eat_eggs),
-                        ]))),
-                Expanded(
-                    child: InkWell(
-                        onTap: () {
-                          onMilkCheckboxClick(!(_userParams.eatsMilk ?? false));
-                        },
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          CheckboxPlante(
-                              value: _userParams.eatsMilk ?? false,
-                              onChanged: onMilkCheckboxClick),
-                          Text(context.strings.init_user_page_i_eat_milk),
-                        ]))),
-                Expanded(
-                    child: InkWell(
-                        onTap: () {
-                          onHoneyCheckboxClick(
-                              !(_userParams.eatsHoney ?? false));
-                        },
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          CheckboxPlante(
-                              value: _userParams.eatsHoney ?? false,
-                              onChanged: onHoneyCheckboxClick),
-                          Text(context.strings.init_user_page_i_eat_honey),
-                        ]))),
-              ])),
-        ]));
-
-    final onNextClicked = () async {
-      _userParams = _userParams.rebuild((v) => v
-        ..eatsMilk = _userParams.eatsMilk ?? false
-        ..eatsEggs = _userParams.eatsEggs ?? false
-        ..eatsHoney = _userParams.eatsHoney ?? false);
-      _stepperController.stepForward();
-    };
-
-    final buttonDone = Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: SizedBox(
-            width: double.infinity,
-            child: ButtonFilledPlante.withText(
-                context.strings.init_user_page_next_button_title,
-                onPressed:
-                    !_loading && isVegan != null ? onNextClicked : null)));
-
-    final bottomControls =
-        Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonDone);
-
-    return StepperPage(content, bottomControls);
-  }
-
-  StepperPage _page3() {
     final Widget content;
     if (_userLangs != null) {
       content = Column(children: [
