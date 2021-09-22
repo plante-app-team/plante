@@ -86,8 +86,8 @@ class ShopCard extends StatelessWidget {
                         padding: const EdgeInsets.all(5),
                         child: Text(
                             _haveProducts()
-                                ? 'Products listed'
-                                : 'Nothing listed',
+                                ? context.strings.shop_card_products_listed
+                                : context.strings.shop_card_no_products_listed,
                             style: TextStyles.tag)),
                   ),
                 ),
