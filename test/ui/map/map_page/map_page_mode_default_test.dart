@@ -135,9 +135,9 @@ void main() {
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
 
-    expect(find.text(context.strings.shop_card_no_products_in_shop),
+    expect(find.text(context.strings.shop_card_no_products_listed),
         findsOneWidget);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+    expect(find.text(context.strings.shop_card_products_listed),
         findsNothing);
 
     // Add a product to the shop, kind of
@@ -154,8 +154,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-        find.text(context.strings.shop_card_no_products_in_shop), findsNothing);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        find.text(context.strings.shop_card_no_products_listed), findsNothing);
+    expect(find.text(context.strings.shop_card_products_listed),
         findsOneWidget);
   });
 

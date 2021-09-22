@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/button_icon_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/shop/shop_product_range_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
+import 'package:plante/ui/shop/shop_product_range_page.dart';
 
 typedef ShopCardProductSoldChangeCallback = dynamic Function(
     Shop shop, bool? isSold);
@@ -76,40 +77,46 @@ class ShopCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        elevation: 3,
-        child: Column(children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               textDirection: TextDirection.rtl,
               children: [
-                InkWell(
-                  key: const Key('card_cancel_btn'),
-                  borderRadius: BorderRadius.circular(24),
-                  onTap: _onCancel,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: SvgPicture.asset(
-                      'assets/cancel_circle.svg',
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 10, top: 16),
+                  child: Material(
+                    color: _haveProducts()
+                        ? ColorsPlante.amber
+                        : ColorsPlante.lightGrey,
+                    borderRadius: BorderRadius.circular(5),
+                    child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                            _haveProducts()
+                                ? context.strings.shop_card_products_listed
+                                : context.strings.shop_card_no_products_listed,
+                            style: TextStyles.tag)),
                   ),
                 ),
                 Expanded(
                     child: Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 8),
-                        child: Column(children: [
-                          SizedBox(
-                              width: double.infinity,
+                        padding: const EdgeInsets.only(left: 16, top: 16),
+                        child: SizedBox(
+                            width: double.infinity,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5, bottom: 5),
                               child: Text(shop.name,
                                   textAlign: TextAlign.start,
-                                  style: TextStyles.headline1,
+                                  style: TextStyles.headline2,
                                   maxLines: 2,
-                                  overflow: TextOverflow.ellipsis)),
-                          const SizedBox(height: 4),
-                          AddressWidget.forShop(shop, address,
-                              loadCompletedCallback: loadCompletedCallback),
-                        ]))),
+                                  overflow: TextOverflow.ellipsis),
+                            )))),
               ]),
+          Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: AddressWidget.forShop(shop, address,
+                              loadCompletedCallback: loadCompletedCallback),
+          ),
           Padding(
               padding: const EdgeInsets.all(16),
               child: Column(children: [
@@ -120,24 +127,33 @@ class ShopCard extends StatelessWidget {
   }
 
   Widget _productRangeContent(BuildContext context) {
-    return Column(children: [
-      SizedBox(
-          width: double.infinity,
-          child: Text(
-              _haveProducts()
-                  ? context.strings.shop_card_there_are_products_in_shop
-                  : context.strings.shop_card_no_products_in_shop,
-              style: TextStyles.normal)),
-      const SizedBox(height: 12),
-      SizedBox(
-          width: double.infinity,
+    return _getButton(context);
+  }
+
+  Widget _getButton(BuildContext context) {
+    if (_haveProducts()) {
+      return SizedBox(
+          width: 115,
           child: ButtonFilledPlante.withText(
-              _haveProducts()
-                  ? context.strings.shop_card_open_shop_products
-                  : context.strings.shop_card_add_product, onPressed: () {
-            _onMainButtonClick(context);
-          }))
-    ]);
+            context.strings.shop_card_open_shop_products,
+            onPressed: () {
+              _onMainButtonClick(context);
+            },
+            height: 35,
+            textStyle: TextStyles.buttonFilledSmall,
+          ));
+    }
+    return SizedBox(
+        width: 160,
+        child: ButtonIconPlante(context.strings.shop_card_add_product,
+            onPressed: () {
+          _onMainButtonClick(context);
+        },
+            icon: const Icon(
+              Icons.add_sharp,
+              color: Colors.white,
+            ),
+            height: 35));
   }
 
   Widget _checkIfProductSoldContent(BuildContext context) {
@@ -159,7 +175,7 @@ class ShopCard extends StatelessWidget {
       Row(children: [
         Expanded(
             child: SizedBox(
-                height: 46,
+                height: 35,
                 child: CheckButtonPlante(
                   key: Key('${product.barcode}_sold_false'),
                   checked: isProductSold == false,
@@ -175,7 +191,7 @@ class ShopCard extends StatelessWidget {
         const SizedBox(width: 15),
         Expanded(
             child: SizedBox(
-                height: 46,
+                height: 35,
                 child: CheckButtonPlante(
                   key: Key('${product.barcode}_sold_true'),
                   checked: isProductSold == true,
@@ -194,10 +210,6 @@ class ShopCard extends StatelessWidget {
 
   bool _haveProducts() {
     return 0 < shop.productsCount;
-  }
-
-  void _onCancel() {
-    cancelCallback?.call(shop);
   }
 
   void _onMainButtonClick(BuildContext context) {

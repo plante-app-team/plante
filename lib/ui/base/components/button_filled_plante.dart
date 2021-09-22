@@ -6,6 +6,7 @@ import 'package:plante/ui/base/text_styles.dart';
 class ButtonFilledPlante extends StatelessWidget {
   final double? height;
   final Widget child;
+  final TextStyle? textStyle;
   final VoidCallback? onPressed;
   final VoidCallback? onDisabledPressed;
 
@@ -14,12 +15,13 @@ class ButtonFilledPlante extends StatelessWidget {
       required this.child,
       required this.onPressed,
       this.onDisabledPressed,
+      this.textStyle,
       this.height})
       : super(key: key);
 
   ButtonFilledPlante.withText(String text,
-      {Key? key, required this.onPressed, this.onDisabledPressed, this.height})
-      : child = Text(text, style: TextStyles.buttonFilled),
+      {Key? key, required this.onPressed, this.onDisabledPressed, this.height, this.textStyle})
+      : child = Text(text, style: textStyle ?? TextStyles.buttonFilled),
         super(key: key);
 
   @override

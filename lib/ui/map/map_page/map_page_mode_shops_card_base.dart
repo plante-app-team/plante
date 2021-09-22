@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
@@ -64,51 +66,137 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   Widget shopsCardsWidget(BuildContext context) {
     return AnimatedSwitcher(
         duration: DURATION_DEFAULT,
-        child:
-            _displayedShops.isEmpty ? const SizedBox.shrink() : _shopCards());
+        child: _displayedShops.isEmpty
+            ? const SizedBox.shrink()
+            : _displayedShops.length > 1
+                ? _draggableScrollableSheet()
+                : _onlyOneShopSheet());
+  }
+
+  Widget _onlyOneShopSheet() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Row(
+        children: [
+          Expanded(
+            child: Material(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+              elevation: 3,
+              child: SingleChildScrollView(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10, right: 10, bottom: 5),
+                        child: InkWell(
+                          key: const Key('card_cancel_btn'),
+                          onTap: hideShopsCard,
+                          child: SvgPicture.asset(
+                            'assets/cancel_circle.svg',
+                          ),
+                        ),
+                      ),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            Expanded(child: _buildShopCard(context, 0)),
+                          ]),
+                    ]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  DraggableScrollableSheet _draggableScrollableSheet() {
+    return DraggableScrollableSheet(
+        key: const Key('shop_card_scroll'),
+        initialChildSize: 0.30,
+        minChildSize: 0.30,
+        maxChildSize: 0.75,
+        builder: (context, shopScrollController) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+            ),
+            child: CustomScrollView(
+              controller: shopScrollController,
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 1,
+                  backgroundColor: Colors.white,
+                  shape: const ContinuousRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30))),
+                  flexibleSpace: Padding(
+                    padding:
+                        const EdgeInsets.only(top: 8, left: 160, right: 160),
+                    child: Container(
+                        height: 2,
+                        width: 5,
+                        decoration: BoxDecoration(
+                            color: ColorsPlante.divider,
+                            borderRadius: BorderRadius.circular(30))),
+                  ),
+                  actions: [
+                    InkWell(
+                      key: const Key('card_cancel_btn'),
+                      onTap: hideShopsCard,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10, top: 5),
+                        child: SvgPicture.asset(
+                          'assets/cancel_circle.svg',
+                        ),
+                      ),
+                    ),
+                  ],
+                  bottom: PreferredSize(
+                    preferredSize: const Size.fromHeight(-30),
+                    child: Container(), //hack to make appbar smaller
+                  ),
+                ),
+                _shopCards()
+              ],
+            ),
+          );
+        });
   }
 
   Widget _shopCards() {
-    return Align(
-        alignment: Alignment.bottomCenter,
-        child: SizedBox(
-            height: 230,
-            child: PageView.builder(
-              controller: PageController(viewportFraction: 0.87),
-              itemCount: _displayedShops.length,
-              itemBuilder: _buildShopCard,
-            )));
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        _buildShopCard,
+        childCount: math.max(0, _displayedShops.length * 2 - 1),
+      ),
+    );
   }
 
-  Widget _buildShopCard(BuildContext context, int itemIndex) {
-    final double leftPadding;
-    final double rightPadding;
-    if (_displayedShops.length == 1) {
-      leftPadding = 0;
-      rightPadding = 0;
-    } else if (itemIndex == 0) {
-      leftPadding = 0;
-      rightPadding = 6;
-    } else if (itemIndex == _displayedShops.length - 1) {
-      leftPadding = 6;
-      rightPadding = 0;
-    } else {
-      leftPadding = 6;
-      rightPadding = 6;
+  Widget _buildShopCard(BuildContext context, int index) {
+    final int itemIndex = index ~/ 2;
+    if (index.isEven) {
+      return Column(children: [
+        createCardFor(
+            _displayedShops[itemIndex],
+            model.addressOf(_displayedShops[itemIndex]),
+            (Shop shop) => hideShopsCard())
+      ]);
     }
-    return Material(
-        color: Colors.transparent,
-        child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Wrap(children: [
-              Padding(
-                  padding: EdgeInsets.only(
-                      left: leftPadding, right: rightPadding, bottom: 12),
-                  child: createCardFor(
-                      _displayedShops[itemIndex],
-                      model.addressOf(_displayedShops[itemIndex]),
-                      (Shop shop) => hideShopsCard()))
-            ])));
+    return const Divider(
+      height: 2,
+      color: ColorsPlante.divider,
+      indent: 16,
+      endIndent: 16,
+      thickness: 1,
+    );
   }
 
   @protected
