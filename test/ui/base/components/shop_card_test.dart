@@ -107,9 +107,9 @@ void main() {
         .superPump(ShopCard.forProductRange(shop: shop, address: readyAddress));
 
     expect(find.text(shop.name), findsOneWidget);
-    expect(find.text(context.strings.shop_card_no_products_in_shop),
+    expect(find.text(context.strings.shop_card_no_products_listed),
         findsOneWidget);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+    expect(find.text(context.strings.shop_card_products_listed),
         findsNothing);
     expect(
         find.text(context.strings.shop_card_open_shop_products), findsNothing);
@@ -124,8 +124,8 @@ void main() {
 
     expect(find.text(shop.name), findsOneWidget);
     expect(
-        find.text(context.strings.shop_card_no_products_in_shop), findsNothing);
-    expect(find.text(context.strings.shop_card_there_are_products_in_shop),
+        find.text(context.strings.shop_card_no_products_listed), findsNothing);
+    expect(find.text(context.strings.shop_card_products_listed),
         findsOneWidget);
     expect(find.text(context.strings.shop_card_open_shop_products),
         findsOneWidget);

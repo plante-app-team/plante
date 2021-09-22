@@ -64,7 +64,7 @@ dependencies:
   package_info_plus: ^1.0.2
   diffutil_dart: ^2.0.0+1
   visibility_detector: ^0.2.0
-  sign_in_with_apple: ^3.0.0
+  sign_in_with_apple: ^3.1.0
   flutter_linkify: ^5.0.2
   sqflite: ^2.0.0+3
   sqflite_common_ffi: ^2.0.0+1

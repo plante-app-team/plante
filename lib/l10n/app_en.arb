@@ -268,6 +268,9 @@
 
       "shop_card_open_shop_products": "Product list",
       "shop_card_add_product": "Add product",
+      "shop_card_products_listed" : "Products listed",
+      "shop_card_no_products_listed" : "Nothing listed",
+
 
       "shop_address_widget_possible_address": "Approximate address: ",
 

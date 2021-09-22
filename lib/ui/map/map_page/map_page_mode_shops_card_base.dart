@@ -77,41 +77,48 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   Widget _onlyOneShopSheet() {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: 165,
-        child: Material(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-          elevation: 3,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10, right: 10, bottom: 5),
-              child: InkWell(
-                key: const Key('card_cancel_btn'),
-                onTap: hideShopsCard,
-                child: SvgPicture.asset(
-                  'assets/cancel_circle.svg',
-                ),
+      child: Row(
+        children: [
+          Expanded(
+
+            child: Material(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+              elevation: 3,
+              child: SingleChildScrollView(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, right: 10, bottom: 5),
+                    child: InkWell(
+                      key: const Key('card_cancel_btn'),
+                      onTap: hideShopsCard,
+                      child: SvgPicture.asset(
+                        'assets/cancel_circle.svg',
+                      ),
+                    ),
+                  ),
+                  Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        Expanded(child: _buildShopCard(context, 0)),
+                      ]),
+                ]),
               ),
             ),
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                textDirection: TextDirection.rtl,
-                children: [
-                  Expanded(child: _buildShopCard(context, 0)),
-                ]),
-          ]),
-        ),
+          ),
+        ],
       ),
     );
   }
 
   DraggableScrollableSheet _draggableScrollableSheet() {
     return DraggableScrollableSheet(
-        initialChildSize: 0.35,
-        minChildSize: 0.35,
-        maxChildSize: 0.78,
+        key: const Key('shop_card_scroll'),
+        initialChildSize: 0.30,
+        minChildSize: 0.30,
+        maxChildSize: 0.75,
         builder: (context, shopScrollController) {
           return Container(
             decoration: const BoxDecoration(
@@ -175,13 +182,12 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   Widget _buildShopCard(BuildContext context, int index) {
     final int itemIndex = index ~/ 2;
     if (index.isEven) {
-      return Material(
-          child: Column(children: [
+      return Column(children: [
         createCardFor(
-            _displayedShops[itemIndex],
-            model.addressOf(_displayedShops[itemIndex]),
-            (Shop shop) => hideShopsCard())
-      ]));
+        _displayedShops[itemIndex],
+        model.addressOf(_displayedShops[itemIndex]),
+        (Shop shop) => hideShopsCard())
+      ]);
     }
     return const Divider(
       height: 2,

@@ -167,7 +167,7 @@ class ShopCard extends StatelessWidget {
       Row(children: [
         Expanded(
             child: SizedBox(
-                height: 46,
+                height: 35,
                 child: CheckButtonPlante(
                   key: Key('${product.barcode}_sold_false'),
                   checked: isProductSold == false,
@@ -183,7 +183,7 @@ class ShopCard extends StatelessWidget {
         const SizedBox(width: 15),
         Expanded(
             child: SizedBox(
-                height: 46,
+                height: 35,
                 child: CheckButtonPlante(
                   key: Key('${product.barcode}_sold_true'),
                   checked: isProductSold == true,

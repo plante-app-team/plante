@@ -7,7 +7,6 @@ import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold_base.dart';
@@ -115,16 +114,17 @@ void main() {
     widget.onMarkerClickForTesting([shops[0], shops[1]]);
     await tester.pumpAndSettle();
     // Scroll to card 2
-    final card1 = find.byType(ShopCard).evaluate().first.widget;
-    await tester.drag(find.byWidget(card1), const Offset(-3000, 0));
-    await tester.pumpAndSettle();
-    // Button 2 click
     final yesButton2 =
         find.text(context.strings.global_yes).evaluate().last.widget;
+    await tester.dragUntilVisible(find.byWidget(yesButton2), find.byKey(const Key('shop_card_scroll')), const Offset(0, 400));
+    await tester.pumpAndSettle();
+    // Button 2 click
+
     await tester.tap(find.byWidget(yesButton2));
     await tester.pumpAndSettle();
 
     verifyNever(shopsManager.putProductToShops(any, any));
+    expect(find.byKey(const Key('shop_card_scroll')), findsNothing);
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
