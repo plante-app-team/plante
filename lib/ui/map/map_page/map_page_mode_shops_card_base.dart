@@ -80,31 +80,33 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
       child: Row(
         children: [
           Expanded(
-
             child: Material(
               color: Colors.white,
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(15), topRight: Radius.circular(15)),
               elevation: 3,
               child: SingleChildScrollView(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, right: 10, bottom: 5),
-                    child: InkWell(
-                      key: const Key('card_cancel_btn'),
-                      onTap: hideShopsCard,
-                      child: SvgPicture.asset(
-                        'assets/cancel_circle.svg',
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10, right: 10, bottom: 5),
+                        child: InkWell(
+                          key: const Key('card_cancel_btn'),
+                          onTap: hideShopsCard,
+                          child: SvgPicture.asset(
+                            'assets/cancel_circle.svg',
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        Expanded(child: _buildShopCard(context, 0)),
-                      ]),
-                ]),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            Expanded(child: _buildShopCard(context, 0)),
+                          ]),
+                    ]),
               ),
             ),
           ),
@@ -151,7 +153,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
                       key: const Key('card_cancel_btn'),
                       onTap: hideShopsCard,
                       child: Padding(
-                        padding: const EdgeInsets.only(right: 10,top: 5),
+                        padding: const EdgeInsets.only(right: 10, top: 5),
                         child: SvgPicture.asset(
                           'assets/cancel_circle.svg',
                         ),
@@ -184,9 +186,9 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     if (index.isEven) {
       return Column(children: [
         createCardFor(
-        _displayedShops[itemIndex],
-        model.addressOf(_displayedShops[itemIndex]),
-        (Shop shop) => hideShopsCard())
+            _displayedShops[itemIndex],
+            model.addressOf(_displayedShops[itemIndex]),
+            (Shop shop) => hideShopsCard())
       ]);
     }
     return const Divider(

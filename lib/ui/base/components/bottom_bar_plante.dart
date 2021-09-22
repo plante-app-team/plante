@@ -19,11 +19,24 @@ class BottomBarPlante extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
         color: Colors.white,
-        child: SizedBox(
-          height: 86,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: buttons()),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: SizedBox(
+            height: 86,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: buttons()),
+          ),
         ));
   }
 
