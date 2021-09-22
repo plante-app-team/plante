@@ -4,7 +4,7 @@ import 'package:plante/ui/base/text_styles.dart';
 
 class MapSearchResultEntry extends StatelessWidget {
   final String title;
-  final String? subtitle;
+  final Widget? subtitle;
   final double distanceMeters;
   const MapSearchResultEntry(
       {Key? key,
@@ -25,10 +25,7 @@ class MapSearchResultEntry extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, style: TextStyles.headline4),
           if (subtitle != null)
-            Column(children: [
-              const SizedBox(height: 4),
-              Text(subtitle!, style: TextStyles.hint),
-            ]),
+            Column(children: [const SizedBox(height: 4), subtitle!]),
         ]))
       ],
     );

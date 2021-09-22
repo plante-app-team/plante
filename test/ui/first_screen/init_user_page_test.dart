@@ -107,7 +107,8 @@ void main() {
 
     // Expect next screen to not be open even after
     // "Next" tap (because name is too short)
-    expect(find.text(context.strings.init_user_page_langs_explanation), findsNothing);
+    expect(find.text(context.strings.init_user_page_langs_explanation),
+        findsNothing);
   });
 
   testWidgets('Langs saving error', (WidgetTester tester) async {

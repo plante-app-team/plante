@@ -19,6 +19,7 @@ import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page_displayed_error.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
@@ -37,6 +38,8 @@ class MapSearchPageModel {
   final Stream<String> _queryChanges;
   final VoidCallback _updateUi;
   final ArgCallback<MapSearchPageDisplayedError> _errCallback;
+
+  final UiListAddressesObtainer<Shop> _shopsAddresses;
 
   final _searchResultsStream = StreamController<MapSearchResult?>();
 
@@ -81,7 +84,8 @@ class MapSearchPageModel {
       this._querySource,
       this._queryChanges,
       this._updateUi,
-      this._errCallback) {
+      this._errCallback)
+      : _shopsAddresses = UiListAddressesObtainer<Shop>(_addressObtainer) {
     _lastQuery = _querySource.call();
     _queryChanges.listen((updatedQuery) {
       if (_lastQuery != updatedQuery) {
@@ -238,6 +242,7 @@ class MapSearchPageModel {
           .timeout(_ONLINE_SEARCH_TIMEOUT);
     } on TimeoutException {
       // Network timeout - we won't show online result
+      Log.i('Online search timeout for $query');
       _maybeSendError(MapSearchPageDisplayedError.NETWORK);
       osmSearchRes = Ok(OsmSearchResult.empty);
     }
@@ -332,6 +337,15 @@ class MapSearchPageModel {
     if (err != null) {
       _errCallback.call(err);
     }
+  }
+
+  void onDisplayedShopsChanged(Set<Shop> displayedShops, List<Shop> allShops) {
+    _shopsAddresses.onDisplayedEntitiesChanged(
+        displayedEntities: displayedShops, allEntitiesOrdered: allShops);
+  }
+
+  FutureShortAddress requestAddressOf(Shop shop) {
+    return _shopsAddresses.requestAddressOf(shop);
   }
 }
 

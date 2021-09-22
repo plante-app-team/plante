@@ -15,6 +15,8 @@ import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -46,6 +48,8 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
 
   late final MapSearchPageModel _model;
   MapSearchResult? _lastSearchResult;
+
+  final _displayedShops = <Shop>{};
 
   _MapSearchPageState() : super('MapSearchPage');
 
@@ -166,14 +170,6 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
     return results;
   }
 
-  // Widget _itemPadding(Widget item) => Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-  //     child: item);
-
-  // Widget _itemsTitlePadding(Widget item) => Padding(
-  //     padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
-  //     child: item);
-
   List<Widget> _convertFoundEntitiesToWidgets<T>(
       {required Iterable<T>? entities,
       required EdgeInsets entityPadding,
@@ -215,10 +211,26 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   }
 
   Widget _shopToWidget(Shop shop) {
-    return MapSearchResultEntry(
-        title: shop.name,
-        subtitle: shop.type?.localize(context),
-        distanceMeters: metersBetween(_model.center, shop.coord));
+    return VisibilityDetectorPlante(
+        keyStr: shop.osmId,
+        onVisibilityChanged: (visible, _) =>
+            _onShopVisibilityChange(shop, visible),
+        child: MapSearchResultEntry(
+            title: shop.name,
+            subtitle:
+                AddressWidget.forShop(shop, _model.requestAddressOf(shop)),
+            distanceMeters: metersBetween(_model.center, shop.coord)));
+  }
+
+  void _onShopVisibilityChange(Shop shop, bool visible) {
+    if (visible) {
+      _displayedShops.add(shop);
+    } else {
+      _displayedShops.remove(shop);
+    }
+    _model.onDisplayedShopsChanged(
+        _displayedShops.toSet(), // Defensive copy
+        _lastSearchResult?.shops?.toList() ?? []);
   }
 
   Widget _roadToWidget(OsmRoad road) {
