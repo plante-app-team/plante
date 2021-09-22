@@ -19,6 +19,7 @@ import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -28,6 +29,7 @@ import 'package:plante/ui/map/search_page/map_search_page_model.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
 
+import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
@@ -140,6 +142,10 @@ void main() {
           ..city = 'London'
           ..country = 'England'
           ..countryCode = 'UK')));
+    when(addressObtainer.addressOfShop(any))
+        .thenAnswer((_) async => Ok(OsmShortAddress((e) => e
+          ..city = 'London'
+          ..road = 'Broadway')));
 
     setUpFoundEntities(
         localShops: [],
@@ -953,6 +959,56 @@ void main() {
       expectedRoads: localRoads + foundInOsmRoads,
     );
     expect(find.text('cool query'), findsOneWidget);
+  });
+
+  testWidgets('shops addresses are displayed', (WidgetTester tester) async {
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '1'
+          ..name = 'shop name 1'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon
+          ..latitude = userPos.lat))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '1'
+          ..productsCount = 2))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmId = '2'
+          ..name = 'shop name 2'
+          ..type = 'supermarket'
+          ..longitude = userPos.lon
+          ..latitude = userPos.lat))
+        ..backendShop.replace(BackendShop((e) => e
+          ..osmId = '2'
+          ..productsCount = 2))),
+    ];
+
+    final addresses = [
+      OsmShortAddress((e) => e
+        ..city = 'London'
+        ..road = 'Broadway'),
+      OsmShortAddress((e) => e
+        ..city = 'London'
+        ..road = 'Baker street'),
+    ];
+
+    when(addressObtainer.addressOfShop(shops[0]))
+        .thenAnswer((_) async => Ok(addresses[0]));
+    when(addressObtainer.addressOfShop(shops[1]))
+        .thenAnswer((_) async => Ok(addresses[1]));
+
+    setUpFoundEntities(localShops: shops);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'shop name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    expect(find.richTextContaining(addresses[0].road!), findsWidgets);
+    expect(find.richTextContaining(addresses[1].road!), findsWidgets);
   });
 }
 

@@ -17,7 +17,8 @@ class PhotosTaker {
 
     try {
       Log.i('takeAndCropPhoto imagePicker.getImage');
-      final pickedFile = await imagePicker.getImage(source: ImageSource.camera);
+      final pickedFile =
+          await imagePicker.pickImage(source: ImageSource.camera);
       if (pickedFile == null) {
         Log.i('takeAndCropPhoto pickedFile == null');
         return null;
@@ -50,9 +51,12 @@ class PhotosTaker {
   /// See https://pub.dev/packages/image_picker#handling-mainactivity-destruction-on-android
   /// Android, man!
   Future<Result<Uri, PlatformException>?> retrieveLostPhoto() async {
-    final picker = ImagePicker();
+    if (!Platform.isAndroid) {
+      return null;
+    }
 
-    final LostData response = await picker.getLostData();
+    final picker = ImagePicker();
+    final response = await picker.retrieveLostData();
     if (response.isEmpty) {
       return null;
     }

@@ -70,4 +70,27 @@ extension WidgetTesterExtension on WidgetTester {
     await enterText(finder, text);
     await pumpAndSettle();
   }
+
+  /// For some reason [testWidgets] doesn't work with futures which weren't
+  /// produced by a [WidgetTester].
+  /// Which means if a widget provides some future we can await, the awaiting
+  /// test will hang on it.
+  ///
+  /// This function is a hack which resolves this problem - it converts
+  /// the not-awaitable future to an awaitable.
+  ///
+  /// I'm not 100% sure of why this works.
+  /// The most probable explanation is the next one:
+  /// 1. Flutter widget test run in a fake async environment (FakeAsync).
+  /// 2. This somehow conflicts with awaiting futures not produced by a [WidgetTester].
+  /// 3. We resolve this conflict by wrapping such a future into another
+  ///    future which is produced by [WidgetTester.runAsync].
+  Future<T> awaitableFutureFrom<T>(Future<T> future) async {
+    await runAsync(() async => _noop());
+    final res = await future;
+    await pumpAndSettle();
+    return res;
+  }
 }
+
+void _noop() {}

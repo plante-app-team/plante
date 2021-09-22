@@ -6,7 +6,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_icon_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
-import 'package:plante/ui/base/components/shop_address_widget.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/l10n/strings.dart';
@@ -25,6 +25,8 @@ class ShopCard extends StatelessWidget {
   final bool? isProductSold;
   final ShopCardProductSoldChangeCallback? onIsProductSoldChanged;
 
+  final VoidCallback? loadCompletedCallback;
+
   const ShopCard._(
       {Key? key,
       required this.shop,
@@ -32,20 +34,23 @@ class ShopCard extends StatelessWidget {
       required this.checkedProduct,
       this.isProductSold,
       this.onIsProductSoldChanged,
-      this.cancelCallback})
+      this.cancelCallback,
+      this.loadCompletedCallback})
       : super(key: key);
 
   factory ShopCard.forProductRange(
       {Key? key,
       required Shop shop,
       required FutureShortAddress address,
-      ArgCallback<Shop>? cancelCallback}) {
+      ArgCallback<Shop>? cancelCallback,
+      VoidCallback? loadCompletedCallback}) {
     return ShopCard._(
         key: key,
         shop: shop,
         address: address,
         checkedProduct: null,
-        cancelCallback: cancelCallback);
+        cancelCallback: cancelCallback,
+        loadCompletedCallback: loadCompletedCallback);
   }
 
   factory ShopCard.askIfProductIsSold(
@@ -55,7 +60,8 @@ class ShopCard extends StatelessWidget {
       required FutureShortAddress address,
       required bool? isProductSold,
       required ShopCardProductSoldChangeCallback onIsProductSoldChanged,
-      ArgCallback<Shop>? cancelCallback}) {
+      ArgCallback<Shop>? cancelCallback,
+      VoidCallback? loadCompletedCallback}) {
     return ShopCard._(
         key: key,
         shop: shop,
@@ -63,7 +69,8 @@ class ShopCard extends StatelessWidget {
         checkedProduct: product,
         isProductSold: isProductSold,
         onIsProductSoldChanged: onIsProductSoldChanged,
-        cancelCallback: cancelCallback);
+        cancelCallback: cancelCallback,
+        loadCompletedCallback: loadCompletedCallback);
   }
 
   @override
@@ -107,7 +114,8 @@ class ShopCard extends StatelessWidget {
               ]),
           Padding(
             padding: const EdgeInsets.only(left: 16),
-            child: ShopAddressWidget(shop, address),
+            child: AddressWidget.forShop(shop, address,
+                              loadCompletedCallback: loadCompletedCallback),
           ),
           Padding(
               padding: const EdgeInsets.all(16),

@@ -144,6 +144,28 @@ void main() {
     expect(visible, isTrue);
     expect(callsCount, equals(3));
   });
+
+  testWidgets('when widget is disposed it notifies about gone visibility',
+      (WidgetTester tester) async {
+    bool? visible;
+    final visibilityDetector = VisibilityDetectorPlante(
+      keyStr: 'key',
+      appLifecycleWatcher: FakeAppLifecycleWatcher(),
+      onVisibilityChanged: (visibleIn, _) {
+        visible = visibleIn;
+      },
+      child: Container(width: 10, height: 10, color: Colors.white),
+    );
+    final helper = _VisibilityDetectorTestHelper(visibilityDetector);
+
+    await tester.superPump(helper);
+    await tester.pumpAndSettle();
+    expect(visible, isTrue);
+
+    helper.disposeWidget();
+    await tester.pumpAndSettle();
+    expect(visible, isFalse);
+  });
 }
 
 class _VisibilityDetectorTestHelper extends StatefulWidget {
@@ -159,15 +181,21 @@ class _VisibilityDetectorTestHelper extends StatefulWidget {
   void showPage(int page) {
     _storage._showPageCallback!.call(page);
   }
+
+  void disposeWidget() {
+    _storage._disposeWidgetCallback!.call();
+  }
 }
 
 class _VisibilityDetectorTestHelperCallbacksStorage {
   ArgCallback<int>? _showPageCallback;
+  VoidCallback? _disposeWidgetCallback;
 }
 
 class __VisibilityDetectorTestHelperState
     extends State<_VisibilityDetectorTestHelper> {
   var _page = 0;
+  var _dispose = false;
 
   @override
   void initState() {
@@ -177,10 +205,18 @@ class __VisibilityDetectorTestHelperState
         _page = page;
       });
     };
+    widget._storage._disposeWidgetCallback = () {
+      setState(() {
+        _dispose = true;
+      });
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_dispose) {
+      return const SizedBox.shrink();
+    }
     return IndexedStack(index: _page, children: [
       widget.visibilityDetector,
       const SizedBox.shrink(),

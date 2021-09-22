@@ -8,6 +8,7 @@ typedef OnVisibilityChanged = Function(bool visible, bool firstNotification);
 /// Wrapper around [VisibilityDetector].
 /// Observes VisibilityDetector, app's background-foreground state and
 /// supports tests.
+/// Also notifies about gone visibility when is disposed.
 ///
 /// PLEASE NOTE that unfortunately the events emitted by this widget (and by
 /// [VisibilityDetector]) are PROBABILISTIC, and DO NOT GUARANTY that the
@@ -79,6 +80,7 @@ class _VisibilityDetectorPlanteState extends State<VisibilityDetectorPlante>
   @override
   void dispose() {
     widget.appLifecycleWatcher.removeObserver(this);
+    _onVisibilityPieceChange(newFraction: 0);
     super.dispose();
   }
 
