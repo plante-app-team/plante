@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:plante/base/base.dart';
 
 class GradientSpinner extends StatefulWidget {
   const GradientSpinner({Key? key}) : super(key: key);
@@ -33,7 +34,9 @@ class _GradientSpinnerState extends State<GradientSpinner>
         _animationController.forward();
       }
     });
-    _animationController.forward();
+    if (!isInTests()) {
+      _animationController.forward();
+    }
   }
 
   @override
