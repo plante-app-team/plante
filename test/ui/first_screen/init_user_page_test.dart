@@ -53,14 +53,6 @@ void main() {
         .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // await tester.tap(find.text(context.strings.init_user_page_i_eat_honey));
-    // await tester.pumpAndSettle();
-    //
-    // await tester
-    //     .tap(find.text(context.strings.init_user_page_next_button_title));
-    // await tester.pumpAndSettle();
-
     await tester.tap(find.text(LangCode.be.localize(context)));
     await tester.pumpAndSettle();
 
@@ -92,14 +84,6 @@ void main() {
         .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
 
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // await tester.tap(find.text(context.strings.init_user_page_im_vegan));
-    // await tester.pumpAndSettle();
-    //
-    // await tester
-    //     .tap(find.text(context.strings.init_user_page_next_button_title));
-    // await tester.pumpAndSettle();
-
     // We're ok with the system lang
     await tester
         .tap(find.text(context.strings.init_user_page_done_button_title));
@@ -123,30 +107,8 @@ void main() {
 
     // Expect next screen to not be open even after
     // "Next" tap (because name is too short)
-    expect(find.text(context.strings.init_user_page_i_eat_honey), findsNothing);
+    expect(find.text(context.strings.init_user_page_langs_explanation), findsNothing);
   });
-
-  // Vegan-only https://trello.com/c/eUGrj1eH/
-  // testWidgets('Does not finish without vegan or vegetarian selection',
-  //     (WidgetTester tester) async {
-  //   final initialParams = UserParams((v) => v.name = 'Nora');
-  //   await userParamsController.setUserParams(initialParams);
-  //   final context = await tester.superPump(const InitUserPage());
-  //
-  //   await tester.pumpAndSettle();
-  //   await tester
-  //       .tap(find.text(context.strings.init_user_page_next_button_title));
-  //   await tester.pumpAndSettle();
-  //
-  //   await tester
-  //       .tap(find.text(context.strings.init_user_page_next_button_title));
-  //   await tester.pumpAndSettle();
-  //
-  //   // Expect next screen to not be open even after
-  //   // "Next" tap (because veg-selection is not made)
-  //   expect(find.text(context.strings.init_user_page_langs_explanation),
-  //       findsNothing);
-  // });
 
   testWidgets('Langs saving error', (WidgetTester tester) async {
     userLangsManager.savingLangsError = UserLangsManagerError.NETWORK;
@@ -159,14 +121,6 @@ void main() {
     await tester
         .tap(find.text(context.strings.init_user_page_next_button_title));
     await tester.pumpAndSettle();
-
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // await tester.tap(find.text(context.strings.init_user_page_i_eat_honey));
-    // await tester.pumpAndSettle();
-    //
-    // await tester
-    //     .tap(find.text(context.strings.init_user_page_next_button_title));
-    // await tester.pumpAndSettle();
 
     await tester.tap(find.text(LangCode.be.localize(context)));
     await tester.pumpAndSettle();
