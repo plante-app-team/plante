@@ -20,7 +20,11 @@ class ButtonFilledPlante extends StatelessWidget {
       : super(key: key);
 
   ButtonFilledPlante.withText(String text,
-      {Key? key, required this.onPressed, this.onDisabledPressed, this.height, this.textStyle})
+      {Key? key,
+      required this.onPressed,
+      this.onDisabledPressed,
+      this.height,
+      this.textStyle})
       : child = Text(text, style: textStyle ?? TextStyles.buttonFilled),
         super(key: key);
 

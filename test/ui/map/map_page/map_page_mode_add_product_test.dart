@@ -116,7 +116,8 @@ void main() {
     // Scroll to card 2
     final yesButton2 =
         find.text(context.strings.global_yes).evaluate().last.widget;
-    await tester.dragUntilVisible(find.byWidget(yesButton2), find.byKey(const Key('shop_card_scroll')), const Offset(0, 400));
+    await tester.dragUntilVisible(find.byWidget(yesButton2),
+        find.byKey(const Key('shop_card_scroll')), const Offset(0, 400));
     await tester.pumpAndSettle();
     // Button 2 click
 

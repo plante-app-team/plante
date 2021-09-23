@@ -89,7 +89,8 @@ class ShopsManagerTestCommons {
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));
-    when(osm.fetchShops(any)).thenAnswer((_) async => Ok(osmShops));
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
+        .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
     when(productsObtainer.inflate(rangeBackendProducts[0]))

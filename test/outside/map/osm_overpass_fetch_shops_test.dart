@@ -79,8 +79,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(3));
 
@@ -119,8 +121,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrap().length, equals(0));
 
     // Empty response is still a successful response
@@ -137,8 +141,10 @@ void main() {
 
     http.setResponse('.*', osmResp, responseCode: 400);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // On HTTP errors all Overpass URLs expected to be queried 1 by 1
@@ -163,8 +169,10 @@ void main() {
     http.setResponse('.*${forcedOrderedUrls[3]}.*', okOsmResp,
         responseCode: 400);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.isOk, isTrue);
 
     // First request expected to be failed
@@ -185,8 +193,10 @@ void main() {
       http.reset();
       http.setResponse('.*', '', responseCode: httpResponseCode);
 
-      await overpass.fetchShops(CoordsBounds(
-          southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+      await overpass.fetchShops(
+          bounds: CoordsBounds(
+              southwest: Coord(lat: 0, lon: 0),
+              northeast: Coord(lat: 1, lon: 1)));
 
       // We expect analytics event only in case of 2 error codes
       if (httpResponseCode == 403 || httpResponseCode == 429) {
@@ -212,8 +222,10 @@ void main() {
     ''';
 
     http.setResponse('.*', osmResp);
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // Response with an invalid JSON is still a successful response
@@ -229,8 +241,10 @@ void main() {
     ''';
 
     http.setResponse('.*', osmResp);
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     expect(shopsRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
 
     // Empty response is still a successful response
@@ -266,8 +280,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -302,8 +318,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(2));
     expect(shops[0].name, 'Spar');
@@ -353,8 +371,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -390,8 +410,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');
@@ -427,8 +449,10 @@ void main() {
 
     http.setResponse('.*', osmResp);
 
-    final shopsRes = await overpass.fetchShops(CoordsBounds(
-        southwest: Coord(lat: 0, lon: 0), northeast: Coord(lat: 1, lon: 1)));
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
     final shops = shopsRes.unwrap();
     expect(shops.length, equals(1));
     expect(shops[0].name, 'Spar');

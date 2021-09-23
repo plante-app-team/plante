@@ -137,8 +137,7 @@ void main() {
 
     expect(find.text(context.strings.shop_card_no_products_listed),
         findsOneWidget);
-    expect(find.text(context.strings.shop_card_products_listed),
-        findsNothing);
+    expect(find.text(context.strings.shop_card_products_listed), findsNothing);
 
     // Add a product to the shop, kind of
     var backendShop = commons.shops[0].backendShop!;
@@ -155,8 +154,8 @@ void main() {
 
     expect(
         find.text(context.strings.shop_card_no_products_listed), findsNothing);
-    expect(find.text(context.strings.shop_card_products_listed),
-        findsOneWidget);
+    expect(
+        find.text(context.strings.shop_card_products_listed), findsOneWidget);
   });
 
   testWidgets('shops card closes on back press', (WidgetTester tester) async {
