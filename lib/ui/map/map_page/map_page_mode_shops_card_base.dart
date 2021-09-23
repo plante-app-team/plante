@@ -131,7 +131,9 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
               controller: shopScrollController,
               slivers: [
                 SliverAppBar(
-                  expandedHeight: 1,
+                  elevation: 0,
+                  expandedHeight: 2,
+                  pinned: true,
                   backgroundColor: Colors.white,
                   shape: const ContinuousRectangleBorder(
                       borderRadius: BorderRadius.only(
@@ -152,7 +154,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
                       key: const Key('card_cancel_btn'),
                       onTap: hideShopsCard,
                       child: Padding(
-                        padding: const EdgeInsets.only(right: 10, top: 5),
+                        padding: const EdgeInsets.only(right: 10, top: 5, bottom: 3),
                         child: SvgPicture.asset(
                           'assets/cancel_circle.svg',
                         ),
