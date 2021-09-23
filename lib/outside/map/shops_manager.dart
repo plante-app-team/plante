@@ -136,8 +136,8 @@ class ShopsManager {
 
     if (osmShopsToLoad.isNotEmpty) {
       final inflateResult = await _requester.inflateOsmShops(osmShopsToLoad);
-      Log.w('ShopsManager.inflateOsmShops err: $inflateResult');
       if (inflateResult.isErr) {
+        Log.w('ShopsManager.inflateOsmShops err: $inflateResult');
         return inflateResult;
       }
 
