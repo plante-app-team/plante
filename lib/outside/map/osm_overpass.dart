@@ -43,21 +43,37 @@ class OsmOverpass {
     _urls['taiwan'] = 'overpass.nchc.org.tw';
   }
 
+  /// Order of returned shops is not guaranteed to resemble order of [ids].
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
-      CoordsBounds bounds) async {
+      {CoordsBounds? bounds, Iterable<String>? ids}) async {
     if (!_interactionsQueue.isInteracting(OsmInteractionService.OVERPASS)) {
       Log.e('OSM.fetchShops called outside of the queue');
     }
-    final val1 = bounds.southwest.lat;
-    final val2 = bounds.southwest.lon;
-    final val3 = bounds.northeast.lat;
-    final val4 = bounds.northeast.lon;
     final typesStr = ShopType.values.map((type) => type.osmName).join('|');
-    final cmd = '[out:json];('
-        'node[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
-        'relation[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
-        'way[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
-        ');out center;';
+
+    final String boundsCmdPiece;
+    if (bounds != null) {
+      final val1 = bounds.southwest.lat;
+      final val2 = bounds.southwest.lon;
+      final val3 = bounds.northeast.lat;
+      final val4 = bounds.northeast.lon;
+      boundsCmdPiece = 'node[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
+          'relation[shop~"$typesStr"]($val1,$val2,$val3,$val4);'
+          'way[shop~"$typesStr"]($val1,$val2,$val3,$val4);';
+    } else {
+      boundsCmdPiece = '';
+    }
+    final String idsCmdPiece;
+    if (ids != null) {
+      final idsStr = ids.join(',');
+      idsCmdPiece = 'node[shop~"$typesStr"](id:$idsStr);'
+          'relation[shop~"$typesStr"](id:$idsStr);'
+          'way[shop~"$typesStr"](id:$idsStr);';
+    } else {
+      idsCmdPiece = '';
+    }
+
+    final cmd = '[out:json];($boundsCmdPiece$idsCmdPiece);out center;';
 
     final response = await _sendCmd(cmd);
     if (response.isErr) {

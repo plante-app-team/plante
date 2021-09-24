@@ -115,7 +115,7 @@ class ShopCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 16),
             child: AddressWidget.forShop(shop, address,
-                              loadCompletedCallback: loadCompletedCallback),
+                loadCompletedCallback: loadCompletedCallback),
           ),
           Padding(
               padding: const EdgeInsets.all(16),

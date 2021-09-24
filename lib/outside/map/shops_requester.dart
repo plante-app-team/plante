@@ -36,7 +36,7 @@ class ShopsRequester {
     // Either request OSM shops or use preloaded
     final Iterable<OsmShop> osmShops;
     if (preloadedOsmShops == null) {
-      final osmShopsResult = await overpass.fetchShops(osmBounds);
+      final osmShopsResult = await overpass.fetchShops(bounds: osmBounds);
       if (osmShopsResult.isErr) {
         return Err(_convertOsmErr(osmShopsResult.unwrapErr()));
       }

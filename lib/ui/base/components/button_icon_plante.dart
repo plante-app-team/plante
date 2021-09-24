@@ -30,7 +30,7 @@ class ButtonIconPlante extends StatelessWidget {
         onTap: onPressed != null ? null : onDisabledPressed,
         child: SizedBox(
             height: height ?? 46,
-            child: OutlinedButton (
+            child: OutlinedButton(
                 style: ButtonStyle(
                     padding: MaterialStateProperty.all(
                         const EdgeInsets.only(left: 10, right: 10)),
@@ -48,10 +48,7 @@ class ButtonIconPlante extends StatelessWidget {
                 onPressed: onPressed,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(child: label),
-                    icon
-                  ],
-                ) )));
+                  children: [Flexible(child: label), icon],
+                ))));
   }
 }

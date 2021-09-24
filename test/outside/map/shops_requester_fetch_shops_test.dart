@@ -37,7 +37,7 @@ void main() {
   });
 
   test('fetchShops with simple bounds without preloaded data', () async {
-    when(osm.fetchShops(any))
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(someOsmShops.values.toList()));
     when(backend.requestShops(any))
         .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
@@ -65,7 +65,7 @@ void main() {
     when(backend.requestShops(any))
         .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
     // OSM would return an error if it would be queried...
-    when(osm.fetchShops(any))
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
 
     // ...but we still expect [osmShops] to be ok! Because...
@@ -112,7 +112,7 @@ void main() {
           ..longitude = 100000);
       }
     }
-    when(osm.fetchShops(any))
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops.values.toList()));
     // Prepare backend shops
     when(backend.requestShops(any)).thenAnswer((invc) async {
@@ -143,7 +143,7 @@ void main() {
   });
 
   test('fetchShops osm error', () async {
-    when(osm.fetchShops(any))
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Err(OpenStreetMapError.NETWORK));
 
     final backendShops = [
@@ -174,7 +174,8 @@ void main() {
         ..longitude = 123
         ..latitude = 321)
     ];
-    when(osm.fetchShops(any)).thenAnswer((_) async => Ok(osmShops));
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
+        .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any))
         .thenAnswer((_) async => Err(BackendError.other()));
 

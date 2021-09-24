@@ -69,7 +69,7 @@ void main() {
     final shops = shopsRes.unwrap();
     expect(shops, equals(fullShops));
     // Both backends expected to be touched
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
 
     clearInteractions(osm);
@@ -90,7 +90,7 @@ void main() {
     final shops1 = shopsRes1.unwrap();
     expect(shops1, equals(fullShops));
     // Both backends expected to be touched
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
     // Reset mocks
     clearInteractions(osm);
@@ -104,7 +104,7 @@ void main() {
     // Fetch #2
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
-    verifyNever(osm.fetchShops(any));
+    verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
     verifyNever(backend.requestShops(any));
 
     // Ensure +1 product in productsCount
@@ -127,7 +127,8 @@ void main() {
         ..latitude = 15),
     ];
     final backendShops = <BackendShop>[];
-    when(osm.fetchShops(any)).thenAnswer((_) async => Ok(osmShops));
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
+        .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
     final fullShops = {
       osmShops[0].osmId: Shop((e) => e..osmShop.replace(osmShops[0])),
@@ -139,7 +140,7 @@ void main() {
     expect(shops1, equals(fullShops));
     expect(shops1.values.first.backendShop, isNull);
     // Both backends expected to be touched
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
     // Reset mocks
     clearInteractions(osm);
@@ -153,7 +154,7 @@ void main() {
     // Fetch #2
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
-    verifyNever(osm.fetchShops(any));
+    verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
     verifyNever(backend.requestShops(any));
 
     // Ensure a BackendShop is now created even though it didn't exist before
@@ -186,7 +187,7 @@ void main() {
       expect(result.unwrap(), equals(fullShops));
     }
     // Both backends expected to be touched exactly once
-    verify(osm.fetchShops(any)).called(1);
+    verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
     verify(backend.requestShops(any)).called(1);
   });
 
@@ -198,7 +199,7 @@ void main() {
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isOk, isTrue);
     // Both backends expected to be touched
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
 
     clearInteractions(osm);
@@ -209,7 +210,7 @@ void main() {
     expect(shopsRes2.isOk, isTrue);
     // Both backends expected to be touched again!
     // Because the requested area is too far away from the cached one
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
   });
 
@@ -217,7 +218,7 @@ void main() {
     // First request to each will fail, the others will succeed
     var osmLoadsCount = 0;
     var backendLoadsCount = 0;
-    when(osm.fetchShops(any)).thenAnswer((_) async {
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       osmLoadsCount += 1;
       if (osmLoadsCount == 1) {
         return Err(OpenStreetMapError.OTHER);
@@ -239,13 +240,13 @@ void main() {
 
     // First call fails, second succeeds, but backend fails then.
     // So the third call will be the final one.
-    verify(osm.fetchShops(any)).called(3);
+    verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(3);
     // First call fails, second succeeds.
     verify(backend.requestShops(any)).called(2);
   });
 
   test('all shops loads failed', () async {
-    when(osm.fetchShops(any)).thenAnswer((_) async {
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       return Err(OpenStreetMapError.OTHER);
     });
     when(backend.requestShops(any)).thenAnswer((_) async {
@@ -259,7 +260,7 @@ void main() {
     // First request will fail, the others would succeed.
     // Would, if not for the network error!
     var osmLoadsCount = 0;
-    when(osm.fetchShops(any)).thenAnswer((_) async {
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       osmLoadsCount += 1;
       if (osmLoadsCount == 1) {
         return Err(OpenStreetMapError.NETWORK);
@@ -275,7 +276,7 @@ void main() {
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
 
     // First call fails with a network errors, other calls don't happen.
-    verify(osm.fetchShops(any)).called(1);
+    verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
     verifyNever(backend.requestShops(any));
   });
 
@@ -283,8 +284,9 @@ void main() {
     // First request to OSM will fail, the others will succeed
     var osmLoadsCount = 0;
     final osmRequestedBounds = <CoordsBounds>[];
-    when(osm.fetchShops(any)).thenAnswer((invc) async {
-      final bounds = invc.positionalArguments[0] as CoordsBounds;
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((invc) async {
+      final bounds =
+          invc.namedArguments[const Symbol('bounds')] as CoordsBounds;
       osmRequestedBounds.add(bounds);
       osmLoadsCount += 1;
       if (osmLoadsCount == 1) {
@@ -351,7 +353,7 @@ void main() {
     expect(shops, isNot(equals(shopsCreatedFromCache)));
     expect(shops, equals(fullShops));
     // OSM expected to be touched because the persistent cache is old
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
 
     // We expect old persistent cache to be deleted and new to be saved
     final newCache = await osmCacher.getCachedShops();
@@ -374,7 +376,7 @@ void main() {
         now, bounds.center.makeSquare(1), osmShopsInPersistentCacheShops);
 
     // OSM returns errors
-    when(osm.fetchShops(any)).thenAnswer((_) async {
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       return Err(OpenStreetMapError.OTHER);
     });
 
@@ -385,7 +387,7 @@ void main() {
     expect(shops, equals(shopsCreatedFromCache));
     expect(shops, isNot(equals(fullShops)));
     // OSM expected to be touched because the persistent cache is old
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
 
     // We expect the persistent cache to be unchanged because OSM is not responsive
     expect(await osmCacher.getCachedShops(), equals([oldCache]));
@@ -403,7 +405,7 @@ void main() {
         now, bounds.center.makeSquare(1), osmShopsInPersistentCacheShops);
 
     // OSM returns errors
-    when(osm.fetchShops(any)).thenAnswer((_) async {
+    when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       return Err(OpenStreetMapError.OTHER);
     });
 
@@ -530,7 +532,7 @@ void main() {
     final initialShops = initialShopsRes.unwrap();
     expect(initialShops, equals(fullShops));
     // Both backends expected to be touched
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
 
     clearInteractions(osm);
@@ -558,7 +560,7 @@ void main() {
     expect(shops.values, contains(newShop));
 
     // Both backends expected to be NOT touched, cache expected to be used
-    verifyNever(osm.fetchShops(any));
+    verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
     verifyNever(backend.requestShops(any));
   });
 
@@ -673,7 +675,8 @@ void main() {
         ..longitude = 15.0001
         ..latitude = 15.0001),
     ];
-    when(osm.fetchShops(any)).thenAnswer((_) async => Ok(osmShops));
+    when(osm.fetchShops(bounds: anyNamed('bounds')))
+        .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
     final northeast = Coord(lat: 15, lon: 15);
@@ -686,7 +689,7 @@ void main() {
     // Only shop 1 is expected because only it is within the bounds
     expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
     // Verify cache was not used
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
 
     clearInteractions(osm);
 
@@ -696,7 +699,7 @@ void main() {
     // Again only shop 1 is expected because only it is within the bounds
     expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
     // Verify cache WAS used
-    verifyNever(osm.fetchShops(any));
+    verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
   });
 
   test('clear cache', () async {
@@ -724,7 +727,7 @@ void main() {
     // Fetch #3 is run after we cleared cache so backends
     // are expected to be touched
     await shopsManager.fetchShops(bounds);
-    verify(osm.fetchShops(any));
+    verify(osm.fetchShops(bounds: anyNamed('bounds')));
     verify(backend.requestShops(any));
     // Persistent cache expected to be refilled
     expect(await osmCacher.getCachedShops(), isNotEmpty);

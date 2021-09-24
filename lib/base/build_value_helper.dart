@@ -17,6 +17,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm_short_address.dart';
 
 part 'build_value_helper.g.dart';
 
@@ -34,6 +35,7 @@ part 'build_value_helper.g.dart';
   OsmRoad,
   Shop,
   OsmAddress,
+  OsmShortAddress,
   ModeratorChoiceReason,
   LangCode,
   UserLangs,

@@ -33,7 +33,6 @@ import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
-
 enum MapPageRequestedMode {
   DEFAULT,
   ADD_PRODUCT,

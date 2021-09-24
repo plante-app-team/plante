@@ -565,9 +565,10 @@ class MockOsmOverpass extends _i1.Mock implements _i37.OsmOverpass {
   Map<String, String> get urls => (super.noSuchMethod(Invocation.getter(#urls),
       returnValue: <String, String>{}) as Map<String, String>);
   @override
-  _i9.Future<_i2.Result<List<_i38.OsmShop>, _i11.OpenStreetMapError>>
-      fetchShops(_i39.CoordsBounds? bounds) => (super.noSuchMethod(
-          Invocation.method(#fetchShops, [bounds]),
+  _i9.Future<_i2.Result<List<_i38.OsmShop>, _i11.OpenStreetMapError>> fetchShops(
+          {_i39.CoordsBounds? bounds, Iterable<String>? ids}) =>
+      (super.noSuchMethod(
+          Invocation.method(#fetchShops, [], {#bounds: bounds, #ids: ids}),
           returnValue: Future<
                   _i2.Result<List<_i38.OsmShop>, _i11.OpenStreetMapError>>.value(
               _FakeResult_0<List<_i38.OsmShop>, _i11.OpenStreetMapError>())) as _i9
