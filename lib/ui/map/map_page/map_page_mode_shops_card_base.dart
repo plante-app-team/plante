@@ -95,43 +95,50 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
 
   Widget _onlyOneShopSheet() {
     return Align(
-      alignment: Alignment.bottomCenter,
-      child: Row(
-        children: [
-          Expanded(
-            child: Material(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-              elevation: 3,
-              child: SingleChildScrollView(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 10, right: 10, bottom: 5),
-                        child: InkWell(
-                          key: const Key('card_cancel_btn'),
-                          onTap: hideShopsCard,
-                          child: SvgPicture.asset(
-                            'assets/cancel_circle.svg',
+        alignment: Alignment.bottomCenter,
+        child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            if ((details.primaryVelocity ?? 0) > 400) {
+              hideShopsCard();
+            }
+          },
+          child: Row(
+            children: [
+              Expanded(
+                child: Material(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15)),
+                  elevation: 3,
+                  child: SingleChildScrollView(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10, right: 10, bottom: 5),
+                            child: InkWell(
+                              key: const Key('card_cancel_btn'),
+                              onTap: hideShopsCard,
+                              child: SvgPicture.asset(
+                                'assets/cancel_circle.svg',
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            Expanded(child: _buildShopCard(context, 0)),
-                          ]),
-                    ]),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                Expanded(child: _buildShopCard(context, 0)),
+                              ]),
+                        ]),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _draggableScrollableSheet() {
