@@ -143,9 +143,7 @@ class ShopCard extends StatelessWidget {
             textStyle: TextStyles.buttonFilledSmall,
           ));
     }
-    return SizedBox(
-        width: 160,
-        child: ButtonIconPlante(context.strings.shop_card_add_product,
+    return ButtonIconPlante(context.strings.shop_card_add_product,
             onPressed: () {
           _onMainButtonClick(context);
         },
@@ -153,7 +151,7 @@ class ShopCard extends StatelessWidget {
               Icons.add_sharp,
               color: Colors.white,
             ),
-            height: 35));
+            height: 35);
   }
 
   Widget _checkIfProductSoldContent(BuildContext context) {
