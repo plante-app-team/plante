@@ -46,7 +46,7 @@ class ButtonIconPlante extends StatelessWidget {
                         ? MaterialStateProperty.all<BorderSide>(side!)
                         : null),
                 onPressed: onPressed,
-                child: Row(
+                child: Row(mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [Flexible(child: label), icon],
                 ))));
