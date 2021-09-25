@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -115,10 +116,16 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   DraggableScrollableSheet _draggableScrollableSheet() {
+    double draggableSize = 0.30;
+    if (Platform.isIOS) {
+      draggableSize = MediaQuery.of(context).size.height > 670 ? 0.30: 0.35;
+    } else {
+      draggableSize = MediaQuery.of(context).size.height > 670 ? 0.35: 0.40;
+    }
     return DraggableScrollableSheet(
         key: const Key('shop_card_scroll'),
-        initialChildSize: 0.30,
-        minChildSize: 0.30,
+        initialChildSize: draggableSize,
+        minChildSize: draggableSize,
         maxChildSize: 0.75,
         builder: (context, shopScrollController) {
           return Container(
