@@ -229,8 +229,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       _displayedShops.remove(shop);
     }
     _model.onDisplayedShopsChanged(
-        _displayedShops.toSet(), // Defensive copy
-        _lastSearchResult?.shops?.toList() ?? []);
+        _displayedShops, _lastSearchResult?.shops?.toList() ?? []);
   }
 
   Widget _roadToWidget(OsmRoad road) {

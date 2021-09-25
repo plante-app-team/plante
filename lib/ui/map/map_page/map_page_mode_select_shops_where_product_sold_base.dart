@@ -38,6 +38,8 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @mustCallSuper
   @override
   void init(MapPageMode? previousMode) {
+    super.init(previousMode);
+
     if (previousMode != null) {
       _selectedShops.addAll(
           previousMode.selectedShops().take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX));
@@ -53,6 +55,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   void deinit() {
     hintsController.removeHint(_HINT_ID);
     setBottomHint(null);
+    super.deinit();
   }
 
   @override

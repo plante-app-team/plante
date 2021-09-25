@@ -49,7 +49,9 @@ abstract class MapPageMode {
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
   bool get loading => params.isLoadingCallback.call();
 
+  @mustCallSuper
   void init(MapPageMode? previousMode) {}
+  @mustCallSuper
   void deinit() {}
   Iterable<Shop> filter(Iterable<Shop> shops) => shops;
   Set<Shop> selectedShops() => {};

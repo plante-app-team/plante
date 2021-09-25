@@ -25,6 +25,7 @@ class MapPageModeCreateShop extends MapPageMode {
 
   @override
   void init(MapPageMode? previousMode) {
+    super.init(previousMode);
     if (previousMode == null ||
         previousMode is! MapPageModeSelectShopsWhereProductSoldBase) {
       Log.e('MapPageModeSelectShopsBase expected, got $previousMode');
@@ -38,6 +39,7 @@ class MapPageModeCreateShop extends MapPageMode {
   @override
   void deinit() {
     hintsController.removeHint(_HINT_ID);
+    super.deinit();
   }
 
   // Let's hide markers of all other shops so that

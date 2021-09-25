@@ -134,23 +134,23 @@ class ShopCard extends StatelessWidget {
     if (_haveProducts()) {
       return SizedBox(
           child: ButtonFilledPlante.withText(
-            context.strings.shop_card_open_shop_products,
-            onPressed: () {
-              _onMainButtonClick(context);
-            },
-            height: 35,
-            textStyle: TextStyles.buttonFilledSmall,
-          ));
-    }
-    return ButtonIconPlante(context.strings.shop_card_add_product,
-            onPressed: () {
+        context.strings.shop_card_open_shop_products,
+        onPressed: () {
           _onMainButtonClick(context);
         },
-            icon: const Icon(
-              Icons.add_sharp,
-              color: Colors.white,
-            ),
-            height: 35);
+        height: 35,
+        textStyle: TextStyles.buttonFilledSmall,
+      ));
+    }
+    return ButtonIconPlante(context.strings.shop_card_add_product,
+        onPressed: () {
+      _onMainButtonClick(context);
+    },
+        icon: const Icon(
+          Icons.add_sharp,
+          color: Colors.white,
+        ),
+        height: 35);
   }
 
   Widget _checkIfProductSoldContent(BuildContext context) {

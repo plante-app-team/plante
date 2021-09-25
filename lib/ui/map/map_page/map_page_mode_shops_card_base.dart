@@ -6,17 +6,36 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 
 abstract class MapPageModeShopsCardBase extends MapPageMode {
   final _displayedShops = <Shop>[];
+  final _actuallyVisibleShops = <Shop>{};
+  late final UiListAddressesObtainer addressesObtainer;
 
   MapPageModeShopsCardBase(MapPageModeParams params,
       {required String nameForAnalytics})
       : super(params, nameForAnalytics: nameForAnalytics);
+
+  @mustCallSuper
+  @override
+  void init(MapPageMode? previousMode) {
+    super.init(previousMode);
+    addressesObtainer = model.createListAddressesObtainer();
+  }
+
+  @mustCallSuper
+  @override
+  void deinit() {
+    addressesObtainer.onDisplayedEntitiesChanged(
+        displayedEntities: const [], allEntitiesOrdered: const []);
+    super.deinit();
+  }
 
   @protected
   ShopCard createCardFor(
@@ -124,11 +143,11 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
         maxChildSize = 0.80;
       }
     } else {
-      draggableSize = MediaQuery.of(context).size.height < 670 ? 0.40 : 0.35 ;
+      draggableSize = MediaQuery.of(context).size.height < 670 ? 0.40 : 0.35;
     }
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
-        if (notification.extent == notification.minExtent){
+        if (notification.extent == notification.minExtent) {
           hideShopsCard();
         }
         return true;
@@ -206,11 +225,22 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   Widget _buildShopCard(BuildContext context, int index) {
     final int itemIndex = index ~/ 2;
     if (index.isEven) {
+      final shop = _displayedShops[itemIndex];
       return Column(children: [
-        createCardFor(
-            _displayedShops[itemIndex],
-            model.addressOf(_displayedShops[itemIndex]),
-            (Shop shop) => hideShopsCard())
+        VisibilityDetectorPlante(
+            keyStr: shop.osmId,
+            onVisibilityChanged: (visible, _) {
+              if (visible) {
+                _actuallyVisibleShops.add(shop);
+              } else {
+                _actuallyVisibleShops.remove(shop);
+              }
+              addressesObtainer.onDisplayedEntitiesChanged(
+                  displayedEntities: _actuallyVisibleShops,
+                  allEntitiesOrdered: _displayedShops);
+            },
+            child: createCardFor(shop, addressesObtainer.requestAddressOf(shop),
+                (Shop shop) => hideShopsCard())),
       ]);
     }
     return const Divider(

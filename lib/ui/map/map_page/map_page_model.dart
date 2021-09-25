@@ -15,6 +15,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -149,8 +150,8 @@ class MapPageModel implements ShopsManagerListener {
     });
   }
 
-  FutureShortAddress addressOf(Shop shop) async {
-    return await _addressObtainer.addressOfShop(shop);
+  UiListAddressesObtainer<Shop> createListAddressesObtainer() {
+    return UiListAddressesObtainer<Shop>(_addressObtainer);
   }
 
   @override

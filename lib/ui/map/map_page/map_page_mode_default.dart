@@ -51,6 +51,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   void init(MapPageMode? previousMode) {
+    super.init(previousMode);
     switch (widget.requestedMode) {
       case MapPageRequestedMode.ADD_PRODUCT:
         if (widget.product == null) {
@@ -72,6 +73,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   @override
   void deinit() {
     setBottomHint(null);
+    super.deinit();
   }
 
   @override
