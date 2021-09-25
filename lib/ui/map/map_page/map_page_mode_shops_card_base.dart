@@ -33,7 +33,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   @override
   void deinit() {
     addressesObtainer.onDisplayedEntitiesChanged(
-        displayedEntities: const [], allEntitiesOrdered: const []);
+        displayedEntities: const <Shop>[], allEntitiesOrdered: const <Shop>[]);
     super.deinit();
   }
 
