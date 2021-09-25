@@ -133,7 +133,6 @@ class ShopCard extends StatelessWidget {
   Widget _getButton(BuildContext context) {
     if (_haveProducts()) {
       return SizedBox(
-          width: 115,
           child: ButtonFilledPlante.withText(
             context.strings.shop_card_open_shop_products,
             onPressed: () {
