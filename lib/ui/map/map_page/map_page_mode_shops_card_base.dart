@@ -115,69 +115,83 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     );
   }
 
-  DraggableScrollableSheet _draggableScrollableSheet() {
-    double draggableSize = 0.30;
+  Widget _draggableScrollableSheet() {
+    double draggableSize = 0.35;
+    double maxChildSize = 0.75;
     if (Platform.isIOS) {
-      draggableSize = MediaQuery.of(context).size.height > 670 ? 0.30: 0.35;
+      if (MediaQuery.of(context).size.height > 670) {
+        draggableSize = 0.30;
+        maxChildSize = 0.80;
+      }
     } else {
-      draggableSize = MediaQuery.of(context).size.height > 670 ? 0.35: 0.40;
+      draggableSize = MediaQuery.of(context).size.height < 670 ? 0.40 : 0.35 ;
     }
-    return DraggableScrollableSheet(
-        key: const Key('shop_card_scroll'),
-        initialChildSize: draggableSize,
-        minChildSize: draggableSize,
-        maxChildSize: 0.75,
-        builder: (context, shopScrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-            ),
-            child: CustomScrollView(
-              controller: shopScrollController,
-              slivers: [
-                SliverAppBar(
-                  elevation: 0,
-                  expandedHeight: 2,
-                  pinned: true,
-                  backgroundColor: Colors.white,
-                  shape: const ContinuousRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30))),
-                  flexibleSpace: Padding(
-                    padding:
-                        const EdgeInsets.only(top: 8, left: 160, right: 160),
-                    child: Container(
-                        height: 2,
-                        width: 5,
-                        decoration: BoxDecoration(
-                            color: ColorsPlante.divider,
-                            borderRadius: BorderRadius.circular(30))),
-                  ),
-                  actions: [
-                    InkWell(
-                      key: const Key('card_cancel_btn'),
-                      onTap: hideShopsCard,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10, top: 5, bottom: 3),
-                        child: SvgPicture.asset(
-                          'assets/cancel_circle.svg',
+    return NotificationListener<DraggableScrollableNotification>(
+      onNotification: (notification) {
+        if (notification.extent == notification.minExtent){
+          hideShopsCard();
+        }
+        return true;
+      },
+      child: DraggableScrollableSheet(
+          key: const Key('shop_card_scroll'),
+          initialChildSize: draggableSize,
+          minChildSize: 0.06,
+          maxChildSize: maxChildSize,
+          builder: (context, shopScrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15)),
+              ),
+              child: CustomScrollView(
+                controller: shopScrollController,
+                slivers: [
+                  SliverAppBar(
+                    elevation: 0,
+                    expandedHeight: 2,
+                    pinned: true,
+                    backgroundColor: Colors.white,
+                    shape: const ContinuousRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30))),
+                    flexibleSpace: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 8, left: 160, right: 160),
+                      child: Container(
+                          height: 2,
+                          width: 5,
+                          decoration: BoxDecoration(
+                              color: ColorsPlante.divider,
+                              borderRadius: BorderRadius.circular(30))),
+                    ),
+                    actions: [
+                      InkWell(
+                        key: const Key('card_cancel_btn'),
+                        onTap: hideShopsCard,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              right: 10, top: 5, bottom: 3),
+                          child: SvgPicture.asset(
+                            'assets/cancel_circle.svg',
+                          ),
                         ),
                       ),
+                    ],
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(-30),
+                      child: Container(), //hack to make appbar smaller
                     ),
-                  ],
-                  bottom: PreferredSize(
-                    preferredSize: const Size.fromHeight(-30),
-                    child: Container(), //hack to make appbar smaller
                   ),
-                ),
-                _shopCards()
-              ],
-            ),
-          );
-        });
+                  _shopCards()
+                ],
+              ),
+            );
+          }),
+    );
   }
 
   Widget _shopCards() {
