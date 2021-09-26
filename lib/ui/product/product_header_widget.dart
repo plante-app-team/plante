@@ -40,6 +40,22 @@ class ProductHeaderWidget extends StatelessWidget {
         )),
         Positioned.fill(
             child: Align(
+                alignment: Alignment.topRight,
+                child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.black45,
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(8),
+                            bottomRight: Radius.circular(8))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        context.strings.display_product_page_off_licence,
+                        style: TextStyles.licenceMarker,
+                      ),
+                    )))),
+        Positioned.fill(
+            child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 12, bottom: 18),
