@@ -20,6 +20,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
@@ -380,6 +381,13 @@ class _MapPageState extends PageStatePlante<MapPage>
                 child: SizedBox(
                     width: 80,
                     child: AnimatedListSimplePlante(children: _fabs()))),
+            Align(
+              alignment: Alignment.centerRight,
+              child: LicenceLabel(
+                darkBox: false,
+                label: context.strings.display_product_page_off_licence,
+              ),
+            ),
             MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(
                 children: _mode.buildBottomActions(context)),

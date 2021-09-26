@@ -112,6 +112,7 @@
     "map_page_no_shops_hint_default_mode_1": "Рядом пока нет магазинов с продуктами. Но вы можете нажать на \"Пустые магазины\" и добавить первый продукт!",
     "map_page_no_shops_hint_default_mode_2": "Похоже, рядом нет известных магазинов! Вы отметить новый магазин при добавлении или просмотре продукта",
     "map_page_no_shops_hint_in_select_shops_mode": "Рядом нет известных магазинов. Но вы можете отметить новый, кликнув на круглую кнопку с плюсиком справа!",
+    "map_page_open_street_map_licence": "Данные от Open Street Map",
 
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_label": "Название магазина",
@@ -167,6 +168,7 @@
     "display_product_page_moderator_comment_dialog_close": "Понятно!",
     "display_product_page_no_info_in_your_langs": "Нет информации о продукте на вашем языке",
     "display_product_page_add_info_in_your_langs": "Добавить информацию",
+    "display_product_page_off_licence": "Данные от Open Food Facts",
 
     "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
     "product_report_dialog_send": "Отправить",

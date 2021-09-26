@@ -134,6 +134,19 @@ class TextStyles {
       fontSize: 17,
       color: ColorsPlante.grey);
 
+  static const TextStyle licenceMarker = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 9,
+      color: Colors.white70);
+
+  static const TextStyle licenceMarkerLight = TextStyle(
+      fontFamily: 'Montserrat',
+      fontWeight: FontWeight.bold,
+      fontSize: 9,
+      color: ColorsPlante.grey);
+
+
   static const TextStyle langName =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
 
