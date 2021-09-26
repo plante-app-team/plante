@@ -18,9 +18,9 @@ import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
-import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/map/components/animated_mode_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
@@ -381,9 +381,12 @@ class _MapPageState extends PageStatePlante<MapPage>
                 child: SizedBox(
                     width: 80,
                     child: AnimatedListSimplePlante(children: _fabs()))),
-            const Align(
+            Align(
               alignment: Alignment.centerRight,
-              child: LicenceLabel(),
+              child: LicenceLabel(
+                darkBox: false,
+                label: context.strings.display_product_page_off_licence,
+              ),
             ),
             MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(
@@ -571,29 +574,6 @@ class _MapPageState extends PageStatePlante<MapPage>
       return false;
     }
     return await _mode.onWillPop();
-  }
-}
-
-class LicenceLabel extends StatelessWidget {
-  const LicenceLabel({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        decoration: const BoxDecoration(
-            color: Colors.white70,
-            borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                topLeft: Radius.circular(8))),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Text(
-            context.strings.display_product_page_off_licence,
-            style: TextStyles.licenceMarkerLight,
-          ),
-        ));
   }
 }
 

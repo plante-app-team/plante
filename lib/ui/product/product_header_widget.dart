@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/l10n/strings.dart';
 
 // ignore: always_use_package_imports
@@ -41,19 +42,10 @@ class ProductHeaderWidget extends StatelessWidget {
         Positioned.fill(
             child: Align(
                 alignment: Alignment.topRight,
-                child: Container(
-                    decoration: const BoxDecoration(
-                        color: Colors.black45,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        context.strings.display_product_page_off_licence,
-                        style: TextStyles.licenceMarker,
-                      ),
-                    )))),
+                child: LicenceLabel(
+                  label: context.strings.display_product_page_off_licence,
+                  darkBox: true,
+                ))),
         Positioned.fill(
             child: Align(
                 alignment: Alignment.bottomLeft,
