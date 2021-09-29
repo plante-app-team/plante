@@ -15,6 +15,17 @@ extension OsmElementTypeExt on OsmElementType {
         return 3;
     }
   }
+
+  String get name {
+    switch (this) {
+      case OsmElementType.NODE:
+        return 'node';
+      case OsmElementType.RELATION:
+        return 'relation';
+      case OsmElementType.WAY:
+        return 'way';
+    }
+  }
 }
 
 OsmElementType osmElementTypeFromCode(int persistentCode) {

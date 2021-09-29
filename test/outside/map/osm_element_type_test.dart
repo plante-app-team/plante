@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   setUp(() async {});
 
-  test('concrete persistent code values', () {
+  test('concrete persistent codes values', () {
     // If new elements added, test must be changed
     expect(OsmElementType.values.length, equals(3));
 
@@ -13,6 +13,17 @@ void main() {
     expect(OsmElementType.NODE.persistentCode, equals(1));
     expect(OsmElementType.RELATION.persistentCode, equals(2));
     expect(OsmElementType.WAY.persistentCode, equals(3));
+  });
+
+  test('concrete names values', () {
+    // If new elements added, test must be changed
+    expect(OsmElementType.values.length, equals(3));
+
+    // Same names are also used in Open Street Map -
+    // it's prohibited to change the values.
+    expect(OsmElementType.NODE.name, equals('node'));
+    expect(OsmElementType.RELATION.name, equals('relation'));
+    expect(OsmElementType.WAY.name, equals('way'));
   });
 
   test('values can be obtained from their persistent codes', () {
