@@ -12,7 +12,7 @@ part 'shop.g.dart';
 abstract class Shop implements Built<Shop, ShopBuilder> {
   static final Shop empty = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = ''
+      ..osmUID = '1:0'
       ..name = ''
       ..latitude = 0
       ..longitude = 0)));
@@ -20,7 +20,7 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   OsmShop get osmShop;
   BackendShop? get backendShop;
 
-  String get osmId => osmShop.osmId;
+  String get osmUID => osmShop.osmUID;
   String get name => osmShop.name;
   String? get typeStr => osmShop.type;
   ShopType? get type => typeStr != null ? ShopType.safeValueOf(typeStr!) : null;

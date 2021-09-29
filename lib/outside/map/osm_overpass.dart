@@ -13,6 +13,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_element_type.dart';
 import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -93,11 +94,8 @@ class OsmOverpass {
     for (final shopJson in shopsJson['elements']) {
       final shopType = shopJson['tags']?['shop'] as String?;
       final shopName = shopJson['tags']?['name'] as String?;
-      if (shopName == null) {
-        continue;
-      }
-
       final id = shopJson['id']?.toString();
+      final osmElementType = _osmTypeFrom(shopJson['type']?.toString());
       final double? lat;
       final double? lon;
       final center = shopJson['center'] as Map<dynamic, dynamic>?;
@@ -109,7 +107,11 @@ class OsmOverpass {
         lon = shopJson['lon'] as double?;
       }
 
-      if (id == null || lat == null || lon == null) {
+      if (id == null ||
+          osmElementType == null ||
+          shopName == null ||
+          lat == null ||
+          lon == null) {
         continue;
       }
 
@@ -117,7 +119,7 @@ class OsmOverpass {
       final road = shopJson['tags']?['addr:street'] as String?;
       final houseNumber = shopJson['tags']?['addr:housenumber'] as String?;
       result.add(OsmShop((e) => e
-        ..osmId = id
+        ..osmUID = '${osmElementType.persistentCode}:$id'
         ..name = shopName
         ..type = shopType
         ..latitude = lat
@@ -243,4 +245,11 @@ Result<List<OsmRoad>, _ParseRoadsErr> _parseRoads(String text) {
       ..longitude = lon));
   }
   return Ok(result);
+}
+
+OsmElementType? _osmTypeFrom(String? str) {
+  if (str == null) {
+    return null;
+  }
+  return osmElementTypeFromStr(str);
 }

@@ -145,7 +145,7 @@ void main() {
         .rebuild((e) => e.productsCount = backendShop.productsCount + 1);
     commons.shops[0] =
         commons.shops[0].rebuild((e) => e.backendShop.replace(backendShop));
-    commons.shopsMap = {for (final shop in commons.shops) shop.osmId: shop};
+    commons.shopsMap = {for (final shop in commons.shops) shop.osmUID: shop};
     // Notify about the update
     commons.shopsManagerListeners.forEach((listener) {
       listener.onLocalShopsChange();

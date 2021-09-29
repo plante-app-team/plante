@@ -87,19 +87,19 @@ void main() {
     expect(shops.length, equals(3));
 
     final expectedShop1 = OsmShop((e) => e
-      ..osmId = '992336735'
+      ..osmUID = '1:992336735'
       ..name = 'Spar'
       ..type = 'supermarket'
       ..latitude = 56.3202185
       ..longitude = 44.0097146);
     final expectedShop2 = OsmShop((e) => e
-      ..osmId = '1641239353'
+      ..osmUID = '1:1641239353'
       ..name = 'Orehovskiy'
       ..type = 'convenience'
       ..latitude = 56.3257464
       ..longitude = 44.0121258);
     final expectedShop3 = OsmShop((e) => e
-      ..osmId = '12702145'
+      ..osmUID = '2:12702145'
       ..name = 'Grozd'
       ..type = 'supermarket'
       ..latitude = 51.4702343
@@ -327,13 +327,13 @@ void main() {
     expect(shops[0].name, 'Spar');
 
     final expectedShop1 = OsmShop((e) => e
-      ..osmId = '992336735'
+      ..osmUID = '1:992336735'
       ..name = 'Spar'
       ..type = 'supermarket'
       ..latitude = 56.3202185
       ..longitude = 44.0097146);
     final expectedShop2 = OsmShop((e) => e
-      ..osmId = '1641239353'
+      ..osmUID = '1:1641239353'
       ..name = 'Orehovskiy'
       ..type = null
       ..latitude = 56.3257464

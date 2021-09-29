@@ -18,8 +18,8 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
   Iterable<Object?> serialize(Serializers serializers, OsmShop object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'osmId',
-      serializers.serialize(object.osmId,
+      'osmUID',
+      serializers.serialize(object.osmUID,
           specifiedType: const FullType(String)),
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
@@ -73,8 +73,8 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'osmId':
-          result.osmId = serializers.deserialize(value,
+        case 'osmUID':
+          result.osmUID = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
         case 'name':
@@ -114,7 +114,7 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
 
 class _$OsmShop extends OsmShop {
   @override
-  final String osmId;
+  final String osmUID;
   @override
   final String name;
   @override
@@ -134,7 +134,7 @@ class _$OsmShop extends OsmShop {
       (new OsmShopBuilder()..update(updates)).build();
 
   _$OsmShop._(
-      {required this.osmId,
+      {required this.osmUID,
       required this.name,
       this.type,
       required this.latitude,
@@ -143,7 +143,7 @@ class _$OsmShop extends OsmShop {
       this.road,
       this.houseNumber})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(osmId, 'OsmShop', 'osmId');
+    BuiltValueNullFieldError.checkNotNull(osmUID, 'OsmShop', 'osmUID');
     BuiltValueNullFieldError.checkNotNull(name, 'OsmShop', 'name');
     BuiltValueNullFieldError.checkNotNull(latitude, 'OsmShop', 'latitude');
     BuiltValueNullFieldError.checkNotNull(longitude, 'OsmShop', 'longitude');
@@ -160,7 +160,7 @@ class _$OsmShop extends OsmShop {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is OsmShop &&
-        osmId == other.osmId &&
+        osmUID == other.osmUID &&
         name == other.name &&
         type == other.type &&
         latitude == other.latitude &&
@@ -177,7 +177,7 @@ class _$OsmShop extends OsmShop {
             $jc(
                 $jc(
                     $jc(
-                        $jc($jc($jc(0, osmId.hashCode), name.hashCode),
+                        $jc($jc($jc(0, osmUID.hashCode), name.hashCode),
                             type.hashCode),
                         latitude.hashCode),
                     longitude.hashCode),
@@ -189,7 +189,7 @@ class _$OsmShop extends OsmShop {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('OsmShop')
-          ..add('osmId', osmId)
+          ..add('osmUID', osmUID)
           ..add('name', name)
           ..add('type', type)
           ..add('latitude', latitude)
@@ -204,9 +204,9 @@ class _$OsmShop extends OsmShop {
 class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   _$OsmShop? _$v;
 
-  String? _osmId;
-  String? get osmId => _$this._osmId;
-  set osmId(String? osmId) => _$this._osmId = osmId;
+  String? _osmUID;
+  String? get osmUID => _$this._osmUID;
+  set osmUID(String? osmUID) => _$this._osmUID = osmUID;
 
   String? _name;
   String? get name => _$this._name;
@@ -241,7 +241,7 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   OsmShopBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _osmId = $v.osmId;
+      _osmUID = $v.osmUID;
       _name = $v.name;
       _type = $v.type;
       _latitude = $v.latitude;
@@ -269,8 +269,8 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   _$OsmShop build() {
     final _$result = _$v ??
         new _$OsmShop._(
-            osmId: BuiltValueNullFieldError.checkNotNull(
-                osmId, 'OsmShop', 'osmId'),
+            osmUID: BuiltValueNullFieldError.checkNotNull(
+                osmUID, 'OsmShop', 'osmUID'),
             name:
                 BuiltValueNullFieldError.checkNotNull(name, 'OsmShop', 'name'),
             type: type,

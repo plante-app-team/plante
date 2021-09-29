@@ -292,7 +292,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                       children: _model.shops
                           .map((shop) => LabelCancelablePlante(
                                 shop.name,
-                                key: Key('shop_label_${shop.osmId}'),
+                                key: Key('shop_label_${shop.osmUID}'),
                                 onCanceledCallback: () {
                                   final newShops = _model.shops.toList();
                                   newShops.remove(shop);

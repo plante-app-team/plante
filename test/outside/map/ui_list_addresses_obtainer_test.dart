@@ -33,12 +33,12 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 10
           ..latitude = 10
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 1))),
     ];
 

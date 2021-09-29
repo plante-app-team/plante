@@ -107,7 +107,7 @@ void main() {
         ])
         ..shops.addAll([
           OsmShop((e) => e
-            ..osmId = '6266574214'
+            ..osmUID = '1:6266574214'
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
@@ -424,7 +424,7 @@ void main() {
       (e) => e
         ..shops.addAll([
           OsmShop((e) => e
-            ..osmId = '6266574214'
+            ..osmUID = '1:6266574214'
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
@@ -433,7 +433,7 @@ void main() {
             ..road = 'Broadway Street'
             ..houseNumber = '34A'),
           OsmShop((e) => e
-            ..osmId = '6266574215'
+            ..osmUID = '1:6266574215'
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002

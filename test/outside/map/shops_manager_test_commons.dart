@@ -23,8 +23,8 @@ class ShopsManagerTestCommons {
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
 
-  final osmId1 = '1';
-  final osmId2 = '2';
+  final osmUID1 = '1:1';
+  final osmUID2 = '1:2';
   var osmShops = <OsmShop>[];
   var backendShops = <BackendShop>[];
   var fullShops = <String, Shop>{};
@@ -50,13 +50,13 @@ class ShopsManagerTestCommons {
   ShopsManagerTestCommons() {
     osmShops = [
       OsmShop((e) => e
-        ..osmId = osmId1
+        ..osmUID = osmUID1
         ..name = 'shop1'
         ..type = 'supermarket'
         ..longitude = 15
         ..latitude = 15),
       OsmShop((e) => e
-        ..osmId = osmId2
+        ..osmUID = osmUID2
         ..name = 'shop2'
         ..type = 'convenience'
         ..longitude = 15
@@ -64,17 +64,17 @@ class ShopsManagerTestCommons {
     ];
     backendShops = [
       BackendShop((e) => e
-        ..osmId = osmId1
+        ..osmUID = osmUID1
         ..productsCount = 2),
       BackendShop((e) => e
-        ..osmId = osmId2
+        ..osmUID = osmUID2
         ..productsCount = 1),
     ];
     fullShops = {
-      osmShops[0].osmId: Shop((e) => e
+      osmShops[0].osmUID: Shop((e) => e
         ..osmShop.replace(osmShops[0])
         ..backendShop.replace(backendShops[0])),
-      osmShops[1].osmId: Shop((e) => e
+      osmShops[1].osmUID: Shop((e) => e
         ..osmShop.replace(osmShops[1])
         ..backendShop.replace(backendShops[1])),
     };
@@ -106,7 +106,7 @@ class ShopsManagerTestCommons {
             type: anyNamed('type')))
         .thenAnswer((_) async {
       final result = BackendShop((e) => e
-        ..osmId = randInt(1, 99999).toString()
+        ..osmUID = '1:${randInt(1, 99999)}'
         ..productsCount = 0);
       backendShops.add(result);
       return Ok(result);

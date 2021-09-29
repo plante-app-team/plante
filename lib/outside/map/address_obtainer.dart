@@ -27,13 +27,13 @@ class AddressObtainer {
         ..road = shop.road
         ..houseNumber = shop.houseNumber));
     }
-    final cache = _cache[shop.osmId];
+    final cache = _cache[shop.osmUID];
     if (cache != null) {
       return Ok(cache.toShort());
     }
     final result = await _osm.withNominatim((nominatim) async =>
         await _fetchAddress(
-            nominatim, shop.latitude, shop.longitude, shop.osmId));
+            nominatim, shop.latitude, shop.longitude, shop.osmUID));
     if (result.isOk) {
       return Ok(result.unwrap().toShort());
     } else {
@@ -42,13 +42,13 @@ class AddressObtainer {
   }
 
   FutureAddress _fetchAddress(
-      OsmNominatim nominatim, double lat, double lon, String? osmId) async {
-    if (osmId != null && _cache.containsKey(osmId)) {
-      return Ok(_cache[osmId]!);
+      OsmNominatim nominatim, double lat, double lon, String? osmUID) async {
+    if (osmUID != null && _cache.containsKey(osmUID)) {
+      return Ok(_cache[osmUID]!);
     }
     final result = await nominatim.fetchAddress(lat, lon);
-    if (result.isOk && osmId != null) {
-      _cache[osmId] = result.unwrap();
+    if (result.isOk && osmUID != null) {
+      _cache[osmUID] = result.unwrap();
     }
     return result;
   }

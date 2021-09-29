@@ -5,8 +5,8 @@ import 'package:plante/base/build_value_helper.dart';
 part 'backend_shop.g.dart';
 
 abstract class BackendShop implements Built<BackendShop, BackendShopBuilder> {
-  @BuiltValueField(wireName: 'osm_id')
-  String get osmId;
+  @BuiltValueField(wireName: 'osm_uid')
+  String get osmUID;
   @BuiltValueField(wireName: 'products_count')
   int get productsCount;
 

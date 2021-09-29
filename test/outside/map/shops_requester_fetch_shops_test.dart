@@ -102,12 +102,12 @@ void main() {
     for (var index = 0; index < someOsmShops.values.toList().length; ++index) {
       final osmShop = someOsmShops.values.toList()[index];
       if (index == 0) {
-        theOnlyExpectedShopIs = osmShop.osmId;
-        osmShops[osmShop.osmId] = osmShop.rebuild((e) => e
+        theOnlyExpectedShopIs = osmShop.osmUID;
+        osmShops[osmShop.osmUID] = osmShop.rebuild((e) => e
           ..latitude = 10
           ..longitude = 10);
       } else {
-        osmShops[osmShop.osmId] = osmShop.rebuild((e) => e
+        osmShops[osmShop.osmUID] = osmShop.rebuild((e) => e
           ..latitude = 100000
           ..longitude = 100000);
       }
@@ -118,7 +118,7 @@ void main() {
     when(backend.requestShops(any)).thenAnswer((invc) async {
       final ids = invc.positionalArguments[0] as Iterable<String>;
       final result =
-          someBackendShops.values.where((e) => ids.contains(e.osmId));
+          someBackendShops.values.where((e) => ids.contains(e.osmUID));
       return Ok(result.toList());
     });
 
@@ -148,10 +148,10 @@ void main() {
 
     final backendShops = [
       BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 2),
       BackendShop((e) => e
-        ..osmId = '2'
+        ..osmUID = '1:2'
         ..productsCount = 1),
     ];
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
@@ -168,7 +168,7 @@ void main() {
   test('fetchShops backend error', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..name = 'shop1'
         ..type = 'supermarket'
         ..longitude = 123

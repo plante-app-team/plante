@@ -32,7 +32,7 @@ void main() {
             coord: anyNamed('coord'),
             type: anyNamed('type')))
         .thenAnswer((_) async => Ok(BackendShop((e) => e
-          ..osmId = '123456'
+          ..osmUID = '1:123456'
           ..productsCount = 0)));
 
     final result = await shopsRequester.createShop(
@@ -43,13 +43,13 @@ void main() {
 
     final expectedResult = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '123456'
+        ..osmUID = '1:123456'
         ..longitude = 10
         ..latitude = 20
         ..name = 'Horns and Hooves'
         ..type = ShopType.supermarket.osmName))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '123456'
+        ..osmUID = '1:123456'
         ..productsCount = 0)));
     expect(result.unwrap(), equals(expectedResult));
   });

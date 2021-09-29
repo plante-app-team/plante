@@ -74,7 +74,7 @@ class OsmCacher {
     if (db == null) {
       final appDir = await getAppDir();
       db = await openDB('${appDir.path}/osm_cache.sqlite',
-          version: 3, onUpgrade: _onUpgradeDb);
+          version: 4, onUpgrade: _onUpgradeDb);
     }
     Log.i('OsmCacher._initAsync db loaded');
 
@@ -185,6 +185,11 @@ class OsmCacher {
         await txn.execute(
             "ALTER TABLE $_SHOP_TABLE ADD COLUMN $_SHOP_HOUSE_NUMBER TEXT DEFAULT ''");
       }
+
+      if (oldVersion < 4) {
+        // Deleting all stored shops because osmId is replaced with OsmUID
+        await txn.delete(_SHOP_TABLE);
+      }
     });
   }
 
@@ -200,7 +205,7 @@ class OsmCacher {
       }
       for (final column in batch) {
         final territoryId = column[_SHOP_TERRITORY_ID] as int?;
-        final osmId = column[_SHOP_OSM_ID] as String?;
+        final osmUID = column[_SHOP_OSM_ID] as String?;
         final name = column[_SHOP_NAME] as String?;
         final type = _strColumnToNullableStr(column, _SHOP_TYPE);
         final city = _strColumnToNullableStr(column, _SHOP_CITY);
@@ -209,7 +214,7 @@ class OsmCacher {
         final lat = column[_SHOP_LAT] as double?;
         final lon = column[_SHOP_LON] as double?;
         if (territoryId == null ||
-            osmId == null ||
+            osmUID == null ||
             name == null ||
             lat == null ||
             lon == null) {
@@ -220,7 +225,7 @@ class OsmCacher {
           shopsAndTerritoriesIds[territoryId] = [];
         }
         shopsAndTerritoriesIds[territoryId]!.add(OsmShop((e) => e
-          ..osmId = osmId
+          ..osmUID = osmUID
           ..name = name
           ..type = type
           ..latitude = lat
@@ -401,7 +406,7 @@ Map<String, dynamic> _territoryValues(
 Map<String, dynamic> _shopColumnsValues(int territoryId, OsmShop shop) {
   return {
     _SHOP_TERRITORY_ID: territoryId,
-    _SHOP_OSM_ID: shop.osmId,
+    _SHOP_OSM_ID: shop.osmUID,
     _SHOP_NAME: shop.name,
     _SHOP_TYPE: shop.type ?? '',
     _SHOP_LAT: shop.latitude,

@@ -149,7 +149,7 @@ class ShopProductRangePageModel {
     _updateCallback.call();
     try {
       final result = await _backend.productPresenceVote(
-          product.barcode, _shop.osmId, positive);
+          product.barcode, _shop.osmUID, positive);
       if (result.isOk && positive) {
         _shopProductRange = Ok(loadedRange.rebuild((e) =>
             e.productsLastSeenSecsUtc[product.barcode] =

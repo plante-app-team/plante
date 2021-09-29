@@ -65,7 +65,7 @@ void main() {
 
     final requestedShops = commons.osmShops.toList();
     requestedShops.add(OsmShop((e) => e
-      ..osmId = '123321'
+      ..osmUID = '1:123321'
       ..name = 'new cool shop'
       ..type = 'supermarket'
       ..longitude = 15
@@ -76,7 +76,7 @@ void main() {
 
     final expectedShops = <String, Shop>{};
     expectedShops.addAll(commons.fullShops);
-    expectedShops[requestedShops.last.osmId] =
+    expectedShops[requestedShops.last.osmUID] =
         Shop((e) => e..osmShop.replace(requestedShops.last));
     expect(inflatedShops, equals(expectedShops));
 

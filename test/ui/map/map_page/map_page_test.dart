@@ -393,7 +393,7 @@ void main() {
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('map_shops_click'),
-        {'shops': commons.shops.map((e) => e.osmId).join(', ')});
+        {'shops': commons.shops.map((e) => e.osmUID).join(', ')});
   });
 }
 

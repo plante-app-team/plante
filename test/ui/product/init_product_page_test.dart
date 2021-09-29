@@ -59,12 +59,12 @@ void main() {
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..productsCount = 2)));
 
   setUp(() async {
@@ -238,7 +238,7 @@ void main() {
 
     if (shopsToCancel.isNotEmpty) {
       for (final shopToCancel in shopsToCancel) {
-        final key = Key('shop_label_${shopToCancel.osmId}');
+        final key = Key('shop_label_${shopToCancel.osmUID}');
         final label = find.byKey(key);
         final cancel = find.descendant(
             of: label,
@@ -1081,21 +1081,21 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..productsCount = 2))),
     ];
 
@@ -1133,39 +1133,39 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '3'
+          ..osmUID = '1:3'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '3'
+          ..osmUID = '1:3'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '4'
+          ..osmUID = '1:4'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '4'
+          ..osmUID = '1:4'
           ..productsCount = 2))),
     ];
 

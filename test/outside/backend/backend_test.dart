@@ -558,9 +558,9 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*products_at_shops_data.*', '''
           {
-            "results" : {
-              "8711880917" : {
-                "shop_osm_id" : "8711880917",
+            "results_v2" : {
+              "1:8711880917" : {
+                "shop_osm_uid" : "1:8711880917",
                 "products" : [ {
                   "server_id" : 23,
                   "barcode" : "4605932001284",
@@ -571,8 +571,8 @@ void main() {
                 } ],
                 "products_last_seen_utc" : { }
               },
-              "8771781029" : {
-                "shop_osm_id" : "8771781029",
+              "1:8771781029" : {
+                "shop_osm_uid" : "1:8771781029",
                 "products" : [ {
                   "server_id" : 16,
                   "barcode" : "4612742721165",
@@ -597,7 +597,7 @@ void main() {
         ''');
 
     final result =
-        await backend.requestProductsAtShops(['8711880917', '8771781029']);
+        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -605,7 +605,7 @@ void main() {
 
     final BackendProductsAtShop shop1;
     final BackendProductsAtShop shop2;
-    if (shops[0].osmId == '8711880917') {
+    if (shops[0].osmUID == '1:8711880917') {
       shop1 = shops[0];
       shop2 = shops[1];
     } else {
@@ -659,12 +659,12 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*products_at_shops_data.*', '''
           {
-            "results" : {}
+            "results_v2" : {}
           }
         ''');
 
     final result =
-        await backend.requestProductsAtShops(['8711880917', '8771781029']);
+        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrap().length, equals(0));
   });
 
@@ -674,9 +674,9 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*products_at_shops_data.*', '''
           {{{{{{{{{{{{{{{{{{{{{{
-            "results" : {
-              "8711880917" : {
-                "shop_osm_id" : "8711880917",
+            "results_v2" : {
+              "1:8711880917" : {
+                "shop_osm_uid" : "1:8711880917",
                 "products" : [ {
                   "server_id" : 23,
                   "barcode" : "4605932001284",
@@ -692,7 +692,7 @@ void main() {
         ''');
 
     final result =
-        await backend.requestProductsAtShops(['8711880917', '8771781029']);
+        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -707,7 +707,7 @@ void main() {
         ''');
 
     final result =
-        await backend.requestProductsAtShops(['8711880917', '8771781029']);
+        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -719,7 +719,7 @@ void main() {
         '.*products_at_shops_data.*', const SocketException(''));
 
     final result =
-        await backend.requestProductsAtShops(['8711880917', '8771781029']);
+        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -730,20 +730,20 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*shops_data.*', '''
           {
-            "results" : {
-              "8711880917" : {
-                "osm_id" : "8711880917",
+            "results_v2" : {
+              "1:8711880917" : {
+                "osm_uid" : "1:8711880917",
                 "products_count" : 1
               },
-              "8771781029" : {
-                "osm_id" : "8771781029",
+              "1:8771781029" : {
+                "osm_uid" : "1:8771781029",
                 "products_count" : 2
               }
             }
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -751,7 +751,7 @@ void main() {
 
     final BackendShop shop1;
     final BackendShop shop2;
-    if (shops[0].osmId == '8711880917') {
+    if (shops[0].osmUID == '1:8711880917') {
       shop1 = shops[0];
       shop2 = shops[1];
     } else {
@@ -769,11 +769,11 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*shops_data.*', '''
           {
-            "results" : {}
+            "results_v2" : {}
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrap().length, equals(0));
   });
 
@@ -783,12 +783,12 @@ void main() {
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponse('.*shops_data.*', '''
           {{{{{{{{{{{{{{{{{{{{{{
-            "results" : {
+            "results_v2" : {
             }
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -802,7 +802,7 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -813,7 +813,7 @@ void main() {
     httpClient.setResponseException(
         '.*shops_data.*', const SocketException(''));
 
-    final result = await backend.requestShops(['8711880917', '8771781029']);
+    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -825,10 +825,10 @@ void main() {
     httpClient
         .setResponse('.*product_presence_vote.*', ''' { "result": "ok" } ''');
 
-    var result = await backend.productPresenceVote('123456', '1', true);
+    var result = await backend.productPresenceVote('1:123456', '1', true);
     expect(result.isOk, isTrue);
 
-    result = await backend.productPresenceVote('123456', '1', false);
+    result = await backend.productPresenceVote('1:123456', '1', false);
     expect(result.isOk, isTrue);
   });
 
@@ -841,16 +841,16 @@ void main() {
 
     expect(analytics.allEvents(), equals([]));
 
-    await backend.productPresenceVote('123456', '1', true);
+    await backend.productPresenceVote('123456', '1:1', true);
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.firstSentEvent('product_presence_vote').second,
-        equals({'barcode': '123456', 'shop': '1', 'vote': true}));
+        equals({'barcode': '123456', 'shop': '1:1', 'vote': true}));
     analytics.clearEvents();
 
-    await backend.productPresenceVote('123456', '1', false);
+    await backend.productPresenceVote('123456', '1:1', false);
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.firstSentEvent('product_presence_vote').second,
-        equals({'barcode': '123456', 'shop': '1', 'vote': false}));
+        equals({'barcode': '123456', 'shop': '1:1', 'vote': false}));
   });
 
   test('product presence vote error', () async {
@@ -860,7 +860,7 @@ void main() {
     httpClient.setResponseException(
         '.*product_presence_vote.*', const SocketException(''));
 
-    final result = await backend.productPresenceVote('123456', '1', true);
+    final result = await backend.productPresenceVote('1:123456', '1', true);
     expect(result.isErr, isTrue);
   });
 
@@ -871,7 +871,7 @@ void main() {
     httpClient
         .setResponse('.*put_product_to_shop.*', ''' { "result": "ok" } ''');
 
-    final result = await backend.putProductToShop('123456', '1');
+    final result = await backend.putProductToShop('1:123456', '1');
     expect(result.isOk, isTrue);
   });
 
@@ -882,7 +882,7 @@ void main() {
     httpClient.setResponseException(
         '.*put_product_to_shop.*', const SocketException(''));
 
-    final result = await backend.putProductToShop('123456', '1');
+    final result = await backend.putProductToShop('1:123456', '1');
     expect(result.isErr, isTrue);
   });
 
@@ -890,14 +890,15 @@ void main() {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*create_shop.*', ''' { "osm_id": "123456" } ''');
+    httpClient
+        .setResponse('.*create_shop.*', ''' { "osm_uid": "1:123456" } ''');
 
     final result = await backend.createShop(
         name: 'hello there',
         coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
     expect(result.isOk, isTrue);
-    expect('123456', equals(result.unwrap().osmId));
+    expect('1:123456', equals(result.unwrap().osmUID));
     expect(0, equals(result.unwrap().productsCount));
   });
 
@@ -926,7 +927,7 @@ void main() {
         coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
 
-    // 'osm_id' was expected, not 'result'
+    // 'osm_uid' was expected, not 'result'
     expect(result.isErr, isTrue);
     expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
   });

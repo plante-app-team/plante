@@ -44,21 +44,21 @@ void main() {
 
   final shopWithProduct = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..productsCount = 1)));
   final shopEmpty = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..productsCount = 0)));
   final product = ProductLangSlice((e) => e
     ..barcode = '123456'

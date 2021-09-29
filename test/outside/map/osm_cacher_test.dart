@@ -11,19 +11,19 @@ void main() {
 
   final shops = [
     OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..name = 'first shop'
       ..type = 'type1'
       ..latitude = 111.321
       ..longitude = 111.321),
     OsmShop((e) => e
-      ..osmId = '2'
+      ..osmUID = '1:2'
       ..name = 'second shop'
       ..type = null
       ..latitude = 222.123
       ..longitude = 222.321),
     OsmShop((e) => e
-      ..osmId = '3'
+      ..osmUID = '1:3'
       ..name = 'third shop'
       ..type = 'type3'
       ..latitude = 333.321

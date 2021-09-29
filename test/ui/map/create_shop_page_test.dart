@@ -45,15 +45,15 @@ void main() {
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
       final coords = invc.namedArguments[const Symbol('coord')] as Coord;
-      final id = randInt(100, 500);
+      final id = '1:${randInt(100, 500)}';
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = id.toString()
+          ..osmUID = id.toString()
           ..longitude = coords.lon
           ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = id.toString()
+          ..osmUID = id.toString()
           ..productsCount = 0))));
     });
     when(addressObtainer.addressOfCoords(any))

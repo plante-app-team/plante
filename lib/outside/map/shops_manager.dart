@@ -79,7 +79,7 @@ class ShopsManager {
         final shops = ids
             .map((id) => _shopsCache[id]!)
             .where((shop) => bounds.containsShop(shop));
-        return {for (var shop in shops) shop.osmId: shop};
+        return {for (var shop in shops) shop.osmUID: shop};
       }
     }
     return null;
@@ -113,12 +113,12 @@ class ShopsManager {
 
     final fetchResult = shopsFetchResult.unwrap();
     _shopsCache.addAll(fetchResult.shops);
-    final ids = fetchResult.shops.values.map((shop) => shop.osmId).toList();
+    final ids = fetchResult.shops.values.map((shop) => shop.osmUID).toList();
     _loadedAreas[fetchResult.shopsBounds] = ids;
     final result = ids
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
-    return Ok({for (var shop in result) shop.osmId: shop});
+    return Ok({for (var shop in result) shop.osmUID: shop});
   }
 
   Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
@@ -126,9 +126,9 @@ class ShopsManager {
     final loadedShops = <String, Shop>{};
     final osmShopsToLoad = <OsmShop>[];
     for (final osmShop in shops) {
-      final loadedShop = _shopsCache[osmShop.osmId];
+      final loadedShop = _shopsCache[osmShop.osmUID];
       if (loadedShop != null) {
-        loadedShops[loadedShop.osmId] = loadedShop;
+        loadedShops[loadedShop.osmUID] = loadedShop;
       } else {
         osmShopsToLoad.add(osmShop);
       }
@@ -145,7 +145,7 @@ class ShopsManager {
       loadedShops.addAll(inflatedShops);
 
       for (final inflatedShop in inflatedShops.values) {
-        _shopsCache[inflatedShop.osmId] = inflatedShop;
+        _shopsCache[inflatedShop.osmUID] = inflatedShop;
       }
       // NOTE: we don't put the shop into [_loadedAreas] because the
       // [_loadedAreas] field is an entire area of already loaded shops -
@@ -160,14 +160,14 @@ class ShopsManager {
       Shop shop,
       {bool noCache = false}) async {
     if (!noCache) {
-      final cache = _rangesCache[shop.osmId];
+      final cache = _rangesCache[shop.osmUID];
       if (cache != null) {
         return Ok(cache);
       }
     }
     final result = await _requester.fetchShopProductRange(shop);
     if (result.isOk) {
-      _rangesCache[shop.osmId] = result.unwrap();
+      _rangesCache[shop.osmUID] = result.unwrap();
     }
     return result;
   }
@@ -177,21 +177,21 @@ class ShopsManager {
     final result = await _requester.putProductToShops(product, shops);
     final eventParam = {
       'barcode': product.barcode,
-      'shops': shops.map((e) => e.osmId).join(', ')
+      'shops': shops.map((e) => e.osmUID).join(', ')
     };
     if (result.isOk) {
       _analytics.sendEvent('product_put_to_shop', eventParam);
       for (final shop in shops) {
-        var rangeCache = _rangesCache[shop.osmId];
+        var rangeCache = _rangesCache[shop.osmUID];
         if (rangeCache != null) {
           final now = DateTime.now().secondsSinceEpoch;
           rangeCache = rangeCache.rebuild((e) => e
             ..products.add(product)
             ..productsLastSeenSecsUtc[product.barcode] = now);
-          _rangesCache[shop.osmId] = rangeCache;
+          _rangesCache[shop.osmUID] = rangeCache;
         }
 
-        var shopCache = _shopsCache[shop.osmId];
+        var shopCache = _shopsCache[shop.osmUID];
         if (shopCache != null) {
           var backendShop = shopCache.backendShop;
           if (backendShop != null) {
@@ -199,12 +199,12 @@ class ShopsManager {
                 (e) => e.productsCount = backendShop!.productsCount + 1);
           } else {
             backendShop = BackendShop((e) => e
-              ..osmId = shop.osmId
+              ..osmUID = shop.osmUID
               ..productsCount = 1);
           }
           shopCache =
               shopCache.rebuild((e) => e.backendShop.replace(backendShop!));
-          _shopsCache[shop.osmId] = shopCache;
+          _shopsCache[shop.osmUID] = shopCache;
         } else {
           Log.w('A product is put into a shop while there '
               'was no cache for the shop. Shop: $shop');
@@ -227,10 +227,10 @@ class ShopsManager {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',
           {'name': name, 'lat': coord.lat, 'lon': coord.lon});
-      _shopsCache[shop.osmId] = shop;
+      _shopsCache[shop.osmUID] = shop;
       for (final loadedArea in _loadedAreas.keys) {
         if (loadedArea.containsShop(shop)) {
-          _loadedAreas[loadedArea]!.add(shop.osmId);
+          _loadedAreas[loadedArea]!.add(shop.osmUID);
         }
       }
       for (final territory in await _osmCacher.getCachedShops()) {

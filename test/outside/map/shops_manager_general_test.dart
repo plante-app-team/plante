@@ -110,7 +110,7 @@ void main() {
     // Ensure +1 product in productsCount
     final shops2 = shopsRes2.unwrap();
     expect(shops2, isNot(equals(shops1)));
-    expect(shops2.values.first.osmId, equals(shops1.values.first.osmId));
+    expect(shops2.values.first.osmUID, equals(shops1.values.first.osmUID));
     expect(shops2.values.first.productsCount,
         equals(shops1.values.first.productsCount + 1));
   });
@@ -120,7 +120,7 @@ void main() {
       'the shop had no backend shop before', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..name = 'shop1'
         ..type = 'supermarket'
         ..longitude = 15
@@ -131,7 +131,7 @@ void main() {
         .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
     final fullShops = {
-      osmShops[0].osmId: Shop((e) => e..osmShop.replace(osmShops[0])),
+      osmShops[0].osmUID: Shop((e) => e..osmShop.replace(osmShops[0])),
     };
 
     // Fetch #1
@@ -160,12 +160,12 @@ void main() {
     // Ensure a BackendShop is now created even though it didn't exist before
     final shops2 = shopsRes2.unwrap();
     expect(shops2, isNot(equals(shops1)));
-    expect(shops2.values.first.osmId, equals(shops1.values.first.osmId));
+    expect(shops2.values.first.osmUID, equals(shops1.values.first.osmUID));
     expect(shops2.values.first.backendShop, isNotNull);
     expect(
         shops2.values.first.backendShop,
         equals(BackendShop((e) => e
-          ..osmId = shops1.values.first.osmId
+          ..osmUID = shops1.values.first.osmUID
           ..productsCount = 1)));
   });
 
@@ -314,7 +314,7 @@ void main() {
       osmShops.first,
     ];
     final shopsCreatedFromCache = {
-      osmShops.first.osmId: fullShops[osmShops.first.osmId]
+      osmShops.first.osmUID: fullShops[osmShops.first.osmUID]
     };
     final now = DateTime.now();
     final cache = await osmCacher.cacheShops(
@@ -339,7 +339,7 @@ void main() {
       osmShops.first,
     ];
     final shopsCreatedFromCache = {
-      osmShops.first.osmId: fullShops[osmShops.first.osmId]
+      osmShops.first.osmUID: fullShops[osmShops.first.osmUID]
     };
     final now = DateTime.now().subtract(const Duration(
         days: ShopsManager.DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD + 1));
@@ -368,7 +368,7 @@ void main() {
       osmShops.first,
     ];
     final shopsCreatedFromCache = {
-      osmShops.first.osmId: fullShops[osmShops.first.osmId]
+      osmShops.first.osmUID: fullShops[osmShops.first.osmUID]
     };
     final now = DateTime.now().subtract(const Duration(
         days: ShopsManager.DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD + 1));
@@ -426,7 +426,7 @@ void main() {
     // NOTE: no backendProducts[2]
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e
-        ..osmId = shop.osmId
+        ..osmUID = shop.osmUID
         ..products.addAll([rangeBackendProducts[0], rangeBackendProducts[1]])
         ..productsLastSeenUtc.addAll({
           rangeBackendProducts[0].barcode: 123456,
@@ -491,7 +491,7 @@ void main() {
     final shop = fullShops.values.first;
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e
-        ..osmId = shop.osmId
+        ..osmUID = shop.osmUID
         ..products.addAll([rangeBackendProducts[0], rangeBackendProducts[1]])
         ..productsLastSeenUtc.addAll({
           rangeBackendProducts[0].barcode: 123456,
@@ -578,7 +578,7 @@ void main() {
 
     // Expecting all previous shops + the new shop
     final expectedAllShops = Map.from(fullShops);
-    expectedAllShops[newShop.osmId] = newShop;
+    expectedAllShops[newShop.osmUID] = newShop;
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));
 
@@ -601,8 +601,11 @@ void main() {
         analytics.firstSentEvent('product_put_to_shop').second,
         equals({
           'barcode': rangeProducts[2].barcode,
-          'shops':
-              fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+          'shops': fullShops.values
+              .toList()
+              .map((e) => e.osmUID)
+              .toList()
+              .join(', '),
         }));
     analytics.clearEvents();
 
@@ -616,8 +619,11 @@ void main() {
         analytics.firstSentEvent('product_put_to_shop_failure').second,
         equals({
           'barcode': rangeProducts[2].barcode,
-          'shops':
-              fullShops.values.toList().map((e) => e.osmId).toList().join(', '),
+          'shops': fullShops.values
+              .toList()
+              .map((e) => e.osmUID)
+              .toList()
+              .join(', '),
         }));
     analytics.clearEvents();
   });
@@ -665,12 +671,12 @@ void main() {
   test('returned shops are within the requested bounds', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..name = 'shop1'
         ..longitude = 15
         ..latitude = 15),
       OsmShop((e) => e
-        ..osmId = '2'
+        ..osmUID = '1:2'
         ..name = 'shop2'
         ..longitude = 15.0001
         ..latitude = 15.0001),
@@ -687,7 +693,7 @@ void main() {
     var shopsRes = await shopsManager.fetchShops(bounds);
     var shops = shopsRes.unwrap();
     // Only shop 1 is expected because only it is within the bounds
-    expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
+    expect(shops.values.map((e) => e.osmUID), equals([osmShops[0].osmUID]));
     // Verify cache was not used
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
 
@@ -697,7 +703,7 @@ void main() {
     shopsRes = await shopsManager.fetchShops(bounds);
     shops = shopsRes.unwrap();
     // Again only shop 1 is expected because only it is within the bounds
-    expect(shops.values.map((e) => e.osmId), equals([osmShops[0].osmId]));
+    expect(shops.values.map((e) => e.osmUID), equals([osmShops[0].osmUID]));
     // Verify cache WAS used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
   });

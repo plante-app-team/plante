@@ -59,12 +59,12 @@ void main() {
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..longitude = 10
       ..latitude = 10
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..productsCount = 1)));
 
   final products = [
@@ -267,7 +267,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmId, true));
+    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, true));
 
     // Verify the date is updated
     card = find.byType(ProductCard).evaluate().first.widget;
@@ -325,7 +325,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmId, false));
+    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, false));
 
     // Verify the old date is still in place
     card = find.byType(ProductCard).evaluate().first.widget;

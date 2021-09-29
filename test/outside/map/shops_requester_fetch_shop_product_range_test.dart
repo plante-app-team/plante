@@ -40,7 +40,7 @@ void main() {
     ];
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e
-        ..osmId = aShop.osmId
+        ..osmUID = aShop.osmUID
         ..products.addAll([backendProducts[0], backendProducts[1]])
         ..productsLastSeenUtc.addAll({
           backendProducts[0].barcode: 123456,
@@ -92,7 +92,7 @@ void main() {
 
   test('fetchShopProductRange no products', () async {
     final backendProductsAtShops = [
-      BackendProductsAtShop((e) => e.osmId = aShop.osmId),
+      BackendProductsAtShop((e) => e.osmUID = aShop.osmUID),
     ];
     when(backend.requestProductsAtShops(any))
         .thenAnswer((_) async => Ok(backendProductsAtShops));
@@ -114,7 +114,7 @@ void main() {
     ];
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e
-        ..osmId = aShop.osmId
+        ..osmUID = aShop.osmUID
         ..products.addAll([backendProducts[0], backendProducts[1]])),
     ];
     when(backend.requestProductsAtShops(any))
@@ -148,7 +148,7 @@ void main() {
     ];
     final backendProductsAtShops = [
       BackendProductsAtShop((e) => e
-        ..osmId = aShop.osmId
+        ..osmUID = aShop.osmUID
         ..products.addAll([backendProducts[0], backendProducts[1]])),
     ];
     when(backend.requestProductsAtShops(any))

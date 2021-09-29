@@ -8,8 +8,8 @@ part 'backend_products_at_shop.g.dart';
 
 abstract class BackendProductsAtShop
     implements Built<BackendProductsAtShop, BackendProductsAtShopBuilder> {
-  @BuiltValueField(wireName: 'shop_osm_id')
-  String get osmId;
+  @BuiltValueField(wireName: 'shop_osm_uid')
+  String get osmUID;
   @BuiltValueField(wireName: 'products')
   BuiltList<BackendProduct> get products;
   @BuiltValueField(wireName: 'products_last_seen_utc')

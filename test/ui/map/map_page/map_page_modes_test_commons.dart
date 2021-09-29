@@ -40,39 +40,39 @@ class MapPageModesTestCommons {
   final shops = [
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '0'
+        ..osmUID = '1:0'
         ..longitude = 10
         ..latitude = 10
         ..name = 'Spar0'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '0'
+        ..osmUID = '1:0'
         ..productsCount = 0))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar1'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 1))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '2'
+        ..osmUID = '1:2'
         ..longitude = 12
         ..latitude = 12
         ..name = 'Spar2'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '2'
+        ..osmUID = '1:2'
         ..productsCount = 2))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '3'
+        ..osmUID = '1:3'
         ..longitude = 13
         ..latitude = 13
         ..name = 'Spar3'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '3'
+        ..osmUID = '1:3'
         ..productsCount = 3))),
   ];
   late Map<String, Shop> shopsMap;
@@ -130,15 +130,15 @@ class MapPageModesTestCommons {
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
       final coords = invc.namedArguments[const Symbol('coord')] as Coord;
-      final id = randInt(100, 500);
+      final id = '1:${randInt(100, 500)}';
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = id.toString()
+          ..osmUID = id.toString()
           ..longitude = coords.lon
           ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = id.toString()
+          ..osmUID = id.toString()
           ..productsCount = 0))));
     });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
@@ -161,7 +161,7 @@ class MapPageModesTestCommons {
   }
 
   void fillFetchedShops() {
-    shopsMap = {for (final shop in shops) shop.osmId: shop};
+    shopsMap = {for (final shop in shops) shop.osmUID: shop};
   }
 
   void clearFetchedShops() {

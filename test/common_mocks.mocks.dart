@@ -238,33 +238,33 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
           as _i9.Future<_i2.Result<_i18.UserParams, _i19.BackendError>>);
   @override
   _i9.Future<_i2.Result<List<_i23.BackendProductsAtShop>, _i19.BackendError>>
-      requestProductsAtShops(Iterable<String>? osmIds) => (super.noSuchMethod(
-          Invocation.method(#requestProductsAtShops, [osmIds]),
+      requestProductsAtShops(Iterable<String>? osmUIDs) => (super.noSuchMethod(
+          Invocation.method(#requestProductsAtShops, [osmUIDs]),
           returnValue: Future<_i2.Result<List<_i23.BackendProductsAtShop>, _i19.BackendError>>.value(
               _FakeResult_0<List<_i23.BackendProductsAtShop>,
                   _i19.BackendError>())) as _i9
           .Future<_i2.Result<List<_i23.BackendProductsAtShop>, _i19.BackendError>>);
   @override
   _i9.Future<_i2.Result<List<_i24.BackendShop>, _i19.BackendError>>
-      requestShops(Iterable<String>? osmIds) => (super.noSuchMethod(
-          Invocation.method(#requestShops, [osmIds]),
+      requestShops(Iterable<String>? osmUIDs) => (super.noSuchMethod(
+          Invocation.method(#requestShops, [osmUIDs]),
           returnValue: Future<
                   _i2.Result<List<_i24.BackendShop>, _i19.BackendError>>.value(
               _FakeResult_0<List<_i24.BackendShop>, _i19.BackendError>())) as _i9
           .Future<_i2.Result<List<_i24.BackendShop>, _i19.BackendError>>);
   @override
   _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> productPresenceVote(
-          String? barcode, String? osmId, bool? positive) =>
+          String? barcode, String? osmUID, bool? positive) =>
       (super.noSuchMethod(
-          Invocation.method(#productPresenceVote, [barcode, osmId, positive]),
+          Invocation.method(#productPresenceVote, [barcode, osmUID, positive]),
           returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
               _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
           .Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
   _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> putProductToShop(
-          String? barcode, String? osmId) =>
+          String? barcode, String? osmUID) =>
       (super.noSuchMethod(
-          Invocation.method(#putProductToShop, [barcode, osmId]),
+          Invocation.method(#putProductToShop, [barcode, osmUID]),
           returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
               _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
           .Future<_i2.Result<_i2.None, _i19.BackendError>>);

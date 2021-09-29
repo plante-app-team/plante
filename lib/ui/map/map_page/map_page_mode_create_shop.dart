@@ -15,7 +15,7 @@ import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_
 import 'package:plante/l10n/strings.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
-  static const _NEW_SHOP_PSEUDO_OSM_ID = 'NEW_SHOP_PSEUDO_OSM_ID';
+  static const _NEW_SHOP_PSEUDO_OSM_ID = '1:NEW_SHOP_PSEUDO_OSM_ID';
   static const _HINT_ID = 'MapPageModeCreateShop hint 1';
   final ResCallback<MapPageMode> nextModeMaker;
   final Set<Shop> _selectedShops = <Shop>{};
@@ -46,7 +46,7 @@ class MapPageModeCreateShop extends MapPageMode {
   // they wouldn't mess user's taps
   @override
   Iterable<Shop> filter(Iterable<Shop> shops) =>
-      shops.where((shop) => shop.osmId == _NEW_SHOP_PSEUDO_OSM_ID);
+      shops.where((shop) => shop.osmUID == _NEW_SHOP_PSEUDO_OSM_ID);
 
   @override
   Set<Shop> selectedShops() => _selectedShops;
@@ -94,13 +94,13 @@ class MapPageModeCreateShop extends MapPageMode {
   Shop _createShop(String name, ShopType type, Coord coords) {
     return Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
+        ..osmUID = _NEW_SHOP_PSEUDO_OSM_ID
         ..longitude = coords.lon
         ..latitude = coords.lat
         ..name = name
         ..type = type.osmName))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = _NEW_SHOP_PSEUDO_OSM_ID
+        ..osmUID = _NEW_SHOP_PSEUDO_OSM_ID
         ..productsCount = 0)));
   }
 

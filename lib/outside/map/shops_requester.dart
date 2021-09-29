@@ -49,7 +49,7 @@ class ShopsRequester {
     final osmShopsToRequestFromPlante =
         osmShops.where((e) => planteBounds.contains(e.coord));
     final backendShopsResult = await _backend
-        .requestShops(osmShopsToRequestFromPlante.map((e) => e.osmId));
+        .requestShops(osmShopsToRequestFromPlante.map((e) => e.osmUID));
     if (backendShopsResult.isErr) {
       return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
     }
@@ -61,7 +61,7 @@ class ShopsRequester {
 
     // Finish forming the result
     final osmShopsMap = {
-      for (final osmShop in osmShops) osmShop.osmId: osmShop
+      for (final osmShop in osmShops) osmShop.osmUID: osmShop
     };
 
     return Ok(FetchedShops(
@@ -75,16 +75,16 @@ class ShopsRequester {
   Map<String, Shop> _combineOsmAndPlanteShops(
       Iterable<OsmShop> osmShops, List<BackendShop> backendShops) {
     final backendShopsMap = {
-      for (final backendShop in backendShops) backendShop.osmId: backendShop
+      for (final backendShop in backendShops) backendShop.osmUID: backendShop
     };
     final shops = <String, Shop>{};
     for (final osmShop in osmShops) {
-      final backendShopNullable = backendShopsMap[osmShop.osmId];
+      final backendShopNullable = backendShopsMap[osmShop.osmUID];
       var shop = Shop((e) => e.osmShop.replace(osmShop));
       if (backendShopNullable != null) {
         shop = shop.rebuild((e) => e.backendShop.replace(backendShopNullable));
       }
-      shops[osmShop.osmId] = shop;
+      shops[osmShop.osmUID] = shop;
     }
     return shops;
   }
@@ -92,7 +92,7 @@ class ShopsRequester {
   Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
       List<OsmShop> osmShops) async {
     final backendShopsRes =
-        await _backend.requestShops(osmShops.map((e) => e.osmId));
+        await _backend.requestShops(osmShops.map((e) => e.osmUID));
     if (backendShopsRes.isErr) {
       return Err(_convertBackendErr(backendShopsRes.unwrapErr()));
     }
@@ -103,7 +103,7 @@ class ShopsRequester {
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(
       Shop shop) async {
     // Obtain products from backend
-    final backendRes = await _backend.requestProductsAtShops([shop.osmId]);
+    final backendRes = await _backend.requestProductsAtShops([shop.osmUID]);
     if (backendRes.isErr) {
       return Err(_convertBackendErr(backendRes.unwrapErr()));
     }
@@ -141,7 +141,7 @@ class ShopsRequester {
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
     for (final shop in shops) {
-      final res = await _backend.putProductToShop(product.barcode, shop.osmId);
+      final res = await _backend.putProductToShop(product.barcode, shop.osmUID);
       if (res.isErr) {
         return Err(_convertBackendErr(res.unwrapErr()));
       }
@@ -160,7 +160,7 @@ class ShopsRequester {
       return Ok(Shop((e) => e
         ..backendShop.replace(backendShop)
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = backendShop.osmId
+          ..osmUID = backendShop.osmUID
           ..name = name
           ..type = type.osmName
           ..longitude = coord.lon

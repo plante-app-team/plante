@@ -148,12 +148,12 @@ void main() {
 
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 2)));
 
     final restorable = ShopRestorable(Shop.empty);
@@ -174,21 +174,21 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 1))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..longitude = 12
           ..latitude = 12
           ..name = 'Spar2'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..productsCount = 2))),
     ];
 

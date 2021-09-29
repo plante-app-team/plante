@@ -446,12 +446,12 @@ void main() {
       (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
       ..barcode = '12345'
@@ -492,12 +492,12 @@ void main() {
       (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
       ..barcode = '12345'
@@ -537,12 +537,12 @@ void main() {
       (WidgetTester tester) async {
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1'
+        ..osmUID = '1:1'
         ..productsCount = 2)));
     when(productsObtainer.getProduct(any)).thenAnswer((_) async => Ok(null));
 

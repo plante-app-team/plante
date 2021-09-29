@@ -18,7 +18,9 @@ class LicenceLabel extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           child: Text(
             label,
-            style: darkBox ? TextStyles.licenceMarker : TextStyles.licenceMarkerLight,
+            style: darkBox
+                ? TextStyles.licenceMarker
+                : TextStyles.licenceMarkerLight,
           ),
         ));
   }

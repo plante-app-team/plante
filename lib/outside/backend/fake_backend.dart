@@ -99,7 +99,7 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<None, BackendError>> productPresenceVote(
-      String barcode, String osmId, bool positive) async {
+      String barcode, String osmUID, bool positive) async {
     await _delay();
     return Ok(None());
   }
@@ -122,13 +122,13 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<List<BackendProductsAtShop>, BackendError>>
-      requestProductsAtShops(Iterable<String> osmIds) async {
+      requestProductsAtShops(Iterable<String> osmUIDs) async {
     await _delay();
 
     final result = <BackendProductsAtShop>[];
-    for (final osmId in osmIds) {
-      _createFakeShopIfNotExists(osmId: osmId);
-      result.add(_fakeShops[osmId]!);
+    for (final osmUID in osmUIDs) {
+      _createFakeShopIfNotExists(osmUID: osmUID);
+      result.add(_fakeShops[osmUID]!);
     }
 
     return Ok(result);
@@ -136,11 +136,11 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, String osmId) async {
+      String barcode, String osmUID) async {
     await _delay();
 
-    _createFakeShopIfNotExists(osmId: osmId);
-    _fakeShops[osmId] = _fakeShops[osmId]!.rebuild((e) => e
+    _createFakeShopIfNotExists(osmUID: osmUID);
+    _fakeShops[osmUID] = _fakeShops[osmUID]!.rebuild((e) => e
       ..products.add(_createBackendProduct(barcode))
       ..productsLastSeenUtc[barcode] = _nowSecs());
     return Ok(None());
@@ -148,13 +148,13 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<List<BackendShop>, BackendError>> requestShops(
-      Iterable<String> osmIds) async {
+      Iterable<String> osmUIDs) async {
     await _delay();
 
     final result = <BackendShop>[];
-    for (final osmId in osmIds) {
-      _createFakeShopIfNotExists(osmId: osmId);
-      result.add(_fakeShops[osmId]!.toShop());
+    for (final osmUID in osmUIDs) {
+      _createFakeShopIfNotExists(osmUID: osmUID);
+      result.add(_fakeShops[osmUID]!.toShop());
     }
     return Ok(result);
   }
@@ -168,11 +168,11 @@ class FakeBackend implements Backend {
   }
 
   BackendProductsAtShop _createFakeShopIfNotExists(
-      {String? osmId, int? productsNumber}) {
-    if (_fakeShops.containsKey(osmId)) {
-      return _fakeShops[osmId]!;
+      {String? osmUID, int? productsNumber}) {
+    if (_fakeShops.containsKey(osmUID)) {
+      return _fakeShops[osmUID]!;
     }
-    osmId ??= DateTime.now().millisecondsSinceEpoch.toString();
+    osmUID ??= '1:${DateTime.now().millisecondsSinceEpoch.toString()}';
     if (randInt(0, 2) == 1) {
       productsNumber ??= 0;
     } else {
@@ -188,10 +188,10 @@ class FakeBackend implements Backend {
     }
 
     final productsAtShop = BackendProductsAtShop((e) => e
-      ..osmId = osmId
+      ..osmUID = osmUID
       ..products.addAll(fakeProducts)
       ..productsLastSeenUtc.addAll(lastSeen));
-    _fakeShops[osmId] = productsAtShop;
+    _fakeShops[osmUID] = productsAtShop;
     return productsAtShop;
   }
 
@@ -205,7 +205,7 @@ class FakeBackend implements Backend {
 extension _ProductsAtShopExt on BackendProductsAtShop {
   BackendShop toShop() {
     return BackendShop((e) => e
-      ..osmId = osmId
+      ..osmUID = osmUID
       ..productsCount = products.length);
   }
 }

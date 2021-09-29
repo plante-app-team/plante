@@ -10,6 +10,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm_element_type.dart';
 import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
@@ -119,12 +120,14 @@ class OsmNominatim {
       }
       final type = entry['type']?.toString();
       final osmClass = entry['class']?.toString();
+      final osmElementType = _osmTypeFrom(entry['osm_type']?.toString());
       final osmId = entry['osm_id']?.toString();
       final double? lat = _extractPosPiece('lat', entry);
       final double? lon = _extractPosPiece('lon', entry);
       final name = entry['namedetails']?['name']?.toString();
       if (type == null ||
           osmId == null ||
+          osmElementType == null ||
           lat == null ||
           lon == null ||
           name == null) {
@@ -135,7 +138,7 @@ class OsmNominatim {
         final road = entry['address']?['road'] as String?;
         final houseNumber = entry['address']?['house_number'] as String?;
         foundShops.add(OsmShop((e) => e
-          ..osmId = osmId
+          ..osmUID = '${osmElementType.persistentCode}:$osmId'
           ..name = name
           ..type = type
           ..latitude = lat
@@ -190,4 +193,11 @@ T? _jsonDecodeSafeImpl<T>(String str) {
     Log.w("OpenStreetMap: couldn't decode safe: %str", ex: e);
     return null;
   }
+}
+
+OsmElementType? _osmTypeFrom(String? str) {
+  if (str == null) {
+    return null;
+  }
+  return osmElementTypeFromStr(str);
 }

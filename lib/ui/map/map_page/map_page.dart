@@ -282,7 +282,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       return;
     }
     analytics.sendEvent(
-        'map_shops_click', {'shops': shops.map((e) => e.osmId).join(', ')});
+        'map_shops_click', {'shops': shops.map((e) => e.osmUID).join(', ')});
     _mode.onMarkerClick(shops);
   }
 
@@ -385,7 +385,7 @@ class _MapPageState extends PageStatePlante<MapPage>
               alignment: Alignment.centerRight,
               child: LicenceLabel(
                 darkBox: false,
-                label: context.strings.display_product_page_off_licence,
+                label: context.strings.map_page_open_street_map_licence,
               ),
             ),
             MapBottomHint(_bottomHint),

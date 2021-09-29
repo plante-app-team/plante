@@ -259,15 +259,15 @@ void main() {
     for (var i = 0; i < MAP_PAGE_MODE_SELECTED_SHOPS_MAX * 2; ++i) {
       manyShops.add(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '$i'
+          ..osmUID = '1:$i'
           ..longitude = 10
           ..latitude = 10
           ..name = 'Spar$i'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '$i'
+          ..osmUID = '1:$i'
           ..productsCount = i))));
     }
-    final shopsMap = {for (final shop in manyShops) shop.osmId: shop};
+    final shopsMap = {for (final shop in manyShops) shop.osmUID: shop};
     when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shopsMap));
 
     final widget = MapPage(

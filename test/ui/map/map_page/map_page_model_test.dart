@@ -24,15 +24,15 @@ void main() {
   MapPageModelError? latestError;
 
   final shops = {
-    '1234': Shop((e) => e
+    '1:1234': Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmId = '1234'
+        ..osmUID = '1:1234'
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'
         ..type = 'Supermarket'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmId = '1234'
+        ..osmUID = '1:1234'
         ..productsCount = 3)))
   };
 

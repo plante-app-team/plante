@@ -24,8 +24,8 @@ class _$BackendProductsAtShopSerializer
       Serializers serializers, BackendProductsAtShop object,
       {FullType specifiedType = FullType.unspecified}) {
     final result = <Object?>[
-      'shop_osm_id',
-      serializers.serialize(object.osmId,
+      'shop_osm_uid',
+      serializers.serialize(object.osmUID,
           specifiedType: const FullType(String)),
       'products',
       serializers.serialize(object.products,
@@ -52,8 +52,8 @@ class _$BackendProductsAtShopSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'shop_osm_id':
-          result.osmId = serializers.deserialize(value,
+        case 'shop_osm_uid':
+          result.osmUID = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
         case 'products':
@@ -76,7 +76,7 @@ class _$BackendProductsAtShopSerializer
 
 class _$BackendProductsAtShop extends BackendProductsAtShop {
   @override
-  final String osmId;
+  final String osmUID;
   @override
   final BuiltList<BackendProduct> products;
   @override
@@ -87,12 +87,12 @@ class _$BackendProductsAtShop extends BackendProductsAtShop {
       (new BackendProductsAtShopBuilder()..update(updates)).build();
 
   _$BackendProductsAtShop._(
-      {required this.osmId,
+      {required this.osmUID,
       required this.products,
       required this.productsLastSeenUtc})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        osmId, 'BackendProductsAtShop', 'osmId');
+        osmUID, 'BackendProductsAtShop', 'osmUID');
     BuiltValueNullFieldError.checkNotNull(
         products, 'BackendProductsAtShop', 'products');
     BuiltValueNullFieldError.checkNotNull(
@@ -112,21 +112,21 @@ class _$BackendProductsAtShop extends BackendProductsAtShop {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is BackendProductsAtShop &&
-        osmId == other.osmId &&
+        osmUID == other.osmUID &&
         products == other.products &&
         productsLastSeenUtc == other.productsLastSeenUtc;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, osmId.hashCode), products.hashCode),
+    return $jf($jc($jc($jc(0, osmUID.hashCode), products.hashCode),
         productsLastSeenUtc.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('BackendProductsAtShop')
-          ..add('osmId', osmId)
+          ..add('osmUID', osmUID)
           ..add('products', products)
           ..add('productsLastSeenUtc', productsLastSeenUtc))
         .toString();
@@ -137,9 +137,9 @@ class BackendProductsAtShopBuilder
     implements Builder<BackendProductsAtShop, BackendProductsAtShopBuilder> {
   _$BackendProductsAtShop? _$v;
 
-  String? _osmId;
-  String? get osmId => _$this._osmId;
-  set osmId(String? osmId) => _$this._osmId = osmId;
+  String? _osmUID;
+  String? get osmUID => _$this._osmUID;
+  set osmUID(String? osmUID) => _$this._osmUID = osmUID;
 
   ListBuilder<BackendProduct>? _products;
   ListBuilder<BackendProduct> get products =>
@@ -158,7 +158,7 @@ class BackendProductsAtShopBuilder
   BackendProductsAtShopBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _osmId = $v.osmId;
+      _osmUID = $v.osmUID;
       _products = $v.products.toBuilder();
       _productsLastSeenUtc = $v.productsLastSeenUtc.toBuilder();
       _$v = null;
@@ -183,8 +183,8 @@ class BackendProductsAtShopBuilder
     try {
       _$result = _$v ??
           new _$BackendProductsAtShop._(
-              osmId: BuiltValueNullFieldError.checkNotNull(
-                  osmId, 'BackendProductsAtShop', 'osmId'),
+              osmUID: BuiltValueNullFieldError.checkNotNull(
+                  osmUID, 'BackendProductsAtShop', 'osmUID'),
               products: products.build(),
               productsLastSeenUtc: productsLastSeenUtc.build());
     } catch (_) {

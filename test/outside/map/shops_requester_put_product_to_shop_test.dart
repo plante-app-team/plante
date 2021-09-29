@@ -30,21 +30,21 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar2'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..productsCount = 2)))
     ];
 
@@ -60,30 +60,30 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar2'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '2'
+          ..osmUID = '1:2'
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '3'
+          ..osmUID = '1:3'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar3'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '3'
+          ..osmUID = '1:3'
           ..productsCount = 2)))
     ];
 
@@ -108,12 +108,12 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmId = '1'
+          ..osmUID = '1:1'
           ..productsCount = 2)))
     ];
 

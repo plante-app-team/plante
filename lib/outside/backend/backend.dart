@@ -225,24 +225,24 @@ class Backend {
   }
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
-      requestProductsAtShops(Iterable<String> osmIds) async {
+      requestProductsAtShops(Iterable<String> osmUIDs) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestProductsAtShops(osmIds);
+      return await _fakeBackend.requestProductsAtShops(osmUIDs);
     }
 
     final jsonRes = await _backendGetJson(
-        'products_at_shops_data/', {'osmShopsIds': osmIds});
+        'products_at_shops_data/', {'osmShopsUIDs': osmUIDs});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
 
-    if (!json.containsKey('results')) {
+    if (!json.containsKey('results_v2')) {
       Log.w('Invalid products_at_shops_data response: $json');
       return Err(BackendError.invalidDecodedJson(json));
     }
 
-    final results = json['results'] as Map<String, dynamic>;
+    final results = json['results_v2'] as Map<String, dynamic>;
     final productsAtShops = <BackendProductsAtShop>[];
     for (final result in results.values) {
       final productsAtShop =
@@ -255,25 +255,25 @@ class Backend {
   }
 
   Future<Result<List<BackendShop>, BackendError>> requestShops(
-      Iterable<String> osmIds) async {
+      Iterable<String> osmUIDs) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestShops(osmIds);
+      return await _fakeBackend.requestShops(osmUIDs);
     }
 
     final jsonRes = await _backendGetJson('shops_data/', {},
-        body: jsonEncode({'osm_ids': osmIds.toList()}),
+        body: jsonEncode({'osm_uids': osmUIDs.toList()}),
         contentType: 'application/json');
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
 
-    if (!json.containsKey('results')) {
+    if (!json.containsKey('results_v2')) {
       Log.w('Invalid shops_data response: $json');
       return Err(BackendError.invalidDecodedJson(json));
     }
 
-    final results = json['results'] as Map<String, dynamic>;
+    final results = json['results_v2'] as Map<String, dynamic>;
     final shops = <BackendShop>[];
     for (final result in results.values) {
       final shop = BackendShop.fromJson(result as Map<String, dynamic>);
@@ -285,30 +285,30 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> productPresenceVote(
-      String barcode, String osmId, bool positive) async {
+      String barcode, String osmUID, bool positive) async {
     _analytics.sendEvent('product_presence_vote',
-        {'barcode': barcode, 'shop': osmId, 'vote': positive});
+        {'barcode': barcode, 'shop': osmUID, 'vote': positive});
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.productPresenceVote(barcode, osmId, positive);
+      return await _fakeBackend.productPresenceVote(barcode, osmUID, positive);
     }
 
     final response = await _backendGet('product_presence_vote/', {
       'barcode': barcode,
-      'shopOsmId': osmId,
+      'shopOsmUID': osmUID,
       'voteVal': positive ? '1' : '0',
     });
     return _noneOrErrorFrom(response);
   }
 
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, String osmId) async {
+      String barcode, String osmUID) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.putProductToShop(barcode, osmId);
+      return await _fakeBackend.putProductToShop(barcode, osmUID);
     }
 
     final response = await _backendGet('put_product_to_shop/', {
       'barcode': barcode,
-      'shopOsmId': osmId,
+      'shopOsmUID': osmUID,
     });
     return _noneOrErrorFrom(response);
   }
@@ -332,11 +332,11 @@ class Backend {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-    if (!json.containsKey('osm_id')) {
+    if (!json.containsKey('osm_uid')) {
       return Err(BackendError.invalidDecodedJson(json));
     }
     return Ok(BackendShop((e) => e
-      ..osmId = json['osm_id'] as String
+      ..osmUID = json['osm_uid'] as String
       ..productsCount = 0));
   }
 

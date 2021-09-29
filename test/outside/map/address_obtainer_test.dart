@@ -23,12 +23,12 @@ void main() {
     ..houseNumber = '123');
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmId = '1'
+      ..osmUID = '1:1'
       ..productsCount = 2)));
 
   setUp(() async {

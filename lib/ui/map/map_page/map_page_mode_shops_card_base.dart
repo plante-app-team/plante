@@ -74,7 +74,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     final oldDisplayedShops = _displayedShops.toList();
     for (var index = 0; index < _displayedShops.length; ++index) {
       final shop = _displayedShops[index];
-      _displayedShops[index] = shops[shop.osmId] ?? shop;
+      _displayedShops[index] = shops[shop.osmUID] ?? shop;
     }
     if (!listEquals(oldDisplayedShops, _displayedShops)) {
       updateWidget();
@@ -235,7 +235,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
       final shop = _displayedShops[itemIndex];
       return Column(children: [
         VisibilityDetectorPlante(
-            keyStr: shop.osmId,
+            keyStr: shop.osmUID,
             onVisibilityChanged: (visible, _) {
               if (visible) {
                 _actuallyVisibleShops.add(shop);
