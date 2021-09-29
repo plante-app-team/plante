@@ -9,6 +9,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -32,7 +33,7 @@ void main() {
       ..houseNumber = '4');
     final shopWithoutAddress = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar')));
@@ -63,7 +64,7 @@ void main() {
       ..houseNumber = '4');
     final shopWithAddress = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'

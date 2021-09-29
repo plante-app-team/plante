@@ -174,7 +174,7 @@ class MapSearchPageModel {
     final foundInOsm = await _searchInOsm(query);
     final foundOsmEntitiesIds = <String>{};
     if (foundInOsm != null) {
-      foundOsmEntitiesIds.addAll(foundInOsm.first.map((e) => e.osmUID));
+      foundOsmEntitiesIds.addAll(foundInOsm.first.map((e) => e.osmUID.osmId));
       foundOsmEntitiesIds.addAll(foundInOsm.second.map((e) => e.osmId));
     }
 
@@ -186,9 +186,9 @@ class MapSearchPageModel {
       final fuzzyFoundShops =
           await _shopsFuzzySearch(query, fetchShopRes.unwrap().values.toList());
       for (final shop in fuzzyFoundShops) {
-        if (!foundOsmEntitiesIds.contains(shop.osmUID)) {
+        if (!foundOsmEntitiesIds.contains(shop.osmUID.osmId)) {
           foundShopsLocally.add(shop);
-          foundOsmEntitiesIds.add(shop.osmUID);
+          foundOsmEntitiesIds.add(shop.osmUID.osmId);
         }
       }
     }

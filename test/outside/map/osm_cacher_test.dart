@@ -4,6 +4,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -11,19 +12,19 @@ void main() {
 
   final shops = [
     OsmShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..name = 'first shop'
       ..type = 'type1'
       ..latitude = 111.321
       ..longitude = 111.321),
     OsmShop((e) => e
-      ..osmUID = '1:2'
+      ..osmUID = OsmUID.parse('1:2')
       ..name = 'second shop'
       ..type = null
       ..latitude = 222.123
       ..longitude = 222.321),
     OsmShop((e) => e
-      ..osmUID = '1:3'
+      ..osmUID = OsmUID.parse('1:3')
       ..name = 'third shop'
       ..type = 'type3'
       ..latitude = 333.321

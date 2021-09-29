@@ -13,6 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
@@ -26,7 +27,7 @@ enum MapPageModelError {
 class MapPageModel implements ShopsManagerListener {
   static const DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
 
-  final ArgCallback<Map<String, Shop>> _updateShopsCallback;
+  final ArgCallback<Map<OsmUID, Shop>> _updateShopsCallback;
   final ArgCallback<MapPageModelError> _errorCallback;
   final VoidCallback _updateCallback;
   final VoidCallback _loadingChangeCallback;
@@ -38,7 +39,7 @@ class MapPageModel implements ShopsManagerListener {
   CoordsBounds? _latestViewPort;
   bool _networkOperationInProgress = false;
 
-  Map<String, Shop> _shopsCache = {};
+  Map<OsmUID, Shop> _shopsCache = {};
 
   MapPageModel(
       this._locationController,
@@ -57,7 +58,7 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   bool get loading => _networkOperationInProgress;
-  Map<String, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
+  Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();

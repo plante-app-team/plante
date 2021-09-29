@@ -7,6 +7,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
@@ -23,8 +24,8 @@ void main() {
   late MockProductsObtainer productsObtainer;
   late ShopsRequester shopsRequester;
 
-  late Map<String, OsmShop> someOsmShops;
-  late Map<String, BackendShop> someBackendShops;
+  late Map<OsmUID, OsmShop> someOsmShops;
+  late Map<OsmUID, BackendShop> someBackendShops;
 
   setUp(() async {
     commons = ShopsRequesterTestCommons();
@@ -97,8 +98,8 @@ void main() {
   test('fetchShops with Plante bounds smaller than OSM bounds', () async {
     // Prepare OsmShops, 1 of which will be within bounds, and others outside
     expect(someBackendShops.length, greaterThanOrEqualTo(2));
-    final osmShops = <String, OsmShop>{};
-    String? theOnlyExpectedShopIs;
+    final osmShops = <OsmUID, OsmShop>{};
+    OsmUID? theOnlyExpectedShopIs;
     for (var index = 0; index < someOsmShops.values.toList().length; ++index) {
       final osmShop = someOsmShops.values.toList()[index];
       if (index == 0) {
@@ -116,7 +117,7 @@ void main() {
         .thenAnswer((_) async => Ok(osmShops.values.toList()));
     // Prepare backend shops
     when(backend.requestShops(any)).thenAnswer((invc) async {
-      final ids = invc.positionalArguments[0] as Iterable<String>;
+      final ids = invc.positionalArguments[0] as Iterable<OsmUID>;
       final result =
           someBackendShops.values.where((e) => ids.contains(e.osmUID));
       return Ok(result.toList());
@@ -148,10 +149,10 @@ void main() {
 
     final backendShops = [
       BackendShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2),
       BackendShop((e) => e
-        ..osmUID = '1:2'
+        ..osmUID = OsmUID.parse('1:2')
         ..productsCount = 1),
     ];
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
@@ -168,7 +169,7 @@ void main() {
   test('fetchShops backend error', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..name = 'shop1'
         ..type = 'supermarket'
         ..longitude = 123

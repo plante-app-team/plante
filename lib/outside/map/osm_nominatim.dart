@@ -15,6 +15,7 @@ import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 /// A wrapper around Open Street Map Nominatim APIs.
 ///
@@ -138,7 +139,7 @@ class OsmNominatim {
         final road = entry['address']?['road'] as String?;
         final houseNumber = entry['address']?['house_number'] as String?;
         foundShops.add(OsmShop((e) => e
-          ..osmUID = '${osmElementType.persistentCode}:$osmId'
+          ..osmUID = OsmUID.parse('${osmElementType.persistentCode}:$osmId')
           ..name = name
           ..type = type
           ..latitude = lat

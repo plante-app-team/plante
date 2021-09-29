@@ -6,6 +6,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
@@ -32,7 +33,7 @@ void main() {
             coord: anyNamed('coord'),
             type: anyNamed('type')))
         .thenAnswer((_) async => Ok(BackendShop((e) => e
-          ..osmUID = '1:123456'
+          ..osmUID = OsmUID.parse('1:123456')
           ..productsCount = 0)));
 
     final result = await shopsRequester.createShop(
@@ -43,13 +44,13 @@ void main() {
 
     final expectedResult = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:123456'
+        ..osmUID = OsmUID.parse('1:123456')
         ..longitude = 10
         ..latitude = 20
         ..name = 'Horns and Hooves'
         ..type = ShopType.supermarket.osmName))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:123456'
+        ..osmUID = OsmUID.parse('1:123456')
         ..productsCount = 0)));
     expect(result.unwrap(), equals(expectedResult));
   });

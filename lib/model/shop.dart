@@ -6,13 +6,14 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 part 'shop.g.dart';
 
 abstract class Shop implements Built<Shop, ShopBuilder> {
   static final Shop empty = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmUID = '1:0'
+      ..osmUID = OsmUID.parse('1:0')
       ..name = ''
       ..latitude = 0
       ..longitude = 0)));
@@ -20,7 +21,7 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   OsmShop get osmShop;
   BackendShop? get backendShop;
 
-  String get osmUID => osmShop.osmUID;
+  OsmUID get osmUID => osmShop.osmUID;
   String get name => osmShop.name;
   String? get typeStr => osmShop.type;
   ShopType? get type => typeStr != null ? ShopType.safeValueOf(typeStr!) : null;

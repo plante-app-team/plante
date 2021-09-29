@@ -14,6 +14,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -40,42 +41,42 @@ class MapPageModesTestCommons {
   final shops = [
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:0'
+        ..osmUID = OsmUID.parse('1:0')
         ..longitude = 10
         ..latitude = 10
         ..name = 'Spar0'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:0'
+        ..osmUID = OsmUID.parse('1:0')
         ..productsCount = 0))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar1'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 1))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:2'
+        ..osmUID = OsmUID.parse('1:2')
         ..longitude = 12
         ..latitude = 12
         ..name = 'Spar2'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:2'
+        ..osmUID = OsmUID.parse('1:2')
         ..productsCount = 2))),
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:3'
+        ..osmUID = OsmUID.parse('1:3')
         ..longitude = 13
         ..latitude = 13
         ..name = 'Spar3'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:3'
+        ..osmUID = OsmUID.parse('1:3')
         ..productsCount = 3))),
   ];
-  late Map<String, Shop> shopsMap;
+  late Map<OsmUID, Shop> shopsMap;
 
   Future<void> setUp() async {
     fillFetchedShops();
@@ -130,15 +131,15 @@ class MapPageModesTestCommons {
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
       final coords = invc.namedArguments[const Symbol('coord')] as Coord;
-      final id = '1:${randInt(100, 500)}';
+      final id = OsmUID.parse('1:${randInt(100, 500)}');
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = id.toString()
+          ..osmUID = id
           ..longitude = coords.lon
           ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = id.toString()
+          ..osmUID = id
           ..productsCount = 0))));
     });
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);

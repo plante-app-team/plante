@@ -4,12 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 @immutable
 class FetchedShops {
-  final Map<String, Shop> shops;
+  final Map<OsmUID, Shop> shops;
   final CoordsBounds shopsBounds;
-  final Map<String, OsmShop> osmShops;
+  final Map<OsmUID, OsmShop> osmShops;
   final CoordsBounds osmShopsBounds;
   const FetchedShops(
       this.shops, this.shopsBounds, this.osmShops, this.osmShopsBounds);

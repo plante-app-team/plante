@@ -212,7 +212,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
 
   Widget _shopToWidget(Shop shop) {
     return VisibilityDetectorPlante(
-        keyStr: shop.osmUID,
+        keyStr: shop.osmUID.toString(),
         onVisibilityChanged: (visible, _) =>
             _onShopVisibilityChange(shop, visible),
         child: MapSearchResultEntry(

@@ -17,6 +17,7 @@ import 'package:plante/outside/map/osm_element_type.dart';
 import 'package:plante/outside/map/osm_interactions_queue.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 // We use LinkedHashMap because order is important, so:
 // ignore_for_file: prefer_collection_literals
@@ -44,9 +45,9 @@ class OsmOverpass {
     _urls['taiwan'] = 'overpass.nchc.org.tw';
   }
 
-  /// Order of returned shops is not guaranteed to resemble order of [ids].
+  /// Order of returned shops is not guaranteed to resemble order of [osmUIDs].
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
-      {CoordsBounds? bounds, Iterable<String>? ids}) async {
+      {CoordsBounds? bounds, Iterable<OsmUID>? osmUIDs}) async {
     if (!_interactionsQueue.isInteracting(OsmInteractionService.OVERPASS)) {
       Log.e('OSM.fetchShops called outside of the queue');
     }
@@ -65,11 +66,15 @@ class OsmOverpass {
       boundsCmdPiece = '';
     }
     final String idsCmdPiece;
-    if (ids != null) {
-      final idsStr = ids.join(',');
-      idsCmdPiece = 'node[shop~"$typesStr"](id:$idsStr);'
-          'relation[shop~"$typesStr"](id:$idsStr);'
-          'way[shop~"$typesStr"](id:$idsStr);';
+    if (osmUIDs != null) {
+      final osmIdsStr = (OsmElementType type) => osmUIDs
+          .where((uid) => uid.type == type)
+          .map((uid) => uid.osmId)
+          .join(',');
+      idsCmdPiece =
+          'node[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.NODE)});'
+          'relation[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.RELATION)});'
+          'way[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.WAY)});';
     } else {
       idsCmdPiece = '';
     }
@@ -119,7 +124,7 @@ class OsmOverpass {
       final road = shopJson['tags']?['addr:street'] as String?;
       final houseNumber = shopJson['tags']?['addr:housenumber'] as String?;
       result.add(OsmShop((e) => e
-        ..osmUID = '${osmElementType.persistentCode}:$id'
+        ..osmUID = OsmUID.parse('${osmElementType.persistentCode}:$id')
         ..name = shopName
         ..type = shopType
         ..latitude = lat

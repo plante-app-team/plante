@@ -1,6 +1,7 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
@@ -65,7 +66,7 @@ void main() {
 
     final requestedShops = commons.osmShops.toList();
     requestedShops.add(OsmShop((e) => e
-      ..osmUID = '1:123321'
+      ..osmUID = OsmUID.parse('1:123321')
       ..name = 'new cool shop'
       ..type = 'supermarket'
       ..longitude = 15
@@ -74,7 +75,7 @@ void main() {
     final inflateRes = await shopsManager.inflateOsmShops(requestedShops);
     final inflatedShops = inflateRes.unwrap();
 
-    final expectedShops = <String, Shop>{};
+    final expectedShops = <OsmUID, Shop>{};
     expectedShops.addAll(commons.fullShops);
     expectedShops[requestedShops.last.osmUID] =
         Shop((e) => e..osmShop.replace(requestedShops.last));

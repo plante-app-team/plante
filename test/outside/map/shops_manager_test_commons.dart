@@ -9,6 +9,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -23,11 +24,11 @@ class ShopsManagerTestCommons {
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
 
-  final osmUID1 = '1:1';
-  final osmUID2 = '1:2';
+  final osmUID1 = OsmUID.parse('1:1');
+  final osmUID2 = OsmUID.parse('1:2');
   var osmShops = <OsmShop>[];
   var backendShops = <BackendShop>[];
-  var fullShops = <String, Shop>{};
+  var fullShops = <OsmUID, Shop>{};
 
   final bounds = CoordsBounds(
       northeast: Coord(lat: 15.001, lon: 15.001),
@@ -106,7 +107,7 @@ class ShopsManagerTestCommons {
             type: anyNamed('type')))
         .thenAnswer((_) async {
       final result = BackendShop((e) => e
-        ..osmUID = '1:${randInt(1, 99999)}'
+        ..osmUID = OsmUID.parse('1:${randInt(1, 99999)}')
         ..productsCount = 0);
       backendShops.add(result);
       return Ok(result);

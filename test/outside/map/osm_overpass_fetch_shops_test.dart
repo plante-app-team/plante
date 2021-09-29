@@ -1,8 +1,10 @@
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm_element_type.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_analytics.dart';
@@ -87,19 +89,19 @@ void main() {
     expect(shops.length, equals(3));
 
     final expectedShop1 = OsmShop((e) => e
-      ..osmUID = '1:992336735'
+      ..osmUID = OsmUID.parse('1:992336735')
       ..name = 'Spar'
       ..type = 'supermarket'
       ..latitude = 56.3202185
       ..longitude = 44.0097146);
     final expectedShop2 = OsmShop((e) => e
-      ..osmUID = '1:1641239353'
+      ..osmUID = OsmUID.parse('1:1641239353')
       ..name = 'Orehovskiy'
       ..type = 'convenience'
       ..latitude = 56.3257464
       ..longitude = 44.0121258);
     final expectedShop3 = OsmShop((e) => e
-      ..osmUID = '2:12702145'
+      ..osmUID = OsmUID.parse('2:12702145')
       ..name = 'Grozd'
       ..type = 'supermarket'
       ..latitude = 51.4702343
@@ -327,13 +329,13 @@ void main() {
     expect(shops[0].name, 'Spar');
 
     final expectedShop1 = OsmShop((e) => e
-      ..osmUID = '1:992336735'
+      ..osmUID = OsmUID.parse('1:992336735')
       ..name = 'Spar'
       ..type = 'supermarket'
       ..latitude = 56.3202185
       ..longitude = 44.0097146);
     final expectedShop2 = OsmShop((e) => e
-      ..osmUID = '1:1641239353'
+      ..osmUID = OsmUID.parse('1:1641239353')
       ..name = 'Orehovskiy'
       ..type = null
       ..latitude = 56.3257464
@@ -464,5 +466,86 @@ void main() {
     // and we need to make sure order doesn't suddenly change.
     final forcedOrdered = overpass.urls.keys.toList();
     expect(forcedOrdered, equals(['lz4', 'z', 'kumi', 'taiwan']));
+  });
+
+  test('fetchShops with OSM UIDs', () async {
+    const nodeId = '992336735';
+    const wayId = '1641239353';
+    const relationId = '12702145';
+    const osmResp = '''
+    {
+      "elements": [
+        {
+          "type": "node",
+          "id": $nodeId,
+          "lat": 56.3202185,
+          "lon": 44.0097146,
+          "tags": {
+            "name": "Spar",
+            "opening_hours": "Mo-Su 07:00-23:00",
+            "shop": "supermarket"
+          }
+        },
+        {
+          "type": "way",
+          "id": $wayId,
+          "lat": 56.3257464,
+          "lon": 44.0121258,
+          "tags": {
+            "name": "Orehovskiy",
+            "shop": "convenience"
+          }
+        },
+        {
+          "type": "relation",
+          "id": $relationId,
+          "center": {
+            "lat": 51.4702343,
+            "lon": 45.9190756
+          },
+          "members": [
+            {
+              "type": "way",
+              "ref": 942131327,
+              "role": "outer"
+            }
+          ],
+          "tags": {
+            "name": "Grozd",
+            "shop": "supermarket",
+            "type": "multipolygon"
+          }
+        }
+      ]
+    }
+    ''';
+
+    http.setResponse('.*', osmResp);
+
+    final shopsRes = await overpass.fetchShops(osmUIDs: [
+      const OsmUID(OsmElementType.NODE, nodeId),
+      const OsmUID(OsmElementType.WAY, wayId),
+      const OsmUID(OsmElementType.RELATION, relationId),
+    ]);
+    final shops = shopsRes.unwrap();
+    expect(shops.where((e) => e.osmUID.osmId == nodeId).length, equals(1));
+    expect(shops.where((e) => e.osmUID.osmId == wayId).length, equals(1));
+    expect(shops.where((e) => e.osmUID.osmId == relationId).length, equals(1));
+
+    final requests = http.getRequestsMatching('.*');
+    expect(requests.length, equals(1));
+
+    final request = Uri.decodeFull(requests.first.url.toString());
+
+    // Ensure our regex check type+id properly (there's no NODE with wayId)
+    expect(request,
+        isNot(matches(RegExp('.*node\\[shop~"[^"]*"\\]\\(id:$wayId\\);.*'))));
+    // Check type+id pairs
+    expect(request,
+        matches(RegExp('.*node\\[shop~"[^"]*"\\]\\(id:$nodeId\\);.*')));
+    expect(
+        request, matches(RegExp('.*way\\[shop~"[^"]*"\\]\\(id:$wayId\\);.*')));
+    expect(request,
+        matches(RegExp('.*relation\\[shop~"[^"]*"\\]\\(id:$relationId\\);.*')));
   });
 }

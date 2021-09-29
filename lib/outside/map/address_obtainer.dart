@@ -7,6 +7,7 @@ import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_nominatim.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 typedef AddressResult = Result<OsmAddress, OpenStreetMapError>;
 typedef FutureAddress = Future<AddressResult>;
@@ -16,7 +17,7 @@ typedef FutureShortAddress = Future<ShortAddressResult>;
 
 class AddressObtainer {
   late final OpenStreetMap _osm;
-  final _cache = <String, OsmAddress>{};
+  final _cache = <OsmUID, OsmAddress>{};
 
   AddressObtainer(this._osm);
 
@@ -42,7 +43,7 @@ class AddressObtainer {
   }
 
   FutureAddress _fetchAddress(
-      OsmNominatim nominatim, double lat, double lon, String? osmUID) async {
+      OsmNominatim nominatim, double lat, double lon, OsmUID? osmUID) async {
     if (osmUID != null && _cache.containsKey(osmUID)) {
       return Ok(_cache[osmUID]!);
     }

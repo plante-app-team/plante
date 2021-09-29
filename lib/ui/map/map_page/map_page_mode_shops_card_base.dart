@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
@@ -67,7 +68,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   @override
-  void onShopsUpdated(Map<String, Shop> shops) {
+  void onShopsUpdated(Map<OsmUID, Shop> shops) {
     if (_displayedShops.isEmpty) {
       return;
     }
@@ -235,7 +236,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
       final shop = _displayedShops[itemIndex];
       return Column(children: [
         VisibilityDetectorPlante(
-            keyStr: shop.osmUID,
+            keyStr: shop.osmUID.toString(),
             onVisibilityChanged: (visible, _) {
               if (visible) {
                 _actuallyVisibleShops.add(shop);

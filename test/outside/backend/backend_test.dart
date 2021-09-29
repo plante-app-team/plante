@@ -6,6 +6,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -596,8 +597,8 @@ void main() {
           }
         ''');
 
-    final result =
-        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestProductsAtShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -605,7 +606,7 @@ void main() {
 
     final BackendProductsAtShop shop1;
     final BackendProductsAtShop shop2;
-    if (shops[0].osmUID == '1:8711880917') {
+    if (shops[0].osmUID.toString() == '1:8711880917') {
       shop1 = shops[0];
       shop2 = shops[1];
     } else {
@@ -663,8 +664,8 @@ void main() {
           }
         ''');
 
-    final result =
-        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestProductsAtShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrap().length, equals(0));
   });
 
@@ -691,8 +692,8 @@ void main() {
           }
         ''');
 
-    final result =
-        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestProductsAtShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -706,8 +707,8 @@ void main() {
           }
         ''');
 
-    final result =
-        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestProductsAtShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -718,8 +719,8 @@ void main() {
     httpClient.setResponseException(
         '.*products_at_shops_data.*', const SocketException(''));
 
-    final result =
-        await backend.requestProductsAtShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestProductsAtShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -743,7 +744,8 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -751,7 +753,7 @@ void main() {
 
     final BackendShop shop1;
     final BackendShop shop2;
-    if (shops[0].osmUID == '1:8711880917') {
+    if (shops[0].osmUID == OsmUID.parse('1:8711880917')) {
       shop1 = shops[0];
       shop2 = shops[1];
     } else {
@@ -773,7 +775,8 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrap().length, equals(0));
   });
 
@@ -788,7 +791,8 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -802,7 +806,8 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -813,7 +818,8 @@ void main() {
     httpClient.setResponseException(
         '.*shops_data.*', const SocketException(''));
 
-    final result = await backend.requestShops(['1:8711880917', '1:8771781029']);
+    final result = await backend.requestShops(
+        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -825,10 +831,12 @@ void main() {
     httpClient
         .setResponse('.*product_presence_vote.*', ''' { "result": "ok" } ''');
 
-    var result = await backend.productPresenceVote('1:123456', '1', true);
+    var result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), true);
     expect(result.isOk, isTrue);
 
-    result = await backend.productPresenceVote('1:123456', '1', false);
+    result = await backend.productPresenceVote(
+        '1:123456', OsmUID.parse('1:123'), false);
     expect(result.isOk, isTrue);
   });
 
@@ -841,13 +849,13 @@ void main() {
 
     expect(analytics.allEvents(), equals([]));
 
-    await backend.productPresenceVote('123456', '1:1', true);
+    await backend.productPresenceVote('123456', OsmUID.parse('1:1'), true);
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.firstSentEvent('product_presence_vote').second,
         equals({'barcode': '123456', 'shop': '1:1', 'vote': true}));
     analytics.clearEvents();
 
-    await backend.productPresenceVote('123456', '1:1', false);
+    await backend.productPresenceVote('123456', OsmUID.parse('1:1'), false);
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.firstSentEvent('product_presence_vote').second,
         equals({'barcode': '123456', 'shop': '1:1', 'vote': false}));
@@ -860,7 +868,8 @@ void main() {
     httpClient.setResponseException(
         '.*product_presence_vote.*', const SocketException(''));
 
-    final result = await backend.productPresenceVote('1:123456', '1', true);
+    final result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), true);
     expect(result.isErr, isTrue);
   });
 
@@ -871,7 +880,8 @@ void main() {
     httpClient
         .setResponse('.*put_product_to_shop.*', ''' { "result": "ok" } ''');
 
-    final result = await backend.putProductToShop('1:123456', '1');
+    final result =
+        await backend.putProductToShop('123456', OsmUID.parse('1:123'));
     expect(result.isOk, isTrue);
   });
 
@@ -882,7 +892,8 @@ void main() {
     httpClient.setResponseException(
         '.*put_product_to_shop.*', const SocketException(''));
 
-    final result = await backend.putProductToShop('1:123456', '1');
+    final result =
+        await backend.putProductToShop('123456', OsmUID.parse('1:123'));
     expect(result.isErr, isTrue);
   });
 
@@ -898,7 +909,7 @@ void main() {
         coord: Coord(lat: 321, lon: 123),
         type: 'supermarket');
     expect(result.isOk, isTrue);
-    expect('1:123456', equals(result.unwrap().osmUID));
+    expect(OsmUID.parse('1:123456'), equals(result.unwrap().osmUID));
     expect(0, equals(result.unwrap().productsCount));
   });
 

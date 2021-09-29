@@ -5,7 +5,9 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_element_type.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -15,7 +17,8 @@ import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_
 import 'package:plante/l10n/strings.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
-  static const _NEW_SHOP_PSEUDO_OSM_ID = '1:NEW_SHOP_PSEUDO_OSM_ID';
+  static const _NEW_SHOP_PSEUDO_OSM_ID =
+      OsmUID(OsmElementType.NODE, 'NEW_SHOP_PSEUDO_OSM_ID');
   static const _HINT_ID = 'MapPageModeCreateShop hint 1';
   final ResCallback<MapPageMode> nextModeMaker;
   final Set<Shop> _selectedShops = <Shop>{};

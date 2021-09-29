@@ -14,6 +14,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
 
@@ -45,15 +46,15 @@ void main() {
         .thenAnswer((invc) async {
       final name = invc.namedArguments[const Symbol('name')] as String;
       final coords = invc.namedArguments[const Symbol('coord')] as Coord;
-      final id = '1:${randInt(100, 500)}';
+      final id = OsmUID.parse('1:${randInt(100, 500)}');
       return Ok(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = id.toString()
+          ..osmUID = id
           ..longitude = coords.lon
           ..latitude = coords.lat
           ..name = name))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = id.toString()
+          ..osmUID = id
           ..productsCount = 0))));
     });
     when(addressObtainer.addressOfCoords(any))

@@ -7,6 +7,7 @@ import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -23,12 +24,12 @@ void main() {
     ..houseNumber = '123');
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..productsCount = 2)));
 
   setUp(() async {

@@ -6,6 +6,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
@@ -20,19 +21,19 @@ void main() {
 
   final shopsManagerListeners = <ShopsManagerListener>[];
 
-  Map<String, Shop>? latestLoadedShops;
+  Map<OsmUID, Shop>? latestLoadedShops;
   MapPageModelError? latestError;
 
   final shops = {
-    '1:1234': Shop((e) => e
+    OsmUID.parse('1:1234'): Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1234'
+        ..osmUID = OsmUID.parse('1:1234')
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'
         ..type = 'Supermarket'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:1234'
+        ..osmUID = OsmUID.parse('1:1234')
         ..productsCount = 3)))
   };
 

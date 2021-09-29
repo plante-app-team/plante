@@ -4,6 +4,7 @@ import 'package:plante/outside/map/osm_nominatim.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_http_client.dart';
@@ -107,7 +108,7 @@ void main() {
         ])
         ..shops.addAll([
           OsmShop((e) => e
-            ..osmUID = '1:6266574214'
+            ..osmUID = OsmUID.parse('1:6266574214')
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
@@ -424,7 +425,7 @@ void main() {
       (e) => e
         ..shops.addAll([
           OsmShop((e) => e
-            ..osmUID = '1:6266574214'
+            ..osmUID = OsmUID.parse('1:6266574214')
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002
@@ -433,7 +434,7 @@ void main() {
             ..road = 'Broadway Street'
             ..houseNumber = '34A'),
           OsmShop((e) => e
-            ..osmUID = '1:6266574215'
+            ..osmUID = OsmUID.parse('1:6266574215')
             ..name = 'Broadway shop'
             ..type = 'supermarket'
             ..latitude = 56.321002

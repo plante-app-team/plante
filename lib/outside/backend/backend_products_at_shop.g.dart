@@ -26,7 +26,7 @@ class _$BackendProductsAtShopSerializer
     final result = <Object?>[
       'shop_osm_uid',
       serializers.serialize(object.osmUID,
-          specifiedType: const FullType(String)),
+          specifiedType: const FullType(OsmUID)),
       'products',
       serializers.serialize(object.products,
           specifiedType: const FullType(
@@ -54,7 +54,7 @@ class _$BackendProductsAtShopSerializer
       switch (key) {
         case 'shop_osm_uid':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(OsmUID)) as OsmUID;
           break;
         case 'products':
           result.products.replace(serializers.deserialize(value,
@@ -76,7 +76,7 @@ class _$BackendProductsAtShopSerializer
 
 class _$BackendProductsAtShop extends BackendProductsAtShop {
   @override
-  final String osmUID;
+  final OsmUID osmUID;
   @override
   final BuiltList<BackendProduct> products;
   @override
@@ -137,9 +137,9 @@ class BackendProductsAtShopBuilder
     implements Builder<BackendProductsAtShop, BackendProductsAtShopBuilder> {
   _$BackendProductsAtShop? _$v;
 
-  String? _osmUID;
-  String? get osmUID => _$this._osmUID;
-  set osmUID(String? osmUID) => _$this._osmUID = osmUID;
+  OsmUID? _osmUID;
+  OsmUID? get osmUID => _$this._osmUID;
+  set osmUID(OsmUID? osmUID) => _$this._osmUID = osmUID;
 
   ListBuilder<BackendProduct>? _products;
   ListBuilder<BackendProduct> get products =>

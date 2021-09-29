@@ -1,12 +1,13 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 part 'backend_shop.g.dart';
 
 abstract class BackendShop implements Built<BackendShop, BackendShopBuilder> {
   @BuiltValueField(wireName: 'osm_uid')
-  String get osmUID;
+  OsmUID get osmUID;
   @BuiltValueField(wireName: 'products_count')
   int get productsCount;
 

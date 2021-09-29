@@ -26,7 +26,7 @@ OsmElementType osmElementTypeFromCode(int persistentCode) {
     case 3:
       return OsmElementType.WAY;
     default:
-      throw Error();
+      throw ArgumentError();
   }
 }
 
@@ -39,6 +39,24 @@ OsmElementType osmElementTypeFromStr(String str) {
     case 'way':
       return OsmElementType.WAY;
     default:
-      throw Error();
+      throw ArgumentError();
   }
+}
+
+OsmElementType? osmElementTypeFromOsmUID(String osmUID,
+    {bool throwOnError = false}) {
+  if (osmUID[1] != ':') {
+    if (throwOnError) {
+      throw ArgumentError('OSM UID must include OSM element type: $osmUID');
+    }
+    return null;
+  }
+  final persistentCode = int.tryParse(osmUID[0]);
+  if (persistentCode == null) {
+    if (throwOnError) {
+      throw ArgumentError('Invalid persistent code in  $osmUID');
+    }
+    return null;
+  }
+  return osmElementTypeFromCode(persistentCode);
 }

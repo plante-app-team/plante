@@ -7,6 +7,7 @@ import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold_base.dart';
@@ -259,12 +260,12 @@ void main() {
     for (var i = 0; i < MAP_PAGE_MODE_SELECTED_SHOPS_MAX * 2; ++i) {
       manyShops.add(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:$i'
+          ..osmUID = OsmUID.parse('1:$i')
           ..longitude = 10
           ..latitude = 10
           ..name = 'Spar$i'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:$i'
+          ..osmUID = OsmUID.parse('1:$i')
           ..productsCount = i))));
     }
     final shopsMap = {for (final shop in manyShops) shop.osmUID: shop};

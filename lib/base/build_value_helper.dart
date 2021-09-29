@@ -18,6 +18,7 @@ import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 part 'build_value_helper.g.dart';
 
@@ -42,6 +43,7 @@ part 'build_value_helper.g.dart';
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers = (_serializers.toBuilder()
+      ..add(OsmUIDBuildValueSerializer())
       ..addPlugin(StandardJsonPlugin())
       ..addBuilderFactory(const FullType(BuiltList, [FullType(Ingredient)]),
           () => ListBuilder<Ingredient>()))

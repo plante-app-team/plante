@@ -16,6 +16,7 @@ import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -35,9 +36,9 @@ class ShopsManager {
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
-  final _shopsCache = <String, Shop>{};
-  final _loadedAreas = <CoordsBounds, List<String>>{};
-  final _rangesCache = <String, ShopProductRange>{};
+  final _shopsCache = <OsmUID, Shop>{};
+  final _loadedAreas = <CoordsBounds, List<OsmUID>>{};
+  final _rangesCache = <OsmUID, ShopProductRange>{};
 
   int get loadedAreasCount => _loadedAreas.length;
 
@@ -61,7 +62,7 @@ class ShopsManager {
     });
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> fetchShops(
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
     final existingCache = _loadShopsFromCache(bounds);
     if (existingCache != null) {
@@ -71,7 +72,7 @@ class ShopsManager {
         await _maybeLoadShops(overpass, bounds, attemptNumber: 1));
   }
 
-  Map<String, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
+  Map<OsmUID, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
     for (final loadedArea in _loadedAreas.keys) {
       // Already loaded
       if (loadedArea.containsBounds(bounds)) {
@@ -85,7 +86,7 @@ class ShopsManager {
     return null;
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> _maybeLoadShops(
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> _maybeLoadShops(
       OsmOverpass overpass, CoordsBounds bounds,
       {required int attemptNumber}) async {
     final existingCache = _loadShopsFromCache(bounds);
@@ -121,9 +122,9 @@ class ShopsManager {
     return Ok({for (var shop in result) shop.osmUID: shop});
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(
       Iterable<OsmShop> shops) async {
-    final loadedShops = <String, Shop>{};
+    final loadedShops = <OsmUID, Shop>{};
     final osmShopsToLoad = <OsmShop>[];
     for (final osmShop in shops) {
       final loadedShop = _shopsCache[osmShop.osmUID];

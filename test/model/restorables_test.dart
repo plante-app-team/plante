@@ -14,6 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 
 import '../widget_tester_extension.dart';
 
@@ -148,12 +149,12 @@ void main() {
 
     final shop = Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..longitude = 11
         ..latitude = 11
         ..name = 'Spar'))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2)));
 
     final restorable = ShopRestorable(Shop.empty);
@@ -174,21 +175,21 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 1))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..longitude = 12
           ..latitude = 12
           ..name = 'Spar2'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
     ];
 

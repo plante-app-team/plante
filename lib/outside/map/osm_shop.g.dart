@@ -20,7 +20,7 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
     final result = <Object?>[
       'osmUID',
       serializers.serialize(object.osmUID,
-          specifiedType: const FullType(String)),
+          specifiedType: const FullType(OsmUID)),
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
       'latitude',
@@ -75,7 +75,7 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
       switch (key) {
         case 'osmUID':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(OsmUID)) as OsmUID;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
@@ -114,7 +114,7 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
 
 class _$OsmShop extends OsmShop {
   @override
-  final String osmUID;
+  final OsmUID osmUID;
   @override
   final String name;
   @override
@@ -204,9 +204,9 @@ class _$OsmShop extends OsmShop {
 class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   _$OsmShop? _$v;
 
-  String? _osmUID;
-  String? get osmUID => _$this._osmUID;
-  set osmUID(String? osmUID) => _$this._osmUID = osmUID;
+  OsmUID? _osmUID;
+  OsmUID? get osmUID => _$this._osmUID;
+  set osmUID(OsmUID? osmUID) => _$this._osmUID = osmUID;
 
   String? _name;
   String? get name => _$this._name;

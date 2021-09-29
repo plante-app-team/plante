@@ -13,6 +13,7 @@ import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
@@ -72,12 +73,12 @@ class ShopsRequester {
     ));
   }
 
-  Map<String, Shop> _combineOsmAndPlanteShops(
+  Map<OsmUID, Shop> _combineOsmAndPlanteShops(
       Iterable<OsmShop> osmShops, List<BackendShop> backendShops) {
     final backendShopsMap = {
       for (final backendShop in backendShops) backendShop.osmUID: backendShop
     };
-    final shops = <String, Shop>{};
+    final shops = <OsmUID, Shop>{};
     for (final osmShop in osmShops) {
       final backendShopNullable = backendShopsMap[osmShop.osmUID];
       var shop = Shop((e) => e.osmShop.replace(osmShop));
@@ -89,7 +90,7 @@ class ShopsRequester {
     return shops;
   }
 
-  Future<Result<Map<String, Shop>, ShopsManagerError>> inflateOsmShops(
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(
       List<OsmShop> osmShops) async {
     final backendShopsRes =
         await _backend.requestShops(osmShops.map((e) => e.osmUID));

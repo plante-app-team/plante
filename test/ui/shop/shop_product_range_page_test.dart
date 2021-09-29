@@ -28,6 +28,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -59,12 +60,12 @@ void main() {
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..longitude = 10
       ..latitude = 10
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..productsCount = 1)));
 
   final products = [

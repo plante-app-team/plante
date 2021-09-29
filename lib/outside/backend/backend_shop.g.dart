@@ -20,7 +20,7 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
     final result = <Object?>[
       'osm_uid',
       serializers.serialize(object.osmUID,
-          specifiedType: const FullType(String)),
+          specifiedType: const FullType(OsmUID)),
       'products_count',
       serializers.serialize(object.productsCount,
           specifiedType: const FullType(int)),
@@ -42,7 +42,7 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
       switch (key) {
         case 'osm_uid':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(OsmUID)) as OsmUID;
           break;
         case 'products_count':
           result.productsCount = serializers.deserialize(value,
@@ -57,7 +57,7 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
 
 class _$BackendShop extends BackendShop {
   @override
-  final String osmUID;
+  final OsmUID osmUID;
   @override
   final int productsCount;
 
@@ -103,9 +103,9 @@ class _$BackendShop extends BackendShop {
 class BackendShopBuilder implements Builder<BackendShop, BackendShopBuilder> {
   _$BackendShop? _$v;
 
-  String? _osmUID;
-  String? get osmUID => _$this._osmUID;
-  set osmUID(String? osmUID) => _$this._osmUID = osmUID;
+  OsmUID? _osmUID;
+  OsmUID? get osmUID => _$this._osmUID;
+  set osmUID(OsmUID? osmUID) => _$this._osmUID = osmUID;
 
   int? _productsCount;
   int? get productsCount => _$this._productsCount;

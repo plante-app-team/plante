@@ -20,6 +20,7 @@ import 'package:plante/outside/map/osm_search_result.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -53,26 +54,26 @@ void main() {
   final localShops = [
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..name = 'shop name 1'
         ..type = 'supermarket'
         ..longitude = userPos.lon + distanceToEntities
         ..latitude = userPos.lat + distanceToEntities))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2))),
   ];
 
   final foundInOsmShops = [
     Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
-        ..osmUID = '1:3'
+        ..osmUID = OsmUID.parse('1:3')
         ..name = 'shop name 3'
         ..type = 'bakery'
         ..longitude = userPos.lon + distanceToEntities
         ..latitude = userPos.lat + distanceToEntities))
       ..backendShop.replace(BackendShop((e) => e
-        ..osmUID = '1:3'
+        ..osmUID = OsmUID.parse('1:3')
         ..productsCount = 3))),
   ];
 
@@ -456,7 +457,7 @@ void main() {
 
     // Shops search will be slow
     final shopsSearchCompleter =
-        Completer<Result<Map<String, Shop>, ShopsManagerError>>();
+        Completer<Result<Map<OsmUID, Shop>, ShopsManagerError>>();
     when(shopsManager.fetchShops(any))
         .thenAnswer((_) async => shopsSearchCompleter.future);
 
@@ -717,33 +718,33 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon + distanceToEntities + 1
           ..latitude = userPos.lat + distanceToEntities + 1))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon + distanceToEntities + 3
           ..latitude = userPos.lat + distanceToEntities + 3))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon + distanceToEntities + 2
           ..latitude = userPos.lat + distanceToEntities + 2))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..productsCount = 2))),
     ];
 
@@ -883,27 +884,27 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon + distanceToEntities
           ..latitude = userPos.lat + distanceToEntities))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon + distanceToEntities + kmToGrad(1)
           ..latitude = userPos.lat + distanceToEntities + kmToGrad(1)))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..name = 'shop name'
           ..type = 'supermarket'
           ..longitude = userPos.lon +
@@ -916,7 +917,7 @@ void main() {
                   MapSearchPageModel.MAX_DISTANCE_BETWEEN_MERGED_ROADS_KMS *
                       3)))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..productsCount = 2))),
     ];
 
@@ -965,23 +966,23 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..name = 'shop name 1'
           ..type = 'supermarket'
           ..longitude = userPos.lon
           ..latitude = userPos.lat))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..name = 'shop name 2'
           ..type = 'supermarket'
           ..longitude = userPos.lon
           ..latitude = userPos.lat))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
     ];
 
@@ -1013,7 +1014,7 @@ void main() {
 }
 
 extension _ShopsListExt on Iterable<Shop> {
-  Map<String, Shop> toMap() {
+  Map<OsmUID, Shop> toMap() {
     return {for (var e in this) e.osmUID: e};
   }
 }

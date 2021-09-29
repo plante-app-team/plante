@@ -6,6 +6,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import 'package:plante/base/base.dart';
@@ -225,7 +226,7 @@ class OsmCacher {
           shopsAndTerritoriesIds[territoryId] = [];
         }
         shopsAndTerritoriesIds[territoryId]!.add(OsmShop((e) => e
-          ..osmUID = osmUID
+          ..osmUID = OsmUID.parse(osmUID)
           ..name = name
           ..type = type
           ..latitude = lat
@@ -406,7 +407,7 @@ Map<String, dynamic> _territoryValues(
 Map<String, dynamic> _shopColumnsValues(int territoryId, OsmShop shop) {
   return {
     _SHOP_TERRITORY_ID: territoryId,
-    _SHOP_OSM_ID: shop.osmUID,
+    _SHOP_OSM_ID: shop.osmUID.toString(),
     _SHOP_NAME: shop.name,
     _SHOP_TYPE: shop.type ?? '',
     _SHOP_LAT: shop.latitude,

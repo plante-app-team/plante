@@ -10,6 +10,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/base/date_time_extensions.dart';
@@ -34,7 +35,7 @@ void main() {
 
   late List<OsmShop> osmShops;
   late List<BackendShop> backendShops;
-  late Map<String, Shop> fullShops;
+  late Map<OsmUID, Shop> fullShops;
 
   late CoordsBounds bounds;
   late CoordsBounds farBounds;
@@ -120,7 +121,7 @@ void main() {
       'the shop had no backend shop before', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..name = 'shop1'
         ..type = 'supermarket'
         ..longitude = 15
@@ -671,12 +672,12 @@ void main() {
   test('returned shops are within the requested bounds', () async {
     final osmShops = [
       OsmShop((e) => e
-        ..osmUID = '1:1'
+        ..osmUID = OsmUID.parse('1:1')
         ..name = 'shop1'
         ..longitude = 15
         ..latitude = 15),
       OsmShop((e) => e
-        ..osmUID = '1:2'
+        ..osmUID = OsmUID.parse('1:2')
         ..name = 'shop2'
         ..longitude = 15.0001
         ..latitude = 15.0001),

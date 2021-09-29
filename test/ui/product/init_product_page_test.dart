@@ -24,6 +24,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -59,12 +60,12 @@ void main() {
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..longitude = 11
       ..latitude = 11
       ..name = 'Spar'))
     ..backendShop.replace(BackendShop((e) => e
-      ..osmUID = '1:1'
+      ..osmUID = OsmUID.parse('1:1')
       ..productsCount = 2)));
 
   setUp(() async {
@@ -1081,21 +1082,21 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
     ];
 
@@ -1133,39 +1134,39 @@ void main() {
     final shops = [
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:1'
+          ..osmUID = OsmUID.parse('1:1')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:2'
+          ..osmUID = OsmUID.parse('1:2')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:3'
+          ..osmUID = OsmUID.parse('1:3')
           ..productsCount = 2))),
       Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
-          ..osmUID = '1:4'
+          ..osmUID = OsmUID.parse('1:4')
           ..longitude = 11
           ..latitude = 11
           ..name = 'Spar'))
         ..backendShop.replace(BackendShop((e) => e
-          ..osmUID = '1:4'
+          ..osmUID = OsmUID.parse('1:4')
           ..productsCount = 2))),
     ];
 

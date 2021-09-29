@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -308,7 +309,7 @@ void main() {
 
   testWidgets('no shops hint is not shown until shops are loaded',
       (WidgetTester tester) async {
-    final completer = Completer<Map<String, Shop>>();
+    final completer = Completer<Map<OsmUID, Shop>>();
     when(shopsManager.fetchShops(any))
         .thenAnswer((_) async => Ok(await completer.future));
 
