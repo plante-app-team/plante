@@ -13,6 +13,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
@@ -196,7 +197,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         GetIt.I.get<LocationController>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<AddressObtainer>(),
-        GetIt.I.get<LatestCameraPosStorage>(), (_) {
+        GetIt.I.get<LatestCameraPosStorage>(),
+        GetIt.I.get<DirectionsManager>(), (_) {
       updateMapCallback.call();
     }, _onError, updateCallback, loadingChangeCallback);
 

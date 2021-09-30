@@ -11,6 +11,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -33,6 +34,7 @@ class MapPageModesTestCommons {
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
+  late MockDirectionsManager directionsManager;
 
   final shopsManagerListeners = <ShopsManagerListener>[];
 
@@ -101,6 +103,8 @@ class MapPageModesTestCommons {
     GetIt.I.registerSingleton<RoadsManager>(roadsManager);
     final osmSearcher = MockOsmSearcher();
     GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
+    directionsManager = MockDirectionsManager();
+    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
 
     shopsManagerListeners.clear();
     when(shopsManager.addListener(any)).thenAnswer((invc) {
@@ -159,6 +163,9 @@ class MapPageModesTestCommons {
 
     when(roadsManager.fetchRoadsWithinAndNearby(any))
         .thenAnswer((_) async => Ok(const []));
+
+    when(directionsManager.areDirectionsAvailable())
+        .thenAnswer((_) async => false);
   }
 
   void fillFetchedShops() {

@@ -264,6 +264,7 @@
     "shop_card_add_product": "Добавить продукт",
     "shop_card_products_listed" : "Есть продукты",
     "shop_card_no_products_listed" : "Нет продуктов",
+    "shop_card_directions" : "Маршрут",
 
     "shop_address_widget_possible_address": "Примерный адрес: ",
 

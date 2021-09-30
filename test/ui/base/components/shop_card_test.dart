@@ -291,4 +291,50 @@ void main() {
     final expectedStr = AddressWidget.addressString(address, false, context)!;
     expect(find.richTextContaining(expectedStr), findsWidgets);
   });
+
+  testWidgets('directions button when callback provided',
+      (WidgetTester tester) async {
+    var directionsRequested = false;
+    final showDirections = (Shop shop) {
+      directionsRequested = true;
+    };
+    await tester.superPump(ShopCard.forProductRange(
+      shop: shopEmpty,
+      address: addressFuture,
+      showDirections: showDirections,
+    ));
+    expect(directionsRequested, isFalse);
+    await tester.superTap(find.byKey(const Key('directions_button')));
+    expect(directionsRequested, isTrue);
+  });
+
+  testWidgets('directions button when callback not provided',
+      (WidgetTester tester) async {
+    await tester.superPump(ShopCard.forProductRange(
+      shop: shopEmpty,
+      address: addressFuture,
+      showDirections: null,
+    ));
+    expect(find.byKey(const Key('directions_button')), findsNothing);
+  });
+
+  testWidgets('directions button text when shop has products',
+      (WidgetTester tester) async {
+    final context = await tester.superPump(ShopCard.forProductRange(
+      shop: shopWithProduct,
+      address: addressFuture,
+      showDirections: (_) {},
+    ));
+    expect(find.text(context.strings.shop_card_directions), findsOneWidget);
+  });
+
+  testWidgets('directions button text when shop has no products',
+      (WidgetTester tester) async {
+    final context = await tester.superPump(ShopCard.forProductRange(
+      shop: shopEmpty,
+      address: addressFuture,
+      showDirections: (_) {},
+    ));
+    expect(find.text(context.strings.shop_card_directions), findsNothing);
+  });
 }

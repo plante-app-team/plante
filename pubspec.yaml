@@ -69,6 +69,7 @@ dependencies:
   sqflite: ^2.0.0+3
   sqflite_common_ffi: ^2.0.0+1
   fuzzywuzzy: ^0.1.4
+  map_launcher: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -159,3 +160,5 @@ flutter:
     - assets/list_drag_n_drop.svg
     - assets/search.svg
     - assets/empty.svg
+    - assets/directions.svg
+    - assets/plus_small.svg

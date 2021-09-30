@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
@@ -20,6 +21,7 @@ void main() {
   late MockGoogleMapController mapController;
   late FakeAnalytics analytics;
   late MockShopsManager shopsManager;
+  late MockDirectionsManager directionsManager;
   late List<Shop> shops;
 
   setUp(() async {
@@ -29,6 +31,7 @@ void main() {
     shops = commons.shops;
     analytics = commons.analytics;
     shopsManager = commons.shopsManager;
+    directionsManager = commons.directionsManager;
   });
 
   testWidgets('empty shops are not displayed by default',
@@ -349,5 +352,41 @@ void main() {
 
     expect(find.byType(ShopCard), findsOneWidget);
     expect(find.byType(AddressWidget), findsOneWidget);
+  });
+
+  testWidgets('shop card directions btn when directions available',
+      (WidgetTester tester) async {
+    when(directionsManager.areDirectionsAvailable())
+        .thenAnswer((_) async => true);
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    final shop = shops[1];
+
+    verifyNever(directionsManager.direct(any, any));
+
+    widget.onMarkerClickForTesting([shop]);
+    await tester.pumpAndSettle();
+    await tester.superTap(find.byKey(const Key('directions_button')));
+
+    verify(directionsManager.direct(shop.coord, shop.name));
+  });
+
+  testWidgets('shop card directions btn when directions not available',
+      (WidgetTester tester) async {
+    when(directionsManager.areDirectionsAvailable())
+        .thenAnswer((_) async => false);
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    widget.onMarkerClickForTesting([shops[1]]);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('directions_button')), findsNothing);
   });
 }

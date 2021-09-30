@@ -13,6 +13,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -35,22 +36,29 @@ class MapPageModel implements ShopsManagerListener {
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
+  final DirectionsManager _directionsManager;
 
   CoordsBounds? _latestViewPort;
   bool _networkOperationInProgress = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
 
+  bool _directionsAvailable = false;
+
   MapPageModel(
       this._locationController,
       this._shopsManager,
       this._addressObtainer,
       this._latestCameraPosStorage,
+      this._directionsManager,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
       this._loadingChangeCallback) {
     _shopsManager.addListener(this);
+    _directionsManager
+        .areDirectionsAvailable()
+        .then((value) => _directionsAvailable = value);
   }
 
   void dispose() {
@@ -161,6 +169,12 @@ class MapPageModel implements ShopsManagerListener {
     if (_latestViewPort != null) {
       onCameraMoved(_latestViewPort!);
     }
+  }
+
+  bool areDirectionsAvailable() => _directionsAvailable;
+
+  void showDirectionsTo(Shop shop) {
+    _directionsManager.direct(shop.coord, shop.name);
   }
 
   void finishWith<T>(BuildContext context, T result) {

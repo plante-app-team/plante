@@ -33,6 +33,12 @@ class TextStyles {
       fontWeight: FontWeight.bold,
       color: ColorsPlante.primary);
 
+  static const TextStyle smallBoldWhite = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      color: Colors.white);
+
   static const TextStyle url = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 14,
