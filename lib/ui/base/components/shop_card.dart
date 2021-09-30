@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/button_icon_plante.dart';
+import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -27,6 +27,8 @@ class ShopCard extends StatelessWidget {
 
   final VoidCallback? loadCompletedCallback;
 
+  final ArgCallback<Shop>? showDirections;
+
   const ShopCard._(
       {Key? key,
       required this.shop,
@@ -35,7 +37,8 @@ class ShopCard extends StatelessWidget {
       this.isProductSold,
       this.onIsProductSoldChanged,
       this.cancelCallback,
-      this.loadCompletedCallback})
+      this.loadCompletedCallback,
+      required this.showDirections})
       : super(key: key);
 
   factory ShopCard.forProductRange(
@@ -43,14 +46,17 @@ class ShopCard extends StatelessWidget {
       required Shop shop,
       required FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback,
-      VoidCallback? loadCompletedCallback}) {
+      VoidCallback? loadCompletedCallback,
+      ArgCallback<Shop>? showDirections}) {
     return ShopCard._(
-        key: key,
-        shop: shop,
-        address: address,
-        checkedProduct: null,
-        cancelCallback: cancelCallback,
-        loadCompletedCallback: loadCompletedCallback);
+      key: key,
+      shop: shop,
+      address: address,
+      checkedProduct: null,
+      cancelCallback: cancelCallback,
+      loadCompletedCallback: loadCompletedCallback,
+      showDirections: showDirections,
+    );
   }
 
   factory ShopCard.askIfProductIsSold(
@@ -63,14 +69,16 @@ class ShopCard extends StatelessWidget {
       ArgCallback<Shop>? cancelCallback,
       VoidCallback? loadCompletedCallback}) {
     return ShopCard._(
-        key: key,
-        shop: shop,
-        address: address,
-        checkedProduct: product,
-        isProductSold: isProductSold,
-        onIsProductSoldChanged: onIsProductSoldChanged,
-        cancelCallback: cancelCallback,
-        loadCompletedCallback: loadCompletedCallback);
+      key: key,
+      shop: shop,
+      address: address,
+      checkedProduct: product,
+      isProductSold: isProductSold,
+      onIsProductSoldChanged: onIsProductSoldChanged,
+      cancelCallback: cancelCallback,
+      loadCompletedCallback: loadCompletedCallback,
+      showDirections: null,
+    );
   }
 
   @override
@@ -127,30 +135,47 @@ class ShopCard extends StatelessWidget {
   }
 
   Widget _productRangeContent(BuildContext context) {
-    return _getButton(context);
+    return Row(children: [
+      _getButton(context),
+      if (showDirections != null) const SizedBox(width: 12),
+      if (showDirections != null && _haveProducts())
+        ButtonFilledSmallPlante.lightGreen(
+          key: const Key('directions_button'),
+          text: context.strings.shop_card_directions,
+          onPressed: _showDirections,
+          icon: SvgPicture.asset('assets/directions.svg'),
+          paddings: const EdgeInsets.only(left: 12, right: 10),
+          spaceBetweenTextAndIcon: 6,
+        ),
+      if (showDirections != null && !_haveProducts())
+        ButtonFilledSmallPlante.lightGreen(
+          key: const Key('directions_button'),
+          width: 36,
+          onPressed: _showDirections,
+          icon: SvgPicture.asset('assets/directions.svg'),
+        ),
+    ]);
   }
 
   Widget _getButton(BuildContext context) {
     if (_haveProducts()) {
-      return SizedBox(
-          child: ButtonFilledPlante.withText(
-        context.strings.shop_card_open_shop_products,
+      return ButtonFilledSmallPlante.green(
+          text: context.strings.shop_card_open_shop_products,
+          onPressed: () {
+            _onMainButtonClick(context);
+          });
+    }
+    return ButtonFilledSmallPlante.green(
+        text: context.strings.shop_card_add_product,
         onPressed: () {
           _onMainButtonClick(context);
         },
-        height: 35,
-        textStyle: TextStyles.buttonFilledSmall,
-      ));
-    }
-    return ButtonIconPlante(context.strings.shop_card_add_product,
-        onPressed: () {
-      _onMainButtonClick(context);
-    },
-        icon: const Icon(
-          Icons.add_sharp,
-          color: Colors.white,
-        ),
-        height: 35);
+        icon: SvgPicture.asset('assets/plus_small.svg'),
+        paddings: const EdgeInsets.only(left: 12, right: 6));
+  }
+
+  void _showDirections() {
+    showDirections?.call(shop);
   }
 
   Widget _checkIfProductSoldContent(BuildContext context) {

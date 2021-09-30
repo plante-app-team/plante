@@ -138,8 +138,14 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   @override
   ShopCard createCardFor(Shop shop, FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback) {
+    final showDirections = (Shop shop) {
+      model.showDirectionsTo(shop);
+    };
     return ShopCard.forProductRange(
-        shop: shop, address: address, cancelCallback: cancelCallback);
+        shop: shop,
+        address: address,
+        cancelCallback: cancelCallback,
+        showDirections: model.areDirectionsAvailable() ? showDirections : null);
   }
 
   @override

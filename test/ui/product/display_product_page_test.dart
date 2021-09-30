@@ -24,6 +24,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -109,6 +110,11 @@ void main() {
 
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
+
+    final directionsManager = MockDirectionsManager();
+    when(directionsManager.areDirectionsAvailable())
+        .thenAnswer((_) async => false);
+    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

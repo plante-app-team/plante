@@ -22,6 +22,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/osm_uid.dart';
@@ -123,6 +124,11 @@ void main() {
 
     GetIt.I
         .registerSingleton<UserLangsManager>(FakeUserLangsManager(_USER_LANGS));
+
+    final directionsManager = MockDirectionsManager();
+    when(directionsManager.areDirectionsAvailable())
+        .thenAnswer((_) async => false);
+    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -323,26 +329,6 @@ void main() {
       }
       await tester.pumpAndSettle();
     }
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    // if (vegetarianStatusInput != null) {
-    //   switch (vegetarianStatusInput) {
-    //     case VegStatus.positive:
-    //       await tester.tap(find.byKey(const Key('vegetarian_positive_btn')));
-    //       break;
-    //     case VegStatus.negative:
-    //       await tester.tap(find.byKey(const Key('vegetarian_negative_btn')));
-    //       break;
-    //     case VegStatus.unknown:
-    //       await tester.tap(find.byKey(const Key('vegetarian_unknown_btn')));
-    //       break;
-    //     case VegStatus.possible:
-    //       throw Exception(
-    //           'Not supported by VegStatusSelectionPanel, a test is broken');
-    //     default:
-    //       throw Error();
-    //   }
-    //   await tester.pumpAndSettle();
-    // }
 
     if (!selectLangAtStart) {
       await selectLangFn.call();
