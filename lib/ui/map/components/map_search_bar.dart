@@ -166,9 +166,15 @@ class _MapSearchBarState extends State<MapSearchBar>
     final textField = Stack(children: [
       InkWell(
           onTap: !widget.enabled ? widget.onDisabledTap : null,
-          child: AnimatedSize(
+          child: AnimatedContainer(
               duration: _DURATION,
-              vsync: this,
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.375),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                )
+              ]),
               child: TextField(
                 key: const Key('map_search_bar_text_field'),
                 textCapitalization: TextCapitalization.sentences,
