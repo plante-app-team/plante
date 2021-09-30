@@ -127,7 +127,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
             ),
             if (_isProductInForeignLang())
               Container(
-                color: const Color(0xfff5f7fa),
+                color: ColorsPlante.lightGrey,
                 padding: const EdgeInsets.only(
                     left: 24, right: 24, top: 16, bottom: 12),
                 child: Column(
@@ -183,7 +183,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                   child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F7FA),
+                        color: ColorsPlante.lightGrey,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Padding(

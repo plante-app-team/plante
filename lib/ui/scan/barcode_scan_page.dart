@@ -14,6 +14,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -31,8 +32,6 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-
-const _BACKGROUND_COLOR = Color(0xfff5f7fa);
 
 class BarcodeScanPage extends StatefulWidget {
   final Shop? addProductToShop;
@@ -130,12 +129,12 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-        backgroundColor: _BACKGROUND_COLOR,
+        backgroundColor: ColorsPlante.lightGrey,
         body: SafeArea(
             child: Stack(children: [
           Column(children: [
             HeaderPlante(
-                color: _BACKGROUND_COLOR,
+                color: ColorsPlante.lightGrey,
                 title: SwitchPlante(
                   key: const Key('input_mode_switch'),
                   leftSelected: _showCameraInput,
@@ -160,7 +159,8 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
                     onPressed: _openSettings,
                     icon: SvgPicture.asset('assets/settings.svg'))),
             AnimatedCrossFadePlante(
-                firstChild: _boxWithCutout(context, color: _BACKGROUND_COLOR),
+                firstChild:
+                    _boxWithCutout(context, color: ColorsPlante.lightGrey),
                 secondChild: _manualInput(),
                 crossFadeState: _showCameraInput
                     ? CrossFadeState.showFirst
@@ -169,7 +169,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
                 child: Stack(clipBehavior: Clip.none, children: [
               // Top: -2 is a part of a fix for https://github.com/flutter/flutter/issues/14288
               Positioned.fill(
-                  top: -2, child: Container(color: _BACKGROUND_COLOR)),
+                  top: -2, child: Container(color: ColorsPlante.lightGrey)),
             ])),
           ]),
           Align(alignment: Alignment.bottomCenter, child: _contentWidget()),
@@ -240,7 +240,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
           width: double.infinity,
           child: Stack(clipBehavior: Clip.none, children: [
             Positioned.fill(
-                top: -2, child: Container(color: _BACKGROUND_COLOR)),
+                top: -2, child: Container(color: ColorsPlante.lightGrey)),
             Center(
                 child: Padding(
                     padding: const EdgeInsets.only(top: 14),

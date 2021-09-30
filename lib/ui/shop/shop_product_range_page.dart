@@ -13,10 +13,12 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/components/fading_edge_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -86,6 +88,7 @@ class _TestingStorage {
 }
 
 class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
+  static const _LIST_GRADIENT_SIZE = 12.0;
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
 
@@ -143,13 +146,14 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       content = errorWrapper(errorText(
           context.strings.shop_product_range_page_this_shop_has_no_product));
     } else {
-      content = ListView(
-          children: _model.loadedProducts
-              .map((e) => _productToCard(e, context))
-              .toList());
+      final widgets =
+          _model.loadedProducts.map((e) => _productToCard(e, context)).toList();
+      widgets.insert(0, const SizedBox(height: _LIST_GRADIENT_SIZE));
+      widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
+      content = ListView(children: widgets);
     }
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: ColorsPlante.lightGrey,
       body: SafeArea(
           child: Stack(children: [
         Column(children: [
@@ -174,16 +178,30 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                                   widget.addressLoadFinishCallback),
                         ])),
                   ]),
-              const SizedBox(height: 28),
-              SizedBox(
+            ]),
+          ),
+          const SizedBox(height: _LIST_GRADIENT_SIZE),
+          Expanded(
+              child: Stack(children: [
+            content,
+            const FadingEdgePlante(
+                direction: FadingEdgeDirection.TOP_TO_BOTTOM,
+                size: _LIST_GRADIENT_SIZE,
+                color: ColorsPlante.lightGrey),
+            const FadingEdgePlante(
+                direction: FadingEdgeDirection.BOTTOM_TO_TOP,
+                size: _LIST_GRADIENT_SIZE,
+                color: ColorsPlante.lightGrey),
+          ])),
+          const SizedBox(height: _LIST_GRADIENT_SIZE),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 24, right: 24, top: 12, bottom: 33),
+              child: SizedBox(
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
                       context.strings.shop_product_range_page_add_product,
-                      onPressed: !_model.loading ? _onAddProductClick : null)),
-            ]),
-          ),
-          const SizedBox(height: 24),
-          Expanded(child: content)
+                      onPressed: !_model.loading ? _onAddProductClick : null))),
         ]),
         Positioned.fill(
             child: AnimatedCrossFadePlante(
@@ -200,7 +218,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     );
   }
 
-  Padding _productToCard(Product product, BuildContext context) {
+  Widget _productToCard(Product product, BuildContext context) {
     final dateStr = secsSinceEpochToStr(_model.lastSeenSecs(product), context);
 
     final cardExtraContent = Padding(

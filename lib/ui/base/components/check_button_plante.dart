@@ -26,7 +26,7 @@ class CheckButtonPlante extends StatelessWidget {
                     ? ColorsPlante.splashColor
                     : ColorsPlante.primaryDisabled),
                 backgroundColor: MaterialStateProperty.all(
-                    checked ? ColorsPlante.primary : const Color(0xFFF5F7FA)),
+                    checked ? ColorsPlante.primary : ColorsPlante.lightGrey),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)))),

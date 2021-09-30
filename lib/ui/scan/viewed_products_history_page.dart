@@ -9,6 +9,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -28,7 +29,6 @@ class ViewedProductsHistoryPage extends StatefulWidget {
 
 class _ViewedProductsHistoryPageState
     extends PageStatePlante<ViewedProductsHistoryPage> {
-  static const _BACKGROUND_COLOR = Color(0xfff5f7fa);
   final ViewedProductsStorage viewedProductsStorage;
   late final StreamSubscription viewedProductsSubscription;
   final UserParams user;
@@ -64,7 +64,7 @@ class _ViewedProductsHistoryPageState
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-        backgroundColor: _BACKGROUND_COLOR,
+        backgroundColor: ColorsPlante.lightGrey,
         body: SafeArea(
             child: Column(children: [
           Stack(children: [

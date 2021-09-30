@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/langs/lang_list_item.dart';
 import 'package:plante/l10n/strings.dart';
 
@@ -85,7 +86,7 @@ class _UserLangsWidgetState extends State<UserLangsWidget>
         key: Key(lang.name),
         index: index,
         lang: lang,
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: ColorsPlante.lightGrey,
         reorderable: true,
         selected: true,
         hint: sysLang ? context.strings.user_langs_widget_system_lang : null,

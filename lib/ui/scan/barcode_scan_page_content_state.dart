@@ -6,6 +6,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/barcode_spinner.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
@@ -195,7 +196,7 @@ class BarcodeScanPageContentStateNoPermission
   Widget buildWidget(BuildContext context) {
     return Container(
         key: Key(id),
-        color: const Color(0xfff5f7fa),
+        color: ColorsPlante.lightGrey,
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ButtonFilledPlante.withText(
@@ -216,7 +217,7 @@ class BarcodeScanPageContentStateCannotAskPermission
   Widget buildWidget(BuildContext context) {
     return Container(
         key: Key(id),
-        color: const Color(0xfff5f7fa),
+        color: ColorsPlante.lightGrey,
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ButtonFilledPlante.withText(
