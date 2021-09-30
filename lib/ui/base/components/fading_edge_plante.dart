@@ -43,14 +43,15 @@ class FadingEdgePlante extends StatelessWidget {
 
     return Align(
         alignment: begin,
-        child: Container(
-            height: size,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: begin,
-                end: end,
-                colors: <Color>[color, const Color(0x00ffffff)],
-              ),
-            )));
+        child: IgnorePointer(
+            child: Container(
+                height: size,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: begin,
+                    end: end,
+                    colors: <Color>[color, const Color(0x00ffffff)],
+                  ),
+                ))));
   }
 }

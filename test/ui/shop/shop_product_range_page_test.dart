@@ -923,15 +923,6 @@ void main() {
 
     // NO vote
 
-    card = find.byType(ProductCard).evaluate().last.widget;
-    product = products[1];
-
-    // Verify the proper product
-    expect(
-        find.descendant(
-            of: find.byWidget(card), matching: find.text(product.name!)),
-        findsOneWidget);
-
     // Tap and verify the vote is sent
     await tester.tap(find.descendant(
         of: find.byWidget(card),
