@@ -131,7 +131,7 @@ void main() {
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
 
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -172,7 +172,7 @@ void main() {
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
 
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -201,13 +201,39 @@ void main() {
         isTrue);
   });
 
+  testWidgets('invalid barcode scanned', (WidgetTester tester) async {
+    when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(
+        ProductLangSlice((e) => e
+              ..lang = _DEFAULT_LANG
+              ..barcode = invc.positionalArguments[0] as String
+              ..name = 'Product name'
+              ..imageFront = Uri.file('/tmp/asd')
+              ..imageIngredients = Uri.file('/tmp/asd')
+              ..ingredientsText = 'beans'
+              ..veganStatus = VegStatus.positive
+              ..vegetarianStatus = VegStatus.positive
+              ..veganStatusSource = VegStatusSource.community
+              ..vegetarianStatusSource = VegStatusSource.community)
+            .buildSingleLangProduct()));
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    widget.newScanDataForTesting(_barcode('invalid barcode!'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product name'), findsNothing);
+    expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
+    expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
+  });
+
   testWidgets('product not found', (WidgetTester tester) async {
     when(productsObtainer.getProduct(any)).thenAnswer((invc) async => Ok(null));
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
-    const barcode = '12345';
+    const barcode = '4606038069239';
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
@@ -232,7 +258,7 @@ void main() {
     await tester.superPump(widget);
 
     verifyNever(backend.sendProductScan(any));
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
     verify(backend.sendProductScan(any));
   });
@@ -380,7 +406,7 @@ void main() {
 
     expect(find.byKey(const Key('manual_barcode_input')), findsWidgets);
     await tester.enterText(
-        find.byKey(const Key('manual_barcode_input')), '1234567891234');
+        find.byKey(const Key('manual_barcode_input')), '460603806923967891234');
     await tester.pumpAndSettle();
 
     expect(find.text(context.strings.barcode_scan_page_invalid_barcode),
@@ -411,7 +437,7 @@ void main() {
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -428,7 +454,7 @@ void main() {
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
-    const barcode = '12345';
+    const barcode = '4606038069239';
 
     widget.newScanDataForTesting(_barcode(barcode));
     await tester.pumpAndSettle();
@@ -455,7 +481,7 @@ void main() {
         ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
-      ..barcode = '12345'
+      ..barcode = '4606038069239'
       ..name = 'Beans can'
       ..imageFront = Uri.file('/tmp/asd')
       ..imageIngredients = Uri.file('/tmp/asd')
@@ -474,7 +500,7 @@ void main() {
         .replaceAll('<SHOP>', shop.name);
 
     expect(find.text(expectedQuestion), findsNothing);
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
     expect(find.text(expectedQuestion), findsOneWidget);
 
@@ -501,7 +527,7 @@ void main() {
         ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
-      ..barcode = '12345'
+      ..barcode = '4606038069239'
       ..name = 'Beans can'
       ..imageFront = Uri.file('/tmp/asd')
       ..imageIngredients = Uri.file('/tmp/asd')
@@ -520,7 +546,7 @@ void main() {
         .replaceAll('<SHOP>', shop.name);
 
     expect(find.text(expectedQuestion), findsNothing);
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
     expect(find.text(expectedQuestion), findsOneWidget);
 
@@ -552,7 +578,7 @@ void main() {
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
-    widget.newScanDataForTesting(_barcode('12345'));
+    widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
@@ -581,11 +607,11 @@ void main() {
 
     analytics.clearEvents();
 
-    widget.newScanDataForTesting(_barcode('12345'), byCamera: true);
+    widget.newScanDataForTesting(_barcode('4606038069239'), byCamera: true);
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('barcode_scan'),
-        equals({'barcode': '12345'}));
+        equals({'barcode': '4606038069239'}));
     expect(analytics.wasEventSent('barcode_manual'), isFalse);
   });
 
@@ -598,11 +624,11 @@ void main() {
 
     analytics.clearEvents();
 
-    widget.newScanDataForTesting(_barcode('12345'), byCamera: false);
+    widget.newScanDataForTesting(_barcode('4606038069239'), byCamera: false);
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('barcode_manual'),
-        equals({'barcode': '12345'}));
+        equals({'barcode': '4606038069239'}));
     expect(analytics.wasEventSent('barcode_scan'), isFalse);
   });
 }

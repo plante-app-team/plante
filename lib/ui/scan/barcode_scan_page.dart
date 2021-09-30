@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/permissions_manager.dart';
@@ -326,8 +327,10 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
 
   void _onNewScanData(qr.Barcode scanData,
       {required bool byCamera, bool forceSearch = false}) async {
-    if (_model.barcode == scanData.code && !forceSearch) {
-      return;
+    if (_model.barcode == scanData.code || !isBarcodeValid(scanData.code)) {
+      if (!forceSearch) {
+        return;
+      }
     }
     if (byCamera) {
       analytics.sendEvent('barcode_scan', {'barcode': scanData.code});
