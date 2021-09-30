@@ -65,16 +65,25 @@ class OsmOverpass {
     } else {
       boundsCmdPiece = '';
     }
-    final String idsCmdPiece;
+    String idsCmdPiece;
     if (osmUIDs != null) {
       final osmIdsStr = (OsmElementType type) => osmUIDs
           .where((uid) => uid.type == type)
           .map((uid) => uid.osmId)
           .join(',');
-      idsCmdPiece =
-          'node[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.NODE)});'
-          'relation[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.RELATION)});'
-          'way[shop~"$typesStr"](id:${osmIdsStr(OsmElementType.WAY)});';
+      final nodesIds = osmIdsStr(OsmElementType.NODE);
+      final relationIds = osmIdsStr(OsmElementType.RELATION);
+      final wayIds = osmIdsStr(OsmElementType.WAY);
+      idsCmdPiece = '';
+      if (nodesIds.isNotEmpty) {
+        idsCmdPiece += 'node[shop~"$typesStr"](id:$nodesIds);';
+      }
+      if (relationIds.isNotEmpty) {
+        idsCmdPiece += 'relation[shop~"$typesStr"](id:$relationIds);';
+      }
+      if (wayIds.isNotEmpty) {
+        idsCmdPiece += 'way[shop~"$typesStr"](id:$wayIds);';
+      }
     } else {
       idsCmdPiece = '';
     }

@@ -548,4 +548,55 @@ void main() {
     expect(request,
         matches(RegExp('.*relation\\[shop~"[^"]*"\\]\\(id:$relationId\\);.*')));
   });
+
+  test('fetchShops OSM UID for node only', () async {
+    http.setResponse('.*', ' { "elements": [] } ');
+
+    await overpass.fetchShops(osmUIDs: [
+      const OsmUID(OsmElementType.NODE, '123'),
+    ]);
+
+    final requests = http.getRequestsMatching('.*');
+    expect(requests.length, equals(1));
+    final request = Uri.decodeFull(requests.first.url.toString());
+
+    // Only Node expected to be found in the request
+    expect(request, matches(RegExp(r'.*node\[shop.*')));
+    expect(request, isNot(matches(RegExp(r'.*way\[shop.*'))));
+    expect(request, isNot(matches(RegExp(r'.*relation\[shop.*'))));
+  });
+
+  test('fetchShops OSM UID for way only', () async {
+    http.setResponse('.*', ' { "elements": [] } ');
+
+    await overpass.fetchShops(osmUIDs: [
+      const OsmUID(OsmElementType.WAY, '123'),
+    ]);
+
+    final requests = http.getRequestsMatching('.*');
+    expect(requests.length, equals(1));
+    final request = Uri.decodeFull(requests.first.url.toString());
+
+    // Only Node expected to be found in the request
+    expect(request, isNot(matches(RegExp(r'.*node\[shop.*'))));
+    expect(request, matches(RegExp(r'.*way\[shop.*')));
+    expect(request, isNot(matches(RegExp(r'.*relation\[shop.*'))));
+  });
+
+  test('fetchShops OSM UID for relation only', () async {
+    http.setResponse('.*', ' { "elements": [] } ');
+
+    await overpass.fetchShops(osmUIDs: [
+      const OsmUID(OsmElementType.RELATION, '123'),
+    ]);
+
+    final requests = http.getRequestsMatching('.*');
+    expect(requests.length, equals(1));
+    final request = Uri.decodeFull(requests.first.url.toString());
+
+    // Only Node expected to be found in the request
+    expect(request, isNot(matches(RegExp(r'.*node\[shop.*'))));
+    expect(request, isNot(matches(RegExp(r'.*way\[shop.*'))));
+    expect(request, matches(RegExp(r'.*relation\[shop.*')));
+  });
 }
