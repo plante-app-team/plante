@@ -33,8 +33,8 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
+import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
@@ -890,7 +890,7 @@ void main() {
     // YES vote
 
     var card = find.byType(ProductCard).evaluate().first.widget;
-    var product = products[0];
+    final product = products[0];
 
     // Verify the proper product
     expect(

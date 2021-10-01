@@ -8,8 +8,8 @@ import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 
 // Extracted from ShopsManager logic of shops fetching
 class ShopsManagerFetchShopsHelper {

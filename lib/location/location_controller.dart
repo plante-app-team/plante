@@ -1,14 +1,15 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
-import 'package:plante/model/coord.dart';
-import 'package:plante/model/shared_preferences_holder.dart';
-import 'package:plante/model/shared_preferences_ext.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
+import 'package:plante/model/shared_preferences_ext.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 
 const PREF_LAST_KNOWN_POS = 'PREF_LAST_KNOWN_POS2';
 

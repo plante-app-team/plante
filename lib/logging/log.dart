@@ -6,8 +6,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:plante/base/base.dart';
-import 'package:share/share.dart';
 import 'package:plante/base/pair.dart';
+import 'package:share/share.dart';
 
 const LOGS_DIR_MAX_SIZE = 1024 * 1024 * 10;
 

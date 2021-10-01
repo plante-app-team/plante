@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/l10n/strings.dart';
-import 'package:intl/intl.dart' as intl;
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 

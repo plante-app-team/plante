@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/l10n/strings.dart';
 
 class AddressWidgetEntry {
   final FutureShortAddress address;
@@ -56,8 +56,7 @@ class AddressWidget extends StatefulWidget {
   }
 }
 
-class _AddressWidgetState extends State<AddressWidget>
-    with SingleTickerProviderStateMixin {
+class _AddressWidgetState extends State<AddressWidget> {
   late final List<AddressWidgetEntry> _prioritizedPossibleAddresses;
   ShortAddressResult? _loadedResult;
   bool _loadedResultPrecise = false;
@@ -111,7 +110,6 @@ class _AddressWidgetState extends State<AddressWidget>
         alignment: Alignment.topCenter,
         clipBehavior: Clip.none,
         duration: DURATION_DEFAULT,
-        vsync: this,
         child: SizedBox(width: double.infinity, child: _buildContent(context)));
   }
 

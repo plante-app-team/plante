@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/logging/log.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -166,8 +166,9 @@ class OsmNominatim {
           ..longitude = lon));
       }
     }
-    return Ok(OsmSearchResult(
-        (e) => e..shops.addAll(foundShops)..roads.addAll(foundRoads)));
+    return Ok(OsmSearchResult((e) => e
+      ..shops.addAll(foundShops)
+      ..roads.addAll(foundRoads)));
   }
 
   double? _extractPosPiece(String name, Map<String, dynamic> source) {

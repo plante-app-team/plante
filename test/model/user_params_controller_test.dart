@@ -1,10 +1,10 @@
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test/test.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test/test.dart';
 
 import 'user_params_controller_test.mocks.dart';
 

@@ -1,9 +1,9 @@
-import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/product_lang_slice.dart';
-import 'package:test/test.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
+import 'package:test/test.dart';
 
 void main() {
   setUp(() {});

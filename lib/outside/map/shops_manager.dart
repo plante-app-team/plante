@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
+import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
@@ -18,10 +19,9 @@ import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/base/date_time_extensions.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
 class ShopsManager {

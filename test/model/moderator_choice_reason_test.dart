@@ -1,5 +1,5 @@
-import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 
 void main() {
   setUp(() async {});

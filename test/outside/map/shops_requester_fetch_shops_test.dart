@@ -6,13 +6,12 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:test/test.dart';
-
-import 'package:plante/outside/map/open_street_map.dart';
 
 import '../../common_mocks.mocks.dart';
 import 'shops_requester_test_commons.dart';

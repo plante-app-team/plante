@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/l10n/strings.dart';
 
 class MapSearchBarQueryView {
   String? _latestQuery;
@@ -60,8 +60,7 @@ class MapSearchBar extends StatefulWidget {
   _MapSearchBarState createState() => _MapSearchBarState();
 }
 
-class _MapSearchBarState extends State<MapSearchBar>
-    with TickerProviderStateMixin {
+class _MapSearchBarState extends State<MapSearchBar> {
   static const _SIZE = 46.0;
   static const _DURATION = Duration(milliseconds: 200);
   var _canSearch = false;
@@ -225,7 +224,6 @@ class _MapSearchBarState extends State<MapSearchBar>
               Expanded(child: textField),
               AnimatedSize(
                   duration: _DURATION,
-                  vsync: this,
                   child: !_showSearchButton
                       ? const SizedBox.shrink()
                       : Row(children: [

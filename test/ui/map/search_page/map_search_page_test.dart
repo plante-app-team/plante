@@ -102,8 +102,8 @@ void main() {
         .thenAnswer((_) async => Ok(localShops.toMap()));
     when(roadsManager.fetchRoadsWithinAndNearby(any))
         .thenAnswer((_) async => Ok(localRoads));
-    when(osmSearcher.search(any, any, any)).thenAnswer((_) async => Ok(
-        OsmSearchResult((e) => e
+    when(osmSearcher.search(any, any, any))
+        .thenAnswer((_) async => Ok(OsmSearchResult((e) => e
           ..shops.addAll(foundInOsmShops.map((e) => e.osmShop))
           ..roads.addAll(foundInOsmRoads))));
 

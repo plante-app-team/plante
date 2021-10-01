@@ -32,8 +32,7 @@ class ProductCard extends StatefulWidget {
   _ProductCardState createState() => _ProductCardState();
 }
 
-class _ProductCardState extends State<ProductCard>
-    with TickerProviderStateMixin {
+class _ProductCardState extends State<ProductCard> {
   Color? dominantColor;
 
   _ProductCardState();
@@ -112,14 +111,12 @@ class _ProductCardState extends State<ProductCard>
                               product: widget.product, user: widget.beholder),
                           AnimatedSize(
                               duration: DURATION_DEFAULT,
-                              vsync: this,
                               child: widget.extraContentMiddle ??
                                   const SizedBox.shrink()),
                         ])),
                   ]),
                   AnimatedSize(
                       duration: DURATION_DEFAULT,
-                      vsync: this,
                       child:
                           widget.extraContentBottom ?? const SizedBox.shrink())
                 ]))));

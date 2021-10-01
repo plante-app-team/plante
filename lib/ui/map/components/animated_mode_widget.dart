@@ -9,12 +9,10 @@ class AnimatedModeWidget extends StatefulWidget {
   _AnimatedModeWidgetState createState() => _AnimatedModeWidgetState();
 }
 
-class _AnimatedModeWidgetState extends State<AnimatedModeWidget>
-    with SingleTickerProviderStateMixin {
+class _AnimatedModeWidgetState extends State<AnimatedModeWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(
-        vsync: this,
         duration: DURATION_DEFAULT,
         child:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: widget.child));

@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:plante/model/shared_preferences_ext.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test/test.dart';
-import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/shared_preferences_ext.dart';
 
 void main() {
   setUp(() async {

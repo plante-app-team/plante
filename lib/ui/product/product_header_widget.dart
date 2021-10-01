@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plante/model/product.dart';
-import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/product.dart';
+import 'package:plante/ui/base/components/licence_label.dart';
+import 'package:plante/ui/base/text_styles.dart';
 
 // ignore: always_use_package_imports
 import '_product_images_helper.dart';

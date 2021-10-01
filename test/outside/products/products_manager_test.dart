@@ -2,24 +2,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
+import 'package:mockito/mockito.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
-
-import 'package:mockito/mockito.dart';
-import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/outside/products/taken_products_images_storage.dart';
-import 'package:test/test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/outside/products/taken_products_images_storage.dart';
+import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';

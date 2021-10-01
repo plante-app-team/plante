@@ -1,8 +1,8 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';

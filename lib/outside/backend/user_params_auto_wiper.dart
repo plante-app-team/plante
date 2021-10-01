@@ -1,6 +1,6 @@
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/model/user_params_controller.dart';
 
 class UserParamsAutoWiper implements BackendObserver {
   final Backend _backend;

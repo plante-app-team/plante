@@ -1,19 +1,19 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/product_lang_slice_restorable.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_restorable.dart';
 import 'package:plante/model/shops_list_restorable.dart';
+import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:plante/model/ingredient.dart';
-import 'package:plante/model/product.dart';
-import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
 import '../widget_tester_extension.dart';

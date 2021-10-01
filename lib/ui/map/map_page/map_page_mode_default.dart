@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
@@ -13,10 +14,9 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_add_product.dart';
-import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 class MapPageModeDefault extends MapPageModeShopsCardBase {

@@ -1,8 +1,9 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:plante/logging/log.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
@@ -13,7 +14,6 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
 class ShopProductRangePageModel {
