@@ -9,8 +9,7 @@ class AnimatedModeWidget extends StatefulWidget {
   _AnimatedModeWidgetState createState() => _AnimatedModeWidgetState();
 }
 
-class _AnimatedModeWidgetState extends State<AnimatedModeWidget>
-    with SingleTickerProviderStateMixin {
+class _AnimatedModeWidgetState extends State<AnimatedModeWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(

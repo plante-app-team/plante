@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// ignore: directives_ordering
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/ui/base/components/licence_label.dart';

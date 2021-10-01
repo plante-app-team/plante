@@ -60,8 +60,7 @@ class MapSearchBar extends StatefulWidget {
   _MapSearchBarState createState() => _MapSearchBarState();
 }
 
-class _MapSearchBarState extends State<MapSearchBar>
-    with TickerProviderStateMixin {
+class _MapSearchBarState extends State<MapSearchBar> {
   static const _SIZE = 46.0;
   static const _DURATION = Duration(milliseconds: 200);
   var _canSearch = false;

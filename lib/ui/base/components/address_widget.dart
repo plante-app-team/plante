@@ -56,8 +56,7 @@ class AddressWidget extends StatefulWidget {
   }
 }
 
-class _AddressWidgetState extends State<AddressWidget>
-    with SingleTickerProviderStateMixin {
+class _AddressWidgetState extends State<AddressWidget> {
   late final List<AddressWidgetEntry> _prioritizedPossibleAddresses;
   ShortAddressResult? _loadedResult;
   bool _loadedResultPrecise = false;

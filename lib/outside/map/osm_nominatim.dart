@@ -166,8 +166,9 @@ class OsmNominatim {
           ..longitude = lon));
       }
     }
-    return Ok(OsmSearchResult(
-        (e) => e..shops.addAll(foundShops)..roads.addAll(foundRoads)));
+    return Ok(OsmSearchResult((e) => e
+      ..shops.addAll(foundShops)
+      ..roads.addAll(foundRoads)));
   }
 
   double? _extractPosPiece(String name, Map<String, dynamic> source) {

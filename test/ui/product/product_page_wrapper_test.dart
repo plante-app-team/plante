@@ -80,16 +80,17 @@ void main() {
       (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = ProductLangSlice((v) => v
-      ..barcode = '123'
-      ..name = 'name'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.community
-      ..ingredientsText = '1, 2, 3'
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(
-          File('./test/assets/img.jpg').absolute.path)).productForTests();
+          ..barcode = '123'
+          ..name = 'name'
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.community
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.community
+          ..ingredientsText = '1, 2, 3'
+          ..imageIngredients =
+              Uri.file(File('./test/assets/img.jpg').absolute.path)
+          ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path))
+        .productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
@@ -100,16 +101,17 @@ void main() {
       (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = ProductLangSlice((v) => v
-      ..barcode = '123'
-      ..name = 'name'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.community
-      ..ingredientsText = null // !!!!!!!!
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(
-          File('./test/assets/img.jpg').absolute.path)).productForTests();
+          ..barcode = '123'
+          ..name = 'name'
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.community
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.community
+          ..ingredientsText = null // !!!!!!!!
+          ..imageIngredients =
+              Uri.file(File('./test/assets/img.jpg').absolute.path)
+          ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path))
+        .productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);
@@ -120,16 +122,17 @@ void main() {
       'veg-statuses are filled by OFF', (WidgetTester tester) async {
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
     final initialProduct = ProductLangSlice((v) => v
-      ..barcode = '123'
-      ..name = 'name'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts // OFF!
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
-      ..ingredientsText = '1, 2, 3'
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageFront = Uri.file(
-          File('./test/assets/img.jpg').absolute.path)).productForTests();
+          ..barcode = '123'
+          ..name = 'name'
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.open_food_facts // OFF!
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
+          ..ingredientsText = '1, 2, 3'
+          ..imageIngredients =
+              Uri.file(File('./test/assets/img.jpg').absolute.path)
+          ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path))
+        .productForTests();
     await tester.superPump(ProductPageWrapper.createForTesting(initialProduct));
     expect(find.byType(InitProductPage), findsNothing);
     expect(find.byType(DisplayProductPage), findsOneWidget);

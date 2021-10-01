@@ -32,8 +32,7 @@ class ProductCard extends StatefulWidget {
   _ProductCardState createState() => _ProductCardState();
 }
 
-class _ProductCardState extends State<ProductCard>
-    with TickerProviderStateMixin {
+class _ProductCardState extends State<ProductCard> {
   Color? dominantColor;
 
   _ProductCardState();

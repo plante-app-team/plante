@@ -31,7 +31,12 @@ class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
         body: SafeArea(
             child: Stack(children: [
           if (img != null)
-            PhotoView(imageProvider: img, filterQuality: FilterQuality.high),
+            PhotoView(
+                imageProvider: img,
+                loadingBuilder: (context, imageChunk) {
+                  return const CircularProgressIndicator();
+                },
+                filterQuality: FilterQuality.high),
           Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
