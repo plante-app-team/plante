@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class ModeratorCommentDialog extends StatelessWidget {

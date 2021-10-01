@@ -2,8 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:flutter/material.dart';
-import 'package:plante/logging/log.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/logging/log.dart';
 
 part 'lang_code.g.dart';
 

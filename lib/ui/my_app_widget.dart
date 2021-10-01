@@ -6,11 +6,11 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params.dart';
+import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
-import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/main/main_page.dart';
 
 class MyAppWidget extends StatefulWidget {
@@ -46,10 +46,9 @@ class _MyAppWidgetState extends State<MyAppWidget>
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
-          primarySwatch: ColorsPlante.primaryMaterial,
-          accentColor: ColorsPlante.primary,
           unselectedWidgetColor: ColorsPlante.grey,
           fontFamily: 'Poppins',
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: ColorsPlante.primaryMaterial).copyWith(secondary: ColorsPlante.primary),
         ),
         home:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),

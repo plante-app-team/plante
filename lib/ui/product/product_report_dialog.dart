@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
-import 'package:plante/l10n/strings.dart';
 
 class ProductReportDialog extends StatefulWidget {
   final String barcode;

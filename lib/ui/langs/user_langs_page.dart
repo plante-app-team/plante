@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
-import 'package:plante/ui/base/components/header_plante.dart';
-import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/base/components/fab_plante.dart';
 
 class UserLangsPage extends StatefulWidget {
   const UserLangsPage({Key? key}) : super(key: key);

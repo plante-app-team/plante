@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/l10n/strings.dart';
 
 class MapSearchBarQueryView {
   String? _latestQuery;
@@ -225,7 +225,6 @@ class _MapSearchBarState extends State<MapSearchBar>
               Expanded(child: textField),
               AnimatedSize(
                   duration: _DURATION,
-                  vsync: this,
                   child: !_showSearchButton
                       ? const SizedBox.shrink()
                       : Row(children: [

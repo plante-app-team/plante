@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:plante/model/coord.dart';
-import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shared_preferences_ext.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 
 class LatestCameraPosStorage {
   static const _LATEST_CAMERA_POS = 'LATEST_CAMERA_POS';

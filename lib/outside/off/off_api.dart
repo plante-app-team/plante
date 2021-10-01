@@ -1,7 +1,7 @@
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
-import 'package:plante/logging/log.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 
 /// OFF wrapper mainly needed for DI in tests

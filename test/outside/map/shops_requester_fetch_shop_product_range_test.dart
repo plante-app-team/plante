@@ -9,8 +9,8 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 

@@ -112,14 +112,12 @@ class _ProductCardState extends State<ProductCard>
                               product: widget.product, user: widget.beholder),
                           AnimatedSize(
                               duration: DURATION_DEFAULT,
-                              vsync: this,
                               child: widget.extraContentMiddle ??
                                   const SizedBox.shrink()),
                         ])),
                   ]),
                   AnimatedSize(
                       duration: DURATION_DEFAULT,
-                      vsync: this,
                       child:
                           widget.extraContentBottom ?? const SizedBox.shrink())
                 ]))));

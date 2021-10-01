@@ -1,11 +1,11 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/langs/lang_list_item.dart';
-import 'package:plante/l10n/strings.dart';
 
 /// Widget with a list of languages selected by user, which allows the user
 /// to select and deselect them.

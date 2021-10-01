@@ -1,6 +1,6 @@
 import 'package:built_collection/built_collection.dart';
-import 'package:openfoodfacts/utils/LanguageHelper.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:openfoodfacts/utils/LanguageHelper.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/ingredient.dart';

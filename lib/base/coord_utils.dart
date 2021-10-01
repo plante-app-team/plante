@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:plante/model/coord.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/coord.dart';
 
 /// Note: it's very approximate since Earth is all round and complex.
 double kmToGrad(double km) {

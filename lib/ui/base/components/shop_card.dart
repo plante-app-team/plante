@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
-import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 

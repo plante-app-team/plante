@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
@@ -17,7 +18,6 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
-import 'package:plante/l10n/strings.dart';
 
 class ViewedProductsHistoryPage extends StatefulWidget {
   const ViewedProductsHistoryPage({Key? key}) : super(key: key);

@@ -4,10 +4,10 @@ import 'package:built_collection/built_collection.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/shared_preferences_extensions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 const PREF_USER_PARAMS_NAME = 'USER_PARAMS_NAME2';

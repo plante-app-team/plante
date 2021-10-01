@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/veg_status.dart';
@@ -13,7 +14,6 @@ import 'package:plante/ui/base/components/veg_status_selection_panel.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 typedef DoneCallback = void Function();

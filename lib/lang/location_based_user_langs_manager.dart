@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
+import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';

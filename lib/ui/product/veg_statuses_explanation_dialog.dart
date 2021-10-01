@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/model/veg_status.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/veg_status.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';

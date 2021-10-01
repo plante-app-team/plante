@@ -8,10 +8,13 @@ import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/permissions_manager.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
@@ -25,14 +28,10 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
 import 'package:plante/ui/settings_page.dart';
-
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
-import 'package:plante/logging/log.dart';
-import 'package:plante/l10n/strings.dart';
-import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/ui/base/ui_utils.dart';
 
 class BarcodeScanPage extends StatefulWidget {
   final Shop? addProductToShop;

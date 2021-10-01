@@ -1,4 +1,5 @@
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -9,14 +10,12 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/base/date_time_extensions.dart';
 import 'package:test/test.dart';
-
-import 'package:plante/outside/map/open_street_map.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';

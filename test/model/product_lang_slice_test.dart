@@ -1,11 +1,11 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
+import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:test/test.dart';
-import 'package:plante/model/ingredient.dart';
-import 'package:plante/model/product.dart';
-import 'package:plante/model/veg_status.dart';
 
 void main() {
   setUp(() {});

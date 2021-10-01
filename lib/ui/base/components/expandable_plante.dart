@@ -1,8 +1,8 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 
 class ExpandablePlante extends StatelessWidget {
   final Widget collapsed;

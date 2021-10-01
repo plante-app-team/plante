@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 
 class LocationBasedUserLangsStorage {
