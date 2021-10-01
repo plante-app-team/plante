@@ -39,6 +39,8 @@ class _MyAppWidgetState extends State<MyAppWidget>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme =
+        ColorScheme.fromSwatch(primarySwatch: ColorsPlante.primaryMaterial);
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Plante',
@@ -48,7 +50,8 @@ class _MyAppWidgetState extends State<MyAppWidget>
         theme: ThemeData(
           unselectedWidgetColor: ColorsPlante.grey,
           fontFamily: 'Poppins',
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: ColorsPlante.primaryMaterial).copyWith(secondary: ColorsPlante.primary),
+          toggleableActiveColor: ColorsPlante.primary,
+          colorScheme: colorScheme.copyWith(primary: ColorsPlante.primary),
         ),
         home:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
