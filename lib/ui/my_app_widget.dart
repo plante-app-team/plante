@@ -46,10 +46,9 @@ class _MyAppWidgetState extends State<MyAppWidget>
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
-          primarySwatch: ColorsPlante.primaryMaterial,
-          // accentColor: ColorsPlante.primary, // TODO: what to use instead?
           unselectedWidgetColor: ColorsPlante.grey,
           fontFamily: 'Poppins',
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: ColorsPlante.primaryMaterial).copyWith(secondary: ColorsPlante.primary),
         ),
         home:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
