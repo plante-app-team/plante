@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -34,7 +35,7 @@ class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
             PhotoView(
                 imageProvider: img,
                 loadingBuilder: (context, imageChunk) {
-                  return const CircularProgressIndicator();
+                  return !isInTests() ? const CircularProgressIndicator() : const SizedBox();
                 },
                 filterQuality: FilterQuality.high),
           Table(
