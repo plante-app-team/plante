@@ -1,0 +1,33 @@
+name: Run Tests
+
+on:
+  workflow_dispatch:
+  # Runs when a PR is made against master branch 
+  pull_request:
+    branches: [ master ]
+
+env:
+  flutter_version: "2.5.2"
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      # Cache Flutter environment
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}  
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: ${{ env.flutter_version }}
+          channel: stable 
+      # Run pub get 
+      - name: Run pub get   
+        run: flutter pub get
+      # Runs tests
+      - name: Run tests
+        run: flutter test
