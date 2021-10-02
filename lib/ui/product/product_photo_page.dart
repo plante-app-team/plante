@@ -35,7 +35,9 @@ class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
             PhotoView(
                 imageProvider: img,
                 loadingBuilder: (context, imageChunk) {
-                  return !isInTests() ? const CircularProgressIndicator() : const SizedBox();
+                  return !isInTests()
+                      ? const CircularProgressIndicator()
+                      : const SizedBox();
                 },
                 filterQuality: FilterQuality.high),
           Table(
