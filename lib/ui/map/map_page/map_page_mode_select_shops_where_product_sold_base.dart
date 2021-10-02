@@ -127,7 +127,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
           key: const Key('map_page_done'),
           width: double.infinity,
           child: Padding(
-              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 38),
+              padding: const EdgeInsets.only(left: 26, right: 26, bottom: 24),
               child: ButtonFilledPlante.withText(context.strings.global_done,
                   onPressed: selectedShops().isNotEmpty && !model.loading
                       ? onDoneClick

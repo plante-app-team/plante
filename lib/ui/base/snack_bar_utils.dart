@@ -23,7 +23,7 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           content: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 38),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               child: SizedBox(
                 height: 90,
                 child: Material(

@@ -116,7 +116,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                   width: double.infinity,
                   child: Padding(
                       padding: const EdgeInsets.only(
-                          left: 24, right: 24, bottom: 38),
+                          left: 24, right: 24, bottom: 24),
                       child: ButtonFilledPlante.withText(
                           context.strings.global_done,
                           onPressed: _isInputOk() ? _onAddPressed : null)))))

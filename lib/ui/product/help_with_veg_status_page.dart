@@ -76,7 +76,7 @@ class _HelpWithVegStatusPageState
             key: const Key('done_btn'),
             onPressed: _canSave() ? _save : null,
           )),
-      const SizedBox(height: 40)
+      const SizedBox(height: 24)
     ]);
 
     return Scaffold(

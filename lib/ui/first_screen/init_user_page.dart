@@ -157,7 +157,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
                     _firstPageHasData && !_loading ? onNextPressed : null)));
 
     final bottomControls =
-        Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonNext);
+        Padding(padding: const EdgeInsets.only(bottom: 24), child: buttonNext);
 
     return StepperPage(content, bottomControls);
   }
@@ -225,7 +225,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
                     !_loading && _userLangs != null ? onDoneClicked : null)));
 
     final bottomControls =
-        Padding(padding: const EdgeInsets.only(bottom: 38), child: buttonDone);
+        Padding(padding: const EdgeInsets.only(bottom: 24), child: buttonDone);
 
     return StepperPage(content, bottomControls);
   }

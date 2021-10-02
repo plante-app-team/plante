@@ -367,7 +367,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                 ? _saveProduct
                 : null,
           )),
-      const SizedBox(height: 40)
+      const SizedBox(height: 24)
     ]);
 
     return Scaffold(

@@ -68,7 +68,7 @@ class _UserLangsPageState extends PageStatePlante<UserLangsPage> {
           Expanded(child: langsList),
           Padding(
               padding: const EdgeInsets.only(
-                  left: 24, right: 24, bottom: 38, top: 8),
+                  left: 24, right: 24, bottom: 24, top: 8),
               child: SizedBox(
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(

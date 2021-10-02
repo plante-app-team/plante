@@ -22,7 +22,7 @@ class DialogPlante extends StatelessWidget {
         alignment: Alignment.bottomCenter,
         child: Container(
             margin: MediaQuery.of(context).viewInsets,
-            padding: const EdgeInsets.only(bottom: 38, left: 16, right: 16),
+            padding: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
             child: Material(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),

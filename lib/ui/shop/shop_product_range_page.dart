@@ -183,19 +183,23 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           Expanded(
               child: Stack(children: [
             content,
-            const FadingEdgePlante(
-                direction: FadingEdgeDirection.TOP_TO_BOTTOM,
-                size: _LIST_GRADIENT_SIZE,
-                color: ColorsPlante.lightGrey),
-            const FadingEdgePlante(
-                direction: FadingEdgeDirection.BOTTOM_TO_TOP,
-                size: _LIST_GRADIENT_SIZE,
-                color: ColorsPlante.lightGrey),
+            const Positioned.fill(
+                top: -2,
+                child: FadingEdgePlante(
+                    direction: FadingEdgeDirection.TOP_TO_BOTTOM,
+                    size: _LIST_GRADIENT_SIZE,
+                    color: ColorsPlante.lightGrey)),
+            const Positioned.fill(
+                bottom: -2,
+                child: FadingEdgePlante(
+                    direction: FadingEdgeDirection.BOTTOM_TO_TOP,
+                    size: _LIST_GRADIENT_SIZE,
+                    color: ColorsPlante.lightGrey)),
           ])),
           const SizedBox(height: _LIST_GRADIENT_SIZE),
           Padding(
               padding: const EdgeInsets.only(
-                  left: 24, right: 24, top: 12, bottom: 33),
+                  left: 24, right: 24, top: 0, bottom: 21),
               child: SizedBox(
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
@@ -252,7 +256,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
     return Padding(
         key: Key('product_${product.barcode}'),
-        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+        padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ProductCard(
               product: product,
