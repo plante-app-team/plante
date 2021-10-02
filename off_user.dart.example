@@ -1,0 +1,4 @@
+class OffUser {
+  static const USERNAME = 'planteuser';
+  static const PASSWORD = 'SOME VERY SECRET PASSWORD';
+}
