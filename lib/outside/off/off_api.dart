@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
+import 'package:plante/outside/off/off_shop.dart';
+
 
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
@@ -55,9 +60,17 @@ class OffApi {
     return result;
   }
 
-  Future getShopsForLocation(String countryIso) async {
-    http.Response response = await http.get(Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'));
-    print(response);
-    return response;
+  Future<List<OffShop>> getShopsForLocation(String countryIso, HttpClient client) async {
+    List<OffShop> shops = [];
+    final http.Response response = await client.get(Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),headers: {
+      'user-agent': 'Plante - Flutter',
+    });
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      shops = result['tags'].map<OffShop>((shop) => OffShop.fromJson(shop as Map<String, dynamic>)).toList() as List<OffShop>;
+    } else {
+      Log.w('OffApi.getShopsForLocation error: ${response.body}');
+    }
+    return shops;
   }
 }
