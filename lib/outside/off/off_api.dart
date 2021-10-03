@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/settings.dart';
@@ -52,5 +53,11 @@ class OffApi {
       Log.w('OffApi.extractIngredients error: ${result.toJson()}');
     }
     return result;
+  }
+
+  Future getShopsForLocation(String countryIso) async {
+    http.Response response = await http.get(Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'));
+    print(response);
+    return response;
   }
 }

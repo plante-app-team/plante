@@ -108,6 +108,11 @@ class FakeOffApi implements OffApi {
     _fakeProducts[product.barcode!] = product;
     return off.Status(status: 1);
   }
+
+  @override
+  Future getShopsForLocation(String countryIso) async {
+    return "ok";
+  }
 }
 
 String _generateName() {
