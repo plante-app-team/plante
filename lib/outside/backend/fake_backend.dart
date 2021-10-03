@@ -12,6 +12,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
 class FakeBackend implements Backend {
@@ -106,10 +107,14 @@ class FakeBackend implements Backend {
   }
 
   @override
-  Future<Result<BackendProduct?, BackendError>> requestProduct(
-      String barcode) async {
+  Future<Result<RequestedProductsResult, BackendError>> requestProducts(
+      List<String> barcodes, int page) async {
     await _delay();
-    return Ok(_createBackendProduct(barcode));
+    if (page > 0) {
+      return Ok(RequestedProductsResult(const [], page, true));
+    }
+    final products = barcodes.map(_createBackendProduct).toList();
+    return Ok(RequestedProductsResult(products, page, true));
   }
 
   BackendProduct _createBackendProduct(String barcode) {

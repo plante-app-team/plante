@@ -1,5 +1,6 @@
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -57,8 +58,7 @@ class FakeOffApi implements OffApi {
         status: 0, ingredientsTextFromImage: 'Cucumbers, salad, onion');
   }
 
-  @override
-  Future<off.ProductResult> getProduct(
+  Future<off.ProductResult> _getProduct(
       off.ProductQueryConfiguration configuration) async {
     await _delay();
     if (_fakeProducts[configuration.barcode] != null) {
@@ -100,6 +100,28 @@ class FakeOffApi implements OffApi {
     ]);
     return off.ProductResult(
         status: 1, barcode: configuration.barcode, product: product);
+  }
+
+  @override
+  Future<off.SearchResult> getProductList(
+      ProductListQueryConfiguration configuration) async {
+    await _delay();
+
+    final products = <off.Product>[];
+    for (final barcode in configuration.barcodes) {
+      final productRes =
+          await _getProduct(off.ProductQueryConfiguration(barcode));
+      if (productRes.product != null) {
+        products.add(productRes.product!);
+      }
+    }
+    return off.SearchResult(
+      page: 0,
+      pageSize: products.length,
+      count: products.length,
+      skip: 0,
+      products: products,
+    );
   }
 
   @override

@@ -100,6 +100,14 @@ class ShopsManagerTestCommons {
         .thenAnswer((_) async => Ok(rangeProducts[1]));
     when(productsObtainer.inflate(rangeBackendProducts[2]))
         .thenAnswer((_) async => Ok(rangeProducts[2]));
+    when(productsObtainer.inflateProducts(any)).thenAnswer((invc) async {
+      final requestedProducts =
+          invc.positionalArguments[0] as List<BackendProduct>;
+      final requestedBarcodes = requestedProducts.map((e) => e.barcode);
+      final result =
+          rangeProducts.where((e) => requestedBarcodes.contains(e.barcode));
+      return Ok(result.toList());
+    });
 
     when(backend.createShop(
             name: anyNamed('name'),

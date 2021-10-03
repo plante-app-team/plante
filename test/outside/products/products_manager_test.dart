@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mockito/mockito.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/Product.dart' as off;
+import 'package:openfoodfacts/model/SearchResult.dart' as off;
+import 'package:openfoodfacts/model/parameter/Page.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
@@ -15,6 +19,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
+import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
@@ -79,6 +84,34 @@ void main() {
   late TakenProductsImagesStorage takenProductsImagesStorage;
   late ProductsManager productsManager;
 
+  void setUpOffProducts(List<off.Product> products) {
+    when(offApi.getProductList(any)).thenAnswer((_) async => off.SearchResult(
+        page: 1,
+        pageSize: products.length,
+        count: products.length,
+        skip: 0,
+        products: products));
+  }
+
+  void setUpBackendProducts(
+      Result<List<BackendProduct>, BackendError> productsRes) {
+    when(backend.requestProducts(any, any)).thenAnswer((invc) async {
+      if (productsRes.isErr) {
+        return Err(productsRes.unwrapErr());
+      }
+      final products = productsRes.unwrap();
+      final requestedBarcodes =
+          (invc.positionalArguments[0] as List<String>).toSet();
+      final passedBarcodes = products.map((e) => e.barcode).toSet();
+      if (products.isNotEmpty &&
+          !setEquals(requestedBarcodes, passedBarcodes)) {
+        throw ArgumentError(
+            'Requested and passed barcodes differ: $requestedBarcodes, $passedBarcodes');
+      }
+      return Ok(RequestedProductsResult(products, 0, true));
+    });
+  }
+
   setUp(() async {
     offApi = MockOffApi();
     backend = MockBackend();
@@ -90,8 +123,7 @@ void main() {
         offApi, backend, takenProductsImagesStorage, FakeAnalytics());
 
     when(offApi.saveProduct(any, any)).thenAnswer((_) async => off.Status());
-    when(offApi.getProduct(any)).thenAnswer(
-        (_) async => off.ProductResult(product: off.Product(barcode: '123')));
+    setUpOffProducts([off.Product(barcode: '123')]);
     when(offApi.addProductImage(any, any))
         .thenAnswer((_) async => off.Status());
     when(offApi.extractIngredients(any, any, any))
@@ -102,9 +134,7 @@ void main() {
             veganStatus: anyNamed('veganStatus'),
             changedLangs: anyNamed('changedLangs')))
         .thenAnswer((_) async => Ok(None()));
-    when(backend.requestProduct(any)).thenAnswer((invc) async => Ok(
-        BackendProduct(
-            (v) => v.barcode = invc.positionalArguments[0] as String)));
+    setUpBackendProducts(Ok([BackendProduct((v) => v.barcode = '123')]));
   });
 
   void ensureProductIsInOFF(Product product) {
@@ -114,9 +144,8 @@ void main() {
       'brands_tags': product.brands?.toList() ?? [],
       'ingredients_text_ru': product.ingredientsText,
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpOffProducts([offProduct]);
+    setUpBackendProducts(Ok(const []));
   }
 
   test('get product when the product is on both OFF and backend', () async {
@@ -127,8 +156,7 @@ void main() {
       'ingredients_text_ru': 'lemon, water',
       'selected_images': jsonDecode(selectedImagesRuJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -136,8 +164,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -166,10 +193,9 @@ void main() {
       'ingredients_text_ru': 'lemon, water',
       'selected_images': jsonDecode(selectedImagesRuJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -192,8 +218,7 @@ void main() {
   });
 
   test('get product when the product is on backend only', () async {
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => const off.ProductResult(product: null));
+    setUpOffProducts(const []);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -201,16 +226,119 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
     expect(product, equals(null));
   });
 
+  test('get many products with pagination', () async {
+    const barcodes = [
+      '121',
+      '122',
+      '123',
+      '124',
+      '125',
+      '126',
+      '127',
+    ];
+    final offProducts = barcodes
+        .map((e) => off.Product.fromJson({
+              'code': e,
+              'product_name_ru': 'name$e',
+              'brands_tags': ['Brand name'],
+              'ingredients_text_ru': 'lemon, water',
+              'selected_images': jsonDecode(selectedImagesRuJson),
+            }))
+        .toList();
+    when(offApi.getProductList(any)).thenAnswer((invc) async {
+      final configuration =
+          invc.positionalArguments[0] as off.ProductListQueryConfiguration;
+      final page =
+          configuration.parametersList.whereType<off.Page>().first.page;
+      if (page < 1) {
+        throw ArgumentError('OFF pagination count starts from 1');
+      }
+      if (page == 1) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 0,
+            products: [offProducts[0], offProducts[1], offProducts[2]]);
+      } else if (page == 2) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 3,
+            products: [offProducts[3], offProducts[4], offProducts[5]]);
+      } else if (page == 3) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 6,
+            products: [offProducts[6]]);
+      } else {
+        throw Exception("Page 3 should've been the last one");
+      }
+    });
+
+    final backendProducts = barcodes
+        .map((e) => BackendProduct((v) => v
+          ..barcode = e
+          ..vegetarianStatus = VegStatus.positive.name
+          ..vegetarianStatusSource = VegStatusSource.community.name
+          ..veganStatus = VegStatus.negative.name
+          ..veganStatusSource = VegStatusSource.moderator.name))
+        .toList();
+    var zeroBackendPageMet = false; // Plante backend pagination works from 0
+    when(backend.requestProducts(any, any)).thenAnswer((invc) async {
+      final page = invc.positionalArguments[1] as int;
+      if (page == 0) {
+        zeroBackendPageMet = true;
+        return Ok(RequestedProductsResult([
+          backendProducts[0],
+          backendProducts[1],
+          backendProducts[2],
+          backendProducts[3],
+        ], 0, false));
+      } else if (page == 1) {
+        return Ok(RequestedProductsResult([
+          backendProducts[4],
+          backendProducts[5],
+          backendProducts[6],
+        ], 1, true));
+      } else {
+        throw Exception("Page 2 should've been the last one");
+      }
+    });
+
+    final productRes =
+        await productsManager.getProducts(barcodes, [LangCode.ru]);
+    expect(zeroBackendPageMet, isTrue);
+    final products = productRes.unwrap();
+    final expectedProducts = barcodes.map((e) => ProductLangSlice((v) => v
+          ..lang = LangCode.ru
+          ..barcode = e
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.community
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.moderator
+          ..name = 'name$e'
+          ..brands.add('Brand name')
+          ..ingredientsText = 'lemon, water'
+          ..imageFront = Uri.parse(expectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(expectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(expectedImageIngredientsRu))
+        .productForTests());
+    expect(products.toSet(), equals(expectedProducts.toSet()));
+  });
+
   test('get product when OFF throws network error', () async {
-    when(offApi.getProduct(any))
+    when(offApi.getProductList(any))
         .thenAnswer((_) async => throw const SocketException(''));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
@@ -225,11 +353,10 @@ void main() {
       'ingredients_text_ru': 'lemon, water',
       'selected_images': jsonDecode(selectedImagesRuJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer(
-        (_) async => Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
+    setUpBackendProducts(
+        Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     expect(productRes.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
@@ -521,8 +648,7 @@ void main() {
       ..ingredientsText = 'lemon, water').productForTests();
 
     // Product is not in OFF yet
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => const off.ProductResult(product: null));
+    setUpOffProducts(const []);
 
     verifyZeroInteractions(offApi);
     verifyZeroInteractions(backend);
@@ -624,9 +750,9 @@ void main() {
   test('barcode from off is used', () async {
     const badBarcode = '0000000000123';
     const goodBarcode = '123';
-    when(offApi.getProduct(any)).thenAnswer((_) async => off.ProductResult(
-        product: off.Product.fromJson(
-            {'code': goodBarcode, 'product_name_ru': 'name'})));
+    setUpOffProducts([
+      off.Product.fromJson({'code': goodBarcode, 'product_name_ru': 'name'})
+    ]);
 
     final productRes =
         await productsManager.getProduct(badBarcode, [LangCode.ru]);
@@ -635,7 +761,7 @@ void main() {
     // Verify received product
     expect(product!.barcode, equals(goodBarcode));
     // Verify good barcode is asked from the backed
-    verify(backend.requestProduct(goodBarcode)).called(1);
+    verify(backend.requestProducts([goodBarcode], any)).called(1);
   });
 
   test('brands are not sent when they are empty', () async {
@@ -654,10 +780,9 @@ void main() {
       'product_name': 'name',
       'ingredients_text': 'lemon, water'
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -676,10 +801,9 @@ void main() {
       'code': '123',
       'brands_tags': ['brand1', 'en:brand2'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -707,9 +831,8 @@ void main() {
       'code': '123',
       'brands_tags': ['brand1', 'en:brand2'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct1));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpOffProducts([offProduct1]);
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -738,10 +861,9 @@ void main() {
       'code': '123',
       'brands_tags': ['brand1', 'en:brand2'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -760,9 +882,8 @@ void main() {
       'code': '123',
       'brands_tags': ['brand1', 'en:brand2'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpOffProducts([offProduct]);
+    setUpBackendProducts(Ok(const []));
 
     final productRes =
         await productsManager.getProduct('123', [LangCode.de, LangCode.ru]);
@@ -789,10 +910,9 @@ void main() {
       'code': '123',
       'brands_tags': ['brand1', 'brand2'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -823,8 +943,7 @@ void main() {
       'ingredients_tags': ['en:water'],
       'ingredients_tags_ru': ['voda'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -859,8 +978,7 @@ void main() {
       'ingredients_tags': ['en:water', 'en:salt'],
       'ingredients_tags_ru': ['voda', 'sol'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -899,8 +1017,7 @@ void main() {
       'ingredients_tags': ['en:water', 'en:salt'],
       'ingredients_tags_ru': ['voda', 'sol'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -935,8 +1052,7 @@ void main() {
       'ingredients_tags': ['en:water'],
       'ingredients_tags_ru': ['voda'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -960,15 +1076,13 @@ void main() {
       'ingredients_tags': ['en:water'],
       'ingredients_tags_ru': ['voda'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
       ..vegetarianStatus = VegStatus.unknown.name
       ..vegetarianStatusSource = VegStatusSource.community.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -995,15 +1109,13 @@ void main() {
       'ingredients_tags': ['en:water'],
       'ingredients_tags_ru': ['voda'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1016,8 +1128,7 @@ void main() {
 
   test('invalid veg statuses from server are treated as community', () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -1025,8 +1136,7 @@ void main() {
       ..vegetarianStatusSource = '${VegStatusSource.moderator.name}woop'
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = '${VegStatusSource.moderator.name}woop');
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1039,8 +1149,7 @@ void main() {
   test('invalid veg statuses from server are treated as if they do not exist',
       () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -1048,8 +1157,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1060,8 +1168,7 @@ void main() {
   test('invalid veg statuses from server are treated as if they do not exist',
       () async {
     final offProduct = off.Product.fromJson({'code': '123'});
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -1069,8 +1176,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1094,8 +1200,7 @@ void main() {
       'ingredients_tags': ['en:water'],
       'ingredients_tags_ru': ['voda'],
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -1103,8 +1208,7 @@ void main() {
       ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
-    when(backend.requestProduct(any))
-        .thenAnswer((_) async => Ok(backendProduct));
+    setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1126,9 +1230,9 @@ void main() {
       ..name = 'name'
       ..ingredientsText = 'lemon, water').productForTests();
 
-    verifyNever(offApi.getProduct(any));
+    verifyNever(offApi.getProductList(any));
     final saveResult = await productsManager.createUpdateProduct(product);
-    verify(offApi.getProduct(any));
+    verify(offApi.getProductList(any));
 
     expect(saveResult.isOk, isTrue);
   });
@@ -1144,12 +1248,11 @@ void main() {
       ..name = 'name'
       ..ingredientsText = 'lemon, water').productForTests();
 
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => const off.ProductResult(status: 123));
+    setUpOffProducts(const []);
 
-    verifyNever(offApi.getProduct(any));
+    verifyNever(offApi.getProductList(any));
     final saveResult = await productsManager.createUpdateProduct(product);
-    verify(offApi.getProduct(any));
+    verify(offApi.getProductList(any));
 
     expect(saveResult.isErr, isTrue);
   });
@@ -1162,8 +1265,7 @@ void main() {
       'ingredients_text_ru': 'lemon, water',
       'selected_images': jsonDecode(selectedImagesRuJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
@@ -1194,7 +1296,93 @@ void main() {
 
     // We expect the backend to not be touched since
     // we already have a backend product.
-    verifyNever(backend.requestProduct(any));
+    verifyNever(backend.requestProducts(any, any));
+  });
+
+  test('inflate many backend products with pagination', () async {
+    const barcodes = [
+      '121',
+      '122',
+      '123',
+      '124',
+      '125',
+      '126',
+      '127',
+    ];
+    final offProducts = barcodes
+        .map((e) => off.Product.fromJson({
+              'code': e,
+              'product_name_ru': 'name$e',
+              'brands_tags': ['Brand name'],
+              'ingredients_text_ru': 'lemon, water',
+              'selected_images': jsonDecode(selectedImagesRuJson),
+            }))
+        .toList();
+    when(offApi.getProductList(any)).thenAnswer((invc) async {
+      final configuration =
+          invc.positionalArguments[0] as off.ProductListQueryConfiguration;
+      final page =
+          configuration.parametersList.whereType<off.Page>().first.page;
+      if (page < 1) {
+        throw ArgumentError('OFF pagination count starts from 1');
+      }
+      if (page == 1) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 0,
+            products: [offProducts[0], offProducts[1], offProducts[2]]);
+      } else if (page == 2) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 3,
+            products: [offProducts[3], offProducts[4], offProducts[5]]);
+      } else if (page == 3) {
+        return off.SearchResult(
+            page: page,
+            pageSize: 3,
+            count: offProducts.length,
+            skip: 6,
+            products: [offProducts[6]]);
+      } else {
+        throw Exception("Page 3 should've been the last one");
+      }
+    });
+
+    final backendProducts = barcodes
+        .map((e) => BackendProduct((v) => v
+          ..barcode = e
+          ..vegetarianStatus = VegStatus.positive.name
+          ..vegetarianStatusSource = VegStatusSource.community.name
+          ..veganStatus = VegStatus.negative.name
+          ..veganStatusSource = VegStatusSource.moderator.name))
+        .toList();
+    final productsRes =
+        await productsManager.inflateProducts(backendProducts, [LangCode.ru]);
+
+    final products = productsRes.unwrap();
+    final expectedProducts = barcodes.map((e) => ProductLangSlice((v) => v
+          ..lang = LangCode.ru
+          ..barcode = e
+          ..vegetarianStatus = VegStatus.positive
+          ..vegetarianStatusSource = VegStatusSource.community
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.moderator
+          ..name = 'name$e'
+          ..brands.add('Brand name')
+          ..ingredientsText = 'lemon, water'
+          ..imageFront = Uri.parse(expectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(expectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(expectedImageIngredientsRu))
+        .productForTests());
+    expect(products.toSet(), equals(expectedProducts.toSet()));
+
+    // We expect the backend to not be touched since
+    // we already have backend products.
+    verifyNever(backend.requestProducts(any, any));
   });
 
   test(
@@ -1302,10 +1490,9 @@ void main() {
       'images': jsonDecode(imagesJson),
     });
     off.ProductHelper.createImageUrls(offProduct);
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
@@ -1349,10 +1536,9 @@ void main() {
       'ingredients_tags_de': ['wasser'],
       'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
+    setUpOffProducts([offProduct]);
 
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpBackendProducts(Ok(const []));
 
     final productRes =
         await productsManager.getProduct('123', langsPrioritized);
@@ -1498,9 +1684,8 @@ void main() {
       'ingredients_text_de': 'banane, schälen',
       'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpOffProducts([offProduct]);
+    setUpBackendProducts(Ok(const []));
 
     final originalProductRes =
         await productsManager.getProduct(barcode, [LangCode.ru, LangCode.de]);
@@ -1534,9 +1719,8 @@ void main() {
       'ingredients_text_de': 'banane, schälen',
       'selected_images': jsonDecode(selectedImagesRuDeJson),
     });
-    when(offApi.getProduct(any))
-        .thenAnswer((_) async => off.ProductResult(product: offProduct));
-    when(backend.requestProduct(any)).thenAnswer((_) async => Ok(null));
+    setUpOffProducts([offProduct]);
+    setUpBackendProducts(Ok(const []));
 
     final originalProductRes =
         await productsManager.getProduct(barcode, [LangCode.ru, LangCode.de]);
