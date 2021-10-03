@@ -20,6 +20,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/fake_backend.dart';
+import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
@@ -135,23 +136,35 @@ class Backend {
     }
   }
 
-  Future<Result<BackendProduct?, BackendError>> requestProduct(
-      String barcode) async {
+  Future<Result<RequestedProductsResult, BackendError>> requestProducts(
+      List<String> barcodes, int page) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestProduct(barcode);
+      return await _fakeBackend.requestProducts(barcodes, page);
     }
 
-    final jsonRes =
-        await _backendGetJson('product_data/', {'barcode': barcode});
+    final jsonRes = await _backendGetJson(
+        'products_data/', {'barcodes': barcodes, 'page': '$page'});
     if (jsonRes.isErr) {
-      if (jsonRes.unwrapErr().errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
-        return Ok(null);
-      } else {
-        return Err(jsonRes.unwrapErr());
-      }
+      return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-    return Ok(BackendProduct.fromJson(json));
+    if (!json.containsKey('products') || !json.containsKey('last_page')) {
+      Log.w('Invalid product_data response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+
+    final result = <BackendProduct>[];
+    final productsJson = json['products'] as List<dynamic>;
+    for (final productJson in productsJson) {
+      final product =
+          BackendProduct.fromJson(productJson as Map<String, dynamic>);
+      if (product == null) {
+        Log.w('Product could not pe parsed: $productJson');
+        continue;
+      }
+      result.add(product);
+    }
+    return Ok(RequestedProductsResult(result, page, json['last_page'] as bool));
   }
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,

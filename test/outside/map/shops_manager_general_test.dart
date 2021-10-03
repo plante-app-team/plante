@@ -448,7 +448,8 @@ void main() {
 
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    verify(productsObtainer.inflateProducts(any));
+    verifyNever(productsObtainer.inflate(any));
 
     clearInteractions(backend);
     clearInteractions(productsObtainer);
@@ -460,6 +461,7 @@ void main() {
 
     // The second fetch DID NOT send request (it used cache)
     verifyNever(backend.requestProductsAtShops(any));
+    verifyNever(productsObtainer.inflateProducts(any));
     verifyNever(productsObtainer.inflate(any));
 
     // Range update
@@ -485,6 +487,7 @@ void main() {
     // The third fetch DID NOT send request (it used updated cache)
     verifyNever(backend.requestProductsAtShops(any));
     verifyNever(productsObtainer.inflate(any));
+    verifyNever(productsObtainer.inflateProducts(any));
   });
 
   test('shops products range force reload', () async {
@@ -506,7 +509,8 @@ void main() {
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    verifyNever(productsObtainer.inflate(any));
+    verify(productsObtainer.inflateProducts(any));
 
     clearInteractions(backend);
     clearInteractions(productsObtainer);
@@ -520,7 +524,8 @@ void main() {
     // The second fetch call again DID send requests, because was asked
     // to explicitly
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    verifyNever(productsObtainer.inflate(any));
+    verify(productsObtainer.inflateProducts(any));
   });
 
   test('shop creation', () async {

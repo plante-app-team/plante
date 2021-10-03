@@ -113,23 +113,15 @@ class ShopsRequester {
     }
     final backendProductsAtShop = backendRes.unwrap().first;
 
-    // Inflate backend products with OFF products
     final products = <Product>[];
-    ProductsManagerError? lastProductsError;
-    for (final backendProduct in backendProductsAtShop.products) {
-      final productResult = await _productsObtainer.inflate(backendProduct);
-      if (productResult.isErr) {
-        lastProductsError = productResult.unwrapErr();
-        continue;
+    if (backendProductsAtShop.products.isNotEmpty) {
+      // Inflate backend products with OFF products
+      final result = await _productsObtainer
+          .inflateProducts(backendProductsAtShop.products.toList());
+      if (result.isErr) {
+        return Err(_convertProductErr(result.unwrapErr()));
       }
-      final product = productResult.unwrap();
-      if (product == null) {
-        continue;
-      }
-      products.add(product);
-    }
-    if (products.isEmpty && lastProductsError != null) {
-      return Err(_convertProductErr(lastProductsError));
+      products.addAll(result.unwrap());
     }
 
     return Ok(ShopProductRange((e) => e

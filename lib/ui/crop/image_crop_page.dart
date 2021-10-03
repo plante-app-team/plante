@@ -9,7 +9,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -124,13 +123,14 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   Widget _cropWidget() {
     if (_originalImage != null) {
       return Crop(
-          // So that the widget will be recreated on image rotation
-          key: UniqueKey(),
-          image: _originalImage!,
-          controller: _cropController,
-          baseColor: Colors.white,
-          initialSize: 0.5,
-          onCropped: _onCropped);
+        // So that the widget will be recreated on image rotation
+        key: UniqueKey(),
+        image: _originalImage!,
+        controller: _cropController,
+        baseColor: Colors.white,
+        initialSize: 0.5,
+        onCropped: _onCropped,
+      );
     }
     return const SizedBox.shrink();
   }
