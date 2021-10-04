@@ -6,6 +6,7 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
@@ -195,17 +196,27 @@ class BarcodeScanPageModel
   }
 
   Future<BarcodeScanPageSearchResult> searchProduct(String barcode) async {
+    Log.i('BarcodeScanPageModel.searchProduct start: $barcode');
     _barcode = barcode;
     _searching = true;
-    _onStateChangeCallback.call();
 
-    final foundProductResult = await _productsObtainer.getProduct(barcode);
-
-    final foundProduct = foundProductResult.maybeOk();
-    _foundProduct = foundProduct;
-    _searching = false;
-    _barcode = foundProductResult.isOk ? barcode : null;
-    _onStateChangeCallback.call();
+    Result<Product?, ProductsManagerError> foundProductResult;
+    Product? foundProduct;
+    try {
+      _onStateChangeCallback.call();
+      foundProductResult = await _productsObtainer.getProduct(barcode);
+      foundProduct = foundProductResult.maybeOk();
+      _barcode = foundProductResult.isOk ? barcode : null;
+      _foundProduct = foundProduct;
+      Log.i(
+          'BarcodeScanPageModel.searchProduct success, product: $foundProduct');
+    } catch (e) {
+      Log.w('BarcodeScanPageModel.searchProduct failure', ex: e);
+      rethrow;
+    } finally {
+      _searching = false;
+      _onStateChangeCallback.call();
+    }
 
     if (foundProduct != null && _userLangs != null) {
       if (ProductPageWrapper.isProductFilledEnoughForDisplayInLangs(
