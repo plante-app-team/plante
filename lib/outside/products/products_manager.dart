@@ -151,10 +151,8 @@ class ProductsManager {
         barcodes,
         languages: offLangs,
         fields: _NEEDED_OFF_FIELDS,
-        parametersList: [
-          off.Page(page: offPage),
-          const off.SortBy(option: off.SortOption.CREATED),
-        ],
+        page: offPage,
+        sortOption: off.SortOption.CREATED,
       );
       final off.SearchResult offProductResult;
       try {
