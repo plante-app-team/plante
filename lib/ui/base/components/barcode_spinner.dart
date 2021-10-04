@@ -21,13 +21,6 @@ class _BarcodeSpinnerState extends State<BarcodeSpinner>
     _paddingAnimation =
         Tween<double>(begin: 5, end: 12).animate(_animationController);
 
-    _animationController.addListener(() {
-      if (mounted) {
-        setState(() {
-          // Update!
-        });
-      }
-    });
     _animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _animationController.reverse();
@@ -63,18 +56,23 @@ class _BarcodeSpinnerState extends State<BarcodeSpinner>
             borderRadius: const BorderRadius.all(Radius.circular(4)),
           ),
         )),
-        Padding(
-          padding: EdgeInsets.only(top: _paddingAnimation.value, bottom: 5),
-          child: Container(
-              width: 36,
-              height: 12,
-              color: Colors.white,
-              child: const Divider(
-                height: 2,
-                thickness: 2,
-                color: ColorsPlante.primary,
-              )),
-        )
+        AnimatedBuilder(
+          animation: _animationController,
+          builder: (_, child) {
+            return Padding(
+              padding: EdgeInsets.only(top: _paddingAnimation.value, bottom: 5),
+              child: Container(
+                  width: 36,
+                  height: 12,
+                  color: Colors.white,
+                  child: const Divider(
+                    height: 2,
+                    thickness: 2,
+                    color: ColorsPlante.primary,
+                  )),
+            );
+          },
+        ),
       ]),
     );
   }

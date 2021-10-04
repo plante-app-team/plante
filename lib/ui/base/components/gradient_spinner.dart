@@ -21,13 +21,6 @@ class _GradientSpinnerState extends State<GradientSpinner>
     _alignmentAnimation =
         Tween<double>(begin: -2.5, end: 2.5).animate(_animationController);
 
-    _animationController.addListener(() {
-      if (mounted) {
-        setState(() {
-          // Update!
-        });
-      }
-    });
     _animationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _animationController.reset();
@@ -48,19 +41,25 @@ class _GradientSpinnerState extends State<GradientSpinner>
 
   @override
   Widget build(BuildContext context) {
-    final begin = -1.0 + _alignmentAnimation.value;
-    final end = 1.0 + _alignmentAnimation.value;
-    return Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            gradient: LinearGradient(
-              begin: Alignment(begin, 0),
-              end: Alignment(end, 0),
-              colors: const <Color>[
-                Color(0xFFD6E8DC),
-                Color(0xFFEBF0ED),
-                Color(0xFFD6E8DC),
-              ],
-            )));
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (_, child) {
+        return Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                gradient: LinearGradient(
+                  begin: Alignment(begin(), 0),
+                  end: Alignment(end(), 0),
+                  colors: const <Color>[
+                    Color(0xFFD6E8DC),
+                    Color(0xFFEBF0ED),
+                    Color(0xFFD6E8DC),
+                  ],
+                )));
+      },
+    );
   }
+
+  double begin() => -1.0 + _alignmentAnimation.value;
+  double end() => 1.0 + _alignmentAnimation.value;
 }
