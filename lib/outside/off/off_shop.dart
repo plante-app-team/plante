@@ -7,7 +7,7 @@ class OffShop {
   OffShop(this.id, this._name, this._products);
 
   OffShop.fromJson(Map<String, dynamic> json) :
-        id = json['_id'].toString(),
+        id = json['id'].toString(),
         _name = json['name'] as String,
         _products = json['products'] as int;
 
