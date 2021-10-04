@@ -69,11 +69,8 @@ void main() {
     final obtainedBarcodes = <String>[];
     var page = 1;
     while (true) {
-      final configuration =
-          ProductListQueryConfiguration(barcodes, parametersList: [
-        off.Page(page: page),
-        const off.SortBy(option: off.SortOption.CREATED),
-      ]);
+      final configuration = ProductListQueryConfiguration(barcodes,
+          page: page, sortOption: off.SortOption.CREATED);
 
       final result = await offApi.getProductList(configuration);
       if (result.products == null || result.products!.isEmpty) {

@@ -256,7 +256,7 @@ void main() {
       final configuration =
           invc.positionalArguments[0] as off.ProductListQueryConfiguration;
       final page =
-          configuration.parametersList.whereType<off.Page>().first.page;
+          configuration.additionalParameters.whereType<off.Page>().first.page;
       if (page < 1) {
         throw ArgumentError('OFF pagination count starts from 1');
       }
@@ -1322,7 +1322,7 @@ void main() {
       final configuration =
           invc.positionalArguments[0] as off.ProductListQueryConfiguration;
       final page =
-          configuration.parametersList.whereType<off.Page>().first.page;
+          configuration.additionalParameters.whereType<off.Page>().first.page;
       if (page < 1) {
         throw ArgumentError('OFF pagination count starts from 1');
       }
