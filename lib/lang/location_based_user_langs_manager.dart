@@ -40,7 +40,7 @@ class LocationBasedUserLangsManager {
   Future<void> _tryFirstInit() async {
     final userLangs = await _storage.userLangs();
     if (userLangs != null) {
-      Log.i('User langs known as $userLangs');
+      Log.i('LocationBasedUserLangsManager: User langs known as $userLangs');
       return;
     }
 
@@ -49,27 +49,30 @@ class LocationBasedUserLangsManager {
     // without it.
     final pos = await _locationController.lastKnownPosition();
     if (pos == null) {
-      Log.w('Cannot determine user langs - no user position available');
+      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
+          'no user position available');
       return;
     }
 
     final addressRes = await _addressObtainer.addressOfCoords(pos);
     if (addressRes.isErr) {
-      Log.w('Cannot determine user langs - OSM error: $addressRes');
+      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
+          'OSM error: $addressRes');
       return;
     }
 
     final address = addressRes.unwrap();
     final countryCode = address.countryCode;
     if (countryCode == null) {
-      Log.w('Cannot determine user langs - no country code: $address');
+      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
+          'no country code: $address');
       return;
     }
 
     final langs = _langCodesTable.countryCodeToLangCode(countryCode);
     if (langs == null) {
-      Log.w(
-          'Cannot determine user langs - no langs for country code: $countryCode');
+      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
+          'no langs for country code: $countryCode');
       return;
     }
 
@@ -82,7 +85,7 @@ class LocationBasedUserLangsManager {
     // Async check
     if (await _storage.userLangs() != null) {
       // Already inited by external code
-      Log.w('AutoUserLangsManager._initAsync: Already inited by external code');
+      Log.w('LocationBasedUserLangsManager: Already inited by external code');
       return;
     }
     await _storage.setUserLangs(langs);
