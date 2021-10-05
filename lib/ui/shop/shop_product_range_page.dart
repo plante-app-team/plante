@@ -116,6 +116,12 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   }
 
   @override
+  void dispose() {
+    _model.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget buildPage(BuildContext context) {
     Widget content;
     final errorWrapper = (Widget child) {
@@ -303,6 +309,5 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         MaterialPageRoute(
             builder: (context) =>
                 BarcodeScanPage(addProductToShop: widget.shop)));
-    _model.reload();
   }
 }

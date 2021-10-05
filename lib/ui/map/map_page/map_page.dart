@@ -184,14 +184,18 @@ class _MapPageState extends PageStatePlante<MapPage>
       }
     };
     final updateMapCallback = () {
-      final allShops = <Shop>{};
-      _mode.onShopsUpdated(_model.shopsCache);
-      allShops.addAll(_model.shopsCache.values);
-      allShops.addAll(_mode.additionalShops());
-      _onShopsUpdated(_mode.filter(allShops));
+      if (mounted) {
+        final allShops = <Shop>{};
+        _mode.onShopsUpdated(_model.shopsCache);
+        allShops.addAll(_model.shopsCache.values);
+        allShops.addAll(_mode.additionalShops());
+        _onShopsUpdated(_mode.filter(allShops));
+      }
     };
     final loadingChangeCallback = () {
-      _mode.onLoadingChange();
+      if (mounted) {
+        _mode.onLoadingChange();
+      }
     };
     _model = MapPageModel(
         GetIt.I.get<LocationController>(),

@@ -16,7 +16,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
-class ShopProductRangePageModel {
+class ShopProductRangePageModel implements ShopsManagerListener {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
   final Backend _backend;
@@ -58,6 +58,11 @@ class ShopProductRangePageModel {
       this._backend, this._addressObtainer, this._shop, this._updateCallback) {
     load();
     _address = _addressObtainer.addressOfShop(_shop);
+    _shopsManager.addListener(this);
+  }
+
+  void dispose() {
+    _shopsManager.removeListener(this);
   }
 
   int lastSeenSecs(Product product) {
@@ -163,4 +168,9 @@ class ShopProductRangePageModel {
   }
 
   FutureShortAddress address() => _address;
+
+  @override
+  void onLocalShopsChange() {
+    reload();
+  }
 }
