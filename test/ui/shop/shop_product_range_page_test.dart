@@ -52,6 +52,7 @@ import '../../z_fakes/fake_user_params_controller.dart';
 void main() {
   late MockBackend backend;
   late MockShopsManager shopsManager;
+  late List<ShopsManagerListener> shopsManagerListeners;
   late FakeUserParamsController userParamsController;
   late MockProductsManager productsManager;
   late MockPermissionsManager permissionsManager;
@@ -146,6 +147,16 @@ void main() {
 
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
+    shopsManagerListeners = [];
+    when(shopsManager.addListener(any)).thenAnswer((invc) {
+      shopsManagerListeners
+          .add(invc.positionalArguments[0] as ShopsManagerListener);
+    });
+    when(shopsManager.removeListener(any)).thenAnswer((invc) {
+      shopsManagerListeners
+          .remove(invc.positionalArguments[0] as ShopsManagerListener);
+    });
+
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
     when(backend.productPresenceVote(any, any, any))
@@ -186,12 +197,21 @@ void main() {
     final scanPage =
         find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
     expect(scanPage.addProductToShop, equals(aShop));
+  });
 
-    // Now close the scan page
-    clearInteractions(shopsManager);
-    scanPage.closeForTesting();
+  testWidgets('product range reloading on product range updates',
+      (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
     await tester.pumpAndSettle();
-    // Ensure updated shops are obtained
+
+    clearInteractions(shopsManager);
+    await tester.pumpAndSettle();
+    verifyNever(shopsManager.fetchShopProductRange(any));
+
+    // Ensure shop's product range is requested after listeners notification
+    shopsManagerListeners.forEach((e) => e.onLocalShopsChange());
+    await tester.pumpAndSettle();
     verify(shopsManager.fetchShopProductRange(any));
   });
 
@@ -509,108 +529,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(products[0].name!), findsNothing);
-    expect(find.text(products[1].name!), findsOneWidget);
-  });
-
-  testWidgets('non-vegetarian products are not shown to a vegetarian',
-      (WidgetTester tester) async {
-    final products = [
-      ProductLangSlice((v) => v
-        ..barcode = '123'
-        ..name = 'Meat apple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.negative
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.negative
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-      ProductLangSlice((v) => v
-        ..barcode = '124'
-        ..name = 'Pineapple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.positive
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-    ];
-    final productsLastSeen = {
-      products[0]: DateTime(2012, 1, 1),
-      products[1]: DateTime(2011, 2, 2),
-    };
-    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
-        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(products)
-      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any))
-        .thenAnswer((_) async => Ok(range));
-
-    final veganUser = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = true
-      ..eatsEggs = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(veganUser);
-
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.text(products[0].name!), findsNothing);
-    expect(find.text(products[1].name!), findsOneWidget);
-  });
-
-  testWidgets('non-vegan products ARE shown to a vegetarian',
-      (WidgetTester tester) async {
-    final products = [
-      ProductLangSlice((v) => v
-        ..barcode = '123'
-        ..name = 'Meat apple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.negative
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-      ProductLangSlice((v) => v
-        ..barcode = '124'
-        ..name = 'Pineapple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.positive
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-    ];
-    final productsLastSeen = {
-      products[0]: DateTime(2012, 1, 1),
-      products[1]: DateTime(2011, 2, 2),
-    };
-    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
-        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(products)
-      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any))
-        .thenAnswer((_) async => Ok(range));
-
-    final veganUser = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = true
-      ..eatsEggs = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(veganUser);
-
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.text(products[0].name!), findsOneWidget);
     expect(find.text(products[1].name!), findsOneWidget);
   });
 

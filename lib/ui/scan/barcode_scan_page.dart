@@ -48,18 +48,10 @@ class BarcodeScanPage extends StatefulWidget {
     }
     _testingStorage.newScanDataCallback!.call(Pair(barcode, byCamera));
   }
-
-  void closeForTesting() {
-    if (!isInTests()) {
-      throw Exception('closeForTesting not in tests');
-    }
-    _testingStorage.closeCallback!.call();
-  }
 }
 
 class _TestingStorage {
   ArgCallback<Pair<qr.Barcode, bool>>? newScanDataCallback;
-  VoidCallback? closeCallback;
 }
 
 class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
@@ -80,9 +72,6 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     super.initState();
     widget._testingStorage.newScanDataCallback = (pair) {
       _onNewScanData(pair.first, byCamera: pair.second);
-    };
-    widget._testingStorage.closeCallback = () {
-      Navigator.of(context).pop();
     };
 
     final stateChangeCallback = () {
