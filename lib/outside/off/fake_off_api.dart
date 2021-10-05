@@ -1,4 +1,3 @@
-
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
@@ -6,8 +5,6 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
-
-
 
 class FakeOffApi implements OffApi {
   final Settings _settings;
@@ -115,9 +112,18 @@ class FakeOffApi implements OffApi {
   }
 
   @override
-  Future<List<OffShop>> getShopsForLocation(String countryIso, HttpClient client) async {
+  Future<List<OffShop>> getShopsForLocation(
+      String countryIso, HttpClient client) async {
+    //TODO implement
     print('i am in fake');
     return [];
+  }
+
+  @override
+  Future<off.SearchResult> getVeganProductsForShop(
+      String countryIso, String shop, HttpClient client) async {
+    //TODO implement
+    return const off.SearchResult();
   }
 }
 

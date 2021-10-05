@@ -9,7 +9,6 @@ import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
-
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
   final Settings _settings;
@@ -60,17 +59,41 @@ class OffApi {
     return result;
   }
 
-  Future<List<OffShop>> getShopsForLocation(String countryIso, HttpClient client) async {
+  Future<List<OffShop>> getShopsForLocation(
+      String countryIso, HttpClient client) async {
     List<OffShop> shops = [];
-    final http.Response response = await client.get(Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),headers: {
-      'user-agent': 'Plante - Flutter',
-    });
+    final http.Response response = await client.get(
+        Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
+        headers: {
+          'user-agent': 'Plante - Flutter',
+        });
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
-      shops = result['tags'].map<OffShop>((shop) => OffShop.fromJson(shop as Map<String, dynamic>)).toList() as List<OffShop>;
+      shops = result['tags']
+          .map<OffShop>(
+              (shop) => OffShop.fromJson(shop as Map<String, dynamic>))
+          .toList() as List<OffShop>;
     } else {
       Log.w('OffApi.getShopsForLocation error: ${response.body}');
     }
     return shops;
+  }
+
+  Future<off.SearchResult> getVeganProductsForShop(
+      String countryIso, String shop, HttpClient client) async {
+    late off.SearchResult searchResult = const off.SearchResult();
+    final http.Response response = await client.get(
+        Uri.parse(
+            'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=1'),
+        headers: {
+          'user-agent': 'Plante - Flutter',
+        });
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      searchResult = off.SearchResult.fromJson(result as Map<String, dynamic>);
+    } else {
+      Log.w('OffApi.getProductsForShop $shop error: ${response.body}');
+    }
+    return searchResult;
   }
 }

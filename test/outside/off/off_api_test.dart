@@ -36,12 +36,44 @@ void main() {
       ]
     }''');
     final result = await offApi.getShopsForLocation('be', httpClient);
-    expect(result.length,equals(2));
+    expect(result.length, equals(2));
   });
+
+  test('fetch products from off for delhaize belgium', () async {
+    final httpClient = FakeHttpClient();
+    httpClient.setResponse(
+        '.openfoodfacts.org/api/v2/search\\\?ingredients_analysis_tags=en:vegan\\\&stores_tags=Delhaize',
+        '''{
+      "count": 2,
+      "page" : 1,
+      "page_count" : 2,
+      "page_size" : 20,
+      "products": [
+        {
+          "_id": "product1"
+        },
+        {
+          "_id": "product2"
+        }
+      ]
+    }''');
+    final result =
+        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient);
+    expect(result.products?.length, equals(2));
+    expect(result.count, equals(2));
+    expect(result.page, equals(1));
+  }, skip: false);
 
   test('fetch shops from off for belgium - integration', () async {
     final httpClient = HttpClient();
     final result = await offApi.getShopsForLocation('be', httpClient);
-    expect(result.length,greaterThanOrEqualTo(1));
+    expect(result.length, greaterThanOrEqualTo(1));
+  }, skip: true);
+
+  test('fetch products from off for delhaize belgium - integration', () async {
+    final httpClient = HttpClient();
+    final result =
+        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient);
+    expect(result.products?.length, greaterThanOrEqualTo(1));
   }, skip: true);
 }

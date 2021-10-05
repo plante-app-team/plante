@@ -1,4 +1,3 @@
-
 class OffShop {
   final String id;
   final String? _name;
@@ -6,8 +5,8 @@ class OffShop {
 
   OffShop(this.id, this._name, this._products);
 
-  OffShop.fromJson(Map<String, dynamic> json) :
-        id = json['id'].toString(),
+  OffShop.fromJson(Map<String, dynamic> json)
+      : id = json['id'].toString(),
         _name = json['name'] as String,
         _products = json['products'] as int;
 
@@ -19,4 +18,3 @@ class OffShop {
     return _products != null ? _products! : 0;
   }
 }
-
