@@ -380,6 +380,13 @@ class _MapPageState extends PageStatePlante<MapPage>
         markers: _instances.last == this ? _displayedShopsMarkers : {},
       ),
       Align(
+        alignment: Alignment.bottomRight,
+        child: LicenceLabel(
+          darkBox: false,
+          label: context.strings.map_page_open_street_map_licence,
+        ),
+      ),
+      Align(
           alignment: Alignment.bottomCenter,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Align(
@@ -387,13 +394,6 @@ class _MapPageState extends PageStatePlante<MapPage>
                 child: SizedBox(
                     width: 80,
                     child: AnimatedListSimplePlante(children: _fabs()))),
-            Align(
-              alignment: Alignment.centerRight,
-              child: LicenceLabel(
-                darkBox: false,
-                label: context.strings.map_page_open_street_map_licence,
-              ),
-            ),
             MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(
                 children: _mode.buildBottomActions(context)),
