@@ -20,6 +20,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/fake_backend.dart';
+import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_uid.dart';
@@ -217,25 +218,16 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Future<Result<UserParams, BackendError>> userData() async {
+  Future<Result<MobileAppConfig, BackendError>> mobileAppConfig() async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.userData();
+      return await _fakeBackend.mobileAppConfig();
     }
-
-    final jsonRes = await _backendGetJson('user_data/', {});
+    final jsonRes = await _backendGetJson('mobile_app_config/', {});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-
-    final backendUserParams = UserParams.fromJson(json)!;
-    // NOTE: client token is not present in the response, but
-    // the Backend class knows the token and can set it.
-    // If it wouldn't set it, the `userData()` method clients would get
-    // not fully set params.
-    final storedUserParams = await _userParamsController.getUserParams();
-    return Ok(backendUserParams.rebuild(
-        (e) => e..backendClientToken = storedUserParams?.backendClientToken));
+    return Ok(MobileAppConfig.fromJson(json)!);
   }
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>

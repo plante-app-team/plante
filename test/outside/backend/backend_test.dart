@@ -596,42 +596,50 @@ void main() {
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
-  test('user data obtaining', () async {
+  test('mobile app config obtaining', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse(
-        '.*user_data.*', ''' { "name": "Bob Kelso", "user_id": "123" } ''');
+    httpClient.setResponse('.*mobile_app_config.*', '''
+        {
+          "user_data": { "name": "Bob Kelso", "user_id": "123" },
+          "nominatim_enabled": false
+        }
+        ''');
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(result.isOk, isTrue);
 
-    final obtainedParams = result.unwrap();
+    final obtainedConfig = result.unwrap();
+    expect(obtainedConfig.nominatimEnabled, isFalse);
+    final obtainedParams = obtainedConfig.remoteUserParams;
     expect(obtainedParams.name, equals('Bob Kelso'));
     expect(obtainedParams.backendId, equals('123'));
-    // NOTE: client token was not present in the response, but
-    // the Backend class knows the token and can set it.
-    expect(obtainedParams.backendClientToken, equals('aaa'));
   });
 
-  test('user data obtaining invalid JSON response', () async {
+  test('mobile app config obtaining invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*user_data.*',
-        ''' {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } ''');
+    httpClient.setResponse('.*mobile_app_config.*', '''
+        {{{{{{{{{{{{{{{{{
+          "user_data": { "name": "Bob Kelso", "user_id": "123" },
+          "nominatim_enabled": false
+        }
+        ''');
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('user data obtaining network error', () async {
+  test('mobile app config obtaining network error', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponseException('.*user_data.*', const SocketException(''));
+    httpClient.setResponseException(
+        '.*mobile_app_config.*', const SocketException(''));
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
