@@ -9,6 +9,7 @@ import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
 void main() {
@@ -47,8 +48,10 @@ void main() {
           fullRoads.where((road) => bounds.contains(road.coord)).toList());
     });
 
-    roadsManager =
-        RoadsManager(OpenStreetMap.forTesting(overpass: osm), cacher);
+    roadsManager = RoadsManager(
+        OpenStreetMap.forTesting(
+            overpass: osm, configManager: FakeMobileAppConfigManager()),
+        cacher);
   });
 
   test('roads fetched and then cached', () async {

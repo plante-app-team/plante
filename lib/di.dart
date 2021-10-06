@@ -53,12 +53,6 @@ void initDI() {
       GetIt.I.get<IpLocationProvider>(),
       GetIt.I.get<PermissionsManager>(),
       GetIt.I.get<SharedPreferencesHolder>()));
-  GetIt.I.registerSingleton<OpenStreetMap>(OpenStreetMap(
-    GetIt.I.get<HttpClient>(),
-    GetIt.I.get<Analytics>(),
-  ));
-  GetIt.I.registerSingleton<AddressObtainer>(
-      AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
@@ -67,6 +61,17 @@ void initDI() {
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<HttpClient>(),
       GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(
+      GetIt.I.get<Backend>(),
+      GetIt.I.get<UserParamsController>(),
+      GetIt.I.get<SharedPreferencesHolder>()));
+  GetIt.I.registerSingleton<OpenStreetMap>(OpenStreetMap(
+    GetIt.I.get<HttpClient>(),
+    GetIt.I.get<Analytics>(),
+    GetIt.I.get<MobileAppConfigManager>(),
+  ));
+  GetIt.I.registerSingleton<AddressObtainer>(
+      AddressObtainer(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
       GetIt.I.get<SysLangCodeHolder>(),
       GetIt.I.get<CountriesLangCodesTable>(),
@@ -94,10 +99,6 @@ void initDI() {
     GetIt.I.get<ProductsManager>(),
     GetIt.I.get<UserLangsManager>(),
   ));
-  GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(
-      GetIt.I.get<Backend>(),
-      GetIt.I.get<UserParamsController>(),
-      GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<MobileAppConfigManager>()));
