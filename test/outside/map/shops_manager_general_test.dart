@@ -19,6 +19,7 @@ import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 import 'shops_manager_test_commons.dart';
 
@@ -588,8 +589,13 @@ void main() {
         equals(expectedAllShops));
 
     // Create a NEW shops manager with same persistent cache
-    shopsManager = ShopsManager(OpenStreetMap.forTesting(overpass: osm),
-        backend, productsObtainer, analytics, osmCacher);
+    shopsManager = ShopsManager(
+        OpenStreetMap.forTesting(
+            overpass: osm, configManager: FakeMobileAppConfigManager()),
+        backend,
+        productsObtainer,
+        analytics,
+        osmCacher);
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));

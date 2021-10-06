@@ -14,6 +14,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 
 class ShopsManagerTestCommons {
@@ -85,8 +86,13 @@ class ShopsManagerTestCommons {
     productsObtainer = MockProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager = ShopsManager(OpenStreetMap.forTesting(overpass: osm),
-        backend, productsObtainer, analytics, osmCacher);
+    shopsManager = ShopsManager(
+        OpenStreetMap.forTesting(
+            overpass: osm, configManager: FakeMobileAppConfigManager()),
+        backend,
+        productsObtainer,
+        analytics,
+        osmCacher);
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));

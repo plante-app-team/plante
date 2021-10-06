@@ -8,13 +8,12 @@ class FakeMobileAppConfigManager implements MobileAppConfigManager {
   MobileAppConfig? _config;
 
   FakeMobileAppConfigManager({MobileAppConfig? defaultConfig}) {
-    _config = defaultConfig ?? MobileAppConfig((e) => e
-      ..remoteUserParams.replace(UserParams((e) => e
-          ..backendId = '321'
-          ..name = 'Bob')
-      )
-      ..nominatimEnabled = true
-    );
+    _config = defaultConfig ??
+        MobileAppConfig((e) => e
+          ..remoteUserParams.replace(UserParams((e) => e
+            ..backendId = '321'
+            ..name = 'Bob'))
+          ..nominatimEnabled = true);
   }
 
   @override
@@ -26,10 +25,16 @@ class FakeMobileAppConfigManager implements MobileAppConfigManager {
   }
 
   @override
-  void addObserver(MobileAppConfigManagerObserver observer) => _observers.add(observer);
+  void addObserver(MobileAppConfigManagerObserver observer) =>
+      _observers.add(observer);
 
   @override
-  void removeObserver(MobileAppConfigManagerObserver observer) => _observers.remove(observer);
+  void removeObserver(MobileAppConfigManagerObserver observer) =>
+      _observers.remove(observer);
+
+  void setNominatimEnabled(bool value) {
+    _config = _config!.rebuild((e) => e.nominatimEnabled = value);
+  }
 
   @override
   void onUserParamsUpdate(UserParams? userParams) {
