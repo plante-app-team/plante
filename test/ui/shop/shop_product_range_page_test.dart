@@ -25,6 +25,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
@@ -50,7 +51,6 @@ import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
-  late MockBackend backend;
   late MockShopsManager shopsManager;
   late List<ShopsManagerListener> shopsManagerListeners;
   late FakeUserParamsController userParamsController;
@@ -109,8 +109,6 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
-    backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     userParamsController = FakeUserParamsController();
@@ -134,6 +132,7 @@ void main() {
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
+    GetIt.I.registerSingleton<Backend>(MockBackend());
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
@@ -159,8 +158,8 @@ void main() {
 
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
-    when(backend.productPresenceVote(any, any, any))
-        .thenAnswer((_) async => Ok(None()));
+    when(shopsManager.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
     when(productsManager.createUpdateProduct(any)).thenAnswer(
         (invoc) async => Ok(invoc.positionalArguments[0] as Product));
 
@@ -258,7 +257,7 @@ void main() {
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    var card = find.byType(ProductCard).evaluate().first.widget;
+    final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
 
     // Verify the proper product
@@ -267,19 +266,8 @@ void main() {
             of: find.byWidget(card), matching: find.text(product.name!)),
         findsOneWidget);
 
-    // Verify the old date
-    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
-    final expectedOldLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedOldDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
-
     // Tap and verify the vote is sent
-    verifyNever(backend.productPresenceVote(any, any, any));
+    verifyNever(shopsManager.productPresenceVote(any, any, any));
     await tester.tap(find.descendant(
         of: find.byWidget(card),
         matching: find.text(context.strings.global_yes)));
@@ -288,27 +276,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, true));
-
-    // Verify the date is updated
-    card = find.byType(ProductCard).evaluate().first.widget;
-    // Old date is no more
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsNothing);
-    // New date has come!
-    final now = DateTime.now();
-    final expectedNewDateStr = dateToStr(now, context);
-    final expectedNewLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedNewDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedNewLastSeenStr)),
-        findsOneWidget);
+    verify(shopsManager.productPresenceVote(product, aShop, true));
   });
 
   testWidgets('vote against product presence', (WidgetTester tester) async {
@@ -316,7 +284,7 @@ void main() {
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    var card = find.byType(ProductCard).evaluate().first.widget;
+    final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
 
     // Verify the proper product
@@ -325,19 +293,8 @@ void main() {
             of: find.byWidget(card), matching: find.text(product.name!)),
         findsOneWidget);
 
-    // Verify the old date
-    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
-    final expectedOldLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedOldDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
-
     // Tap and verify the vote is sent
-    verifyNever(backend.productPresenceVote(any, any, any));
+    verifyNever(shopsManager.productPresenceVote(any, any, any));
     await tester.tap(find.descendant(
         of: find.byWidget(card),
         matching: find.text(context.strings.global_no)));
@@ -346,15 +303,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, false));
-
-    // Verify the old date is still in place
-    card = find.byType(ProductCard).evaluate().first.widget;
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
+    verify(shopsManager.productPresenceVote(product, aShop, false));
   });
 
   testWidgets('no products', (WidgetTester tester) async {

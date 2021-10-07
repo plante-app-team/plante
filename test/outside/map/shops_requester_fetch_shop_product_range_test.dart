@@ -9,8 +9,8 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
@@ -18,19 +18,20 @@ import '../../common_mocks.mocks.dart';
 import 'shops_requester_test_commons.dart';
 
 void main() {
-  late ShopsRequesterTestCommons commons;
+  late ShopsManagerBackendWorkerTestCommons commons;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
-  late ShopsRequester shopsRequester;
+  late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
   late Shop aShop;
 
   setUp(() async {
-    commons = ShopsRequesterTestCommons();
+    commons = ShopsManagerBackendWorkerTestCommons();
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     aShop = commons.aShop;
-    shopsRequester = ShopsRequester(backend, productsObtainer);
+    shopsManagerBackendWorker =
+        ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
   test('fetchShopProductRange good scenario', () async {
@@ -57,7 +58,7 @@ void main() {
     when(productsObtainer.inflateProducts(any))
         .thenAnswer((_) async => Ok(products));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     expect(result.isOk, isTrue);
 
     final expectedShopProductRange = ShopProductRange((e) => e
@@ -73,7 +74,7 @@ void main() {
         BackendError.fromResp(BackendResponse.fromError(
             Exception(''), Uri.parse('https://ya.ru')))));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
 
     expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
@@ -83,7 +84,7 @@ void main() {
         BackendError.fromResp(BackendResponse.fromError(
             const SocketException(''), Uri.parse('https://ya.ru')))));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
 
     expect(result.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
@@ -95,7 +96,7 @@ void main() {
     when(backend.requestProductsAtShops(any))
         .thenAnswer((_) async => Ok(backendProductsAtShops));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     expect(result.isOk, isTrue);
 
     final expectedShopProductRange =
@@ -122,7 +123,7 @@ void main() {
     when(productsObtainer.inflateProducts(any))
         .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     // Last error received from ShopsManager is expected to be what we get here
     expect(result.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });

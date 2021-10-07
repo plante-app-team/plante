@@ -931,6 +931,44 @@ void main() {
     expect(result.isOk, isTrue);
   });
 
+  test('product presence vote "deleted" param', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+
+    // Deleted: true
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok",
+           "deleted": true
+         }
+         ''');
+    var result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isTrue);
+
+    // Deleted: false
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok",
+           "deleted": false
+         }
+         ''');
+    result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isFalse);
+
+    // Deleted: N/A
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok"
+         }
+         ''');
+    result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isFalse);
+  });
+
   test('product presence vote analytics events', () async {
     final httpClient = FakeHttpClient();
     final backend =
