@@ -8,8 +8,6 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -106,7 +104,6 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     _model = ShopProductRangePageModel(
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<UserParamsController>(),
-        GetIt.I.get<Backend>(),
         GetIt.I.get<AddressObtainer>(),
         widget.shop,
         updateCallback);
@@ -294,8 +291,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         setState(() {
           _votedProducts.add(product.barcode);
         });
-      } else if (result.unwrapErr().errorKind ==
-          BackendErrorKind.NETWORK_ERROR) {
+      } else if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);
       } else {
         showSnackBar(context.strings.global_something_went_wrong, context);

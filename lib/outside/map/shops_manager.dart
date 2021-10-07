@@ -13,14 +13,15 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 /// Wrapper around ShopsManagerImpl with caching and retry logic.
@@ -32,7 +33,7 @@ class ShopsManager {
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _osm;
-  late final ShopsRequester _requester;
+  late final ShopsManagerBackendWorker _backendWorker;
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
@@ -44,8 +45,9 @@ class ShopsManager {
 
   ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
       this._analytics, this._osmCacher)
-      : _requester = ShopsRequester(backend, productsObtainer) {
-    _fetchShopsHelper = ShopsManagerFetchShopsHelper(_requester, _osmCacher);
+      : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
+    _fetchShopsHelper =
+        ShopsManagerFetchShopsHelper(_backendWorker, _osmCacher);
   }
 
   void addListener(ShopsManagerListener listener) {
@@ -136,7 +138,8 @@ class ShopsManager {
     }
 
     if (osmShopsToLoad.isNotEmpty) {
-      final inflateResult = await _requester.inflateOsmShops(osmShopsToLoad);
+      final inflateResult =
+          await _backendWorker.inflateOsmShops(osmShopsToLoad);
       if (inflateResult.isErr) {
         Log.w('ShopsManager.inflateOsmShops err: $inflateResult');
         return inflateResult;
@@ -166,7 +169,7 @@ class ShopsManager {
         return Ok(cache);
       }
     }
-    final result = await _requester.fetchShopProductRange(shop);
+    final result = await _backendWorker.fetchShopProductRange(shop);
     if (result.isOk) {
       _rangesCache[shop.osmUID] = result.unwrap();
     }
@@ -175,7 +178,7 @@ class ShopsManager {
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
-    final result = await _requester.putProductToShops(product, shops);
+    final result = await _backendWorker.putProductToShops(product, shops);
     final eventParam = {
       'barcode': product.barcode,
       'shops': shops.map((e) => e.osmUID).join(', ')
@@ -223,7 +226,7 @@ class ShopsManager {
       required Coord coord,
       required ShopType type}) async {
     final result =
-        await _requester.createShop(name: name, coord: coord, type: type);
+        await _backendWorker.createShop(name: name, coord: coord, type: type);
     if (result.isOk) {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',
@@ -243,6 +246,43 @@ class ShopsManager {
     } else {
       _analytics.sendEvent('create_shop_failure',
           {'name': name, 'lat': coord.lat, 'lon': coord.lon});
+    }
+    return result;
+  }
+
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
+      productPresenceVote(Product product, Shop shop, bool positive) async {
+    final result =
+        await _backendWorker.productPresenceVote(product, shop, positive);
+    if (result.isOk) {
+      final cachedRange = _rangesCache[shop.osmUID];
+      final cachedShop = _shopsCache[shop.osmUID];
+      if (cachedShop == null) {
+        Log.w('productPresenceVote: '
+            'cachedShop is null - it is rare but possible');
+      }
+      if (cachedRange == null) {
+        Log.e('Voting was done for a shop range which was not cached before');
+        return result;
+      }
+      if (positive) {
+        if (cachedShop != null &&
+            !cachedRange.hasProductWith(product.barcode)) {
+          _shopsCache[shop.osmUID] = cachedShop.rebuildWith(
+              productsCount: cachedShop.productsCount + 1);
+        }
+        _rangesCache[shop.osmUID] = cachedRange.rebuildWithProduct(
+            product, DateTime.now().secondsSinceEpoch);
+        _notifyListeners();
+      } else if (result.unwrap().productDeleted) {
+        _rangesCache[shop.osmUID] =
+            cachedRange.rebuildWithoutProduct(product.barcode);
+        if (cachedShop != null) {
+          _shopsCache[shop.osmUID] = cachedShop.rebuildWith(
+              productsCount: cachedShop.productsCount - 1);
+        }
+        _notifyListeners();
+      }
     }
     return result;
   }

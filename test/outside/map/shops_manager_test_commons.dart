@@ -16,11 +16,12 @@ import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
+import '../../z_fakes/fake_products_obtainer.dart';
 
 class ShopsManagerTestCommons {
   late MockOsmOverpass osm;
   late MockBackend backend;
-  late MockProductsObtainer productsObtainer;
+  late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
@@ -83,7 +84,7 @@ class ShopsManagerTestCommons {
 
     osm = MockOsmOverpass();
     backend = MockBackend();
-    productsObtainer = MockProductsObtainer();
+    productsObtainer = FakeProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
     shopsManager = ShopsManager(
@@ -100,20 +101,7 @@ class ShopsManagerTestCommons {
         .thenAnswer((_) async => Ok(osmShops));
     when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
 
-    when(productsObtainer.inflate(rangeBackendProducts[0]))
-        .thenAnswer((_) async => Ok(rangeProducts[0]));
-    when(productsObtainer.inflate(rangeBackendProducts[1]))
-        .thenAnswer((_) async => Ok(rangeProducts[1]));
-    when(productsObtainer.inflate(rangeBackendProducts[2]))
-        .thenAnswer((_) async => Ok(rangeProducts[2]));
-    when(productsObtainer.inflateProducts(any)).thenAnswer((invc) async {
-      final requestedProducts =
-          invc.positionalArguments[0] as List<BackendProduct>;
-      final requestedBarcodes = requestedProducts.map((e) => e.barcode);
-      final result =
-          rangeProducts.where((e) => requestedBarcodes.contains(e.barcode));
-      return Ok(result.toList());
-    });
+    productsObtainer.addKnownProducts(rangeProducts);
 
     when(backend.createShop(
             name: anyNamed('name'),

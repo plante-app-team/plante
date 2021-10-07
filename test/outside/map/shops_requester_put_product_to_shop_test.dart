@@ -6,24 +6,25 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import 'shops_requester_test_commons.dart';
 
 void main() {
-  late ShopsRequesterTestCommons commons;
+  late ShopsManagerBackendWorkerTestCommons commons;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
-  late ShopsRequester shopsRequester;
+  late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
   setUp(() async {
-    commons = ShopsRequesterTestCommons();
+    commons = ShopsManagerBackendWorkerTestCommons();
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
-    shopsRequester = ShopsRequester(backend, productsObtainer);
+    shopsManagerBackendWorker =
+        ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
   test('putProductToShops good scenario', () async {
@@ -52,7 +53,8 @@ void main() {
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));
 
-    final result = await shopsRequester.putProductToShops(product, shops);
+    final result =
+        await shopsManagerBackendWorker.putProductToShops(product, shops);
     expect(result.isOk, isTrue);
   });
 
@@ -97,7 +99,8 @@ void main() {
       return Ok(None());
     });
 
-    final result = await shopsRequester.putProductToShops(product, shops);
+    final result =
+        await shopsManagerBackendWorker.putProductToShops(product, shops);
     // Expecting an error
     expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
     // Expecting the third call to not happen
@@ -121,7 +124,8 @@ void main() {
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Err(BackendError.other()));
 
-    final result = await shopsRequester.putProductToShops(product, shops);
+    final result =
+        await shopsManagerBackendWorker.putProductToShops(product, shops);
     // Expecting an error
     expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
   });

@@ -9,6 +9,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
@@ -18,11 +19,11 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
-class ShopsRequester {
+class ShopsManagerBackendWorker {
   final Backend _backend;
   final ProductsObtainer _productsObtainer;
 
-  ShopsRequester(this._backend, this._productsObtainer);
+  ShopsManagerBackendWorker(this._backend, this._productsObtainer);
 
   Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
       OsmOverpass overpass,
@@ -161,6 +162,16 @@ class ShopsRequester {
     } else {
       return Err(_convertBackendErr(res.unwrapErr()));
     }
+  }
+
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
+      productPresenceVote(Product product, Shop shop, bool positive) async {
+    final result = await _backend.productPresenceVote(
+        product.barcode, shop.osmUID, positive);
+    if (result.isErr) {
+      return Err(_convertBackendErr(result.unwrapErr()));
+    }
+    return Ok(result.unwrap());
   }
 }
 

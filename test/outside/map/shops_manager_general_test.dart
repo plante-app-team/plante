@@ -21,6 +21,7 @@ import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
+import '../../z_fakes/fake_products_obtainer.dart';
 import 'shops_manager_test_commons.dart';
 
 // TODO: please try to decouple tests in this file into many smaller files
@@ -28,7 +29,7 @@ void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
   late MockBackend backend;
-  late MockProductsObtainer productsObtainer;
+  late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
@@ -449,11 +450,10 @@ void main() {
 
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflateProducts(any));
-    verifyNever(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
 
     clearInteractions(backend);
-    clearInteractions(productsObtainer);
+    productsObtainer.inflatesCount = 0;
 
     // Second fetch
     final rangeRes2 = await shopsManager.fetchShopProductRange(shop);
@@ -462,8 +462,7 @@ void main() {
 
     // The second fetch DID NOT send request (it used cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflateProducts(any));
-    verifyNever(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, equals(0));
 
     // Range update
     verifyNever(backend.putProductToShop(any, any));
@@ -487,8 +486,7 @@ void main() {
 
     // The third fetch DID NOT send request (it used updated cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflate(any));
-    verifyNever(productsObtainer.inflateProducts(any));
+    expect(productsObtainer.inflatesCount, equals(0));
   });
 
   test('shops products range force reload', () async {
@@ -510,11 +508,10 @@ void main() {
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflate(any));
-    verify(productsObtainer.inflateProducts(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
 
     clearInteractions(backend);
-    clearInteractions(productsObtainer);
+    productsObtainer.inflatesCount = 0;
 
     // Second fetch
     final rangeRes2 =
@@ -525,8 +522,7 @@ void main() {
     // The second fetch call again DID send requests, because was asked
     // to explicitly
     verify(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflate(any));
-    verify(productsObtainer.inflateProducts(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
   });
 
   test('shop creation', () async {

@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
@@ -103,10 +104,10 @@ class FakeBackend implements Backend {
   }
 
   @override
-  Future<Result<None, BackendError>> productPresenceVote(
+  Future<Result<ProductPresenceVoteResult, BackendError>> productPresenceVote(
       String barcode, OsmUID osmUID, bool positive) async {
     await _delay();
-    return Ok(None());
+    return Ok(ProductPresenceVoteResult(productDeleted: !positive));
   }
 
   @override
