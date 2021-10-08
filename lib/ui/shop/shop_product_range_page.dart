@@ -207,7 +207,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                   width: double.infinity,
                   child: ButtonFilledPlante.withText(
                       context.strings.shop_product_range_page_add_product,
-                      onPressed: !_model.loading ? _onAddProductClick : null))),
+                      onPressed: _onAddProductClick))),
         ]),
         Positioned.fill(
             child: AnimatedCrossFadePlante(
