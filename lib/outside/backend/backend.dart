@@ -20,6 +20,8 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/fake_backend.dart';
+import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_uid.dart';
@@ -217,25 +219,16 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Future<Result<UserParams, BackendError>> userData() async {
+  Future<Result<MobileAppConfig, BackendError>> mobileAppConfig() async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.userData();
+      return await _fakeBackend.mobileAppConfig();
     }
-
-    final jsonRes = await _backendGetJson('user_data/', {});
+    final jsonRes = await _backendGetJson('mobile_app_config/', {});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-
-    final backendUserParams = UserParams.fromJson(json)!;
-    // NOTE: client token is not present in the response, but
-    // the Backend class knows the token and can set it.
-    // If it wouldn't set it, the `userData()` method clients would get
-    // not fully set params.
-    final storedUserParams = await _userParamsController.getUserParams();
-    return Ok(backendUserParams.rebuild(
-        (e) => e..backendClientToken = storedUserParams?.backendClientToken));
+    return Ok(MobileAppConfig.fromJson(json)!);
   }
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
@@ -299,7 +292,7 @@ class Backend {
     return Ok(shops);
   }
 
-  Future<Result<None, BackendError>> productPresenceVote(
+  Future<Result<ProductPresenceVoteResult, BackendError>> productPresenceVote(
       String barcode, OsmUID osmUID, bool positive) async {
     _analytics.sendEvent('product_presence_vote',
         {'barcode': barcode, 'shop': osmUID.toString(), 'vote': positive});
@@ -307,12 +300,17 @@ class Backend {
       return await _fakeBackend.productPresenceVote(barcode, osmUID, positive);
     }
 
-    final response = await _backendGet('product_presence_vote/', {
+    final response = await _backendGetJson('product_presence_vote/', {
       'barcode': barcode,
       'shopOsmUID': osmUID.toString(),
       'voteVal': positive ? '1' : '0',
     });
-    return _noneOrErrorFrom(response);
+    if (response.isErr) {
+      return Err(response.unwrapErr());
+    }
+    final json = response.unwrap();
+    final deleted = json['deleted'] as bool?;
+    return Ok(ProductPresenceVoteResult(productDeleted: deleted ?? false));
   }
 
   Future<Result<None, BackendError>> putProductToShop(

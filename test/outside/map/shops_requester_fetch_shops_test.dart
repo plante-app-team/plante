@@ -9,31 +9,32 @@ import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import 'shops_requester_test_commons.dart';
 
 void main() {
-  late ShopsRequesterTestCommons commons;
+  late ShopsManagerBackendWorkerTestCommons commons;
   late MockOsmOverpass osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
-  late ShopsRequester shopsRequester;
+  late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
   late Map<OsmUID, OsmShop> someOsmShops;
   late Map<OsmUID, BackendShop> someBackendShops;
 
   setUp(() async {
-    commons = ShopsRequesterTestCommons();
+    commons = ShopsManagerBackendWorkerTestCommons();
     osm = commons.osm;
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     someOsmShops = commons.someOsmShops;
     someBackendShops = commons.someBackendShops;
-    shopsRequester = ShopsRequester(backend, productsObtainer);
+    shopsManagerBackendWorker =
+        ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
   test('fetchShops with simple bounds without preloaded data', () async {
@@ -55,7 +56,7 @@ void main() {
     final expectedFetchResult =
         FetchedShops(expectedShops, bounds, someOsmShops, bounds);
 
-    final shopsRes = await shopsRequester.fetchShops(osm,
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
     final shops = shopsRes.unwrap();
     expect(shops, equals(expectedFetchResult));
@@ -83,7 +84,7 @@ void main() {
         FetchedShops(expectedShops, bounds, someOsmShops, bounds);
 
     // ...Because [preloadedOsmShops] is specified
-    final shopsRes = await shopsRequester.fetchShops(osm,
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds,
         planteBounds: bounds,
         preloadedOsmShops: someOsmShops.values);
@@ -136,7 +137,7 @@ void main() {
     final expectedFetchResult =
         FetchedShops(expectedShops, bounds, osmShops, bounds);
 
-    final shopsRes = await shopsRequester.fetchShops(osm,
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
     final shops = shopsRes.unwrap();
     expect(shops, equals(expectedFetchResult));
@@ -160,7 +161,7 @@ void main() {
       southwest: Coord(lat: 0, lon: 0),
       northeast: Coord(lat: 99, lon: 99),
     );
-    final shopsRes = await shopsRequester.fetchShops(osm,
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
@@ -183,7 +184,7 @@ void main() {
       southwest: Coord(lat: 0, lon: 0),
       northeast: Coord(lat: 99, lon: 99),
     );
-    final shopsRes = await shopsRequester.fetchShops(osm,
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.OTHER));
   });

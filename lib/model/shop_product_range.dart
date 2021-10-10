@@ -15,6 +15,32 @@ abstract class ShopProductRange
     return productsLastSeenSecsUtc[product.barcode] ?? 0;
   }
 
+  bool hasProductWith(String barcode) =>
+      products.any((e) => e.barcode == barcode);
+
+  ShopProductRange rebuildWithoutProduct(String barcode) {
+    final productsUpdated = products.where((e) => e.barcode != barcode);
+    final lastSeenUpdated = productsLastSeenSecsUtc.toMap();
+    lastSeenUpdated.remove(barcode);
+    return rebuild((e) => e
+      ..products = ListBuilder(productsUpdated)
+      ..productsLastSeenSecsUtc = MapBuilder(lastSeenUpdated));
+  }
+
+  ShopProductRange rebuildWithProduct(Product product, int lastSeenSecsUtc) {
+    // At first let's remove the product so that
+    // we would be able to update the last seen time.
+    final withoutProduct = rebuildWithoutProduct(product.barcode);
+
+    final productsUpdated = withoutProduct.products.toList();
+    final lastSeenUpdated = withoutProduct.productsLastSeenSecsUtc.toMap();
+    productsUpdated.add(product);
+    lastSeenUpdated[product.barcode] = lastSeenSecsUtc;
+    return withoutProduct.rebuild((e) => e
+      ..products = ListBuilder(productsUpdated)
+      ..productsLastSeenSecsUtc = MapBuilder(lastSeenUpdated));
+  }
+
   factory ShopProductRange([void Function(ShopProductRangeBuilder) updates]) =
       _$ShopProductRange;
   ShopProductRange._();

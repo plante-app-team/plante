@@ -5,7 +5,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 
 import '../../common_mocks.mocks.dart';
 
-class ShopsRequesterTestCommons {
+class ShopsManagerBackendWorkerTestCommons {
   late MockOsmOverpass osm;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
@@ -46,7 +46,7 @@ class ShopsRequesterTestCommons {
       ..osmUID = OsmUID.parse('1:1')
       ..productsCount = 2)));
 
-  ShopsRequesterTestCommons() {
+  ShopsManagerBackendWorkerTestCommons() {
     someShops = {
       OsmUID.parse('1:1'): Shop((e) => e
         ..osmShop.replace(someOsmShops[OsmUID.parse('1:1')]!)
