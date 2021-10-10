@@ -9,12 +9,15 @@ import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
+
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
   final Settings _settings;
   final FakeOffApi _fakeOffApi;
 
-  OffApi(this._settings) : _fakeOffApi = FakeOffApi(_settings);
+  OffApi(this._settings) :
+    _fakeOffApi = FakeOffApi(_settings);
+
 
   Future<off.ProductResult> getProduct(
       off.ProductQueryConfiguration configuration) async {
@@ -80,17 +83,23 @@ class OffApi {
   }
 
   Future<off.SearchResult> getVeganProductsForShop(
-      String countryIso, String shop, HttpClient client) async {
+      String countryIso, String shop, HttpClient client, int page) async {
     late off.SearchResult searchResult = const off.SearchResult();
     final http.Response response = await client.get(
         Uri.parse(
-            'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=1'),
+            'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=$page'),
         headers: {
           'user-agent': 'Plante - Flutter',
         });
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
       searchResult = off.SearchResult.fromJson(result as Map<String, dynamic>);
+      //convert product _productsConverter.convertAndCache
+      //final List<Product> products = [];
+      //for (final off.Product offProduct in searchResult.products!){
+        //final product = _productConverter.convertAndCache(offProduct, null, [LangCode.be]);
+        //products.add(product);
+      //}
     } else {
       Log.w('OffApi.getProductsForShop $shop error: ${response.body}');
     }

@@ -50,15 +50,17 @@ void main() {
       "page_size" : 20,
       "products": [
         {
-          "_id": "product1"
+          "product_name": "product1",
+          "code" : "1234"
         },
         {
-          "_id": "product2"
+          "product_name": "product2",
+          "code":"4321"
         }
       ]
     }''');
     final result =
-        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient);
+        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient, 1);
     expect(result.products?.length, equals(2));
     expect(result.count, equals(2));
     expect(result.page, equals(1));
@@ -73,7 +75,7 @@ void main() {
   test('fetch products from off for delhaize belgium - integration', () async {
     final httpClient = HttpClient();
     final result =
-        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient);
+        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient,1);
     expect(result.products?.length, greaterThanOrEqualTo(1));
   }, skip: true);
 }

@@ -2,9 +2,11 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
@@ -45,6 +47,9 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
+    } else if (GetIt.I.get<OffShopsManager>().hasVeganProducts(shops.first.name)) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/marker_abstract.svg', 1, TextStyles.markerFilled);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);

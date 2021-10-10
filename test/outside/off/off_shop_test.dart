@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('test from map to offShop', () async {
-    Map<String, dynamic> json = {
+    final Map<String, dynamic> json = {
       'id' : 'shopId',
       'name' : 'Delhaize',
       'products' : 100

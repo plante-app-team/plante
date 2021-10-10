@@ -76,7 +76,7 @@ class FakeOffApi implements OffApi {
     }
     final product =
         off.Product(barcode: configuration.barcode, productNameInLanguages: {
-      for (var l in configuration.languages!) l: _generateName()
+      for (var l in configuration.languages) l: _generateName()
     }, selectedImages: <off.ProductImage>[
       off.ProductImage(
           field: off.ImageField.FRONT,
@@ -89,7 +89,7 @@ class FakeOffApi implements OffApi {
           url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
           language: off.OpenFoodFactsLanguage.RUSSIAN)
     ], ingredientsTextInLanguages: {
-      for (var l in configuration.languages!) l: 'lemon, water'
+      for (var l in configuration.languages) l: 'lemon, water'
     }, ingredients: <off.Ingredient>[
       off.Ingredient(
           vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
@@ -115,13 +115,12 @@ class FakeOffApi implements OffApi {
   Future<List<OffShop>> getShopsForLocation(
       String countryIso, HttpClient client) async {
     //TODO implement
-    print('i am in fake');
     return [];
   }
 
   @override
   Future<off.SearchResult> getVeganProductsForShop(
-      String countryIso, String shop, HttpClient client) async {
+      String countryIso, String shop, HttpClient client, int page) async {
     //TODO implement
     return const off.SearchResult();
   }
