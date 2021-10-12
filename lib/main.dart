@@ -11,6 +11,8 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/my_app_widget.dart';
 
+import 'base/base.dart';
+
 void main() {
   runZonedGuarded(mainImpl, (Object error, StackTrace stack) {
     Log.e(error.toString(), ex: error, stacktrace: stack, crashAllowed: false);
@@ -45,6 +47,8 @@ void mainImpl() async {
   initDI();
   final initialUserParams =
       await GetIt.I.get<UserParamsController>().getUserParams();
+
+  setSystemUIOverlayStyle();
 
   runApp(MyAppWidget(initialUserParams));
 }
