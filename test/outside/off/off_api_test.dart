@@ -1,4 +1,3 @@
-import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:test/test.dart';
 
@@ -11,12 +10,12 @@ void main() {
 
   setUp(() async {
     fakeSettings = FakeSettings();
-    offApi = OffApi(fakeSettings);
+    offApi = OffApi(fakeSettings, FakeHttpClient());
   });
 
   test('fetch shops from off for belgium', () async {
-    final httpClient = FakeHttpClient();
-    httpClient.setResponse('.openfoodfacts.org/stores.json', '''{
+    final FakeHttpClient fakeClient = offApi.httpClient as FakeHttpClient;
+    fakeClient.setResponse('.openfoodfacts.org/stores.json', '''{
       "count": 2,
       "tags": [
         {
@@ -35,13 +34,13 @@ void main() {
         }
       ]
     }''');
-    final result = await offApi.getShopsForLocation('be', httpClient);
+    final result = await offApi.getShopsForLocation('be');
     expect(result.length, equals(2));
   });
 
   test('fetch products from off for delhaize belgium', () async {
-    final httpClient = FakeHttpClient();
-    httpClient.setResponse(
+    final FakeHttpClient fakeClient = offApi.httpClient as FakeHttpClient;
+    fakeClient.setResponse(
         '.openfoodfacts.org/api/v2/search\\\?ingredients_analysis_tags=en:vegan\\\&stores_tags=Delhaize',
         '''{
       "count": 2,
@@ -60,22 +59,20 @@ void main() {
       ]
     }''');
     final result =
-        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient, 1);
+        await offApi.getVeganProductsForShop('be', 'Delhaize', 1);
     expect(result.products?.length, equals(2));
     expect(result.count, equals(2));
     expect(result.page, equals(1));
   }, skip: false);
 
   test('fetch shops from off for belgium - integration', () async {
-    final httpClient = HttpClient();
-    final result = await offApi.getShopsForLocation('be', httpClient);
+    final result = await offApi.getShopsForLocation('be');
     expect(result.length, greaterThanOrEqualTo(1));
   }, skip: true);
 
   test('fetch products from off for delhaize belgium - integration', () async {
-    final httpClient = HttpClient();
     final result =
-        await offApi.getVeganProductsForShop('be', 'Delhaize', httpClient,1);
+        await offApi.getVeganProductsForShop('be', 'Delhaize',1);
     expect(result.products?.length, greaterThanOrEqualTo(1));
   }, skip: true);
 }

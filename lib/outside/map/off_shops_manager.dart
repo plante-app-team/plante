@@ -1,38 +1,40 @@
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/http_client.dart';
-import 'package:plante/outside/map/off_shops_manager_types.dart';
+import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
-class OffShopsManager {
+class OffShopsManager implements ShopsManagerListener {
   late final OffApi _offApi;
+  final ShopsManager _shopsManager;
   late List<OffShop> _offShops = [];
-  final _listeners = <OffShopsManagerListener>[];
 
-  OffShopsManager(Settings settings) {
-    _offApi = OffApi(settings);
-    fetchOffShops('be');
+  OffShopsManager(Settings settings, this._shopsManager) {
+    _offApi = OffApi(settings, HttpClient());
+    _shopsManager.addListener(this);
+    if(enableNewestFeatures()) {
+      fetchOffShops('be');
+    }
   }
 
-  void addListener(OffShopsManagerListener listener) {
-    _listeners.add(listener);
+  void dispose() {
+    _shopsManager.removeListener(this);
   }
 
-  void removeListener(OffShopsManagerListener listener) {
-    _listeners.remove(listener);
-  }
-
-  void _notifyListeners() {
-    _listeners.forEach((listener) {
-      listener.onOffShopsChange();
-    });
+  @override
+  void onLocalShopsChange() {
+    //for (final Shop shop in _shopsManager. ._shopsCache.values) {
+     // await fetchVeganProductsForShop(shop.name);
+   // }
   }
 
   Future<dynamic> fetchOffShops(String countryIso) async {
     Log.i('offShopManager.fetchOffShop start');
-    _offShops = await _offApi.getShopsForLocation(countryIso, HttpClient());
+    _offShops = await _offApi.getShopsForLocation(countryIso);
   }
 
   Future<void> fetchVeganProductsForShop(String shopName) async {
@@ -40,7 +42,7 @@ class OffShopsManager {
     if (index >= 0) {
       Log.i('offShopsManager.fetchVeganProductsForShop $shopName');
       final off.SearchResult searchResult = await _offApi
-          .getVeganProductsForShop('be', shopName, HttpClient(), 1);
+          .getVeganProductsForShop('be', shopName, 1);
 
       Log.i(
           'offShopsManager.fetchVeganProductsForShop set result ${searchResult.count} for $shopName');
@@ -55,4 +57,6 @@ class OffShopsManager {
     }
     return false;
   }
+
+
 }

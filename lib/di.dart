@@ -82,7 +82,7 @@ void initDI() {
       GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
-  GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<TakenProductsImagesStorage>(
       TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
@@ -104,7 +104,7 @@ void initDI() {
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
       GetIt.I.get<OsmCacher>()));
-  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(GetIt.I.get<Settings>(),GetIt.I.get<ShopsManager>()));
   GetIt.I.registerSingleton<RoadsManager>(
       RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
   GetIt.I.registerSingleton<OsmSearcher>(

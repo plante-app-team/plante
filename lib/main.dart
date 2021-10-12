@@ -6,12 +6,11 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/di.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/ui/my_app_widget.dart';
-
-import 'base/base.dart';
 
 void main() {
   runZonedGuarded(mainImpl, (Object error, StackTrace stack) {

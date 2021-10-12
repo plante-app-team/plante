@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
@@ -9,15 +10,19 @@ import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
-
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
   final Settings _settings;
+  final HttpClient _httpClient;
   final FakeOffApi _fakeOffApi;
 
-  OffApi(this._settings) :
-    _fakeOffApi = FakeOffApi(_settings);
+  OffApi(this._settings, this._httpClient) :
+    _fakeOffApi = FakeOffApi(_settings,_httpClient);
 
+  @visibleForTesting
+  HttpClient get httpClient {
+    return _httpClient;
+  }
 
   Future<off.ProductResult> getProduct(
       off.ProductQueryConfiguration configuration) async {
@@ -63,9 +68,9 @@ class OffApi {
   }
 
   Future<List<OffShop>> getShopsForLocation(
-      String countryIso, HttpClient client) async {
+      String countryIso) async {
     List<OffShop> shops = [];
-    final http.Response response = await client.get(
+    final http.Response response = await _httpClient.get(
         Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
         headers: {
           'user-agent': 'Plante - Flutter',
@@ -83,9 +88,9 @@ class OffApi {
   }
 
   Future<off.SearchResult> getVeganProductsForShop(
-      String countryIso, String shop, HttpClient client, int page) async {
+      String countryIso, String shop, int page) async {
     late off.SearchResult searchResult = const off.SearchResult();
-    final http.Response response = await client.get(
+    final http.Response response = await _httpClient.get(
         Uri.parse(
             'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=$page'),
         headers: {

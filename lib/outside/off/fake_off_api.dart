@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
@@ -8,10 +9,17 @@ import 'package:plante/outside/off/off_shop.dart';
 
 class FakeOffApi implements OffApi {
   final Settings _settings;
+  final HttpClient _httpClient;
   final Map<String, off.Product> _fakeProducts = {};
   final Set<String> _triedOcrProducts = {};
 
-  FakeOffApi(this._settings);
+  FakeOffApi(this._settings,this._httpClient);
+
+  @override
+  @visibleForTesting
+  HttpClient get httpClient {
+    return _httpClient;
+  }
 
   @override
   Future<off.Status> addProductImage(off.User user, off.SendImage image) async {
@@ -76,7 +84,7 @@ class FakeOffApi implements OffApi {
     }
     final product =
         off.Product(barcode: configuration.barcode, productNameInLanguages: {
-      for (var l in configuration.languages) l: _generateName()
+      for (var l in configuration.languages!) l: _generateName()
     }, selectedImages: <off.ProductImage>[
       off.ProductImage(
           field: off.ImageField.FRONT,
@@ -89,7 +97,7 @@ class FakeOffApi implements OffApi {
           url: 'https://en.wikipedia.org/static/apple-touch/wikipedia.png',
           language: off.OpenFoodFactsLanguage.RUSSIAN)
     ], ingredientsTextInLanguages: {
-      for (var l in configuration.languages) l: 'lemon, water'
+      for (var l in configuration.languages!) l: 'lemon, water'
     }, ingredients: <off.Ingredient>[
       off.Ingredient(
           vegan: off.IngredientSpecialPropertyStatus.POSITIVE,
@@ -113,14 +121,14 @@ class FakeOffApi implements OffApi {
 
   @override
   Future<List<OffShop>> getShopsForLocation(
-      String countryIso, HttpClient client) async {
+      String countryIso) async {
     //TODO implement
     return [];
   }
 
   @override
   Future<off.SearchResult> getVeganProductsForShop(
-      String countryIso, String shop, HttpClient client, int page) async {
+      String countryIso, String shop, int page) async {
     //TODO implement
     return const off.SearchResult();
   }
