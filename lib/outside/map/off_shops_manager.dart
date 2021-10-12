@@ -12,6 +12,7 @@ class OffShopsManager implements ShopsManagerListener {
   late final OffApi _offApi;
   final ShopsManager _shopsManager;
   late List<OffShop> _offShops = [];
+  late final Map<String,off.SearchResult> _veganProductsSearch = {};
 
   OffShopsManager(Settings settings, this._shopsManager) {
     _offApi = OffApi(settings, HttpClient());
@@ -38,7 +39,8 @@ class OffShopsManager implements ShopsManagerListener {
   }
 
   Future<void> fetchVeganProductsForShop(String shopName) async {
-    final index = _offShops.indexWhere((element) => element.id == shopName.toLowerCase() && element.latestSearchResult==null);
+    final decodedShopName = shopName.toLowerCase();
+    final index = _offShops.indexWhere((element) => element.id == decodedShopName && _veganProductsSearch[decodedShopName]==null);
     if (index >= 0) {
       Log.i('offShopsManager.fetchVeganProductsForShop $shopName');
       final off.SearchResult searchResult = await _offApi
@@ -46,16 +48,12 @@ class OffShopsManager implements ShopsManagerListener {
 
       Log.i(
           'offShopsManager.fetchVeganProductsForShop set result ${searchResult.count} for $shopName');
-      _offShops[index].latestSearchResult = searchResult;
+      _veganProductsSearch[decodedShopName] = searchResult;
     }
   }
 
   bool hasVeganProducts(String shopName) {
-    final index = _offShops.indexWhere((element) => element.id == shopName.toLowerCase());
-    if (index >=0){
-      return _offShops[index].hasVeganProducts();
-    }
-    return false;
+      return _veganProductsSearch[shopName.toLowerCase()] != null;
   }
 
 

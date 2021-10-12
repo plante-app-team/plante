@@ -1,35 +1,26 @@
-import 'package:openfoodfacts/model/SearchResult.dart';
-import 'package:plante/model/product.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+import 'package:plante/base/build_value_helper.dart';
 
-class OffShop {
-  final String id;
-  final String? _name;
-  final int? _products;
-  late SearchResult? latestSearchResult;
-  final List<Product>? _veganProducts;
+part 'off_shop.g.dart';
 
-  OffShop(this.id, this._name, this._products, this.latestSearchResult, this._veganProducts);
+abstract class OffShop implements Built<OffShop, OffShopBuilder> {
+  @BuiltValueField(wireName: 'id')
+  String get id;
+  @BuiltValueField(wireName: 'name')
+  String? get name;
+  @BuiltValueField(wireName: 'products')
+  int? get products;
 
-  OffShop.fromJson(Map<String, dynamic> json)
-      : id = json['id'].toString(),
-        _name = json['name'] as String,
-        _products = json['products'] as int,
-        latestSearchResult = null,
-        _veganProducts = [];
-
-  String get name {
-    return _name != null ? _name! : '';
+  static OffShop? fromJson(Map<String, dynamic> json) {
+    return BuildValueHelper.jsonSerializers
+        .deserializeWith(OffShop.serializer, json);
   }
 
-  int get products {
-    return _products != null ? _products! : 0;
-  }
+  factory OffShop([void Function(OffShopBuilder) updates]) =
+  _$OffShop;
+  OffShop._();
+  static Serializer<OffShop> get serializer => _$offShopSerializer;
 
-  List<Product> get veganProducts {
-    return _veganProducts != null ? _veganProducts! : [];
-  }
-
-  bool hasVeganProducts() {
-    return latestSearchResult != null ? latestSearchResult!.count! >= 0 : false;
-  }
 }
+
