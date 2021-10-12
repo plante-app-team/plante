@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:plante/base/base.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/http_client.dart';
@@ -73,7 +74,7 @@ class OffApi {
     final http.Response response = await _httpClient.get(
         Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
         headers: {
-          'user-agent': 'Plante - Flutter',
+          'user-agent': await userAgent()
         });
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
@@ -94,7 +95,7 @@ class OffApi {
         Uri.parse(
             'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=$page'),
         headers: {
-          'user-agent': 'Plante - Flutter',
+          'user-agent': await userAgent()
         });
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
