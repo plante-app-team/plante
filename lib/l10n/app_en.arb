@@ -107,6 +107,7 @@
       "map_page_no_shops_hint_default_mode_2": "Seems we don't know of any shops nearby! You can add a new shop while adding a new product or viewing a known one",
       "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any shops nearby. But you can add a new one by clicking the round button with a plus on the right!",
       "map_page_open_street_map_licence": "Data from Open Street Map",
+      "map_page_zoom_in_to_see_shops": "Please zoom in to see shops",
 
       "create_shop_page_how_new_shop_is_called": "What is the name of the shop?",
       "create_shop_page_how_new_shop_is_called_label": "Shop's name",

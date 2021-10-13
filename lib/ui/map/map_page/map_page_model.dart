@@ -39,6 +39,7 @@ class MapPageModel implements ShopsManagerListener {
   final DirectionsManager _directionsManager;
 
   CoordsBounds? _latestViewPort;
+  bool _lastIdleLoadShops = true;
   bool _networkOperationInProgress = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
@@ -111,21 +112,23 @@ class MapPageModel implements ShopsManagerListener {
     }
   }
 
-  Future<void> onCameraMoved(CoordsBounds viewBounds) async {
+  Future<void> onCameraIdle(CoordsBounds viewBounds, bool loadShops) async {
     _latestViewPort = viewBounds;
+    _lastIdleLoadShops = loadShops;
     unawaited(_latestCameraPosStorage.set(viewBounds.center));
 
-    final result = await _networkOperation(() async {
-      return await _shopsManager.fetchShops(viewBounds);
-    });
-
-    if (result.isOk) {
-      _shopsCache = result.unwrap();
-      _updateShopsCallback.call(result.unwrap());
-    } else {
-      _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
+    if (loadShops) {
+      final result = await _networkOperation(() async {
+        return await _shopsManager.fetchShops(viewBounds);
+      });
+      if (result.isOk) {
+        _shopsCache = result.unwrap();
+        _updateShopsCallback.call(result.unwrap());
+      } else {
+        _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
+      }
+      _updateCallback.call();
     }
-    _updateCallback.call();
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
@@ -167,7 +170,7 @@ class MapPageModel implements ShopsManagerListener {
   void onLocalShopsChange() {
     /// Invalidating cache!
     if (_latestViewPort != null) {
-      onCameraMoved(_latestViewPort!);
+      onCameraIdle(_latestViewPort!, _lastIdleLoadShops);
     }
   }
 

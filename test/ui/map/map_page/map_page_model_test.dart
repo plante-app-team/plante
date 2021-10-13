@@ -70,9 +70,11 @@ void main() {
     expect(latestLoadedShops, isNull);
     expect(latestError, isNull);
 
-    await model.onCameraMoved(CoordsBounds(
-        southwest: Coord(lat: 14.999, lon: 14.999),
-        northeast: Coord(lat: 15.001, lon: 15.001)));
+    await model.onCameraIdle(
+        CoordsBounds(
+            southwest: Coord(lat: 14.999, lon: 14.999),
+            northeast: Coord(lat: 15.001, lon: 15.001)),
+        true);
 
     expect(latestLoadedShops, equals(shops));
     expect(latestError, isNull);
@@ -82,9 +84,11 @@ void main() {
     when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shops));
 
     verifyNever(shopsManager.fetchShops(any));
-    await model.onCameraMoved(CoordsBounds(
-        southwest: Coord(lat: 14.999, lon: 14.999),
-        northeast: Coord(lat: 15.001, lon: 15.001)));
+    await model.onCameraIdle(
+        CoordsBounds(
+            southwest: Coord(lat: 14.999, lon: 14.999),
+            northeast: Coord(lat: 15.001, lon: 15.001)),
+        true);
     verify(shopsManager.fetchShops(any));
 
     clearInteractions(shopsManager);
