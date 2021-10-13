@@ -5,11 +5,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -388,5 +391,47 @@ void main() {
     widget.onMarkerClickForTesting([shops[1]]);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('directions_button')), findsNothing);
+  });
+
+  testWidgets('shops are not loaded when zoomed out',
+      (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    // When map just loaded - shops are fetched
+    verify(shopsManager.fetchShops(any));
+
+    // Map moved again - shops fetched again
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+    verify(shopsManager.fetchShops(any));
+
+    // No zoom hint yet
+    expect(
+        find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
+
+    // Map zoomed out really much - shops are not fetch anymore
+    widget.onMapMoveForTesting(
+        Coord(lat: 10, lon: 10), MapPageModeDefault.MIN_ZOOM);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+    verifyNever(shopsManager.fetchShops(any));
+
+    // Zoom hint is present
+    expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
+        findsOneWidget);
+
+    // Map zoomed back in - shops are fetched again
+    widget.onMapMoveForTesting(
+        Coord(lat: 10, lon: 10), MapPageMode.DEFAULT_MAX_ZOOM);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+    verify(shopsManager.fetchShops(any));
+
+    // No zoom hint anymore
+    expect(
+        find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
   });
 }

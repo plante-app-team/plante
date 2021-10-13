@@ -11,6 +11,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_mobile_app_config_manager.dart';
 
 void main() {
   late MockOsmNominatim nominatim;
@@ -36,8 +37,8 @@ void main() {
     nominatim = MockOsmNominatim();
     when(nominatim.fetchAddress(any, any))
         .thenAnswer((_) async => Ok(anAddress));
-    addressObtainer =
-        AddressObtainer(OpenStreetMap.forTesting(nominatim: nominatim));
+    addressObtainer = AddressObtainer(OpenStreetMap.forTesting(
+        nominatim: nominatim, configManager: FakeMobileAppConfigManager()));
   });
 
   test('address fetched and then cached', () async {

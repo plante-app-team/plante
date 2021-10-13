@@ -29,6 +29,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 /// (or the app) if it sends too many requests.
 /// Instead, wrappers for certain purposes should be created.
 class OsmOverpass {
+  static const SINGLE_SERVER_TIMEOUT = Duration(seconds: 20);
   final HttpClient _http;
   final Analytics _analytics;
   final OsmInteractionsQueue _interactionsQueue;
@@ -152,10 +153,15 @@ class OsmOverpass {
       final Response r;
       try {
         r = await _http.get(Uri.https(url, 'api/interpreter', {'data': cmd}),
-            headers: {'User-Agent': await userAgent()});
+            headers: {
+              'User-Agent': await userAgent()
+            }).timeout(SINGLE_SERVER_TIMEOUT);
       } on IOException catch (e) {
         Log.w('OSM overpass network error', ex: e);
         return Err(OpenStreetMapError.NETWORK);
+      } on TimeoutException catch (e) {
+        Log.w('OSM overpass server ($nameAndUrl) timeout', ex: e);
+        continue;
       }
 
       if (r.statusCode != 200) {

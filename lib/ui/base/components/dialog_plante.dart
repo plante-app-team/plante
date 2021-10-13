@@ -6,6 +6,8 @@ class DialogPlante extends StatelessWidget {
   final Widget content;
   final Widget? actions;
   final EdgeInsets contentPadding;
+  final double? contentWidth;
+  final double? contentHeight;
 
   const DialogPlante(
       {Key? key,
@@ -13,7 +15,9 @@ class DialogPlante extends StatelessWidget {
       required this.content,
       this.actions,
       this.contentPadding =
-          const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 16)})
+          const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 16),
+      this.contentWidth,
+      this.contentHeight})
       : super(key: key);
 
   @override
@@ -32,13 +36,22 @@ class DialogPlante extends StatelessWidget {
                     child: Wrap(children: [
                       Column(children: [
                         if (title != null)
-                          Column(
-                              children: [title!, const SizedBox(height: 16)]),
-                        content,
+                          SizedBox(
+                              width: contentWidth,
+                              child: Column(children: [
+                                title!,
+                                const SizedBox(height: 16)
+                              ])),
+                        SizedBox(
+                            width: contentWidth,
+                            height: contentHeight,
+                            child: content),
                         if (actions != null)
                           Column(children: [
                             const SizedBox(height: 16),
-                            SizedBox(width: double.infinity, child: actions)
+                            SizedBox(
+                                width: contentWidth ?? double.infinity,
+                                child: actions)
                           ])
                       ])
                     ])))));

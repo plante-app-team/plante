@@ -32,10 +32,11 @@ class MapHintWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 15),
-              Flexible(
-                  child: Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 8),
-                      child: Text(text, style: TextStyles.hintWhite))),
+              Expanded(
+                  child: Center(
+                      child: Padding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 8),
+                          child: Text(text, style: TextStyles.hintWhite)))),
             ]),
       ),
     );

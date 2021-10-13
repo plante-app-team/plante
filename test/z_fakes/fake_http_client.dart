@@ -1,20 +1,22 @@
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/outside/http_client.dart';
 
 class FakeHttpClient extends HttpClient {
   late final MockClient _impl;
-  final _responses = <RegExp, _Response>{};
+  final _responses = <RegExp, ResCallback<_Response>>{};
   final _requests = <http.BaseRequest>[];
 
   FakeHttpClient() {
     _impl = MockClient((request) async {
-      for (final response in _responses.entries) {
-        if (response.key.hasMatch(request.url.toString())) {
-          if (response.value.httpResponse != null) {
-            return response.value.httpResponse!;
+      for (final responsePair in _responses.entries) {
+        if (responsePair.key.hasMatch(request.url.toString())) {
+          final response = responsePair.value.call();
+          if (response.httpResponse != null) {
+            return response.httpResponse!;
           } else {
-            throw response.value.exception!;
+            throw response.exception!;
           }
         }
       }
@@ -24,11 +26,16 @@ class FakeHttpClient extends HttpClient {
 
   void setResponse(String regex, String response, {int responseCode = 200}) {
     _responses[RegExp(regex)] =
-        _Response.ok(http.Response(response, responseCode));
+        () => _Response.ok(http.Response(response, responseCode));
+  }
+
+  void setResponseFunction(String regex, ResCallback<String> fn) {
+    _responses[RegExp(regex)] =
+        () => _Response.ok(http.Response(fn.call(), 200));
   }
 
   void setResponseException(String regex, Exception exception) {
-    _responses[RegExp(regex)] = _Response.err(exception);
+    _responses[RegExp(regex)] = () => _Response.err(exception);
   }
 
   List<http.BaseRequest> getRequestsMatching(String regex) {

@@ -40,6 +40,20 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
     ..road = road
     ..houseNumber = houseNumber);
 
+  Shop rebuildWith({int? productsCount}) {
+    return rebuild((e) {
+      final oldBackendShop = backendShop ??
+          BackendShop((e) => e
+            ..osmUID = osmUID
+            ..productsCount = 0);
+      if (productsCount != null) {
+        e.backendShop = oldBackendShop
+            .rebuild((e) => e.productsCount = productsCount)
+            .toBuilder();
+      }
+    });
+  }
+
   static Shop? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(Shop.serializer, json);

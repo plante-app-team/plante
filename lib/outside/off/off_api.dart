@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
+import 'package:openfoodfacts/model/SearchResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
+import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/http_client.dart';
@@ -25,12 +27,12 @@ class OffApi {
     return _httpClient;
   }
 
-  Future<off.ProductResult> getProduct(
-      off.ProductQueryConfiguration configuration) async {
+  Future<off.SearchResult> getProductList(
+      off.ProductListQueryConfiguration configuration) async {
     if (await _settings.testingBackends()) {
-      return await _fakeOffApi.getProduct(configuration);
+      return await _fakeOffApi.getProductList(configuration);
     }
-    return await off.OpenFoodAPIClient.getProduct(configuration);
+    return await off.OpenFoodAPIClient.getProductList(null, configuration);
   }
 
   Future<off.Status> saveProduct(off.User user, off.Product product) async {

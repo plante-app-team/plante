@@ -14,6 +14,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_road.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -33,6 +34,7 @@ part 'build_value_helper.g.dart';
   Ingredient,
   BackendProductsAtShop,
   BackendShop,
+  MobileAppConfig,
   OsmShop,
   OsmRoad,
   Shop,

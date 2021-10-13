@@ -9,28 +9,29 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
-import 'shops_requester_test_commons.dart';
+import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
-  late ShopsRequesterTestCommons commons;
+  late ShopsManagerBackendWorkerTestCommons commons;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
-  late ShopsRequester shopsRequester;
+  late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
   late Shop aShop;
 
   setUp(() async {
-    commons = ShopsRequesterTestCommons();
+    commons = ShopsManagerBackendWorkerTestCommons();
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     aShop = commons.aShop;
-    shopsRequester = ShopsRequester(backend, productsObtainer);
+    shopsManagerBackendWorker =
+        ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
   test('fetchShopProductRange good scenario', () async {
@@ -54,12 +55,10 @@ void main() {
       Product((e) => e.barcode = '123'),
       Product((e) => e.barcode = '124'),
     ];
-    when(productsObtainer.inflate(backendProducts[0]))
-        .thenAnswer((_) async => Ok(products[0]));
-    when(productsObtainer.inflate(backendProducts[1]))
-        .thenAnswer((_) async => Ok(products[1]));
+    when(productsObtainer.inflateProducts(any))
+        .thenAnswer((_) async => Ok(products));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     expect(result.isOk, isTrue);
 
     final expectedShopProductRange = ShopProductRange((e) => e
@@ -75,7 +74,7 @@ void main() {
         BackendError.fromResp(BackendResponse.fromError(
             Exception(''), Uri.parse('https://ya.ru')))));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
 
     expect(result.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
@@ -85,7 +84,7 @@ void main() {
         BackendError.fromResp(BackendResponse.fromError(
             const SocketException(''), Uri.parse('https://ya.ru')))));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
 
     expect(result.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });
@@ -97,7 +96,7 @@ void main() {
     when(backend.requestProductsAtShops(any))
         .thenAnswer((_) async => Ok(backendProductsAtShops));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     expect(result.isOk, isTrue);
 
     final expectedShopProductRange =
@@ -106,41 +105,7 @@ void main() {
   });
 
   test(
-      'fetchShopProductRange single products manager error while inflating backend products',
-      () async {
-    final backendProducts = [
-      BackendProduct((e) => e.barcode = '123'),
-      BackendProduct((e) => e.barcode = '124'),
-    ];
-    final backendProductsAtShops = [
-      BackendProductsAtShop((e) => e
-        ..osmUID = aShop.osmUID
-        ..products.addAll([backendProducts[0], backendProducts[1]])),
-    ];
-    when(backend.requestProductsAtShops(any))
-        .thenAnswer((_) async => Ok(backendProductsAtShops));
-
-    final products = [
-      Product((e) => e.barcode = '123'),
-    ];
-    when(productsObtainer.inflate(backendProducts[0]))
-        .thenAnswer((_) async => Ok(products[0]));
-    // An error here!
-    when(productsObtainer.inflate(backendProducts[1]))
-        .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
-
-    final result = await shopsRequester.fetchShopProductRange(aShop);
-    expect(result.isOk, isTrue);
-
-    final expectedShopProductRange = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(products));
-    // No errors expected because one of the products is received
-    expect(result.unwrap(), equals(expectedShopProductRange));
-  });
-
-  test(
-      'fetchShopProductRange all products manager errors while inflating backend products',
+      'fetchShopProductRange product manager error while inflating backend products',
       () async {
     final backendProducts = [
       BackendProduct((e) => e.barcode = '123'),
@@ -155,12 +120,10 @@ void main() {
         .thenAnswer((_) async => Ok(backendProductsAtShops));
 
     // All error here!
-    when(productsObtainer.inflate(backendProducts[0]))
-        .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
-    when(productsObtainer.inflate(backendProducts[1]))
+    when(productsObtainer.inflateProducts(any))
         .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
 
-    final result = await shopsRequester.fetchShopProductRange(aShop);
+    final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     // Last error received from ShopsManager is expected to be what we get here
     expect(result.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
   });

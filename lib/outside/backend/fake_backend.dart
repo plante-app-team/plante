@@ -2,6 +2,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -12,6 +13,9 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
+import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
 class FakeBackend implements Backend {
@@ -93,23 +97,29 @@ class FakeBackend implements Backend {
   }
 
   @override
-  Future<Result<UserParams, BackendError>> userData() async {
+  Future<Result<MobileAppConfig, BackendError>> mobileAppConfig() async {
     await _delay();
-    return Ok(_userParams);
+    return Ok(MobileAppConfig((e) => e
+      ..remoteUserParams.replace(_userParams)
+      ..nominatimEnabled = true));
   }
 
   @override
-  Future<Result<None, BackendError>> productPresenceVote(
+  Future<Result<ProductPresenceVoteResult, BackendError>> productPresenceVote(
       String barcode, OsmUID osmUID, bool positive) async {
     await _delay();
-    return Ok(None());
+    return Ok(ProductPresenceVoteResult(productDeleted: !positive));
   }
 
   @override
-  Future<Result<BackendProduct?, BackendError>> requestProduct(
-      String barcode) async {
+  Future<Result<RequestedProductsResult, BackendError>> requestProducts(
+      List<String> barcodes, int page) async {
     await _delay();
-    return Ok(_createBackendProduct(barcode));
+    if (page > 0) {
+      return Ok(RequestedProductsResult(const [], page, true));
+    }
+    final products = barcodes.map(_createBackendProduct).toList();
+    return Ok(RequestedProductsResult(products, page, true));
   }
 
   BackendProduct _createBackendProduct(String barcode) {
@@ -148,7 +158,7 @@ class FakeBackend implements Backend {
   }
 
   @override
-  Future<Result<List<BackendShop>, BackendError>> requestShops(
+  Future<Result<List<BackendShop>, BackendError>> requestShopsByOsmUIDs(
       Iterable<OsmUID> osmUIDs) async {
     await _delay();
 
@@ -158,6 +168,12 @@ class FakeBackend implements Backend {
       result.add(_fakeShops[osmUID]!.toShop());
     }
     return Ok(result);
+  }
+
+  @override
+  Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
+      CoordsBounds bounds) async {
+    return Ok(const []);
   }
 
   @override

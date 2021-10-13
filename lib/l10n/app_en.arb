@@ -60,23 +60,17 @@
       "lang_zh": "Chinese",
 
       "mod_reason_info_found_in_external_source": "Information found in an external source",
-      "mod_reason_all_ingredients_are_vegetarian": "Product has no non-vegetarian ingredients",
       "mod_reason_all_ingredients_are_vegan": "Product has no non-vegan ingredients",
       "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegan",
-      "mod_reason_ambiguous_ingredients_are_almost_always_vegetarian_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegetarian",
-      "mod_reason_manufacturer_confirmed_non_vegetarian_ingredients_absence": "Manufacturer confirmed non-vegetarian ingredients absence",
       "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Manufacturer confirmed non-vegan ingredients absence",
-      "mod_reason_some_ingredient_is_non_vegetarian": "Product has non-vegetarian ingredients",
       "mod_reason_some_ingredient_is_non_vegan": "Product has non-vegan ingredients",
       "mod_reason_honey_in_ingredients": "Product contains honey",
-      "mod_reason_manufacturer_confirmed_non_vegetarian_ingredients_presence": "Manufacturer confirmed non-vegetarian ingredients absence",
       "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Manufacturer confirmed non-vegan ingredients presence",
       "mod_reason_tested_on_animals": "Animal tested product",
-      "mod_reason_some_ingredient_is_possibly_non_vegetarian": "Product has ambiguous ingredients (ambiguous ingredients can be vegetarian or non-vegetarian depending on how they were manufactured)",
       "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
-      "mod_reason_some_of_product_series_have_non_vegetarian_ingredients": "Some of product series have non-vegetarian ingredients and some don't — please read ingredients list carefully!",
       "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
       "mod_reason_some_ingredient_has_unknown_origin": "Some of the ingredients have unknown origin",
+      "mod_reason_some_ingredient_is_in_fact_a_category": "Some of the ingredients are in fact categories, and ingredients of such categories can be vegan or non-vegan. E.g. if a product had \"flavor\" within its ingredients, it wouldn't tell us much.",
 
       "image_crop_page_title": "Let's crop it!",
 
@@ -113,6 +107,7 @@
       "map_page_no_shops_hint_default_mode_2": "Seems we don't know of any shops nearby! You can add a new shop while adding a new product or viewing a known one",
       "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any shops nearby. But you can add a new one by clicking the round button with a plus on the right!",
       "map_page_open_street_map_licence": "Data from Open Street Map",
+      "map_page_zoom_in_to_see_shops": "Please zoom in to see shops",
 
       "create_shop_page_how_new_shop_is_called": "What is the name of the shop?",
       "create_shop_page_how_new_shop_is_called_label": "Shop's name",

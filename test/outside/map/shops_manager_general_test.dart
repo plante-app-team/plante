@@ -19,7 +19,9 @@ import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
+import '../../z_fakes/fake_products_obtainer.dart';
 import 'shops_manager_test_commons.dart';
 
 // TODO: please try to decouple tests in this file into many smaller files
@@ -27,7 +29,7 @@ void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
   late MockBackend backend;
-  late MockProductsObtainer productsObtainer;
+  late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
@@ -70,7 +72,7 @@ void main() {
     expect(shops, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
 
     clearInteractions(osm);
     clearInteractions(backend);
@@ -91,7 +93,7 @@ void main() {
     expect(shops1, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
     // Reset mocks
     clearInteractions(osm);
     clearInteractions(backend);
@@ -105,7 +107,7 @@ void main() {
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShops(any));
+    verifyNever(backend.requestShopsWithin(any));
 
     // Ensure +1 product in productsCount
     final shops2 = shopsRes2.unwrap();
@@ -129,7 +131,8 @@ void main() {
     final backendShops = <BackendShop>[];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any))
+        .thenAnswer((_) async => Ok(backendShops));
     final fullShops = {
       osmShops[0].osmUID: Shop((e) => e..osmShop.replace(osmShops[0])),
     };
@@ -141,7 +144,7 @@ void main() {
     expect(shops1.values.first.backendShop, isNull);
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
     // Reset mocks
     clearInteractions(osm);
     clearInteractions(backend);
@@ -155,7 +158,7 @@ void main() {
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShops(any));
+    verifyNever(backend.requestShopsWithin(any));
 
     // Ensure a BackendShop is now created even though it didn't exist before
     final shops2 = shopsRes2.unwrap();
@@ -188,7 +191,7 @@ void main() {
     }
     // Both backends expected to be touched exactly once
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
-    verify(backend.requestShops(any)).called(1);
+    verify(backend.requestShopsWithin(any)).called(1);
   });
 
   test('shops fetch when cache exists but it is for another area', () async {
@@ -200,7 +203,7 @@ void main() {
     expect(shopsRes.isOk, isTrue);
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
 
     clearInteractions(osm);
     clearInteractions(backend);
@@ -211,7 +214,7 @@ void main() {
     // Both backends expected to be touched again!
     // Because the requested area is too far away from the cached one
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
   });
 
   test('multiple failed shops load attempts and 1 successful', () async {
@@ -226,7 +229,7 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShops(any)).thenAnswer((_) async {
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
       backendLoadsCount += 1;
       if (backendLoadsCount == 1) {
         return Err(BackendError.other());
@@ -242,14 +245,14 @@ void main() {
     // So the third call will be the final one.
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(3);
     // First call fails, second succeeds.
-    verify(backend.requestShops(any)).called(2);
+    verify(backend.requestShopsWithin(any)).called(2);
   });
 
   test('all shops loads failed', () async {
     when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       return Err(OpenStreetMapError.OTHER);
     });
-    when(backend.requestShops(any)).thenAnswer((_) async {
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
       return Err(BackendError.other());
     });
     final shopsRes = await shopsManager.fetchShops(bounds);
@@ -268,7 +271,7 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShops(any)).thenAnswer((_) async {
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
       return Ok(backendShops);
     });
 
@@ -277,7 +280,7 @@ void main() {
 
     // First call fails with a network errors, other calls don't happen.
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
-    verifyNever(backend.requestShops(any));
+    verifyNever(backend.requestShopsWithin(any));
   });
 
   test('shops fetch: requested bounds sizes', () async {
@@ -295,7 +298,7 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShops(any)).thenAnswer((_) async => Ok(const []));
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async => Ok(const []));
 
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isOk, isTrue);
@@ -448,10 +451,10 @@ void main() {
 
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
 
     clearInteractions(backend);
-    clearInteractions(productsObtainer);
+    productsObtainer.inflatesCount = 0;
 
     // Second fetch
     final rangeRes2 = await shopsManager.fetchShopProductRange(shop);
@@ -460,7 +463,7 @@ void main() {
 
     // The second fetch DID NOT send request (it used cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, equals(0));
 
     // Range update
     verifyNever(backend.putProductToShop(any, any));
@@ -484,7 +487,7 @@ void main() {
 
     // The third fetch DID NOT send request (it used updated cache)
     verifyNever(backend.requestProductsAtShops(any));
-    verifyNever(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, equals(0));
   });
 
   test('shops products range force reload', () async {
@@ -506,10 +509,10 @@ void main() {
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
 
     clearInteractions(backend);
-    clearInteractions(productsObtainer);
+    productsObtainer.inflatesCount = 0;
 
     // Second fetch
     final rangeRes2 =
@@ -520,7 +523,7 @@ void main() {
     // The second fetch call again DID send requests, because was asked
     // to explicitly
     verify(backend.requestProductsAtShops(any));
-    verify(productsObtainer.inflate(any));
+    expect(productsObtainer.inflatesCount, greaterThan(0));
   });
 
   test('shop creation', () async {
@@ -533,7 +536,7 @@ void main() {
     expect(initialShops, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
 
     clearInteractions(osm);
     clearInteractions(backend);
@@ -561,7 +564,7 @@ void main() {
 
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShops(any));
+    verifyNever(backend.requestShopsWithin(any));
   });
 
   test('shop creation adds the shop to persistent OSM cache', () async {
@@ -583,8 +586,13 @@ void main() {
         equals(expectedAllShops));
 
     // Create a NEW shops manager with same persistent cache
-    shopsManager = ShopsManager(OpenStreetMap.forTesting(overpass: osm),
-        backend, productsObtainer, analytics, osmCacher);
+    shopsManager = ShopsManager(
+        OpenStreetMap.forTesting(
+            overpass: osm, configManager: FakeMobileAppConfigManager()),
+        backend,
+        productsObtainer,
+        analytics,
+        osmCacher);
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));
@@ -683,7 +691,8 @@ void main() {
     ];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any))
+        .thenAnswer((_) async => Ok(backendShops));
 
     final northeast = Coord(lat: 15, lon: 15);
     final southwest = Coord(lat: 14.999, lon: 14.999);
@@ -734,7 +743,7 @@ void main() {
     // are expected to be touched
     await shopsManager.fetchShops(bounds);
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsWithin(any));
     // Persistent cache expected to be refilled
     expect(await osmCacher.getCachedShops(), isNotEmpty);
   });

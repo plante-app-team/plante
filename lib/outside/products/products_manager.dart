@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
+import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
@@ -51,55 +53,149 @@ class ProductsManager {
 
   Future<Result<Product?, ProductsManagerError>> getProduct(
       String barcodeRaw, List<LangCode> langsPrioritized) async {
-    return _getProduct(
-        barcodeRaw: barcodeRaw, langsPrioritized: langsPrioritized);
+    final result = await _getProducts(
+        barcodesRaw: [barcodeRaw], langsPrioritized: langsPrioritized);
+    if (result.isErr) {
+      return Err(result.unwrapErr());
+    }
+    final products = result.unwrap();
+    return Ok(products.isNotEmpty ? products.first : null);
   }
 
   Future<Result<Product?, ProductsManagerError>> inflate(
       BackendProduct backendProduct, List<LangCode> langsPrioritized) async {
-    return _getProduct(
-        backendProduct: backendProduct, langsPrioritized: langsPrioritized);
+    final result = await _getProducts(
+        backendProducts: [backendProduct], langsPrioritized: langsPrioritized);
+    if (result.isErr) {
+      return Err(result.unwrapErr());
+    }
+    final products = result.unwrap();
+    return Ok(products.isNotEmpty ? products.first : null);
   }
 
-  Future<Result<Product?, ProductsManagerError>> _getProduct(
-      {String? barcodeRaw,
-      BackendProduct? backendProduct,
+  Future<Result<List<Product>, ProductsManagerError>> getProducts(
+      List<String> barcodesRaw, List<LangCode> langsPrioritized) async {
+    return await _getProducts(
+        barcodesRaw: barcodesRaw, langsPrioritized: langsPrioritized);
+  }
+
+  Future<Result<List<Product>, ProductsManagerError>> inflateProducts(
+      List<BackendProduct> backendProducts,
+      List<LangCode> langsPrioritized) async {
+    return await _getProducts(
+        backendProducts: backendProducts, langsPrioritized: langsPrioritized);
+  }
+
+  Future<Result<List<Product>, ProductsManagerError>> _getProducts(
+      {List<String>? barcodesRaw,
+      List<BackendProduct>? backendProducts,
       required List<LangCode> langsPrioritized}) async {
-    if (barcodeRaw == null && backendProduct == null) {
+    if (barcodesRaw == null && backendProducts == null) {
       Log.e('Invalid getProduct implementation');
     }
-    barcodeRaw ??= backendProduct!.barcode;
+    barcodesRaw ??= backendProducts!.map((e) => e.barcode).toList();
 
+    final offProductsRes =
+        await _requestOffProducts(barcodesRaw, langsPrioritized);
+    if (offProductsRes.isErr) {
+      return Err(offProductsRes.unwrapErr());
+    }
+    final offProducts = offProductsRes.unwrap();
+    if (offProducts.isEmpty) {
+      return Ok(const []);
+    }
+
+    // OFF server often changes barcodes, erasing extra symbols.
+    // So we use barcodes returned from the OFF server instead of the ones
+    // provided to this function.
+    final barcodes = offProducts.map((e) => e.barcode!);
+    if (backendProducts == null) {
+      final backendProductsRes = await _requestBackendProducts(barcodes);
+      if (backendProductsRes.isErr) {
+        return Err(backendProductsRes.unwrapErr());
+      }
+      backendProducts = backendProductsRes.unwrap();
+    }
+
+    final offProductsMap = {
+      for (final product in offProducts) product.barcode: product
+    };
+    final backendProductsMap = {
+      for (final product in backendProducts) product.barcode: product
+    };
+
+    final result = <Product>[];
+    for (final barcode in barcodes) {
+      final offProduct = offProductsMap[barcode];
+      if (offProduct == null) {
+        Log.e('barcodes list was built from OFF products but '
+            'now an OFF product is not found');
+        continue;
+      }
+      final backendProduct = backendProductsMap[barcode];
+      result.add(_productsConverter.convertAndCache(
+          offProduct, backendProduct, langsPrioritized));
+    }
+    return Ok(result);
+  }
+
+  Future<Result<List<off.Product>, ProductsManagerError>> _requestOffProducts(
+      List<String> barcodes, List<LangCode> langsPrioritized) async {
     final offLangs = langsPrioritized
         .map((e) => off.LanguageHelper.fromJson(e.name))
         .toList();
-    final configuration = off.ProductQueryConfiguration(barcodeRaw,
-        languages: offLangs, fields: _NEEDED_OFF_FIELDS.toList());
-
-    final off.ProductResult offProductResult;
-    try {
-      offProductResult = await _off.getProduct(configuration);
-    } on IOException catch (e) {
-      Log.w('Network error in ProductsManager.getProduct', ex: e);
-      return Err(ProductsManagerError.NETWORK_ERROR);
+    final offProducts = <off.Product>[];
+    var offPage = 1;
+    while (true) {
+      final configuration = off.ProductListQueryConfiguration(
+        barcodes,
+        languages: offLangs,
+        fields: _NEEDED_OFF_FIELDS,
+        page: offPage,
+        sortOption: off.SortOption.CREATED,
+      );
+      final off.SearchResult offProductResult;
+      try {
+        offProductResult = await _off.getProductList(configuration);
+      } on IOException catch (e) {
+        Log.w('Network error in ProductsManager.getProduct', ex: e);
+        return Err(ProductsManagerError.NETWORK_ERROR);
+      }
+      if (offProductResult.products == null ||
+          offProductResult.products!.isEmpty) {
+        break;
+      }
+      final products = offProductResult.products!;
+      offProducts.addAll(products);
+      final productsObtainedCount =
+          (offPage - 1) * (offProductResult.pageSize ?? 0) + products.length;
+      final lastPage = productsObtainedCount == offProductResult.count;
+      if (lastPage) {
+        break;
+      }
+      offPage += 1;
     }
-    final offProduct = offProductResult.product;
-    if (offProduct == null) {
-      return Ok(null);
-    }
+    return Ok(offProducts);
+  }
 
-    final barcode = offProduct.barcode!;
-    if (backendProduct == null) {
-      final backendProductResult = await _backend.requestProduct(barcode);
+  Future<Result<List<BackendProduct>, ProductsManagerError>>
+      _requestBackendProducts(Iterable<String> barcodes) async {
+    final backendProducts = <BackendProduct>[];
+    var backendPage = 0;
+    while (true) {
+      final backendProductResult =
+          await _backend.requestProducts(barcodes.toList(), backendPage);
       if (backendProductResult.isErr) {
         return _convertBackendError(backendProductResult);
       }
-      backendProduct = backendProductResult.unwrap();
+      backendPage += 1;
+      final products = backendProductResult.unwrap().products;
+      backendProducts.addAll(products);
+      if (products.isEmpty || backendProductResult.unwrap().lastPage) {
+        break;
+      }
     }
-
-    final result = _productsConverter.convertAndCache(
-        offProduct, backendProduct, langsPrioritized);
-    return Ok(result);
+    return Ok(backendProducts);
   }
 
   /// Returns updated product if update was successful

@@ -37,6 +37,9 @@ class MapPageModeParams {
 }
 
 abstract class MapPageMode {
+  static const DEFAULT_MIN_ZOOM = 11.0;
+  static const DEFAULT_MAX_ZOOM = 19.0;
+
   final String nameForAnalytics;
   final MapPageModeParams params;
 
@@ -61,6 +64,9 @@ abstract class MapPageMode {
   /// Extra shops added to what MapPageModel has
   Set<Shop> additionalShops() => {};
   bool showWhereAmIFAB() => true;
+  double minZoom() => DEFAULT_MIN_ZOOM;
+  double maxZoom() => DEFAULT_MAX_ZOOM;
+  bool loadNewShops() => true;
 
   Widget buildOverlay(BuildContext context) => const SizedBox.shrink();
   Widget buildHeader(BuildContext context) => const SizedBox.shrink();
@@ -74,6 +80,7 @@ abstract class MapPageMode {
   void onMapClick(Coord coord) {}
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
   void onLoadingChange() {}
+  void onCameraMove(Coord coord, double zoom) {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;

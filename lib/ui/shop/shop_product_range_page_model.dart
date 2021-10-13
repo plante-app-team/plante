@@ -1,7 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
@@ -10,16 +9,14 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
-import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
-class ShopProductRangePageModel {
+class ShopProductRangePageModel implements ShopsManagerListener {
   final ShopsManager _shopsManager;
   final UserParamsController _userParamsController;
-  final Backend _backend;
   final AddressObtainer _addressObtainer;
 
   final Shop _shop;
@@ -41,23 +38,22 @@ class ShopProductRangePageModel {
       _shopProductRange!;
   ShopProductRange get loadedRange => _shopProductRange!.unwrap();
   List<Product> get loadedProducts {
-    Iterable<Product> products = loadedRange.products;
-    if (user.eatsVeggiesOnly ?? true) {
-      products = products
-          .where((product) => product.veganStatus != VegStatus.negative);
-    } else {
-      products = products
-          .where((product) => product.vegetarianStatus != VegStatus.negative);
-    }
-    return products.toList();
+    return loadedRange.products
+        .where((product) => product.veganStatus != VegStatus.negative)
+        .toList();
   }
 
   UserParams get user => _userParamsController.cachedUserParams!;
 
   ShopProductRangePageModel(this._shopsManager, this._userParamsController,
-      this._backend, this._addressObtainer, this._shop, this._updateCallback) {
+      this._addressObtainer, this._shop, this._updateCallback) {
     load();
     _address = _addressObtainer.addressOfShop(_shop);
+    _shopsManager.addListener(this);
+  }
+
+  void dispose() {
+    _shopsManager.removeListener(this);
   }
 
   int lastSeenSecs(Product product) {
@@ -143,19 +139,12 @@ class ShopProductRangePageModel {
     _updateCallback.call();
   }
 
-  Future<Result<None, BackendError>> productPresenceVote(
-      Product product, bool positive) async {
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
+      productPresenceVote(Product product, bool positive) async {
     _performingBackendAction = true;
     _updateCallback.call();
     try {
-      final result = await _backend.productPresenceVote(
-          product.barcode, _shop.osmUID, positive);
-      if (result.isOk && positive) {
-        _shopProductRange = Ok(loadedRange.rebuild((e) =>
-            e.productsLastSeenSecsUtc[product.barcode] =
-                DateTime.now().secondsSinceEpoch));
-      }
-      return result;
+      return await _shopsManager.productPresenceVote(product, _shop, positive);
     } finally {
       _performingBackendAction = false;
       _updateCallback.call();
@@ -163,4 +152,9 @@ class ShopProductRangePageModel {
   }
 
   FutureShortAddress address() => _address;
+
+  @override
+  void onLocalShopsChange() {
+    reload();
+  }
 }

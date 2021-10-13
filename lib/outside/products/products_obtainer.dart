@@ -26,4 +26,15 @@ class ProductsObtainer {
       BackendProduct backendProduct) async {
     return _productsManager.inflate(backendProduct, await _userLangs());
   }
+
+  Future<Result<List<Product>, ProductsManagerError>> getProducts(
+      List<String> barcodes) async {
+    return _productsManager.getProducts(barcodes, await _userLangs());
+  }
+
+  Future<Result<List<Product>, ProductsManagerError>> inflateProducts(
+      List<BackendProduct> backendProducts) async {
+    return _productsManager.inflateProducts(
+        backendProducts, await _userLangs());
+  }
 }

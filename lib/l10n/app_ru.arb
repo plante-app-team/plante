@@ -60,23 +60,17 @@
     "lang_zh": "Китайский",
 
     "mod_reason_info_found_in_external_source": "Информация из внешнего источника",
-    "mod_reason_all_ingredients_are_vegetarian": "В составе нет невегетарианских ингредиентов",
     "mod_reason_all_ingredients_are_vegan": "В составе нет невеганских ингредиентов",
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "В составе есть исторически неоднозначные ингредиенты, но в современной пищевой промышленности они почти всегда имеют растительное происхождение",
-    "mod_reason_ambiguous_ingredients_are_almost_always_vegetarian_in_modern_food_industry": "В составе есть исторически неоднозначные ингредиенты, но в современной пищевой промышленности они почти всегда имеют вегетарианское происхождение",
-    "mod_reason_manufacturer_confirmed_non_vegetarian_ingredients_absence": "Производитель подтвердил отсутствие невегетарианских ингредиентов",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Производитель подтвердил отсутствие невеганских ингредиентов",
-    "mod_reason_some_ingredient_is_non_vegetarian": "В составе имеются невегетарианские ингредиенты",
     "mod_reason_some_ingredient_is_non_vegan": "В составе имеются невеганские ингредиенты",
     "mod_reason_honey_in_ingredients": "В составе есть мёд",
-    "mod_reason_manufacturer_confirmed_non_vegetarian_ingredients_presence": "Производитель подтвердил присутствие невегетарианских ингредиентов",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Производитель подтвердил присутствие невеганских ингредиентов",
     "mod_reason_tested_on_animals": "Продукт тестируется на животных",
-    "mod_reason_some_ingredient_is_possibly_non_vegetarian": "В составе имеются неоднозначные ингредиенты (могут быть как вегетарианскими, так и невегетарианскими, в зависимости от конкретного способа производства)",
     "mod_reason_some_ingredient_is_possibly_non_vegan": "В составе имеются неоднозначные ингредиенты (могут быть как веганскими, так и невеганскими, в зависимости от конкретного способа производства)",
-    "mod_reason_some_of_product_series_have_non_vegetarian_ingredients": "В некоторых партиях продуктов возможно присутствие невегетарианских ингредиентов — внимательно читайте состав!",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "В некоторых партиях продуктов возможно присутствие невеганских ингредиентов — внимательно читайте состав!",
     "mod_reason_some_ingredient_has_unknown_origin": "Какие-то из ингредиентов в составе имеют неизвестное нам происхождение",
+    "mod_reason_some_ingredient_is_in_fact_a_category": "Какой-то из ингредиентов в составе на самом деле является категорией, и ингредиенты из этой категории могут быть как веганскими, так и нет. Например, если у продукта в составе есть \"ароматизатор\", это почти ни о чём не говорит.",
 
     "image_crop_page_title": "Давайте-ка обрежем!",
 
@@ -113,6 +107,7 @@
     "map_page_no_shops_hint_default_mode_2": "Похоже, рядом нет известных магазинов! Вы отметить новый магазин при добавлении или просмотре продукта",
     "map_page_no_shops_hint_in_select_shops_mode": "Рядом нет известных магазинов. Но вы можете отметить новый, кликнув на круглую кнопку с плюсиком справа!",
     "map_page_open_street_map_licence": "Данные от Open Street Map",
+    "map_page_zoom_in_to_see_shops": "Приблизьте карту, чтобы видеть магазины",
 
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_label": "Название магазина",

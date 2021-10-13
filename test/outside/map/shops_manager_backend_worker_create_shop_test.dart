@@ -7,24 +7,25 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
-import 'shops_requester_test_commons.dart';
+import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
-  late ShopsRequesterTestCommons commons;
+  late ShopsManagerBackendWorkerTestCommons commons;
   late MockBackend backend;
   late MockProductsObtainer productsObtainer;
-  late ShopsRequester shopsRequester;
+  late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
   setUp(() async {
-    commons = ShopsRequesterTestCommons();
+    commons = ShopsManagerBackendWorkerTestCommons();
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
-    shopsRequester = ShopsRequester(backend, productsObtainer);
+    shopsManagerBackendWorker =
+        ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
   test('createShop good scenario', () async {
@@ -36,7 +37,7 @@ void main() {
           ..osmUID = OsmUID.parse('1:123456')
           ..productsCount = 0)));
 
-    final result = await shopsRequester.createShop(
+    final result = await shopsManagerBackendWorker.createShop(
         name: 'Horns and Hooves',
         coord: Coord(lat: 20, lon: 10),
         type: ShopType.supermarket);
@@ -62,7 +63,7 @@ void main() {
             type: anyNamed('type')))
         .thenAnswer((_) async => Err(BackendError.other()));
 
-    final result = await shopsRequester.createShop(
+    final result = await shopsManagerBackendWorker.createShop(
         name: 'Horns and Hooves',
         coord: Coord(lat: 20, lon: 10),
         type: ShopType.supermarket);

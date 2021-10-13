@@ -8,12 +8,12 @@ import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/shops_requester.dart';
 
 // Extracted from ShopsManager logic of shops fetching
 class ShopsManagerFetchShopsHelper {
-  final ShopsRequester _impl;
+  final ShopsManagerBackendWorker _impl;
   final OsmCacher _osmCacher;
 
   ShopsManagerFetchShopsHelper(this._impl, this._osmCacher);
@@ -47,7 +47,7 @@ class ShopsManagerFetchShopsHelper {
 
     final planteShopsBounds =
         viewPort.center.makeSquare(kmToGrad(planteBoundsSizeToRequest));
-    final osmCachedTerritory = await _obtainCachedOsmShops(viewPort);
+    final osmCachedTerritory = await _obtainCachedOsmShops(planteShopsBounds);
     Result<FetchedShops, ShopsManagerError>? fetchResult;
 
     // At first let's try to use cached OSM territory

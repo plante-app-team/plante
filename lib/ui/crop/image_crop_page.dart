@@ -123,13 +123,14 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   Widget _cropWidget() {
     if (_originalImage != null) {
       return Crop(
-          // So that the widget will be recreated on image rotation
-          key: UniqueKey(),
-          image: _originalImage!,
-          controller: _cropController,
-          baseColor: Colors.white,
-          initialSize: 0.5,
-          onCropped: _onCropped);
+        // So that the widget will be recreated on image rotation
+        key: UniqueKey(),
+        image: _originalImage!,
+        controller: _cropController,
+        baseColor: Colors.white,
+        initialSize: 0.5,
+        onCropped: _onCropped,
+      );
     }
     return const SizedBox.shrink();
   }

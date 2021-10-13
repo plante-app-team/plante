@@ -25,6 +25,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
@@ -50,8 +51,8 @@ import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
-  late MockBackend backend;
   late MockShopsManager shopsManager;
+  late List<ShopsManagerListener> shopsManagerListeners;
   late FakeUserParamsController userParamsController;
   late MockProductsManager productsManager;
   late MockPermissionsManager permissionsManager;
@@ -108,8 +109,6 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
-    backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     userParamsController = FakeUserParamsController();
@@ -133,6 +132,7 @@ void main() {
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
+    GetIt.I.registerSingleton<Backend>(MockBackend());
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
@@ -146,10 +146,20 @@ void main() {
 
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
+    shopsManagerListeners = [];
+    when(shopsManager.addListener(any)).thenAnswer((invc) {
+      shopsManagerListeners
+          .add(invc.positionalArguments[0] as ShopsManagerListener);
+    });
+    when(shopsManager.removeListener(any)).thenAnswer((invc) {
+      shopsManagerListeners
+          .remove(invc.positionalArguments[0] as ShopsManagerListener);
+    });
+
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
-    when(backend.productPresenceVote(any, any, any))
-        .thenAnswer((_) async => Ok(None()));
+    when(shopsManager.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
     when(productsManager.createUpdateProduct(any)).thenAnswer(
         (invoc) async => Ok(invoc.positionalArguments[0] as Product));
 
@@ -186,12 +196,21 @@ void main() {
     final scanPage =
         find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
     expect(scanPage.addProductToShop, equals(aShop));
+  });
 
-    // Now close the scan page
-    clearInteractions(shopsManager);
-    scanPage.closeForTesting();
+  testWidgets('product range reloading on product range updates',
+      (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
     await tester.pumpAndSettle();
-    // Ensure updated shops are obtained
+
+    clearInteractions(shopsManager);
+    await tester.pumpAndSettle();
+    verifyNever(shopsManager.fetchShopProductRange(any));
+
+    // Ensure shop's product range is requested after listeners notification
+    shopsManagerListeners.forEach((e) => e.onLocalShopsChange());
+    await tester.pumpAndSettle();
     verify(shopsManager.fetchShopProductRange(any));
   });
 
@@ -238,7 +257,7 @@ void main() {
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    var card = find.byType(ProductCard).evaluate().first.widget;
+    final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
 
     // Verify the proper product
@@ -247,19 +266,8 @@ void main() {
             of: find.byWidget(card), matching: find.text(product.name!)),
         findsOneWidget);
 
-    // Verify the old date
-    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
-    final expectedOldLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedOldDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
-
     // Tap and verify the vote is sent
-    verifyNever(backend.productPresenceVote(any, any, any));
+    verifyNever(shopsManager.productPresenceVote(any, any, any));
     await tester.tap(find.descendant(
         of: find.byWidget(card),
         matching: find.text(context.strings.global_yes)));
@@ -268,27 +276,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, true));
-
-    // Verify the date is updated
-    card = find.byType(ProductCard).evaluate().first.widget;
-    // Old date is no more
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsNothing);
-    // New date has come!
-    final now = DateTime.now();
-    final expectedNewDateStr = dateToStr(now, context);
-    final expectedNewLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedNewDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedNewLastSeenStr)),
-        findsOneWidget);
+    verify(shopsManager.productPresenceVote(product, aShop, true));
   });
 
   testWidgets('vote against product presence', (WidgetTester tester) async {
@@ -296,7 +284,7 @@ void main() {
     final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
 
-    var card = find.byType(ProductCard).evaluate().first.widget;
+    final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
 
     // Verify the proper product
@@ -305,19 +293,8 @@ void main() {
             of: find.byWidget(card), matching: find.text(product.name!)),
         findsOneWidget);
 
-    // Verify the old date
-    final expectedOldDateStr = dateToStr(productsLastSeen[product]!, context);
-    final expectedOldLastSeenStr =
-        '${context.strings.shop_product_range_page_product_last_seen_here}'
-        '$expectedOldDateStr';
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
-
     // Tap and verify the vote is sent
-    verifyNever(backend.productPresenceVote(any, any, any));
+    verifyNever(shopsManager.productPresenceVote(any, any, any));
     await tester.tap(find.descendant(
         of: find.byWidget(card),
         matching: find.text(context.strings.global_no)));
@@ -326,15 +303,7 @@ void main() {
         of: find.byKey(const Key('yes_no_dialog')),
         matching: find.text(context.strings.global_yes)));
     await tester.pumpAndSettle();
-    verify(backend.productPresenceVote(product.barcode, aShop.osmUID, false));
-
-    // Verify the old date is still in place
-    card = find.byType(ProductCard).evaluate().first.widget;
-    expect(
-        find.descendant(
-            of: find.byWidget(card),
-            matching: find.text(expectedOldLastSeenStr)),
-        findsOneWidget);
+    verify(shopsManager.productPresenceVote(product, aShop, false));
   });
 
   testWidgets('no products', (WidgetTester tester) async {
@@ -509,108 +478,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(products[0].name!), findsNothing);
-    expect(find.text(products[1].name!), findsOneWidget);
-  });
-
-  testWidgets('non-vegetarian products are not shown to a vegetarian',
-      (WidgetTester tester) async {
-    final products = [
-      ProductLangSlice((v) => v
-        ..barcode = '123'
-        ..name = 'Meat apple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.negative
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.negative
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-      ProductLangSlice((v) => v
-        ..barcode = '124'
-        ..name = 'Pineapple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.positive
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-    ];
-    final productsLastSeen = {
-      products[0]: DateTime(2012, 1, 1),
-      products[1]: DateTime(2011, 2, 2),
-    };
-    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
-        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(products)
-      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any))
-        .thenAnswer((_) async => Ok(range));
-
-    final veganUser = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = true
-      ..eatsEggs = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(veganUser);
-
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.text(products[0].name!), findsNothing);
-    expect(find.text(products[1].name!), findsOneWidget);
-  });
-
-  testWidgets('non-vegan products ARE shown to a vegetarian',
-      (WidgetTester tester) async {
-    final products = [
-      ProductLangSlice((v) => v
-        ..barcode = '123'
-        ..name = 'Meat apple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.negative
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-      ProductLangSlice((v) => v
-        ..barcode = '124'
-        ..name = 'Pineapple'
-        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
-        ..veganStatus = VegStatus.positive
-        ..veganStatusSource = VegStatusSource.open_food_facts
-        ..ingredientsText = 'Water, salt, sugar').productForTests(),
-    ];
-    final productsLastSeen = {
-      products[0]: DateTime(2012, 1, 1),
-      products[1]: DateTime(2011, 2, 2),
-    };
-    final productsLastSeenSecs = productsLastSeen.map((key, value) =>
-        MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(products)
-      ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-    when(shopsManager.fetchShopProductRange(any))
-        .thenAnswer((_) async => Ok(range));
-
-    final veganUser = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = true
-      ..eatsEggs = true
-      ..eatsHoney = true);
-    await userParamsController.setUserParams(veganUser);
-
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-    await tester.pumpAndSettle();
-
-    expect(find.text(products[0].name!), findsOneWidget);
     expect(find.text(products[1].name!), findsOneWidget);
   });
 

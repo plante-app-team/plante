@@ -9,6 +9,7 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
@@ -20,6 +21,9 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/fake_backend.dart';
+import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
+import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 
@@ -135,23 +139,35 @@ class Backend {
     }
   }
 
-  Future<Result<BackendProduct?, BackendError>> requestProduct(
-      String barcode) async {
+  Future<Result<RequestedProductsResult, BackendError>> requestProducts(
+      List<String> barcodes, int page) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestProduct(barcode);
+      return await _fakeBackend.requestProducts(barcodes, page);
     }
 
-    final jsonRes =
-        await _backendGetJson('product_data/', {'barcode': barcode});
+    final jsonRes = await _backendGetJson(
+        'products_data/', {'barcodes': barcodes, 'page': '$page'});
     if (jsonRes.isErr) {
-      if (jsonRes.unwrapErr().errorKind == BackendErrorKind.PRODUCT_NOT_FOUND) {
-        return Ok(null);
-      } else {
-        return Err(jsonRes.unwrapErr());
-      }
+      return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-    return Ok(BackendProduct.fromJson(json));
+    if (!json.containsKey('products') || !json.containsKey('last_page')) {
+      Log.w('Invalid product_data response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+
+    final result = <BackendProduct>[];
+    final productsJson = json['products'] as List<dynamic>;
+    for (final productJson in productsJson) {
+      final product =
+          BackendProduct.fromJson(productJson as Map<String, dynamic>);
+      if (product == null) {
+        Log.w('Product could not pe parsed: $productJson');
+        continue;
+      }
+      result.add(product);
+    }
+    return Ok(RequestedProductsResult(result, page, json['last_page'] as bool));
   }
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
@@ -204,25 +220,16 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Future<Result<UserParams, BackendError>> userData() async {
+  Future<Result<MobileAppConfig, BackendError>> mobileAppConfig() async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.userData();
+      return await _fakeBackend.mobileAppConfig();
     }
-
-    final jsonRes = await _backendGetJson('user_data/', {});
+    final jsonRes = await _backendGetJson('mobile_app_config/', {});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
     }
     final json = jsonRes.unwrap();
-
-    final backendUserParams = UserParams.fromJson(json)!;
-    // NOTE: client token is not present in the response, but
-    // the Backend class knows the token and can set it.
-    // If it wouldn't set it, the `userData()` method clients would get
-    // not fully set params.
-    final storedUserParams = await _userParamsController.getUserParams();
-    return Ok(backendUserParams.rebuild(
-        (e) => e..backendClientToken = storedUserParams?.backendClientToken));
+    return Ok(MobileAppConfig.fromJson(json)!);
   }
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
@@ -255,10 +262,10 @@ class Backend {
     return Ok(productsAtShops);
   }
 
-  Future<Result<List<BackendShop>, BackendError>> requestShops(
+  Future<Result<List<BackendShop>, BackendError>> requestShopsByOsmUIDs(
       Iterable<OsmUID> osmUIDs) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestShops(osmUIDs);
+      return await _fakeBackend.requestShopsByOsmUIDs(osmUIDs);
     }
 
     final jsonRes = await _backendGetJson('shops_data/', {},
@@ -286,7 +293,40 @@ class Backend {
     return Ok(shops);
   }
 
-  Future<Result<None, BackendError>> productPresenceVote(
+  Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
+      CoordsBounds bounds) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.requestShopsWithin(bounds);
+    }
+
+    final jsonRes = await _backendGetJson('/shops_in_bounds_data/', {
+      'north': '${bounds.north}',
+      'south': '${bounds.south}',
+      'west': '${bounds.west}',
+      'east': '${bounds.east}',
+    });
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+
+    if (!json.containsKey('results')) {
+      Log.w('Invalid shops_in_bounds_data response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+
+    final results = json['results'] as Map<String, dynamic>;
+    final shops = <BackendShop>[];
+    for (final result in results.values) {
+      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
+      if (shop != null) {
+        shops.add(shop);
+      }
+    }
+    return Ok(shops);
+  }
+
+  Future<Result<ProductPresenceVoteResult, BackendError>> productPresenceVote(
       String barcode, OsmUID osmUID, bool positive) async {
     _analytics.sendEvent('product_presence_vote',
         {'barcode': barcode, 'shop': osmUID.toString(), 'vote': positive});
@@ -294,12 +334,17 @@ class Backend {
       return await _fakeBackend.productPresenceVote(barcode, osmUID, positive);
     }
 
-    final response = await _backendGet('product_presence_vote/', {
+    final response = await _backendGetJson('product_presence_vote/', {
       'barcode': barcode,
       'shopOsmUID': osmUID.toString(),
       'voteVal': positive ? '1' : '0',
     });
-    return _noneOrErrorFrom(response);
+    if (response.isErr) {
+      return Err(response.unwrapErr());
+    }
+    final json = response.unwrap();
+    final deleted = json['deleted'] as bool?;
+    return Ok(ProductPresenceVoteResult(productDeleted: deleted ?? false));
   }
 
   Future<Result<None, BackendError>> putProductToShop(

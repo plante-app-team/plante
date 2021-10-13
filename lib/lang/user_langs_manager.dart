@@ -79,11 +79,32 @@ class UserLangsManager {
 
   /// At least 1 language is guaranteed.
   Future<UserLangs> getUserLangs() async {
-    await initFuture.timeout(const Duration(seconds: 5));
+    await _sysLangCodeHolder.langCodeInited;
 
+    try {
+      await _manualUserLangsManager.initFuture
+          .timeout(const Duration(seconds: 3));
+    } on TimeoutException catch (e) {
+      // Sad, but cannot do anything with it
+      Log.w(
+          'UserLangsManager: '
+          'manualUserLangsManager.initFuture.timeout',
+          ex: e);
+    }
     var langs = await _manualUserLangsManager.getUserLangs();
     if (langs != null) {
       return _constructResult(langs);
+    }
+
+    try {
+      await _locationUserLangsManager.initFuture
+          .timeout(const Duration(seconds: 3));
+    } on TimeoutException catch (e) {
+      // Sad, but cannot do anything with it
+      Log.w(
+          'UserLangsManager: '
+          'locationUserLangsManager.initFuture.timeout',
+          ex: e);
     }
     langs = await _locationUserLangsManager.getUserLangs();
     if (langs != null) {

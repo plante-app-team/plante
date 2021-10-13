@@ -9,6 +9,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
@@ -18,11 +19,11 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
-class ShopsRequester {
+class ShopsManagerBackendWorker {
   final Backend _backend;
   final ProductsObtainer _productsObtainer;
 
-  ShopsRequester(this._backend, this._productsObtainer);
+  ShopsManagerBackendWorker(this._backend, this._productsObtainer);
 
   Future<Result<FetchedShops, ShopsManagerError>> fetchShops(
       OsmOverpass overpass,
@@ -47,18 +48,17 @@ class ShopsRequester {
     }
 
     // Request Plante shops
-    final osmShopsToRequestFromPlante =
-        osmShops.where((e) => planteBounds.contains(e.coord));
-    final backendShopsResult = await _backend
-        .requestShops(osmShopsToRequestFromPlante.map((e) => e.osmUID));
+    final backendShopsResult = await _backend.requestShopsWithin(planteBounds);
     if (backendShopsResult.isErr) {
       return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
     }
 
     // Combine OSM and Plante shops
+    final osmShopsWithinPlanteBounds =
+        osmShops.where((e) => planteBounds.contains(e.coord));
     final backendShops = backendShopsResult.unwrap();
     final shops =
-        _combineOsmAndPlanteShops(osmShopsToRequestFromPlante, backendShops);
+        _combineOsmAndPlanteShops(osmShopsWithinPlanteBounds, backendShops);
 
     // Finish forming the result
     final osmShopsMap = {
@@ -93,7 +93,7 @@ class ShopsRequester {
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(
       List<OsmShop> osmShops) async {
     final backendShopsRes =
-        await _backend.requestShops(osmShops.map((e) => e.osmUID));
+        await _backend.requestShopsByOsmUIDs(osmShops.map((e) => e.osmUID));
     if (backendShopsRes.isErr) {
       return Err(_convertBackendErr(backendShopsRes.unwrapErr()));
     }
@@ -113,23 +113,15 @@ class ShopsRequester {
     }
     final backendProductsAtShop = backendRes.unwrap().first;
 
-    // Inflate backend products with OFF products
     final products = <Product>[];
-    ProductsManagerError? lastProductsError;
-    for (final backendProduct in backendProductsAtShop.products) {
-      final productResult = await _productsObtainer.inflate(backendProduct);
-      if (productResult.isErr) {
-        lastProductsError = productResult.unwrapErr();
-        continue;
+    if (backendProductsAtShop.products.isNotEmpty) {
+      // Inflate backend products with OFF products
+      final result = await _productsObtainer
+          .inflateProducts(backendProductsAtShop.products.toList());
+      if (result.isErr) {
+        return Err(_convertProductErr(result.unwrapErr()));
       }
-      final product = productResult.unwrap();
-      if (product == null) {
-        continue;
-      }
-      products.add(product);
-    }
-    if (products.isEmpty && lastProductsError != null) {
-      return Err(_convertProductErr(lastProductsError));
+      products.addAll(result.unwrap());
     }
 
     return Ok(ShopProductRange((e) => e
@@ -169,6 +161,16 @@ class ShopsRequester {
     } else {
       return Err(_convertBackendErr(res.unwrapErr()));
     }
+  }
+
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
+      productPresenceVote(Product product, Shop shop, bool positive) async {
+    final result = await _backend.productPresenceVote(
+        product.barcode, shop.osmUID, positive);
+    if (result.isErr) {
+      return Err(_convertBackendErr(result.unwrapErr()));
+    }
+    return Ok(result.unwrap());
   }
 }
 

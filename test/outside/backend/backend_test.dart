@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -259,18 +260,23 @@ void main() {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*product_data.*', '''
+    httpClient.setResponse('.*products_data.*', '''
      {
-       "barcode": "123",
-       "vegetarian_status": "${VegStatus.positive.name}",
-       "vegetarian_status_source": "${VegStatusSource.community.name}",
-       "vegan_status": "${VegStatus.negative.name}",
-       "vegan_status_source": "${VegStatusSource.moderator.name}"
+       "last_page": true,
+       "products": [
+         {
+           "barcode": "123",
+           "vegetarian_status": "${VegStatus.positive.name}",
+           "vegetarian_status_source": "${VegStatusSource.community.name}",
+           "vegan_status": "${VegStatus.negative.name}",
+           "vegan_status_source": "${VegStatusSource.moderator.name}"
+         }
+       ]
      }
       ''');
 
-    final result = await backend.requestProduct('123');
-    final product = result.unwrap();
+    final result = await backend.requestProducts(['123'], 0);
+    final product = result.unwrap().products.first;
     final expectedProduct = BackendProduct((v) => v
       ..barcode = '123'
       ..vegetarianStatus = VegStatus.positive.name
@@ -279,37 +285,118 @@ void main() {
       ..veganStatusSource = VegStatusSource.moderator.name);
     expect(product, equals(expectedProduct));
 
-    final requests = httpClient.getRequestsMatching('.*product_data.*');
+    final requests = httpClient.getRequestsMatching('.*products_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(request.headers['Authorization'], equals('Bearer aaa'));
+  });
+
+  test('request many products', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+
+    httpClient.setResponse('.*products_data.*page=0.*', '''
+         {
+           "last_page": false,
+           "products": [
+             {
+               "barcode": "123",
+               "vegetarian_status": "${VegStatus.positive.name}",
+               "vegetarian_status_source": "${VegStatusSource.community.name}",
+               "vegan_status": "${VegStatus.negative.name}",
+               "vegan_status_source": "${VegStatusSource.moderator.name}"
+             }
+           ]
+         }
+          ''');
+    httpClient.setResponse('.*products_data.*page=1.*', '''
+         {
+           "last_page": true,
+           "products": [
+             {
+               "barcode": "124",
+               "vegetarian_status": "${VegStatus.positive.name}",
+               "vegetarian_status_source": "${VegStatusSource.community.name}",
+               "vegan_status": "${VegStatus.negative.name}",
+               "vegan_status_source": "${VegStatusSource.moderator.name}"
+             }
+           ]
+         }
+          ''');
+    httpClient.setResponse('.*products_data.*page=2.*', '''
+         {
+           "last_page": true,
+           "products": []
+         }
+          ''');
+
+    var resultWrapped = await backend.requestProducts(['123', '124'], 0);
+    var result = resultWrapped.unwrap();
+    expect(result.lastPage, isFalse);
+    expect(
+        result.products,
+        equals([
+          BackendProduct((v) => v
+            ..barcode = '123'
+            ..vegetarianStatus = VegStatus.positive.name
+            ..vegetarianStatusSource = VegStatusSource.community.name
+            ..veganStatus = VegStatus.negative.name
+            ..veganStatusSource = VegStatusSource.moderator.name)
+        ]));
+
+    resultWrapped = await backend.requestProducts(['123', '124'], 1);
+    result = resultWrapped.unwrap();
+    expect(result.lastPage, isTrue);
+    expect(
+        result.products,
+        equals([
+          BackendProduct((v) => v
+            ..barcode = '124'
+            ..vegetarianStatus = VegStatus.positive.name
+            ..vegetarianStatusSource = VegStatusSource.community.name
+            ..veganStatus = VegStatus.negative.name
+            ..veganStatusSource = VegStatusSource.moderator.name)
+        ]));
+
+    resultWrapped = await backend.requestProducts(['123', '124'], 2);
+    result = resultWrapped.unwrap();
+    expect(result.lastPage, isTrue);
+    expect(result.products, isEmpty);
+
+    final requests = httpClient.getRequestsMatching('.*products_data.*');
+    expect(requests.length, equals(3));
+    expect(requests[0].headers['Authorization'], equals('Bearer aaa'));
+    expect(requests[1].headers['Authorization'], equals('Bearer aaa'));
+    expect(requests[2].headers['Authorization'], equals('Bearer aaa'));
   });
 
   test('request product not found', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*product_data.*', '''
-     {
-       "error": "product_not_found"
-     }
-      ''');
+    httpClient.setResponse('.*products_data.*', '''
+         {
+           "last_page": true,
+           "products": []
+         }
+          ''');
 
-    final result = await backend.requestProduct('123');
-    final product = result.unwrap();
-    expect(product, isNull);
+    final result = await backend.requestProducts(['123'], 0);
+    final products = result.unwrap().products;
+    expect(products, isEmpty);
   });
 
   test('request product http error', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*product_data.*', '', responseCode: 500);
+    httpClient.setResponse('.*products_data.*', '', responseCode: 500);
 
-    final result = await backend.requestProduct('123');
+    final result = await backend.requestProducts(['123'], 0);
     expect(result.isErr, isTrue);
 
-    final requests = httpClient.getRequestsMatching('.*product_data.*');
+    final requests = httpClient.getRequestsMatching('.*products_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(request.headers['Authorization'], equals('Bearer aaa'));
@@ -319,20 +406,17 @@ void main() {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*product_data.*', '''
-     {{{{{{{{{{{{
-       "barcode": "123",
-       "vegetarian_status": "${VegStatus.positive.name}",
-       "vegetarian_status_source": "${VegStatusSource.community.name}",
-       "vegan_status": "${VegStatus.negative.name}",
-       "vegan_status_source": "${VegStatusSource.moderator.name}"
-     }
-      ''');
+    httpClient.setResponse('.*products_data.*', '''
+         {{{{{{{{{{{{{{{{{{
+           "last_page": true,
+           "products": []
+         }
+          ''');
 
-    final result = await backend.requestProduct('123');
+    final result = await backend.requestProducts(['123'], 0);
     expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
 
-    final requests = httpClient.getRequestsMatching('.*product_data.*');
+    final requests = httpClient.getRequestsMatching('.*products_data.*');
     expect(requests.length, equals(1));
     final request = requests[0];
     expect(request.headers['Authorization'], equals('Bearer aaa'));
@@ -343,9 +427,9 @@ void main() {
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
-        '.*product_data.*', const SocketException(''));
+        '.*products_data.*', const SocketException(''));
 
-    final result = await backend.requestProduct('123');
+    final result = await backend.requestProducts(['123'], 0);
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
@@ -513,42 +597,50 @@ void main() {
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
-  test('user data obtaining', () async {
+  test('mobile app config obtaining', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse(
-        '.*user_data.*', ''' { "name": "Bob Kelso", "user_id": "123" } ''');
+    httpClient.setResponse('.*mobile_app_config.*', '''
+        {
+          "user_data": { "name": "Bob Kelso", "user_id": "123" },
+          "nominatim_enabled": false
+        }
+        ''');
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(result.isOk, isTrue);
 
-    final obtainedParams = result.unwrap();
+    final obtainedConfig = result.unwrap();
+    expect(obtainedConfig.nominatimEnabled, isFalse);
+    final obtainedParams = obtainedConfig.remoteUserParams;
     expect(obtainedParams.name, equals('Bob Kelso'));
     expect(obtainedParams.backendId, equals('123'));
-    // NOTE: client token was not present in the response, but
-    // the Backend class knows the token and can set it.
-    expect(obtainedParams.backendClientToken, equals('aaa'));
   });
 
-  test('user data obtaining invalid JSON response', () async {
+  test('mobile app config obtaining invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*user_data.*',
-        ''' {{{{{{{{{{{ "name": "Bob Kelso", "user_id": "123" } ''');
+    httpClient.setResponse('.*mobile_app_config.*', '''
+        {{{{{{{{{{{{{{{{{
+          "user_data": { "name": "Bob Kelso", "user_id": "123" },
+          "nominatim_enabled": false
+        }
+        ''');
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('user data obtaining network error', () async {
+  test('mobile app config obtaining network error', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponseException('.*user_data.*', const SocketException(''));
+    httpClient.setResponseException(
+        '.*mobile_app_config.*', const SocketException(''));
 
-    final result = await backend.userData();
+    final result = await backend.mobileAppConfig();
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -725,11 +817,11 @@ void main() {
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
-  test('requesting shops', () async {
+  test('requesting shops by UIDs', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "results_v2" : {
               "1:8711880917" : {
@@ -744,7 +836,7 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.isOk, isTrue);
 
@@ -765,61 +857,165 @@ void main() {
     expect(shop2.productsCount, equals(2));
   });
 
-  test('requesting shops empty response', () async {
+  test('requesting shops by UIDs empty response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "results_v2" : {}
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrap().length, equals(0));
   });
 
-  test('requesting shops invalid JSON response', () async {
+  test('requesting shops by UIDs invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {{{{{{{{{{{{{{{{{{{{{{
             "results_v2" : {
             }
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops JSON without results response', () async {
+  test('requesting shops by UIDs JSON without results response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "rezzzults" : {}
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops network error', () async {
+  test('requesting shops by UIDs network error', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
-        '.*shops_data.*', const SocketException(''));
+        '.*/shops_data/.*', const SocketException(''));
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+    expect(
+        result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+  });
+
+  test('requesting shops by bounds', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "results" : {
+              "1:8711880917" : {
+                "osm_uid" : "1:8711880917",
+                "products_count" : 1
+              },
+              "1:8771781029" : {
+                "osm_uid" : "1:8771781029",
+                "products_count" : 2
+              }
+            }
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.isOk, isTrue);
+
+    final shops = result.unwrap();
+    expect(shops.length, equals(2));
+
+    final BackendShop shop1;
+    final BackendShop shop2;
+    if (shops[0].osmUID == OsmUID.parse('1:8711880917')) {
+      shop1 = shops[0];
+      shop2 = shops[1];
+    } else {
+      shop1 = shops[1];
+      shop2 = shops[0];
+    }
+
+    expect(shop1.productsCount, equals(1));
+    expect(shop2.productsCount, equals(2));
+  });
+
+  test('requesting shops by bounds empty response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "results" : {}
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrap().length, equals(0));
+  });
+
+  test('requesting shops by bounds invalid JSON response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {{{{{{{{{{{{{{{{{{{{{{
+            "results" : {
+            }
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops by bounds JSON without results response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "rezzzults" : {}
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops by bounds network error', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*/shops_in_bounds_data/.*', const SocketException(''));
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -838,6 +1034,44 @@ void main() {
     result = await backend.productPresenceVote(
         '1:123456', OsmUID.parse('1:123'), false);
     expect(result.isOk, isTrue);
+  });
+
+  test('product presence vote "deleted" param', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+
+    // Deleted: true
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok",
+           "deleted": true
+         }
+         ''');
+    var result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isTrue);
+
+    // Deleted: false
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok",
+           "deleted": false
+         }
+         ''');
+    result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isFalse);
+
+    // Deleted: N/A
+    httpClient.setResponse('.*product_presence_vote.*', '''
+         {
+           "result": "ok"
+         }
+         ''');
+    result = await backend.productPresenceVote(
+        '123456', OsmUID.parse('1:123'), false);
+    expect(result.unwrap().productDeleted, isFalse);
   });
 
   test('product presence vote analytics events', () async {

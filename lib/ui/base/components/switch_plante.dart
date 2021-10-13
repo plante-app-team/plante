@@ -54,11 +54,6 @@ class _SwitchPlanteState extends State<SwitchPlante>
     _colorRight =
         ColorTween(begin: widget.colorActive, end: widget.colorBackground)
             .animate(_animationController);
-    final updateState = () {
-      setState(() {});
-    };
-    _colorLeft.addListener(updateState);
-    _colorRight.addListener(updateState);
   }
 
   @override
@@ -103,14 +98,19 @@ class _SwitchPlanteState extends State<SwitchPlante>
                 ))),
         SizedBox(
             height: widget.height,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  SvgPicture.asset(widget.leftSvgAsset,
-                      color: _colorLeft.value),
-                  SvgPicture.asset(widget.rightSvgAsset,
-                      color: _colorRight.value),
-                ])),
+            child: AnimatedBuilder(
+              animation: _animationController,
+              builder: (_, child) {
+                return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SvgPicture.asset(widget.leftSvgAsset,
+                          color: _colorLeft.value),
+                      SvgPicture.asset(widget.rightSvgAsset,
+                          color: _colorRight.value),
+                    ]);
+              },
+            )),
         Material(
             color: Colors.transparent,
             child: InkWell(
