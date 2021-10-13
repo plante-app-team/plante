@@ -47,7 +47,7 @@ class ShopsManagerFetchShopsHelper {
 
     final planteShopsBounds =
         viewPort.center.makeSquare(kmToGrad(planteBoundsSizeToRequest));
-    final osmCachedTerritory = await _obtainCachedOsmShops(viewPort);
+    final osmCachedTerritory = await _obtainCachedOsmShops(planteShopsBounds);
     Result<FetchedShops, ShopsManagerError>? fetchResult;
 
     // At first let's try to use cached OSM territory

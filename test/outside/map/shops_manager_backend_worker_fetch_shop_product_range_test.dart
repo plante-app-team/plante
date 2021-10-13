@@ -15,7 +15,7 @@ import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
-import 'shops_requester_test_commons.dart';
+import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
   late ShopsManagerBackendWorkerTestCommons commons;

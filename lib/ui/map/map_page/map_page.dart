@@ -31,6 +31,7 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
@@ -45,7 +46,7 @@ class MapPage extends StatefulWidget {
   final Product? product;
   final List<Shop> initialSelectedShops;
   final MapPageRequestedMode requestedMode;
-  final _testingStorage = _TestingStorage();
+  final _testingStorage = MapPageTestingStorage();
 
   MapPage(
       {Key? key,
@@ -63,75 +64,19 @@ class MapPage extends StatefulWidget {
   @override
   _MapPageState createState() => _MapPageState();
 
-  @visibleForTesting
-  void finishForTesting<T>(T result) {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (finishForTesting)');
-    }
-    _testingStorage.finishCallback?.call(result);
-  }
-
-  @visibleForTesting
-  void onMapIdleForTesting() {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (onMapIdleForTesting)');
-    }
-    _testingStorage.onMapIdleCallback?.call();
-  }
-
-  @visibleForTesting
-  void onMarkerClickForTesting(Iterable<Shop> markerShops) {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (onMarkerClickForTesting)');
-    }
-    _testingStorage.onMarkerClickCallback?.call(markerShops);
-  }
-
-  @visibleForTesting
-  void onMapClickForTesting(Coord coords) {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (onMapClickForTesting)');
-    }
-    _testingStorage.onMapClickCallback?.call(coords);
-  }
-
-  @visibleForTesting
-  MapPageMode getModeForTesting() {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (getModeForTesting)');
-    }
-    return _testingStorage.modeCallback!.call();
-  }
-
-  @visibleForTesting
-  Set<Shop> getDisplayedShopsForTesting() {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (getDisplayedShopsForTesting)');
-    }
-    return _testingStorage.displayedShops;
-  }
-
-  @visibleForTesting
-  void onSearchResultsForTesting(MapSearchPageResult searchResult) {
-    if (!isInTests()) {
-      throw Exception('MapPage: not in tests (onSearchResultsForTesting)');
-    }
-    return _testingStorage.onSearchResultCallback?.call(searchResult);
-  }
-}
-
-typedef _TestingFinishCallback = dynamic Function(dynamic result);
-
-class _TestingStorage {
-  _TestingFinishCallback? finishCallback;
-  VoidCallback? onMapIdleCallback;
-  ArgCallback<Iterable<Shop>>? onMarkerClickCallback;
-  ArgCallback<Coord>? onMapClickCallback;
-  ResCallback<MapPageMode>? modeCallback;
-  ArgCallback<MapSearchPageResult>? onSearchResultCallback;
-  final Set<Shop> displayedShops = {};
-
-  GoogleMapController? mapControllerForTesting;
+  void finishForTesting<T>(T res) => _testingStorage.finishForTesting(res);
+  void onMapIdleForTesting() => _testingStorage.onMapIdleForTesting();
+  void onMapMoveForTesting(Coord coord, double zoom) =>
+      _testingStorage.onMapMoveForTesting(coord, zoom);
+  void onMarkerClickForTesting(Iterable<Shop> markerShops) =>
+      _testingStorage.onMarkerClickForTesting(markerShops);
+  void onMapClickForTesting(Coord coords) =>
+      _testingStorage.onMapClickForTesting(coords);
+  MapPageMode getModeForTesting() => _testingStorage.getModeForTesting();
+  Set<Shop> getDisplayedShopsForTesting() =>
+      _testingStorage.getDisplayedShopsForTesting();
+  void onSearchResultsForTesting(MapSearchPageResult searchResult) =>
+      _testingStorage.onSearchResultsForTesting(searchResult);
 }
 
 class _MapPageState extends PageStatePlante<MapPage>
@@ -165,6 +110,10 @@ class _MapPageState extends PageStatePlante<MapPage>
     super.initState();
     widget._testingStorage.finishCallback = (result) {
       _model.finishWith(context, result);
+    };
+    widget._testingStorage.onMapMoveCallback = (posZoomPair) {
+      _onCameraMove(CameraPosition(
+          target: posZoomPair.first.toLatLng(), zoom: posZoomPair.second));
     };
     widget._testingStorage.onMapIdleCallback = _onCameraIdle;
     widget._testingStorage.onMarkerClickCallback = _onMarkerClick;
@@ -218,7 +167,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     /// selected by manual testing.
     /// You can adjust them, but only with very careful testing and with
     /// God's help (you'll need it).
-    const clusteringLevels = <double>[12, 12, 12, 12, 12, 12, 14, 16.5, 20];
+    const clusteringLevels = <double>[10, 10, 10, 10, 10, 12, 14, 16.5, 20];
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
@@ -360,7 +309,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         mapToolbarEnabled: false,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-        minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
+        minMaxZoomPreference:
+            MinMaxZoomPreference(_mode.minZoom(), _mode.maxZoom()),
         mapType: MapType.normal,
         initialCameraPosition: initialPos,
         onMapCreated: (GoogleMapController controller) {
@@ -369,7 +319,7 @@ class _MapPageState extends PageStatePlante<MapPage>
           _clusterManager.onCameraMove(initialPos!);
           _onCameraIdle();
         },
-        onCameraMove: _clusterManager.onCameraMove,
+        onCameraMove: _onCameraMove,
         onCameraIdle: _onCameraIdle,
         onTap: _onMapTap,
         // When there are more than 2 instances of GoogleMap and both
@@ -490,11 +440,17 @@ class _MapPageState extends PageStatePlante<MapPage>
     return result;
   }
 
+  void _onCameraMove(CameraPosition position) {
+    _clusterManager.onCameraMove(position);
+    _mode.onCameraMove(position.target.toCoord(), position.zoom);
+  }
+
   void _onCameraIdle() async {
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
     _updateMap(delay: const Duration(milliseconds: 1000));
-    await _model.onCameraMoved(viewBounds.toCoordsBounds());
+    await _model.onCameraIdle(
+        viewBounds.toCoordsBounds(), _mode.loadNewShops());
   }
 
   void _onShopsUpdated(Iterable<Shop> shops) {

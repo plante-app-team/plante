@@ -98,8 +98,8 @@ class ShopsManager {
 
     final shopsFetchResult = await _fetchShopsHelper.fetchShops(overpass,
         viewPort: bounds,
-        osmBoundsSizesToRequest: [100, 30],
-        planteBoundsSizeToRequest: 20);
+        osmBoundsSizesToRequest: [100, 91],
+        planteBoundsSizeToRequest: 90);
     if (shopsFetchResult.isErr) {
       Log.w(
           'ShopsManager._maybeLoadShops err: $shopsFetchResult, attemptNumber: $attemptNumber');

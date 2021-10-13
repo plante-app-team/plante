@@ -29,7 +29,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 /// (or the app) if it sends too many requests.
 /// Instead, wrappers for certain purposes should be created.
 class OsmOverpass {
-  static const SINGLE_SERVER_TIMEOUT = Duration(seconds: 10);
+  static const SINGLE_SERVER_TIMEOUT = Duration(seconds: 20);
   final HttpClient _http;
   final Analytics _analytics;
   final OsmInteractionsQueue _interactionsQueue;

@@ -25,7 +25,7 @@ void main() {
     final inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
     final inflatedShops = inflateRes.unwrap();
     expect(inflatedShops, equals(commons.fullShops));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsByOsmUIDs(any));
   });
 
   test('inflateOsmShops: second call does not touch backend because is cached',
@@ -34,7 +34,7 @@ void main() {
     var inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
     var inflatedShops = inflateRes.unwrap();
     expect(inflatedShops, equals(commons.fullShops));
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsByOsmUIDs(any));
 
     // Second inflate
     clearInteractions(backend);
@@ -56,7 +56,7 @@ void main() {
 
     // Backend is NOT expected to be requested since
     // all of the requested shops should be in cache by now
-    verifyNever(backend.requestShops(any));
+    verifyNever(backend.requestShopsByOsmUIDs(any));
   });
 
   test('inflateOsmShops when part of shops are in cache', () async {
@@ -83,6 +83,6 @@ void main() {
 
     // Backend is expected to be requested since
     // not all of the shops are in cache
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsByOsmUIDs(any));
   });
 }
