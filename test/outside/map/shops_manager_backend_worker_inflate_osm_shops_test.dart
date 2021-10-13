@@ -6,7 +6,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
-import 'shops_requester_test_commons.dart';
+import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
   late ShopsManagerBackendWorkerTestCommons commons;
@@ -23,19 +23,19 @@ void main() {
   });
 
   test('inflateOsmShops good scenario', () async {
-    when(backend.requestShops(any))
+    when(backend.requestShopsByOsmUIDs(any))
         .thenAnswer((_) async => Ok(commons.someBackendShops.values.toList()));
 
     verifyZeroInteractions(backend);
     final shopsRes = await shopsManagerBackendWorker
         .inflateOsmShops(commons.someOsmShops.values.toList());
-    verify(backend.requestShops(any));
+    verify(backend.requestShopsByOsmUIDs(any));
 
     expect(shopsRes.unwrap(), commons.someShops);
   });
 
   test('inflateOsmShops backend error', () async {
-    when(backend.requestShops(any))
+    when(backend.requestShopsByOsmUIDs(any))
         .thenAnswer((_) async => Err(BackendError.other()));
 
     final shopsRes = await shopsManagerBackendWorker

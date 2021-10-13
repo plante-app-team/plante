@@ -218,7 +218,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     /// selected by manual testing.
     /// You can adjust them, but only with very careful testing and with
     /// God's help (you'll need it).
-    const clusteringLevels = <double>[12, 12, 12, 12, 12, 12, 14, 16.5, 20];
+    const clusteringLevels = <double>[10, 10, 10, 10, 10, 12, 14, 16.5, 20];
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
@@ -360,7 +360,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         mapToolbarEnabled: false,
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
-        minMaxZoomPreference: const MinMaxZoomPreference(13, 19),
+        minMaxZoomPreference: const MinMaxZoomPreference(11, 19),
         mapType: MapType.normal,
         initialCameraPosition: initialPos,
         onMapCreated: (GoogleMapController controller) {

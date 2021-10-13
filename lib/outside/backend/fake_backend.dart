@@ -2,6 +2,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -157,7 +158,7 @@ class FakeBackend implements Backend {
   }
 
   @override
-  Future<Result<List<BackendShop>, BackendError>> requestShops(
+  Future<Result<List<BackendShop>, BackendError>> requestShopsByOsmUIDs(
       Iterable<OsmUID> osmUIDs) async {
     await _delay();
 
@@ -167,6 +168,12 @@ class FakeBackend implements Backend {
       result.add(_fakeShops[osmUID]!.toShop());
     }
     return Ok(result);
+  }
+
+  @override
+  Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
+      CoordsBounds bounds) async {
+    return Ok(const []);
   }
 
   @override

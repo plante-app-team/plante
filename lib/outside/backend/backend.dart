@@ -9,6 +9,7 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
@@ -261,10 +262,10 @@ class Backend {
     return Ok(productsAtShops);
   }
 
-  Future<Result<List<BackendShop>, BackendError>> requestShops(
+  Future<Result<List<BackendShop>, BackendError>> requestShopsByOsmUIDs(
       Iterable<OsmUID> osmUIDs) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestShops(osmUIDs);
+      return await _fakeBackend.requestShopsByOsmUIDs(osmUIDs);
     }
 
     final jsonRes = await _backendGetJson('shops_data/', {},
@@ -282,6 +283,39 @@ class Backend {
     }
 
     final results = json['results_v2'] as Map<String, dynamic>;
+    final shops = <BackendShop>[];
+    for (final result in results.values) {
+      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
+      if (shop != null) {
+        shops.add(shop);
+      }
+    }
+    return Ok(shops);
+  }
+
+  Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
+      CoordsBounds bounds) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeBackend.requestShopsWithin(bounds);
+    }
+
+    final jsonRes = await _backendGetJson('/shops_in_bounds_data/', {
+      'north': '${bounds.north}',
+      'south': '${bounds.south}',
+      'west': '${bounds.west}',
+      'east': '${bounds.east}',
+    });
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+
+    if (!json.containsKey('results')) {
+      Log.w('Invalid shops_in_bounds_data response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+
+    final results = json['results'] as Map<String, dynamic>;
     final shops = <BackendShop>[];
     for (final result in results.values) {
       final shop = BackendShop.fromJson(result as Map<String, dynamic>);

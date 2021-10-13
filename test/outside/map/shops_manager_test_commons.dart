@@ -99,7 +99,10 @@ class ShopsManagerTestCommons {
         .thenAnswer((_) async => Ok(None()));
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsByOsmUIDs(any))
+        .thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any))
+        .thenAnswer((_) async => Ok(backendShops));
 
     productsObtainer.addKnownProducts(rangeProducts);
 
