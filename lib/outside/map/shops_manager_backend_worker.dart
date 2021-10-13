@@ -48,18 +48,17 @@ class ShopsManagerBackendWorker {
     }
 
     // Request Plante shops
-    final osmShopsToRequestFromPlante =
-        osmShops.where((e) => planteBounds.contains(e.coord));
-    final backendShopsResult = await _backend
-        .requestShops(osmShopsToRequestFromPlante.map((e) => e.osmUID));
+    final backendShopsResult = await _backend.requestShopsWithin(planteBounds);
     if (backendShopsResult.isErr) {
       return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
     }
 
     // Combine OSM and Plante shops
+    final osmShopsWithinPlanteBounds =
+        osmShops.where((e) => planteBounds.contains(e.coord));
     final backendShops = backendShopsResult.unwrap();
     final shops =
-        _combineOsmAndPlanteShops(osmShopsToRequestFromPlante, backendShops);
+        _combineOsmAndPlanteShops(osmShopsWithinPlanteBounds, backendShops);
 
     // Finish forming the result
     final osmShopsMap = {
@@ -94,7 +93,7 @@ class ShopsManagerBackendWorker {
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(
       List<OsmShop> osmShops) async {
     final backendShopsRes =
-        await _backend.requestShops(osmShops.map((e) => e.osmUID));
+        await _backend.requestShopsByOsmUIDs(osmShops.map((e) => e.osmUID));
     if (backendShopsRes.isErr) {
       return Err(_convertBackendErr(backendShopsRes.unwrapErr()));
     }

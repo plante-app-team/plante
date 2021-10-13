@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
@@ -816,11 +817,11 @@ void main() {
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 
-  test('requesting shops', () async {
+  test('requesting shops by UIDs', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "results_v2" : {
               "1:8711880917" : {
@@ -835,7 +836,7 @@ void main() {
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.isOk, isTrue);
 
@@ -856,61 +857,165 @@ void main() {
     expect(shop2.productsCount, equals(2));
   });
 
-  test('requesting shops empty response', () async {
+  test('requesting shops by UIDs empty response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "results_v2" : {}
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrap().length, equals(0));
   });
 
-  test('requesting shops invalid JSON response', () async {
+  test('requesting shops by UIDs invalid JSON response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {{{{{{{{{{{{{{{{{{{{{{
             "results_v2" : {
             }
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops JSON without results response', () async {
+  test('requesting shops by UIDs JSON without results response', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient.setResponse('.*shops_data.*', '''
+    httpClient.setResponse('.*/shops_data/.*', '''
           {
             "rezzzults" : {}
           }
         ''');
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
-  test('requesting shops network error', () async {
+  test('requesting shops by UIDs network error', () async {
     final httpClient = FakeHttpClient();
     final backend =
         Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
     httpClient.setResponseException(
-        '.*shops_data.*', const SocketException(''));
+        '.*/shops_data/.*', const SocketException(''));
 
-    final result = await backend.requestShops(
+    final result = await backend.requestShopsByOsmUIDs(
         ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+    expect(
+        result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
+  });
+
+  test('requesting shops by bounds', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "results" : {
+              "1:8711880917" : {
+                "osm_uid" : "1:8711880917",
+                "products_count" : 1
+              },
+              "1:8771781029" : {
+                "osm_uid" : "1:8771781029",
+                "products_count" : 2
+              }
+            }
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.isOk, isTrue);
+
+    final shops = result.unwrap();
+    expect(shops.length, equals(2));
+
+    final BackendShop shop1;
+    final BackendShop shop2;
+    if (shops[0].osmUID == OsmUID.parse('1:8711880917')) {
+      shop1 = shops[0];
+      shop2 = shops[1];
+    } else {
+      shop1 = shops[1];
+      shop2 = shops[0];
+    }
+
+    expect(shop1.productsCount, equals(1));
+    expect(shop2.productsCount, equals(2));
+  });
+
+  test('requesting shops by bounds empty response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "results" : {}
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrap().length, equals(0));
+  });
+
+  test('requesting shops by bounds invalid JSON response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {{{{{{{{{{{{{{{{{{{{{{
+            "results" : {
+            }
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops by bounds JSON without results response', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
+          {
+            "rezzzults" : {}
+          }
+        ''');
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
+  });
+
+  test('requesting shops by bounds network error', () async {
+    final httpClient = FakeHttpClient();
+    final backend =
+        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
+    httpClient.setResponseException(
+        '.*/shops_in_bounds_data/.*', const SocketException(''));
+
+    final result = await backend.requestShopsWithin(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });

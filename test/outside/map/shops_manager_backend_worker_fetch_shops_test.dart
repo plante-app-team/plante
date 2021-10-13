@@ -14,7 +14,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
-import 'shops_requester_test_commons.dart';
+import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
   late ShopsManagerBackendWorkerTestCommons commons;
@@ -40,7 +40,7 @@ void main() {
   test('fetchShops with simple bounds without preloaded data', () async {
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(someOsmShops.values.toList()));
-    when(backend.requestShops(any))
+    when(backend.requestShopsWithin(any))
         .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
 
     final expectedShops = someOsmShops.map((key, value) => MapEntry(
@@ -63,7 +63,7 @@ void main() {
   });
 
   test('fetchShops with preloaded data', () async {
-    when(backend.requestShops(any))
+    when(backend.requestShopsWithin(any))
         .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
     // OSM would return an error if it would be queried...
     when(osm.fetchShops(bounds: anyNamed('bounds')))
@@ -116,11 +116,8 @@ void main() {
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops.values.toList()));
     // Prepare backend shops
-    when(backend.requestShops(any)).thenAnswer((invc) async {
-      final ids = invc.positionalArguments[0] as Iterable<OsmUID>;
-      final result =
-          someBackendShops.values.where((e) => ids.contains(e.osmUID));
-      return Ok(result.toList());
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
+      return Ok([someBackendShops[theOnlyExpectedShopIs]!]);
     });
 
     final bounds = CoordsBounds(
@@ -155,7 +152,8 @@ void main() {
         ..osmUID = OsmUID.parse('1:2')
         ..productsCount = 1),
     ];
-    when(backend.requestShops(any)).thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any))
+        .thenAnswer((_) async => Ok(backendShops));
 
     final bounds = CoordsBounds(
       southwest: Coord(lat: 0, lon: 0),
@@ -177,7 +175,7 @@ void main() {
     ];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShops(any))
+    when(backend.requestShopsWithin(any))
         .thenAnswer((_) async => Err(BackendError.other()));
 
     final bounds = CoordsBounds(
