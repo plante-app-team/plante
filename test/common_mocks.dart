@@ -15,6 +15,7 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/osm_nominatim.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
@@ -41,6 +42,7 @@ import 'package:plante/ui/photos_taker.dart';
   LocationController,
   MobileAppConfigManager,
   OffApi,
+  OffShopsManager,
   OsmNominatim,
   OsmOverpass,
   OsmSearcher,

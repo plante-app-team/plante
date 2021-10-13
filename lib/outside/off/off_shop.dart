@@ -12,7 +12,7 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   @BuiltValueField(wireName: 'products')
   int? get products;
 
-  static OffShop? fromJson(Map<String, dynamic> json) {
+  static OffShop? fromJson(dynamic json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(OffShop.serializer, json);
   }

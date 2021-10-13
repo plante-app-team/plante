@@ -16,9 +16,13 @@ class OffShopsManager implements ShopsManagerListener {
 
   OffShopsManager(Settings settings, this._shopsManager) {
     _offApi = OffApi(settings, HttpClient());
-    _shopsManager.addListener(this);
-    if(enableNewestFeatures()) {
-      fetchOffShops('be');
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    if (await enableNewestFeatures()) {
+      _shopsManager.addListener(this);
+      await fetchOffShops('be');
     }
   }
 
@@ -55,6 +59,4 @@ class OffShopsManager implements ShopsManagerListener {
   bool hasVeganProducts(String shopName) {
       return _veganProductsSearch[shopName.toLowerCase()] != null;
   }
-
-
 }

@@ -1,10 +1,9 @@
-import 'package:plante/outside/off/off_api.dart';
-import 'package:test/test.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:test/test.dart';
 
+import '../../z_fakes/fake_http_client.dart';
 import '../../z_fakes/fake_settings.dart';
 
 void main() {
