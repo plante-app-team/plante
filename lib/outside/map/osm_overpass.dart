@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
@@ -29,7 +30,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 /// (or the app) if it sends too many requests.
 /// Instead, wrappers for certain purposes should be created.
 class OsmOverpass {
-  static const SINGLE_SERVER_TIMEOUT = Duration(seconds: 20);
+  static const SINGLE_SERVER_TIMEOUT = Duration(seconds: 60);
   final HttpClient _http;
   final Analytics _analytics;
   final OsmInteractionsQueue _interactionsQueue;
@@ -45,6 +46,8 @@ class OsmOverpass {
     _urls['kumi'] = 'overpass.kumi.systems';
     _urls['taiwan'] = 'overpass.nchc.org.tw';
   }
+
+  int now() => DateTime.now().secondsSinceEpoch;
 
   /// Order of returned shops is not guaranteed to resemble order of [osmUIDs].
   Future<Result<List<OsmShop>, OpenStreetMapError>> fetchShops(
@@ -147,25 +150,31 @@ class OsmOverpass {
   }
 
   Future<Result<String, OpenStreetMapError>> _sendCmd(String cmd) async {
+    final start = now();
     for (final nameAndUrl in _urls.entries) {
       final urlName = nameAndUrl.key;
       final url = nameAndUrl.value;
       final Response r;
+      Log.i('OSM._sendCmd: about to send $cmd to $url');
       try {
         r = await _http.get(Uri.https(url, 'api/interpreter', {'data': cmd}),
             headers: {
               'User-Agent': await userAgent()
             }).timeout(SINGLE_SERVER_TIMEOUT);
       } on IOException catch (e) {
-        Log.w('OSM overpass network error', ex: e);
+        Log.w('OSM._sendCmd network error, passed: ${now() - start},', ex: e);
         return Err(OpenStreetMapError.NETWORK);
       } on TimeoutException catch (e) {
-        Log.w('OSM overpass server ($nameAndUrl) timeout', ex: e);
+        Log.w(
+            'OSM._sendCmd overpass server ($nameAndUrl) timeout, '
+            'passed: ${now() - start},',
+            ex: e);
         continue;
       }
 
       if (r.statusCode != 200) {
-        Log.w('OSM._sendCmd: $cmd, status: ${r.statusCode}, body: ${r.body}');
+        Log.w('OSM._sendCmd: Passed: ${now() - start}, cmd: $cmd, '
+            'status: ${r.statusCode}, body: ${r.body}');
         if (r.statusCode == 403) {
           _analytics.sendEvent('osm_${urlName}_failure_403');
         } else if (r.statusCode == 429) {
@@ -174,7 +183,7 @@ class OsmOverpass {
         continue;
       }
 
-      Log.i('OSM._sendCmd success: $cmd');
+      Log.i('OSM._sendCmd success. Passed: ${now() - start}, cmd: $cmd');
       return Ok(utf8.decode(r.bodyBytes));
     }
 

@@ -64,6 +64,18 @@ class ShopsManager {
     });
   }
 
+  Future<bool> osmShopsCacheExistFor(CoordsBounds bounds) async {
+    if (_loadShopsFromCache(bounds) != null) {
+      return true;
+    }
+    for (final territory in await _osmCacher.getCachedShops()) {
+      if (territory.bounds.containsBounds(bounds)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
     final existingCache = _loadShopsFromCache(bounds);

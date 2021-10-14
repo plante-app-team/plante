@@ -8,8 +8,14 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/shop.dart';
+import 'package:plante/model/shop_type.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
@@ -394,6 +400,51 @@ void main() {
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('map_shops_click'),
         {'shops': commons.shops.map((e) => e.osmUID).join(', ')});
+  });
+
+  testWidgets('Load Shops button behaviour', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    // No button because in tests there's a loaded area by default
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsNothing);
+
+    // Move the map to somewhere without loaded shops
+    final newCenter = Coord(
+      lat: commons.shopsBounds.center.lat + 10,
+      lon: commons.shopsBounds.center.lon + 10,
+    );
+    commons.shopsManager.setShopsLoader((bounds) => [
+          Shop((e) => e
+            ..osmShop.replace(OsmShop((e) => e
+              ..osmUID = OsmUID.parse('1:load_shops_test')
+              ..longitude = newCenter.lat
+              ..latitude = newCenter.lon
+              ..name = 'Horns and Hooves'
+              ..type = ShopType.supermarket.osmName))
+            ..backendShop.replace(BackendShop((e) => e
+              ..osmUID = OsmUID.parse('1:load_shops_test')
+              ..productsCount = 1)))
+        ]);
+    await commons.moveCamera(
+        newCenter, MapPageMode.DEFAULT_MIN_ZOOM, widget, tester);
+
+    // Now the button should appear
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsOneWidget);
+    commons.shopsManager.clear_verifiedCalls();
+
+    // Load shops
+    await tester
+        .superTap(find.text(context.strings.map_page_load_shops_of_this_area));
+
+    // Now the button should disappear
+    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+        findsNothing);
+    commons.shopsManager.verify_fetchShops_called();
   });
 }
 

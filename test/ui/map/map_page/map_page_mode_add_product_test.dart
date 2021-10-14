@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
@@ -15,12 +13,13 @@ import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_shops_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
-  late MockShopsManager shopsManager;
+  late FakeShopsManager shopsManager;
   late FakeAnalytics analytics;
   late List<Shop> shops;
   final product = ProductLangSlice((e) => e
@@ -83,7 +82,7 @@ void main() {
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
 
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verity_createShop_called(times: 0);
 
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
@@ -91,7 +90,9 @@ void main() {
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
     // Verify the product is added to the shop
-    verify(shopsManager.putProductToShops(product, [shops[0], shops[1]]));
+    final createShopParams = shopsManager.calls_putProductToShops().single;
+    expect(createShopParams.product, equals(product));
+    expect(createShopParams.shops, equals([shops[0], shops[1]]));
   });
 
   testWidgets('can put products to shops cluster', (WidgetTester tester) async {
@@ -125,7 +126,7 @@ void main() {
     await tester.tap(find.byWidget(yesButton2));
     await tester.pumpAndSettle();
 
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verity_createShop_called(times: 0);
     expect(find.byKey(const Key('shop_card_scroll')), findsNothing);
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
@@ -133,7 +134,9 @@ void main() {
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
     // Verify the product is added to the shops
-    verify(shopsManager.putProductToShops(product, [shops[1], shops[0]]));
+    final createShopParams = shopsManager.calls_putProductToShops().single;
+    expect(createShopParams.product, equals(product));
+    expect(createShopParams.shops, equals([shops[1], shops[0]]));
   });
 
   testWidgets('cannot put products to shops when no products are selected',
@@ -152,7 +155,7 @@ void main() {
     // Expecting the page to still be open
     expect(find.byType(MapPage), findsOneWidget);
     // Verify no product is added to any shop
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verify_putProductToShops_called(times: 0);
   });
 
   testWidgets('unselect shop', (WidgetTester tester) async {
@@ -186,7 +189,7 @@ void main() {
     // Expecting the page to still be open
     expect(find.byType(MapPage), findsOneWidget);
     // Verify no product is added to any shop
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verity_createShop_called(times: 0);
   });
 
   testWidgets('can cancel the mode after shops are selected',
@@ -214,7 +217,7 @@ void main() {
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
     // Verify no product is added to any shop
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verity_createShop_called(times: 0);
   });
 
   testWidgets('can cancel the mode when no shops are selected',
@@ -233,7 +236,7 @@ void main() {
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
     // Verify no product is added to any shop
-    verifyNever(shopsManager.putProductToShops(any, any));
+    shopsManager.verity_createShop_called(times: 0);
   });
 
   testWidgets('can cancel a shop selection', (WidgetTester tester) async {
@@ -261,15 +264,15 @@ void main() {
       manyShops.add(Shop((e) => e
         ..osmShop.replace(OsmShop((e) => e
           ..osmUID = OsmUID.parse('1:$i')
-          ..longitude = 10
-          ..latitude = 10
+          ..longitude = commons.shopsBounds.center.lon
+          ..latitude = commons.shopsBounds.center.lat
           ..name = 'Spar$i'))
         ..backendShop.replace(BackendShop((e) => e
           ..osmUID = OsmUID.parse('1:$i')
           ..productsCount = i))));
     }
-    final shopsMap = {for (final shop in manyShops) shop.osmUID: shop};
-    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shopsMap));
+    await shopsManager.clearCache();
+    shopsManager.addPreloadedArea(commons.shopsBounds, manyShops);
 
     final widget = MapPage(
         mapControllerForTesting: mapController,
@@ -344,9 +347,6 @@ void main() {
   });
 
   testWidgets('no shops hint', (WidgetTester tester) async {
-    // Shops available!
-    commons.fillFetchedShops();
-
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
@@ -363,16 +363,14 @@ void main() {
         findsNothing);
 
     // No shops!
-    commons.clearFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.clearFetchedShops(widget, tester, context);
 
     expect(
         find.text(context.strings.map_page_no_shops_hint_in_select_shops_mode),
         findsOneWidget);
 
     // Fetch shops!
-    commons.fillFetchedShops();
+    await commons.fillFetchedShops(widget, tester);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 

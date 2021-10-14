@@ -108,6 +108,7 @@
     "map_page_no_shops_hint_in_select_shops_mode": "Рядом нет известных магазинов. Но вы можете отметить новый, кликнув на круглую кнопку с плюсиком справа!",
     "map_page_open_street_map_licence": "Данные от Open Street Map",
     "map_page_zoom_in_to_see_shops": "Приблизьте карту, чтобы видеть магазины",
+    "map_page_load_shops_of_this_area": "Загрузить магазины рядом",
 
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_label": "Название магазина",

@@ -950,6 +950,10 @@ class MockShopsManager extends _i1.Mock implements _i59.ShopsManager {
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
+  _i9.Future<bool> areShopsFetchedFor(_i27.CoordsBounds? bounds) =>
+      (super.noSuchMethod(Invocation.method(#areShopsFetchedFor, [bounds]),
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
+  @override
   _i9.Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i60.ShopsManagerError>>
       fetchShops(_i27.CoordsBounds? bounds) =>
           (super.noSuchMethod(Invocation.method(#fetchShops, [bounds]),

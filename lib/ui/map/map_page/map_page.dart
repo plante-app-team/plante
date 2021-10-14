@@ -16,13 +16,14 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
+import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/components/animated_mode_widget.dart';
+import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
@@ -204,7 +205,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         bottomHintCallback: updateBottomHintCallback,
         moveMapCallback: moveMapCallback,
         modeSwitchCallback: switchModeCallback,
-        isLoadingCallback: () => _loading);
+        isLoadingCallback: () => _loading,
+        areShopsForViewPortLoadedCallback: _model.viewPortShopsLoaded);
 
     _asyncInit();
     _instances.add(this);
@@ -303,6 +305,31 @@ class _MapPageState extends PageStatePlante<MapPage>
       initialPos = _model.defaultUserPos();
     }
 
+    final searchBar = Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Hero(
+            tag: 'search_bar',
+            child: MapSearchBar(
+                queryOverride: _latestSearchResult?.query,
+                enabled: false,
+                onDisabledTap: _onSearchBarTap,
+                onCleared: () {
+                  setState(() {
+                    _latestSearchResult = null;
+                  });
+                })));
+
+    final loadShopsButton = Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: AnimatedMapWidget(
+            child: !_model.viewPortShopsLoaded() &&
+                    _mode.loadNewShops() &&
+                    !_model.loading
+                ? ButtonFilledPlante.withText(
+                    context.strings.map_page_load_shops_of_this_area,
+                    onPressed: _loadShops)
+                : const SizedBox()));
+
     final content = Stack(children: [
       GoogleMap(
         myLocationEnabled: _locationPermissionObtained,
@@ -344,6 +371,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                 child: SizedBox(
                     width: 80,
                     child: AnimatedListSimplePlante(children: _fabs()))),
+            loadShopsButton,
             MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(
                 children: _mode.buildBottomActions(context)),
@@ -353,23 +381,13 @@ class _MapPageState extends PageStatePlante<MapPage>
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Hero(
-                    tag: 'search_bar',
-                    child: MapSearchBar(
-                        queryOverride: _latestSearchResult?.query,
-                        enabled: false,
-                        onDisabledTap: _onSearchBarTap,
-                        onCleared: () {
-                          setState(() {
-                            _latestSearchResult = null;
-                          });
-                        })),
-              ),
-              AnimatedModeWidget(child: _mode.buildHeader(context)),
+              AnimatedMapWidget(
+                  child: _mode.loadNewShops() && _model.viewPortShopsLoaded()
+                      ? searchBar
+                      : const SizedBox()),
+              AnimatedMapWidget(child: _mode.buildHeader(context)),
               MapHintsList(controller: _hintsController),
-              AnimatedModeWidget(child: _mode.buildTopActions(context)),
+              AnimatedMapWidget(child: _mode.buildTopActions(context)),
             ])),
       ),
       _mode.buildOverlay(context),
@@ -449,8 +467,8 @@ class _MapPageState extends PageStatePlante<MapPage>
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
     _updateMap(delay: const Duration(milliseconds: 1000));
-    await _model.onCameraIdle(
-        viewBounds.toCoordsBounds(), _mode.loadNewShops());
+    await _model.onCameraIdle(viewBounds.toCoordsBounds());
+    _mode.onCameraIdle();
   }
 
   void _onShopsUpdated(Iterable<Shop> shops) {
@@ -536,6 +554,10 @@ class _MapPageState extends PageStatePlante<MapPage>
       return false;
     }
     return await _mode.onWillPop();
+  }
+
+  void _loadShops() {
+    _model.loadShops();
   }
 }
 
