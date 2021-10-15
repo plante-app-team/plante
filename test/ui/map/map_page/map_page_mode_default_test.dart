@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
+import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
@@ -17,13 +15,14 @@ import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_shops_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
   late FakeAnalytics analytics;
-  late MockShopsManager shopsManager;
+  late FakeShopsManager shopsManager;
   late MockDirectionsManager directionsManager;
   late List<Shop> shops;
 
@@ -150,13 +149,11 @@ void main() {
     var backendShop = commons.shops[0].backendShop!;
     backendShop = backendShop
         .rebuild((e) => e.productsCount = backendShop.productsCount + 1);
-    commons.shops[0] =
-        commons.shops[0].rebuild((e) => e.backendShop.replace(backendShop));
-    commons.shopsMap = {for (final shop in commons.shops) shop.osmUID: shop};
-    // Notify about the update
-    commons.shopsManagerListeners.forEach((listener) {
-      listener.onLocalShopsChange();
-    });
+
+    final shopsCopy = commons.shops.toList();
+    shopsCopy[0] =
+        shopsCopy[0].rebuild((e) => e.backendShop.replace(backendShop));
+    await commons.replaceFetchedShops(shopsCopy, tester);
     await tester.pumpAndSettle();
 
     expect(
@@ -204,9 +201,6 @@ void main() {
 
   testWidgets('no shops hint when empty shops are not displayed',
       (WidgetTester tester) async {
-    // Shops available!
-    commons.fillFetchedShops();
-
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await tester.superPump(widget);
     widget.onMapIdleForTesting();
@@ -218,19 +212,16 @@ void main() {
         findsNothing);
 
     // No shops!
-    commons.clearFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.clearFetchedShops(widget, tester, context);
 
+    // No shops hint is expected
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
         findsOneWidget);
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
         findsNothing);
 
     // Fetch shops!
-    commons.fillFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.fillFetchedShops(widget, tester);
 
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
         findsNothing);
@@ -240,11 +231,11 @@ void main() {
 
   testWidgets('no shops hint when empty shops are displayed',
       (WidgetTester tester) async {
-    // Shops available!
-    commons.fillFetchedShops();
-
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
     // Show empty shops
     await tester.tap(find.text(context.strings.map_page_empty_shops));
 
@@ -257,9 +248,7 @@ void main() {
         findsNothing);
 
     // No shops!
-    commons.clearFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.clearFetchedShops(widget, tester, context);
 
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
         findsNothing);
@@ -267,9 +256,7 @@ void main() {
         findsOneWidget);
 
     // Fetch shops!
-    commons.fillFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.fillFetchedShops(widget, tester);
 
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
         findsNothing);
@@ -282,9 +269,7 @@ void main() {
     final context = await tester.superPump(widget);
 
     // No shops!
-    commons.clearFetchedShops();
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.clearFetchedShops(widget, tester, context);
 
     // Hint 1
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
@@ -313,15 +298,19 @@ void main() {
         findsNothing);
   });
 
-  testWidgets('no shops hint is not shown until shops are loaded',
+  testWidgets('no shops hint is shown until shops are loaded',
       (WidgetTester tester) async {
-    final completer = Completer<Map<OsmUID, Shop>>();
-    when(shopsManager.fetchShops(any))
-        .thenAnswer((_) async => Ok(await completer.future));
+    await shopsManager.clearCache();
+    final completer = Completer<List<Shop>>();
+    shopsManager.setAsyncShopsLoader((_) => completer.future);
 
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await tester.superPump(widget);
     widget.onMapIdleForTesting();
+    await tester.pump(const Duration(milliseconds: 10));
+
+    await tester
+        .tap(find.text(context.strings.map_page_load_shops_of_this_area));
     await tester.pump(const Duration(milliseconds: 10));
 
     // No hints yet!
@@ -331,7 +320,7 @@ void main() {
         findsNothing);
 
     // Shops loaded, and there are no shops!
-    completer.complete({});
+    completer.complete([]);
     await tester.pumpAndSettle();
 
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
@@ -393,45 +382,85 @@ void main() {
     expect(find.byKey(const Key('directions_button')), findsNothing);
   });
 
-  testWidgets('shops are not loaded when zoomed out',
+  testWidgets('huge zoom out when shops ARE NOT loaded',
+      (WidgetTester tester) async {
+    await shopsManager.clearCache();
+
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    // Close zoom and expected (and not expected) widgets
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageMode.DEFAULT_MIN_ZOOM, widget, tester);
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
+    expect(find.byType(MapSearchBar), findsNothing);
+    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+
+    // Map zoomed out really much
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageModeDefault.MIN_ZOOM, widget, tester);
+
+    // Again, expected and not expected widgets
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsNothing);
+    expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
+        findsOneWidget);
+    expect(find.byType(MapSearchBar), findsNothing);
+    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+
+    // Map zoomed back in - first check done again
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageMode.DEFAULT_MAX_ZOOM, widget, tester);
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsOneWidget);
+    expect(
+        find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
+    expect(find.byType(MapSearchBar), findsNothing);
+    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+  });
+
+  testWidgets('huge zoom out when shops ARE loaded',
       (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await tester.superPump(widget);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    // When map just loaded - shops are fetched
-    verify(shopsManager.fetchShops(any));
-
-    // Map moved again - shops fetched again
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-    verify(shopsManager.fetchShops(any));
-
-    // No zoom hint yet
+    // Close zoom and expected (and not expected) widgets
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageMode.DEFAULT_MIN_ZOOM, widget, tester);
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsNothing);
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
+    expect(find.byType(MapSearchBar), findsOneWidget);
+    expect(find.text(context.strings.map_page_empty_shops), findsOneWidget);
 
-    // Map zoomed out really much - shops are not fetch anymore
-    widget.onMapMoveForTesting(
-        Coord(lat: 10, lon: 10), MapPageModeDefault.MIN_ZOOM);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-    verifyNever(shopsManager.fetchShops(any));
+    // Map zoomed out really much
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageModeDefault.MIN_ZOOM, widget, tester);
 
-    // Zoom hint is present
+    // Again, expected and not expected widgets
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsNothing);
     expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
         findsOneWidget);
+    expect(find.byType(MapSearchBar), findsNothing);
+    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
 
-    // Map zoomed back in - shops are fetched again
-    widget.onMapMoveForTesting(
-        Coord(lat: 10, lon: 10), MapPageMode.DEFAULT_MAX_ZOOM);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-    verify(shopsManager.fetchShops(any));
-
-    // No zoom hint anymore
+    // Map zoomed back in - first check done again
+    await commons.moveCamera(commons.shopsBounds.center,
+        MapPageMode.DEFAULT_MAX_ZOOM, widget, tester);
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
+        findsNothing);
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
+    expect(find.byType(MapSearchBar), findsOneWidget);
+    expect(find.text(context.strings.map_page_empty_shops), findsOneWidget);
   });
 }

@@ -35,7 +35,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       required ArgCallback<String?> bottomHintCallback,
       required ArgCallback<Coord> moveMapCallback,
       required ArgCallback<MapPageMode> modeSwitchCallback,
-      required ResCallback<bool> isLoadingCallback})
+      required ResCallback<bool> isLoadingCallback,
+      required ResCallback<bool> areShopsForViewPortLoadedCallback})
       : super(
             MapPageModeParams(
                 model,
@@ -49,6 +50,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 moveMapCallback,
                 modeSwitchCallback,
                 isLoadingCallback,
+                areShopsForViewPortLoadedCallback,
                 analytics),
             nameForAnalytics: 'default');
 
@@ -97,6 +99,9 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Widget buildTopActions(BuildContext context) {
+    if (!shopsForViewPortLoaded) {
+      return super.buildTopActions(context);
+    }
     return Align(
         alignment: Alignment.centerRight,
         child: SizedBox(
@@ -164,8 +169,13 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
     _updateBottomHint();
   }
 
+  @override
+  void onCameraIdle() {
+    _updateBottomHint();
+  }
+
   void _updateBottomHint() {
-    if (displayedShops.isNotEmpty || loading) {
+    if (displayedShops.isNotEmpty || loading || !shopsForViewPortLoaded) {
       setBottomHint(null);
       return;
     }

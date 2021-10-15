@@ -1,5 +1,4 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
@@ -30,11 +29,6 @@ class ShopsManagerBackendWorker {
       {required CoordsBounds osmBounds,
       required CoordsBounds planteBounds,
       Iterable<OsmShop>? preloadedOsmShops}) async {
-    if (!osmBounds.containsBounds(planteBounds) && osmBounds != planteBounds) {
-      Log.e('Plante bounds are not expected to be bigger than OSM bounds. '
-          'osm bounds: $osmBounds, plante bounds: $planteBounds');
-    }
-
     // Either request OSM shops or use preloaded
     final Iterable<OsmShop> osmShops;
     if (preloadedOsmShops == null) {

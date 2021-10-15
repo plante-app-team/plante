@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
@@ -12,12 +11,13 @@ import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_shops_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
-  late MockShopsManager shopsManager;
+  late FakeShopsManager shopsManager;
   late FakeAnalytics analytics;
   late List<Shop> shops;
 
@@ -116,17 +116,13 @@ void main() {
     await tester.tapDropDownItem(context.strings.shop_type_supermarket);
     await tester.pumpAndSettle();
 
-    verifyNever(shopsManager.createShop(
-        name: anyNamed('name'),
-        coord: anyNamed('coord'),
-        type: anyNamed('type')));
+    shopsManager.verity_createShop_called(times: 0);
 
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
     // Shop is created
-    verify(shopsManager.createShop(
-        name: 'new shop', coord: anyNamed('coord'), type: anyNamed('type')));
+    shopsManager.verity_createShop_called(times: 1);
     // Mode is changed
     expect(widget.getModeForTesting().runtimeType,
         equals(MapPageModeSelectShopsWhereProductSold));

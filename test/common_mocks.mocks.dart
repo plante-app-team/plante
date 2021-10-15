@@ -700,6 +700,9 @@ class MockOsmOverpass extends _i1.Mock implements _i47.OsmOverpass {
   Map<String, String> get urls => (super.noSuchMethod(Invocation.getter(#urls),
       returnValue: <String, String>{}) as Map<String, String>);
   @override
+  int now() =>
+      (super.noSuchMethod(Invocation.method(#now, []), returnValue: 0) as int);
+  @override
   _i10.Future<_i2.Result<List<_i48.OsmShop>, _i12.OpenStreetMapError>> fetchShops(
           {_i28.CoordsBounds? bounds, Iterable<_i26.OsmUID>? osmUIDs}) =>
       (super.noSuchMethod(
@@ -1011,6 +1014,10 @@ class MockShopsManager extends _i1.Mock implements _i62.ShopsManager {
   void removeListener(_i63.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
+  @override
+  _i10.Future<bool> osmShopsCacheExistFor(_i28.CoordsBounds? bounds) =>
+      (super.noSuchMethod(Invocation.method(#osmShopsCacheExistFor, [bounds]),
+          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
   @override
   _i10.Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>
       fetchShops(_i28.CoordsBounds? bounds) =>
