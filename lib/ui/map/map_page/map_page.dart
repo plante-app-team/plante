@@ -162,13 +162,10 @@ class _MapPageState extends PageStatePlante<MapPage>
     /// which marks when clustering behaviour should change (whether to cluster
     /// markers into smaller or bigger groups).
     ///
-    /// We allow to change map's zoom between 13 and 19 so all levels outside
-    /// of those bounds are useless for us.
-    /// The useful levels (vals between 13 and 19) in the const list below are
-    /// selected by manual testing.
+    /// The levels in the const list below are selected by manual testing.
     /// You can adjust them, but only with very careful testing and with
     /// God's help (you'll need it).
-    const clusteringLevels = <double>[10, 10, 10, 10, 10, 12, 14, 16.5, 20];
+    const clusteringLevels = <double>[9, 9.5, 10, 10.5, 11, 12, 14, 17, 18];
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
