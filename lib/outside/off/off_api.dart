@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -7,14 +9,22 @@ import 'package:openfoodfacts/model/SearchResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
+/// Errors caused by OFF REST API (not by the OFF Dart SDK).
+enum OffRestApiError {
+  NETWORK,
+  OTHER,
+}
+
 /// OFF wrapper mainly needed for DI in tests
 class OffApi {
+  static const _REST_API_TIMEOUT = Duration(seconds: 10);
   final Settings _settings;
   final HttpClient _httpClient;
   final FakeOffApi _fakeOffApi;
@@ -70,48 +80,92 @@ class OffApi {
     return result;
   }
 
-  Future<List<OffShop>> getShopsForLocation(
+  Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
       String countryIso) async {
-    List<OffShop> shops = [];
-    final http.Response response = await _httpClient.get(
-        Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
-        headers: {
-          'user-agent': await userAgent()
-        });
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body) as Map<String, dynamic>;
-      final shopsJson = result['tags'] as List<dynamic>;
-      shops = shopsJson
-          .map(OffShop.fromJson)
-          .whereType<OffShop>()
-          .toList();
-    } else {
-      Log.w('OffApi.getShopsForLocation error: ${response.body}');
+    final http.Response response;
+    try {
+      response = await _httpClient.get(
+          Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
+          headers: {
+            'user-agent': await userAgent()
+          }).timeout(_REST_API_TIMEOUT);
+    } on IOException catch (e) {
+      Log.w('OffApi.getShopsForLocation network error', ex: e);
+      return Err(OffRestApiError.NETWORK);
+    } on TimeoutException catch (e) {
+      Log.w(
+          'OffApi.getShopsForLocation timeout',
+          ex: e);
+      return Err(OffRestApiError.NETWORK);
     }
-    return shops;
+
+    if (response.statusCode != 200) {
+      Log.w('OffApi.getShopsForLocation response error: $response');
+      return Err(OffRestApiError.OTHER);
+    }
+
+    final resultJson = _jsonDecodeSafe(response.body);
+    if (resultJson == null) {
+      Log.w('OffApi.getShopsForLocation invalid JSON: ${response.body}');
+      return Err(OffRestApiError.OTHER);
+    }
+    final shopsJson = resultJson['tags'] as List<dynamic>;
+    return Ok(shopsJson
+        .map(OffShop.fromJson)
+        .whereType<OffShop>()
+        .toList());
   }
 
-  Future<off.SearchResult> getVeganProductsForShop(
-      String countryIso, String shop, int page) async {
-    late off.SearchResult searchResult = const off.SearchResult();
-    final http.Response response = await _httpClient.get(
-        Uri.parse(
-            'https://$countryIso.openfoodfacts.org/api/v2/search?ingredients_analysis_tags=en:vegan&stores_tags=$shop&page_size=20&page=$page'),
-        headers: {
-          'user-agent': await userAgent()
-        });
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body);
-      searchResult = off.SearchResult.fromJson(result as Map<String, dynamic>);
-      //convert product _productsConverter.convertAndCache
-      //final List<Product> products = [];
-      //for (final off.Product offProduct in searchResult.products!){
-        //final product = _productConverter.convertAndCache(offProduct, null, [LangCode.be]);
-        //products.add(product);
-      //}
-    } else {
-      Log.w('OffApi.getProductsForShop $shop error: ${response.body}');
+  Future<Result<off.SearchResult, OffRestApiError>> getVeganProductsForShop(
+      String countryIso, String shopID, int page) async {
+    final http.Response response;
+
+    try {
+      response = await _httpClient.get(
+          Uri.parse(
+              'https://$countryIso.openfoodfacts.org/api/v2/search?'
+                  'ingredients_analysis_tags=en:vegan&'
+                  'stores_tags=$shopID&'
+                  'page_size=20&'
+                  'page=$page'),
+          headers: {
+            'user-agent': await userAgent()
+          });
+    } on IOException catch (e) {
+      Log.w('OffApi.getVeganProductsForShop network error', ex: e);
+      return Err(OffRestApiError.NETWORK);
+    } on TimeoutException catch (e) {
+      Log.w(
+          'OffApi.getVeganProductsForShop timeout',
+          ex: e);
+      return Err(OffRestApiError.NETWORK);
     }
-    return searchResult;
+
+    if (response.statusCode != 200) {
+      Log.w('OffApi.getProductsForShop $shopID error: ${response.body}');
+      return Err(OffRestApiError.OTHER);
+    }
+
+    final resultJson = _jsonDecodeSafe(response.body);
+    if (resultJson == null) {
+      Log.w('OffApi.getProductsForShop invalid JSON: ${response.body}');
+      return Err(OffRestApiError.OTHER);
+    }
+
+    try {
+      return Ok(off.SearchResult.fromJson(resultJson));
+    } catch (e) {
+      Log.w('OffApi.getProductsForShop invalid JSON format: $resultJson');
+      return Err(OffRestApiError.OTHER);
+    }
+  }
+}
+
+Map<String, dynamic>? _jsonDecodeSafe(String str) {
+  try {
+    return jsonDecode(str) as Map<String, dynamic>?;
+  } on FormatException catch (e) {
+    Log.w("OffApi: couldn't decode safe: %str", ex: e);
+    return null;
   }
 }

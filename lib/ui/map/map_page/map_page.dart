@@ -14,6 +14,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -139,7 +140,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         _mode.onShopsUpdated(_model.shopsCache);
         allShops.addAll(_model.shopsCache.values);
         allShops.addAll(_mode.additionalShops());
-        _onShopsUpdated(_mode.filter(allShops));
+        _onShopsUpdated(_mode.filter(allShops, _model.shopsWithPossibleProducts));
       }
     };
     final loadingChangeCallback = () {
@@ -147,14 +148,17 @@ class _MapPageState extends PageStatePlante<MapPage>
         _mode.onLoadingChange();
       }
     };
+    final updateShopsCallback = (_) {
+      updateMapCallback.call();
+    };
     _model = MapPageModel(
         GetIt.I.get<LocationController>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<AddressObtainer>(),
         GetIt.I.get<LatestCameraPosStorage>(),
-        GetIt.I.get<DirectionsManager>(), (_) {
-      updateMapCallback.call();
-    }, _onError, updateCallback, loadingChangeCallback);
+        GetIt.I.get<DirectionsManager>(),
+        GetIt.I.get<OffShopsManager>(),
+        updateShopsCallback, _onError, updateCallback, loadingChangeCallback);
 
     /// The clustering library levels logic is complicated.
     ///
@@ -227,7 +231,7 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
     final extraData =
-        ShopsMarkersExtraData(_mode.selectedShops(), _mode.accentedShops());
+        ShopsMarkersExtraData(_mode.selectedShops(), _mode.accentedShops(), _model.shopsWithPossibleProducts);
     return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 

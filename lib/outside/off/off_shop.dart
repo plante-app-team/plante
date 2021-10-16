@@ -10,7 +10,10 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   @BuiltValueField(wireName: 'name')
   String? get name;
   @BuiltValueField(wireName: 'products')
-  int? get products;
+  int get productsCount;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _setDefaults(OffShopBuilder b) => b.productsCount = 0;
 
   static OffShop? fromJson(dynamic json) {
     return BuildValueHelper.jsonSerializers
@@ -23,4 +26,3 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   static Serializer<OffShop> get serializer => _$offShopSerializer;
 
 }
-

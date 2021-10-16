@@ -111,7 +111,12 @@ void initDI() {
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
       GetIt.I.get<OsmCacher>()));
-  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(GetIt.I.get<Settings>(),GetIt.I.get<ShopsManager>()));
+  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
+    GetIt.I.get<OffApi>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
+    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<ProductsObtainer>(),
+  ));
   GetIt.I.registerSingleton<RoadsManager>(
       RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
   GetIt.I.registerSingleton<OsmSearcher>(
