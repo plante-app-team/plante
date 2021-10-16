@@ -307,11 +307,11 @@ void main() {
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await tester.superPump(widget);
     widget.onMapIdleForTesting();
-    await tester.pump(const Duration(milliseconds: 10));
+    await tester.pumpAndSettle();
 
     await tester
         .tap(find.text(context.strings.map_page_load_shops_of_this_area));
-    await tester.pump(const Duration(milliseconds: 10));
+    await tester.pumpAndSettle();
 
     // No hints yet!
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),

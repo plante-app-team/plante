@@ -13,6 +13,7 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
+import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/stepper/customizable_stepper.dart';
@@ -106,7 +107,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           AnimatedSwitcher(
               duration: DURATION_DEFAULT,
               child: _loading
-                  ? const LinearProgressIndicator()
+                  ? const LinearProgressIndicatorPlante()
                   : const SizedBox.shrink()),
           CustomizableStepper(
             pages: [

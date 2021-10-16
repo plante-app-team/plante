@@ -24,6 +24,7 @@ import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/label_cancelable_plante.dart';
 import 'package:plante/ui/base/components/veg_status_selection_panel.dart';
+import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -396,7 +397,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
                   AnimatedSwitcher(
                       duration: DURATION_DEFAULT,
                       child: _model.loading
-                          ? const LinearProgressIndicator()
+                          ? const LinearProgressIndicatorPlante()
                           : const SizedBox.shrink())
                 ]))));
   }
