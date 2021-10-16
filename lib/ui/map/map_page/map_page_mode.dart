@@ -20,6 +20,7 @@ class MapPageModeParams {
   final ArgCallback<Coord> moveMapCallback;
   final ArgCallback<MapPageMode> modeSwitchCallback;
   final ResCallback<bool> isLoadingCallback;
+  final ResCallback<bool> areShopsForViewPortLoadedCallback;
   final Analytics analytics;
   MapPageModeParams(
       this.model,
@@ -33,6 +34,7 @@ class MapPageModeParams {
       this.moveMapCallback,
       this.modeSwitchCallback,
       this.isLoadingCallback,
+      this.areShopsForViewPortLoadedCallback,
       this.analytics);
 }
 
@@ -52,6 +54,8 @@ abstract class MapPageMode {
   Analytics get analytics => params.analytics;
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
   bool get loading => params.isLoadingCallback.call();
+  bool get shopsForViewPortLoaded =>
+      params.areShopsForViewPortLoadedCallback.call();
 
   @mustCallSuper
   void init(MapPageMode? previousMode) {}
@@ -81,6 +85,7 @@ abstract class MapPageMode {
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
   void onLoadingChange() {}
   void onCameraMove(Coord coord, double zoom) {}
+  void onCameraIdle() {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
   Future<bool> onWillPop() async => true;

@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/location_controller.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
@@ -38,8 +39,9 @@ class MapPageModel implements ShopsManagerListener {
   final LatestCameraPosStorage _latestCameraPosStorage;
   final DirectionsManager _directionsManager;
 
+  bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
-  bool _lastIdleLoadShops = true;
+  CoordsBounds? _latestFetchedViewPort;
   bool _networkOperationInProgress = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
@@ -112,23 +114,45 @@ class MapPageModel implements ShopsManagerListener {
     }
   }
 
-  Future<void> onCameraIdle(CoordsBounds viewBounds, bool loadShops) async {
+  bool viewPortShopsLoaded() => _viewPortShopsFetched;
+
+  Future<void> onCameraIdle(CoordsBounds viewBounds) async {
     _latestViewPort = viewBounds;
-    _lastIdleLoadShops = loadShops;
     unawaited(_latestCameraPosStorage.set(viewBounds.center));
 
-    if (loadShops) {
-      final result = await _networkOperation(() async {
-        return await _shopsManager.fetchShops(viewBounds);
-      });
-      if (result.isOk) {
-        _shopsCache = result.unwrap();
-        _updateShopsCallback.call(result.unwrap());
-      } else {
-        _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
-      }
-      _updateCallback.call();
+    // NOTE: we intentionally load shops each time
+    // camera is idle - this is because [ShopsManager] filters
+    // out shops which are not within the bounds it receives, thus
+    // we need to give it new bounds all the time.
+    if (await _shopsManager.osmShopsCacheExistFor(viewBounds)) {
+      unawaited(_loadShopsImpl(viewBounds));
+    } else {
+      _viewPortShopsFetched = false;
     }
+    _updateCallback.call();
+  }
+
+  Future<void> loadShops() async {
+    if (_latestViewPort == null) {
+      Log.e('MapPageModel.loadShops: no view port');
+      return;
+    }
+    await _loadShopsImpl(_latestViewPort!);
+  }
+
+  Future<void> _loadShopsImpl(CoordsBounds viewPort) async {
+    final result = await _networkOperation(() async {
+      return await _shopsManager.fetchShops(viewPort);
+    });
+    if (result.isOk) {
+      _shopsCache = result.unwrap();
+      _viewPortShopsFetched = true;
+      _latestFetchedViewPort = viewPort;
+      _updateShopsCallback.call(result.unwrap());
+    } else {
+      _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
+    }
+    _updateCallback.call();
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
@@ -169,8 +193,10 @@ class MapPageModel implements ShopsManagerListener {
   @override
   void onLocalShopsChange() {
     /// Invalidating cache!
-    if (_latestViewPort != null) {
-      onCameraIdle(_latestViewPort!, _lastIdleLoadShops);
+    if (_latestFetchedViewPort != null) {
+      // We expect the call to not go to network because
+      // we use already fetched view port
+      _loadShopsImpl(_latestFetchedViewPort!);
     }
   }
 

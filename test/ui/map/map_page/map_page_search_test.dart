@@ -47,6 +47,8 @@ void main() {
   testWidgets('searchbar click opens search page', (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
     await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
 
     expect(find.byType(MapSearchPage), findsNothing);
     await tester.superTap(find.byType(MapSearchBar));

@@ -1,25 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
-import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../z_fakes/fake_shops_manager.dart';
 
 void main() {
   late MockLocationController locationController;
-  late MockShopsManager shopsManager;
+  late FakeShopsManager fakeShopsManager;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late MockAddressObtainer addressObtainer;
   late MapPageModel model;
-
-  final shopsManagerListeners = <ShopsManagerListener>[];
 
   Map<OsmUID, Shop>? latestLoadedShops;
   MapPageModelError? latestError;
@@ -28,8 +25,8 @@ void main() {
     OsmUID.parse('1:1234'): Shop((e) => e
       ..osmShop.replace(OsmShop((e) => e
         ..osmUID = OsmUID.parse('1:1234')
-        ..longitude = 11
-        ..latitude = 11
+        ..longitude = 15
+        ..latitude = 15
         ..name = 'Spar'
         ..type = 'Supermarket'))
       ..backendShop.replace(BackendShop((e) => e
@@ -42,21 +39,15 @@ void main() {
     latestError = null;
 
     locationController = MockLocationController();
-    shopsManager = MockShopsManager();
+    fakeShopsManager = FakeShopsManager();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     addressObtainer = MockAddressObtainer();
-
-    shopsManagerListeners.clear();
-    when(shopsManager.addListener(any)).thenAnswer((invc) {
-      final listener = invc.positionalArguments[0] as ShopsManagerListener;
-      shopsManagerListeners.add(listener);
-    });
 
     final directionsManager = MockDirectionsManager();
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
 
-    model = MapPageModel(locationController, shopsManager, addressObtainer,
+    model = MapPageModel(locationController, fakeShopsManager, addressObtainer,
         latestCameraPosStorage, directionsManager, (shops) {
       latestLoadedShops = shops;
     }, (error) {
@@ -65,38 +56,81 @@ void main() {
   });
 
   test('successful shops load', () async {
-    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shops));
+    fakeShopsManager.addPreloadedArea(
+        CoordsBounds(
+            southwest: Coord(lat: 14, lon: 14),
+            northeast: Coord(lat: 16, lon: 16)),
+        shops.values);
 
     expect(latestLoadedShops, isNull);
     expect(latestError, isNull);
 
-    await model.onCameraIdle(
-        CoordsBounds(
-            southwest: Coord(lat: 14.999, lon: 14.999),
-            northeast: Coord(lat: 15.001, lon: 15.001)),
-        true);
+    await model.onCameraIdle(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+
+    expect(latestLoadedShops, isNull);
+    expect(latestError, isNull);
+
+    await model.loadShops();
 
     expect(latestLoadedShops, equals(shops));
     expect(latestError, isNull);
   });
 
   test('shops reloaded on shops manager change notification', () async {
-    when(shopsManager.fetchShops(any)).thenAnswer((_) async => Ok(shops));
-
-    verifyNever(shopsManager.fetchShops(any));
-    await model.onCameraIdle(
+    fakeShopsManager.addPreloadedArea(
         CoordsBounds(
-            southwest: Coord(lat: 14.999, lon: 14.999),
-            northeast: Coord(lat: 15.001, lon: 15.001)),
-        true);
-    verify(shopsManager.fetchShops(any));
+            southwest: Coord(lat: 14, lon: 14),
+            northeast: Coord(lat: 16, lon: 16)),
+        shops.values);
 
-    clearInteractions(shopsManager);
+    // Initial load
+    fakeShopsManager.verify_fetchShops_called(times: 0);
+    await model.onCameraIdle(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    await model.loadShops();
+    fakeShopsManager.verify_fetchShops_called();
 
-    verifyNever(shopsManager.fetchShops(any));
-    shopsManagerListeners.forEach((listener) {
-      listener.onLocalShopsChange();
-    });
-    verify(shopsManager.fetchShops(any));
+    // Reload
+    await fakeShopsManager.clearCache();
+    fakeShopsManager.clear_verifiedCalls();
+    fakeShopsManager.verify_fetchShops_called(times: 0);
+    fakeShopsManager.addPreloadedArea(
+        CoordsBounds(
+            southwest: Coord(lat: 14, lon: 14),
+            northeast: Coord(lat: 16, lon: 16)),
+        shops.values);
+
+    await Future.delayed(const Duration(milliseconds: 1));
+    fakeShopsManager.verify_fetchShops_called();
+  });
+
+  test('shops from same view port reloaded on shops manager change', () async {
+    final preloadedBounds = CoordsBounds(
+        southwest: Coord(lat: 14, lon: 14), northeast: Coord(lat: 16, lon: 16));
+    fakeShopsManager.addPreloadedArea(preloadedBounds, shops.values);
+
+    // Initial load
+    fakeShopsManager.verify_fetchShops_called(times: 0);
+    final initialViewPort = CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001));
+    await model.onCameraIdle(initialViewPort);
+    await model.loadShops();
+    fakeShopsManager.verify_fetchShops_called();
+
+    // Viewport moved
+    await model.onCameraIdle(CoordsBounds(
+        southwest: Coord(lat: 4.999, lon: 4.999),
+        northeast: Coord(lat: 5.001, lon: 5.001)));
+
+    // Reload is expected for already loaded view port
+    fakeShopsManager.clear_verifiedCalls();
+    fakeShopsManager.updatePreloadedArea(preloadedBounds, shops.values);
+    await Future.delayed(const Duration(milliseconds: 1));
+    fakeShopsManager.verify_fetchShops_called(times: 1);
+    expect(fakeShopsManager.calls_fetchShop().first, equals(initialViewPort));
   });
 }

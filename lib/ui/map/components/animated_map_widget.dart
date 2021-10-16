@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
-class AnimatedModeWidget extends StatefulWidget {
+class AnimatedMapWidget extends StatefulWidget {
   final Widget child;
-  const AnimatedModeWidget({Key? key, required this.child}) : super(key: key);
+  const AnimatedMapWidget({Key? key, required this.child}) : super(key: key);
 
   @override
-  _AnimatedModeWidgetState createState() => _AnimatedModeWidgetState();
+  _AnimatedMapWidgetState createState() => _AnimatedMapWidgetState();
 }
 
-class _AnimatedModeWidgetState extends State<AnimatedModeWidget> {
+class _AnimatedMapWidgetState extends State<AnimatedMapWidget> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(

@@ -45,10 +45,12 @@ class ShopsManagerFetchShopsHelper {
           'All requested OSM bounds must be greater than Plante bounds');
     }
 
+    // NOTE: we intentionally search for OSM territory which contains
+    // only [viewPort], not entire [planteShopsBounds].
+    final osmCachedTerritory = await _obtainCachedOsmShops(viewPort);
+    Result<FetchedShops, ShopsManagerError>? fetchResult;
     final planteShopsBounds =
         viewPort.center.makeSquare(kmToGrad(planteBoundsSizeToRequest));
-    final osmCachedTerritory = await _obtainCachedOsmShops(planteShopsBounds);
-    Result<FetchedShops, ShopsManagerError>? fetchResult;
 
     // At first let's try to use cached OSM territory
     if (osmCachedTerritory != null && !_isOld(osmCachedTerritory)) {
