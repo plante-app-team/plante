@@ -18,6 +18,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
+import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -129,8 +130,8 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                   Material(color: Colors.transparent, child: content),
                   AnimatedSwitcher(
                       duration: DURATION_DEFAULT,
-                      child: _model.loading && !isInTests()
-                          ? const LinearProgressIndicator()
+                      child: _model.loading
+                          ? const LinearProgressIndicatorPlante()
                           : const SizedBox.shrink())
                 ]))));
   }
