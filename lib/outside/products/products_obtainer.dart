@@ -1,3 +1,4 @@
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
@@ -36,5 +37,11 @@ class ProductsObtainer {
       List<BackendProduct> backendProducts) async {
     return _productsManager.inflateProducts(
         backendProducts, await _userLangs());
+  }
+
+  Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
+      List<off.Product> offProducts) async {
+    return _productsManager.inflateOffProducts(
+        offProducts, await _userLangs());
   }
 }

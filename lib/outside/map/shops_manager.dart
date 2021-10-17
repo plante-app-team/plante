@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
@@ -15,7 +14,6 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
-import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_overpass.dart';
@@ -130,9 +128,6 @@ class ShopsManager {
 
     final fetchResult = shopsFetchResult.unwrap();
     _shopsCache.addAll(fetchResult.shops);
-    for (final Shop shop in _shopsCache.values) {
-      await GetIt.I.get<OffShopsManager>().fetchVeganProductsForShop(shop.name);
-    }
     final ids = fetchResult.shops.values.map((shop) => shop.osmUID).toList();
     _loadedAreas[fetchResult.shopsBounds] = ids;
     final result = ids
