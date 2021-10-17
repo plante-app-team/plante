@@ -19,6 +19,7 @@ import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
+import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
@@ -391,7 +392,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       AnimatedSwitcher(
           duration: DURATION_DEFAULT,
           child: _loading
-              ? const LinearProgressIndicator()
+              ? const LinearProgressIndicatorPlante()
               : const SizedBox.shrink()),
     ]);
 

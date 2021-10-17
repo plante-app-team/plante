@@ -13,6 +13,7 @@ import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
+import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -72,7 +73,7 @@ class _ViewedProductsHistoryPageState
             AnimatedSwitcher(
                 duration: DURATION_DEFAULT,
                 child: loading
-                    ? const LinearProgressIndicator()
+                    ? const LinearProgressIndicatorPlante()
                     : const SizedBox.shrink()),
           ]),
           const SizedBox(height: 24),

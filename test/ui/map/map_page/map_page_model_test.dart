@@ -133,4 +133,12 @@ void main() {
     fakeShopsManager.verify_fetchShops_called(times: 1);
     expect(fakeShopsManager.calls_fetchShop().first, equals(initialViewPort));
   });
+
+  test('loading == true until first onCameraIdle is handled', () async {
+    expect(model.loading, isTrue);
+    await model.onCameraIdle(CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001)));
+    expect(model.loading, isFalse);
+  });
 }

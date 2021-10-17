@@ -43,6 +43,7 @@ class MapPageModel implements ShopsManagerListener {
   CoordsBounds? _latestViewPort;
   CoordsBounds? _latestFetchedViewPort;
   bool _networkOperationInProgress = false;
+  bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
 
@@ -68,7 +69,7 @@ class MapPageModel implements ShopsManagerListener {
     _shopsManager.removeListener(this);
   }
 
-  bool get loading => _networkOperationInProgress;
+  bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
 
   CameraPosition? initialCameraPosInstant() {
@@ -129,6 +130,7 @@ class MapPageModel implements ShopsManagerListener {
     } else {
       _viewPortShopsFetched = false;
     }
+    _firstTerritoryLoadDone = true;
     _updateCallback.call();
   }
 
