@@ -219,7 +219,7 @@
     "veg_status_displayed_not_vegetarian": "Не вегетарианский",
     "veg_status_displayed_veg_status_source_community": "Информация от сообщества",
     "veg_status_displayed_veg_status_source_off": "Авто-анализ состава",
-    "veg_status_displayed_veg_status_source_moderator": "Проверено модератором",
+    "veg_status_displayed_veg_status_source_moderator": "Проверено",
     "veg_status_displayed_veg_status_source_unknown": "Внутренняя ошибка: источник неизвестен",
 
     "viewed_products_history_page_title": "Недавно просмотренные",
