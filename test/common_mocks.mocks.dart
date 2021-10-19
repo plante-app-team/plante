@@ -634,10 +634,6 @@ class MockOffShopsManager extends _i1.Mock implements _i43.OffShopsManager {
                   _FakeResult_0<List<_i44.Product>, _i43.OffShopsManagerError>()))
           as _i9.Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>);
   @override
-  String shopNameToPossibleOffShopID(String? shopName) => (super.noSuchMethod(
-      Invocation.method(#shopNameToPossibleOffShopID, [shopName]),
-      returnValue: '') as String);
-  @override
   String toString() => super.toString();
 }
 
