@@ -86,7 +86,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   @override
-  Iterable<Shop> filter(Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) {
+  Iterable<Shop> filter(
+      Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) {
     if (_showEmptyShops) {
       return shops;
     }

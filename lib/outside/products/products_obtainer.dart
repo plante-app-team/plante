@@ -41,7 +41,6 @@ class ProductsObtainer {
 
   Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
       List<off.Product> offProducts) async {
-    return _productsManager.inflateOffProducts(
-        offProducts, await _userLangs());
+    return _productsManager.inflateOffProducts(offProducts, await _userLangs());
   }
 }

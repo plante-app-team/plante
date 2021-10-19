@@ -20,9 +20,7 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
         .deserializeWith(OffShop.serializer, json);
   }
 
-  factory OffShop([void Function(OffShopBuilder) updates]) =
-  _$OffShop;
+  factory OffShop([void Function(OffShopBuilder) updates]) = _$OffShop;
   OffShop._();
   static Serializer<OffShop> get serializer => _$offShopSerializer;
-
 }

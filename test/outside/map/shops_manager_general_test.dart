@@ -451,10 +451,10 @@ void main() {
 
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    expect(productsObtainer.inflatesCount, greaterThan(0));
+    expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
 
     clearInteractions(backend);
-    productsObtainer.inflatesCount = 0;
+    productsObtainer.inflatesBackendProductsCount = 0;
 
     // Second fetch
     final rangeRes2 = await shopsManager.fetchShopProductRange(shop);
@@ -463,7 +463,7 @@ void main() {
 
     // The second fetch DID NOT send request (it used cache)
     verifyNever(backend.requestProductsAtShops(any));
-    expect(productsObtainer.inflatesCount, equals(0));
+    expect(productsObtainer.inflatesBackendProductsCount, equals(0));
 
     // Range update
     verifyNever(backend.putProductToShop(any, any));
@@ -487,7 +487,7 @@ void main() {
 
     // The third fetch DID NOT send request (it used updated cache)
     verifyNever(backend.requestProductsAtShops(any));
-    expect(productsObtainer.inflatesCount, equals(0));
+    expect(productsObtainer.inflatesBackendProductsCount, equals(0));
   });
 
   test('shops products range force reload', () async {
@@ -509,10 +509,10 @@ void main() {
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
     verify(backend.requestProductsAtShops(any));
-    expect(productsObtainer.inflatesCount, greaterThan(0));
+    expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
 
     clearInteractions(backend);
-    productsObtainer.inflatesCount = 0;
+    productsObtainer.inflatesBackendProductsCount = 0;
 
     // Second fetch
     final rangeRes2 =
@@ -523,7 +523,7 @@ void main() {
     // The second fetch call again DID send requests, because was asked
     // to explicitly
     verify(backend.requestProductsAtShops(any));
-    expect(productsObtainer.inflatesCount, greaterThan(0));
+    expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
   });
 
   test('shop creation', () async {

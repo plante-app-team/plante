@@ -2,78 +2,77 @@
 // in plante/test/common_mocks.dart.
 // Do not manually edit this file.
 
-import 'dart:async' as _i10;
+import 'dart:async' as _i9;
 import 'dart:io' as _i54;
-import 'dart:typed_data' as _i35;
+import 'dart:typed_data' as _i34;
 
 import 'package:flutter/material.dart' as _i53;
 import 'package:flutter/services.dart' as _i55;
-import 'package:google_maps_flutter/google_maps_flutter.dart' as _i34;
+import 'package:google_maps_flutter/google_maps_flutter.dart' as _i33;
 import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart'
     as _i4;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as _i7;
-import 'package:openfoodfacts/openfoodfacts.dart' as _i6;
-import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as _i42;
-import 'package:plante/base/base.dart' as _i39;
+import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as _i6;
+import 'package:openfoodfacts/openfoodfacts.dart' as _i5;
+import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as _i41;
+import 'package:plante/base/base.dart' as _i38;
 import 'package:plante/base/permissions_manager.dart' as _i51;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/lang/sys_lang_code_holder.dart' as _i66;
-import 'package:plante/lang/user_langs_manager.dart' as _i67;
-import 'package:plante/lang/user_langs_manager_error.dart' as _i68;
-import 'package:plante/location/geolocator_wrapper.dart' as _i31;
-import 'package:plante/location/ip_location_provider.dart' as _i36;
-import 'package:plante/location/location_controller.dart' as _i38;
-import 'package:plante/model/coord.dart' as _i15;
-import 'package:plante/model/coords_bounds.dart' as _i28;
-import 'package:plante/model/lang_code.dart' as _i23;
-import 'package:plante/model/product.dart' as _i57;
-import 'package:plante/model/shop.dart' as _i13;
-import 'package:plante/model/shop_product_range.dart' as _i64;
-import 'package:plante/model/shop_type.dart' as _i65;
-import 'package:plante/model/user_langs.dart' as _i8;
-import 'package:plante/model/user_params.dart' as _i19;
-import 'package:plante/model/user_params_controller.dart' as _i69;
-import 'package:plante/model/veg_status.dart' as _i22;
-import 'package:plante/model/viewed_products_storage.dart' as _i70;
-import 'package:plante/outside/backend/backend.dart' as _i18;
-import 'package:plante/outside/backend/backend_error.dart' as _i20;
-import 'package:plante/outside/backend/backend_product.dart' as _i59;
-import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i25;
+import 'package:plante/lang/sys_lang_code_holder.dart' as _i65;
+import 'package:plante/lang/user_langs_manager.dart' as _i66;
+import 'package:plante/lang/user_langs_manager_error.dart' as _i67;
+import 'package:plante/location/geolocator_wrapper.dart' as _i30;
+import 'package:plante/location/ip_location_provider.dart' as _i35;
+import 'package:plante/location/location_controller.dart' as _i37;
+import 'package:plante/model/coord.dart' as _i14;
+import 'package:plante/model/coords_bounds.dart' as _i27;
+import 'package:plante/model/lang_code.dart' as _i22;
+import 'package:plante/model/product.dart' as _i44;
+import 'package:plante/model/shop.dart' as _i12;
+import 'package:plante/model/shop_product_range.dart' as _i63;
+import 'package:plante/model/shop_type.dart' as _i64;
+import 'package:plante/model/user_langs.dart' as _i7;
+import 'package:plante/model/user_params.dart' as _i18;
+import 'package:plante/model/user_params_controller.dart' as _i68;
+import 'package:plante/model/veg_status.dart' as _i21;
+import 'package:plante/model/viewed_products_storage.dart' as _i69;
+import 'package:plante/outside/backend/backend.dart' as _i17;
+import 'package:plante/outside/backend/backend_error.dart' as _i19;
+import 'package:plante/outside/backend/backend_product.dart' as _i58;
+import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i24;
 import 'package:plante/outside/backend/backend_response.dart' as _i3;
-import 'package:plante/outside/backend/backend_shop.dart' as _i27;
-import 'package:plante/outside/backend/mobile_app_config.dart' as _i24;
-import 'package:plante/outside/backend/mobile_app_config_manager.dart' as _i40;
+import 'package:plante/outside/backend/backend_shop.dart' as _i26;
+import 'package:plante/outside/backend/mobile_app_config.dart' as _i23;
+import 'package:plante/outside/backend/mobile_app_config_manager.dart' as _i39;
 import 'package:plante/outside/backend/product_presence_vote_result.dart'
-    as _i29;
-import 'package:plante/outside/backend/requested_products_result.dart' as _i21;
-import 'package:plante/outside/http_client.dart' as _i5;
-import 'package:plante/outside/identity/apple_authorizer.dart' as _i16;
-import 'package:plante/outside/identity/apple_user.dart' as _i17;
-import 'package:plante/outside/identity/google_authorizer.dart' as _i32;
-import 'package:plante/outside/identity/google_user.dart' as _i33;
-import 'package:plante/outside/map/address_obtainer.dart' as _i9;
-import 'package:plante/outside/map/directions_manager.dart' as _i30;
-import 'package:plante/outside/map/off_shops_manager.dart' as _i44;
-import 'package:plante/outside/map/open_street_map.dart' as _i12;
-import 'package:plante/outside/map/osm_address.dart' as _i14;
+    as _i28;
+import 'package:plante/outside/backend/requested_products_result.dart' as _i20;
+import 'package:plante/outside/identity/apple_authorizer.dart' as _i15;
+import 'package:plante/outside/identity/apple_user.dart' as _i16;
+import 'package:plante/outside/identity/google_authorizer.dart' as _i31;
+import 'package:plante/outside/identity/google_user.dart' as _i32;
+import 'package:plante/outside/map/address_obtainer.dart' as _i8;
+import 'package:plante/outside/map/directions_manager.dart' as _i29;
+import 'package:plante/outside/map/off_shops_manager.dart' as _i43;
+import 'package:plante/outside/map/open_street_map.dart' as _i11;
+import 'package:plante/outside/map/osm_address.dart' as _i13;
 import 'package:plante/outside/map/osm_nominatim.dart' as _i45;
 import 'package:plante/outside/map/osm_overpass.dart' as _i47;
 import 'package:plante/outside/map/osm_road.dart' as _i49;
 import 'package:plante/outside/map/osm_search_result.dart' as _i46;
 import 'package:plante/outside/map/osm_searcher.dart' as _i50;
 import 'package:plante/outside/map/osm_shop.dart' as _i48;
-import 'package:plante/outside/map/osm_short_address.dart' as _i11;
-import 'package:plante/outside/map/osm_uid.dart' as _i26;
-import 'package:plante/outside/map/roads_manager.dart' as _i61;
-import 'package:plante/outside/map/shops_manager.dart' as _i62;
-import 'package:plante/outside/map/shops_manager_types.dart' as _i63;
-import 'package:plante/outside/off/off_api.dart' as _i41;
-import 'package:plante/outside/off/off_shop.dart' as _i43;
+import 'package:plante/outside/map/osm_short_address.dart' as _i10;
+import 'package:plante/outside/map/osm_uid.dart' as _i25;
+import 'package:plante/outside/map/roads_manager.dart' as _i60;
+import 'package:plante/outside/map/shops_manager.dart' as _i61;
+import 'package:plante/outside/map/shops_manager_types.dart' as _i62;
+import 'package:plante/outside/off/off_api.dart' as _i40;
+import 'package:plante/outside/off/off_shop.dart' as _i42;
 import 'package:plante/outside/products/products_manager.dart' as _i56;
-import 'package:plante/outside/products/products_manager_error.dart' as _i58;
-import 'package:plante/outside/products/products_obtainer.dart' as _i60;
-import 'package:plante/ui/map/latest_camera_pos_storage.dart' as _i37;
+import 'package:plante/outside/products/products_manager_error.dart' as _i57;
+import 'package:plante/outside/products/products_obtainer.dart' as _i59;
+import 'package:plante/ui/map/latest_camera_pos_storage.dart' as _i36;
 import 'package:plante/ui/photos_taker.dart' as _i52;
 
 // ignore_for_file: avoid_redundant_argument_values
@@ -95,51 +94,49 @@ class _FakeScreenCoordinate_3 extends _i1.Fake implements _i4.ScreenCoordinate {
 
 class _FakeLatLng_4 extends _i1.Fake implements _i4.LatLng {}
 
-class _FakeHttpClient_5 extends _i1.Fake implements _i5.HttpClient {}
+class _FakeSearchResult_5 extends _i1.Fake implements _i5.SearchResult {}
 
-class _FakeSearchResult_6 extends _i1.Fake implements _i6.SearchResult {}
+class _FakeStatus_6 extends _i1.Fake implements _i5.Status {}
 
-class _FakeStatus_7 extends _i1.Fake implements _i6.Status {}
+class _FakeOcrIngredientsResult_7 extends _i1.Fake
+    implements _i6.OcrIngredientsResult {}
 
-class _FakeOcrIngredientsResult_8 extends _i1.Fake
-    implements _i7.OcrIngredientsResult {}
-
-class _FakeUserLangs_9 extends _i1.Fake implements _i8.UserLangs {}
+class _FakeUserLangs_8 extends _i1.Fake implements _i7.UserLangs {}
 
 /// A class which mocks [AddressObtainer].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAddressObtainer extends _i1.Mock implements _i9.AddressObtainer {
+class MockAddressObtainer extends _i1.Mock implements _i8.AddressObtainer {
   MockAddressObtainer() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>
-      addressOfShop(_i13.Shop? shop) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>
+      addressOfShop(_i12.Shop? shop) => (super.noSuchMethod(
           Invocation.method(#addressOfShop, [shop]),
           returnValue:
-              Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>.value(
-                  _FakeResult_0<_i11.OsmShortAddress,
-                      _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>);
+              Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>.value(
+                  _FakeResult_0<_i10.OsmShortAddress,
+                      _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>);
   @override
-  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>
-      addressOfCoords(_i15.Coord? coords) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>
+      addressOfCoords(_i14.Coord? coords) => (super.noSuchMethod(
           Invocation.method(#addressOfCoords, [coords]),
           returnValue: Future<
-                  _i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>.value(
-              _FakeResult_0<_i14.OsmAddress, _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>);
+                  _i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>.value(
+              _FakeResult_0<_i13.OsmAddress, _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>);
   @override
-  _i10.Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>
-      shortAddressOfCoords(_i15.Coord? coords) =>
-          (super.noSuchMethod(Invocation.method(#shortAddressOfCoords, [coords]),
-              returnValue:
-                  Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>.value(
-                      _FakeResult_0<_i11.OsmShortAddress,
-                          _i12.OpenStreetMapError>())) as _i10
-              .Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>);
+  _i9.Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>
+      shortAddressOfCoords(_i14.Coord? coords) => (super.noSuchMethod(
+          Invocation.method(#shortAddressOfCoords, [coords]),
+          returnValue:
+              Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>.value(
+                  _FakeResult_0<_i10.OsmShortAddress,
+                      _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>);
   @override
   String toString() => super.toString();
 }
@@ -147,16 +144,16 @@ class MockAddressObtainer extends _i1.Mock implements _i9.AddressObtainer {
 /// A class which mocks [AppleAuthorizer].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockAppleAuthorizer extends _i1.Mock implements _i16.AppleAuthorizer {
+class MockAppleAuthorizer extends _i1.Mock implements _i15.AppleAuthorizer {
   MockAppleAuthorizer() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i17.AppleUser?> auth() =>
+  _i9.Future<_i16.AppleUser?> auth() =>
       (super.noSuchMethod(Invocation.method(#auth, []),
-              returnValue: Future<_i17.AppleUser?>.value())
-          as _i10.Future<_i17.AppleUser?>);
+              returnValue: Future<_i16.AppleUser?>.value())
+          as _i9.Future<_i16.AppleUser?>);
   @override
   String toString() => super.toString();
 }
@@ -164,25 +161,25 @@ class MockAppleAuthorizer extends _i1.Mock implements _i16.AppleAuthorizer {
 /// A class which mocks [Backend].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBackend extends _i1.Mock implements _i18.Backend {
+class MockBackend extends _i1.Mock implements _i17.Backend {
   MockBackend() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i18.BackendObserver? observer) =>
+  void addObserver(_i17.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i18.BackendObserver? observer) =>
+  void removeObserver(_i17.BackendObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<bool> isLoggedIn() =>
+  _i9.Future<bool> isLoggedIn() =>
       (super.noSuchMethod(Invocation.method(#isLoggedIn, []),
-          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
   @override
-  _i10.Future<_i2.Result<_i19.UserParams, _i20.BackendError>> loginOrRegister(
+  _i9.Future<_i2.Result<_i18.UserParams, _i19.BackendError>> loginOrRegister(
           {String? googleIdToken, String? appleAuthorizationCode}) =>
       (super.noSuchMethod(
               Invocation.method(#loginOrRegister, [], {
@@ -190,33 +187,33 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
                 #appleAuthorizationCode: appleAuthorizationCode
               }),
               returnValue:
-                  Future<_i2.Result<_i19.UserParams, _i20.BackendError>>.value(
-                      _FakeResult_0<_i19.UserParams, _i20.BackendError>()))
-          as _i10.Future<_i2.Result<_i19.UserParams, _i20.BackendError>>);
+                  Future<_i2.Result<_i18.UserParams, _i19.BackendError>>.value(
+                      _FakeResult_0<_i18.UserParams, _i19.BackendError>()))
+          as _i9.Future<_i2.Result<_i18.UserParams, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<bool, _i20.BackendError>> updateUserParams(
-          _i19.UserParams? userParams,
+  _i9.Future<_i2.Result<bool, _i19.BackendError>> updateUserParams(
+          _i18.UserParams? userParams,
           {String? backendClientTokenOverride}) =>
       (super.noSuchMethod(
               Invocation.method(#updateUserParams, [userParams],
                   {#backendClientTokenOverride: backendClientTokenOverride}),
-              returnValue: Future<_i2.Result<bool, _i20.BackendError>>.value(
-                  _FakeResult_0<bool, _i20.BackendError>()))
-          as _i10.Future<_i2.Result<bool, _i20.BackendError>>);
+              returnValue: Future<_i2.Result<bool, _i19.BackendError>>.value(
+                  _FakeResult_0<bool, _i19.BackendError>()))
+          as _i9.Future<_i2.Result<bool, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i21.RequestedProductsResult, _i20.BackendError>>
+  _i9.Future<_i2.Result<_i20.RequestedProductsResult, _i19.BackendError>>
       requestProducts(List<String>? barcodes, int? page) => (super.noSuchMethod(
           Invocation.method(#requestProducts, [barcodes, page]),
-          returnValue: Future<_i2.Result<_i21.RequestedProductsResult, _i20.BackendError>>.value(
-              _FakeResult_0<_i21.RequestedProductsResult,
-                  _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i21.RequestedProductsResult, _i20.BackendError>>);
+          returnValue: Future<_i2.Result<_i20.RequestedProductsResult, _i19.BackendError>>.value(
+              _FakeResult_0<_i20.RequestedProductsResult,
+                  _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i20.RequestedProductsResult, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i2.None, _i20.BackendError>> createUpdateProduct(
+  _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> createUpdateProduct(
           String? barcode,
-          {_i22.VegStatus? vegetarianStatus,
-          _i22.VegStatus? veganStatus,
-          List<_i23.LangCode>? changedLangs}) =>
+          {_i21.VegStatus? vegetarianStatus,
+          _i21.VegStatus? veganStatus,
+          List<_i22.LangCode>? changedLangs}) =>
       (super.noSuchMethod(
           Invocation.method(#createUpdateProduct, [
             barcode
@@ -225,92 +222,92 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             #veganStatus: veganStatus,
             #changedLangs: changedLangs
           }),
-          returnValue: Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-              _FakeResult_0<_i2.None, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i2.None, _i20.BackendError>>);
+          returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+              _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i2.None, _i20.BackendError>> sendReport(
+  _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> sendReport(
           String? barcode, String? reportText) =>
       (super.noSuchMethod(Invocation.method(#sendReport, [barcode, reportText]),
-          returnValue: Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-              _FakeResult_0<_i2.None, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i2.None, _i20.BackendError>>);
+          returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+              _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i2.None, _i20.BackendError>> sendProductScan(
+  _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> sendProductScan(
           String? barcode) =>
       (super.noSuchMethod(Invocation.method(#sendProductScan, [barcode]),
-          returnValue: Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-              _FakeResult_0<_i2.None, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i2.None, _i20.BackendError>>);
+          returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+              _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i24.MobileAppConfig, _i20.BackendError>>
+  _i9.Future<_i2.Result<_i23.MobileAppConfig, _i19.BackendError>>
       mobileAppConfig() => (super.noSuchMethod(
           Invocation.method(#mobileAppConfig, []),
           returnValue: Future<
-                  _i2.Result<_i24.MobileAppConfig, _i20.BackendError>>.value(
-              _FakeResult_0<_i24.MobileAppConfig, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i24.MobileAppConfig, _i20.BackendError>>);
+                  _i2.Result<_i23.MobileAppConfig, _i19.BackendError>>.value(
+              _FakeResult_0<_i23.MobileAppConfig, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i23.MobileAppConfig, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<List<_i25.BackendProductsAtShop>, _i20.BackendError>>
-      requestProductsAtShops(Iterable<_i26.OsmUID>? osmUIDs) =>
+  _i9.Future<_i2.Result<List<_i24.BackendProductsAtShop>, _i19.BackendError>>
+      requestProductsAtShops(Iterable<_i25.OsmUID>? osmUIDs) =>
           (super.noSuchMethod(Invocation.method(#requestProductsAtShops, [osmUIDs]),
               returnValue:
-                  Future<_i2.Result<List<_i25.BackendProductsAtShop>, _i20.BackendError>>.value(
-                      _FakeResult_0<List<_i25.BackendProductsAtShop>,
-                          _i20.BackendError>())) as _i10
-              .Future<_i2.Result<List<_i25.BackendProductsAtShop>, _i20.BackendError>>);
+                  Future<_i2.Result<List<_i24.BackendProductsAtShop>, _i19.BackendError>>.value(
+                      _FakeResult_0<List<_i24.BackendProductsAtShop>,
+                          _i19.BackendError>())) as _i9
+              .Future<_i2.Result<List<_i24.BackendProductsAtShop>, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<List<_i27.BackendShop>, _i20.BackendError>>
-      requestShopsByOsmUIDs(Iterable<_i26.OsmUID>? osmUIDs) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<List<_i26.BackendShop>, _i19.BackendError>>
+      requestShopsByOsmUIDs(Iterable<_i25.OsmUID>? osmUIDs) => (super.noSuchMethod(
           Invocation.method(#requestShopsByOsmUIDs, [osmUIDs]),
           returnValue: Future<
-                  _i2.Result<List<_i27.BackendShop>, _i20.BackendError>>.value(
-              _FakeResult_0<List<_i27.BackendShop>, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<List<_i27.BackendShop>, _i20.BackendError>>);
+                  _i2.Result<List<_i26.BackendShop>, _i19.BackendError>>.value(
+              _FakeResult_0<List<_i26.BackendShop>, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<List<_i26.BackendShop>, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<List<_i27.BackendShop>, _i20.BackendError>>
-      requestShopsWithin(_i28.CoordsBounds? bounds) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<List<_i26.BackendShop>, _i19.BackendError>>
+      requestShopsWithin(_i27.CoordsBounds? bounds) => (super.noSuchMethod(
           Invocation.method(#requestShopsWithin, [bounds]),
           returnValue: Future<
-                  _i2.Result<List<_i27.BackendShop>, _i20.BackendError>>.value(
-              _FakeResult_0<List<_i27.BackendShop>, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<List<_i27.BackendShop>, _i20.BackendError>>);
+                  _i2.Result<List<_i26.BackendShop>, _i19.BackendError>>.value(
+              _FakeResult_0<List<_i26.BackendShop>, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<List<_i26.BackendShop>, _i19.BackendError>>);
   @override
-  _i10.Future<
-      _i2.Result<_i29.ProductPresenceVoteResult, _i20.BackendError>> productPresenceVote(
-          String? barcode, _i26.OsmUID? osmUID, bool? positive) =>
+  _i9.Future<
+      _i2.Result<_i28.ProductPresenceVoteResult, _i19.BackendError>> productPresenceVote(
+          String? barcode, _i25.OsmUID? osmUID, bool? positive) =>
       (super.noSuchMethod(
           Invocation.method(#productPresenceVote, [barcode, osmUID, positive]),
           returnValue:
-              Future<_i2.Result<_i29.ProductPresenceVoteResult, _i20.BackendError>>.value(
-                  _FakeResult_0<_i29.ProductPresenceVoteResult, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i29.ProductPresenceVoteResult, _i20.BackendError>>);
+              Future<_i2.Result<_i28.ProductPresenceVoteResult, _i19.BackendError>>.value(
+                  _FakeResult_0<_i28.ProductPresenceVoteResult, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i28.ProductPresenceVoteResult, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i2.None, _i20.BackendError>> putProductToShop(
-          String? barcode, _i26.OsmUID? osmUID) =>
+  _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> putProductToShop(
+          String? barcode, _i25.OsmUID? osmUID) =>
       (super.noSuchMethod(
           Invocation.method(#putProductToShop, [barcode, osmUID]),
-          returnValue: Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-              _FakeResult_0<_i2.None, _i20.BackendError>())) as _i10
-          .Future<_i2.Result<_i2.None, _i20.BackendError>>);
+          returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+              _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i10.Future<_i2.Result<_i27.BackendShop, _i20.BackendError>> createShop(
-          {String? name, _i15.Coord? coord, String? type}) =>
+  _i9.Future<_i2.Result<_i26.BackendShop, _i19.BackendError>> createShop(
+          {String? name, _i14.Coord? coord, String? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coord: coord, #type: type}),
               returnValue:
-                  Future<_i2.Result<_i27.BackendShop, _i20.BackendError>>.value(
-                      _FakeResult_0<_i27.BackendShop, _i20.BackendError>()))
-          as _i10.Future<_i2.Result<_i27.BackendShop, _i20.BackendError>>);
+                  Future<_i2.Result<_i26.BackendShop, _i19.BackendError>>.value(
+                      _FakeResult_0<_i26.BackendShop, _i19.BackendError>()))
+          as _i9.Future<_i2.Result<_i26.BackendShop, _i19.BackendError>>);
   @override
-  _i10.Future<_i3.BackendResponse> customGet(String? path,
+  _i9.Future<_i3.BackendResponse> customGet(String? path,
           [Map<String, String>? queryParams, Map<String, String>? headers]) =>
       (super.noSuchMethod(
               Invocation.method(#customGet, [path, queryParams, headers]),
               returnValue:
                   Future<_i3.BackendResponse>.value(_FakeBackendResponse_1()))
-          as _i10.Future<_i3.BackendResponse>);
+          as _i9.Future<_i3.BackendResponse>);
   @override
   String toString() => super.toString();
 }
@@ -318,13 +315,13 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
 /// A class which mocks [BackendObserver].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBackendObserver extends _i1.Mock implements _i18.BackendObserver {
+class MockBackendObserver extends _i1.Mock implements _i17.BackendObserver {
   MockBackendObserver() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void onBackendError(_i20.BackendError? error) =>
+  void onBackendError(_i19.BackendError? error) =>
       super.noSuchMethod(Invocation.method(#onBackendError, [error]),
           returnValueForMissingStub: null);
   @override
@@ -334,17 +331,17 @@ class MockBackendObserver extends _i1.Mock implements _i18.BackendObserver {
 /// A class which mocks [DirectionsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockDirectionsManager extends _i1.Mock implements _i30.DirectionsManager {
+class MockDirectionsManager extends _i1.Mock implements _i29.DirectionsManager {
   MockDirectionsManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<bool> areDirectionsAvailable() =>
+  _i9.Future<bool> areDirectionsAvailable() =>
       (super.noSuchMethod(Invocation.method(#areDirectionsAvailable, []),
-          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
   @override
-  void direct(_i15.Coord? destination, String? destinationTitle) => super
+  void direct(_i14.Coord? destination, String? destinationTitle) => super
       .noSuchMethod(Invocation.method(#direct, [destination, destinationTitle]),
           returnValueForMissingStub: null);
   @override
@@ -354,19 +351,19 @@ class MockDirectionsManager extends _i1.Mock implements _i30.DirectionsManager {
 /// A class which mocks [GeolocatorWrapper].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGeolocatorWrapper extends _i1.Mock implements _i31.GeolocatorWrapper {
+class MockGeolocatorWrapper extends _i1.Mock implements _i30.GeolocatorWrapper {
   MockGeolocatorWrapper() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i15.Coord?> getLastKnownPosition() => (super.noSuchMethod(
-      Invocation.method(#getLastKnownPosition, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> getLastKnownPosition() =>
+      (super.noSuchMethod(Invocation.method(#getLastKnownPosition, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
-  _i10.Future<_i15.Coord?> getCurrentPosition() => (super.noSuchMethod(
-      Invocation.method(#getCurrentPosition, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> getCurrentPosition() =>
+      (super.noSuchMethod(Invocation.method(#getCurrentPosition, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
   String toString() => super.toString();
 }
@@ -374,16 +371,16 @@ class MockGeolocatorWrapper extends _i1.Mock implements _i31.GeolocatorWrapper {
 /// A class which mocks [GoogleAuthorizer].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGoogleAuthorizer extends _i1.Mock implements _i32.GoogleAuthorizer {
+class MockGoogleAuthorizer extends _i1.Mock implements _i31.GoogleAuthorizer {
   MockGoogleAuthorizer() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i33.GoogleUser?> auth() =>
+  _i9.Future<_i32.GoogleUser?> auth() =>
       (super.noSuchMethod(Invocation.method(#auth, []),
-              returnValue: Future<_i33.GoogleUser?>.value())
-          as _i10.Future<_i33.GoogleUser?>);
+              returnValue: Future<_i32.GoogleUser?>.value())
+          as _i9.Future<_i32.GoogleUser?>);
   @override
   String toString() => super.toString();
 }
@@ -392,7 +389,7 @@ class MockGoogleAuthorizer extends _i1.Mock implements _i32.GoogleAuthorizer {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGoogleMapController extends _i1.Mock
-    implements _i34.GoogleMapController {
+    implements _i33.GoogleMapController {
   MockGoogleMapController() {
     _i1.throwOnMissingStub(this);
   }
@@ -401,69 +398,64 @@ class MockGoogleMapController extends _i1.Mock
   int get mapId =>
       (super.noSuchMethod(Invocation.getter(#mapId), returnValue: 0) as int);
   @override
-  _i10.Future<void> clearTileCache(_i4.TileOverlayId? tileOverlayId) =>
+  _i9.Future<void> clearTileCache(_i4.TileOverlayId? tileOverlayId) =>
       (super.noSuchMethod(Invocation.method(#clearTileCache, [tileOverlayId]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<void> animateCamera(_i4.CameraUpdate? cameraUpdate) =>
+  _i9.Future<void> animateCamera(_i4.CameraUpdate? cameraUpdate) =>
       (super.noSuchMethod(Invocation.method(#animateCamera, [cameraUpdate]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<void> moveCamera(_i4.CameraUpdate? cameraUpdate) =>
+  _i9.Future<void> moveCamera(_i4.CameraUpdate? cameraUpdate) =>
       (super.noSuchMethod(Invocation.method(#moveCamera, [cameraUpdate]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<void> setMapStyle(String? mapStyle) => (super.noSuchMethod(
-      Invocation.method(#setMapStyle, [mapStyle]),
-      returnValue: Future<void>.value(),
-      returnValueForMissingStub: Future<void>.value()) as _i10.Future<void>);
+  _i9.Future<void> setMapStyle(String? mapStyle) =>
+      (super.noSuchMethod(Invocation.method(#setMapStyle, [mapStyle]),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<_i4.LatLngBounds> getVisibleRegion() => (super.noSuchMethod(
+  _i9.Future<_i4.LatLngBounds> getVisibleRegion() => (super.noSuchMethod(
           Invocation.method(#getVisibleRegion, []),
           returnValue: Future<_i4.LatLngBounds>.value(_FakeLatLngBounds_2()))
-      as _i10.Future<_i4.LatLngBounds>);
+      as _i9.Future<_i4.LatLngBounds>);
   @override
-  _i10.Future<_i4.ScreenCoordinate> getScreenCoordinate(_i4.LatLng? latLng) =>
+  _i9.Future<_i4.ScreenCoordinate> getScreenCoordinate(_i4.LatLng? latLng) =>
       (super.noSuchMethod(Invocation.method(#getScreenCoordinate, [latLng]),
               returnValue:
                   Future<_i4.ScreenCoordinate>.value(_FakeScreenCoordinate_3()))
-          as _i10.Future<_i4.ScreenCoordinate>);
+          as _i9.Future<_i4.ScreenCoordinate>);
   @override
-  _i10.Future<_i4.LatLng> getLatLng(_i4.ScreenCoordinate? screenCoordinate) =>
+  _i9.Future<_i4.LatLng> getLatLng(_i4.ScreenCoordinate? screenCoordinate) =>
       (super.noSuchMethod(Invocation.method(#getLatLng, [screenCoordinate]),
               returnValue: Future<_i4.LatLng>.value(_FakeLatLng_4()))
-          as _i10.Future<_i4.LatLng>);
+          as _i9.Future<_i4.LatLng>);
   @override
-  _i10.Future<void> showMarkerInfoWindow(_i4.MarkerId? markerId) =>
+  _i9.Future<void> showMarkerInfoWindow(_i4.MarkerId? markerId) =>
       (super.noSuchMethod(Invocation.method(#showMarkerInfoWindow, [markerId]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<void> hideMarkerInfoWindow(_i4.MarkerId? markerId) =>
+  _i9.Future<void> hideMarkerInfoWindow(_i4.MarkerId? markerId) =>
       (super.noSuchMethod(Invocation.method(#hideMarkerInfoWindow, [markerId]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<bool> isMarkerInfoWindowShown(_i4.MarkerId? markerId) => (super
+  _i9.Future<bool> isMarkerInfoWindowShown(_i4.MarkerId? markerId) => (super
       .noSuchMethod(Invocation.method(#isMarkerInfoWindowShown, [markerId]),
-          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
   @override
-  _i10.Future<double> getZoomLevel() =>
+  _i9.Future<double> getZoomLevel() =>
       (super.noSuchMethod(Invocation.method(#getZoomLevel, []),
-          returnValue: Future<double>.value(0.0)) as _i10.Future<double>);
+          returnValue: Future<double>.value(0.0)) as _i9.Future<double>);
   @override
-  _i10.Future<_i35.Uint8List?> takeSnapshot() =>
+  _i9.Future<_i34.Uint8List?> takeSnapshot() =>
       (super.noSuchMethod(Invocation.method(#takeSnapshot, []),
-              returnValue: Future<_i35.Uint8List?>.value())
-          as _i10.Future<_i35.Uint8List?>);
+              returnValue: Future<_i34.Uint8List?>.value())
+          as _i9.Future<_i34.Uint8List?>);
   @override
   void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),
       returnValueForMissingStub: null);
@@ -475,15 +467,15 @@ class MockGoogleMapController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockIpLocationProvider extends _i1.Mock
-    implements _i36.IpLocationProvider {
+    implements _i35.IpLocationProvider {
   MockIpLocationProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i15.Coord?> positionByIP() => (super.noSuchMethod(
-      Invocation.method(#positionByIP, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> positionByIP() =>
+      (super.noSuchMethod(Invocation.method(#positionByIP, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
   String toString() => super.toString();
 }
@@ -492,20 +484,20 @@ class MockIpLocationProvider extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLatestCameraPosStorage extends _i1.Mock
-    implements _i37.LatestCameraPosStorage {
+    implements _i36.LatestCameraPosStorage {
   MockLatestCameraPosStorage() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<void> set(_i15.Coord? pos) => (super.noSuchMethod(
-      Invocation.method(#set, [pos]),
-      returnValue: Future<void>.value(),
-      returnValueForMissingStub: Future<void>.value()) as _i10.Future<void>);
+  _i9.Future<void> set(_i14.Coord? pos) =>
+      (super.noSuchMethod(Invocation.method(#set, [pos]),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  _i10.Future<_i15.Coord?> get() => (super.noSuchMethod(
-      Invocation.method(#get, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> get() =>
+      (super.noSuchMethod(Invocation.method(#get, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
   String toString() => super.toString();
 }
@@ -514,21 +506,21 @@ class MockLatestCameraPosStorage extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockLocationController extends _i1.Mock
-    implements _i38.LocationController {
+    implements _i37.LocationController {
   MockLocationController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i15.Coord?> lastKnownPosition() => (super.noSuchMethod(
-      Invocation.method(#lastKnownPosition, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> lastKnownPosition() =>
+      (super.noSuchMethod(Invocation.method(#lastKnownPosition, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
-  _i10.Future<_i15.Coord?> currentPosition() => (super.noSuchMethod(
-      Invocation.method(#currentPosition, []),
-      returnValue: Future<_i15.Coord?>.value()) as _i10.Future<_i15.Coord?>);
+  _i9.Future<_i14.Coord?> currentPosition() =>
+      (super.noSuchMethod(Invocation.method(#currentPosition, []),
+          returnValue: Future<_i14.Coord?>.value()) as _i9.Future<_i14.Coord?>);
   @override
-  void callWhenLastPositionKnown(_i39.ArgCallback<_i15.Coord>? callback) =>
+  void callWhenLastPositionKnown(_i38.ArgCallback<_i14.Coord>? callback) =>
       super.noSuchMethod(
           Invocation.method(#callWhenLastPositionKnown, [callback]),
           returnValueForMissingStub: null);
@@ -540,32 +532,32 @@ class MockLocationController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMobileAppConfigManager extends _i1.Mock
-    implements _i40.MobileAppConfigManager {
+    implements _i39.MobileAppConfigManager {
   MockMobileAppConfigManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<void> get initFuture =>
+  _i9.Future<void> get initFuture =>
       (super.noSuchMethod(Invocation.getter(#initFuture),
-          returnValue: Future<void>.value()) as _i10.Future<void>);
+          returnValue: Future<void>.value()) as _i9.Future<void>);
   @override
-  void onUserParamsUpdate(_i19.UserParams? userParams) =>
+  void onUserParamsUpdate(_i18.UserParams? userParams) =>
       super.noSuchMethod(Invocation.method(#onUserParamsUpdate, [userParams]),
           returnValueForMissingStub: null);
   @override
-  void addObserver(_i40.MobileAppConfigManagerObserver? observer) =>
+  void addObserver(_i39.MobileAppConfigManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i40.MobileAppConfigManagerObserver? observer) =>
+  void removeObserver(_i39.MobileAppConfigManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<_i24.MobileAppConfig?> getConfig() =>
+  _i9.Future<_i23.MobileAppConfig?> getConfig() =>
       (super.noSuchMethod(Invocation.method(#getConfig, []),
-              returnValue: Future<_i24.MobileAppConfig?>.value())
-          as _i10.Future<_i24.MobileAppConfig?>);
+              returnValue: Future<_i23.MobileAppConfig?>.value())
+          as _i9.Future<_i23.MobileAppConfig?>);
   @override
   String toString() => super.toString();
 }
@@ -573,54 +565,45 @@ class MockMobileAppConfigManager extends _i1.Mock
 /// A class which mocks [OffApi].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockOffApi extends _i1.Mock implements _i41.OffApi {
+class MockOffApi extends _i1.Mock implements _i40.OffApi {
   MockOffApi() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.HttpClient get httpClient =>
-      (super.noSuchMethod(Invocation.getter(#httpClient),
-          returnValue: _FakeHttpClient_5()) as _i5.HttpClient);
-  @override
-  _i10.Future<_i6.SearchResult> getProductList(
-          _i42.ProductListQueryConfiguration? configuration) =>
+  _i9.Future<_i5.SearchResult> getProductList(
+          _i41.ProductListQueryConfiguration? configuration) =>
       (super.noSuchMethod(Invocation.method(#getProductList, [configuration]),
               returnValue:
-                  Future<_i6.SearchResult>.value(_FakeSearchResult_6()))
-          as _i10.Future<_i6.SearchResult>);
+                  Future<_i5.SearchResult>.value(_FakeSearchResult_5()))
+          as _i9.Future<_i5.SearchResult>);
   @override
-  _i10.Future<_i6.Status> saveProduct(_i6.User? user, _i6.Product? product) =>
+  _i9.Future<_i5.Status> saveProduct(_i5.User? user, _i5.Product? product) =>
       (super.noSuchMethod(Invocation.method(#saveProduct, [user, product]),
-              returnValue: Future<_i6.Status>.value(_FakeStatus_7()))
-          as _i10.Future<_i6.Status>);
+              returnValue: Future<_i5.Status>.value(_FakeStatus_6()))
+          as _i9.Future<_i5.Status>);
   @override
-  _i10.Future<_i6.Status> addProductImage(
-          _i6.User? user, _i6.SendImage? image) =>
+  _i9.Future<_i5.Status> addProductImage(
+          _i5.User? user, _i5.SendImage? image) =>
       (super.noSuchMethod(Invocation.method(#addProductImage, [user, image]),
-              returnValue: Future<_i6.Status>.value(_FakeStatus_7()))
-          as _i10.Future<_i6.Status>);
+              returnValue: Future<_i5.Status>.value(_FakeStatus_6()))
+          as _i9.Future<_i5.Status>);
   @override
-  _i10.Future<_i7.OcrIngredientsResult> extractIngredients(_i6.User? user,
-          String? barcode, _i6.OpenFoodFactsLanguage? language) =>
+  _i9.Future<_i6.OcrIngredientsResult> extractIngredients(_i5.User? user,
+          String? barcode, _i5.OpenFoodFactsLanguage? language) =>
       (super.noSuchMethod(
               Invocation.method(#extractIngredients, [user, barcode, language]),
-              returnValue: Future<_i7.OcrIngredientsResult>.value(
-                  _FakeOcrIngredientsResult_8()))
-          as _i10.Future<_i7.OcrIngredientsResult>);
+              returnValue: Future<_i6.OcrIngredientsResult>.value(
+                  _FakeOcrIngredientsResult_7()))
+          as _i9.Future<_i6.OcrIngredientsResult>);
   @override
-  _i10.Future<List<_i43.OffShop>> getShopsForLocation(String? countryIso) =>
-      (super.noSuchMethod(Invocation.method(#getShopsForLocation, [countryIso]),
-              returnValue: Future<List<_i43.OffShop>>.value(<_i43.OffShop>[]))
-          as _i10.Future<List<_i43.OffShop>>);
-  @override
-  _i10.Future<_i6.SearchResult> getVeganProductsForShop(
-          String? countryIso, String? shop, int? page) =>
-      (super.noSuchMethod(
-          Invocation.method(#getVeganProductsForShop, [countryIso, shop, page]),
-          returnValue:
-              Future<_i6.SearchResult>.value(_FakeSearchResult_6())) as _i10
-          .Future<_i6.SearchResult>);
+  _i9.Future<_i2.Result<List<_i42.OffShop>, _i40.OffRestApiError>>
+      getShopsForLocation(String? countryIso) => (super.noSuchMethod(
+          Invocation.method(#getShopsForLocation, [countryIso]),
+          returnValue: Future<
+                  _i2.Result<List<_i42.OffShop>, _i40.OffRestApiError>>.value(
+              _FakeResult_0<List<_i42.OffShop>, _i40.OffRestApiError>())) as _i9
+          .Future<_i2.Result<List<_i42.OffShop>, _i40.OffRestApiError>>);
   @override
   String toString() => super.toString();
 }
@@ -628,33 +611,32 @@ class MockOffApi extends _i1.Mock implements _i41.OffApi {
 /// A class which mocks [OffShopsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
+class MockOffShopsManager extends _i1.Mock implements _i43.OffShopsManager {
   MockOffShopsManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),
-      returnValueForMissingStub: null);
+  _i9.Future<_i2.Result<List<_i42.OffShop>, _i43.OffShopsManagerError>>
+      fetchOffShops() => (super.noSuchMethod(
+          Invocation.method(#fetchOffShops, []),
+          returnValue:
+              Future<_i2.Result<List<_i42.OffShop>, _i43.OffShopsManagerError>>.value(
+                  _FakeResult_0<List<_i42.OffShop>,
+                      _i43.OffShopsManagerError>())) as _i9
+          .Future<_i2.Result<List<_i42.OffShop>, _i43.OffShopsManagerError>>);
   @override
-  void onLocalShopsChange() =>
-      super.noSuchMethod(Invocation.method(#onLocalShopsChange, []),
-          returnValueForMissingStub: null);
-  @override
-  _i10.Future<dynamic> fetchOffShops(String? countryIso) =>
-      (super.noSuchMethod(Invocation.method(#fetchOffShops, [countryIso]),
-          returnValue: Future<dynamic>.value()) as _i10.Future<dynamic>);
-  @override
-  _i10.Future<void> fetchVeganProductsForShop(String? shopName) =>
-      (super.noSuchMethod(
+  _i9.Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>
+      fetchVeganProductsForShop(String? shopName) => (super.noSuchMethod(
               Invocation.method(#fetchVeganProductsForShop, [shopName]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+              returnValue: Future<
+                      _i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>, _i43.OffShopsManagerError>()))
+          as _i9.Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>);
   @override
-  bool hasVeganProducts(String? shopName) =>
-      (super.noSuchMethod(Invocation.method(#hasVeganProducts, [shopName]),
-          returnValue: false) as bool);
+  String shopNameToPossibleOffShopID(String? shopName) => (super.noSuchMethod(
+      Invocation.method(#shopNameToPossibleOffShopID, [shopName]),
+      returnValue: '') as String);
   @override
   String toString() => super.toString();
 }
@@ -668,22 +650,22 @@ class MockOsmNominatim extends _i1.Mock implements _i45.OsmNominatim {
   }
 
   @override
-  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>
-      fetchAddress(double? lat, double? lon) => (super.noSuchMethod(
-          Invocation.method(#fetchAddress, [lat, lon]),
+  _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>> fetchAddress(
+          double? lat, double? lon) =>
+      (super.noSuchMethod(Invocation.method(#fetchAddress, [lat, lon]),
           returnValue: Future<
-                  _i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>.value(
-              _FakeResult_0<_i14.OsmAddress, _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>);
+                  _i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>.value(
+              _FakeResult_0<_i13.OsmAddress, _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>);
   @override
-  _i10.Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>> search(
+  _i9.Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>> search(
           String? country, String? city, String? query) =>
       (super.noSuchMethod(Invocation.method(#search, [country, city, query]),
           returnValue:
-              Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>>.value(
+              Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>>.value(
                   _FakeResult_0<_i46.OsmSearchResult,
-                      _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>>);
+                      _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>>);
   @override
   String toString() => super.toString();
 }
@@ -703,24 +685,23 @@ class MockOsmOverpass extends _i1.Mock implements _i47.OsmOverpass {
   int now() =>
       (super.noSuchMethod(Invocation.method(#now, []), returnValue: 0) as int);
   @override
-  _i10.Future<_i2.Result<List<_i48.OsmShop>, _i12.OpenStreetMapError>> fetchShops(
-          {_i28.CoordsBounds? bounds, Iterable<_i26.OsmUID>? osmUIDs}) =>
+  _i9.Future<_i2.Result<List<_i48.OsmShop>, _i11.OpenStreetMapError>> fetchShops(
+          {_i27.CoordsBounds? bounds, Iterable<_i25.OsmUID>? osmUIDs}) =>
       (super.noSuchMethod(
           Invocation.method(
               #fetchShops, [], {#bounds: bounds, #osmUIDs: osmUIDs}),
           returnValue:
-              Future<_i2.Result<List<_i48.OsmShop>, _i12.OpenStreetMapError>>.value(
-                  _FakeResult_0<List<_i48.OsmShop>, _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<List<_i48.OsmShop>, _i12.OpenStreetMapError>>);
+              Future<_i2.Result<List<_i48.OsmShop>, _i11.OpenStreetMapError>>.value(
+                  _FakeResult_0<List<_i48.OsmShop>, _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<List<_i48.OsmShop>, _i11.OpenStreetMapError>>);
   @override
-  _i10.Future<_i2.Result<List<_i49.OsmRoad>, _i12.OpenStreetMapError>>
-      fetchRoads(_i28.CoordsBounds? bounds) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<List<_i49.OsmRoad>, _i11.OpenStreetMapError>>
+      fetchRoads(_i27.CoordsBounds? bounds) => (super.noSuchMethod(
           Invocation.method(#fetchRoads, [bounds]),
-          returnValue:
-              Future<_i2.Result<List<_i49.OsmRoad>, _i12.OpenStreetMapError>>.value(
-                  _FakeResult_0<List<_i49.OsmRoad>,
-                      _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<List<_i49.OsmRoad>, _i12.OpenStreetMapError>>);
+          returnValue: Future<
+                  _i2.Result<List<_i49.OsmRoad>, _i11.OpenStreetMapError>>.value(
+              _FakeResult_0<List<_i49.OsmRoad>, _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<List<_i49.OsmRoad>, _i11.OpenStreetMapError>>);
   @override
   String toString() => super.toString();
 }
@@ -734,14 +715,14 @@ class MockOsmSearcher extends _i1.Mock implements _i50.OsmSearcher {
   }
 
   @override
-  _i10.Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>> search(
+  _i9.Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>> search(
           String? country, String? city, String? query) =>
       (super.noSuchMethod(Invocation.method(#search, [country, city, query]),
           returnValue:
-              Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>>.value(
+              Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>>.value(
                   _FakeResult_0<_i46.OsmSearchResult,
-                      _i12.OpenStreetMapError>())) as _i10
-          .Future<_i2.Result<_i46.OsmSearchResult, _i12.OpenStreetMapError>>);
+                      _i11.OpenStreetMapError>())) as _i9
+          .Future<_i2.Result<_i46.OsmSearchResult, _i11.OpenStreetMapError>>);
   @override
   String toString() => super.toString();
 }
@@ -756,21 +737,21 @@ class MockPermissionsManager extends _i1.Mock
   }
 
   @override
-  _i10.Future<_i51.PermissionState> status(_i51.PermissionKind? permission) =>
+  _i9.Future<_i51.PermissionState> status(_i51.PermissionKind? permission) =>
       (super.noSuchMethod(Invocation.method(#status, [permission]),
               returnValue: Future<_i51.PermissionState>.value(
                   _i51.PermissionState.granted))
-          as _i10.Future<_i51.PermissionState>);
+          as _i9.Future<_i51.PermissionState>);
   @override
-  _i10.Future<_i51.PermissionState> request(_i51.PermissionKind? permission) =>
+  _i9.Future<_i51.PermissionState> request(_i51.PermissionKind? permission) =>
       (super.noSuchMethod(Invocation.method(#request, [permission]),
               returnValue: Future<_i51.PermissionState>.value(
                   _i51.PermissionState.granted))
-          as _i10.Future<_i51.PermissionState>);
+          as _i9.Future<_i51.PermissionState>);
   @override
-  _i10.Future<bool> openAppSettings() =>
+  _i9.Future<bool> openAppSettings() =>
       (super.noSuchMethod(Invocation.method(#openAppSettings, []),
-          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
   @override
   String toString() => super.toString();
 }
@@ -784,23 +765,23 @@ class MockPhotosTaker extends _i1.Mock implements _i52.PhotosTaker {
   }
 
   @override
-  _i10.Future<Uri?> takeAndCropPhoto(
+  _i9.Future<Uri?> takeAndCropPhoto(
           _i53.BuildContext? context, _i54.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#takeAndCropPhoto, [context, outFolder]),
-          returnValue: Future<Uri?>.value()) as _i10.Future<Uri?>);
+          returnValue: Future<Uri?>.value()) as _i9.Future<Uri?>);
   @override
-  _i10.Future<Uri?> cropPhoto(String? photoPath, _i53.BuildContext? context,
+  _i9.Future<Uri?> cropPhoto(String? photoPath, _i53.BuildContext? context,
           _i54.Directory? outFolder) =>
       (super.noSuchMethod(
           Invocation.method(#cropPhoto, [photoPath, context, outFolder]),
-          returnValue: Future<Uri?>.value()) as _i10.Future<Uri?>);
+          returnValue: Future<Uri?>.value()) as _i9.Future<Uri?>);
   @override
-  _i10.Future<_i2.Result<Uri, _i55.PlatformException>?> retrieveLostPhoto() =>
+  _i9.Future<_i2.Result<Uri, _i55.PlatformException>?> retrieveLostPhoto() =>
       (super.noSuchMethod(Invocation.method(#retrieveLostPhoto, []),
               returnValue:
                   Future<_i2.Result<Uri, _i55.PlatformException>?>.value())
-          as _i10.Future<_i2.Result<Uri, _i55.PlatformException>?>);
+          as _i9.Future<_i2.Result<Uri, _i55.PlatformException>?>);
   @override
   String toString() => super.toString();
 }
@@ -814,62 +795,74 @@ class MockProductsManager extends _i1.Mock implements _i56.ProductsManager {
   }
 
   @override
-  _i10.Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>> getProduct(
-          String? barcodeRaw, List<_i23.LangCode>? langsPrioritized) =>
+  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> getProduct(
+          String? barcodeRaw, List<_i22.LangCode>? langsPrioritized) =>
       (super.noSuchMethod(
           Invocation.method(#getProduct, [barcodeRaw, langsPrioritized]),
           returnValue: Future<
-                  _i2.Result<_i57.Product?, _i58.ProductsManagerError>>.value(
-              _FakeResult_0<_i57.Product?, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>>);
+                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
+              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>> inflate(
-          _i59.BackendProduct? backendProduct,
-          List<_i23.LangCode>? langsPrioritized) =>
+  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> inflate(
+          _i58.BackendProduct? backendProduct,
+          List<_i22.LangCode>? langsPrioritized) =>
       (super.noSuchMethod(
           Invocation.method(#inflate, [backendProduct, langsPrioritized]),
           returnValue: Future<
-                  _i2.Result<_i57.Product?, _i58.ProductsManagerError>>.value(
-              _FakeResult_0<_i57.Product?, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>>);
+                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
+              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<
-      _i2.Result<List<_i57.Product>, _i58.ProductsManagerError>> getProducts(
-          List<String>? barcodesRaw, List<_i23.LangCode>? langsPrioritized) =>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>> getProducts(
+          List<String>? barcodesRaw, List<_i22.LangCode>? langsPrioritized) =>
       (super.noSuchMethod(
           Invocation.method(#getProducts, [barcodesRaw, langsPrioritized]),
           returnValue:
-              Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>.value(
-                  _FakeResult_0<List<_i57.Product>, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>);
+              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>,
+                      _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>> inflateProducts(
-          List<_i59.BackendProduct>? backendProducts,
-          List<_i23.LangCode>? langsPrioritized) =>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>> inflateProducts(
+          List<_i58.BackendProduct>? backendProducts,
+          List<_i22.LangCode>? langsPrioritized) =>
       (super.noSuchMethod(
           Invocation.method(
               #inflateProducts, [backendProducts, langsPrioritized]),
           returnValue:
-              Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>.value(
-                  _FakeResult_0<List<_i57.Product>, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>);
+              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i57.Product, _i58.ProductsManagerError>>
-      createUpdateProduct(_i57.Product? product) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>
+      inflateOffProducts(List<_i5.Product>? offProducts,
+              List<_i22.LangCode>? langsPrioritized) =>
+          (super.noSuchMethod(
+              Invocation.method(
+                  #inflateOffProducts, [offProducts, langsPrioritized]),
+              returnValue:
+                  Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                      _FakeResult_0<List<_i44.Product>, _i57.ProductsManagerError>())) as _i9
+              .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
+  @override
+  _i9.Future<_i2.Result<_i44.Product, _i57.ProductsManagerError>>
+      createUpdateProduct(_i44.Product? product) => (super.noSuchMethod(
           Invocation.method(#createUpdateProduct, [product]),
           returnValue: Future<
-                  _i2.Result<_i57.Product, _i58.ProductsManagerError>>.value(
-              _FakeResult_0<_i57.Product, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<_i57.Product, _i58.ProductsManagerError>>);
+                  _i2.Result<_i44.Product, _i57.ProductsManagerError>>.value(
+              _FakeResult_0<_i44.Product, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<_i44.Product, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i56.ProductWithOCRIngredients, _i58.ProductsManagerError>> updateProductAndExtractIngredients(
-          _i57.Product? product, _i23.LangCode? ingredientsLangCode) =>
-      (super.noSuchMethod(
-          Invocation.method(#updateProductAndExtractIngredients,
-              [product, ingredientsLangCode]),
-          returnValue: Future<_i2.Result<_i56.ProductWithOCRIngredients, _i58.ProductsManagerError>>.value(
-              _FakeResult_0<_i56.ProductWithOCRIngredients, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<_i56.ProductWithOCRIngredients, _i58.ProductsManagerError>>);
+  _i9.Future<_i2.Result<_i56.ProductWithOCRIngredients, _i57.ProductsManagerError>>
+      updateProductAndExtractIngredients(
+              _i44.Product? product, _i22.LangCode? ingredientsLangCode) =>
+          (super.noSuchMethod(Invocation.method(#updateProductAndExtractIngredients, [product, ingredientsLangCode]),
+                  returnValue:
+                      Future<_i2.Result<_i56.ProductWithOCRIngredients, _i57.ProductsManagerError>>.value(
+                          _FakeResult_0<_i56.ProductWithOCRIngredients, _i57.ProductsManagerError>()))
+              as _i9.Future<
+                  _i2.Result<_i56.ProductWithOCRIngredients, _i57.ProductsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -877,47 +870,54 @@ class MockProductsManager extends _i1.Mock implements _i56.ProductsManager {
 /// A class which mocks [ProductsObtainer].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProductsObtainer extends _i1.Mock implements _i60.ProductsObtainer {
+class MockProductsObtainer extends _i1.Mock implements _i59.ProductsObtainer {
   MockProductsObtainer() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>> getProduct(
+  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> getProduct(
           String? barcode) =>
       (super.noSuchMethod(Invocation.method(#getProduct, [barcode]),
-              returnValue: Future<
-                      _i2.Result<_i57.Product?,
-                          _i58.ProductsManagerError>>.value(
-                  _FakeResult_0<_i57.Product?, _i58.ProductsManagerError>()))
-          as _i10.Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>>);
+          returnValue: Future<
+                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
+              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>> inflate(
-          _i59.BackendProduct? backendProduct) =>
+  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> inflate(
+          _i58.BackendProduct? backendProduct) =>
       (super.noSuchMethod(Invocation.method(#inflate, [backendProduct]),
           returnValue: Future<
-                  _i2.Result<_i57.Product?, _i58.ProductsManagerError>>.value(
-              _FakeResult_0<_i57.Product?, _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<_i57.Product?, _i58.ProductsManagerError>>);
+                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
+              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>
       getProducts(List<String>? barcodes) => (super.noSuchMethod(
           Invocation.method(#getProducts, [barcodes]),
           returnValue:
-              Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>.value(
-                  _FakeResult_0<List<_i57.Product>,
-                      _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>);
+              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>,
+                      _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
   @override
-  _i10.Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>> inflateProducts(
-          List<_i59.BackendProduct>? backendProducts) =>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>> inflateProducts(
+          List<_i58.BackendProduct>? backendProducts) =>
       (super.noSuchMethod(
           Invocation.method(#inflateProducts, [backendProducts]),
           returnValue:
-              Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>.value(
-                  _FakeResult_0<List<_i57.Product>,
-                      _i58.ProductsManagerError>())) as _i10
-          .Future<_i2.Result<List<_i57.Product>, _i58.ProductsManagerError>>);
+              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>,
+                      _i57.ProductsManagerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
+  @override
+  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>
+      inflateOffProducts(List<_i5.Product>? offProducts) => (super.noSuchMethod(
+              Invocation.method(#inflateOffProducts, [offProducts]),
+              returnValue: Future<
+                      _i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+                  _FakeResult_0<List<_i44.Product>, _i57.ProductsManagerError>()))
+          as _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -925,19 +925,19 @@ class MockProductsObtainer extends _i1.Mock implements _i60.ProductsObtainer {
 /// A class which mocks [RoadsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockRoadsManager extends _i1.Mock implements _i61.RoadsManager {
+class MockRoadsManager extends _i1.Mock implements _i60.RoadsManager {
   MockRoadsManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<_i2.Result<List<_i49.OsmRoad>, _i61.RoadsManagerError>>
-      fetchRoadsWithinAndNearby(_i28.CoordsBounds? bounds) => (super.noSuchMethod(
-          Invocation.method(#fetchRoadsWithinAndNearby, [bounds]),
-          returnValue: Future<
-                  _i2.Result<List<_i49.OsmRoad>, _i61.RoadsManagerError>>.value(
-              _FakeResult_0<List<_i49.OsmRoad>, _i61.RoadsManagerError>())) as _i10
-          .Future<_i2.Result<List<_i49.OsmRoad>, _i61.RoadsManagerError>>);
+  _i9.Future<_i2.Result<List<_i49.OsmRoad>, _i60.RoadsManagerError>>
+      fetchRoadsWithinAndNearby(_i27.CoordsBounds? bounds) => (super.noSuchMethod(
+              Invocation.method(#fetchRoadsWithinAndNearby, [bounds]),
+              returnValue: Future<
+                      _i2.Result<List<_i49.OsmRoad>, _i60.RoadsManagerError>>.value(
+                  _FakeResult_0<List<_i49.OsmRoad>, _i60.RoadsManagerError>()))
+          as _i9.Future<_i2.Result<List<_i49.OsmRoad>, _i60.RoadsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -997,7 +997,7 @@ class MockRouteObserver<R extends _i53.Route<dynamic>> extends _i1.Mock
 /// A class which mocks [ShopsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockShopsManager extends _i1.Mock implements _i62.ShopsManager {
+class MockShopsManager extends _i1.Mock implements _i61.ShopsManager {
   MockShopsManager() {
     _i1.throwOnMissingStub(this);
   }
@@ -1007,79 +1007,79 @@ class MockShopsManager extends _i1.Mock implements _i62.ShopsManager {
       (super.noSuchMethod(Invocation.getter(#loadedAreasCount), returnValue: 0)
           as int);
   @override
-  void addListener(_i63.ShopsManagerListener? listener) =>
+  void addListener(_i62.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#addListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  void removeListener(_i63.ShopsManagerListener? listener) =>
+  void removeListener(_i62.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<bool> osmShopsCacheExistFor(_i28.CoordsBounds? bounds) =>
+  _i9.Future<bool> osmShopsCacheExistFor(_i27.CoordsBounds? bounds) =>
       (super.noSuchMethod(Invocation.method(#osmShopsCacheExistFor, [bounds]),
-          returnValue: Future<bool>.value(false)) as _i10.Future<bool>);
+          returnValue: Future<bool>.value(false)) as _i9.Future<bool>);
   @override
-  _i10.Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>
-      fetchShops(_i28.CoordsBounds? bounds) =>
+  _i9.Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>
+      fetchShops(_i27.CoordsBounds? bounds) =>
           (super.noSuchMethod(Invocation.method(#fetchShops, [bounds]),
               returnValue:
-                  Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<Map<_i26.OsmUID, _i13.Shop>,
-                          _i63.ShopsManagerError>())) as _i10
-              .Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>);
+                  Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>.value(
+                      _FakeResult_0<Map<_i25.OsmUID, _i12.Shop>,
+                          _i62.ShopsManagerError>())) as _i9
+              .Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>
+  _i9.Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>
       inflateOsmShops(Iterable<_i48.OsmShop>? shops) =>
           (super.noSuchMethod(Invocation.method(#inflateOsmShops, [shops]),
               returnValue:
-                  Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<Map<_i26.OsmUID, _i13.Shop>,
-                          _i63.ShopsManagerError>())) as _i10
-              .Future<_i2.Result<Map<_i26.OsmUID, _i13.Shop>, _i63.ShopsManagerError>>);
+                  Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>.value(
+                      _FakeResult_0<Map<_i25.OsmUID, _i12.Shop>,
+                          _i62.ShopsManagerError>())) as _i9
+              .Future<_i2.Result<Map<_i25.OsmUID, _i12.Shop>, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i64.ShopProductRange, _i63.ShopsManagerError>>
-      fetchShopProductRange(_i13.Shop? shop, {bool? noCache = false}) => (super
+  _i9.Future<_i2.Result<_i63.ShopProductRange, _i62.ShopsManagerError>>
+      fetchShopProductRange(_i12.Shop? shop, {bool? noCache = false}) => (super
           .noSuchMethod(
               Invocation.method(
                   #fetchShopProductRange, [shop], {#noCache: noCache}),
               returnValue:
-                  Future<_i2.Result<_i64.ShopProductRange, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<_i64.ShopProductRange, _i63.ShopsManagerError>())) as _i10
-          .Future<_i2.Result<_i64.ShopProductRange, _i63.ShopsManagerError>>);
+                  Future<_i2.Result<_i63.ShopProductRange, _i62.ShopsManagerError>>.value(
+                      _FakeResult_0<_i63.ShopProductRange, _i62.ShopsManagerError>())) as _i9
+          .Future<_i2.Result<_i63.ShopProductRange, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i2.None, _i63.ShopsManagerError>> putProductToShops(
-          _i57.Product? product, List<_i13.Shop>? shops) =>
+  _i9.Future<_i2.Result<_i2.None, _i62.ShopsManagerError>> putProductToShops(
+          _i44.Product? product, List<_i12.Shop>? shops) =>
       (super.noSuchMethod(
               Invocation.method(#putProductToShops, [product, shops]),
               returnValue:
-                  Future<_i2.Result<_i2.None, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<_i2.None, _i63.ShopsManagerError>()))
-          as _i10.Future<_i2.Result<_i2.None, _i63.ShopsManagerError>>);
+                  Future<_i2.Result<_i2.None, _i62.ShopsManagerError>>.value(
+                      _FakeResult_0<_i2.None, _i62.ShopsManagerError>()))
+          as _i9.Future<_i2.Result<_i2.None, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i13.Shop, _i63.ShopsManagerError>> createShop(
-          {String? name, _i15.Coord? coord, _i65.ShopType? type}) =>
+  _i9.Future<_i2.Result<_i12.Shop, _i62.ShopsManagerError>> createShop(
+          {String? name, _i14.Coord? coord, _i64.ShopType? type}) =>
       (super.noSuchMethod(
               Invocation.method(
                   #createShop, [], {#name: name, #coord: coord, #type: type}),
               returnValue:
-                  Future<_i2.Result<_i13.Shop, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<_i13.Shop, _i63.ShopsManagerError>()))
-          as _i10.Future<_i2.Result<_i13.Shop, _i63.ShopsManagerError>>);
+                  Future<_i2.Result<_i12.Shop, _i62.ShopsManagerError>>.value(
+                      _FakeResult_0<_i12.Shop, _i62.ShopsManagerError>()))
+          as _i9.Future<_i2.Result<_i12.Shop, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<_i2.Result<_i29.ProductPresenceVoteResult, _i63.ShopsManagerError>>
-      productPresenceVote(_i57.Product? product, _i13.Shop? shop, bool? positive) =>
-          (super.noSuchMethod(
-              Invocation.method(
-                  #productPresenceVote, [product, shop, positive]),
-              returnValue:
-                  Future<_i2.Result<_i29.ProductPresenceVoteResult, _i63.ShopsManagerError>>.value(
-                      _FakeResult_0<_i29.ProductPresenceVoteResult, _i63.ShopsManagerError>())) as _i10
-              .Future<_i2.Result<_i29.ProductPresenceVoteResult, _i63.ShopsManagerError>>);
+  _i9.Future<
+      _i2.Result<_i28.ProductPresenceVoteResult, _i62.ShopsManagerError>> productPresenceVote(
+          _i44.Product? product, _i12.Shop? shop, bool? positive) =>
+      (super.noSuchMethod(
+          Invocation.method(#productPresenceVote, [product, shop, positive]),
+          returnValue:
+              Future<_i2.Result<_i28.ProductPresenceVoteResult, _i62.ShopsManagerError>>.value(
+                  _FakeResult_0<_i28.ProductPresenceVoteResult, _i62.ShopsManagerError>())) as _i9
+          .Future<_i2.Result<_i28.ProductPresenceVoteResult, _i62.ShopsManagerError>>);
   @override
-  _i10.Future<void> clearCache() => (super.noSuchMethod(
-      Invocation.method(#clearCache, []),
-      returnValue: Future<void>.value(),
-      returnValueForMissingStub: Future<void>.value()) as _i10.Future<void>);
+  _i9.Future<void> clearCache() =>
+      (super.noSuchMethod(Invocation.method(#clearCache, []),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
   String toString() => super.toString();
 }
@@ -1088,7 +1088,7 @@ class MockShopsManager extends _i1.Mock implements _i62.ShopsManager {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockShopsManagerListener extends _i1.Mock
-    implements _i63.ShopsManagerListener {
+    implements _i62.ShopsManagerListener {
   MockShopsManagerListener() {
     _i1.throwOnMissingStub(this);
   }
@@ -1104,7 +1104,7 @@ class MockShopsManagerListener extends _i1.Mock
 /// A class which mocks [SysLangCodeHolder].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSysLangCodeHolder extends _i1.Mock implements _i66.SysLangCodeHolder {
+class MockSysLangCodeHolder extends _i1.Mock implements _i65.SysLangCodeHolder {
   MockSysLangCodeHolder() {
     _i1.throwOnMissingStub(this);
   }
@@ -1118,11 +1118,11 @@ class MockSysLangCodeHolder extends _i1.Mock implements _i66.SysLangCodeHolder {
       super.noSuchMethod(Invocation.setter(#langCode, value),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<String> get langCodeInited =>
+  _i9.Future<String> get langCodeInited =>
       (super.noSuchMethod(Invocation.getter(#langCodeInited),
-          returnValue: Future<String>.value('')) as _i10.Future<String>);
+          returnValue: Future<String>.value('')) as _i9.Future<String>);
   @override
-  void callWhenInited(_i39.ArgCallback<String>? callback) =>
+  void callWhenInited(_i38.ArgCallback<String>? callback) =>
       super.noSuchMethod(Invocation.method(#callWhenInited, [callback]),
           returnValueForMissingStub: null);
   @override
@@ -1132,37 +1132,36 @@ class MockSysLangCodeHolder extends _i1.Mock implements _i66.SysLangCodeHolder {
 /// A class which mocks [UserLangsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserLangsManager extends _i1.Mock implements _i67.UserLangsManager {
+class MockUserLangsManager extends _i1.Mock implements _i66.UserLangsManager {
   MockUserLangsManager() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Future<void> get initFuture =>
+  _i9.Future<void> get initFuture =>
       (super.noSuchMethod(Invocation.getter(#initFuture),
-          returnValue: Future<void>.value()) as _i10.Future<void>);
+          returnValue: Future<void>.value()) as _i9.Future<void>);
   @override
-  void addObserver(_i67.UserLangsManagerObserver? observer) =>
+  void addObserver(_i66.UserLangsManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i67.UserLangsManagerObserver? observer) =>
+  void removeObserver(_i66.UserLangsManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<_i8.UserLangs> getUserLangs() =>
+  _i9.Future<_i7.UserLangs> getUserLangs() =>
       (super.noSuchMethod(Invocation.method(#getUserLangs, []),
-              returnValue: Future<_i8.UserLangs>.value(_FakeUserLangs_9()))
-          as _i10.Future<_i8.UserLangs>);
+              returnValue: Future<_i7.UserLangs>.value(_FakeUserLangs_8()))
+          as _i9.Future<_i7.UserLangs>);
   @override
-  _i10.Future<_i2.Result<_i19.UserParams, _i68.UserLangsManagerError>>
-      setManualUserLangs(List<_i23.LangCode>? userLangs) => (super.noSuchMethod(
+  _i9.Future<_i2.Result<_i18.UserParams, _i67.UserLangsManagerError>>
+      setManualUserLangs(List<_i22.LangCode>? userLangs) => (super.noSuchMethod(
           Invocation.method(#setManualUserLangs, [userLangs]),
-          returnValue:
-              Future<_i2.Result<_i19.UserParams, _i68.UserLangsManagerError>>.value(
-                  _FakeResult_0<_i19.UserParams,
-                      _i68.UserLangsManagerError>())) as _i10
-          .Future<_i2.Result<_i19.UserParams, _i68.UserLangsManagerError>>);
+          returnValue: Future<
+                  _i2.Result<_i18.UserParams, _i67.UserLangsManagerError>>.value(
+              _FakeResult_0<_i18.UserParams, _i67.UserLangsManagerError>())) as _i9
+          .Future<_i2.Result<_i18.UserParams, _i67.UserLangsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -1171,13 +1170,13 @@ class MockUserLangsManager extends _i1.Mock implements _i67.UserLangsManager {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserLangsManagerObserver extends _i1.Mock
-    implements _i67.UserLangsManagerObserver {
+    implements _i66.UserLangsManagerObserver {
   MockUserLangsManagerObserver() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void onUserLangsChange(_i8.UserLangs? userLangs) =>
+  void onUserLangsChange(_i7.UserLangs? userLangs) =>
       super.noSuchMethod(Invocation.method(#onUserLangsChange, [userLangs]),
           returnValueForMissingStub: null);
   @override
@@ -1188,30 +1187,29 @@ class MockUserLangsManagerObserver extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserParamsController extends _i1.Mock
-    implements _i69.UserParamsController {
+    implements _i68.UserParamsController {
   MockUserParamsController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i69.UserParamsControllerObserver? observer) =>
+  void addObserver(_i68.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i69.UserParamsControllerObserver? observer) =>
+  void removeObserver(_i68.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<_i19.UserParams?> getUserParams() =>
+  _i9.Future<_i18.UserParams?> getUserParams() =>
       (super.noSuchMethod(Invocation.method(#getUserParams, []),
-              returnValue: Future<_i19.UserParams?>.value())
-          as _i10.Future<_i19.UserParams?>);
+              returnValue: Future<_i18.UserParams?>.value())
+          as _i9.Future<_i18.UserParams?>);
   @override
-  _i10.Future<void> setUserParams(_i19.UserParams? userParams) =>
+  _i9.Future<void> setUserParams(_i18.UserParams? userParams) =>
       (super.noSuchMethod(Invocation.method(#setUserParams, [userParams]),
-              returnValue: Future<void>.value(),
-              returnValueForMissingStub: Future<void>.value())
-          as _i10.Future<void>);
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
   String toString() => super.toString();
 }
@@ -1220,33 +1218,33 @@ class MockUserParamsController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockViewedProductsStorage extends _i1.Mock
-    implements _i70.ViewedProductsStorage {
+    implements _i69.ViewedProductsStorage {
   MockViewedProductsStorage() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i10.Stream<void> updates() =>
+  _i9.Stream<void> updates() =>
       (super.noSuchMethod(Invocation.method(#updates, []),
-          returnValue: Stream<void>.empty()) as _i10.Stream<void>);
+          returnValue: Stream<void>.empty()) as _i9.Stream<void>);
   @override
-  _i10.Future<void> loadPersistentProductsForTesting() => (super.noSuchMethod(
+  _i9.Future<void> loadPersistentProductsForTesting() => (super.noSuchMethod(
       Invocation.method(#loadPersistentProductsForTesting, []),
       returnValue: Future<void>.value(),
-      returnValueForMissingStub: Future<void>.value()) as _i10.Future<void>);
+      returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  List<_i57.Product> getProducts() =>
+  List<_i44.Product> getProducts() =>
       (super.noSuchMethod(Invocation.method(#getProducts, []),
-          returnValue: <_i57.Product>[]) as List<_i57.Product>);
+          returnValue: <_i44.Product>[]) as List<_i44.Product>);
   @override
-  void addProduct(_i57.Product? product) =>
+  void addProduct(_i44.Product? product) =>
       super.noSuchMethod(Invocation.method(#addProduct, [product]),
           returnValueForMissingStub: null);
   @override
-  _i10.Future<void> purgeForTesting() => (super.noSuchMethod(
-      Invocation.method(#purgeForTesting, []),
-      returnValue: Future<void>.value(),
-      returnValueForMissingStub: Future<void>.value()) as _i10.Future<void>);
+  _i9.Future<void> purgeForTesting() =>
+      (super.noSuchMethod(Invocation.method(#purgeForTesting, []),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
   void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),
       returnValueForMissingStub: null);

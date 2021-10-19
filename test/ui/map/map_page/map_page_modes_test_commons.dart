@@ -16,6 +16,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/osm_address.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/osm_shop.dart';
@@ -28,6 +29,7 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_off_shops_manager.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 
@@ -41,6 +43,7 @@ class MapPageModesTestCommons {
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
   late MockDirectionsManager directionsManager;
+  late FakeOffShopsManager offShopsManager;
 
   final readyAddress = OsmAddress((e) => e.road = 'Broadway');
 
@@ -73,6 +76,8 @@ class MapPageModesTestCommons {
     GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
     directionsManager = MockDirectionsManager();
     GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
+    offShopsManager = FakeOffShopsManager();
+    GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
 
     await fillFetchedShops();
 

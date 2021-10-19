@@ -75,7 +75,8 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-  Set<OsmUID> get shopsWithPossibleProducts => UnmodifiableSetView(_shopsWithPossibleProducts);
+  Set<OsmUID> get shopsWithPossibleProducts =>
+      UnmodifiableSetView(_shopsWithPossibleProducts);
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();
@@ -175,15 +176,17 @@ class MapPageModel implements ShopsManagerListener {
 
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
-    final offShopsMap = { for (final offShop in offShops) offShop.id: offShop };
+    final offShopsMap = {for (final offShop in offShops) offShop.id: offShop};
     final shopsOnMap = _shopsCache.values.toSet();
     for (final shopOnMap in shopsOnMap) {
       // Let's convert our shop name to what would be a Shop ID in OFF.
-      final possibleOffShopID = _offShopsManager.shopNameToPossibleOffShopID(shopOnMap.name);
+      final possibleOffShopID =
+          OffShopsManager.shopNameToPossibleOffShopID(shopOnMap.name);
       // Now if OFF shops contain this Shop ID than we've got a shop with
       // possible products!
       if (offShopsMap.containsKey(possibleOffShopID)) {
-        final products = await _offShopsManager.fetchVeganProductsForShop(possibleOffShopID);
+        final products =
+            await _offShopsManager.fetchVeganProductsForShop(possibleOffShopID);
         if (products.isOk && products.unwrap().isNotEmpty) {
           _shopsWithPossibleProducts.add(shopOnMap.osmUID);
           _updateShopsCallback.call(_shopsCache);

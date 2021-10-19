@@ -20,6 +20,9 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
     final result = <Object?>[
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'products',
+      serializers.serialize(object.productsCount,
+          specifiedType: const FullType(int)),
     ];
     Object? value;
     value = object.name;
@@ -28,12 +31,6 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
         ..add('name')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
-    }
-    value = object.products;
-    if (value != null) {
-      result
-        ..add('products')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
     return result;
   }
@@ -58,8 +55,8 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
               specifiedType: const FullType(String)) as String?;
           break;
         case 'products':
-          result.products = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int?;
+          result.productsCount = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
           break;
       }
     }
@@ -74,13 +71,16 @@ class _$OffShop extends OffShop {
   @override
   final String? name;
   @override
-  final int? products;
+  final int productsCount;
 
   factory _$OffShop([void Function(OffShopBuilder)? updates]) =>
       (new OffShopBuilder()..update(updates)).build();
 
-  _$OffShop._({required this.id, this.name, this.products}) : super._() {
+  _$OffShop._({required this.id, this.name, required this.productsCount})
+      : super._() {
     BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id');
+    BuiltValueNullFieldError.checkNotNull(
+        productsCount, 'OffShop', 'productsCount');
   }
 
   @override
@@ -96,12 +96,13 @@ class _$OffShop extends OffShop {
     return other is OffShop &&
         id == other.id &&
         name == other.name &&
-        products == other.products;
+        productsCount == other.productsCount;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, id.hashCode), name.hashCode), products.hashCode));
+    return $jf(
+        $jc($jc($jc(0, id.hashCode), name.hashCode), productsCount.hashCode));
   }
 
   @override
@@ -109,7 +110,7 @@ class _$OffShop extends OffShop {
     return (newBuiltValueToStringHelper('OffShop')
           ..add('id', id)
           ..add('name', name)
-          ..add('products', products))
+          ..add('productsCount', productsCount))
         .toString();
   }
 }
@@ -125,18 +126,21 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  int? _products;
-  int? get products => _$this._products;
-  set products(int? products) => _$this._products = products;
+  int? _productsCount;
+  int? get productsCount => _$this._productsCount;
+  set productsCount(int? productsCount) =>
+      _$this._productsCount = productsCount;
 
-  OffShopBuilder();
+  OffShopBuilder() {
+    OffShop._setDefaults(this);
+  }
 
   OffShopBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
       _name = $v.name;
-      _products = $v.products;
+      _productsCount = $v.productsCount;
       _$v = null;
     }
     return this;
@@ -159,7 +163,8 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
         new _$OffShop._(
             id: BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id'),
             name: name,
-            products: products);
+            productsCount: BuiltValueNullFieldError.checkNotNull(
+                productsCount, 'OffShop', 'productsCount'));
     replace(_$result);
     return _$result;
   }

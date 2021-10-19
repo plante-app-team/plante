@@ -88,7 +88,8 @@ void initDI() {
       GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
-  GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>(), GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<OffApi>(
+      OffApi(GetIt.I.get<Settings>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<TakenProductsImagesStorage>(
       TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(

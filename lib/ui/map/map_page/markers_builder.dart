@@ -14,7 +14,8 @@ class ShopsMarkersExtraData {
   final Set<Shop> selectedShops;
   final Set<Shop> accentedShops;
   final Set<OsmUID> withPossibleProducts;
-  ShopsMarkersExtraData(this.selectedShops, this.accentedShops, this.withPossibleProducts);
+  ShopsMarkersExtraData(
+      this.selectedShops, this.accentedShops, this.withPossibleProducts);
 }
 
 Future<Marker> markersBuilder(
@@ -47,7 +48,8 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
-    } else if (shops.any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
+    } else if (shops
+        .any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/marker_abstract.svg', 1, TextStyles.markerFilled);
     } else {
@@ -76,9 +78,10 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           'assets/map_marker_group_filled.svg',
           shops.length,
           TextStyles.markerFilled);
-    } else if (shops.any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
-      return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/marker_abstract.svg', shops.length, TextStyles.markerEmpty);
+    } else if (shops
+        .any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/marker_abstract.svg', shops.length, TextStyles.markerEmpty);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context,

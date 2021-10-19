@@ -1,27 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
-import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
 class FakeOffApi implements OffApi {
   final Settings _settings;
-  final HttpClient _httpClient;
   final Map<String, off.Product> _fakeProducts = {};
   final Set<String> _triedOcrProducts = {};
 
-  FakeOffApi(this._settings,this._httpClient);
-
-  @override
-  @visibleForTesting
-  HttpClient get httpClient {
-    return _httpClient;
-  }
+  FakeOffApi(this._settings);
 
   @override
   Future<off.Status> addProductImage(off.User user, off.SendImage image) async {
@@ -146,12 +137,6 @@ class FakeOffApi implements OffApi {
   Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
       String countryIso) async {
     return Ok(const []);
-  }
-
-  @override
-  Future<Result<off.SearchResult, OffRestApiError>> getVeganProductsForShop(
-      String countryIso, String shop, int page) async {
-    return Ok(const off.SearchResult());
   }
 }
 

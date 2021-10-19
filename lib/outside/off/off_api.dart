@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/SearchResult.dart' as off;
@@ -29,13 +28,8 @@ class OffApi {
   final HttpClient _httpClient;
   final FakeOffApi _fakeOffApi;
 
-  OffApi(this._settings, this._httpClient) :
-    _fakeOffApi = FakeOffApi(_settings,_httpClient);
-
-  @visibleForTesting
-  HttpClient get httpClient {
-    return _httpClient;
-  }
+  OffApi(this._settings, this._httpClient)
+      : _fakeOffApi = FakeOffApi(_settings);
 
   Future<off.SearchResult> getProductList(
       off.ProductListQueryConfiguration configuration) async {
@@ -93,9 +87,7 @@ class OffApi {
       Log.w('OffApi.getShopsForLocation network error', ex: e);
       return Err(OffRestApiError.NETWORK);
     } on TimeoutException catch (e) {
-      Log.w(
-          'OffApi.getShopsForLocation timeout',
-          ex: e);
+      Log.w('OffApi.getShopsForLocation timeout', ex: e);
       return Err(OffRestApiError.NETWORK);
     }
 
@@ -110,54 +102,7 @@ class OffApi {
       return Err(OffRestApiError.OTHER);
     }
     final shopsJson = resultJson['tags'] as List<dynamic>;
-    return Ok(shopsJson
-        .map(OffShop.fromJson)
-        .whereType<OffShop>()
-        .toList());
-  }
-
-  Future<Result<off.SearchResult, OffRestApiError>> getVeganProductsForShop(
-      String countryIso, String shopID, int page) async {
-    final http.Response response;
-
-    try {
-      response = await _httpClient.get(
-          Uri.parse(
-              'https://$countryIso.openfoodfacts.org/api/v2/search?'
-                  'ingredients_analysis_tags=en:vegan&'
-                  'stores_tags=$shopID&'
-                  'page_size=20&'
-                  'page=$page'),
-          headers: {
-            'user-agent': await userAgent()
-          });
-    } on IOException catch (e) {
-      Log.w('OffApi.getVeganProductsForShop network error', ex: e);
-      return Err(OffRestApiError.NETWORK);
-    } on TimeoutException catch (e) {
-      Log.w(
-          'OffApi.getVeganProductsForShop timeout',
-          ex: e);
-      return Err(OffRestApiError.NETWORK);
-    }
-
-    if (response.statusCode != 200) {
-      Log.w('OffApi.getProductsForShop $shopID error: ${response.body}');
-      return Err(OffRestApiError.OTHER);
-    }
-
-    final resultJson = _jsonDecodeSafe(response.body);
-    if (resultJson == null) {
-      Log.w('OffApi.getProductsForShop invalid JSON: ${response.body}');
-      return Err(OffRestApiError.OTHER);
-    }
-
-    try {
-      return Ok(off.SearchResult.fromJson(resultJson));
-    } catch (e) {
-      Log.w('OffApi.getProductsForShop invalid JSON format: $resultJson');
-      return Err(OffRestApiError.OTHER);
-    }
+    return Ok(shopsJson.map(OffShop.fromJson).whereType<OffShop>().toList());
   }
 }
 

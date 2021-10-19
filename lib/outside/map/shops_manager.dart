@@ -58,6 +58,7 @@ class ShopsManager {
     _listeners.remove(listener);
   }
 
+  // TODO test each notification
   void _notifyListeners() {
     _listeners.forEach((listener) {
       listener.onLocalShopsChange();
@@ -133,6 +134,7 @@ class ShopsManager {
     final result = ids
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
+    _notifyListeners();
     return Ok({for (var shop in result) shop.osmUID: shop});
   }
 
@@ -163,6 +165,7 @@ class ShopsManager {
       for (final inflatedShop in inflatedShops.values) {
         _shopsCache[inflatedShop.osmUID] = inflatedShop;
       }
+      _notifyListeners();
       // NOTE: we don't put the shop into [_loadedAreas] because the
       // [_loadedAreas] field is an entire area of already loaded shops -
       // if a shop was not loaded before [inflateOsmShops], it is not expected
@@ -185,6 +188,7 @@ class ShopsManager {
     if (result.isOk) {
       _rangesCache[shop.osmUID] = result.unwrap();
     }
+    _notifyListeners();
     return result;
   }
 

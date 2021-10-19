@@ -1,3 +1,4 @@
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
@@ -8,7 +9,7 @@ import 'package:plante/outside/products/products_obtainer.dart';
 class FakeProductsObtainer implements ProductsObtainer {
   final _knownProducts = <String, Product>{};
   ArgResCallback<String, Product?>? unknownProductsGenerator;
-  var inflatesCount = 0;
+  var inflatesBackendProductsCount = 0;
 
   FakeProductsObtainer(
       {List<Product>? knownProducts, this.unknownProductsGenerator}) {
@@ -56,14 +57,20 @@ class FakeProductsObtainer implements ProductsObtainer {
   @override
   Future<Result<Product?, ProductsManagerError>> inflate(
       BackendProduct backendProduct) async {
-    inflatesCount += 1;
+    inflatesBackendProductsCount += 1;
     return await getProduct(backendProduct.barcode);
   }
 
   @override
   Future<Result<List<Product>, ProductsManagerError>> inflateProducts(
       List<BackendProduct> backendProducts) async {
-    inflatesCount += backendProducts.length;
+    inflatesBackendProductsCount += backendProducts.length;
     return await getProducts(backendProducts.map((e) => e.barcode).toList());
+  }
+
+  @override
+  Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
+      List<off.Product> offProducts) async {
+    return await getProducts(offProducts.map((e) => e.barcode!).toList());
   }
 }

@@ -88,8 +88,7 @@ class ProductsManager {
 
   // TODO: test inflateOffProducts
   Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
-      List<off.Product> offProducts,
-      List<LangCode> langsPrioritized) async {
+      List<off.Product> offProducts, List<LangCode> langsPrioritized) async {
     return await _getProducts(
         offProducts: offProducts, langsPrioritized: langsPrioritized);
   }
@@ -112,7 +111,7 @@ class ProductsManager {
 
     if (offProducts == null) {
       final offProductsRes =
-      await _requestOffProducts(barcodesRaw, langsPrioritized);
+          await _requestOffProducts(barcodesRaw, langsPrioritized);
       if (offProductsRes.isErr) {
         return Err(offProductsRes.unwrapErr());
       }

@@ -25,6 +25,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -38,6 +39,7 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_off_shops_manager.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -115,6 +117,8 @@ void main() {
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
     GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
+
+    GetIt.I.registerSingleton<OffShopsManager>(FakeOffShopsManager());
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

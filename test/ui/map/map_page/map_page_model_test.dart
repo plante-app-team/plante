@@ -9,6 +9,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../z_fakes/fake_off_shops_manager.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 
 void main() {
@@ -47,8 +48,13 @@ void main() {
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
 
-    model = MapPageModel(locationController, fakeShopsManager, addressObtainer,
-        latestCameraPosStorage, directionsManager, (shops) {
+    model = MapPageModel(
+        locationController,
+        fakeShopsManager,
+        addressObtainer,
+        latestCameraPosStorage,
+        directionsManager,
+        FakeOffShopsManager(), (shops) {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;

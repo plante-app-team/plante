@@ -29,7 +29,9 @@ class MapPageModeZoomedOut extends MapPageMode {
   bool loadNewShops() => false;
 
   @override
-  Iterable<Shop> filter(Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) => const [];
+  Iterable<Shop> filter(
+          Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) =>
+      const [];
 
   @override
   double minZoom() => MIN_ZOOM;
