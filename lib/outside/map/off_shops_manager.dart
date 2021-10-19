@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:openfoodfacts/model/parameter/TagFilter.dart' as off;
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/retryable_lazy_operation.dart';
@@ -8,6 +10,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
+import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -25,12 +28,14 @@ class OffShopsManager {
   final AddressObtainer _addressObtainer;
   final ProductsObtainer _productsObtainer;
 
-  late final RetryableLazyOperation<List<OffShop>, OffShopsManagerError> _offShopsOp;
+  late final RetryableLazyOperation<List<OffShop>, OffShopsManagerError>
+      _offShopsOp;
   late final RetryableLazyOperation<String, None> _countryCodeOp;
 
   final _offShopsProductsCache = <String, List<Product>>{};
 
-  OffShopsManager(this._offApi, this._cameraPosStorage, this._addressObtainer, this._productsObtainer) {
+  OffShopsManager(this._offApi, this._cameraPosStorage, this._addressObtainer,
+      this._productsObtainer) {
     _offShopsOp = RetryableLazyOperation(_fetchOffShopsImpl);
     _countryCodeOp = RetryableLazyOperation(_getCountryCodeImpl);
   }
@@ -52,7 +57,7 @@ class OffShopsManager {
     final countryCode = address.countryCode;
     if (countryCode == null) {
       Log.w('offShopsManager._getCountryCodeImpl: '
-            'User is out of all countries! Coord: $cameraPos, addr: $address');
+          'User is out of all countries! Coord: $cameraPos, addr: $address');
       return Err(None());
     }
 
@@ -66,7 +71,8 @@ class OffShopsManager {
     return await _offShopsOp.result;
   }
 
-  Future<Result<List<OffShop>, OffShopsManagerError>> _fetchOffShopsImpl() async {
+  Future<Result<List<OffShop>, OffShopsManagerError>>
+      _fetchOffShopsImpl() async {
     if (!(await enableNewestFeatures())) {
       return Ok(const []);
     }
@@ -87,7 +93,8 @@ class OffShopsManager {
     return Ok(shopsRes.unwrap());
   }
 
-  Future<Result<List<Product>, OffShopsManagerError>> fetchVeganProductsForShop(String shopName) async {
+  Future<Result<List<Product>, OffShopsManagerError>> fetchVeganProductsForShop(
+      String shopName) async {
     if (!(await enableNewestFeatures())) {
       return Ok(const []);
     }
@@ -117,16 +124,10 @@ class OffShopsManager {
     }
 
     // Let's fetch shop's products!
-    // TODO: fetch other than page 1
-    final offProductsRes = await _offApi.getVeganProductsForShop(countryCode.unwrap(), possibleOffShopID, 1);
-    if (offProductsRes.isErr) {
-      return Err(offProductsRes.unwrapErr().convert());
-    }
-    final searchResult = offProductsRes.unwrap();
-    final offProducts = searchResult.products;
+    final offProducts = await _fetchProducts(possibleOffShopID);
     if (offProducts == null) {
       Log.w('offShopManager.fetchVeganProductsForShop '
-          'searchResult without products: $searchResult');
+          'searchResult without products');
       return Err(OffShopsManagerError.OTHER);
     }
     final productsRes = await _productsObtainer.inflateOffProducts(offProducts);
@@ -140,7 +141,54 @@ class OffShopsManager {
     return Ok(products);
   }
 
-  String shopNameToPossibleOffShopID(String shopName) => shopName.toLowerCase().trim();
+  Future<List<off.Product>?> _fetchProducts(String shopId) async {
+    // TODO: fetch other than page 1
+
+    final products1 = await _fetchProductsWithVeganIngredients(shopId);
+    final products2 = await _fetchProductsWithVeganLabel(shopId);
+
+    if (products1 != null && products2 != null) {
+      final products1Barcodes = products1.map((e) => e.barcode).toSet();
+      products2.removeWhere(
+          (product) => products1Barcodes.contains(product.barcode));
+    }
+
+    if (products1 != null && products2 != null) {
+      return products1 + products2;
+    } else if (products1 != null) {
+      return products1;
+    } else if (products2 != null) {
+      return products2;
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<off.Product>?> _fetchProductsWithVeganIngredients(
+      String shopId) async {
+    final conf = off.ProductSearchQueryConfiguration(parametersList: [
+      const off.TagFilter(
+          tagType: 'ingredients_analysis', contains: true, tagName: 'en:vegan'),
+      off.TagFilter(tagType: 'stores', contains: true, tagName: shopId),
+    ]);
+    final searchResult =
+        await off.OpenFoodAPIClient.searchProducts(_offUser(), conf);
+    return searchResult.products;
+  }
+
+  Future<List<off.Product>?> _fetchProductsWithVeganLabel(String shopId) async {
+    final conf = off.ProductSearchQueryConfiguration(parametersList: [
+      const off.TagFilter(
+          tagType: 'labels', contains: true, tagName: 'en:vegan'),
+      off.TagFilter(tagType: 'stores', contains: true, tagName: shopId),
+    ]);
+    final searchResult =
+        await off.OpenFoodAPIClient.searchProducts(_offUser(), conf);
+    return searchResult.products;
+  }
+
+  static String shopNameToPossibleOffShopID(String shopName) =>
+      shopName.toLowerCase().trim();
 }
 
 extension _OffRestApiErrorExt on OffRestApiError {
@@ -164,3 +212,6 @@ extension _ProductsManagerErrorExt on ProductsManagerError {
     }
   }
 }
+
+off.User _offUser() =>
+    const off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
