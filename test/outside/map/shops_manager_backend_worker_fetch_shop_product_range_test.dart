@@ -11,7 +11,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -121,7 +121,7 @@ void main() {
 
     // All error here!
     when(productsObtainer.inflateProducts(any))
-        .thenAnswer((_) async => Err(ProductsManagerError.NETWORK_ERROR));
+        .thenAnswer((_) async => Err(ProductsObtainerError.NETWORK));
 
     final result = await shopsManagerBackendWorker.fetchShopProductRange(aShop);
     // Last error received from ShopsManager is expected to be what we get here

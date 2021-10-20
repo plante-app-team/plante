@@ -138,6 +138,19 @@ class FakeOffApi implements OffApi {
       String countryIso) async {
     return Ok(const []);
   }
+
+  @override
+  Future<off.SearchResult> searchProducts(
+      off.ProductSearchQueryConfiguration configuration) async {
+    await _delay();
+    return const off.SearchResult(
+      page: 0,
+      pageSize: 20,
+      count: 0,
+      skip: 0,
+      products: [],
+    );
+  }
 }
 
 String _generateName() {

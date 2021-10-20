@@ -26,7 +26,7 @@ class ProductWithOCRIngredients {
 }
 
 class ProductsManager {
-  static const _NEEDED_OFF_FIELDS = [
+  static const NEEDED_OFF_FIELDS = [
     off.ProductField.BARCODE,
     off.ProductField.NAME,
     off.ProductField.NAME_ALL_LANGUAGES,
@@ -86,7 +86,6 @@ class ProductsManager {
         backendProducts: backendProducts, langsPrioritized: langsPrioritized);
   }
 
-  // TODO: test inflateOffProducts
   Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
       List<off.Product> offProducts, List<LangCode> langsPrioritized) async {
     return await _getProducts(
@@ -166,7 +165,7 @@ class ProductsManager {
       final configuration = off.ProductListQueryConfiguration(
         barcodes,
         languages: offLangs,
-        fields: _NEEDED_OFF_FIELDS,
+        fields: NEEDED_OFF_FIELDS,
         page: offPage,
         sortOption: off.SortOption.CREATED,
       );

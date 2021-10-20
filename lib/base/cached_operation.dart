@@ -18,13 +18,12 @@ import 'package:plante/base/result.dart';
 /// This class is good for network operations which you expect to return same
 /// result on success (so it can be reused) and want to retry on failures,
 /// but not eagerly.
-// TODO: test throughout
-class RetryableLazyOperation<T, E> {
+class CachedOperation<T, E> {
   final ResCallback<Future<Result<T, E>>> _fn;
   Result<T, E>? _result;
   Completer<Result<T, E>>? _completer;
 
-  RetryableLazyOperation(this._fn);
+  CachedOperation(this._fn);
 
   Future<Result<T, E>> get result {
     if (_result != null) {

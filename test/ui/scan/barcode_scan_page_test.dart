@@ -111,7 +111,7 @@ void main() {
   });
 
   testWidgets('product found', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGenerator = (barcode) =>
+    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
         ProductLangSlice((e) => e
               ..lang = _DEFAULT_LANG
               ..barcode = barcode
@@ -150,7 +150,7 @@ void main() {
   testWidgets('product found in another lang', (WidgetTester tester) async {
     final anotherLang = LangCode.nl;
     expect(anotherLang, isNot(equals(_DEFAULT_LANG)));
-    productsObtainer.unknownProductsGenerator = (barcode) =>
+    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
         ProductLangSlice((e) => e
               ..lang = anotherLang
               ..barcode = barcode
@@ -203,7 +203,7 @@ void main() {
   });
 
   testWidgets('invalid barcode scanned', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGenerator = (barcode) =>
+    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
         ProductLangSlice((e) => e
               ..lang = _DEFAULT_LANG
               ..barcode = barcode
@@ -250,7 +250,7 @@ void main() {
   });
 
   testWidgets('scan data sent to backend', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGenerator =
+    productsObtainer.unknownProductsGeneratorSimple =
         (barcode) => Product((e) => e.barcode = barcode);
 
     final widget = BarcodeScanPage();
@@ -347,7 +347,7 @@ void main() {
 
   testWidgets('manual barcode search', (WidgetTester tester) async {
     productsObtainer
-        .unknownProductsGenerator = (barcode) => ProductLangSlice((e) => e
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
       ..barcode = barcode
       ..name = 'Product name'
       ..imageFront = Uri.file('/tmp/asd')
@@ -382,7 +382,7 @@ void main() {
   testWidgets('manual barcode search, but barcode is invalid',
       (WidgetTester tester) async {
     productsObtainer
-        .unknownProductsGenerator = (barcode) => ProductLangSlice((e) => e
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
       ..barcode = barcode
       ..name = 'Product name'
       ..imageFront = Uri.file('/tmp/asd')
@@ -419,7 +419,7 @@ void main() {
 
   testWidgets('cancel found product card', (WidgetTester tester) async {
     productsObtainer
-        .unknownProductsGenerator = (barcode) => ProductLangSlice((e) => e
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
       ..barcode = barcode
       ..name = 'Product name'
       ..imageFront = Uri.file('/tmp/asd')
@@ -592,7 +592,7 @@ void main() {
   });
 
   testWidgets('barcode scan analytics', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGenerator =
+    productsObtainer.unknownProductsGeneratorSimple =
         (barcode) => Product((e) => e.barcode = barcode);
 
     final widget = BarcodeScanPage();
@@ -609,7 +609,7 @@ void main() {
   });
 
   testWidgets('barcode manual input analytics', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGenerator =
+    productsObtainer.unknownProductsGeneratorSimple =
         (barcode) => Product((e) => e.barcode = barcode);
 
     final widget = BarcodeScanPage();

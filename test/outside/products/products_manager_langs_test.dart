@@ -17,6 +17,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../off/off_json_product_images_utils.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
@@ -147,7 +148,7 @@ void main() {
       'ingredients_tags_ru': ['voda'],
       'ingredients_text_de': 'wasser',
       'ingredients_tags_de': ['wasser'],
-      'selected_images': jsonDecode(commons.selectedImagesRuDeJson),
+      'selected_images': jsonDecode(offSelectedImagesRuDeJson),
     });
     setUpOffProducts([offProduct]);
 
@@ -182,16 +183,16 @@ void main() {
         ]),
       })
       ..imageFrontLangs.addAll({
-        LangCode.ru: Uri.parse(commons.expectedImageFrontRu),
-        LangCode.de: Uri.parse(commons.expectedImageFrontDe),
+        LangCode.ru: Uri.parse(offExpectedImageFrontRu),
+        LangCode.de: Uri.parse(offExpectedImageFrontDe),
       })
       ..imageFrontThumbLangs.addAll({
-        LangCode.ru: Uri.parse(commons.expectedImageFrontThumbRu),
-        LangCode.de: Uri.parse(commons.expectedImageFrontThumbDe),
+        LangCode.ru: Uri.parse(offExpectedImageFrontThumbRu),
+        LangCode.de: Uri.parse(offExpectedImageFrontThumbDe),
       })
       ..imageIngredientsLangs.addAll({
-        LangCode.ru: Uri.parse(commons.expectedImageIngredientsRu),
-        LangCode.de: Uri.parse(commons.expectedImageIngredientsDe),
+        LangCode.ru: Uri.parse(offExpectedImageIngredientsRu),
+        LangCode.de: Uri.parse(offExpectedImageIngredientsDe),
       }));
     expect(product, equals(expectedProduct));
   }
@@ -295,7 +296,7 @@ void main() {
       'ingredients_text_ru': 'banan, kojura',
       'product_name_de': 'banane',
       'ingredients_text_de': 'banane, schälen',
-      'selected_images': jsonDecode(commons.selectedImagesRuDeJson),
+      'selected_images': jsonDecode(offSelectedImagesRuDeJson),
     });
     setUpOffProducts([offProduct]);
     setUpBackendProducts(Ok(const []));
@@ -330,7 +331,7 @@ void main() {
       'ingredients_text_ru': 'banan, kojura',
       'product_name_de': 'banane',
       'ingredients_text_de': 'banane, schälen',
-      'selected_images': jsonDecode(commons.selectedImagesRuDeJson),
+      'selected_images': jsonDecode(offSelectedImagesRuDeJson),
     });
     setUpOffProducts([offProduct]);
     setUpBackendProducts(Ok(const []));

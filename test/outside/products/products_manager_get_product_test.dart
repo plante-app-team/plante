@@ -20,6 +20,7 @@ import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../off/off_json_product_images_utils.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
@@ -50,7 +51,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(commons.selectedImagesRuJson),
+      'selected_images': jsonDecode(offSelectedImagesRuJson),
     });
     setUpOffProducts([offProduct]);
 
@@ -74,9 +75,9 @@ void main() {
           ..name = 'name'
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
-          ..imageFront = Uri.parse(commons.expectedImageFrontRu)
-          ..imageFrontThumb = Uri.parse(commons.expectedImageFrontThumbRu)
-          ..imageIngredients = Uri.parse(commons.expectedImageIngredientsRu))
+          ..imageFront = Uri.parse(offExpectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(offExpectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(offExpectedImageIngredientsRu))
         .productForTests();
     expect(product, equals(expectedProduct));
   });
@@ -87,7 +88,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(commons.selectedImagesRuJson),
+      'selected_images': jsonDecode(offSelectedImagesRuJson),
     });
     setUpOffProducts([offProduct]);
 
@@ -106,9 +107,9 @@ void main() {
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
           ..ingredientsAnalyzed.addAll([])
-          ..imageFront = Uri.parse(commons.expectedImageFrontRu)
-          ..imageFrontThumb = Uri.parse(commons.expectedImageFrontThumbRu)
-          ..imageIngredients = Uri.parse(commons.expectedImageIngredientsRu))
+          ..imageFront = Uri.parse(offExpectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(offExpectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(offExpectedImageIngredientsRu))
         .productForTests();
     expect(product, equals(expectedProduct));
   });
@@ -145,7 +146,7 @@ void main() {
               'product_name_ru': 'name$e',
               'brands_tags': ['Brand name'],
               'ingredients_text_ru': 'lemon, water',
-              'selected_images': jsonDecode(commons.selectedImagesRuJson),
+              'selected_images': jsonDecode(offSelectedImagesRuJson),
             }))
         .toList();
     when(offApi.getProductList(any)).thenAnswer((invc) async {
@@ -226,9 +227,9 @@ void main() {
           ..name = 'name$e'
           ..brands.add('Brand name')
           ..ingredientsText = 'lemon, water'
-          ..imageFront = Uri.parse(commons.expectedImageFrontRu)
-          ..imageFrontThumb = Uri.parse(commons.expectedImageFrontThumbRu)
-          ..imageIngredients = Uri.parse(commons.expectedImageIngredientsRu))
+          ..imageFront = Uri.parse(offExpectedImageFrontRu)
+          ..imageFrontThumb = Uri.parse(offExpectedImageFrontThumbRu)
+          ..imageIngredients = Uri.parse(offExpectedImageIngredientsRu))
         .productForTests());
     expect(products.toSet(), equals(expectedProducts.toSet()));
   });
@@ -247,7 +248,7 @@ void main() {
       'product_name_ru': 'name',
       'brands_tags': ['Brand name'],
       'ingredients_text_ru': 'lemon, water',
-      'selected_images': jsonDecode(commons.selectedImagesRuJson),
+      'selected_images': jsonDecode(offSelectedImagesRuJson),
     });
     setUpOffProducts([offProduct]);
 

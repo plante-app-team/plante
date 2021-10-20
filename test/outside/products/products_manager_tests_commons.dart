@@ -16,56 +16,6 @@ import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 
 class ProductsManagerTestCommons {
-  final expectedImageFrontRu =
-      'https://static.openfoodfacts.org/images/products/123/front_ru.16.400.jpg';
-  final expectedImageFrontThumbRu =
-      'https://static.openfoodfacts.org/images/products/123/front_ru.16.200.jpg';
-  final expectedImageIngredientsRu =
-      'https://static.openfoodfacts.org/images/products/123/ingredients_ru.19.full.jpg';
-  final expectedImageFrontDe =
-      'https://static.openfoodfacts.org/images/products/123/front_de.16.400.jpg';
-  final expectedImageFrontThumbDe =
-      'https://static.openfoodfacts.org/images/products/123/front_de.16.200.jpg';
-  final expectedImageIngredientsDe =
-      'https://static.openfoodfacts.org/images/products/123/ingredients_de.19.full.jpg';
-  late final selectedImagesRuDeJson = '''
-    {
-       "front":{
-          "display":{
-             "ru":"$expectedImageFrontRu",
-             "de":"$expectedImageFrontDe"
-          },
-          "small":{
-             "ru":"$expectedImageFrontThumbRu",
-             "de":"$expectedImageFrontThumbDe"
-          }
-       },
-       "ingredients":{
-          "display":{
-             "ru":"$expectedImageIngredientsRu",
-             "de":"$expectedImageIngredientsDe"
-          }
-       }
-    }
-  ''';
-  late final selectedImagesRuJson = '''
-    {
-       "front":{
-          "display":{
-             "ru":"$expectedImageFrontRu"
-          },
-          "small":{
-             "ru":"$expectedImageFrontThumbRu"
-          }
-       },
-       "ingredients":{
-          "display":{
-             "ru":"$expectedImageIngredientsRu"
-          }
-       }
-    }
-  ''';
-
   late MockOffApi offApi;
   late MockBackend backend;
   late TakenProductsImagesStorage takenProductsImagesStorage;

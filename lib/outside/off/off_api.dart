@@ -74,6 +74,19 @@ class OffApi {
     return result;
   }
 
+  Future<off.SearchResult> searchProducts(
+      off.ProductSearchQueryConfiguration configuration) async {
+    if (await _settings.testingBackends()) {
+      return await _fakeOffApi.searchProducts(configuration);
+    }
+    final result =
+        await off.OpenFoodAPIClient.searchProducts(null, configuration);
+    if (result.products == null) {
+      Log.w('OffApi.searchProducts no products in result: $result');
+    }
+    return result;
+  }
+
   Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
       String countryIso) async {
     final http.Response response;

@@ -16,11 +16,12 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
-import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -40,7 +41,7 @@ class MapPageModel implements ShopsManagerListener {
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
   final DirectionsManager _directionsManager;
-  final OffShopsManager _offShopsManager;
+  final ProductsObtainer _productsObtainer;
 
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
@@ -58,7 +59,7 @@ class MapPageModel implements ShopsManagerListener {
       this._addressObtainer,
       this._latestCameraPosStorage,
       this._directionsManager,
-      this._offShopsManager,
+      this._productsObtainer,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
@@ -164,33 +165,18 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<void> _fetchOffShopsProductsData() async {
-    final offShopsRes = await _offShopsManager.fetchOffShops();
-    if (offShopsRes.isErr) {
-      return;
-    }
-    final offShops = offShopsRes.unwrap();
-    if (offShops.isEmpty) {
-      Log.i('_fetchOffShopsProductsData: no off shops');
-      return;
-    }
-
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
-    final offShopsMap = {for (final offShop in offShops) offShop.id: offShop};
     final shopsOnMap = _shopsCache.values.toSet();
     for (final shopOnMap in shopsOnMap) {
       // Let's convert our shop name to what would be a Shop ID in OFF.
       final possibleOffShopID =
           OffShopsManager.shopNameToPossibleOffShopID(shopOnMap.name);
-      // Now if OFF shops contain this Shop ID than we've got a shop with
-      // possible products!
-      if (offShopsMap.containsKey(possibleOffShopID)) {
-        final products =
-            await _offShopsManager.fetchVeganProductsForShop(possibleOffShopID);
-        if (products.isOk && products.unwrap().isNotEmpty) {
-          _shopsWithPossibleProducts.add(shopOnMap.osmUID);
-          _updateShopsCallback.call(_shopsCache);
-        }
+      final products =
+          await _productsObtainer.getProductsOfShopsChain(possibleOffShopID);
+      if (products.isOk && products.unwrap().isNotEmpty) {
+        _shopsWithPossibleProducts.add(shopOnMap.osmUID);
+        _updateShopsCallback.call(_shopsCache);
       }
     }
   }

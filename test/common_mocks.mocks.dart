@@ -53,7 +53,6 @@ import 'package:plante/outside/identity/google_authorizer.dart' as _i31;
 import 'package:plante/outside/identity/google_user.dart' as _i32;
 import 'package:plante/outside/map/address_obtainer.dart' as _i8;
 import 'package:plante/outside/map/directions_manager.dart' as _i29;
-import 'package:plante/outside/map/off_shops_manager.dart' as _i43;
 import 'package:plante/outside/map/open_street_map.dart' as _i11;
 import 'package:plante/outside/map/osm_address.dart' as _i13;
 import 'package:plante/outside/map/osm_nominatim.dart' as _i45;
@@ -69,6 +68,7 @@ import 'package:plante/outside/map/shops_manager.dart' as _i61;
 import 'package:plante/outside/map/shops_manager_types.dart' as _i62;
 import 'package:plante/outside/off/off_api.dart' as _i40;
 import 'package:plante/outside/off/off_shop.dart' as _i42;
+import 'package:plante/outside/off/off_shops_manager.dart' as _i43;
 import 'package:plante/outside/products/products_manager.dart' as _i56;
 import 'package:plante/outside/products/products_manager_error.dart' as _i57;
 import 'package:plante/outside/products/products_obtainer.dart' as _i59;
@@ -597,6 +597,13 @@ class MockOffApi extends _i1.Mock implements _i40.OffApi {
                   _FakeOcrIngredientsResult_7()))
           as _i9.Future<_i6.OcrIngredientsResult>);
   @override
+  _i9.Future<_i5.SearchResult> searchProducts(
+          _i5.ProductSearchQueryConfiguration? configuration) =>
+      (super.noSuchMethod(Invocation.method(#searchProducts, [configuration]),
+              returnValue:
+                  Future<_i5.SearchResult>.value(_FakeSearchResult_5()))
+          as _i9.Future<_i5.SearchResult>);
+  @override
   _i9.Future<_i2.Result<List<_i42.OffShop>, _i40.OffRestApiError>>
       getShopsForLocation(String? countryIso) => (super.noSuchMethod(
           Invocation.method(#getShopsForLocation, [countryIso]),
@@ -627,12 +634,13 @@ class MockOffShopsManager extends _i1.Mock implements _i43.OffShopsManager {
           .Future<_i2.Result<List<_i42.OffShop>, _i43.OffShopsManagerError>>);
   @override
   _i9.Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>
-      fetchVeganProductsForShop(String? shopName) => (super.noSuchMethod(
-              Invocation.method(#fetchVeganProductsForShop, [shopName]),
-              returnValue: Future<
-                      _i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>.value(
-                  _FakeResult_0<List<_i44.Product>, _i43.OffShopsManagerError>()))
-          as _i9.Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>);
+      fetchVeganProductsForShop(String? shopName, List<_i22.LangCode>? langs) =>
+          (super.noSuchMethod(
+              Invocation.method(#fetchVeganProductsForShop, [shopName, langs]),
+              returnValue:
+                  Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>.value(
+                      _FakeResult_0<List<_i44.Product>, _i43.OffShopsManagerError>())) as _i9
+              .Future<_i2.Result<List<_i44.Product>, _i43.OffShopsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -872,48 +880,57 @@ class MockProductsObtainer extends _i1.Mock implements _i59.ProductsObtainer {
   }
 
   @override
-  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> getProduct(
+  _i9.Future<_i2.Result<_i44.Product?, _i59.ProductsObtainerError>> getProduct(
           String? barcode) =>
       (super.noSuchMethod(Invocation.method(#getProduct, [barcode]),
-          returnValue: Future<
-                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
-              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
-          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
+              returnValue: Future<
+                      _i2.Result<_i44.Product?,
+                          _i59.ProductsObtainerError>>.value(
+                  _FakeResult_0<_i44.Product?, _i59.ProductsObtainerError>()))
+          as _i9.Future<_i2.Result<_i44.Product?, _i59.ProductsObtainerError>>);
   @override
-  _i9.Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>> inflate(
+  _i9.Future<_i2.Result<_i44.Product?, _i59.ProductsObtainerError>> inflate(
           _i58.BackendProduct? backendProduct) =>
       (super.noSuchMethod(Invocation.method(#inflate, [backendProduct]),
           returnValue: Future<
-                  _i2.Result<_i44.Product?, _i57.ProductsManagerError>>.value(
-              _FakeResult_0<_i44.Product?, _i57.ProductsManagerError>())) as _i9
-          .Future<_i2.Result<_i44.Product?, _i57.ProductsManagerError>>);
+                  _i2.Result<_i44.Product?, _i59.ProductsObtainerError>>.value(
+              _FakeResult_0<_i44.Product?, _i59.ProductsObtainerError>())) as _i9
+          .Future<_i2.Result<_i44.Product?, _i59.ProductsObtainerError>>);
   @override
-  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>
       getProducts(List<String>? barcodes) => (super.noSuchMethod(
           Invocation.method(#getProducts, [barcodes]),
           returnValue:
-              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+              Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>.value(
                   _FakeResult_0<List<_i44.Product>,
-                      _i57.ProductsManagerError>())) as _i9
-          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
+                      _i59.ProductsObtainerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
   @override
-  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>> inflateProducts(
+  _i9.Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>> inflateProducts(
           List<_i58.BackendProduct>? backendProducts) =>
       (super.noSuchMethod(
           Invocation.method(#inflateProducts, [backendProducts]),
           returnValue:
-              Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
+              Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>.value(
                   _FakeResult_0<List<_i44.Product>,
-                      _i57.ProductsManagerError>())) as _i9
-          .Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
+                      _i59.ProductsObtainerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
   @override
-  _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>
+  _i9.Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>
       inflateOffProducts(List<_i5.Product>? offProducts) => (super.noSuchMethod(
-              Invocation.method(#inflateOffProducts, [offProducts]),
-              returnValue: Future<
-                      _i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>.value(
-                  _FakeResult_0<List<_i44.Product>, _i57.ProductsManagerError>()))
-          as _i9.Future<_i2.Result<List<_i44.Product>, _i57.ProductsManagerError>>);
+          Invocation.method(#inflateOffProducts, [offProducts]),
+          returnValue: Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>.value(
+              _FakeResult_0<List<_i44.Product>,
+                  _i59.ProductsObtainerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
+  @override
+  _i9.Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>
+      getProductsOfShopsChain(String? shopsChainName) => (super.noSuchMethod(
+          Invocation.method(#getProductsOfShopsChain, [shopsChainName]),
+          returnValue: Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>.value(
+              _FakeResult_0<List<_i44.Product>,
+                  _i59.ProductsObtainerError>())) as _i9
+          .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
   @override
   String toString() => super.toString();
 }

@@ -21,13 +21,13 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
-import 'package:plante/outside/map/off_shops_manager.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_cacher.dart';
 import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
@@ -97,8 +97,15 @@ void initDI() {
       GetIt.I.get<Backend>(),
       GetIt.I.get<TakenProductsImagesStorage>(),
       GetIt.I.get<Analytics>()));
+  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
+    GetIt.I.get<OffApi>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
+    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<ProductsManager>(),
+  ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),
+    GetIt.I.get<OffShopsManager>(),
     GetIt.I.get<UserLangsManager>(),
   ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
@@ -112,12 +119,6 @@ void initDI() {
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
       GetIt.I.get<OsmCacher>()));
-  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
-    GetIt.I.get<OffApi>(),
-    GetIt.I.get<LatestCameraPosStorage>(),
-    GetIt.I.get<AddressObtainer>(),
-    GetIt.I.get<ProductsObtainer>(),
-  ));
   GetIt.I.registerSingleton<RoadsManager>(
       RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
   GetIt.I.registerSingleton<OsmSearcher>(

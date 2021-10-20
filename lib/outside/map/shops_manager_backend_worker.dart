@@ -15,7 +15,6 @@ import 'package:plante/outside/map/osm_overpass.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 class ShopsManagerBackendWorker {
@@ -186,9 +185,9 @@ ShopsManagerError _convertBackendErr(BackendError err) {
   }
 }
 
-ShopsManagerError _convertProductErr(ProductsManagerError err) {
+ShopsManagerError _convertProductErr(ProductsObtainerError err) {
   switch (err) {
-    case ProductsManagerError.NETWORK_ERROR:
+    case ProductsObtainerError.NETWORK:
       return ShopsManagerError.NETWORK_ERROR;
     default:
       return ShopsManagerError.OTHER;

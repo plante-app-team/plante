@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -17,7 +19,7 @@ void main() {
     offApi = OffApi(fakeSettings, httpClient);
   });
 
-  test('very fragile getProducts test', () async {
+  test('getProducts - integration', () async {
     final barcodes = [
       '4810410075316',
       '4680019562018',
@@ -113,6 +115,29 @@ void main() {
     }''');
     final result = await offApi.getShopsForLocation('be');
     expect(result.unwrap().length, equals(2));
+  });
+
+  test('fetch shops network exceptions', () async {
+    httpClient.setResponseException(
+        '.openfoodfacts.org/stores.json', const SocketException(''));
+    final result = await offApi.getShopsForLocation('be');
+    expect(result.unwrapErr(), equals(OffRestApiError.NETWORK));
+  });
+
+  test('fetch shops error response', () async {
+    httpClient.setResponse('.openfoodfacts.org/stores.json', '',
+        responseCode: 500);
+    final result = await offApi.getShopsForLocation('be');
+    expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
+  });
+
+  test('fetch shops invalid JSON', () async {
+    httpClient.setResponse('.openfoodfacts.org/stores.json', '''{
+      "count": 2,
+      "tags": [[[[[[[[[]
+    }''');
+    final result = await offApi.getShopsForLocation('be');
+    expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
   test('fetch shops from off for belgium - integration', () async {
