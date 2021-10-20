@@ -26,7 +26,7 @@ class ProductWithOCRIngredients {
 }
 
 class ProductsManager {
-  static const _NEEDED_OFF_FIELDS = [
+  static const NEEDED_OFF_FIELDS = [
     off.ProductField.BARCODE,
     off.ProductField.NAME,
     off.ProductField.NAME_ALL_LANGUAGES,
@@ -86,21 +86,36 @@ class ProductsManager {
         backendProducts: backendProducts, langsPrioritized: langsPrioritized);
   }
 
+  Future<Result<List<Product>, ProductsManagerError>> inflateOffProducts(
+      List<off.Product> offProducts, List<LangCode> langsPrioritized) async {
+    return await _getProducts(
+        offProducts: offProducts, langsPrioritized: langsPrioritized);
+  }
+
   Future<Result<List<Product>, ProductsManagerError>> _getProducts(
       {List<String>? barcodesRaw,
+      List<off.Product>? offProducts,
       List<BackendProduct>? backendProducts,
       required List<LangCode> langsPrioritized}) async {
-    if (barcodesRaw == null && backendProducts == null) {
-      Log.e('Invalid getProduct implementation');
+    if (barcodesRaw == null) {
+      if (backendProducts != null) {
+        barcodesRaw ??= backendProducts.map((e) => e.barcode).toList();
+      } else if (offProducts != null) {
+        barcodesRaw ??= offProducts.map((e) => e.barcode!).toList();
+      } else {
+        Log.e('Invalid getProduct implementation');
+        return Err(ProductsManagerError.OTHER);
+      }
     }
-    barcodesRaw ??= backendProducts!.map((e) => e.barcode).toList();
 
-    final offProductsRes =
-        await _requestOffProducts(barcodesRaw, langsPrioritized);
-    if (offProductsRes.isErr) {
-      return Err(offProductsRes.unwrapErr());
+    if (offProducts == null) {
+      final offProductsRes =
+          await _requestOffProducts(barcodesRaw, langsPrioritized);
+      if (offProductsRes.isErr) {
+        return Err(offProductsRes.unwrapErr());
+      }
+      offProducts = offProductsRes.unwrap();
     }
-    final offProducts = offProductsRes.unwrap();
     if (offProducts.isEmpty) {
       return Ok(const []);
     }
@@ -150,7 +165,7 @@ class ProductsManager {
       final configuration = off.ProductListQueryConfiguration(
         barcodes,
         languages: offLangs,
-        fields: _NEEDED_OFF_FIELDS,
+        fields: NEEDED_OFF_FIELDS,
         page: offPage,
         sortOption: off.SortOption.CREATED,
       );

@@ -2,8 +2,10 @@ import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shop.dart';
 
 class FakeOffApi implements OffApi {
   final Settings _settings;
@@ -129,6 +131,25 @@ class FakeOffApi implements OffApi {
     await _delay();
     _fakeProducts[product.barcode!] = product;
     return off.Status(status: 1);
+  }
+
+  @override
+  Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
+      String countryIso) async {
+    return Ok(const []);
+  }
+
+  @override
+  Future<off.SearchResult> searchProducts(
+      off.ProductSearchQueryConfiguration configuration) async {
+    await _delay();
+    return const off.SearchResult(
+      page: 0,
+      pageSize: 20,
+      count: 0,
+      skip: 0,
+      products: [],
+    );
   }
 }
 

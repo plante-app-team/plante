@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
@@ -12,7 +13,9 @@ typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 class ShopsMarkersExtraData {
   final Set<Shop> selectedShops;
   final Set<Shop> accentedShops;
-  ShopsMarkersExtraData(this.selectedShops, this.accentedShops);
+  final Set<OsmUID> withPossibleProducts;
+  ShopsMarkersExtraData(
+      this.selectedShops, this.accentedShops, this.withPossibleProducts);
 }
 
 Future<Marker> markersBuilder(
@@ -45,6 +48,10 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
+    } else if (shops
+        .any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
+      return _bitmapDescriptorFromSvgAsset(
+          context, 'assets/marker_abstract.svg', 1, TextStyles.markerFilled);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);
@@ -71,6 +78,10 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           'assets/map_marker_group_filled.svg',
           shops.length,
           TextStyles.markerFilled);
+    } else if (shops
+        .any((shop) => extraData.withPossibleProducts.contains(shop.osmUID))) {
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/marker_abstract.svg', shops.length, TextStyles.markerEmpty);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context,
