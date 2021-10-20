@@ -8,7 +8,6 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -125,8 +124,7 @@ class _ViewedProductsHistoryPageState
           showSnackBar(context.strings.global_something_went_wrong, context);
         }
       } else {
-        if (productUpdatedResult.unwrapErr() ==
-            ProductsManagerError.NETWORK_ERROR) {
+        if (productUpdatedResult.unwrapErr() == ProductsObtainerError.NETWORK) {
           showSnackBar(context.strings.global_network_error, context);
         } else {
           showSnackBar(context.strings.global_something_went_wrong, context);

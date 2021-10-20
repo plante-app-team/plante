@@ -36,7 +36,7 @@ class ProductsConverterAndCacher {
       ..moderatorVeganChoiceReasonId =
           backendProduct?.moderatorVeganChoiceReason
       ..moderatorVeganSourcesText = backendProduct?.moderatorVeganSourcesText
-      ..brands.addAll(offProduct.brandsTags ?? [])
+      ..brands.addAll(offProduct.brandsTags ?? const [])
       ..nameLangs =
           _castOffLangs(offProduct.productNameInLanguages, _convertOffStr)
       ..ingredientsTextLangs =

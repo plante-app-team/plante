@@ -219,7 +219,7 @@
       "veg_status_displayed_not_vegetarian": "Not vegetarian",
       "veg_status_displayed_veg_status_source_community": "Info from community",
       "veg_status_displayed_veg_status_source_off": "Ingredients auto-analysis",
-      "veg_status_displayed_veg_status_source_moderator": "Verified by a moderator",
+      "veg_status_displayed_veg_status_source_moderator": "Verified",
       "veg_status_displayed_veg_status_source_unknown": "Internal error: source unknown",
 
       "viewed_products_history_page_title": "Recently viewed",

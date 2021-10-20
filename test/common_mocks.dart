@@ -22,6 +22,7 @@ import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -41,6 +42,7 @@ import 'package:plante/ui/photos_taker.dart';
   LocationController,
   MobileAppConfigManager,
   OffApi,
+  OffShopsManager,
   OsmNominatim,
   OsmOverpass,
   OsmSearcher,

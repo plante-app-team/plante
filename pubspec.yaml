@@ -43,7 +43,6 @@ dependencies:
   flutter_svg: ^0.22.0
   google_sign_in: ^5.0.1
   firebase_core: ^1.0.4
-  firebase_auth: ^2.0.0
   firebase_crashlytics: ^2.2.2
   firebase_analytics: ^8.3.2
   device_info: ^2.0.0
