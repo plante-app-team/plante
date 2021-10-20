@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
@@ -19,6 +20,8 @@ import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -38,6 +41,7 @@ class MapPageModel implements ShopsManagerListener {
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
   final DirectionsManager _directionsManager;
+  final ProductsObtainer _productsObtainer;
 
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
@@ -46,6 +50,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
+  final _shopsWithPossibleProducts = <OsmUID>{};
 
   bool _directionsAvailable = false;
 
@@ -55,6 +60,7 @@ class MapPageModel implements ShopsManagerListener {
       this._addressObtainer,
       this._latestCameraPosStorage,
       this._directionsManager,
+      this._productsObtainer,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
@@ -71,6 +77,8 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
+  Set<OsmUID> get shopsWithPossibleProducts =>
+      UnmodifiableSetView(_shopsWithPossibleProducts);
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();
@@ -151,10 +159,28 @@ class MapPageModel implements ShopsManagerListener {
       _viewPortShopsFetched = true;
       _latestFetchedViewPort = viewPort;
       _updateShopsCallback.call(result.unwrap());
+      unawaited(_fetchOffShopsProductsData());
     } else {
       _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
     }
     _updateCallback.call();
+  }
+
+  Future<void> _fetchOffShopsProductsData() async {
+    // Let's see which of the shops we display on the map
+    // has products in Open Food Facts.
+    final shopsOnMap = _shopsCache.values.toSet();
+    for (final shopOnMap in shopsOnMap) {
+      // Let's convert our shop name to what would be a Shop ID in OFF.
+      final possibleOffShopID =
+          OffShopsManager.shopNameToPossibleOffShopID(shopOnMap.name);
+      final products =
+          await _productsObtainer.getProductsOfShopsChain(possibleOffShopID);
+      if (products.isOk && products.unwrap().isNotEmpty) {
+        _shopsWithPossibleProducts.add(shopOnMap.osmUID);
+        _updateShopsCallback.call(_shopsCache);
+      }
+    }
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {

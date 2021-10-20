@@ -1,14 +1,35 @@
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 class FakeProductsObtainer implements ProductsObtainer {
   final _knownProducts = <String, Product>{};
-  ArgResCallback<String, Product?>? unknownProductsGenerator;
-  var inflatesCount = 0;
+
+  /// A function which generates products for testing purposes
+  ArgResCallback<String, Result<Product?, ProductsObtainerError>>?
+      unknownProductsGenerator;
+
+  var inflatesBackendProductsCount = 0;
+
+  /// Same as [unknownProductsGenerator], but without [Result] logic
+  set unknownProductsGeneratorSimple(ArgResCallback<String, Product?>? fn) {
+    if (fn == null) {
+      unknownProductsGenerator = null;
+    } else {
+      unknownProductsGenerator = (String barcode) => Ok(fn.call(barcode));
+    }
+  }
+
+  /// Same as [unknownProductsGenerator], but without [Result] logic
+  ArgResCallback<String, Product?>? get unknownProductsGeneratorSimple {
+    if (unknownProductsGenerator == null) {
+      return null;
+    }
+    return (String barcode) => unknownProductsGenerator!.call(barcode).unwrap();
+  }
 
   FakeProductsObtainer(
       {List<Product>? knownProducts, this.unknownProductsGenerator}) {
@@ -27,25 +48,32 @@ class FakeProductsObtainer implements ProductsObtainer {
   }
 
   @override
-  Future<Result<Product?, ProductsManagerError>> getProduct(
+  Future<Result<Product?, ProductsObtainerError>> getProduct(
       String barcode) async {
-    return Ok(_getProductNow(barcode));
+    return _getProductNow(barcode);
   }
 
-  Product? _getProductNow(String barcode) {
+  Result<Product?, ProductsObtainerError> _getProductNow(String barcode) {
     final result = _knownProducts[barcode];
     if (result != null) {
-      return result;
+      return Ok(result);
     }
-    return unknownProductsGenerator?.call(barcode);
+    if (unknownProductsGenerator != null) {
+      return unknownProductsGenerator!.call(barcode);
+    }
+    return Ok(null);
   }
 
   @override
-  Future<Result<List<Product>, ProductsManagerError>> getProducts(
+  Future<Result<List<Product>, ProductsObtainerError>> getProducts(
       List<String> barcodes) async {
     final products = <Product>[];
     for (final barcode in barcodes) {
-      final product = _getProductNow(barcode);
+      final productRes = _getProductNow(barcode);
+      if (productRes.isErr) {
+        return Err(productRes.unwrapErr());
+      }
+      final product = productRes.unwrap();
       if (product != null) {
         products.add(product);
       }
@@ -54,16 +82,28 @@ class FakeProductsObtainer implements ProductsObtainer {
   }
 
   @override
-  Future<Result<Product?, ProductsManagerError>> inflate(
+  Future<Result<Product?, ProductsObtainerError>> inflate(
       BackendProduct backendProduct) async {
-    inflatesCount += 1;
+    inflatesBackendProductsCount += 1;
     return await getProduct(backendProduct.barcode);
   }
 
   @override
-  Future<Result<List<Product>, ProductsManagerError>> inflateProducts(
+  Future<Result<List<Product>, ProductsObtainerError>> inflateProducts(
       List<BackendProduct> backendProducts) async {
-    inflatesCount += backendProducts.length;
+    inflatesBackendProductsCount += backendProducts.length;
     return await getProducts(backendProducts.map((e) => e.barcode).toList());
+  }
+
+  @override
+  Future<Result<List<Product>, ProductsObtainerError>> inflateOffProducts(
+      List<off.Product> offProducts) async {
+    return await getProducts(offProducts.map((e) => e.barcode!).toList());
+  }
+
+  @override
+  Future<Result<List<Product>, ProductsObtainerError>> getProductsOfShopsChain(
+      String shopsChainName) async {
+    return Ok(const []);
   }
 }

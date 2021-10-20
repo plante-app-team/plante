@@ -13,7 +13,6 @@ import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -200,7 +199,7 @@ class BarcodeScanPageModel
     _barcode = barcode;
     _searching = true;
 
-    Result<Product?, ProductsManagerError> foundProductResult;
+    Result<Product?, ProductsObtainerError> foundProductResult;
     Product? foundProduct;
     try {
       _onStateChangeCallback.call();
@@ -228,8 +227,7 @@ class BarcodeScanPageModel
     }
 
     if (foundProductResult.isErr) {
-      if (foundProductResult.unwrapErr() ==
-          ProductsManagerError.NETWORK_ERROR) {
+      if (foundProductResult.unwrapErr() == ProductsObtainerError.NETWORK) {
         return BarcodeScanPageSearchResult.ERROR_NETWORK;
       } else {
         return BarcodeScanPageSearchResult.ERROR_OTHER;

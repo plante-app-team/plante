@@ -27,6 +27,7 @@ import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
@@ -87,7 +88,8 @@ void initDI() {
       GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
-  GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<OffApi>(
+      OffApi(GetIt.I.get<Settings>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<TakenProductsImagesStorage>(
       TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
@@ -95,8 +97,15 @@ void initDI() {
       GetIt.I.get<Backend>(),
       GetIt.I.get<TakenProductsImagesStorage>(),
       GetIt.I.get<Analytics>()));
+  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
+    GetIt.I.get<OffApi>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
+    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<ProductsManager>(),
+  ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),
+    GetIt.I.get<OffShopsManager>(),
     GetIt.I.get<UserLangsManager>(),
   ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
