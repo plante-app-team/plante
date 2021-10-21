@@ -30,7 +30,7 @@ class MapPageModeZoomedOut extends MapPageMode {
 
   @override
   Iterable<Shop> filter(
-          Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) =>
+          Iterable<Shop> shops, Set<OsmUID> withSuggestedProducts) =>
       const [];
 
   @override

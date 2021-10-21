@@ -87,7 +87,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Iterable<Shop> filter(
-      Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) {
+      Iterable<Shop> shops, Set<OsmUID> withSuggestedProducts) {
     if (_showEmptyShops) {
       return shops;
     }
@@ -95,7 +95,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       return shop.productsCount > 0 ||
           selectedShops().contains(shop) ||
           accentedShops().contains(shop) ||
-          withPossibleProducts.contains(shop.osmUID);
+          withSuggestedProducts.contains(shop.osmUID);
     };
     return shops.where(shouldShow);
   }

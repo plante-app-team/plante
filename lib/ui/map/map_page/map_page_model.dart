@@ -50,7 +50,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
-  final _shopsWithPossibleProducts = <OsmUID>{};
+  final _shopsWithSuggestedProducts = <OsmUID>{};
 
   bool _directionsAvailable = false;
 
@@ -77,8 +77,8 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-  Set<OsmUID> get shopsWithPossibleProducts =>
-      UnmodifiableSetView(_shopsWithPossibleProducts);
+  Set<OsmUID> get shopsWithSuggestedProducts =>
+      UnmodifiableSetView(_shopsWithSuggestedProducts);
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();
@@ -177,7 +177,7 @@ class MapPageModel implements ShopsManagerListener {
       final products =
           await _productsObtainer.getProductsOfShopsChain(possibleOffShopID);
       if (products.isOk && products.unwrap().isNotEmpty) {
-        _shopsWithPossibleProducts.add(shopOnMap.osmUID);
+        _shopsWithSuggestedProducts.add(shopOnMap.osmUID);
         _updateShopsCallback.call(_shopsCache);
       }
     }
