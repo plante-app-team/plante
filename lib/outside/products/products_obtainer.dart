@@ -4,7 +4,6 @@ import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 
@@ -15,11 +14,9 @@ enum ProductsObtainerError {
 
 class ProductsObtainer {
   final ProductsManager _productsManager;
-  final OffShopsManager _offShopsManager;
   final UserLangsManager _userLangsManager;
 
-  ProductsObtainer(
-      this._productsManager, this._offShopsManager, this._userLangsManager);
+  ProductsObtainer(this._productsManager, this._userLangsManager);
 
   Future<Result<Product?, ProductsObtainerError>> getProduct(
       String barcode) async {
@@ -75,16 +72,6 @@ class ProductsObtainer {
     }
     return Ok(result.unwrap());
   }
-
-  Future<Result<List<Product>, ProductsObtainerError>> getProductsOfShopsChain(
-      String shopsChainName) async {
-    final result = await _offShopsManager.fetchVeganProductsForShop(
-        shopsChainName, await _userLangs());
-    if (result.isErr) {
-      return Err(result.unwrapErr().convert());
-    }
-    return Ok(result.unwrap());
-  }
 }
 
 extension _ProductsManagerErrorExt on ProductsManagerError {
@@ -93,17 +80,6 @@ extension _ProductsManagerErrorExt on ProductsManagerError {
       case ProductsManagerError.NETWORK_ERROR:
         return ProductsObtainerError.NETWORK;
       case ProductsManagerError.OTHER:
-        return ProductsObtainerError.OTHER;
-    }
-  }
-}
-
-extension _OffShopsManagerErrorExt on OffShopsManagerError {
-  ProductsObtainerError convert() {
-    switch (this) {
-      case OffShopsManagerError.NETWORK:
-        return ProductsObtainerError.NETWORK;
-      case OffShopsManagerError.OTHER:
         return ProductsObtainerError.OTHER;
     }
   }

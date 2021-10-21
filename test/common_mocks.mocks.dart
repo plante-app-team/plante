@@ -924,14 +924,6 @@ class MockProductsObtainer extends _i1.Mock implements _i59.ProductsObtainer {
                   _i59.ProductsObtainerError>())) as _i9
           .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
   @override
-  _i9.Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>
-      getProductsOfShopsChain(String? shopsChainName) => (super.noSuchMethod(
-          Invocation.method(#getProductsOfShopsChain, [shopsChainName]),
-          returnValue: Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>.value(
-              _FakeResult_0<List<_i44.Product>,
-                  _i59.ProductsObtainerError>())) as _i9
-          .Future<_i2.Result<List<_i44.Product>, _i59.ProductsObtainerError>>);
-  @override
   String toString() => super.toString();
 }
 

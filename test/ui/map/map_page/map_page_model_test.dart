@@ -9,15 +9,15 @@ import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
-import '../../../z_fakes/fake_products_obtainer.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
+import '../../../z_fakes/fake_suggested_products_manager.dart';
 
 void main() {
   late MockLocationController locationController;
   late FakeShopsManager fakeShopsManager;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late MockAddressObtainer addressObtainer;
-  late FakeProductsObtainer productsObtainer;
+  late FakeSuggestedProductsManager suggestedProductsManager;
   late MapPageModel model;
 
   Map<OsmUID, Shop>? latestLoadedShops;
@@ -49,10 +49,15 @@ void main() {
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
 
-    productsObtainer = FakeProductsObtainer();
+    suggestedProductsManager = FakeSuggestedProductsManager();
 
-    model = MapPageModel(locationController, fakeShopsManager, addressObtainer,
-        latestCameraPosStorage, directionsManager, productsObtainer, (shops) {
+    model = MapPageModel(
+        locationController,
+        fakeShopsManager,
+        addressObtainer,
+        latestCameraPosStorage,
+        directionsManager,
+        suggestedProductsManager, (shops) {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;
