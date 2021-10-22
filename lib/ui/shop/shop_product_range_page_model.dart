@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -24,12 +26,12 @@ class ShopProductRangePageModel implements ShopsManagerListener {
 
   final VoidCallback _updateCallback;
 
-  bool _loading = false;
+  Completer<void>? _loading;
   bool _performingBackendAction = false;
   Result<ShopProductRange, ShopsManagerError>? _shopProductRange;
   var _lastSortedBarcodes = <String>[];
 
-  bool get loading => _loading;
+  bool get loading => _loading != null && !_loading!.isCompleted;
   bool get performingBackendAction => _performingBackendAction;
 
   bool get rangeLoaded => _shopProductRange != null && _shopProductRange!.isOk;
@@ -61,11 +63,17 @@ class ShopProductRangePageModel implements ShopsManagerListener {
   }
 
   void reload() async {
+    // Sometimes we're asked to reload while we are already
+    // loading - for such cases we want to wait for the others
+    // loadings to finish, only then to load ourselves.
+    while (_loading != null) {
+      await _loading?.future;
+    }
     await load();
   }
 
   Future<void> load() async {
-    _loading = true;
+    _loading = Completer();
     _updateCallback.call();
     try {
       final oldProducts =
@@ -112,10 +120,12 @@ class ShopProductRangePageModel implements ShopsManagerListener {
         }
       }
     } catch (e) {
+      Log.w('ShopProductRangePageModel.load exception', ex: e);
       _shopProductRange = Err(ShopsManagerError.OTHER);
       rethrow;
     } finally {
-      _loading = false;
+      _loading?.complete();
+      _loading = null;
       _updateCallback.call();
     }
   }
