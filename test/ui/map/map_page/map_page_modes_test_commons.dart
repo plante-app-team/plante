@@ -22,16 +22,16 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
-import '../../../z_fakes/fake_products_obtainer.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
+import '../../../z_fakes/fake_suggested_products_manager.dart';
 
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
@@ -43,7 +43,7 @@ class MapPageModesTestCommons {
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
   late MockDirectionsManager directionsManager;
-  late FakeProductsObtainer productsObtainer;
+  late FakeSuggestedProductsManager suggestedProductsManager;
 
   final readyAddress = OsmAddress((e) => e.road = 'Broadway');
 
@@ -76,8 +76,9 @@ class MapPageModesTestCommons {
     GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
     directionsManager = MockDirectionsManager();
     GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
-    productsObtainer = FakeProductsObtainer();
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
+    suggestedProductsManager = FakeSuggestedProductsManager();
+    GetIt.I
+        .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
 
     await fillFetchedShops();
 

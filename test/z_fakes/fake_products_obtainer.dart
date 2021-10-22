@@ -100,10 +100,4 @@ class FakeProductsObtainer implements ProductsObtainer {
       List<off.Product> offProducts) async {
     return await getProducts(offProducts.map((e) => e.barcode!).toList());
   }
-
-  @override
-  Future<Result<List<Product>, ProductsObtainerError>> getProductsOfShopsChain(
-      String shopsChainName) async {
-    return Ok(const []);
-  }
 }

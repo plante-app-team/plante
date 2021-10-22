@@ -28,7 +28,7 @@ import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/photos_taker.dart';
@@ -39,8 +39,8 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
-import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
+import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
@@ -118,7 +118,8 @@ void main() {
         .thenAnswer((_) async => false);
     GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
 
-    GetIt.I.registerSingleton<ProductsObtainer>(FakeProductsObtainer());
+    GetIt.I.registerSingleton<SuggestedProductsManager>(
+        FakeSuggestedProductsManager());
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable

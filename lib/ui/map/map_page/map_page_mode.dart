@@ -62,7 +62,7 @@ abstract class MapPageMode {
   @mustCallSuper
   void deinit() {}
   Iterable<Shop> filter(
-          Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) =>
+          Iterable<Shop> shops, Set<OsmUID> withSuggestedProducts) =>
       shops;
   Set<Shop> selectedShops() => {};
   Set<Shop> accentedShops() => {};
