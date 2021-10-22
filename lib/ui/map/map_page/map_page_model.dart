@@ -20,8 +20,7 @@ import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
-import 'package:plante/outside/off/off_shops_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -41,7 +40,7 @@ class MapPageModel implements ShopsManagerListener {
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
   final DirectionsManager _directionsManager;
-  final ProductsObtainer _productsObtainer;
+  final SuggestedProductsManager _suggestedProductsManager;
 
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
@@ -50,7 +49,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
-  final _shopsWithPossibleProducts = <OsmUID>{};
+  final _shopsWithSuggestedProducts = <OsmUID>{};
 
   bool _directionsAvailable = false;
 
@@ -60,7 +59,7 @@ class MapPageModel implements ShopsManagerListener {
       this._addressObtainer,
       this._latestCameraPosStorage,
       this._directionsManager,
-      this._productsObtainer,
+      this._suggestedProductsManager,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
@@ -77,8 +76,8 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-  Set<OsmUID> get shopsWithPossibleProducts =>
-      UnmodifiableSetView(_shopsWithPossibleProducts);
+  Set<OsmUID> get shopsWithSuggestedProducts =>
+      UnmodifiableSetView(_shopsWithSuggestedProducts);
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();
@@ -171,13 +170,10 @@ class MapPageModel implements ShopsManagerListener {
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values.toSet();
     for (final shopOnMap in shopsOnMap) {
-      // Let's convert our shop name to what would be a Shop ID in OFF.
-      final possibleOffShopID =
-          OffShopsManager.shopNameToPossibleOffShopID(shopOnMap.name);
       final products =
-          await _productsObtainer.getProductsOfShopsChain(possibleOffShopID);
+          await _suggestedProductsManager.getSuggestedProductsFor(shopOnMap);
       if (products.isOk && products.unwrap().isNotEmpty) {
-        _shopsWithPossibleProducts.add(shopOnMap.osmUID);
+        _shopsWithSuggestedProducts.add(shopOnMap.osmUID);
         _updateShopsCallback.call(_shopsCache);
       }
     }

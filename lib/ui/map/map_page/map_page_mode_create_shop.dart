@@ -49,7 +49,7 @@ class MapPageModeCreateShop extends MapPageMode {
   // they wouldn't mess user's taps
   @override
   Iterable<Shop> filter(
-          Iterable<Shop> shops, Set<OsmUID> withPossibleProducts) =>
+          Iterable<Shop> shops, Set<OsmUID> withSuggestedProducts) =>
       shops.where((shop) => shop.osmUID == _NEW_SHOP_PSEUDO_OSM_ID);
 
   @override

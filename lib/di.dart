@@ -30,6 +30,7 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
@@ -105,6 +106,9 @@ void initDI() {
   ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),
+    GetIt.I.get<UserLangsManager>(),
+  ));
+  GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
     GetIt.I.get<OffShopsManager>(),
     GetIt.I.get<UserLangsManager>(),
   ));

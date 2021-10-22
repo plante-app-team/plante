@@ -15,7 +15,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
@@ -142,7 +142,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         allShops.addAll(_model.shopsCache.values);
         allShops.addAll(_mode.additionalShops());
         _onShopsUpdated(
-            _mode.filter(allShops, _model.shopsWithPossibleProducts));
+            _mode.filter(allShops, _model.shopsWithSuggestedProducts));
       }
     };
     final loadingChangeCallback = () {
@@ -159,7 +159,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         GetIt.I.get<AddressObtainer>(),
         GetIt.I.get<LatestCameraPosStorage>(),
         GetIt.I.get<DirectionsManager>(),
-        GetIt.I.get<ProductsObtainer>(),
+        GetIt.I.get<SuggestedProductsManager>(),
         updateShopsCallback,
         _onError,
         updateCallback,
@@ -236,7 +236,7 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
     final extraData = ShopsMarkersExtraData(_mode.selectedShops(),
-        _mode.accentedShops(), _model.shopsWithPossibleProducts);
+        _mode.accentedShops(), _model.shopsWithSuggestedProducts);
     return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 
