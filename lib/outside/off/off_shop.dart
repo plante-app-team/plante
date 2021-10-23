@@ -5,6 +5,8 @@ import 'package:plante/base/build_value_helper.dart';
 part 'off_shop.g.dart';
 
 abstract class OffShop implements Built<OffShop, OffShopBuilder> {
+  static OffShop empty = OffShop((e) => e.id = '');
+
   @BuiltValueField(wireName: 'id')
   String get id;
   @BuiltValueField(wireName: 'name')
@@ -19,6 +21,9 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(OffShop.serializer, json);
   }
+
+  static String shopNameToPossibleOffShopID(String shopName) =>
+      shopName.toLowerCase().trim();
 
   factory OffShop([void Function(OffShopBuilder) updates]) = _$OffShop;
   OffShop._();

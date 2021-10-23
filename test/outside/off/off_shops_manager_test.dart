@@ -74,6 +74,10 @@ void main() {
         offApi, cameraPosStorage, addressObtainer, productsManager);
   });
 
+  tearDown(() {
+    offShopsManager.dispose();
+  });
+
   Future<void> _initShops({
     required Coord? cameraPos,
     required Result<OsmAddress, OpenStreetMapError> addressOfAnyCoords,
@@ -95,33 +99,32 @@ void main() {
 
   void _initOffShopProducts({
     required String countryCode,
-    required String shopName,
-    required List<off.Product>? veganIngredientsProducts,
-    required List<off.Product>? veganLabelProducts,
+    Map<String, List<off.Product>> veganIngredientsProducts = const {},
+    Map<String, List<off.Product>> veganLabelProducts = const {},
   }) {
-    final shopId = OffShopsManager.shopNameToPossibleOffShopID(shopName);
-
     when(offApi.searchProducts(any)).thenAnswer((invc) async {
       final conf =
           invc.positionalArguments[0] as off.ProductSearchQueryConfiguration;
 
-      // A function which determines whether some tag with a
-      // certain value is requested.
-      final hasTagParamWithVal = (String tag, String val) {
+      // A function which determines what value requested tag has (if any)
+      final getTagParamVal = (String tag) {
         final tagsParams = conf.additionalParameters.whereType<off.TagFilter>();
-        return tagsParams.any((param) =>
-            param.getTagType() == tag &&
-            param.getTagName() == val &&
-            param.contains == true);
+        for (final param in tagsParams) {
+          if (param.contains == true && param.getTagType() == tag) {
+            return param.getTagName();
+          }
+        }
+        return null;
       };
 
-      if (conf.cc == countryCode && hasTagParamWithVal('stores', shopId)) {
+      if (conf.cc == countryCode) {
+        final shopId = getTagParamVal('stores');
         final result = <off.Product>[];
-        if (hasTagParamWithVal('labels', 'en:vegan')) {
-          result.addAll(veganLabelProducts ?? const []);
+        if (getTagParamVal('labels') == 'en:vegan') {
+          result.addAll(veganLabelProducts[shopId] ?? const []);
         }
-        if (hasTagParamWithVal('ingredients_analysis', 'en:vegan')) {
-          result.addAll(veganIngredientsProducts ?? const []);
+        if (getTagParamVal('ingredients_analysis') == 'en:vegan') {
+          result.addAll(veganIngredientsProducts[shopId] ?? const []);
         }
         return off.SearchResult(
           page: 1,
@@ -190,21 +193,37 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
     final products1 = createOffProducts('be', ['123', '124']);
     final products2 = createOffProducts('be', ['125', '126']);
+    final products3 = createOffProducts('be', ['127', '128']);
+    final products4 = createOffProducts('be', ['129', '130']);
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: products1,
-      veganLabelProducts: products2,
+      veganIngredientsProducts: {
+        someOffShops[0].id: products1,
+        someOffShops[1].id: products2,
+      },
+      veganLabelProducts: {
+        someOffShops[0].id: products3,
+        someOffShops[1].id: products4,
+      },
     );
 
-    final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
+    final fetchedProductsRes = await offShopsManager.fetchVeganProductsForShops(
+        someOffShops.map((e) => e.name!).toSet(), [LangCode.be]);
     final fetchedProducts = fetchedProductsRes.unwrap();
-    expect(fetchedProducts.map((e) => e.barcode).toSet(),
-        equals((products1 + products2).map((e) => e.barcode).toSet()));
+
+    final finalBarcodes1 =
+        fetchedProducts[someOffShops[0].name!]!.map((e) => e.barcode);
+    final expectedBarcodes1 = (products1 + products3).map((e) => e.barcode);
+    expect(finalBarcodes1.toSet(), equals(expectedBarcodes1.toSet()));
+
+    final finalBarcodes2 =
+        fetchedProducts[someOffShops[1].name!]!.map((e) => e.barcode);
+    final expectedBarcodes2 = (products2 + products4).map((e) => e.barcode);
+    expect(finalBarcodes2.toSet(), equals(expectedBarcodes2.toSet()));
+
+    expect(fetchedProducts.length, equals(2));
   });
 
   test('fetch products for same shop for second time', () async {
@@ -214,24 +233,24 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
+    final shopName = shop.name!;
     final products = createOffProducts('be', ['123', '124']);
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: products,
-      veganLabelProducts: null,
+      veganIngredientsProducts: {shop.id: products},
+      veganLabelProducts: const {},
     );
 
     final fetchedProductsRes1 = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
+        .fetchVeganProductsForShops({shopName}, [LangCode.be]);
     final fetchedProducts1 = fetchedProductsRes1.unwrap();
     // First fetch leads to network operations
     verify(offApi.searchProducts(any));
     verify(productsManager.inflateOffProducts(any, any));
 
     final fetchedProductsRes2 = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
+        .fetchVeganProductsForShops({shopName}, [LangCode.be]);
     final fetchedProducts2 = fetchedProductsRes2.unwrap();
     // Second fetch does not lead to network operations
     verifyNever(offApi.searchProducts(any));
@@ -240,25 +259,29 @@ void main() {
     expect(fetchedProducts1, equals(fetchedProducts2));
   });
 
-  test('fetch products when the shop is not present', () async {
+  test('fetch products when no products are available for the shop', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
       addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = 'be')),
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName1 = someOffShops.first.name!;
-    final shopName2 = someOffShops.last.name!;
+    final shop1 = someOffShops.first;
+    final shop2 = someOffShops.last;
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName1,
-      veganIngredientsProducts: createOffProducts('be', ['123', '124']),
-      veganLabelProducts: createOffProducts('be', ['125', '126']),
+      veganIngredientsProducts: {
+        shop1.id: createOffProducts('be', ['123', '124'])
+      },
+      veganLabelProducts: {
+        shop1.id: createOffProducts('be', ['125', '126'])
+      },
     );
 
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName2, [LangCode.be]);
-    expect(fetchedProductsRes.unwrap(), isEmpty);
+        .fetchVeganProductsForShops({shop2.name!}, [LangCode.be]);
+    expect(fetchedProductsRes.unwrap()[shop2.name], isEmpty);
+    expect(fetchedProductsRes.unwrap()[shop1.name], isNull);
   });
 
   test('fetch products when only products with vegan label available',
@@ -269,20 +292,20 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
     final veganLabelProducts = createOffProducts('be', ['123', '124']);
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: null,
-      veganLabelProducts: veganLabelProducts,
+      veganIngredientsProducts: const {},
+      veganLabelProducts: {shop.id: veganLabelProducts},
     );
 
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
-    final fetchedProducts = fetchedProductsRes.unwrap();
-    expect(fetchedProducts.map((e) => e.barcode).toSet(),
-        equals(veganLabelProducts.map((e) => e.barcode).toSet()));
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    final fetchedProducts = fetchedProductsRes.unwrap()[shop.name!]!;
+    final fetchedBarcodes = fetchedProducts.map((e) => e.barcode);
+    final expectedBarcodes = veganLabelProducts.map((e) => e.barcode);
+    expect(fetchedBarcodes.toSet(), equals(expectedBarcodes.toSet()));
   });
 
   test('fetch products when only products with vegan ingredients available',
@@ -293,20 +316,20 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
     final veganIngredientsProducts = createOffProducts('be', ['123', '124']);
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: veganIngredientsProducts,
-      veganLabelProducts: null,
+      veganIngredientsProducts: {shop.id: veganIngredientsProducts},
+      veganLabelProducts: const {},
     );
 
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
-    final fetchedProducts = fetchedProductsRes.unwrap();
-    expect(fetchedProducts.map((e) => e.barcode).toSet(),
-        equals(veganIngredientsProducts.map((e) => e.barcode).toSet()));
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    final fetchedProducts = fetchedProductsRes.unwrap()[shop.name!]!;
+    final fetchedBarcodes = fetchedProducts.map((e) => e.barcode);
+    final expectedBarcodes = veganIngredientsProducts.map((e) => e.barcode);
+    expect(fetchedBarcodes.toSet(), equals(expectedBarcodes.toSet()));
   });
 
   test('fetch products when label- and ingredients-products overlap ',
@@ -317,21 +340,20 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
     final products1 = createOffProducts('be', ['123', '124']);
     final products2 = createOffProducts('be', ['123', '126']);
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: products1,
-      veganLabelProducts: products2,
+      veganIngredientsProducts: {shop.id: products1},
+      veganLabelProducts: {shop.id: products2},
     );
 
     expect(products1.first.barcode, equals(products2.first.barcode));
 
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
-    final fetchedProducts = fetchedProductsRes.unwrap();
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    final fetchedProducts = fetchedProductsRes.unwrap()[shop.name!]!;
     expect(fetchedProducts.map((e) => e.barcode).toSet(),
         equals((products1 + products2).map((e) => e.barcode).toSet()));
 
@@ -360,7 +382,7 @@ void main() {
     });
 
     await offShopsManager
-        .fetchVeganProductsForShop(someOffShops.first.name!, [LangCode.be]);
+        .fetchVeganProductsForShops({someOffShops.first.name!}, [LangCode.be]);
     expect(
         requestedOffFields, equals(ProductsManager.NEEDED_OFF_FIELDS.toSet()));
   });
@@ -372,16 +394,16 @@ void main() {
       offApiShops: Err(OffRestApiError.OTHER), // ERROR!!!!!!!!!!!!
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: createOffProducts('be', ['123', '124']),
-      veganLabelProducts: null,
+      veganIngredientsProducts: {
+        shop.id: createOffProducts('be', ['123', '124'])
+      },
     );
 
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
     expect(fetchedProductsRes.isErr, isTrue);
   });
 
@@ -392,19 +414,20 @@ void main() {
       offApiShops: Ok(someOffShops),
     );
 
-    final shopName = someOffShops.first.name!;
+    final shop = someOffShops.first;
     _initOffShopProducts(
       countryCode: 'be',
-      shopName: shopName,
-      veganIngredientsProducts: createOffProducts('be', ['123', '124']),
-      veganLabelProducts: null,
+      veganIngredientsProducts: {
+        shop.id: createOffProducts('be', ['123', '124'])
+      },
     );
 
     when(productsManager.inflateOffProducts(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
+
     final fetchedProductsRes = await offShopsManager
-        .fetchVeganProductsForShop(shopName, [LangCode.be]);
-    expect(fetchedProductsRes.isErr, isTrue);
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    expect(fetchedProductsRes.unwrap()[shop.name!], isNull);
   });
 
   test('fetch products when OFF returned null products', () async {
@@ -424,9 +447,10 @@ void main() {
       );
     });
 
-    final result = await offShopsManager
-        .fetchVeganProductsForShop(someOffShops.first.name!, [LangCode.be]);
-    expect(result.isErr, isTrue);
+    final shop = someOffShops.first;
+    final fetchedProductsRes = await offShopsManager
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    expect(fetchedProductsRes.unwrap()[shop.name!], isNull);
   });
 
   test('fetch products when OFF threw network error', () async {
@@ -440,8 +464,9 @@ void main() {
       throw const SocketException('hello there');
     });
 
-    final result = await offShopsManager
-        .fetchVeganProductsForShop(someOffShops.first.name!, [LangCode.be]);
-    expect(result.isErr, isTrue);
+    final shop = someOffShops.first;
+    final fetchedProductsRes = await offShopsManager
+        .fetchVeganProductsForShops({shop.name!}, [LangCode.be]);
+    expect(fetchedProductsRes.unwrap()[shop.name!], isNull);
   });
 }
