@@ -72,7 +72,7 @@
     "mod_reason_some_ingredient_has_unknown_origin": "Какие-то из ингредиентов в составе имеют неизвестное нам происхождение",
     "mod_reason_some_ingredient_is_in_fact_a_category": "Какой-то из ингредиентов в составе на самом деле является категорией, и ингредиенты из этой категории могут быть как веганскими, так и нет. Например, если у продукта в составе есть \"ароматизатор\", это почти ни о чём не говорит.",
 
-    "image_crop_page_title": "Давайте-ка обрежем!",
+    "image_crop_page_title": "Обрежем!",
 
     "external_auth_page_continue_with": "Продолжить с",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",

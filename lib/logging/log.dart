@@ -7,14 +7,32 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
+import 'package:plante/logging/log_level.dart';
 import 'package:share/share.dart';
 
 const LOGS_DIR_MAX_SIZE = 1024 * 1024 * 10;
+
+@visibleForTesting
+abstract class LogsInterceptor {
+  void onLog(LogLevel level, String msg, dynamic ex, StackTrace? stacktrace);
+}
 
 class Log {
   static DebugTree? _debugTree;
   static TimedRollingFileTree? _fileTree;
   static _CrashlyticsFimberTree? _crashlyticsTree;
+
+  static final _interceptors = <LogsInterceptor>[];
+
+  @visibleForTesting
+  static void addInterceptor(LogsInterceptor interceptor) {
+    _interceptors.add(interceptor);
+  }
+
+  @visibleForTesting
+  static void removeInterceptor(LogsInterceptor interceptor) {
+    _interceptors.remove(interceptor);
+  }
 
   static void init(
       {Directory? logsDir, int maxSizeBytes = LOGS_DIR_MAX_SIZE}) async {
@@ -97,7 +115,29 @@ class Log {
     await Share.shareFiles([logsZip.path]);
   }
 
+  static void custom(LogLevel level, String message,
+      {dynamic ex, StackTrace? stacktrace}) {
+    switch (level) {
+      case LogLevel.DEBUG:
+        d(message, ex: ex, stacktrace: stacktrace);
+        break;
+      case LogLevel.VERBOSE:
+        v(message, ex: ex, stacktrace: stacktrace);
+        break;
+      case LogLevel.INFO:
+        i(message, ex: ex, stacktrace: stacktrace);
+        break;
+      case LogLevel.WARNING:
+        w(message, ex: ex, stacktrace: stacktrace);
+        break;
+      case LogLevel.ERROR:
+        e(message, ex: ex, stacktrace: stacktrace);
+        break;
+    }
+  }
+
   static void v(String message, {dynamic ex, StackTrace? stacktrace}) {
+    _intercept(LogLevel.VERBOSE, message, ex, stacktrace);
     if (ex == null) {
       Fimber.v(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -105,7 +145,13 @@ class Log {
     }
   }
 
+  static void _intercept(
+      LogLevel level, String message, dynamic ex, StackTrace? stacktrace) {
+    _interceptors.forEach((e) => e.onLog(level, message, ex, stacktrace));
+  }
+
   static void d(String message, {dynamic ex, StackTrace? stacktrace}) {
+    _intercept(LogLevel.DEBUG, message, ex, stacktrace);
     if (ex == null) {
       Fimber.d(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -114,6 +160,7 @@ class Log {
   }
 
   static void i(String message, {dynamic ex, StackTrace? stacktrace}) {
+    _intercept(LogLevel.INFO, message, ex, stacktrace);
     if (ex == null) {
       Fimber.i(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -122,6 +169,7 @@ class Log {
   }
 
   static void w(String message, {dynamic ex, StackTrace? stacktrace}) {
+    _intercept(LogLevel.WARNING, message, ex, stacktrace);
     if (ex == null) {
       Fimber.w(message, ex: ex, stacktrace: stacktrace);
     } else {
@@ -138,6 +186,7 @@ class Log {
       throw Exception(message);
     }
 
+    _intercept(LogLevel.ERROR, message, ex, stacktrace);
     if (ex == null) {
       Fimber.e(message, ex: ex, stacktrace: stacktrace);
     } else {

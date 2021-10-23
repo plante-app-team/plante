@@ -168,15 +168,17 @@ class MapPageModel implements ShopsManagerListener {
   Future<void> _fetchOffShopsProductsData() async {
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
-    final shopsOnMap = _shopsCache.values.toSet();
-    for (final shopOnMap in shopsOnMap) {
-      final products =
-          await _suggestedProductsManager.getSuggestedProductsFor(shopOnMap);
-      if (products.isOk && products.unwrap().isNotEmpty) {
-        _shopsWithSuggestedProducts.add(shopOnMap.osmUID);
-        _updateShopsCallback.call(_shopsCache);
-      }
+    final shopsOnMap = _shopsCache.values;
+    final shopsAndProductsRes =
+        await _suggestedProductsManager.getSuggestedProductsFor(shopsOnMap);
+    if (shopsAndProductsRes.isErr) {
+      return;
     }
+    var shopsAndProducts = shopsAndProductsRes.unwrap();
+    shopsAndProducts = Map.from(shopsAndProducts); // Copy
+    shopsAndProducts.removeWhere((key, value) => value.isEmpty);
+    _shopsWithSuggestedProducts.addAll(shopsAndProducts.keys);
+    _updateShopsCallback.call(_shopsCache);
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {

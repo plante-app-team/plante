@@ -12,8 +12,8 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
+import 'package:plante/outside/off/off_shops_list_wrapper.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum OffShopsManagerError {
@@ -21,13 +21,16 @@ enum OffShopsManagerError {
   OTHER,
 }
 
+typedef ShopNamesAndProductsMap = Map<String, List<Product>>;
+
 class OffShopsManager {
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
   final ProductsManager _productsManager;
 
-  late final CachedOperation<List<OffShop>, OffShopsManagerError> _offShopsOp;
+  late final CachedOperation<OffShopsListWrapper, OffShopsManagerError>
+      _offShopsOp;
   late final CachedOperation<String, None> _countryCodeOp;
 
   final _offShopsProductsCache = <String, List<Product>>{};
@@ -36,6 +39,10 @@ class OffShopsManager {
       this._productsManager) {
     _offShopsOp = CachedOperation(_fetchOffShopsImpl);
     _countryCodeOp = CachedOperation(_getCountryCodeImpl);
+  }
+
+  void dispose() {
+    _offShopsOp.result.then((offShops) => offShops.maybeOk()?.dispose());
   }
 
   Future<Result<String, None>> _getCountryCodeImpl() async {
@@ -66,15 +73,15 @@ class OffShopsManager {
     if (!(await enableNewestFeatures())) {
       return Ok(const []);
     }
-    return await _offShopsOp.result;
+    final shopsRes = await _offShopsOp.result;
+    if (shopsRes.isErr) {
+      return Err(shopsRes.unwrapErr());
+    }
+    return Ok(shopsRes.unwrap().shops);
   }
 
-  Future<Result<List<OffShop>, OffShopsManagerError>>
+  Future<Result<OffShopsListWrapper, OffShopsManagerError>>
       _fetchOffShopsImpl() async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const []);
-    }
-
     final countryCode = await _countryCodeOp.result;
     if (countryCode.isErr) {
       Log.w('offShopsManager.fetchOffShops - no country code, cannot fetch');
@@ -88,61 +95,56 @@ class OffShopsManager {
       return Err(shopsRes.unwrapErr().convert());
     }
     Log.i('offShopManager.fetchOffShop fetch done');
-    return Ok(shopsRes.unwrap());
+    final shops = shopsRes.unwrap();
+    return Ok(await OffShopsListWrapper.create(shops));
   }
 
-  Future<Result<List<Product>, OffShopsManagerError>> fetchVeganProductsForShop(
-      String shopName, List<LangCode> langs) async {
+  Future<Result<ShopNamesAndProductsMap, OffShopsManagerError>>
+      fetchVeganProductsForShops(
+          Set<String> shopsNames, List<LangCode> langs) async {
     if (!(await enableNewestFeatures())) {
-      return Ok(const []);
+      return Ok(const {});
     }
-    Log.i('offShopsManager.fetchVeganProductsForShop $shopName');
-
-    // Maybe we already have the value in cache
-    final possibleOffShopID = shopNameToPossibleOffShopID(shopName);
-    final existingCache = _offShopsProductsCache[possibleOffShopID];
-    if (existingCache != null) {
-      return Ok(existingCache);
-    }
-
-    // Let's check whether the shop has any products
-    final offShopsRes = await fetchOffShops();
-    if (offShopsRes.isErr) {
-      Log.w('offShopManager.fetchVeganProductsForShop could not fetch shops');
-      return Err(OffShopsManagerError.OTHER);
-    }
-    final offShops = offShopsRes.unwrap();
-    if (!offShops.any((element) => element.id == possibleOffShopID)) {
-      _offShopsProductsCache[possibleOffShopID] = const [];
-      return Ok(const []);
-    }
-
-    // Let's fetch shop's products!
     final countryCodeRes = await _countryCodeOp.result;
-    if (countryCodeRes.isErr) {
-      return Ok(const []);
+    final shopsRes = await _offShopsOp.result;
+    if (shopsRes.isErr || countryCodeRes.isErr) {
+      return Err(shopsRes.unwrapErr());
     }
-    final offProductsRes =
-        await _fetchProducts(possibleOffShopID, countryCodeRes.unwrap(), langs);
-    if (offProductsRes.isErr) {
-      return Err(offProductsRes.unwrapErr());
-    }
-    final offProducts = offProductsRes.unwrap();
-    if (offProducts == null) {
-      Log.w('offShopManager.fetchVeganProductsForShop '
-          'searchResult without products');
-      return Err(OffShopsManagerError.OTHER);
-    }
-    final productsRes =
-        await _productsManager.inflateOffProducts(offProducts, langs);
-    if (productsRes.isErr) {
-      return Err(productsRes.unwrapErr().convert());
-    }
+    final shopsWrapper = shopsRes.unwrap();
+    final shops = await shopsWrapper.findAppropriateShopsFor(shopsNames);
+    final ShopNamesAndProductsMap result = {};
+    final countryCode = countryCodeRes.unwrap();
 
-    // Cache result and return it
-    final products = productsRes.unwrap();
-    _offShopsProductsCache[possibleOffShopID] = products;
-    return Ok(products);
+    for (final nameAndShop in shops.entries) {
+      final name = nameAndShop.key;
+      final shop = nameAndShop.value;
+
+      final existingCache = _offShopsProductsCache[name];
+      if (existingCache != null) {
+        result[name] = existingCache;
+      } else {
+        final offProductsRes =
+            await _fetchProducts(shop.id, countryCode, langs);
+        if (offProductsRes.isErr || offProductsRes.unwrap() == null) {
+          Log.w('offShopManager could not fetch for $shop: $offProductsRes');
+          // No good way to handle the error because all other
+          // fetches might end with a success.
+          continue;
+        }
+        final offProducts = offProductsRes.unwrap()!;
+        final productsRes =
+            await _productsManager.inflateOffProducts(offProducts, langs);
+        if (productsRes.isErr) {
+          Log.w('offShopManager could not inflate for $shop: $productsRes');
+          // No good way to handle the error because all other
+          // fetches might end with a success.
+          continue;
+        }
+        result[name] = productsRes.unwrap();
+        _offShopsProductsCache[name] = productsRes.unwrap();
+      }
+    }
+    return Ok(result);
   }
 
   Future<Result<List<off.Product>?, OffShopsManagerError>> _fetchProducts(
@@ -210,7 +212,7 @@ class OffShopsManager {
   }
 
   static String shopNameToPossibleOffShopID(String shopName) =>
-      shopName.toLowerCase().trim();
+      OffShop.shopNameToPossibleOffShopID(shopName);
 }
 
 extension _OffRestApiErrorExt on OffRestApiError {
@@ -219,17 +221,6 @@ extension _OffRestApiErrorExt on OffRestApiError {
       case OffRestApiError.NETWORK:
         return OffShopsManagerError.NETWORK;
       case OffRestApiError.OTHER:
-        return OffShopsManagerError.OTHER;
-    }
-  }
-}
-
-extension _ProductsManagerErrorExt on ProductsManagerError {
-  OffShopsManagerError convert() {
-    switch (this) {
-      case ProductsManagerError.NETWORK_ERROR:
-        return OffShopsManagerError.NETWORK;
-      case ProductsManagerError.OTHER:
         return OffShopsManagerError.OTHER;
     }
   }
