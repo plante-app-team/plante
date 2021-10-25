@@ -151,6 +151,18 @@ class FakeOffApi implements OffApi {
       products: [],
     );
   }
+
+  @override
+  Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByIngredients(
+      String countryCode, OffShop shop, List<String> productsCategories) async {
+    return Ok(const []);
+  }
+
+  @override
+  Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByLabel(
+      String countryCode, OffShop shop) async {
+    return Ok(const []);
+  }
 }
 
 String _generateName() {

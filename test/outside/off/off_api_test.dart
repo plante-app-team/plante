@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shop.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_http_client.dart';
@@ -93,30 +94,6 @@ void main() {
     expect(obtainedBarcodes.toSet(), equals(barcodes.toSet()));
   });
 
-  test('fetch shops from off for belgium', () async {
-    httpClient.setResponse('.openfoodfacts.org/stores.json', '''{
-      "count": 2,
-      "tags": [
-        {
-          "id": "delhaize",
-          "known": 0,
-          "name": "Delhaize",
-          "products": 10293,
-          "url": "https://be.openfoodfacts.org/winkel/delhaize"
-        },
-        {
-          "id": "colruyt",
-          "known": 0,
-          "name": "Colruyt",
-          "products": 3399,
-          "url": "https://be.openfoodfacts.org/winkel/colruyt"
-        }
-      ]
-    }''');
-    final result = await offApi.getShopsForLocation('be');
-    expect(result.unwrap().length, equals(2));
-  });
-
   test('fetch shops network exceptions', () async {
     httpClient.setResponseException(
         '.openfoodfacts.org/stores.json', const SocketException(''));
@@ -140,7 +117,7 @@ void main() {
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
-  test('fetch shops from off for belgium - integration', () async {
+  test('fetch shops from off for belgium', () async {
     httpClient.setResponse('.*stores.json.*', '''
     {
       "count":2,
@@ -165,5 +142,70 @@ void main() {
 
     final result = await offApi.getShopsForLocation('be');
     expect(result.unwrap().length, equals(2));
+  });
+
+  test('get vegan barcodes by ingredients analysis', () async {
+    httpClient.setResponse('api/v2/search', '''
+    {
+      "count":3,
+      "page":1,
+      "page_count":3,
+      "page_size":1000,
+      "skip":0,
+      "products":[
+        {"code":"3046920022651"},
+        {"code":"3046920022606"},
+        {"code":"3229820021027"}
+      ]
+    }
+    ''');
+
+    final shop = OffShop((e) => e.id = 'spar');
+    final result = await offApi
+        .getBarcodesVeganByIngredients('ru', shop, ['en:banana', 'en:cocoa']);
+    expect(result.unwrap(),
+        equals(['3046920022651', '3046920022606', '3229820021027']));
+
+    final requests = httpClient.getRequestsMatching('.*');
+    expect(requests.length, equals(1), reason: requests.toString());
+    final url = requests.single.url.toString();
+    expect(url, contains('ru.openfoodfacts.org'));
+    expect(url, contains('api/v2/search'));
+    expect(url, contains('ingredients_analysis_tags=en%3Avegan'));
+    expect(url, isNot(contains('labels_tags=en%3Avegan')));
+    expect(url, contains('categories_tags=en%3Abanana%7Cen%3Acocoa'));
+    expect(url, contains('stores_tags=spar'));
+  });
+
+  test('get vegan barcodes by labels', () async {
+    httpClient.setResponse('api/v2/search', '''
+    {
+      "count":3,
+      "page":1,
+      "page_count":3,
+      "page_size":1000,
+      "skip":0,
+      "products":[
+        {"code":"3046920022651"},
+        {"code":"3046920022606"},
+        {"code":"3229820021027"}
+      ]
+    }
+    ''');
+
+    final shop = OffShop((e) => e.id = 'spar');
+    final result = await offApi.getBarcodesVeganByLabel('ru', shop);
+    expect(result.unwrap(),
+        equals(['3046920022651', '3046920022606', '3229820021027']));
+
+    final requests = httpClient.getRequestsMatching('.*');
+    expect(requests.length, equals(1), reason: requests.toString());
+    final url = requests.single.url.toString();
+    expect(url, contains('ru.openfoodfacts.org'));
+    expect(url, contains('api/v2/search'));
+    expect(url, isNot(contains('ingredients_analysis_tags=en%3Avegan')));
+    expect(url, contains('labels_tags=en%3Avegan'));
+    expect(url, isNot(contains('categories_tags')));
+    expect(url, contains('stores_tags=spar'));
   });
 }

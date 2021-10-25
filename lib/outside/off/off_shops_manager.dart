@@ -1,19 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:openfoodfacts/model/parameter/TagFilter.dart' as off;
-import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/product.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
-import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum OffShopsManagerError {
@@ -21,22 +16,35 @@ enum OffShopsManagerError {
   OTHER,
 }
 
-typedef ShopNamesAndProductsMap = Map<String, List<Product>>;
+typedef ShopNamesAndBarcodesMap = Map<String, List<String>>;
 
 class OffShopsManager {
+  // OFF categories considered acceptable for products which are vegan
+  // accidentally. The field is needed to avoid returning grains and canned
+  // vegetables.
+  static const _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES = [
+    'en:desserts',
+    'en:snacks',
+    'en:meat-analogues',
+    'en:milk-substitute',
+    'en:non-dairy-yogurts',
+    'en:frozen-desserts',
+    'en:chips-and-fries',
+    'en:biscuits-and-cakes',
+    'en:veggie-patties',
+    'en:biscuits',
+  ];
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
-  final ProductsManager _productsManager;
 
   late final CachedOperation<OffShopsListWrapper, OffShopsManagerError>
       _offShopsOp;
   late final CachedOperation<String, None> _countryCodeOp;
 
-  final _offShopsProductsCache = <String, List<Product>>{};
+  final ShopNamesAndBarcodesMap _offShopsProductsCache = {};
 
-  OffShopsManager(this._offApi, this._cameraPosStorage, this._addressObtainer,
-      this._productsManager) {
+  OffShopsManager(this._offApi, this._cameraPosStorage, this._addressObtainer) {
     _offShopsOp = CachedOperation(_fetchOffShopsImpl);
     _countryCodeOp = CachedOperation(_getCountryCodeImpl);
   }
@@ -88,31 +96,31 @@ class OffShopsManager {
       return Err(OffShopsManagerError.OTHER);
     }
 
-    Log.i('offShopManager.fetchOffShop fetch start');
     final shopsRes = await _offApi.getShopsForLocation(countryCode.unwrap());
     if (shopsRes.isErr) {
       Log.w('offShopManager.fetchOffShop error: $shopsRes');
       return Err(shopsRes.unwrapErr().convert());
     }
-    Log.i('offShopManager.fetchOffShop fetch done');
     final shops = shopsRes.unwrap();
     return Ok(await OffShopsListWrapper.create(shops));
   }
 
-  Future<Result<ShopNamesAndProductsMap, OffShopsManagerError>>
-      fetchVeganProductsForShops(
+  Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
+      fetchVeganBarcodesForShops(
           Set<String> shopsNames, List<LangCode> langs) async {
     if (!(await enableNewestFeatures())) {
       return Ok(const {});
     }
     final countryCodeRes = await _countryCodeOp.result;
     final shopsRes = await _offShopsOp.result;
-    if (shopsRes.isErr || countryCodeRes.isErr) {
+    if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
+    } else if (countryCodeRes.isErr) {
+      return Err(OffShopsManagerError.OTHER);
     }
     final shopsWrapper = shopsRes.unwrap();
     final shops = await shopsWrapper.findAppropriateShopsFor(shopsNames);
-    final ShopNamesAndProductsMap result = {};
+    final ShopNamesAndBarcodesMap result = {};
     final countryCode = countryCodeRes.unwrap();
 
     for (final nameAndShop in shops.entries) {
@@ -123,96 +131,38 @@ class OffShopsManager {
       if (existingCache != null) {
         result[name] = existingCache;
       } else {
-        final offProductsRes =
-            await _fetchProducts(shop.id, countryCode, langs);
-        if (offProductsRes.isErr || offProductsRes.unwrap() == null) {
-          Log.w('offShopManager could not fetch for $shop: $offProductsRes');
-          // No good way to handle the error because all other
-          // fetches might end with a success.
-          continue;
+        final barcodesRes = await _queryBarcodesFor(shop, countryCode);
+        if (barcodesRes.isErr) {
+          return Err(barcodesRes.unwrapErr());
         }
-        final offProducts = offProductsRes.unwrap()!;
-        final productsRes =
-            await _productsManager.inflateOffProducts(offProducts, langs);
-        if (productsRes.isErr) {
-          Log.w('offShopManager could not inflate for $shop: $productsRes');
-          // No good way to handle the error because all other
-          // fetches might end with a success.
-          continue;
-        }
-        result[name] = productsRes.unwrap();
-        _offShopsProductsCache[name] = productsRes.unwrap();
+        final barcodes = barcodesRes.unwrap();
+        result[name] = barcodes;
+        _offShopsProductsCache[name] = barcodes;
       }
     }
     return Ok(result);
   }
 
-  Future<Result<List<off.Product>?, OffShopsManagerError>> _fetchProducts(
-      String shopId, String countryCode, List<LangCode> langs) async {
-    // TODO: fetch other than page 1
+  Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesFor(
+      OffShop shop, String countryCode) async {
+    final barcodesRes1 = await _offApi.getBarcodesVeganByIngredients(
+        countryCode, shop, _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES);
+    final barcodesRes2 =
+        await _offApi.getBarcodesVeganByLabel(countryCode, shop);
 
-    final List<off.Product>? products1;
-    final List<off.Product>? products2;
-    try {
-      products1 =
-          await _fetchProductsWithVeganIngredients(shopId, countryCode, langs);
-      products2 =
-          await _fetchProductsWithVeganLabel(shopId, countryCode, langs);
-    } on IOException catch (e) {
-      Log.w('_fetchProducts caught exception', ex: e);
-      return Err(OffShopsManagerError.NETWORK);
-    }
-
-    if (products1 != null && products2 != null) {
-      final products1Barcodes = products1.map((e) => e.barcode).toSet();
-      final products2Filtered =
-          products2.where((p) => !products1Barcodes.contains(p.barcode));
-      return Ok(products1 + products2Filtered.toList());
-    } else if (products1 != null) {
-      return Ok(products1);
-    } else if (products2 != null) {
-      return Ok(products2);
+    if (barcodesRes1.isOk && barcodesRes2.isOk) {
+      final barcodes1 = barcodesRes1.unwrap().toSet();
+      final barcodes2Filtered =
+          barcodesRes2.unwrap().where((e) => !barcodes1.contains(e));
+      return Ok(barcodes1.toList() + barcodes2Filtered.toList());
+    } else if (barcodesRes1.isOk) {
+      return Ok(barcodesRes1.unwrap());
+    } else if (barcodesRes2.isOk) {
+      return Ok(barcodesRes2.unwrap());
     } else {
-      return Ok(null);
+      return Err(barcodesRes1.unwrapErr().convert());
     }
   }
-
-  Future<List<off.Product>?> _fetchProductsWithVeganIngredients(
-      String shopId, String countryCode, List<LangCode> langs) async {
-    final conf = off.ProductSearchQueryConfiguration(
-        cc: countryCode,
-        languages:
-            langs.map((e) => off.LanguageHelper.fromJson(e.name)).toList(),
-        fields: ProductsManager.NEEDED_OFF_FIELDS,
-        parametersList: [
-          const off.TagFilter(
-              tagType: 'ingredients_analysis',
-              contains: true,
-              tagName: 'en:vegan'),
-          off.TagFilter(tagType: 'stores', contains: true, tagName: shopId),
-        ]);
-    final searchResult = await _offApi.searchProducts(conf);
-    return searchResult.products;
-  }
-
-  Future<List<off.Product>?> _fetchProductsWithVeganLabel(
-      String shopId, String countryCode, List<LangCode> langs) async {
-    final conf = off.ProductSearchQueryConfiguration(
-        cc: countryCode,
-        languages:
-            langs.map((e) => off.LanguageHelper.fromJson(e.name)).toList(),
-        fields: ProductsManager.NEEDED_OFF_FIELDS,
-        parametersList: [
-          const off.TagFilter(
-              tagType: 'labels', contains: true, tagName: 'en:vegan'),
-          off.TagFilter(tagType: 'stores', contains: true, tagName: shopId),
-        ]);
-    final searchResult = await _offApi.searchProducts(conf);
-    return searchResult.products;
-  }
-
-  static String shopNameToPossibleOffShopID(String shopName) =>
-      OffShop.shopNameToPossibleOffShopID(shopName);
 }
 
 extension _OffRestApiErrorExt on OffRestApiError {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/model/SearchResult.dart' as off;
@@ -89,33 +90,108 @@ class OffApi {
 
   Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
       String countryIso) async {
+    final responseRes =
+        await _get(Uri.https('$countryIso.openfoodfacts.org', 'stores.json'));
+    if (responseRes.isErr) {
+      return Err(responseRes.unwrapErr());
+    }
+    final result = await compute(_parseShops, responseRes.unwrap());
+    if (result != null) {
+      return Ok(result);
+    } else {
+      Log.w('OffApi.getShopsForLocation invalid JSON: $responseRes');
+      return Err(OffRestApiError.OTHER);
+    }
+  }
+
+  static List<OffShop>? _parseShops(String json) {
+    final resultJson = _jsonDecodeSafe(json);
+    if (resultJson == null) {
+      return null;
+    }
+    final shopsJson = resultJson['tags'] as List<dynamic>;
+    return shopsJson.map(OffShop.fromJson).whereType<OffShop>().toList();
+  }
+
+  Future<Result<String, OffRestApiError>> _get(Uri uri) async {
     final http.Response response;
     try {
-      response = await _httpClient.get(
-          Uri.parse('https://$countryIso.openfoodfacts.org/stores.json'),
-          headers: {
-            'user-agent': await userAgent()
-          }).timeout(_REST_API_TIMEOUT);
+      response = await _httpClient.get(uri, headers: {
+        'user-agent': await userAgent()
+      }).timeout(_REST_API_TIMEOUT);
     } on IOException catch (e) {
-      Log.w('OffApi.getShopsForLocation network error', ex: e);
+      Log.w('OffApi._get $uri network error', ex: e);
       return Err(OffRestApiError.NETWORK);
     } on TimeoutException catch (e) {
-      Log.w('OffApi.getShopsForLocation timeout', ex: e);
+      Log.w('OffApi._get $uri timeout', ex: e);
       return Err(OffRestApiError.NETWORK);
     }
 
     if (response.statusCode != 200) {
-      Log.w('OffApi.getShopsForLocation response error: $response');
+      Log.w('OffApi._get $uri response error: $response');
       return Err(OffRestApiError.OTHER);
     }
 
-    final resultJson = _jsonDecodeSafe(response.body);
-    if (resultJson == null) {
-      Log.w('OffApi.getShopsForLocation invalid JSON: ${response.body}');
+    return Ok(response.body);
+  }
+
+  Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByIngredients(
+      String countryCode, OffShop shop, List<String> productsCategories) async {
+    return await _searchBarcodes(countryCode, {
+      'ingredients_analysis_tags': 'en:vegan',
+      'stores_tags': shop.id,
+      'categories_tags': productsCategories.join('|')
+    });
+  }
+
+  Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByLabel(
+      String countryCode, OffShop shop) async {
+    return await _searchBarcodes(countryCode, {
+      'labels_tags': 'en:vegan',
+      'stores_tags': shop.id,
+    });
+  }
+
+  Future<Result<List<String>, OffRestApiError>> _searchBarcodes(
+      String countryCode, Map<String, String> additionalQueryParams) async {
+    final queryParams = {
+      'page_size': '1000', // We want to get ALL products
+      'page': '1',
+      'fields': 'code',
+      ...additionalQueryParams
+    };
+    final uri = Uri.https(
+        '$countryCode.openfoodfacts.org', 'api/v2/search', queryParams);
+
+    final responseRes = await _get(uri);
+    if (responseRes.isErr) {
+      return Err(responseRes.unwrapErr());
+    }
+    final result = await compute(_extractBarcodes, responseRes.unwrap());
+    if (result != null) {
+      return Ok(result);
+    } else {
+      Log.w('OffApi._searchBarcodes invalid JSON: $responseRes');
       return Err(OffRestApiError.OTHER);
     }
-    final shopsJson = resultJson['tags'] as List<dynamic>;
-    return Ok(shopsJson.map(OffShop.fromJson).whereType<OffShop>().toList());
+  }
+
+  static List<String>? _extractBarcodes(String jsonStr) {
+    final result = <String>[];
+    final json = _jsonDecodeSafe(jsonStr);
+    if (json == null) {
+      return null;
+    }
+    for (final productJson in json['products']) {
+      if (productJson is! Map<String, dynamic>) {
+        continue;
+      }
+      if (!productJson.containsKey('code')) {
+        continue;
+      }
+      result.add(productJson['code'].toString());
+    }
+    return result;
   }
 }
 

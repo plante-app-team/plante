@@ -11,6 +11,8 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
@@ -103,13 +105,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     };
     _model = ShopProductRangePageModel(
         GetIt.I.get<ShopsManager>(),
+        GetIt.I.get<SuggestedProductsManager>(),
+        GetIt.I.get<ProductsObtainer>(),
         GetIt.I.get<UserParamsController>(),
         GetIt.I.get<AddressObtainer>(),
         widget.shop,
         updateCallback);
     initializeDateFormatting();
 
-    widget._testingStorage.forceReload = _model.reload;
+    widget._testingStorage.forceReload = _model.reloadConfirmedProducts;
   }
 
   @override
@@ -138,19 +142,29 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           errorText(context.strings.global_network_error),
           const SizedBox(height: 8),
           ButtonFilledPlante.withText(context.strings.global_try_again,
-              onPressed: _model.reload)
+              onPressed: _model.reloadConfirmedProducts)
         ]));
       } else {
         content = errorWrapper(
             errorText(context.strings.global_something_went_wrong));
       }
-    } else if (_model.loadedProducts.isEmpty) {
+    } else if (!_model.anyProductsLoaded) {
       content = errorWrapper(errorText(
           context.strings.shop_product_range_page_this_shop_has_no_product));
     } else {
-      final widgets =
-          _model.loadedProducts.map((e) => _productToCard(e, context)).toList();
-      widgets.insert(0, const SizedBox(height: _LIST_GRADIENT_SIZE));
+      final widgets = <Widget>[];
+      widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
+      if (_model.loadedProducts.isNotEmpty) {
+        widgets.addAll(_model.loadedProducts
+            .map((e) => _productToCard(e, context))
+            .toList());
+      }
+      if (_model.suggestedProducts.isNotEmpty) {
+        widgets.add(const Text('Suggested products')); // TODO: i18n
+        widgets.addAll(_model.suggestedProducts
+            .map((e) => _productToCard(e, context))
+            .toList());
+      }
       widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
       content = ListView(children: widgets);
     }

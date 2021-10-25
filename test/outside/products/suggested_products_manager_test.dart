@@ -1,5 +1,4 @@
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
@@ -39,20 +38,18 @@ void main() {
         ..productsCount = 2),
     ];
     final allSuggestions = {
-      offShops[0]: [
-        ProductLangSlice((v) => v.barcode = '123').productForTests(),
-      ],
+      offShops[0]: ['123'],
       offShops[1]: [
-        ProductLangSlice((v) => v.barcode = '124').productForTests(),
-        ProductLangSlice((v) => v.barcode = '125').productForTests(),
+        '124',
+        '125',
       ],
       offShops[2]: [
-        ProductLangSlice((v) => v.barcode = '126').productForTests(),
-        ProductLangSlice((v) => v.barcode = '127').productForTests(),
-        ProductLangSlice((v) => v.barcode = '128').productForTests(),
+        '126',
+        '127',
+        '128',
       ],
     };
-    offShopsManager.setSuggestedProducts(allSuggestions);
+    offShopsManager.setSuggestedBarcodes(allSuggestions);
 
     final shops = [
       Shop((e) => e
@@ -70,12 +67,12 @@ void main() {
     ];
 
     var suggestionsRes =
-        await suggestedProductsManager.getSuggestedProductsFor([shops[0]]);
+        await suggestedProductsManager.getSuggestedBarcodesFor([shops[0]]);
     var suggestions = suggestionsRes.unwrap();
     expect(suggestions, equals({shops[0].osmUID: allSuggestions[offShops[0]]}));
 
     suggestionsRes =
-        await suggestedProductsManager.getSuggestedProductsFor(shops);
+        await suggestedProductsManager.getSuggestedBarcodesFor(shops);
     suggestions = suggestionsRes.unwrap();
     expect(
         suggestions,

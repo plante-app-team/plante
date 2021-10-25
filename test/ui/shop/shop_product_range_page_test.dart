@@ -34,6 +34,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -47,6 +48,7 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
@@ -133,6 +135,8 @@ void main() {
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
     GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<SuggestedProductsManager>(
+        FakeSuggestedProductsManager());
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 

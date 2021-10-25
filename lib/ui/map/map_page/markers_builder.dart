@@ -13,7 +13,7 @@ typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 class ShopsMarkersExtraData {
   final Set<Shop> selectedShops;
   final Set<Shop> accentedShops;
-  final Set<OsmUID> withSuggestedProducts;
+  final Iterable<OsmUID> withSuggestedProducts;
   ShopsMarkersExtraData(
       this.selectedShops, this.accentedShops, this.withSuggestedProducts);
 }

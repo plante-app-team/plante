@@ -18,6 +18,7 @@ typedef ShopCardProductSoldChangeCallback = dynamic Function(
 
 class ShopCard extends StatelessWidget {
   final Shop shop;
+  final int suggestedProductsCount;
   final FutureShortAddress address;
   final ArgCallback<Shop>? cancelCallback;
 
@@ -32,6 +33,7 @@ class ShopCard extends StatelessWidget {
   const ShopCard._(
       {Key? key,
       required this.shop,
+      this.suggestedProductsCount = 0,
       required this.address,
       required this.checkedProduct,
       this.isProductSold,
@@ -44,6 +46,7 @@ class ShopCard extends StatelessWidget {
   factory ShopCard.forProductRange(
       {Key? key,
       required Shop shop,
+      int suggestedProductsCount = 0,
       required FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback,
       VoidCallback? loadCompletedCallback,
@@ -51,6 +54,7 @@ class ShopCard extends StatelessWidget {
     return ShopCard._(
       key: key,
       shop: shop,
+      suggestedProductsCount: suggestedProductsCount,
       address: address,
       checkedProduct: null,
       cancelCallback: cancelCallback,
@@ -231,7 +235,7 @@ class ShopCard extends StatelessWidget {
   }
 
   bool _haveProducts() {
-    return 0 < shop.productsCount;
+    return 0 < shop.productsCount || 0 < suggestedProductsCount;
   }
 
   void _onMainButtonClick(BuildContext context) {
