@@ -87,7 +87,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Iterable<Shop> filter(
-      Iterable<Shop> shops, Set<OsmUID> withSuggestedProducts) {
+      Iterable<Shop> shops, Iterable<OsmUID> withSuggestedProducts) {
     if (_showEmptyShops) {
       return shops;
     }
@@ -157,6 +157,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
     };
     return ShopCard.forProductRange(
         shop: shop,
+        suggestedProductsCount: model.suggestedProductsCount(shop),
         address: address,
         cancelCallback: cancelCallback,
         showDirections: model.areDirectionsAvailable() ? showDirections : null);

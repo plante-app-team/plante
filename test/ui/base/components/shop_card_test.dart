@@ -26,6 +26,7 @@ import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -35,6 +36,7 @@ import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_suggested_products_manager.dart';
 import '../../../z_fakes/fake_user_langs_manager.dart';
 import '../../../z_fakes/fake_user_params_controller.dart';
 
@@ -102,6 +104,8 @@ void main() {
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
+    GetIt.I.registerSingleton<SuggestedProductsManager>(
+        FakeSuggestedProductsManager());
   });
 
   testWidgets('card for range: card for empty shop',
@@ -124,6 +128,22 @@ void main() {
     final shop = shopWithProduct;
     final context = await tester.superPump(
         ShopCard.forProductRange(shop: shop, address: addressFuture));
+
+    expect(find.text(shop.name), findsOneWidget);
+    expect(
+        find.text(context.strings.shop_card_no_products_listed), findsNothing);
+    expect(
+        find.text(context.strings.shop_card_products_listed), findsOneWidget);
+    expect(find.text(context.strings.shop_card_open_shop_products),
+        findsOneWidget);
+    expect(find.text(context.strings.shop_card_add_product), findsNothing);
+  });
+
+  testWidgets('card for range: card for empty shop but not empty suggestions',
+      (WidgetTester tester) async {
+    final shop = shopEmpty;
+    final context = await tester.superPump(ShopCard.forProductRange(
+        shop: shop, address: addressFuture, suggestedProductsCount: 3));
 
     expect(find.text(shop.name), findsOneWidget);
     expect(

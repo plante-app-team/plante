@@ -102,7 +102,6 @@ void initDI() {
     GetIt.I.get<OffApi>(),
     GetIt.I.get<LatestCameraPosStorage>(),
     GetIt.I.get<AddressObtainer>(),
-    GetIt.I.get<ProductsManager>(),
   ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,9 +16,13 @@ import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 
 class ShopProductRangePageModel implements ShopsManagerListener {
   final ShopsManager _shopsManager;
+  final SuggestedProductsManager _suggestedProductsManager;
+  final ProductsObtainer _productsObtainer;
   final UserParamsController _userParamsController;
   final AddressObtainer _addressObtainer;
 
@@ -26,12 +31,18 @@ class ShopProductRangePageModel implements ShopsManagerListener {
 
   final VoidCallback _updateCallback;
 
-  Completer<void>? _loading;
+  Completer<void>? _loadingConfirmedProducts;
   bool _performingBackendAction = false;
   Result<ShopProductRange, ShopsManagerError>? _shopProductRange;
-  var _lastSortedBarcodes = <String>[];
+  var _lastSortedConfirmedBarcodes = <String>[];
 
-  bool get loading => _loading != null && !_loading!.isCompleted;
+  bool _loadingSuggestedProducts = false;
+  final _suggestedProducts = <Product>[];
+
+  bool get loadingConfirmedProducts =>
+      _loadingConfirmedProducts != null &&
+      !_loadingConfirmedProducts!.isCompleted;
+  bool get loading => loadingConfirmedProducts || _loadingSuggestedProducts;
   bool get performingBackendAction => _performingBackendAction;
 
   bool get rangeLoaded => _shopProductRange != null && _shopProductRange!.isOk;
@@ -45,11 +56,23 @@ class ShopProductRangePageModel implements ShopsManagerListener {
         .toList();
   }
 
+  List<Product> get suggestedProducts =>
+      UnmodifiableListView(_suggestedProducts);
+  bool get anyProductsLoaded =>
+      (rangeLoaded && loadedProducts.isNotEmpty) ||
+      suggestedProducts.isNotEmpty;
+
   UserParams get user => _userParamsController.cachedUserParams!;
 
-  ShopProductRangePageModel(this._shopsManager, this._userParamsController,
-      this._addressObtainer, this._shop, this._updateCallback) {
-    load();
+  ShopProductRangePageModel(
+      this._shopsManager,
+      this._suggestedProductsManager,
+      this._productsObtainer,
+      this._userParamsController,
+      this._addressObtainer,
+      this._shop,
+      this._updateCallback) {
+    _load();
     _address = _addressObtainer.addressOfShop(_shop);
     _shopsManager.addListener(this);
   }
@@ -58,22 +81,27 @@ class ShopProductRangePageModel implements ShopsManagerListener {
     _shopsManager.removeListener(this);
   }
 
+  Future<void> _load() async {
+    await loadConfirmedProducts();
+    await _loadSuggestedProducts();
+  }
+
   int lastSeenSecs(Product product) {
     return loadedRange.lastSeenSecs(product);
   }
 
-  void reload() async {
+  void reloadConfirmedProducts() async {
     // Sometimes we're asked to reload while we are already
     // loading - for such cases we want to wait for the others
     // loadings to finish, only then to load ourselves.
-    while (_loading != null) {
-      await _loading?.future;
+    while (_loadingConfirmedProducts != null) {
+      await _loadingConfirmedProducts?.future;
     }
-    await load();
+    await loadConfirmedProducts();
   }
 
-  Future<void> load() async {
-    _loading = Completer();
+  Future<void> loadConfirmedProducts() async {
+    _loadingConfirmedProducts = Completer();
     _updateCallback.call();
     try {
       final oldProducts =
@@ -100,13 +128,13 @@ class ShopProductRangePageModel implements ShopsManagerListener {
         final newBarcodes = newProducts.map((e) => e.barcode).toList();
         newBarcodes.sort();
         final productsSetChanged =
-            !listEquals(newBarcodes, _lastSortedBarcodes);
+            !listEquals(newBarcodes, _lastSortedConfirmedBarcodes);
         if (productsSetChanged) {
           newProducts.sort(
               (p1, p2) => range.lastSeenSecs(p2) - range.lastSeenSecs(p1));
           _shopProductRange = Ok(loadedRange
               .rebuild((e) => e.products = ListBuilder(newProducts)));
-          _lastSortedBarcodes = newBarcodes;
+          _lastSortedConfirmedBarcodes = newBarcodes;
         } else {
           final newProductsMap = {
             for (final product in newProducts) product.barcode: product
@@ -124,8 +152,38 @@ class ShopProductRangePageModel implements ShopsManagerListener {
       _shopProductRange = Err(ShopsManagerError.OTHER);
       rethrow;
     } finally {
-      _loading?.complete();
-      _loading = null;
+      _loadingConfirmedProducts?.complete();
+      _loadingConfirmedProducts = null;
+      _updateCallback.call();
+    }
+  }
+
+  Future<void> _loadSuggestedProducts() async {
+    _loadingSuggestedProducts = true;
+    try {
+      final allSuggestedBarcodesRes =
+          await _suggestedProductsManager.getSuggestedBarcodesFor([_shop]);
+      if (allSuggestedBarcodesRes.isErr) {
+        Log.w(
+            'Could not load suggested products because: $allSuggestedBarcodesRes');
+        return;
+      }
+      final allSuggestedBarcodes = allSuggestedBarcodesRes.unwrap();
+      final suggestedBarcodes = allSuggestedBarcodes[_shop.osmUID];
+      if (suggestedBarcodes == null || suggestedBarcodes.isEmpty) {
+        return;
+      }
+      // TODO: take more than 20, we need to load them all somehow
+      final suggestedProductsRes = await _productsObtainer
+          .getProducts(suggestedBarcodes.take(20).toList());
+      if (suggestedProductsRes.isErr) {
+        Log.w(
+            'Could not load suggested products because: $suggestedProductsRes');
+        return;
+      }
+      _suggestedProducts.addAll(suggestedProductsRes.unwrap());
+    } finally {
+      _loadingSuggestedProducts = false;
       _updateCallback.call();
     }
   }
@@ -165,6 +223,6 @@ class ShopProductRangePageModel implements ShopsManagerListener {
 
   @override
   void onLocalShopsChange() {
-    reload();
+    reloadConfirmedProducts();
   }
 }

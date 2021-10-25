@@ -4,8 +4,8 @@ import 'package:plante/outside/products/suggested_products_manager.dart';
 
 class FakeSuggestedProductsManager implements SuggestedProductsManager {
   @override
-  Future<Result<OsmUIDProductsMap, SuggestedProductsManagerError>>
-      getSuggestedProductsFor(Iterable<Shop> shops) async {
+  Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
+      getSuggestedBarcodesFor(Iterable<Shop> shops) async {
     return Ok(const {});
   }
 }

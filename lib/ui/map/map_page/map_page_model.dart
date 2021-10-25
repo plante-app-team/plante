@@ -49,7 +49,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
-  final _shopsWithSuggestedProducts = <OsmUID>{};
+  final _suggestedProductsBarcodes = <OsmUID, List<String>>{};
 
   bool _directionsAvailable = false;
 
@@ -76,8 +76,8 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-  Set<OsmUID> get shopsWithSuggestedProducts =>
-      UnmodifiableSetView(_shopsWithSuggestedProducts);
+  Iterable<OsmUID> get shopsWithSuggestedProducts =>
+      _suggestedProductsBarcodes.keys;
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();
@@ -169,15 +169,15 @@ class MapPageModel implements ShopsManagerListener {
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values;
-    final shopsAndProductsRes =
-        await _suggestedProductsManager.getSuggestedProductsFor(shopsOnMap);
-    if (shopsAndProductsRes.isErr) {
+    final shopsAndBarcodesRes =
+        await _suggestedProductsManager.getSuggestedBarcodesFor(shopsOnMap);
+    if (shopsAndBarcodesRes.isErr) {
       return;
     }
-    var shopsAndProducts = shopsAndProductsRes.unwrap();
-    shopsAndProducts = Map.from(shopsAndProducts); // Copy
-    shopsAndProducts.removeWhere((key, value) => value.isEmpty);
-    _shopsWithSuggestedProducts.addAll(shopsAndProducts.keys);
+    var shopsAndBarcodes = shopsAndBarcodesRes.unwrap();
+    shopsAndBarcodes = Map.from(shopsAndBarcodes); // Copy
+    shopsAndBarcodes.removeWhere((key, value) => value.isEmpty);
+    _suggestedProductsBarcodes.addAll(shopsAndBarcodes);
     _updateShopsCallback.call(_shopsCache);
   }
 
@@ -230,6 +230,10 @@ class MapPageModel implements ShopsManagerListener {
 
   void showDirectionsTo(Shop shop) {
     _directionsManager.direct(shop.coord, shop.name);
+  }
+
+  int suggestedProductsCount(Shop shop) {
+    return _suggestedProductsBarcodes[shop.osmUID]?.length ?? 0;
   }
 
   void finishWith<T>(BuildContext context, T result) {

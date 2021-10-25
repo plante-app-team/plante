@@ -1,31 +1,30 @@
 import 'package:plante/base/result.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/product.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 
 class FakeOffShopsManager implements OffShopsManager {
-  final _suggestedProducts = <OffShop, List<Product>>{};
+  final _suggestedBarcodes = <OffShop, List<String>>{};
 
-  void setSuggestedProducts(Map<OffShop, List<Product>> suggestedProducts) {
-    _suggestedProducts.clear();
-    _suggestedProducts.addAll(suggestedProducts);
+  void setSuggestedBarcodes(Map<OffShop, List<String>> suggestedBarcodes) {
+    _suggestedBarcodes.clear();
+    _suggestedBarcodes.addAll(suggestedBarcodes);
   }
 
   @override
   Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops() async {
-    return Ok(_suggestedProducts.keys.toList());
+    return Ok(_suggestedBarcodes.keys.toList());
   }
 
   @override
-  Future<Result<ShopNamesAndProductsMap, OffShopsManagerError>>
-      fetchVeganProductsForShops(
+  Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
+      fetchVeganBarcodesForShops(
           Set<String> shopsNames, List<LangCode> langs) async {
-    final ShopNamesAndProductsMap result = {};
+    final ShopNamesAndBarcodesMap result = {};
     for (final name in shopsNames) {
-      for (final shop in _suggestedProducts.keys) {
+      for (final shop in _suggestedBarcodes.keys) {
         if (shop.id == OffShop.shopNameToPossibleOffShopID(name)) {
-          result[name] = _suggestedProducts[shop]!;
+          result[name] = _suggestedBarcodes[shop]!;
         }
       }
     }
