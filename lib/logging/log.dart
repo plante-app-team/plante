@@ -141,7 +141,7 @@ class Log {
     if (ex == null) {
       Fimber.v(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.v('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
+      Fimber.v('$message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -155,7 +155,7 @@ class Log {
     if (ex == null) {
       Fimber.d(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.d('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
+      Fimber.d('$message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -164,7 +164,7 @@ class Log {
     if (ex == null) {
       Fimber.i(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.i('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
+      Fimber.i('$message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -173,7 +173,7 @@ class Log {
     if (ex == null) {
       Fimber.w(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.w('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
+      Fimber.w('$message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 
@@ -190,7 +190,7 @@ class Log {
     if (ex == null) {
       Fimber.e(message, ex: ex, stacktrace: stacktrace);
     } else {
-      Fimber.e('message (ex: $ex)', ex: ex, stacktrace: stacktrace);
+      Fimber.e('$message (ex: $ex)', ex: ex, stacktrace: stacktrace);
     }
   }
 }
