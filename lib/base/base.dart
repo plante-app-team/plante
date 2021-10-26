@@ -4,11 +4,9 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
-import 'package:plante/model/user_params_controller.dart';
 
 const _PRIVACY_POLICY_URL_RU =
     'https://docs.google.com/document/d/1fSeiIwDZhcf8d1ad7H8R1YCoffVxaalSIZ35SGuXkec/edit?usp=sharing';
@@ -35,7 +33,7 @@ bool isInTests() {
 
 /// Deprecated, new features should be developed in dedicated branches
 @deprecated
-Future<bool> enableNewestFeatures() async => false;
+Future<bool> enableNewestFeatures() async => isInTests();
 
 void setSystemUIOverlayStyle() {
   if (Platform.isAndroid) {
