@@ -33,15 +33,9 @@ bool isInTests() {
   }
 }
 
-Future<bool> enableNewestFeatures() async {
-  if (isInTests()) {
-    return true;
-  }
-  final userParamsController = GetIt.I.get<UserParamsController>();
-  final user = await userParamsController.getUserParams();
-  final isDev = user != null && user.userGroup != null && user.userGroup! > 1;
-  return kDebugMode || isDev;
-}
+/// Deprecated, new features should be developed in dedicated branches
+@deprecated
+Future<bool> enableNewestFeatures() async => false;
 
 void setSystemUIOverlayStyle() {
   if (Platform.isAndroid) {
