@@ -127,7 +127,7 @@ class ShopsManagerBackendWorker {
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
     for (final shop in shops) {
-      final res = await _backend.putProductToShop(product.barcode, shop.osmUID);
+      final res = await _backend.putProductToShop(product.barcode, shop);
       if (res.isErr) {
         return Err(_convertBackendErr(res.unwrapErr()));
       }

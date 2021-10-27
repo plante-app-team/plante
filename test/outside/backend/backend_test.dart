@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -13,6 +14,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:test/test.dart';
 
@@ -1114,9 +1116,19 @@ void main() {
     httpClient
         .setResponse('.*put_product_to_shop.*', ''' { "result": "ok" } ''');
 
-    final result =
-        await backend.putProductToShop('123456', OsmUID.parse('1:123'));
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmUID = OsmUID.parse('1:2')
+        ..longitude = 11
+        ..latitude = 12
+        ..name = 'Spar2')));
+    final result = await backend.putProductToShop('123456', shop);
     expect(result.isOk, isTrue);
+
+    final request = httpClient.getRequestsMatching('.*').single;
+    final url = request.url.toString();
+    expect(url, contains('lat=12'));
+    expect(url, contains('lon=11'));
   });
 
   test('put product to shop error', () async {
@@ -1126,8 +1138,13 @@ void main() {
     httpClient.setResponseException(
         '.*put_product_to_shop.*', const SocketException(''));
 
-    final result =
-        await backend.putProductToShop('123456', OsmUID.parse('1:123'));
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmUID = OsmUID.parse('1:2')
+        ..longitude = 11
+        ..latitude = 12
+        ..name = 'Spar2')));
+    final result = await backend.putProductToShop('123456', shop);
     expect(result.isErr, isTrue);
   });
 

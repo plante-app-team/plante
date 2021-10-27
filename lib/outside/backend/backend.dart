@@ -12,6 +12,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
@@ -348,14 +349,16 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, OsmUID osmUID) async {
+      String barcode, Shop shop) async {
     if (await _settings.testingBackends()) {
-      return await _fakeBackend.putProductToShop(barcode, osmUID);
+      return await _fakeBackend.putProductToShop(barcode, shop);
     }
 
     final response = await _backendGet('put_product_to_shop/', {
       'barcode': barcode,
-      'shopOsmUID': osmUID.toString(),
+      'shopOsmUID': shop.osmUID.toString(),
+      'lon': shop.coord.lon.toString(),
+      'lat': shop.coord.lat.toString(),
     });
     return _noneOrErrorFrom(response);
   }

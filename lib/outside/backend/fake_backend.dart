@@ -4,6 +4,7 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -147,9 +148,10 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, OsmUID osmUID) async {
+      String barcode, Shop shop) async {
     await _delay();
 
+    final osmUID = shop.osmUID;
     _createFakeShopIfNotExists(osmUID: osmUID);
     _fakeShops[osmUID] = _fakeShops[osmUID]!.rebuild((e) => e
       ..products.add(_createBackendProduct(barcode))
