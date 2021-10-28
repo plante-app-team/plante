@@ -109,6 +109,7 @@
       "map_page_open_street_map_licence": "Data from Open Street Map",
       "map_page_zoom_in_to_see_shops": "Please zoom in to see shops",
       "map_page_load_shops_of_this_area": "Load shops of this area",
+      "map_page_show_found_shops_on_map": "Show on map",
 
       "create_shop_page_how_new_shop_is_called": "What is the name of the shop?",
       "create_shop_page_how_new_shop_is_called_label": "Shop's name",

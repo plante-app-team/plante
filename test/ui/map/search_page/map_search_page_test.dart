@@ -242,6 +242,9 @@ void main() {
       expectedShops: foundInOsmShops + localShops,
       expectedRoads: foundInOsmRoads + localRoads,
     );
+
+    expect(find.text(context.strings.map_page_show_found_shops_on_map),
+        findsOneWidget);
   });
 
   testWidgets('only shops found', (WidgetTester tester) async {
@@ -263,6 +266,9 @@ void main() {
       expectedShops: foundInOsmShops + localShops,
       expectedRoads: [],
     );
+
+    expect(find.text(context.strings.map_page_show_found_shops_on_map),
+        findsOneWidget);
   });
 
   testWidgets('only roads found', (WidgetTester tester) async {
@@ -284,6 +290,9 @@ void main() {
       expectedShops: [],
       expectedRoads: foundInOsmRoads + localRoads,
     );
+
+    expect(find.text(context.strings.map_page_show_found_shops_on_map),
+        findsNothing);
   });
 
   testWidgets('nothing found', (WidgetTester tester) async {
@@ -305,6 +314,9 @@ void main() {
       expectedShops: [],
       expectedRoads: [],
     );
+
+    expect(find.text(context.strings.map_page_show_found_shops_on_map),
+        findsNothing);
   });
 
   testWidgets('osm search error', (WidgetTester tester) async {
@@ -680,7 +692,7 @@ void main() {
         .first as Route<dynamic>;
 
     final pageResult = await capturedRoute.popped as MapSearchPageResult;
-    expect(pageResult.chosenShop, localShops.first);
+    expect(pageResult.chosenShops, equals([localShops.first]));
   });
 
   testWidgets('found road click', (WidgetTester tester) async {
@@ -1010,6 +1022,32 @@ void main() {
 
     expect(find.richTextContaining(addresses[0].road!), findsWidgets);
     expect(find.richTextContaining(addresses[1].road!), findsWidgets);
+  });
+
+  testWidgets('click on "Show on map"', (WidgetTester tester) async {
+    setUpFoundEntities(
+        localShops: localShops,
+        foundInOsmShops: foundInOsmShops,
+        localRoads: [],
+        foundInOsmRoads: []);
+
+    final navigatorObserver = MockNavigatorObserver();
+    final context = await pumpAndWaitPreloadFinish(tester,
+        navigatorObserver: navigatorObserver);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    await tester
+        .superTap(find.text(context.strings.map_page_show_found_shops_on_map));
+
+    final capturedRoute = verify(navigatorObserver.didPop(captureAny, any))
+        .captured
+        .first as Route<dynamic>;
+    final pageResult = await capturedRoute.popped as MapSearchPageResult;
+    expect(pageResult.chosenShops!.toSet(),
+        equals((localShops + foundInOsmShops).toSet()));
   });
 }
 

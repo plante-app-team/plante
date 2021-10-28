@@ -109,6 +109,7 @@
     "map_page_open_street_map_licence": "Данные от Open Street Map",
     "map_page_zoom_in_to_see_shops": "Приблизьте карту, чтобы видеть магазины",
     "map_page_load_shops_of_this_area": "Загрузить магазины рядом",
+    "map_page_show_found_shops_on_map": "На карте",
 
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_label": "Название магазина",

@@ -8,13 +8,18 @@ class ButtonTextPlante extends StatelessWidget {
   final Widget child;
   final VoidCallback? onPressed;
   final VoidCallback? onDisabledPressed;
+  final Color? overlayColor;
 
   ButtonTextPlante(String text,
-      {Key? key, required this.onPressed, this.onDisabledPressed, this.height})
+      {Key? key,
+      required this.onPressed,
+      TextStyle enabledTextStyle = TextStyles.buttonOutlinedEnabled,
+      TextStyle disabledTextStyle = TextStyles.buttonOutlinedDisabled,
+      this.onDisabledPressed,
+      this.overlayColor,
+      this.height})
       : child = Text(text,
-            style: onPressed != null
-                ? TextStyles.buttonOutlinedEnabled
-                : TextStyles.buttonOutlinedDisabled),
+            style: onPressed != null ? enabledTextStyle : disabledTextStyle),
         super(key: key);
 
   @override
@@ -23,7 +28,7 @@ class ButtonTextPlante extends StatelessWidget {
       height: height,
       backgroundColorEnabled: Colors.transparent,
       backgroundColorDisabled: Colors.transparent,
-      overlayColor: ColorsPlante.primaryMaterial.shade700,
+      overlayColor: overlayColor ?? ColorsPlante.primaryMaterial.shade700,
       onPressed: onPressed,
       onDisabledPressed: onDisabledPressed,
       side: const BorderSide(width: 0, color: Colors.transparent),

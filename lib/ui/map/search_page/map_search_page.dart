@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/coord_utils.dart';
@@ -17,6 +18,7 @@ import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
+import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -152,6 +154,8 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
         title: context.strings.map_search_page_shops_title,
         titlePadding:
             const EdgeInsets.only(top: 24, bottom: 6, left: 24, right: 24),
+        titleButtonText: context.strings.map_page_show_found_shops_on_map,
+        titleButtonOnTap: _finishWithShops,
         notFoundMsg: context.strings.map_search_page_shops_not_found,
         toWidget: _shopToWidget,
         onTap: _finishWithShop,
@@ -176,15 +180,44 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       required EdgeInsets entityPadding,
       required String title,
       required EdgeInsets titlePadding,
+      String? titleButtonText,
+      ArgCallback<Iterable<T>>? titleButtonOnTap,
       required String notFoundMsg,
       required ArgResCallback<T, Widget> toWidget,
       required ArgCallback<T> onTap}) {
     final results = <Widget>[];
 
+    final Widget titleButton;
+    if (titleButtonText != null &&
+        titleButtonOnTap != null &&
+        entities != null &&
+        entities.isNotEmpty) {
+      titleButton = ButtonFilledSmallPlante.lightGreen(
+        text: titleButtonText,
+        onPressed: () {
+          titleButtonOnTap.call(entities);
+        },
+        icon: SvgPicture.asset('assets/show_on_map_small.svg'),
+        paddings: const EdgeInsets.only(left: 12, right: 6),
+        spaceBetweenTextAndIcon: 0,
+      );
+    } else {
+      titleButton = const SizedBox();
+    }
+
     results.add(Padding(
         padding: titlePadding,
-        child: Text(title,
-            style: TextStyles.headline3.copyWith(color: ColorsPlante.grey))));
+        child: Row(children: [
+          Text(title,
+              style: TextStyles.headline3.copyWith(color: ColorsPlante.grey)),
+          Expanded(
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: AnimatedSwitcher(
+                    duration: DURATION_DEFAULT,
+                    child: titleButton,
+                  )))
+        ])));
     if (_model.loading || entities == null) {
       if (!isInTests()) {
         results.add(Wrap(children: [
@@ -240,9 +273,13 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   }
 
   void _finishWithShop(Shop shop) {
+    _finishWithShops([shop]);
+  }
+
+  void _finishWithShops(Iterable<Shop> shops) {
     Navigator.of(context).pop(MapSearchPageResult.create(
         query: _querySource.query,
-        chosenShop: shop,
+        chosenShops: shops,
         allFound: _lastSearchResult,
         scrollOffset: _scrollController.offset));
   }
@@ -268,9 +305,11 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
     _analytics.sendEvent('map_search_start');
     FocusScope.of(context).unfocus();
     _model.search(query, (result) {
-      setState(() {
-        _lastSearchResult = result;
-      });
+      if (mounted) {
+        setState(() {
+          _lastSearchResult = result;
+        });
+      }
     });
   }
 

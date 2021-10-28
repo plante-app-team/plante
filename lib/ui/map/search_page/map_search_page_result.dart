@@ -12,7 +12,7 @@ part 'map_search_page_result.g.dart';
 /// The final state of [MapSearchPage].
 abstract class MapSearchPageResult
     implements Built<MapSearchPageResult, MapSearchPageResultBuilder> {
-  Shop? get chosenShop;
+  BuiltList<Shop>? get chosenShops;
   OsmRoad? get chosenRoad;
   BuiltList<Shop> get foundShops;
   BuiltList<OsmRoad> get foundRoads;
@@ -20,14 +20,14 @@ abstract class MapSearchPageResult
   double? get scrollOffset;
 
   static MapSearchPageResult create(
-      {Shop? chosenShop,
+      {Iterable<Shop>? chosenShops,
       OsmRoad? chosenRoad,
       MapSearchResult? allFound,
       String? query,
       double? scrollOffset}) {
     return MapSearchPageResult((e) {
-      if (chosenShop != null) {
-        e.chosenShop.replace(chosenShop);
+      if (chosenShops != null) {
+        e.chosenShops.replace(chosenShops);
       }
       if (chosenRoad != null) {
         e.chosenRoad.replace(chosenRoad);

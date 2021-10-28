@@ -34,12 +34,13 @@ class _$MapSearchPageResultSerializer
               const FullType(BuiltList, const [const FullType(OsmRoad)])),
     ];
     Object? value;
-    value = object.chosenShop;
+    value = object.chosenShops;
     if (value != null) {
       result
-        ..add('chosenShop')
-        ..add(
-            serializers.serialize(value, specifiedType: const FullType(Shop)));
+        ..add('chosenShops')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(Shop)])));
     }
     value = object.chosenRoad;
     if (value != null) {
@@ -77,9 +78,11 @@ class _$MapSearchPageResultSerializer
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
-        case 'chosenShop':
-          result.chosenShop.replace(serializers.deserialize(value,
-              specifiedType: const FullType(Shop))! as Shop);
+        case 'chosenShops':
+          result.chosenShops.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(Shop)]))!
+              as BuiltList<Object?>);
           break;
         case 'chosenRoad':
           result.chosenRoad.replace(serializers.deserialize(value,
@@ -114,7 +117,7 @@ class _$MapSearchPageResultSerializer
 
 class _$MapSearchPageResult extends MapSearchPageResult {
   @override
-  final Shop? chosenShop;
+  final BuiltList<Shop>? chosenShops;
   @override
   final OsmRoad? chosenRoad;
   @override
@@ -131,7 +134,7 @@ class _$MapSearchPageResult extends MapSearchPageResult {
       (new MapSearchPageResultBuilder()..update(updates)).build();
 
   _$MapSearchPageResult._(
-      {this.chosenShop,
+      {this.chosenShops,
       this.chosenRoad,
       required this.foundShops,
       required this.foundRoads,
@@ -157,7 +160,7 @@ class _$MapSearchPageResult extends MapSearchPageResult {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is MapSearchPageResult &&
-        chosenShop == other.chosenShop &&
+        chosenShops == other.chosenShops &&
         chosenRoad == other.chosenRoad &&
         foundShops == other.foundShops &&
         foundRoads == other.foundRoads &&
@@ -170,7 +173,7 @@ class _$MapSearchPageResult extends MapSearchPageResult {
     return $jf($jc(
         $jc(
             $jc(
-                $jc($jc($jc(0, chosenShop.hashCode), chosenRoad.hashCode),
+                $jc($jc($jc(0, chosenShops.hashCode), chosenRoad.hashCode),
                     foundShops.hashCode),
                 foundRoads.hashCode),
             query.hashCode),
@@ -180,7 +183,7 @@ class _$MapSearchPageResult extends MapSearchPageResult {
   @override
   String toString() {
     return (newBuiltValueToStringHelper('MapSearchPageResult')
-          ..add('chosenShop', chosenShop)
+          ..add('chosenShops', chosenShops)
           ..add('chosenRoad', chosenRoad)
           ..add('foundShops', foundShops)
           ..add('foundRoads', foundRoads)
@@ -194,9 +197,11 @@ class MapSearchPageResultBuilder
     implements Builder<MapSearchPageResult, MapSearchPageResultBuilder> {
   _$MapSearchPageResult? _$v;
 
-  ShopBuilder? _chosenShop;
-  ShopBuilder get chosenShop => _$this._chosenShop ??= new ShopBuilder();
-  set chosenShop(ShopBuilder? chosenShop) => _$this._chosenShop = chosenShop;
+  ListBuilder<Shop>? _chosenShops;
+  ListBuilder<Shop> get chosenShops =>
+      _$this._chosenShops ??= new ListBuilder<Shop>();
+  set chosenShops(ListBuilder<Shop>? chosenShops) =>
+      _$this._chosenShops = chosenShops;
 
   OsmRoadBuilder? _chosenRoad;
   OsmRoadBuilder get chosenRoad => _$this._chosenRoad ??= new OsmRoadBuilder();
@@ -227,7 +232,7 @@ class MapSearchPageResultBuilder
   MapSearchPageResultBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _chosenShop = $v.chosenShop?.toBuilder();
+      _chosenShops = $v.chosenShops?.toBuilder();
       _chosenRoad = $v.chosenRoad?.toBuilder();
       _foundShops = $v.foundShops.toBuilder();
       _foundRoads = $v.foundRoads.toBuilder();
@@ -255,7 +260,7 @@ class MapSearchPageResultBuilder
     try {
       _$result = _$v ??
           new _$MapSearchPageResult._(
-              chosenShop: _chosenShop?.build(),
+              chosenShops: _chosenShops?.build(),
               chosenRoad: _chosenRoad?.build(),
               foundShops: foundShops.build(),
               foundRoads: foundRoads.build(),
@@ -264,8 +269,8 @@ class MapSearchPageResultBuilder
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'chosenShop';
-        _chosenShop?.build();
+        _$failedField = 'chosenShops';
+        _chosenShops?.build();
         _$failedField = 'chosenRoad';
         _chosenRoad?.build();
         _$failedField = 'foundShops';

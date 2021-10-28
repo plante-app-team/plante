@@ -66,11 +66,29 @@ void main() {
 
     final shop = commons.shops.first;
     widget.onSearchResultsForTesting(
-        MapSearchPageResult.create(chosenShop: shop));
+        MapSearchPageResult.create(chosenShops: [shop]));
     await tester.pumpAndSettle();
 
     verify(mapController.animateCamera(any));
     expect(find.byType(ShopCard), findsOneWidget);
+  });
+
+  testWidgets('many shops found', (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    await tester.superPump(widget);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+
+    verifyNever(mapController.animateCamera(any));
+    expect(find.byType(ShopCard), findsNothing);
+
+    widget.onSearchResultsForTesting(
+        MapSearchPageResult.create(chosenShops: commons.shops));
+    await tester.pumpAndSettle();
+
+    verify(mapController.animateCamera(any));
+    expect(find.byType(ShopCard, skipOffstage: false),
+        findsNWidgets(commons.shops.length));
   });
 
   testWidgets('road found', (WidgetTester tester) async {
@@ -133,8 +151,8 @@ void main() {
 
   testWidgets('map page can clear search results', (WidgetTester tester) async {
     final searchResults = MapSearchPageResult.create(
-        chosenRoad: roads[0],
-        query: 'cool road',
+        chosenShops: commons.shops,
+        query: 'cool shops',
         allFound: MapSearchResult.create([], roads));
 
     final widget = MapPage(mapControllerForTesting: mapController);
@@ -145,9 +163,12 @@ void main() {
     widget.onSearchResultsForTesting(searchResults);
     await tester.pumpAndSettle();
 
-    expect(find.text('cool road'), findsOneWidget);
+    expect(find.text('cool shops'), findsOneWidget);
+    expect(find.byType(ShopCard), findsWidgets);
     await tester.superTap(find.byKey(const Key('map_search_bar_cancel')));
-    expect(find.text('cool road'), findsNothing);
+    expect(find.text('cool shops'), findsNothing);
+    // Shop card is also expected to be hidden
+    expect(find.byType(ShopCard), findsNothing);
 
     expect(find.byType(MapSearchPage), findsNothing);
     await tester.superTap(find.byType(MapSearchBar));

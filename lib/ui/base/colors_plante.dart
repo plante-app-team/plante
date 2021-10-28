@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorsPlante {
+  ColorsPlante._();
   static const int _primaryVal = 0xFF326243;
   static const Color primary = Color(_primaryVal);
   static const MaterialColor primaryMaterial =

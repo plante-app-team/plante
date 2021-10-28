@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/location_controller.dart';
@@ -275,9 +276,11 @@ class _MapPageState extends PageStatePlante<MapPage>
     await mapController.setMapStyle(noBusinessesStyle);
   }
 
-  Future<void> _moveCameraTo(CameraPosition position) async {
+  /// Returns visible region after camera move
+  Future<LatLngBounds> _moveCameraTo(CameraPosition position) async {
     final mapController = await _mapController.future;
     await mapController.animateCamera(CameraUpdate.newCameraPosition(position));
+    return await mapController.getVisibleRegion();
   }
 
   @override
@@ -322,6 +325,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                 onCleared: () {
                   setState(() {
                     _latestSearchResult = null;
+                    _mode.deselectShops();
                   });
                 })));
 
@@ -540,17 +544,62 @@ class _MapPageState extends PageStatePlante<MapPage>
     if (result == null) {
       return;
     }
-    final shop = result.chosenShop;
+    final shops = result.chosenShops;
     final road = result.chosenRoad;
-    if (shop != null) {
+    if (shops != null && shops.isNotEmpty) {
       _mode.deselectShops();
-      await _moveCameraTo(
-          CameraPosition(target: shop.coord.toLatLng(), zoom: 17));
-      _onMarkerClick([shop]);
+      if (shops.length == 1) {
+        await _moveCameraTo(
+            CameraPosition(target: shops.first.coord.toLatLng(), zoom: 17));
+      } else {
+        final coords = shops.map((e) => e.coord);
+        await _moveCameraToShowManyCoords(coords);
+      }
+      _onMarkerClick(shops);
     } else if (road != null) {
       _mode.deselectShops();
       await _moveCameraTo(
           CameraPosition(target: road.coord.toLatLng(), zoom: 17));
+    }
+  }
+
+  Future<void> _moveCameraToShowManyCoords(Iterable<Coord> coords) async {
+    final coordsBounds = outliningRectFor(coords);
+    final screenSize = MediaQuery.of(context).size;
+    // -2 is so that the markers won't be hidden behind the search
+    // bar or the shops cards (the map will be zoomed out a little more
+    // than necessary).
+    var zoomLevel = boundsZoomLevel(coordsBounds, screenSize) - 2;
+    if (zoomLevel < MapPageMode.DEFAULT_MIN_ZOOM) {
+      zoomLevel = MapPageMode.DEFAULT_MIN_ZOOM;
+    } else if (MapPageMode.DEFAULT_MAX_ZOOM < zoomLevel) {
+      zoomLevel = MapPageMode.DEFAULT_MAX_ZOOM;
+    }
+    final mapController = await _mapController.future;
+
+    // At first let's just zoom out to see if that will be enough in
+    // order for any of coords to be visible.
+    var currentVisibleRegion = await mapController.getVisibleRegion();
+    final newCoord = currentVisibleRegion.toCoordsBounds().center.toLatLng();
+    await mapController.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: newCoord, zoom: zoomLevel)));
+
+    // Now let's move the camera to the coords center IF none of them
+    // is visible.
+    currentVisibleRegion = await mapController.getVisibleRegion();
+    if (!coords
+        .any((coord) => currentVisibleRegion.contains(coord.toLatLng()))) {
+      await mapController.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: coordsBounds.center.toLatLng(), zoom: zoomLevel)));
+    }
+
+    // Now let's move the camera to the first coord if still none is visible
+    currentVisibleRegion = await mapController.getVisibleRegion();
+    if (!coords
+        .any((coord) => currentVisibleRegion.contains(coord.toLatLng()))) {
+      await mapController.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: coords.first.toLatLng(), zoom: zoomLevel)));
     }
   }
 
