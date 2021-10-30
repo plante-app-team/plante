@@ -10,6 +10,7 @@ enum ModeratorChoiceReason {
   ALL_INGREDIENTS_ARE_VEGAN,
   AMBIGUOUS_INGREDIENTS_ARE_ALMOST_ALWAYS_VEGAN_IN_MODERN_FOOD_INDUSTRY,
   MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_ABSENCE,
+  INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL,
 
   // Why negative
   SOME_INGREDIENT_IS_NON_VEGAN,
@@ -59,6 +60,9 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return 18;
       case ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY:
         return 19;
+      case ModeratorChoiceReason
+          .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
+        return 20;
     }
   }
 
@@ -73,6 +77,9 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return {VegStatus.positive};
       case ModeratorChoiceReason
           .MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_ABSENCE:
+        return {VegStatus.positive};
+      case ModeratorChoiceReason
+          .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
         return {VegStatus.positive};
       case ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN:
         return {VegStatus.negative};
@@ -129,6 +136,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return context.strings.mod_reason_some_ingredient_has_unknown_origin;
       case ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY:
         return context.strings.mod_reason_some_ingredient_is_in_fact_a_category;
+      case ModeratorChoiceReason
+          .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
+        return context.strings
+            .mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label;
     }
   }
 }

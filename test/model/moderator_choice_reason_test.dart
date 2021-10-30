@@ -37,6 +37,8 @@ void main() {
           17,
       ModeratorChoiceReason.SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN: 18,
       ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY: 19,
+      ModeratorChoiceReason
+          .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL: 20,
     };
 
     _ensureAllReasonsHandled(idsMap.keys);
@@ -78,6 +80,10 @@ void main() {
       ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY: {
         VegStatus.possible
       },
+      ModeratorChoiceReason
+          .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL: {
+        VegStatus.positive
+      }
     };
 
     _ensureAllReasonsHandled(statusesMap.keys);
