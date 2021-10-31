@@ -121,7 +121,7 @@
 
       "map_search_page_search_hint": "Enter some text and tap Search",
       "map_search_page_shops_title": "Found stores",
-      "map_search_page_shops_not_found": "Stores not found",
+      "map_search_page_shops_not_found": "No stores found",
       "map_search_page_streets_title": "Found streets",
       "map_search_page_streets_not_found": "Streets not found",
 
@@ -250,7 +250,7 @@
       "shop_type_supermarket": "Supermarket",
       "shop_type_grocery": "Grocery",
 
-      "shop_product_range_page_this_shop_has_no_product": "No product are added to this store yet",
+      "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",
       "shop_product_range_page_product_last_seen_here": "Last seen here: ",
       "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?",
       "shop_product_range_page_you_sure_positive_vote": "Are you sure you saw the product in this store?",
