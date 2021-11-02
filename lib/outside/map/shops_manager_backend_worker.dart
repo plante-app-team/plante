@@ -33,7 +33,7 @@ class ShopsManagerBackendWorker {
     if (preloadedOsmShops == null) {
       final osmShopsResult = await overpass.fetchShops(bounds: osmBounds);
       if (osmShopsResult.isErr) {
-        return Err(_convertOsmErr(osmShopsResult.unwrapErr()));
+        return Err(osmShopsResult.unwrapErr().convert());
       }
       osmShops = osmShopsResult.unwrap();
     } else {
@@ -43,13 +43,27 @@ class ShopsManagerBackendWorker {
     // Request Plante shops
     final backendShopsResult = await _backend.requestShopsWithin(planteBounds);
     if (backendShopsResult.isErr) {
-      return Err(_convertBackendErr(backendShopsResult.unwrapErr()));
+      return Err(backendShopsResult.unwrapErr().convert());
     }
 
-    // Combine OSM and Plante shops
     final osmShopsWithinPlanteBounds =
-        osmShops.where((e) => planteBounds.contains(e.coord));
+        osmShops.where((e) => planteBounds.contains(e.coord)).toList();
     final backendShops = backendShopsResult.unwrap();
+    // It's quite possible that [backendShops] would have some shops
+    // which are not present in [osmShopsWithinPlanteBounds].
+    // That happens when another user adds a new shop to the map and
+    // the OSM shops here are used from local persistent cache, which
+    // wasn't updated yet.
+    // NOTE: we don't persistently cache Plante shops, that's why
+    // we treat the Plante shops returned from the Plante backend as
+    // the source of truth.
+    final reqRes = await _acquireMissingOsmShops(
+        osmShopsWithinPlanteBounds, backendShops, overpass);
+    if (reqRes.isErr) {
+      return Err(reqRes.unwrapErr());
+    }
+    osmShopsWithinPlanteBounds.addAll(reqRes.unwrap());
+    // Combine OSM and Plante shops
     final shops =
         _combineOsmAndPlanteShops(osmShopsWithinPlanteBounds, backendShops);
 
@@ -64,6 +78,25 @@ class ShopsManagerBackendWorker {
       osmShopsMap,
       osmBounds,
     ));
+  }
+
+  Future<Result<List<OsmShop>, ShopsManagerError>> _acquireMissingOsmShops(
+      Iterable<OsmShop> osmShops,
+      List<BackendShop> backendShops,
+      OsmOverpass overpass) async {
+    final backendUids = backendShops.map((e) => e.osmUID);
+    final osmUids = osmShops.map((e) => e.osmUID);
+    final missingOsmUids =
+        backendUids.toSet().where((e) => !osmUids.contains(e));
+    if (missingOsmUids.isEmpty) {
+      return Ok(const []);
+    }
+    final missingShops =
+        await overpass.fetchShops(osmUIDs: missingOsmUids.toList());
+    if (missingShops.isErr) {
+      return Err(missingShops.unwrapErr().convert());
+    }
+    return Ok(missingShops.unwrap());
   }
 
   Map<OsmUID, Shop> _combineOsmAndPlanteShops(
@@ -88,7 +121,7 @@ class ShopsManagerBackendWorker {
     final backendShopsRes =
         await _backend.requestShopsByOsmUIDs(osmShops.map((e) => e.osmUID));
     if (backendShopsRes.isErr) {
-      return Err(_convertBackendErr(backendShopsRes.unwrapErr()));
+      return Err(backendShopsRes.unwrapErr().convert());
     }
     final backendShops = backendShopsRes.unwrap();
     return Ok(_combineOsmAndPlanteShops(osmShops, backendShops));
@@ -99,7 +132,7 @@ class ShopsManagerBackendWorker {
     // Obtain products from backend
     final backendRes = await _backend.requestProductsAtShops([shop.osmUID]);
     if (backendRes.isErr) {
-      return Err(_convertBackendErr(backendRes.unwrapErr()));
+      return Err(backendRes.unwrapErr().convert());
     }
     if (backendRes.unwrap().isEmpty) {
       return Ok(ShopProductRange((e) => e.shop.replace(shop)));
@@ -112,7 +145,7 @@ class ShopsManagerBackendWorker {
       final result = await _productsObtainer
           .inflateProducts(backendProductsAtShop.products.toList());
       if (result.isErr) {
-        return Err(_convertProductErr(result.unwrapErr()));
+        return Err(result.unwrapErr().convert());
       }
       products.addAll(result.unwrap());
     }
@@ -129,7 +162,7 @@ class ShopsManagerBackendWorker {
     for (final shop in shops) {
       final res = await _backend.putProductToShop(product.barcode, shop);
       if (res.isErr) {
-        return Err(_convertBackendErr(res.unwrapErr()));
+        return Err(res.unwrapErr().convert());
       }
     }
     return Ok(None());
@@ -152,7 +185,7 @@ class ShopsManagerBackendWorker {
           ..longitude = coord.lon
           ..latitude = coord.lat))));
     } else {
-      return Err(_convertBackendErr(res.unwrapErr()));
+      return Err(res.unwrapErr().convert());
     }
   }
 
@@ -161,35 +194,41 @@ class ShopsManagerBackendWorker {
     final result = await _backend.productPresenceVote(
         product.barcode, shop.osmUID, positive);
     if (result.isErr) {
-      return Err(_convertBackendErr(result.unwrapErr()));
+      return Err(result.unwrapErr().convert());
     }
     return Ok(result.unwrap());
   }
 }
 
-ShopsManagerError _convertOsmErr(OpenStreetMapError err) {
-  switch (err) {
-    case OpenStreetMapError.NETWORK:
-      return ShopsManagerError.NETWORK_ERROR;
-    case OpenStreetMapError.OTHER:
-      return ShopsManagerError.OSM_SERVERS_ERROR;
+extension _OpenStreetMapErrorExt on OpenStreetMapError {
+  ShopsManagerError convert() {
+    switch (this) {
+      case OpenStreetMapError.NETWORK:
+        return ShopsManagerError.NETWORK_ERROR;
+      case OpenStreetMapError.OTHER:
+        return ShopsManagerError.OSM_SERVERS_ERROR;
+    }
   }
 }
 
-ShopsManagerError _convertBackendErr(BackendError err) {
-  switch (err.errorKind) {
-    case BackendErrorKind.NETWORK_ERROR:
-      return ShopsManagerError.NETWORK_ERROR;
-    default:
-      return ShopsManagerError.OTHER;
+extension _BackendErrorExt on BackendError {
+  ShopsManagerError convert() {
+    switch (errorKind) {
+      case BackendErrorKind.NETWORK_ERROR:
+        return ShopsManagerError.NETWORK_ERROR;
+      default:
+        return ShopsManagerError.OTHER;
+    }
   }
 }
 
-ShopsManagerError _convertProductErr(ProductsObtainerError err) {
-  switch (err) {
-    case ProductsObtainerError.NETWORK:
-      return ShopsManagerError.NETWORK_ERROR;
-    default:
-      return ShopsManagerError.OTHER;
+extension _ProductsObtainerErrorExt on ProductsObtainerError {
+  ShopsManagerError convert() {
+    switch (this) {
+      case ProductsObtainerError.NETWORK:
+        return ShopsManagerError.NETWORK_ERROR;
+      default:
+        return ShopsManagerError.OTHER;
+    }
   }
 }

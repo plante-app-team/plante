@@ -30,7 +30,21 @@ class ShopsManagerTestCommons {
   final osmUID2 = OsmUID.parse('1:2');
   var osmShops = <OsmShop>[];
   var backendShops = <BackendShop>[];
-  var fullShops = <OsmUID, Shop>{};
+  // var fullShops = <OsmUID, Shop>{};
+  Map<OsmUID, Shop> get fullShops {
+    final result = <OsmUID, Shop>{};
+    for (final osmShop in osmShops) {
+      final backendShop = backendShops.where((e) => e.osmUID == osmShop.osmUID);
+      final shop = Shop((e) {
+        e.osmShop.replace(osmShop);
+        if (backendShop.isNotEmpty) {
+          e.backendShop.replace(backendShop.first);
+        }
+      });
+      result[shop.osmUID] = shop;
+    }
+    return result;
+  }
 
   final bounds = CoordsBounds(
       northeast: Coord(lat: 15.001, lon: 15.001),
@@ -73,36 +87,50 @@ class ShopsManagerTestCommons {
         ..osmUID = osmUID2
         ..productsCount = 1),
     ];
-    fullShops = {
-      osmShops[0].osmUID: Shop((e) => e
-        ..osmShop.replace(osmShops[0])
-        ..backendShop.replace(backendShops[0])),
-      osmShops[1].osmUID: Shop((e) => e
-        ..osmShop.replace(osmShops[1])
-        ..backendShop.replace(backendShops[1])),
-    };
 
     osm = MockOsmOverpass();
     backend = MockBackend();
     productsObtainer = FakeProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager = ShopsManager(
-        OpenStreetMap.forTesting(
-            overpass: osm, configManager: FakeMobileAppConfigManager()),
-        backend,
-        productsObtainer,
-        analytics,
-        osmCacher);
+    shopsManager = createShopsManager();
 
     when(backend.putProductToShop(any, any))
         .thenAnswer((_) async => Ok(None()));
-    when(osm.fetchShops(bounds: anyNamed('bounds')))
-        .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShopsByOsmUIDs(any))
-        .thenAnswer((_) async => Ok(backendShops));
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(backendShops));
+    when(osm.fetchShops(
+            bounds: anyNamed('bounds'), osmUIDs: anyNamed('osmUIDs')))
+        .thenAnswer((invc) async {
+      final bounds =
+          invc.namedArguments[const Symbol('bounds')] as CoordsBounds?;
+      final osmUIDs =
+          invc.namedArguments[const Symbol('osmUIDs')] as Iterable<OsmUID>?;
+      var result = osmShops.toList();
+      if (bounds != null) {
+        result = result.where((e) => bounds.contains(e.coord)).toList();
+      }
+      if (osmUIDs != null) {
+        result = result.where((e) => osmUIDs.contains(e.osmUID)).toList();
+      }
+      return Ok(result);
+    });
+    when(backend.requestShopsWithin(any)).thenAnswer((invc) async {
+      final coordsMap = {
+        for (final osmShop in osmShops) osmShop.osmUID: osmShop.coord
+      };
+      final bounds = invc.positionalArguments[0] as CoordsBounds;
+      final result = <BackendShop>[];
+      for (final backendShop in backendShops) {
+        final coord = coordsMap[backendShop.osmUID];
+        if (coord != null && bounds.contains(coord)) {
+          result.add(backendShop);
+        }
+      }
+      return Ok(result);
+    });
+    when(backend.requestShopsByOsmUIDs(any)).thenAnswer((invc) async {
+      final uids = invc.positionalArguments[0] as Iterable<OsmUID>;
+      return Ok(backendShops.where((e) => uids.contains(e.osmUID)).toList());
+    });
 
     productsObtainer.addKnownProducts(rangeProducts);
 
@@ -110,12 +138,38 @@ class ShopsManagerTestCommons {
             name: anyNamed('name'),
             coord: anyNamed('coord'),
             type: anyNamed('type')))
-        .thenAnswer((_) async {
-      final result = BackendShop((e) => e
+        .thenAnswer((invc) async {
+      final coord = invc.namedArguments[const Symbol('coord')] as Coord;
+      final name = invc.namedArguments[const Symbol('name')] as String;
+      final type = invc.namedArguments[const Symbol('type')] as String;
+
+      final backendShop = BackendShop((e) => e
         ..osmUID = OsmUID.parse('1:${randInt(1, 99999)}')
         ..productsCount = 0);
-      backendShops.add(result);
-      return Ok(result);
+      backendShops.add(backendShop);
+
+      final osmShop = OsmShop((e) => e
+        ..osmUID = backendShop.osmUID
+        ..longitude = coord.lon
+        ..latitude = coord.lat
+        ..name = name
+        ..type = type);
+      osmShops.add(osmShop);
+
+      fullShops[backendShop.osmUID] = Shop((e) => e
+        ..backendShop.replace(backendShop)
+        ..osmShop.replace(osmShop));
+      return Ok(backendShop);
     });
+  }
+
+  ShopsManager createShopsManager() {
+    return ShopsManager(
+        OpenStreetMap.forTesting(
+            overpass: osm, configManager: FakeMobileAppConfigManager()),
+        backend,
+        productsObtainer,
+        analytics,
+        osmCacher);
   }
 }

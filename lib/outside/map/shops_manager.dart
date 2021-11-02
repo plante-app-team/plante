@@ -24,10 +24,12 @@ import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
-/// Wrapper around ShopsManagerImpl with caching and retry logic.
+/// NOTE: this class is a total mess among with both
+/// [ShopsManagerFetchShopsHelper] and [ShopsManagerBackendWorker].
+/// They need a refactoring.
 class ShopsManager {
-  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 7;
-  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 30;
+  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 30;
+  static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 90;
   final Analytics _analytics;
   final OsmCacher _osmCacher;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
@@ -58,7 +60,6 @@ class ShopsManager {
     _listeners.remove(listener);
   }
 
-  // TODO test each notification
   void _notifyListeners() {
     _listeners.forEach((listener) {
       listener.onLocalShopsChange();
@@ -128,6 +129,7 @@ class ShopsManager {
     }
 
     final fetchResult = shopsFetchResult.unwrap();
+    _ensureAllShopsArePresentInOsmCache(fetchResult.shops.values);
     _shopsCache.addAll(fetchResult.shops);
     final ids = fetchResult.shops.values.map((shop) => shop.osmUID).toList();
     _loadedAreas[fetchResult.shopsBounds] = ids;
@@ -136,6 +138,20 @@ class ShopsManager {
         .where((shop) => bounds.containsShop(shop));
     _notifyListeners();
     return Ok({for (var shop in result) shop.osmUID: shop});
+  }
+
+  void _ensureAllShopsArePresentInOsmCache(Iterable<Shop> shops) async {
+    for (final territory in await _osmCacher.getCachedShops()) {
+      final territoryShopsUids = territory.entities.map((e) => e.osmUID);
+      final shopsToInsert = <OsmUID, OsmShop>{};
+      for (final shop in shops) {
+        if (territory.bounds.containsShop(shop) &&
+            !territoryShopsUids.contains(shop.osmUID)) {
+          shopsToInsert[shop.osmUID] = shop.osmShop;
+          unawaited(_osmCacher.addShopToCache(territory.id, shop.osmShop));
+        }
+      }
+    }
   }
 
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(

@@ -13,10 +13,11 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 
 // Extracted from ShopsManager logic of shops fetching
 class ShopsManagerFetchShopsHelper {
-  final ShopsManagerBackendWorker _impl;
+  final ShopsManagerBackendWorker _shopsManagerBackendWorker;
   final OsmCacher _osmCacher;
 
-  ShopsManagerFetchShopsHelper(this._impl, this._osmCacher);
+  ShopsManagerFetchShopsHelper(
+      this._shopsManagerBackendWorker, this._osmCacher);
 
   /// [osmBoundsSizesToRequest] - list of bounds sizes which will be requested
   /// from OSM servers if OSM cache is missing.
@@ -54,7 +55,7 @@ class ShopsManagerFetchShopsHelper {
 
     // At first let's try to use cached OSM territory
     if (osmCachedTerritory != null && !_isOld(osmCachedTerritory)) {
-      fetchResult = await _impl.fetchShops(overpass,
+      fetchResult = await _shopsManagerBackendWorker.fetchShops(overpass,
           osmBounds: osmCachedTerritory.bounds,
           planteBounds: planteShopsBounds,
           preloadedOsmShops: osmCachedTerritory.entities);
@@ -67,7 +68,7 @@ class ShopsManagerFetchShopsHelper {
     CoordsBounds? osmBounds;
     for (final osmBoundsSize in osmBoundsSizesToRequest) {
       osmBounds = viewPort.center.makeSquare(kmToGrad(osmBoundsSize));
-      fetchResult = await _impl.fetchShops(
+      fetchResult = await _shopsManagerBackendWorker.fetchShops(
         overpass,
         osmBounds: osmBounds,
         planteBounds: planteShopsBounds,
@@ -90,7 +91,7 @@ class ShopsManagerFetchShopsHelper {
     // Let's use cached territory even if it's old, or.. or return the error
     // if there's no cache.
     if (osmCachedTerritory != null) {
-      fetchResult = await _impl.fetchShops(overpass,
+      fetchResult = await _shopsManagerBackendWorker.fetchShops(overpass,
           osmBounds: osmCachedTerritory.bounds,
           planteBounds: planteShopsBounds,
           preloadedOsmShops: osmCachedTerritory.entities);

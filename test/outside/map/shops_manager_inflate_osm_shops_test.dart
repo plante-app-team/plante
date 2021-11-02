@@ -20,28 +20,30 @@ void main() {
     shopsManager = commons.shopsManager;
   });
 
-  test('inflateOsmShops when no shops in cache', () async {
-    verifyZeroInteractions(backend);
-    final inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
-    final inflatedShops = inflateRes.unwrap();
-    expect(inflatedShops, equals(commons.fullShops));
-    verify(backend.requestShopsByOsmUIDs(any));
-  });
+  test('shops inflated and then cached', () async {
+    final listener = MockShopsManagerListener();
+    shopsManager.addListener(listener);
 
-  test('inflateOsmShops: second call does not touch backend because is cached',
-      () async {
     // First inflate
     var inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
     var inflatedShops = inflateRes.unwrap();
     expect(inflatedShops, equals(commons.fullShops));
+    // Backend expected to be touched
     verify(backend.requestShopsByOsmUIDs(any));
+    // Listener expected to be notified about cache updated
+    verify(listener.onLocalShopsChange());
+
+    clearInteractions(backend);
+    clearInteractions(listener);
 
     // Second inflate
-    clearInteractions(backend);
     inflateRes = await shopsManager.inflateOsmShops(commons.osmShops);
     inflatedShops = inflateRes.unwrap();
     expect(inflatedShops, equals(commons.fullShops));
+    // Backend expected to be NOT touched
     verifyZeroInteractions(backend);
+    // Listener expected to be NOT notified
+    verifyZeroInteractions(listener);
   });
 
   test('inflateOsmShops when all of shops are in cache', () async {

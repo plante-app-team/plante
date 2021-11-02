@@ -11,13 +11,23 @@ class FakeOsmCacher implements OsmCacher {
   final _cachedShops = <OsmCachedTerritory<OsmShop>>[];
   final _cachedRoads = <OsmCachedTerritory<OsmRoad>>[];
 
+  Future<List<OsmShop>> getAllOsmShopsForTests() async {
+    final result = <OsmShop>[];
+    for (final territory in await getCachedShops()) {
+      result.addAll(territory.entities);
+    }
+    return result;
+  }
+
   @override
   Future<Database> get dbForTesting => throw UnimplementedError();
 
   @override
-  Future<OsmCachedTerritory<OsmShop>> cacheShops(
-      DateTime whenObtained, CoordsBounds bounds, List<OsmShop> shops) async {
-    final result = OsmCachedTerritory(++_lastId, whenObtained, bounds, shops);
+  Future<OsmCachedTerritory<OsmShop>> cacheShops(DateTime whenObtained,
+      CoordsBounds bounds, Iterable<OsmShop> shops) async {
+    final shopsCopy = shops.toList();
+    final result =
+        OsmCachedTerritory(++_lastId, whenObtained, bounds, shopsCopy);
     _cachedShops.add(result);
     return result;
   }

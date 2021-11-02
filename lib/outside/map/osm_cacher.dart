@@ -293,8 +293,8 @@ class OsmCacher {
     return roadsAndTerritoriesIds;
   }
 
-  Future<OsmCachedTerritory<OsmShop>> cacheShops(
-      DateTime whenObtained, CoordsBounds bounds, List<OsmShop> shops) async {
+  Future<OsmCachedTerritory<OsmShop>> cacheShops(DateTime whenObtained,
+      CoordsBounds bounds, Iterable<OsmShop> shops) async {
     return await _cacheTerritory(_SHOP_TABLE, whenObtained, bounds, shops,
         _shopColumnsValues, _cachedShops);
   }
@@ -303,21 +303,22 @@ class OsmCacher {
       String table,
       DateTime whenObtained,
       CoordsBounds bounds,
-      List<T> entities,
+      Iterable<T> entities,
       _TerritoriedEntityColumnValues<T> columnsValues,
       List<OsmCachedTerritory<T>> entitiesLocalCache) async {
+    final entitiesCopy = entities.toList();
     final db = await _db;
     return await db.transaction((txn) async {
       final territoryId = await txn.insert(
           _TERRITORY_TABLE, _territoryValues(whenObtained, bounds));
-      for (final entity in entities) {
+      for (final entity in entitiesCopy) {
         await txn.insert(table, columnsValues(territoryId, entity));
       }
       final cache = OsmCachedTerritory(
         territoryId,
         whenObtained,
         bounds,
-        entities,
+        entitiesCopy,
       );
       entitiesLocalCache.add(cache);
       return cache;

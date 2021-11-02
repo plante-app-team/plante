@@ -239,4 +239,39 @@ void main() {
     final finalProductsCount = shopsRes2.unwrap()[shop.osmUID]!.productsCount;
     expect(finalProductsCount, equals(initialProductsCount));
   });
+
+  test('votes notify listeners', () async {
+    final listener = MockShopsManagerListener();
+    shopsManager.addListener(listener);
+
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+
+    final targetProduct = rangeProducts[0];
+
+    // Vote!
+    var voteResult =
+        await shopsManager.productPresenceVote(targetProduct, shop, true);
+    expect(voteResult.isOk, isTrue);
+
+    verify(listener.onLocalShopsChange());
+    clearInteractions(listener);
+
+    // Vote again, this time against!
+    voteResult =
+        await shopsManager.productPresenceVote(targetProduct, shop, false);
+    expect(voteResult.isOk, isTrue);
+    // Observer is not expected to be notified because the
+    // product was not deleted by the negative vote
+    // and negative votes don't change the last-seen time
+    verifyZeroInteractions(listener);
+
+    // Vote against, once more!
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: true)));
+    voteResult =
+        await shopsManager.productPresenceVote(targetProduct, shop, false);
+    expect(voteResult.isOk, isTrue);
+    verify(listener.onLocalShopsChange());
+  });
 }
