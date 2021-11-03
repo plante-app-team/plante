@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:http/http.dart';
 import 'package:plante/logging/log.dart';
@@ -15,8 +14,8 @@ class IpLocationProvider {
   Future<Coord?> positionByIP() async {
     final Response resp;
     try {
-      resp = await _httpClient
-          .get(Uri.parse('https://api.ipregistry.co/?key=tryout'));
+      resp = await _httpClient.get(Uri.parse(
+          'https://api.freegeoip.app/json/?apikey=d9f18ea0-3a1a-11ec-b009-e13008b76841'));
     } on IOException catch (e) {
       Log.w('Location from IP caused IOException', ex: e);
       return null;
@@ -33,17 +32,15 @@ class IpLocationProvider {
       return null;
     }
 
-    if (json is! Map<String, dynamic> ||
-        json['location'] is! Map<String, dynamic>) {
-      Log.w('Location from IP response is not a JSON object: ${resp.body}',
-          ex: e);
+    if (json is! Map<String, dynamic>) {
+      Log.w('IP response is not a JSON object: ${resp.body}');
       return null;
     }
 
-    final lon = json['location']['longitude'];
-    final lat = json['location']['latitude'];
+    final lon = json['longitude'];
+    final lat = json['latitude'];
     if (lon is! num || lat is! num) {
-      Log.w('Location from IP response is not applicable: ${resp.body}', ex: e);
+      Log.w('Location from IP response is not applicable: ${resp.body}');
       return null;
     }
 

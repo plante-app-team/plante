@@ -16,12 +16,10 @@ void main() {
   });
 
   test('good scenario', () async {
-    httpClient.setResponse('.*ipregistry.*', '''
+    httpClient.setResponse('.*freegeoip.*', '''
     {
-      "location": {
-        "longitude": 10,
-        "latitude": 20
-      }
+      "longitude": 10,
+      "latitude": 20
     }
     ''');
 
@@ -30,28 +28,14 @@ void main() {
   });
 
   test('IOException', () async {
-    httpClient.setResponseException(
-        '.*ipregistry.*', const SocketException(''));
+    httpClient.setResponseException('.*freegeoip.*', const SocketException(''));
     final pos = await ipLocationProvider.positionByIP();
     expect(pos, isNull);
   });
 
   test('invalid JSON', () async {
-    httpClient.setResponse('.*ipregistry.*', '''
+    httpClient.setResponse('.*freegeoip.*', '''
     {{{{{{{{{{{{
-      "location": {
-        "longitude": 10,
-        "latitude": 20
-      }
-    }
-    ''');
-    final pos = await ipLocationProvider.positionByIP();
-    expect(pos, isNull);
-  });
-
-  test('JSON without location', () async {
-    httpClient.setResponse('.*ipregistry.*', '''
-    {
       "longitude": 10,
       "latitude": 20
     }
@@ -61,12 +45,10 @@ void main() {
   });
 
   test('JSON without lat and lon', () async {
-    httpClient.setResponse('.*ipregistry.*', '''
+    httpClient.setResponse('.*freegeoip.*', '''
     {
-      "location": {
-        "x": 10,
-        "y": 20
-      }
+      "x": 10,
+      "y": 20
     }
     ''');
     final pos = await ipLocationProvider.positionByIP();
@@ -74,12 +56,10 @@ void main() {
   });
 
   test('lat and lon are not numbers', () async {
-    httpClient.setResponse('.*ipregistry.*', '''
+    httpClient.setResponse('.*freegeoip.*', '''
     {
-      "location": {
-        "longitude": "10",
-        "latitude": "20"
-      }
+      "longitude": "10",
+      "latitude": "20"
     }
     ''');
     final pos = await ipLocationProvider.positionByIP();
