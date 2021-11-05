@@ -217,7 +217,7 @@ class FakeBackend implements Backend {
 
   @override
   Future<BackendResponse> customGet(String path,
-      [Map<String, String>? queryParams, Map<String, String>? headers]) {
+      [Map<String, dynamic>? queryParams, Map<String, String>? headers]) {
     throw UnimplementedError('Not supposed to be used');
   }
 }

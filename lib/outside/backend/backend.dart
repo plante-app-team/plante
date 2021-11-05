@@ -509,7 +509,7 @@ class Backend {
   }
 
   Future<BackendResponse> customGet(String path,
-      [Map<String, String>? queryParams, Map<String, String>? headers]) async {
+      [Map<String, dynamic>? queryParams, Map<String, String>? headers]) async {
     if (!kIsWeb) {
       throw Exception('Backend.customGet must be called only from Web');
     }
