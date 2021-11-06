@@ -22,6 +22,8 @@ enum ModeratorChoiceReason {
   SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN,
   SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY,
   SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS,
+  CANE_SUGAR_IN_INGREDIENTS,
+  POSSIBLY_CANE_SUGAR_IN_INGREDIENTS,
 
   // Why unknown
   SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN,
@@ -63,6 +65,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
       case ModeratorChoiceReason
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
         return 20;
+      case ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS:
+        return 21;
+      case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
+        return 22;
     }
   }
 
@@ -98,6 +104,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
       case ModeratorChoiceReason.SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN:
         return {VegStatus.unknown};
       case ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY:
+        return {VegStatus.possible};
+      case ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS:
+        return {VegStatus.possible};
+      case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
         return {VegStatus.possible};
     }
   }
@@ -140,6 +150,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
         return context.strings
             .mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label;
+      case ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS:
+        return context.strings.mod_reason_cane_sugar_in_ingredients;
+      case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
+        return context.strings.mod_reason_possibly_cane_sugar_in_ingredients;
     }
   }
 }

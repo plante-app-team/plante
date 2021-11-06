@@ -301,7 +301,7 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
           as _i9.Future<_i2.Result<_i26.BackendShop, _i19.BackendError>>);
   @override
   _i9.Future<_i3.BackendResponse> customGet(String? path,
-          [Map<String, String>? queryParams, Map<String, String>? headers]) =>
+          [Map<String, dynamic>? queryParams, Map<String, String>? headers]) =>
       (super.noSuchMethod(
               Invocation.method(#customGet, [path, queryParams, headers]),
               returnValue:

@@ -39,6 +39,8 @@ void main() {
       ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY: 19,
       ModeratorChoiceReason
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL: 20,
+      ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS: 21,
+      ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS: 22,
     };
 
     _ensureAllReasonsHandled(idsMap.keys);
@@ -83,7 +85,11 @@ void main() {
       ModeratorChoiceReason
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL: {
         VegStatus.positive
-      }
+      },
+      ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS: {VegStatus.possible},
+      ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS: {
+        VegStatus.possible
+      },
     };
 
     _ensureAllReasonsHandled(statusesMap.keys);
