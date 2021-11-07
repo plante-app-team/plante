@@ -89,7 +89,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                 padding: const EdgeInsets.only(left: 24, right: 24),
                 child: SignInWithAppleButton(
                   text: context.strings.external_auth_page_continue_with_apple,
-                  borderRadius: const BorderRadius.all(Radius.circular(50)),
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
                   onPressed: !_loading ? _signInWithApple : () {},
                 ),
               ),
