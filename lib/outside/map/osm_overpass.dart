@@ -41,10 +41,8 @@ class OsmOverpass {
   Map<String, String> get urls => MapView(_urls);
 
   OsmOverpass(this._http, this._analytics, this._interactionsQueue) {
-    _urls['lz4'] = 'lz4.overpass-api.de';
-    _urls['z'] = 'z.overpass-api.de';
+    _urls['main_overpass'] = 'overpass-api.de';
     _urls['kumi'] = 'overpass.kumi.systems';
-    _urls['taiwan'] = 'overpass.nchc.org.tw';
   }
 
   int now() => DateTime.now().secondsSinceEpoch;
@@ -151,6 +149,7 @@ class OsmOverpass {
 
   Future<Result<String, OpenStreetMapError>> _sendCmd(String cmd) async {
     final start = now();
+    var networkError = false;
     for (final nameAndUrl in _urls.entries) {
       final urlName = nameAndUrl.key;
       final url = nameAndUrl.value;
@@ -163,7 +162,8 @@ class OsmOverpass {
             }).timeout(SINGLE_SERVER_TIMEOUT);
       } on IOException catch (e) {
         Log.w('OSM._sendCmd network error, passed: ${now() - start},', ex: e);
-        return Err(OpenStreetMapError.NETWORK);
+        networkError = true;
+        continue;
       } on TimeoutException catch (e) {
         Log.w(
             'OSM._sendCmd overpass server ($nameAndUrl) timeout, '
@@ -187,7 +187,8 @@ class OsmOverpass {
       return Ok(utf8.decode(r.bodyBytes));
     }
 
-    return Err(OpenStreetMapError.OTHER);
+    return Err(
+        networkError ? OpenStreetMapError.NETWORK : OpenStreetMapError.OTHER);
   }
 
   Future<Result<List<OsmRoad>, OpenStreetMapError>> fetchRoads(

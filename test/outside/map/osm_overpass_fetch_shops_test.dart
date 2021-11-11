@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/open_street_map.dart';
@@ -153,7 +155,7 @@ void main() {
     commons.expectAllOverpassUrlsQueried(); // See function comment
   });
 
-  test('fetchShops 400 for 1st and 2nd URLs and 200 for 3rd', () async {
+  test('fetchShops 400 for 1st and 200 for 2nd URL', () async {
     const okOsmResp = '''
     {
       "elements": [
@@ -165,11 +167,7 @@ void main() {
     http.setResponse('.*${forcedOrderedUrls[0]}.*', okOsmResp,
         responseCode: 400);
     http.setResponse('.*${forcedOrderedUrls[1]}.*', okOsmResp,
-        responseCode: 400);
-    http.setResponse('.*${forcedOrderedUrls[2]}.*', okOsmResp,
         responseCode: 200);
-    http.setResponse('.*${forcedOrderedUrls[3]}.*', okOsmResp,
-        responseCode: 400);
 
     final shopsRes = await overpass.fetchShops(
         bounds: CoordsBounds(
@@ -179,12 +177,34 @@ void main() {
 
     // First request expected to be failed
     expect(http.getRequestsMatching('.*${forcedOrderedUrls[0]}.*').length, 1);
-    // Second request expected to be failed
+    // Second request expected to be successful
     expect(http.getRequestsMatching('.*${forcedOrderedUrls[1]}.*').length, 1);
-    // Third request expected to be successful
-    expect(http.getRequestsMatching('.*${forcedOrderedUrls[2]}.*').length, 1);
-    // Fourth request expected to be absent, because third was successful
-    expect(http.getRequestsMatching('.*${forcedOrderedUrls[3]}.*').length, 0);
+  });
+
+  test('fetchShops exception for 1st and 200 for 2nd URL', () async {
+    const okOsmResp = '''
+    {
+      "elements": [
+      ]
+    }
+    ''';
+
+    final forcedOrderedUrls = overpass.urls.values.toList();
+    http.setResponseException(
+        '.*${forcedOrderedUrls[0]}.*', const SocketException(''));
+    http.setResponse('.*${forcedOrderedUrls[1]}.*', okOsmResp,
+        responseCode: 200);
+
+    final shopsRes = await overpass.fetchShops(
+        bounds: CoordsBounds(
+            southwest: Coord(lat: 0, lon: 0),
+            northeast: Coord(lat: 1, lon: 1)));
+    expect(shopsRes.isOk, isTrue);
+
+    // First request expected to be failed
+    expect(http.getRequestsMatching('.*${forcedOrderedUrls[0]}.*').length, 1);
+    // Second request expected to be successful
+    expect(http.getRequestsMatching('.*${forcedOrderedUrls[1]}.*').length, 1);
   });
 
   test('fetchShops analytics events for different response codes', () async {
@@ -465,7 +485,7 @@ void main() {
     // But [urls] is prioritized - first URLs are of highest priority
     // and we need to make sure order doesn't suddenly change.
     final forcedOrdered = overpass.urls.keys.toList();
-    expect(forcedOrdered, equals(['lz4', 'z', 'kumi', 'taiwan']));
+    expect(forcedOrdered, equals(['main_overpass', 'kumi']));
   });
 
   test('fetchShops with OSM UIDs', () async {
