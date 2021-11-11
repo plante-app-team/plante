@@ -24,7 +24,7 @@ abstract class ProductLangSlice
   VegStatus? get veganStatus;
   VegStatusSource? get veganStatusSource;
 
-  int? get moderatorVeganChoiceReasonId;
+  BuiltList<int> get moderatorVeganChoiceReasonsIds;
   String? get moderatorVeganSourcesText;
 
   BuiltList<String>? get brands;
@@ -56,7 +56,8 @@ abstract class ProductLangSlice
       ..barcode = product.barcode
       ..veganStatus = product.veganStatus
       ..veganStatusSource = product.veganStatusSource
-      ..moderatorVeganChoiceReasonId = product.moderatorVeganChoiceReasonId
+      ..moderatorVeganChoiceReasonsIds =
+          product.moderatorVeganChoiceReasonsIds.toBuilder()
       ..moderatorVeganSourcesText = product.moderatorVeganSourcesText
       ..brands = product.brands?.toBuilder()
       ..name = product.nameLangs[lang]
@@ -78,7 +79,8 @@ abstract class ProductLangSlice
       ..barcode = barcode
       ..veganStatus = veganStatus
       ..veganStatusSource = veganStatusSource
-      ..moderatorVeganChoiceReasonId = moderatorVeganChoiceReasonId
+      ..moderatorVeganChoiceReasonsIds =
+          moderatorVeganChoiceReasonsIds.toBuilder()
       ..moderatorVeganSourcesText = moderatorVeganSourcesText
       ..brands = brands != null ? ListBuilder(brands!) : null
       ..nameLangs.addAll(_valToMap(name, lang))
@@ -138,7 +140,8 @@ extension ProductExtensionForSlice on Product {
     return result.rebuild((e) => e
       ..veganStatus = slice.veganStatus
       ..veganStatusSource = slice.veganStatusSource
-      ..moderatorVeganChoiceReasonId = slice.moderatorVeganChoiceReasonId
+      ..moderatorVeganChoiceReasonsIds =
+          slice.moderatorVeganChoiceReasonsIds.toBuilder()
       ..moderatorVeganSourcesText = slice.moderatorVeganSourcesText
       ..brands = slice.brands != null ? ListBuilder(slice.brands!) : null
       ..nameLangs = _updateMapBuilder(e.nameLangs, slice.name, lang)

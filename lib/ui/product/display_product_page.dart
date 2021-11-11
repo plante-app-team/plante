@@ -349,7 +349,11 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    return _product.moderatorVeganChoiceReason;
+    final reasons = _product.moderatorVeganChoiceReasons;
+    if (reasons.isEmpty) {
+      return null;
+    }
+    return reasons.first;
   }
 
   void _onVegStatusSourceTextClick(BuildContext context) {

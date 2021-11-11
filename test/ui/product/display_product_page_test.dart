@@ -584,8 +584,8 @@ void main() {
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonId =
-          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonsIds
+          .add(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId)
       ..moderatorVeganSourcesText = 'vegan source').buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -639,8 +639,8 @@ void main() {
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonId =
-          ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId
+      ..moderatorVeganChoiceReasonsIds
+          .add(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId)
       ..moderatorVeganSourcesText = null).buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -676,15 +676,17 @@ void main() {
       'vegan status moderator reasoning NOT shown on click '
       'when veg-source is not moderator', (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
-      ..lang = _DEFAULT_LANG
-      ..barcode = '123'
-      ..name = 'My product'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..veganStatus = VegStatus.negative
-      ..veganStatusSource = VegStatusSource.community
-      ..moderatorVeganChoiceReasonId = ModeratorChoiceReason
-          .SOME_INGREDIENT_IS_NON_VEGAN.persistentId).buildSingleLangProduct();
+          ..lang = _DEFAULT_LANG
+          ..barcode = '123'
+          ..name = 'My product'
+          ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+          ..imageIngredients =
+              Uri.file(File('./test/assets/img.jpg').absolute.path)
+          ..veganStatus = VegStatus.negative
+          ..veganStatusSource = VegStatusSource.community
+          ..moderatorVeganChoiceReasonsIds.add(
+              ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId))
+        .buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'

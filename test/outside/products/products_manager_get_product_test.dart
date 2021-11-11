@@ -9,6 +9,8 @@ import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/result.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
@@ -245,5 +247,39 @@ void main() {
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     expect(productRes.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+  });
+
+  test('moderator vegan status choice reasons parsing', () async {
+    final offProduct = off.Product.fromJson({
+      'code': '123',
+      'product_name_ru': 'name',
+      'brands_tags': ['Brand name'],
+      'ingredients_text_ru': 'lemon, water',
+      'selected_images': jsonDecode(offSelectedImagesRuJson),
+    });
+    setUpOffProducts([offProduct]);
+
+    final backendProduct = BackendProduct((v) => v
+      ..barcode = '123'
+      ..veganStatus = VegStatus.negative.name
+      ..veganStatusSource = VegStatusSource.moderator.name
+      ..moderatorVeganChoiceReasons = [
+        ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS.persistentId,
+        ModeratorChoiceReason
+            .SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY.persistentId,
+        ModeratorChoiceReason
+            .SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN.persistentId,
+      ].join(','));
+    setUpBackendProducts(Ok([backendProduct]));
+
+    final productRes = await productsManager.getProduct('123', [LangCode.ru]);
+    final product = productRes.unwrap()!;
+    expect(
+        product.moderatorVeganChoiceReasons.toSet(),
+        equals({
+          ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS,
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY,
+          ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN,
+        }));
   });
 }

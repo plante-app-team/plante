@@ -60,7 +60,11 @@ class ModeratorCommentDialog extends StatelessWidget {
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    return product.moderatorVeganChoiceReason;
+    final reasons = product.moderatorVeganChoiceReasons;
+    if (reasons.isEmpty) {
+      return null;
+    }
+    return reasons.first;
   }
 
   String? _vegStatusModeratorChoiceReasonText(BuildContext context) {

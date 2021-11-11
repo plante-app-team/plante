@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/veg_status.dart';
 
 enum ModeratorChoiceReason {
@@ -165,4 +166,23 @@ ModeratorChoiceReason? moderatorChoiceReasonFromPersistentId(int id) {
     }
   }
   return null;
+}
+
+List<ModeratorChoiceReason> moderatorChoiceReasonFromPersistentIdsStr(
+    String? moderatorVeganChoiceReasonsIdsStr) {
+  if (moderatorVeganChoiceReasonsIdsStr == null) {
+    return const [];
+  }
+  final strs = moderatorVeganChoiceReasonsIdsStr.split(',');
+  final result = <ModeratorChoiceReason>[];
+  for (final str in strs) {
+    final reason =
+        moderatorChoiceReasonFromPersistentId(int.tryParse(str) ?? -1);
+    if (reason == null) {
+      Log.w('Could not parse ModeratorChoiceReason: $str');
+      continue;
+    }
+    result.add(reason);
+  }
+  return result;
 }

@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/logging/log.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
@@ -23,7 +24,7 @@ abstract class Product implements Built<Product, ProductBuilder> {
   VegStatus? get veganStatus;
   VegStatusSource? get veganStatusSource;
 
-  int? get moderatorVeganChoiceReasonId;
+  BuiltList<int> get moderatorVeganChoiceReasonsIds;
   String? get moderatorVeganSourcesText;
 
   /// Service field to implement single-lang getters
@@ -96,9 +97,18 @@ extension ProductLangsMechanicsExtension on Product {
 }
 
 extension ProductModeratorChoiceExtension on Product {
-  ModeratorChoiceReason? get moderatorVeganChoiceReason {
-    return moderatorChoiceReasonFromPersistentId(
-        moderatorVeganChoiceReasonId ?? -1);
+  List<ModeratorChoiceReason> get moderatorVeganChoiceReasons {
+    final result = <ModeratorChoiceReason>[];
+    for (final code in moderatorVeganChoiceReasonsIds) {
+      final reason = moderatorChoiceReasonFromPersistentId(code);
+      if (reason == null) {
+        Log.w('Unknown ID of a ModeratorChoiceReason: $reason. '
+            'New enum element in newer version?');
+        continue;
+      }
+      result.add(reason);
+    }
+    return result;
   }
 }
 

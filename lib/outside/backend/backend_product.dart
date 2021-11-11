@@ -18,8 +18,8 @@ abstract class BackendProduct
   @BuiltValueField(wireName: 'vegan_status_source')
   String? get veganStatusSource;
 
-  @BuiltValueField(wireName: 'moderator_vegan_choice_reason')
-  int? get moderatorVeganChoiceReason;
+  @BuiltValueField(wireName: 'moderator_vegan_choice_reasons')
+  String? get moderatorVeganChoiceReasons;
   @BuiltValueField(wireName: 'moderator_vegan_sources_text')
   String? get moderatorVeganSourcesText;
 

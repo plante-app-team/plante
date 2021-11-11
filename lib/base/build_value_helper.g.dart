@@ -36,6 +36,12 @@ Serializers _$_serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(LangCode)]),
           () => new ListBuilder<LangCode>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(int)]),
+          () => new ListBuilder<int>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(LangCode)]),
           () => new ListBuilder<LangCode>())
       ..addBuilderFactory(
@@ -68,8 +74,8 @@ Serializers _$_serializers = (new Serializers().toBuilder()
           ]),
           () => new MapBuilder<LangCode, BuiltList<Ingredient>>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => new ListBuilder<String>())
+          const FullType(BuiltList, const [const FullType(int)]),
+          () => new ListBuilder<int>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => new ListBuilder<String>())

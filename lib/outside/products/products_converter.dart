@@ -25,8 +25,9 @@ class ProductsConverterAndCacher {
       ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? '')
       ..veganStatusSource =
           VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? '')
-      ..moderatorVeganChoiceReasonId =
-          backendProduct?.moderatorVeganChoiceReason
+      ..moderatorVeganChoiceReasonsIds = ListBuilder(
+          _parseModeratorVeganChoiceReasonsIDs(
+              backendProduct?.moderatorVeganChoiceReasons))
       ..moderatorVeganSourcesText = backendProduct?.moderatorVeganSourcesText
       ..brands.addAll(offProduct.brandsTags ?? const [])
       ..nameLangs =
@@ -232,6 +233,23 @@ class ProductsConverterAndCacher {
     }
 
     return offProduct;
+  }
+
+  List<int> _parseModeratorVeganChoiceReasonsIDs(String? str) {
+    if (str == null) {
+      return const [];
+    }
+    final idsStrs = str.split(',');
+    final ids = <int>[];
+    for (final idStr in idsStrs) {
+      final id = int.tryParse(idStr);
+      if (id == null) {
+        Log.w('_parseModeratorVeganChoiceReasonsIDs: invalid IDs str: $str');
+        continue;
+      }
+      ids.add(id);
+    }
+    return ids;
   }
 
   List<String> _connectDifferentlyTranslated(

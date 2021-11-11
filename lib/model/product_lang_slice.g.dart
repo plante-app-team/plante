@@ -23,6 +23,10 @@ class _$ProductLangSliceSerializer
       'barcode',
       serializers.serialize(object.barcode,
           specifiedType: const FullType(String)),
+      'moderatorVeganChoiceReasonsIds',
+      serializers.serialize(object.moderatorVeganChoiceReasonsIds,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(int)])),
       'ingredientsAnalyzed',
       serializers.serialize(object.ingredientsAnalyzed,
           specifiedType:
@@ -49,12 +53,6 @@ class _$ProductLangSliceSerializer
         ..add('veganStatusSource')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(VegStatusSource)));
-    }
-    value = object.moderatorVeganChoiceReasonId;
-    if (value != null) {
-      result
-        ..add('moderatorVeganChoiceReasonId')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
     value = object.moderatorVeganSourcesText;
     if (value != null) {
@@ -135,9 +133,12 @@ class _$ProductLangSliceSerializer
                   specifiedType: const FullType(VegStatusSource))
               as VegStatusSource?;
           break;
-        case 'moderatorVeganChoiceReasonId':
-          result.moderatorVeganChoiceReasonId = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int?;
+        case 'moderatorVeganChoiceReasonsIds':
+          result.moderatorVeganChoiceReasonsIds.replace(serializers.deserialize(
+                  value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(int)]))!
+              as BuiltList<Object?>);
           break;
         case 'moderatorVeganSourcesText':
           result.moderatorVeganSourcesText = serializers.deserialize(value,
@@ -192,7 +193,7 @@ class _$ProductLangSlice extends ProductLangSlice {
   @override
   final VegStatusSource? veganStatusSource;
   @override
-  final int? moderatorVeganChoiceReasonId;
+  final BuiltList<int> moderatorVeganChoiceReasonsIds;
   @override
   final String? moderatorVeganSourcesText;
   @override
@@ -219,7 +220,7 @@ class _$ProductLangSlice extends ProductLangSlice {
       required this.barcode,
       this.veganStatus,
       this.veganStatusSource,
-      this.moderatorVeganChoiceReasonId,
+      required this.moderatorVeganChoiceReasonsIds,
       this.moderatorVeganSourcesText,
       this.brands,
       this.name,
@@ -231,6 +232,8 @@ class _$ProductLangSlice extends ProductLangSlice {
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         barcode, 'ProductLangSlice', 'barcode');
+    BuiltValueNullFieldError.checkNotNull(moderatorVeganChoiceReasonsIds,
+        'ProductLangSlice', 'moderatorVeganChoiceReasonsIds');
     BuiltValueNullFieldError.checkNotNull(
         ingredientsAnalyzed, 'ProductLangSlice', 'ingredientsAnalyzed');
   }
@@ -251,7 +254,8 @@ class _$ProductLangSlice extends ProductLangSlice {
         barcode == other.barcode &&
         veganStatus == other.veganStatus &&
         veganStatusSource == other.veganStatusSource &&
-        moderatorVeganChoiceReasonId == other.moderatorVeganChoiceReasonId &&
+        moderatorVeganChoiceReasonsIds ==
+            other.moderatorVeganChoiceReasonsIds &&
         moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
         brands == other.brands &&
         name == other.name &&
@@ -279,7 +283,8 @@ class _$ProductLangSlice extends ProductLangSlice {
                                                     barcode.hashCode),
                                                 veganStatus.hashCode),
                                             veganStatusSource.hashCode),
-                                        moderatorVeganChoiceReasonId.hashCode),
+                                        moderatorVeganChoiceReasonsIds
+                                            .hashCode),
                                     moderatorVeganSourcesText.hashCode),
                                 brands.hashCode),
                             name.hashCode),
@@ -297,7 +302,8 @@ class _$ProductLangSlice extends ProductLangSlice {
           ..add('barcode', barcode)
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
-          ..add('moderatorVeganChoiceReasonId', moderatorVeganChoiceReasonId)
+          ..add(
+              'moderatorVeganChoiceReasonsIds', moderatorVeganChoiceReasonsIds)
           ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
           ..add('brands', brands)
           ..add('name', name)
@@ -331,10 +337,12 @@ class ProductLangSliceBuilder
   set veganStatusSource(VegStatusSource? veganStatusSource) =>
       _$this._veganStatusSource = veganStatusSource;
 
-  int? _moderatorVeganChoiceReasonId;
-  int? get moderatorVeganChoiceReasonId => _$this._moderatorVeganChoiceReasonId;
-  set moderatorVeganChoiceReasonId(int? moderatorVeganChoiceReasonId) =>
-      _$this._moderatorVeganChoiceReasonId = moderatorVeganChoiceReasonId;
+  ListBuilder<int>? _moderatorVeganChoiceReasonsIds;
+  ListBuilder<int> get moderatorVeganChoiceReasonsIds =>
+      _$this._moderatorVeganChoiceReasonsIds ??= new ListBuilder<int>();
+  set moderatorVeganChoiceReasonsIds(
+          ListBuilder<int>? moderatorVeganChoiceReasonsIds) =>
+      _$this._moderatorVeganChoiceReasonsIds = moderatorVeganChoiceReasonsIds;
 
   String? _moderatorVeganSourcesText;
   String? get moderatorVeganSourcesText => _$this._moderatorVeganSourcesText;
@@ -384,7 +392,8 @@ class ProductLangSliceBuilder
       _barcode = $v.barcode;
       _veganStatus = $v.veganStatus;
       _veganStatusSource = $v.veganStatusSource;
-      _moderatorVeganChoiceReasonId = $v.moderatorVeganChoiceReasonId;
+      _moderatorVeganChoiceReasonsIds =
+          $v.moderatorVeganChoiceReasonsIds.toBuilder();
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
       _brands = $v.brands?.toBuilder();
       _name = $v.name;
@@ -420,7 +429,8 @@ class ProductLangSliceBuilder
                   barcode, 'ProductLangSlice', 'barcode'),
               veganStatus: veganStatus,
               veganStatusSource: veganStatusSource,
-              moderatorVeganChoiceReasonId: moderatorVeganChoiceReasonId,
+              moderatorVeganChoiceReasonsIds:
+                  moderatorVeganChoiceReasonsIds.build(),
               moderatorVeganSourcesText: moderatorVeganSourcesText,
               brands: _brands?.build(),
               name: name,
@@ -432,6 +442,9 @@ class ProductLangSliceBuilder
     } catch (_) {
       late String _$failedField;
       try {
+        _$failedField = 'moderatorVeganChoiceReasonsIds';
+        moderatorVeganChoiceReasonsIds.build();
+
         _$failedField = 'brands';
         _brands?.build();
 
