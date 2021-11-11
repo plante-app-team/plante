@@ -49,10 +49,7 @@ void main() {
     final user = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
-      ..name = 'Bob'
-      ..eatsEggs = false
-      ..eatsMilk = false
-      ..eatsHoney = false);
+      ..name = 'Bob');
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
   });
@@ -136,7 +133,5 @@ Product _makeProduct(String barcode) {
     ..imageIngredients = Uri.file('/tmp/asd')
     ..ingredientsText = 'beans'
     ..veganStatus = VegStatus.positive
-    ..vegetarianStatus = VegStatus.positive
-    ..veganStatusSource = VegStatusSource.community
-    ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+    ..veganStatusSource = VegStatusSource.community).productForTests();
 }

@@ -60,11 +60,6 @@ void main() {
     // We expect UserParamsFetcher to set backend token manually
     expectedUserParams = expectedUserParams.rebuild(
         (e) => e..backendClientToken = initialParams.backendClientToken);
-    // We expect UserParamsFetcher to force-set user to be a vegan
-    expectedUserParams = expectedUserParams.rebuild((e) => e
-      ..eatsHoney = false
-      ..eatsMilk = false
-      ..eatsEggs = false);
 
     expect(await userParamsController.getUserParams(),
         isNot(equals(initialParams)));
@@ -118,10 +113,7 @@ void main() {
     final initialParams = UserParams((e) => e
       ..backendId = '123'
       ..backendClientToken = '321'
-      ..name = 'Bob'
-      ..eatsHoney = false
-      ..eatsMilk = false
-      ..eatsEggs = false);
+      ..name = 'Bob');
     await userParamsController.setUserParams(initialParams);
     final userParamsObserver = _FakeObserver();
     userParamsController.addObserver(userParamsObserver);

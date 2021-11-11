@@ -53,20 +53,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           ])),
     ];
     Object? value;
-    value = object.vegetarianStatus;
-    if (value != null) {
-      result
-        ..add('vegetarianStatus')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(VegStatus)));
-    }
-    value = object.vegetarianStatusSource;
-    if (value != null) {
-      result
-        ..add('vegetarianStatusSource')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(VegStatusSource)));
-    }
     value = object.veganStatus;
     if (value != null) {
       result
@@ -80,19 +66,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
         ..add('veganStatusSource')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(VegStatusSource)));
-    }
-    value = object.moderatorVegetarianChoiceReasonId;
-    if (value != null) {
-      result
-        ..add('moderatorVegetarianChoiceReasonId')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
-    }
-    value = object.moderatorVegetarianSourcesText;
-    if (value != null) {
-      result
-        ..add('moderatorVegetarianSourcesText')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
     }
     value = object.moderatorVeganChoiceReasonId;
     if (value != null) {
@@ -133,15 +106,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.barcode = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'vegetarianStatus':
-          result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus?;
-          break;
-        case 'vegetarianStatusSource':
-          result.vegetarianStatusSource = serializers.deserialize(value,
-                  specifiedType: const FullType(VegStatusSource))
-              as VegStatusSource?;
-          break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
               specifiedType: const FullType(VegStatus)) as VegStatus?;
@@ -150,14 +114,6 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.veganStatusSource = serializers.deserialize(value,
                   specifiedType: const FullType(VegStatusSource))
               as VegStatusSource?;
-          break;
-        case 'moderatorVegetarianChoiceReasonId':
-          result.moderatorVegetarianChoiceReasonId = serializers
-              .deserialize(value, specifiedType: const FullType(int)) as int?;
-          break;
-        case 'moderatorVegetarianSourcesText':
-          result.moderatorVegetarianSourcesText = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
           break;
         case 'moderatorVeganChoiceReasonId':
           result.moderatorVeganChoiceReasonId = serializers.deserialize(value,
@@ -222,17 +178,9 @@ class _$Product extends Product {
   @override
   final String barcode;
   @override
-  final VegStatus? vegetarianStatus;
-  @override
-  final VegStatusSource? vegetarianStatusSource;
-  @override
   final VegStatus? veganStatus;
   @override
   final VegStatusSource? veganStatusSource;
-  @override
-  final int? moderatorVegetarianChoiceReasonId;
-  @override
-  final String? moderatorVegetarianSourcesText;
   @override
   final int? moderatorVeganChoiceReasonId;
   @override
@@ -259,12 +207,8 @@ class _$Product extends Product {
 
   _$Product._(
       {required this.barcode,
-      this.vegetarianStatus,
-      this.vegetarianStatusSource,
       this.veganStatus,
       this.veganStatusSource,
-      this.moderatorVegetarianChoiceReasonId,
-      this.moderatorVegetarianSourcesText,
       this.moderatorVeganChoiceReasonId,
       this.moderatorVeganSourcesText,
       required this.langsPrioritized,
@@ -304,14 +248,8 @@ class _$Product extends Product {
     if (identical(other, this)) return true;
     return other is Product &&
         barcode == other.barcode &&
-        vegetarianStatus == other.vegetarianStatus &&
-        vegetarianStatusSource == other.vegetarianStatusSource &&
         veganStatus == other.veganStatus &&
         veganStatusSource == other.veganStatusSource &&
-        moderatorVegetarianChoiceReasonId ==
-            other.moderatorVegetarianChoiceReasonId &&
-        moderatorVegetarianSourcesText ==
-            other.moderatorVegetarianSourcesText &&
         moderatorVeganChoiceReasonId == other.moderatorVeganChoiceReasonId &&
         moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
         langsPrioritized == other.langsPrioritized &&
@@ -337,27 +275,9 @@ class _$Product extends Product {
                                     $jc(
                                         $jc(
                                             $jc(
-                                                $jc(
-                                                    $jc(
-                                                        $jc(
-                                                            $jc(
-                                                                $jc(
-                                                                    $jc(
-                                                                        0,
-                                                                        barcode
-                                                                            .hashCode),
-                                                                    vegetarianStatus
-                                                                        .hashCode),
-                                                                vegetarianStatusSource
-                                                                    .hashCode),
-                                                            veganStatus
-                                                                .hashCode),
-                                                        veganStatusSource
-                                                            .hashCode),
-                                                    moderatorVegetarianChoiceReasonId
-                                                        .hashCode),
-                                                moderatorVegetarianSourcesText
-                                                    .hashCode),
+                                                $jc($jc(0, barcode.hashCode),
+                                                    veganStatus.hashCode),
+                                                veganStatusSource.hashCode),
                                             moderatorVeganChoiceReasonId
                                                 .hashCode),
                                         moderatorVeganSourcesText.hashCode),
@@ -375,14 +295,8 @@ class _$Product extends Product {
   String toString() {
     return (newBuiltValueToStringHelper('Product')
           ..add('barcode', barcode)
-          ..add('vegetarianStatus', vegetarianStatus)
-          ..add('vegetarianStatusSource', vegetarianStatusSource)
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
-          ..add('moderatorVegetarianChoiceReasonId',
-              moderatorVegetarianChoiceReasonId)
-          ..add(
-              'moderatorVegetarianSourcesText', moderatorVegetarianSourcesText)
           ..add('moderatorVeganChoiceReasonId', moderatorVeganChoiceReasonId)
           ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
           ..add('langsPrioritized', langsPrioritized)
@@ -404,16 +318,6 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   String? get barcode => _$this._barcode;
   set barcode(String? barcode) => _$this._barcode = barcode;
 
-  VegStatus? _vegetarianStatus;
-  VegStatus? get vegetarianStatus => _$this._vegetarianStatus;
-  set vegetarianStatus(VegStatus? vegetarianStatus) =>
-      _$this._vegetarianStatus = vegetarianStatus;
-
-  VegStatusSource? _vegetarianStatusSource;
-  VegStatusSource? get vegetarianStatusSource => _$this._vegetarianStatusSource;
-  set vegetarianStatusSource(VegStatusSource? vegetarianStatusSource) =>
-      _$this._vegetarianStatusSource = vegetarianStatusSource;
-
   VegStatus? _veganStatus;
   VegStatus? get veganStatus => _$this._veganStatus;
   set veganStatus(VegStatus? veganStatus) => _$this._veganStatus = veganStatus;
@@ -422,20 +326,6 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   VegStatusSource? get veganStatusSource => _$this._veganStatusSource;
   set veganStatusSource(VegStatusSource? veganStatusSource) =>
       _$this._veganStatusSource = veganStatusSource;
-
-  int? _moderatorVegetarianChoiceReasonId;
-  int? get moderatorVegetarianChoiceReasonId =>
-      _$this._moderatorVegetarianChoiceReasonId;
-  set moderatorVegetarianChoiceReasonId(
-          int? moderatorVegetarianChoiceReasonId) =>
-      _$this._moderatorVegetarianChoiceReasonId =
-          moderatorVegetarianChoiceReasonId;
-
-  String? _moderatorVegetarianSourcesText;
-  String? get moderatorVegetarianSourcesText =>
-      _$this._moderatorVegetarianSourcesText;
-  set moderatorVegetarianSourcesText(String? moderatorVegetarianSourcesText) =>
-      _$this._moderatorVegetarianSourcesText = moderatorVegetarianSourcesText;
 
   int? _moderatorVeganChoiceReasonId;
   int? get moderatorVeganChoiceReasonId => _$this._moderatorVeganChoiceReasonId;
@@ -504,12 +394,8 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
     final $v = _$v;
     if ($v != null) {
       _barcode = $v.barcode;
-      _vegetarianStatus = $v.vegetarianStatus;
-      _vegetarianStatusSource = $v.vegetarianStatusSource;
       _veganStatus = $v.veganStatus;
       _veganStatusSource = $v.veganStatusSource;
-      _moderatorVegetarianChoiceReasonId = $v.moderatorVegetarianChoiceReasonId;
-      _moderatorVegetarianSourcesText = $v.moderatorVegetarianSourcesText;
       _moderatorVeganChoiceReasonId = $v.moderatorVeganChoiceReasonId;
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
       _langsPrioritized = $v.langsPrioritized.toBuilder();
@@ -544,13 +430,8 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
           new _$Product._(
               barcode: BuiltValueNullFieldError.checkNotNull(
                   barcode, 'Product', 'barcode'),
-              vegetarianStatus: vegetarianStatus,
-              vegetarianStatusSource: vegetarianStatusSource,
               veganStatus: veganStatus,
               veganStatusSource: veganStatusSource,
-              moderatorVegetarianChoiceReasonId:
-                  moderatorVegetarianChoiceReasonId,
-              moderatorVegetarianSourcesText: moderatorVegetarianSourcesText,
               moderatorVeganChoiceReasonId: moderatorVeganChoiceReasonId,
               moderatorVeganSourcesText: moderatorVeganSourcesText,
               langsPrioritized: langsPrioritized.build(),

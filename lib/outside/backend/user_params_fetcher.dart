@@ -26,11 +26,6 @@ class UserParamsFetcher implements MobileAppConfigManagerObserver {
     // needed for all requests.
     backendParams = backendParams.rebuild(
         (e) => e..backendClientToken = initialParams.backendClientToken);
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    backendParams = backendParams.rebuild((e) => e
-      ..eatsEggs = false
-      ..eatsMilk = false
-      ..eatsHoney = false);
     if (initialParams != backendParams) {
       await _userParamsController.setUserParams(backendParams);
     }

@@ -257,9 +257,7 @@ class ProductsManager {
         product, _productsConverter.getCached(originalProduct?.barcode ?? ''));
 
     final backendResult = await _backend.createUpdateProduct(product.barcode,
-        vegetarianStatus: product.vegetarianStatus,
-        veganStatus: product.veganStatus,
-        changedLangs: changedLangs);
+        veganStatus: product.veganStatus, changedLangs: changedLangs);
     if (backendResult.isErr) {
       return _convertBackendError(backendResult);
     }

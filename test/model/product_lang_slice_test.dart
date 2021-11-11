@@ -14,8 +14,6 @@ void main() {
     // A HUUGE product
     final initProduct = Product((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..langsPrioritized.addAll([LangCode.ru, LangCode.de])
@@ -27,13 +25,11 @@ void main() {
         LangCode.ru: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'voda'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
         LangCode.de: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'wasser'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
       })
@@ -53,8 +49,6 @@ void main() {
     // Make a Russian slice then change a couple of things
     var slice1 = initProduct.sliceFor(LangCode.ru);
     slice1 = slice1.rebuild((e) => e
-      ..vegetarianStatus = VegStatus.negative
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.community
       ..name = 'name2 ru'
@@ -63,7 +57,6 @@ void main() {
       ..ingredientsAnalyzed.replace([
         Ingredient((v) => v
           ..name = 'voda2'
-          ..vegetarianStatus = VegStatus.positive
           ..veganStatus = VegStatus.possible)
       ])
       ..imageFront = Uri.file('/tmp/file2.jpg')
@@ -73,8 +66,6 @@ void main() {
     // Make a German slice then change a couple of things
     var slice2 = initProduct.sliceFor(LangCode.de);
     slice2 = slice2.rebuild((e) => e
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name2 de'
@@ -82,7 +73,6 @@ void main() {
       ..ingredientsAnalyzed.replace([
         Ingredient((v) => v
           ..name = 'super wasser'
-          ..vegetarianStatus = VegStatus.positive
           ..veganStatus = VegStatus.possible)
       ])
       ..imageFront = Uri.file('/tmp/file3.jpg')
@@ -92,8 +82,6 @@ void main() {
     final slice3 = ProductLangSlice((e) => e
       ..barcode = '123'
       ..lang = LangCode.nl
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..brands.add('Super brand NL')
@@ -107,8 +95,6 @@ void main() {
     final expectedFinalProduct = Product((v) => v
       ..barcode = '123'
       // Veg statuses expected to be of the last slice
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       // Brands expected to be of the last slice
@@ -126,13 +112,11 @@ void main() {
         LangCode.ru: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'voda2'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
         LangCode.de: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'super wasser'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
       })

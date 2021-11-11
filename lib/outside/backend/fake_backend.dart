@@ -28,9 +28,6 @@ class FakeBackend implements Backend {
     ..backendId = DateTime.now().millisecondsSinceEpoch.toString()
     ..backendClientToken = 'token'
     ..name = 'Testing User for Fake Backend'
-    ..eatsMilk = false
-    ..eatsEggs = false
-    ..eatsHoney = false
     ..userGroup = 2);
   final _fakeShops = <OsmUID, BackendProductsAtShop>{};
 
@@ -56,9 +53,7 @@ class FakeBackend implements Backend {
 
   @override
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
-      {VegStatus? vegetarianStatus,
-      VegStatus? veganStatus,
-      List<LangCode>? changedLangs}) async {
+      {VegStatus? veganStatus, List<LangCode>? changedLangs}) async {
     await _delay();
     return Ok(None());
   }
@@ -127,9 +122,7 @@ class FakeBackend implements Backend {
     return BackendProduct((e) => e
       ..barcode = barcode
       ..veganStatus = VegStatus.unknown.name
-      ..veganStatusSource = VegStatusSource.community.name
-      ..vegetarianStatus = VegStatus.unknown.name
-      ..vegetarianStatusSource = VegStatusSource.unknown.name);
+      ..veganStatusSource = VegStatusSource.community.name);
   }
 
   @override

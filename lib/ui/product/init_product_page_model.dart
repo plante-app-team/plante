@@ -15,7 +15,6 @@ import 'package:plante/model/product_lang_slice_restorable.dart';
 import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shops_list_restorable.dart';
-import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
@@ -62,35 +61,6 @@ class InitProductPageModel {
   InitProductPageOcrState get ocrState => _ocrState;
   ProductLangSlice get productSlice => _productSliceRestorable.value;
   set productSlice(ProductLangSlice value) {
-    // vegan-only https://trello.com/c/eUGrj1eH/
-    if (value.vegetarianStatus == null ||
-        value.vegetarianStatusSource == null) {
-      value = value.rebuild((e) => e
-        ..vegetarianStatus = VegStatus.unknown
-        ..vegetarianStatusSource = VegStatusSource.community);
-    }
-    // vegan-only https://trello.com/c/eUGrj1eH/
-    // if (value.veganStatus != productSlice.veganStatus) {
-    //   // Vegan status changed
-    //   if (value.veganStatus == VegStatus.positive) {
-    //     value = value.rebuild((v) => v.vegetarianStatus = VegStatus.positive);
-    //   }
-    // }
-    // if (value.vegetarianStatus != productSlice.vegetarianStatus) {
-    //   // Vegetarian status changed
-    //   if (value.vegetarianStatus == VegStatus.negative) {
-    //     value = value.rebuild((v) => v.veganStatus = VegStatus.negative);
-    //   }
-    //   if (value.vegetarianStatus == VegStatus.possible &&
-    //       value.veganStatus == VegStatus.positive) {
-    //     value = value.rebuild((v) => v.veganStatus = VegStatus.possible);
-    //   }
-    //   if (value.vegetarianStatus == VegStatus.unknown &&
-    //       [VegStatus.positive, VegStatus.possible]
-    //           .contains(value.veganStatus)) {
-    //     value = value.rebuild((v) => v.veganStatus = VegStatus.unknown);
-    //   }
-    // }
     _productSliceRestorable.value = value;
     _onProductUpdate.call();
   }
@@ -111,10 +81,6 @@ class InitProductPageModel {
     productSlice = _initialProductFull.sliceFor(lang).rebuild((e) {
       if (productSlice.veganStatus != _initialProductSlice.veganStatus) {
         e.veganStatus = productSlice.veganStatus;
-      }
-      if (productSlice.vegetarianStatus !=
-          _initialProductSlice.vegetarianStatus) {
-        e.vegetarianStatus = productSlice.vegetarianStatus;
       }
       if (productSlice.name != _initialProductSlice.name) {
         e.name = productSlice.name;
@@ -311,10 +277,6 @@ class InitProductPageModel {
             VegStatusSource.open_food_facts;
   }
 
-  bool askForVegetarianStatus() {
-    return false;
-  }
-
   bool canSaveProduct() {
     return ProductPageWrapper.isProductFilledEnoughForDisplay(
         productSlice.buildSingleLangProduct());
@@ -329,10 +291,6 @@ class InitProductPageModel {
       if (askForVeganStatus()) {
         savedProductSlice = savedProductSlice
             .rebuild((e) => e.veganStatusSource = VegStatusSource.community);
-      }
-      if (askForVegetarianStatus()) {
-        savedProductSlice = savedProductSlice.rebuild(
-            (e) => e.vegetarianStatusSource = VegStatusSource.community);
       }
       var savedProduct = _initialProductFull.updateWith(savedProductSlice);
 

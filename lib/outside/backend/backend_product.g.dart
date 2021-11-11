@@ -31,20 +31,6 @@ class _$BackendProductSerializer
         ..add('server_id')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
-    value = object.vegetarianStatus;
-    if (value != null) {
-      result
-        ..add('vegetarian_status')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.vegetarianStatusSource;
-    if (value != null) {
-      result
-        ..add('vegetarian_status_source')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
     value = object.veganStatus;
     if (value != null) {
       result
@@ -56,19 +42,6 @@ class _$BackendProductSerializer
     if (value != null) {
       result
         ..add('vegan_status_source')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.moderatorVegetarianChoiceReason;
-    if (value != null) {
-      result
-        ..add('moderator_vegetarian_choice_reason')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
-    }
-    value = object.moderatorVegetarianSourcesText;
-    if (value != null) {
-      result
-        ..add('moderator_vegetarian_sources_text')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
@@ -108,28 +81,12 @@ class _$BackendProductSerializer
           result.barcode = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'vegetarian_status':
-          result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
-          break;
-        case 'vegetarian_status_source':
-          result.vegetarianStatusSource = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
-          break;
         case 'vegan_status':
           result.veganStatus = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
         case 'vegan_status_source':
           result.veganStatusSource = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
-          break;
-        case 'moderator_vegetarian_choice_reason':
-          result.moderatorVegetarianChoiceReason = serializers
-              .deserialize(value, specifiedType: const FullType(int)) as int?;
-          break;
-        case 'moderator_vegetarian_sources_text':
-          result.moderatorVegetarianSourcesText = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
         case 'moderator_vegan_choice_reason':
@@ -153,17 +110,9 @@ class _$BackendProduct extends BackendProduct {
   @override
   final String barcode;
   @override
-  final String? vegetarianStatus;
-  @override
-  final String? vegetarianStatusSource;
-  @override
   final String? veganStatus;
   @override
   final String? veganStatusSource;
-  @override
-  final int? moderatorVegetarianChoiceReason;
-  @override
-  final String? moderatorVegetarianSourcesText;
   @override
   final int? moderatorVeganChoiceReason;
   @override
@@ -175,12 +124,8 @@ class _$BackendProduct extends BackendProduct {
   _$BackendProduct._(
       {this.serverId,
       required this.barcode,
-      this.vegetarianStatus,
-      this.vegetarianStatusSource,
       this.veganStatus,
       this.veganStatusSource,
-      this.moderatorVegetarianChoiceReason,
-      this.moderatorVegetarianSourcesText,
       this.moderatorVeganChoiceReason,
       this.moderatorVeganSourcesText})
       : super._() {
@@ -201,14 +146,8 @@ class _$BackendProduct extends BackendProduct {
     return other is BackendProduct &&
         serverId == other.serverId &&
         barcode == other.barcode &&
-        vegetarianStatus == other.vegetarianStatus &&
-        vegetarianStatusSource == other.vegetarianStatusSource &&
         veganStatus == other.veganStatus &&
         veganStatusSource == other.veganStatusSource &&
-        moderatorVegetarianChoiceReason ==
-            other.moderatorVegetarianChoiceReason &&
-        moderatorVegetarianSourcesText ==
-            other.moderatorVegetarianSourcesText &&
         moderatorVeganChoiceReason == other.moderatorVeganChoiceReason &&
         moderatorVeganSourcesText == other.moderatorVeganSourcesText;
   }
@@ -218,19 +157,9 @@ class _$BackendProduct extends BackendProduct {
     return $jf($jc(
         $jc(
             $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc(
-                                    $jc($jc(0, serverId.hashCode),
-                                        barcode.hashCode),
-                                    vegetarianStatus.hashCode),
-                                vegetarianStatusSource.hashCode),
-                            veganStatus.hashCode),
-                        veganStatusSource.hashCode),
-                    moderatorVegetarianChoiceReason.hashCode),
-                moderatorVegetarianSourcesText.hashCode),
+                $jc($jc($jc(0, serverId.hashCode), barcode.hashCode),
+                    veganStatus.hashCode),
+                veganStatusSource.hashCode),
             moderatorVeganChoiceReason.hashCode),
         moderatorVeganSourcesText.hashCode));
   }
@@ -240,14 +169,8 @@ class _$BackendProduct extends BackendProduct {
     return (newBuiltValueToStringHelper('BackendProduct')
           ..add('serverId', serverId)
           ..add('barcode', barcode)
-          ..add('vegetarianStatus', vegetarianStatus)
-          ..add('vegetarianStatusSource', vegetarianStatusSource)
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
-          ..add('moderatorVegetarianChoiceReason',
-              moderatorVegetarianChoiceReason)
-          ..add(
-              'moderatorVegetarianSourcesText', moderatorVegetarianSourcesText)
           ..add('moderatorVeganChoiceReason', moderatorVeganChoiceReason)
           ..add('moderatorVeganSourcesText', moderatorVeganSourcesText))
         .toString();
@@ -266,16 +189,6 @@ class BackendProductBuilder
   String? get barcode => _$this._barcode;
   set barcode(String? barcode) => _$this._barcode = barcode;
 
-  String? _vegetarianStatus;
-  String? get vegetarianStatus => _$this._vegetarianStatus;
-  set vegetarianStatus(String? vegetarianStatus) =>
-      _$this._vegetarianStatus = vegetarianStatus;
-
-  String? _vegetarianStatusSource;
-  String? get vegetarianStatusSource => _$this._vegetarianStatusSource;
-  set vegetarianStatusSource(String? vegetarianStatusSource) =>
-      _$this._vegetarianStatusSource = vegetarianStatusSource;
-
   String? _veganStatus;
   String? get veganStatus => _$this._veganStatus;
   set veganStatus(String? veganStatus) => _$this._veganStatus = veganStatus;
@@ -284,18 +197,6 @@ class BackendProductBuilder
   String? get veganStatusSource => _$this._veganStatusSource;
   set veganStatusSource(String? veganStatusSource) =>
       _$this._veganStatusSource = veganStatusSource;
-
-  int? _moderatorVegetarianChoiceReason;
-  int? get moderatorVegetarianChoiceReason =>
-      _$this._moderatorVegetarianChoiceReason;
-  set moderatorVegetarianChoiceReason(int? moderatorVegetarianChoiceReason) =>
-      _$this._moderatorVegetarianChoiceReason = moderatorVegetarianChoiceReason;
-
-  String? _moderatorVegetarianSourcesText;
-  String? get moderatorVegetarianSourcesText =>
-      _$this._moderatorVegetarianSourcesText;
-  set moderatorVegetarianSourcesText(String? moderatorVegetarianSourcesText) =>
-      _$this._moderatorVegetarianSourcesText = moderatorVegetarianSourcesText;
 
   int? _moderatorVeganChoiceReason;
   int? get moderatorVeganChoiceReason => _$this._moderatorVeganChoiceReason;
@@ -314,12 +215,8 @@ class BackendProductBuilder
     if ($v != null) {
       _serverId = $v.serverId;
       _barcode = $v.barcode;
-      _vegetarianStatus = $v.vegetarianStatus;
-      _vegetarianStatusSource = $v.vegetarianStatusSource;
       _veganStatus = $v.veganStatus;
       _veganStatusSource = $v.veganStatusSource;
-      _moderatorVegetarianChoiceReason = $v.moderatorVegetarianChoiceReason;
-      _moderatorVegetarianSourcesText = $v.moderatorVegetarianSourcesText;
       _moderatorVeganChoiceReason = $v.moderatorVeganChoiceReason;
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
       _$v = null;
@@ -345,12 +242,8 @@ class BackendProductBuilder
             serverId: serverId,
             barcode: BuiltValueNullFieldError.checkNotNull(
                 barcode, 'BackendProduct', 'barcode'),
-            vegetarianStatus: vegetarianStatus,
-            vegetarianStatusSource: vegetarianStatusSource,
             veganStatus: veganStatus,
             veganStatusSource: veganStatusSource,
-            moderatorVegetarianChoiceReason: moderatorVegetarianChoiceReason,
-            moderatorVegetarianSourcesText: moderatorVegetarianSourcesText,
             moderatorVeganChoiceReason: moderatorVeganChoiceReason,
             moderatorVeganSourcesText: moderatorVeganSourcesText);
     replace(_$result);

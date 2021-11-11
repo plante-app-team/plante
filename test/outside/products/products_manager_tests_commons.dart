@@ -75,7 +75,6 @@ class ProductsManagerTestCommons {
         .thenAnswer((_) async => const off.OcrIngredientsResult());
 
     when(backend.createUpdateProduct(any,
-            vegetarianStatus: anyNamed('vegetarianStatus'),
             veganStatus: anyNamed('veganStatus'),
             changedLangs: anyNamed('changedLangs')))
         .thenAnswer((_) async => Ok(None()));

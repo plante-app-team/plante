@@ -22,17 +22,9 @@ class ProductsConverterAndCacher {
     var result = Product((v) => v
       ..langsPrioritized.addAll(langsPrioritized)
       ..barcode = offProduct.barcode
-      ..vegetarianStatus =
-          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? '')
-      ..vegetarianStatusSource = VegStatusSource.safeValueOf(
-          backendProduct?.vegetarianStatusSource ?? '')
       ..veganStatus = VegStatus.safeValueOf(backendProduct?.veganStatus ?? '')
       ..veganStatusSource =
           VegStatusSource.safeValueOf(backendProduct?.veganStatusSource ?? '')
-      ..moderatorVegetarianChoiceReasonId =
-          backendProduct?.moderatorVegetarianChoiceReason
-      ..moderatorVegetarianSourcesText =
-          backendProduct?.moderatorVegetarianSourcesText
       ..moderatorVeganChoiceReasonId =
           backendProduct?.moderatorVeganChoiceReason
       ..moderatorVeganSourcesText = backendProduct?.moderatorVeganSourcesText
@@ -49,18 +41,6 @@ class ProductsConverterAndCacher {
           offProduct, off.ImageField.INGREDIENTS, off.ImageSize.DISPLAY)
       ..ingredientsAnalyzedLangs = _extractIngredientsAnalyzed(offProduct));
 
-    if (backendProduct?.vegetarianStatus != null) {
-      final vegetarianStatus =
-          VegStatus.safeValueOf(backendProduct?.vegetarianStatus ?? '');
-      var vegetarianStatusSource = VegStatusSource.safeValueOf(
-          backendProduct?.vegetarianStatusSource ?? '');
-      if (vegetarianStatusSource == null && vegetarianStatus != null) {
-        vegetarianStatusSource = VegStatusSource.community;
-      }
-      result = result.rebuild((v) => v
-        ..vegetarianStatus = vegetarianStatus
-        ..vegetarianStatusSource = vegetarianStatusSource);
-    }
     if (backendProduct?.veganStatus != null) {
       final veganStatus =
           VegStatus.safeValueOf(backendProduct?.veganStatus ?? '');
@@ -75,13 +55,6 @@ class ProductsConverterAndCacher {
     }
 
     // NOTE: server veg-status parsing could fail (and server could have no veg-status).
-    if (result.vegetarianStatus == null) {
-      if (result.vegetarianStatusAnalysis != null) {
-        result = result.rebuild((v) => v
-          ..vegetarianStatus = result.vegetarianStatusAnalysis
-          ..vegetarianStatusSource = VegStatusSource.open_food_facts);
-      }
-    }
     if (result.veganStatus == null) {
       if (result.veganStatusAnalysis != null) {
         result = result.rebuild((v) => v
@@ -193,7 +166,6 @@ class ProductsConverterAndCacher {
             '???';
         result[lang]!.add(Ingredient((e) => e
           ..name = nameTranslation
-          ..vegetarianStatus = offIngredient.vegetarian.convert()
           ..veganStatus = offIngredient.vegan.convert()));
       }
     }

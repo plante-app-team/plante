@@ -1,6 +1,5 @@
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,11 +24,6 @@ void main() {
 
     final params = UserParams((v) => v
       ..name = 'Bob'
-      ..genderStr = Gender.MALE.name
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false
       ..userGroup = 321
       ..langsPrioritized.addAll(['en', 'ru']));
     await controller.setUserParams(params);
@@ -53,26 +47,6 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.birthdayStr = '20.07.1993');
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
-    params = params.rebuild((v) => v.eatsMilk = false);
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
-    params = params.rebuild((v) => v.eatsEggs = false);
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
-    params = params.rebuild((v) => v.eatsHoney = false);
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
-    params = params.rebuild((v) => v.genderStr = Gender.FEMALE.name);
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
     params = params.rebuild((v) => v.backendId = '123');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
@@ -91,11 +65,6 @@ void main() {
 
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false
       ..backendId = '123'
       ..backendClientToken = '321'
       ..userGroup = 123
@@ -108,13 +77,7 @@ void main() {
     final observer = MockUserParamsControllerObserver();
     controller.addObserver(observer);
 
-    final params = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.MALE.name
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
+    final params = UserParams((v) => v.name = 'Bob');
 
     verifyNever(observer.onUserParamsUpdate(any));
     await controller.setUserParams(params);
@@ -164,42 +127,9 @@ void main() {
 
     expect(controller.cachedUserParams, isNull);
 
-    final params = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.MALE.name
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
+    final params = UserParams((v) => v.name = 'Bob');
     await controller.setUserParams(params);
 
     expect(controller.cachedUserParams, equals(params));
-  });
-
-  // https://trello.com/c/eUGrj1eH/
-  test('Vegan-only', () async {
-    final controller = UserParamsController();
-    final initialParams = await controller.getUserParams();
-    expect(initialParams, equals(null));
-
-    final params = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.MALE.name
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = true
-      ..eatsEggs = true
-      ..eatsHoney = true
-      ..userGroup = 321
-      ..langsPrioritized.addAll(['en', 'ru']));
-    await controller.setUserParams(params);
-
-    // We expect the user to be consider vegan even if it's not stored so
-    final expectedParams = params.rebuild((e) => e
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
-
-    final finalParams = await controller.getUserParams();
-    expect(finalParams, equals(expectedParams));
   });
 }

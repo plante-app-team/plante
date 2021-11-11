@@ -20,13 +20,9 @@ abstract class Product implements Built<Product, ProductBuilder> {
   static final Product empty = Product((e) => e.barcode = '');
 
   String get barcode;
-  VegStatus? get vegetarianStatus;
-  VegStatusSource? get vegetarianStatusSource;
   VegStatus? get veganStatus;
   VegStatusSource? get veganStatusSource;
 
-  int? get moderatorVegetarianChoiceReasonId;
-  String? get moderatorVegetarianSourcesText;
   int? get moderatorVeganChoiceReasonId;
   String? get moderatorVeganSourcesText;
 
@@ -100,11 +96,6 @@ extension ProductLangsMechanicsExtension on Product {
 }
 
 extension ProductModeratorChoiceExtension on Product {
-  ModeratorChoiceReason? get moderatorVegetarianChoiceReason {
-    return moderatorChoiceReasonFromPersistentId(
-        moderatorVegetarianChoiceReasonId ?? -1);
-  }
-
   ModeratorChoiceReason? get moderatorVeganChoiceReason {
     return moderatorChoiceReasonFromPersistentId(
         moderatorVeganChoiceReasonId ?? -1);
@@ -112,31 +103,6 @@ extension ProductModeratorChoiceExtension on Product {
 }
 
 extension ProductVegAnalysisExtensions on Product {
-  VegStatus? get vegetarianStatusAnalysis {
-    final ingredientsAnalyzed = this.ingredientsAnalyzed;
-    if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {
-      return null;
-    }
-    if (ingredientsAnalyzed
-        .where((v) => v.vegetarianStatus == VegStatus.negative)
-        .isNotEmpty) {
-      return VegStatus.negative;
-    }
-    if (ingredientsAnalyzed
-        .where((v) => v.vegetarianStatus == VegStatus.unknown)
-        .isNotEmpty) {
-      return VegStatus.unknown;
-    }
-    if (ingredientsAnalyzed
-        .where((v) => v.vegetarianStatus == VegStatus.possible)
-        .isNotEmpty) {
-      return VegStatus.possible;
-    }
-    // NOTE: a veg status of an ingredient can also be null, that means that
-    // the status of the ingredient shoud be ignored
-    return VegStatus.positive;
-  }
-
   VegStatus? get veganStatusAnalysis {
     final ingredientsAnalyzed = this.ingredientsAnalyzed;
     if (ingredientsAnalyzed == null || ingredientsAnalyzed.isEmpty) {

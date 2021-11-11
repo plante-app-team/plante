@@ -22,13 +22,6 @@ class _$IngredientSerializer implements StructuredSerializer<Ingredient> {
       serializers.serialize(object.name, specifiedType: const FullType(String)),
     ];
     Object? value;
-    value = object.vegetarianStatus;
-    if (value != null) {
-      result
-        ..add('vegetarianStatus')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(VegStatus)));
-    }
     value = object.veganStatus;
     if (value != null) {
       result
@@ -54,10 +47,6 @@ class _$IngredientSerializer implements StructuredSerializer<Ingredient> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'vegetarianStatus':
-          result.vegetarianStatus = serializers.deserialize(value,
-              specifiedType: const FullType(VegStatus)) as VegStatus?;
-          break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
               specifiedType: const FullType(VegStatus)) as VegStatus?;
@@ -73,15 +62,12 @@ class _$Ingredient extends Ingredient {
   @override
   final String name;
   @override
-  final VegStatus? vegetarianStatus;
-  @override
   final VegStatus? veganStatus;
 
   factory _$Ingredient([void Function(IngredientBuilder)? updates]) =>
       (new IngredientBuilder()..update(updates)).build();
 
-  _$Ingredient._({required this.name, this.vegetarianStatus, this.veganStatus})
-      : super._() {
+  _$Ingredient._({required this.name, this.veganStatus}) : super._() {
     BuiltValueNullFieldError.checkNotNull(name, 'Ingredient', 'name');
   }
 
@@ -97,21 +83,18 @@ class _$Ingredient extends Ingredient {
     if (identical(other, this)) return true;
     return other is Ingredient &&
         name == other.name &&
-        vegetarianStatus == other.vegetarianStatus &&
         veganStatus == other.veganStatus;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, name.hashCode), vegetarianStatus.hashCode),
-        veganStatus.hashCode));
+    return $jf($jc($jc(0, name.hashCode), veganStatus.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('Ingredient')
           ..add('name', name)
-          ..add('vegetarianStatus', vegetarianStatus)
           ..add('veganStatus', veganStatus))
         .toString();
   }
@@ -124,11 +107,6 @@ class IngredientBuilder implements Builder<Ingredient, IngredientBuilder> {
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  VegStatus? _vegetarianStatus;
-  VegStatus? get vegetarianStatus => _$this._vegetarianStatus;
-  set vegetarianStatus(VegStatus? vegetarianStatus) =>
-      _$this._vegetarianStatus = vegetarianStatus;
-
   VegStatus? _veganStatus;
   VegStatus? get veganStatus => _$this._veganStatus;
   set veganStatus(VegStatus? veganStatus) => _$this._veganStatus = veganStatus;
@@ -139,7 +117,6 @@ class IngredientBuilder implements Builder<Ingredient, IngredientBuilder> {
     final $v = _$v;
     if ($v != null) {
       _name = $v.name;
-      _vegetarianStatus = $v.vegetarianStatus;
       _veganStatus = $v.veganStatus;
       _$v = null;
     }
@@ -163,7 +140,6 @@ class IngredientBuilder implements Builder<Ingredient, IngredientBuilder> {
         new _$Ingredient._(
             name: BuiltValueNullFieldError.checkNotNull(
                 name, 'Ingredient', 'name'),
-            vegetarianStatus: vegetarianStatus,
             veganStatus: veganStatus);
     replace(_$result);
     return _$result;

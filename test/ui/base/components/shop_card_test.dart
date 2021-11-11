@@ -10,7 +10,6 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
-import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
@@ -85,12 +84,7 @@ void main() {
         .thenAnswer((_) async => Ok(OsmShortAddress.empty));
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
-    final params = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.MALE.name
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
+    final params = UserParams((v) => v.name = 'Bob');
     await userParamsController.setUserParams(params);
 
     GetIt.I.registerSingleton<ProductsObtainer>(MockProductsObtainer());

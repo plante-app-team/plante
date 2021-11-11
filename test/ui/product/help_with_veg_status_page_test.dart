@@ -37,8 +37,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts).productForTests();
 
@@ -64,15 +62,12 @@ void main() {
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
-    // Vegan-only https://trello.com/c/eUGrj1eH/
     expect(done, isTrue);
     expect(
         savedProduct,
         equals(product.rebuild((e) => e
           ..veganStatus = VegStatus.positive
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatus = VegStatus.unknown
-          ..vegetarianStatusSource = VegStatusSource.community)));
+          ..veganStatusSource = VegStatusSource.community)));
     expect(analytics.wasEventSent('help_with_veg_status_success'), isTrue);
   });
 
@@ -83,8 +78,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts).productForTests();
 
@@ -118,8 +111,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..barcode = '123'
       ..name = 'My product'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts).productForTests();
 
@@ -151,14 +142,11 @@ void main() {
     await tester.tap(find.text(context.strings.global_done));
     await tester.pumpAndSettle();
 
-    // Vegan-only https://trello.com/c/eUGrj1eH/
     expect(done, isTrue);
     expect(
         savedProduct,
         equals(product.rebuild((e) => e
           ..veganStatus = VegStatus.negative
-          ..veganStatusSource = VegStatusSource.community
-          ..vegetarianStatus = VegStatus.unknown
-          ..vegetarianStatusSource = VegStatusSource.community)));
+          ..veganStatusSource = VegStatusSource.community)));
   });
 }

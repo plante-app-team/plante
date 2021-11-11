@@ -12,7 +12,6 @@ import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
-import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
@@ -76,8 +75,6 @@ void main() {
       ..barcode = '123'
       ..name = 'Apple'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..vegetarianStatus = VegStatus.possible
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -86,8 +83,6 @@ void main() {
       ..barcode = '124'
       ..name = 'Pineapple'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
@@ -140,12 +135,7 @@ void main() {
 
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
-    final params = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
+    final params = UserParams((v) => v.name = 'Bob');
     await userParamsController.setUserParams(params);
 
     when(shopsManager.fetchShopProductRange(any))
@@ -441,8 +431,6 @@ void main() {
         ..barcode = '123'
         ..name = 'Milk apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.possible
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.negative
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -450,8 +438,6 @@ void main() {
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -469,12 +455,7 @@ void main() {
     when(shopsManager.fetchShopProductRange(any))
         .thenAnswer((_) async => Ok(range));
 
-    final veganUser = UserParams((v) => v
-      ..name = 'Bob'
-      ..genderStr = Gender.FEMALE.name
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = false);
+    final veganUser = UserParams((v) => v.name = 'Bob');
     await userParamsController.setUserParams(veganUser);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
@@ -492,8 +473,6 @@ void main() {
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -501,8 +480,6 @@ void main() {
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -536,8 +513,6 @@ void main() {
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -545,8 +520,6 @@ void main() {
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -580,8 +553,6 @@ void main() {
         ..barcode = '123'
         ..name = 'Apple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -589,8 +560,6 @@ void main() {
         ..barcode = '124'
         ..name = 'Pineapple'
         ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-        ..vegetarianStatus = VegStatus.positive
-        ..vegetarianStatusSource = VegStatusSource.open_food_facts
         ..veganStatus = VegStatus.positive
         ..veganStatusSource = VegStatusSource.open_food_facts
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
@@ -649,8 +618,6 @@ void main() {
       ..barcode = '223'
       ..name = 'Some unrelated product'
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..ingredientsText = 'Water, salt, sugar').productForTests());

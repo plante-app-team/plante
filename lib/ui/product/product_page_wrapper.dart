@@ -90,7 +90,6 @@ class ProductPageWrapper {
   static bool isProductFilledEnoughForDisplay(Product product) =>
       product.name != null &&
       product.name!.trim().isNotEmpty &&
-      product.vegetarianStatus != null &&
       product.veganStatus != null &&
       product.imageFront != null &&
       product.imageIngredients != null;

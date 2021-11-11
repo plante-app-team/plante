@@ -48,8 +48,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -80,7 +78,6 @@ void main() {
 
     // Backend Product
     verify(backend.createUpdateProduct('123',
-            vegetarianStatus: VegStatus.positive,
             veganStatus: VegStatus.negative,
             changedLangs: anyNamed('changedLangs')))
         .called(1);
@@ -105,8 +102,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -135,7 +130,6 @@ void main() {
 
     // Backend Product
     verify(backend.createUpdateProduct('123',
-            vegetarianStatus: VegStatus.positive,
             veganStatus: VegStatus.negative,
             changedLangs: anyNamed('changedLangs')))
         .called(1);
@@ -147,8 +141,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -178,7 +170,6 @@ void main() {
 
     // Backend Product
     verify(backend.createUpdateProduct('123',
-            vegetarianStatus: VegStatus.positive,
             veganStatus: VegStatus.negative,
             changedLangs: anyNamed('changedLangs')))
         .called(1);
@@ -199,8 +190,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -230,7 +219,6 @@ void main() {
 
     // Backend Product
     verify(backend.createUpdateProduct('123',
-            vegetarianStatus: VegStatus.positive,
             veganStatus: VegStatus.negative,
             changedLangs: anyNamed('changedLangs')))
         .called(1);
@@ -251,8 +239,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -273,8 +259,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -295,8 +279,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -307,7 +289,6 @@ void main() {
     ensureProductIsInOFF(product);
 
     when(backend.createUpdateProduct(any,
-            vegetarianStatus: anyNamed('vegetarianStatus'),
             veganStatus: anyNamed('veganStatus'),
             changedLangs: anyNamed('changedLangs')))
         .thenAnswer((_) async =>
@@ -321,8 +302,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -355,7 +334,6 @@ void main() {
 
     // Backend Product
     verify(backend.createUpdateProduct('123',
-            vegetarianStatus: VegStatus.positive,
             veganStatus: VegStatus.negative,
             changedLangs: anyNamed('changedLangs')))
         .called(1);
@@ -378,8 +356,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -396,8 +372,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -490,8 +464,6 @@ void main() {
     final product = ProductLangSlice((v) => v
       ..lang = LangCode.ru
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
       ..name = 'name'
@@ -546,7 +518,6 @@ void main() {
     expect(imageUploadsAttempts, equals([off.ImageField.INGREDIENTS]));
     // Expect the product WAS sent to backend because now all images are uploaded.
     verify(backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative,
         changedLangs: anyNamed('changedLangs')));
   });

@@ -21,13 +21,9 @@ abstract class ProductLangSlice
 
   LangCode? get lang;
   String get barcode;
-  VegStatus? get vegetarianStatus;
-  VegStatusSource? get vegetarianStatusSource;
   VegStatus? get veganStatus;
   VegStatusSource? get veganStatusSource;
 
-  int? get moderatorVegetarianChoiceReasonId;
-  String? get moderatorVegetarianSourcesText;
   int? get moderatorVeganChoiceReasonId;
   String? get moderatorVeganSourcesText;
 
@@ -58,13 +54,8 @@ abstract class ProductLangSlice
     return ProductLangSlice((e) => e
       ..lang = lang
       ..barcode = product.barcode
-      ..vegetarianStatus = product.vegetarianStatus
       ..veganStatus = product.veganStatus
-      ..vegetarianStatusSource = product.vegetarianStatusSource
       ..veganStatusSource = product.veganStatusSource
-      ..moderatorVegetarianChoiceReasonId =
-          product.moderatorVegetarianChoiceReasonId
-      ..moderatorVegetarianSourcesText = product.moderatorVegetarianSourcesText
       ..moderatorVeganChoiceReasonId = product.moderatorVeganChoiceReasonId
       ..moderatorVeganSourcesText = product.moderatorVeganSourcesText
       ..brands = product.brands?.toBuilder()
@@ -85,12 +76,8 @@ abstract class ProductLangSlice
     return Product((e) => e
       ..langsPrioritized.add(lang)
       ..barcode = barcode
-      ..vegetarianStatus = vegetarianStatus
       ..veganStatus = veganStatus
-      ..vegetarianStatusSource = vegetarianStatusSource
       ..veganStatusSource = veganStatusSource
-      ..moderatorVegetarianChoiceReasonId = moderatorVegetarianChoiceReasonId
-      ..moderatorVegetarianSourcesText = moderatorVegetarianSourcesText
       ..moderatorVeganChoiceReasonId = moderatorVeganChoiceReasonId
       ..moderatorVeganSourcesText = moderatorVeganSourcesText
       ..brands = brands != null ? ListBuilder(brands!) : null
@@ -149,13 +136,8 @@ extension ProductExtensionForSlice on Product {
       result = result.rebuild((e) => e.langsPrioritized.add(lang));
     }
     return result.rebuild((e) => e
-      ..vegetarianStatus = slice.vegetarianStatus
       ..veganStatus = slice.veganStatus
-      ..vegetarianStatusSource = slice.vegetarianStatusSource
       ..veganStatusSource = slice.veganStatusSource
-      ..moderatorVegetarianChoiceReasonId =
-          slice.moderatorVegetarianChoiceReasonId
-      ..moderatorVegetarianSourcesText = slice.moderatorVegetarianSourcesText
       ..moderatorVeganChoiceReasonId = slice.moderatorVeganChoiceReasonId
       ..moderatorVeganSourcesText = slice.moderatorVeganSourcesText
       ..brands = slice.brands != null ? ListBuilder(slice.brands!) : null

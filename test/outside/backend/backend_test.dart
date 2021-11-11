@@ -175,11 +175,6 @@ void main() {
 
     final updatedParams = initialParams.rebuild((v) => v
       ..name = 'Jack'
-      ..genderStr = 'male'
-      ..birthdayStr = '20.07.1993'
-      ..eatsMilk = false
-      ..eatsEggs = false
-      ..eatsHoney = true
       ..langsPrioritized.replace(['en', 'nl']));
     final result = await backend.updateUserParams(updatedParams);
     expect(result.isOk, isTrue);
@@ -189,11 +184,6 @@ void main() {
     final request = requests[0];
 
     expect(request.url.queryParameters['name'], equals('Jack'));
-    expect(request.url.queryParameters['gender'], equals('male'));
-    expect(request.url.queryParameters['birthday'], equals('20.07.1993'));
-    expect(request.url.queryParameters['eatsMilk'], equals('false'));
-    expect(request.url.queryParameters['eatsEggs'], equals('false'));
-    expect(request.url.queryParameters['eatsHoney'], equals('true'));
     expect(
         request.url
             .toString()
@@ -250,10 +240,7 @@ void main() {
     httpClient.setResponseException(
         '.*update_user_data.*', const HttpException(''));
 
-    final updatedParams = initialParams.rebuild((v) => v
-      ..name = 'Jack'
-      ..genderStr = 'male'
-      ..birthdayStr = '20.07.1993');
+    final updatedParams = initialParams.rebuild((v) => v.name = 'Jack');
     final result = await backend.updateUserParams(updatedParams);
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
@@ -268,8 +255,6 @@ void main() {
        "products": [
          {
            "barcode": "123",
-           "vegetarian_status": "${VegStatus.positive.name}",
-           "vegetarian_status_source": "${VegStatusSource.community.name}",
            "vegan_status": "${VegStatus.negative.name}",
            "vegan_status_source": "${VegStatusSource.moderator.name}"
          }
@@ -281,8 +266,6 @@ void main() {
     final product = result.unwrap().products.first;
     final expectedProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive.name
-      ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
     expect(product, equals(expectedProduct));
@@ -304,8 +287,6 @@ void main() {
            "products": [
              {
                "barcode": "123",
-               "vegetarian_status": "${VegStatus.positive.name}",
-               "vegetarian_status_source": "${VegStatusSource.community.name}",
                "vegan_status": "${VegStatus.negative.name}",
                "vegan_status_source": "${VegStatusSource.moderator.name}"
              }
@@ -318,8 +299,6 @@ void main() {
            "products": [
              {
                "barcode": "124",
-               "vegetarian_status": "${VegStatus.positive.name}",
-               "vegetarian_status_source": "${VegStatusSource.community.name}",
                "vegan_status": "${VegStatus.negative.name}",
                "vegan_status_source": "${VegStatusSource.moderator.name}"
              }
@@ -341,8 +320,6 @@ void main() {
         equals([
           BackendProduct((v) => v
             ..barcode = '123'
-            ..vegetarianStatus = VegStatus.positive.name
-            ..vegetarianStatusSource = VegStatusSource.community.name
             ..veganStatus = VegStatus.negative.name
             ..veganStatusSource = VegStatusSource.moderator.name)
         ]));
@@ -355,8 +332,6 @@ void main() {
         equals([
           BackendProduct((v) => v
             ..barcode = '124'
-            ..vegetarianStatus = VegStatus.positive.name
-            ..vegetarianStatusSource = VegStatusSource.community.name
             ..veganStatus = VegStatus.negative.name
             ..veganStatusSource = VegStatusSource.moderator.name)
         ]));
@@ -443,7 +418,6 @@ void main() {
         .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.negative,
         changedLangs: [LangCode.en, LangCode.ru]);
     expect(result.isOk, isTrue);
@@ -452,53 +426,9 @@ void main() {
         httpClient.getRequestsMatching('.*create_update_product.*');
     expect(requests.length, equals(1));
     final request = requests[0];
-    expect(request.url.queryParameters['vegetarianStatus'],
-        equals(VegStatus.positive.name));
     expect(request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
     expect(request.url.toString().contains('langs=en&langs=ru'), isTrue);
-    expect(request.headers['Authorization'], equals('Bearer aaa'));
-  });
-
-  test('create update product vegetarian status only', () async {
-    final httpClient = FakeHttpClient();
-    final backend =
-        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient
-        .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
-
-    final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive);
-    expect(result.isOk, isTrue);
-
-    final requests =
-        httpClient.getRequestsMatching('.*create_update_product.*');
-    expect(requests.length, equals(1));
-    final request = requests[0];
-    expect(request.url.queryParameters['vegetarianStatus'],
-        equals(VegStatus.positive.name));
-    expect(request.url.queryParameters['veganStatus'], isNull);
-    expect(request.headers['Authorization'], equals('Bearer aaa'));
-  });
-
-  test('create update product vegan status only', () async {
-    final httpClient = FakeHttpClient();
-    final backend =
-        Backend(analytics, await _initUserParams(), httpClient, fakeSettings);
-    httpClient
-        .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
-
-    final result = await backend.createUpdateProduct('123',
-        veganStatus: VegStatus.negative);
-    expect(result.isOk, isTrue);
-
-    final requests =
-        httpClient.getRequestsMatching('.*create_update_product.*');
-    expect(requests.length, equals(1));
-    final request = requests[0];
-    expect(request.url.queryParameters['vegetarianStatus'], isNull);
-    expect(request.url.queryParameters['veganStatus'],
-        equals(VegStatus.negative.name));
     expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
 
@@ -510,17 +440,13 @@ void main() {
         .setResponse('.*create_update_product.*', ''' { "result": "ok" } ''');
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive,
-        veganStatus: VegStatus.negative,
-        changedLangs: []);
+        veganStatus: VegStatus.negative, changedLangs: []);
     expect(result.isOk, isTrue);
 
     final requests =
         httpClient.getRequestsMatching('.*create_update_product.*');
     expect(requests.length, equals(1));
     final request = requests[0];
-    expect(request.url.queryParameters['vegetarianStatus'],
-        equals(VegStatus.positive.name));
     expect(request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
     expect(request.url.toString().contains('langs'), isFalse);
@@ -534,7 +460,7 @@ void main() {
     httpClient.setResponse('.*create_update_product.*', '', responseCode: 500);
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive, veganStatus: VegStatus.negative);
+        veganStatus: VegStatus.negative);
     expect(result.isErr, isTrue);
   });
 
@@ -545,7 +471,7 @@ void main() {
     httpClient.setResponse('.*create_update_product.*', '{{{{}');
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive, veganStatus: VegStatus.negative);
+        veganStatus: VegStatus.negative);
     expect(result.isErr, isTrue);
   });
 
@@ -557,7 +483,7 @@ void main() {
         '.*create_update_product.*', const SocketException(''));
 
     final result = await backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive, veganStatus: VegStatus.negative);
+        veganStatus: VegStatus.negative);
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 
@@ -659,9 +585,7 @@ void main() {
                 "products" : [ {
                   "server_id" : 23,
                   "barcode" : "4605932001284",
-                  "vegetarian_status" : "positive",
                   "vegan_status" : "positive",
-                  "vegetarian_status_source" : "community",
                   "vegan_status_source" : "community"
                 } ],
                 "products_last_seen_utc" : { }
@@ -671,16 +595,12 @@ void main() {
                 "products" : [ {
                   "server_id" : 16,
                   "barcode" : "4612742721165",
-                  "vegetarian_status" : "positive",
                   "vegan_status" : "positive",
-                  "vegetarian_status_source" : "community",
                   "vegan_status_source" : "community"
                 }, {
                   "server_id" : 17,
                   "barcode" : "9001414603703",
-                  "vegetarian_status" : "positive",
                   "vegan_status" : "positive",
-                  "vegetarian_status_source" : "community",
                   "vegan_status_source" : "community"
                 } ],
                 "products_last_seen_utc" : {
@@ -712,27 +632,21 @@ void main() {
     {
       "server_id" : 23,
       "barcode" : "4605932001284",
-      "vegetarian_status" : "positive",
       "vegan_status" : "positive",
-      "vegetarian_status_source" : "community",
       "vegan_status_source" : "community"
     }''') as Map<String, dynamic>);
     final expectedProduct2 = BackendProduct.fromJson(jsonDecode('''
     {
       "server_id" : 16,
       "barcode" : "4612742721165",
-      "vegetarian_status" : "positive",
       "vegan_status" : "positive",
-      "vegetarian_status_source" : "community",
       "vegan_status_source" : "community"
     }''') as Map<String, dynamic>);
     final expectedProduct3 = BackendProduct.fromJson(jsonDecode('''
     {
       "server_id" : 17,
       "barcode" : "9001414603703",
-      "vegetarian_status" : "positive",
       "vegan_status" : "positive",
-      "vegetarian_status_source" : "community",
       "vegan_status_source" : "community"
     }''') as Map<String, dynamic>);
 
@@ -775,9 +689,7 @@ void main() {
                 "products" : [ {
                   "server_id" : 23,
                   "barcode" : "4605932001284",
-                  "vegetarian_status" : "positive",
                   "vegan_status" : "positive",
-                  "vegetarian_status_source" : "community",
                   "vegan_status_source" : "community"
                 } ],
                 "products_last_seen_utc" : { }

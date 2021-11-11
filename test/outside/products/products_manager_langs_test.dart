@@ -159,8 +159,6 @@ void main() {
     final product = productRes.unwrap();
     final expectedProduct = Product((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..langsPrioritized.addAll(langsPrioritized)
@@ -172,13 +170,11 @@ void main() {
         LangCode.ru: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'voda'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
         LangCode.de: BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'wasser'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ]),
       })
@@ -209,8 +205,6 @@ void main() {
   test('save product with multiple languages', () async {
     final product = Product((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive
-      ..vegetarianStatusSource = VegStatusSource.open_food_facts
       ..veganStatus = VegStatus.possible
       ..veganStatusSource = VegStatusSource.open_food_facts
       ..langsPrioritized.addAll([LangCode.ru, LangCode.de])
@@ -233,7 +227,6 @@ void main() {
 
     // Verify changed lang
     verify(backend.createUpdateProduct('123',
-        vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.possible,
         changedLangs: [LangCode.ru, LangCode.de]));
 
@@ -307,7 +300,6 @@ void main() {
 
     // RU is untouched
     final updatedProduct = originalProduct.rebuild((e) => e
-      ..vegetarianStatus = VegStatus.positive
       ..veganStatus = VegStatus.possible
       ..langsPrioritized.add(LangCode.en)
       ..nameLangs[LangCode.en] = 'banana'
@@ -318,7 +310,6 @@ void main() {
 
     // Verify changed langs
     verify(backend.createUpdateProduct(barcode,
-        vegetarianStatus: VegStatus.positive,
         veganStatus: VegStatus.possible,
         changedLangs: [LangCode.de, LangCode.en]));
   });
@@ -341,17 +332,14 @@ void main() {
     final originalProduct = originalProductRes.unwrap()!;
 
     // All langs are untouched
-    final updatedProduct = originalProduct.rebuild((e) => e
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatus = VegStatus.possible);
+    final updatedProduct =
+        originalProduct.rebuild((e) => e..veganStatus = VegStatus.possible);
 
     final result = await productsManager.createUpdateProduct(updatedProduct);
     expect(result.isOk, isTrue);
 
     // Verify not changed langs
     verify(backend.createUpdateProduct(barcode,
-        vegetarianStatus: VegStatus.positive,
-        veganStatus: VegStatus.possible,
-        changedLangs: []));
+        veganStatus: VegStatus.possible, changedLangs: []));
   });
 }

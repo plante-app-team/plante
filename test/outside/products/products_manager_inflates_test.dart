@@ -54,8 +54,6 @@ void main() {
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.positive.name
-      ..vegetarianStatusSource = VegStatusSource.community.name
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = VegStatusSource.moderator.name);
     final productRes =
@@ -65,8 +63,6 @@ void main() {
     final expectedProduct = ProductLangSlice((v) => v
           ..lang = LangCode.ru
           ..barcode = '123'
-          ..vegetarianStatus = VegStatus.positive
-          ..vegetarianStatusSource = VegStatusSource.community
           ..veganStatus = VegStatus.negative
           ..veganStatusSource = VegStatusSource.moderator
           ..name = 'name'
@@ -140,8 +136,6 @@ void main() {
     final backendProducts = barcodes
         .map((e) => BackendProduct((v) => v
           ..barcode = e
-          ..vegetarianStatus = VegStatus.positive.name
-          ..vegetarianStatusSource = VegStatusSource.community.name
           ..veganStatus = VegStatus.negative.name
           ..veganStatusSource = VegStatusSource.moderator.name))
         .toList();
@@ -152,8 +146,6 @@ void main() {
     final expectedProducts = barcodes.map((e) => ProductLangSlice((v) => v
           ..lang = LangCode.ru
           ..barcode = e
-          ..vegetarianStatus = VegStatus.positive
-          ..vegetarianStatusSource = VegStatusSource.community
           ..veganStatus = VegStatus.negative
           ..veganStatusSource = VegStatusSource.moderator
           ..name = 'name$e'

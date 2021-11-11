@@ -40,41 +40,6 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
-    value = object.genderStr;
-    if (value != null) {
-      result
-        ..add('gender')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.birthdayStr;
-    if (value != null) {
-      result
-        ..add('birthday')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.eatsMilk;
-    if (value != null) {
-      result
-        ..add('eats_milk')
-        ..add(
-            serializers.serialize(value, specifiedType: const FullType(bool)));
-    }
-    value = object.eatsEggs;
-    if (value != null) {
-      result
-        ..add('eats_eggs')
-        ..add(
-            serializers.serialize(value, specifiedType: const FullType(bool)));
-    }
-    value = object.eatsHoney;
-    if (value != null) {
-      result
-        ..add('eats_honey')
-        ..add(
-            serializers.serialize(value, specifiedType: const FullType(bool)));
-    }
     value = object.userGroup;
     if (value != null) {
       result
@@ -115,26 +80,6 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
-        case 'gender':
-          result.genderStr = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
-          break;
-        case 'birthday':
-          result.birthdayStr = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
-          break;
-        case 'eats_milk':
-          result.eatsMilk = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool?;
-          break;
-        case 'eats_eggs':
-          result.eatsEggs = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool?;
-          break;
-        case 'eats_honey':
-          result.eatsHoney = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool?;
-          break;
         case 'rights_group':
           result.userGroup = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
@@ -160,16 +105,6 @@ class _$UserParams extends UserParams {
   @override
   final String? name;
   @override
-  final String? genderStr;
-  @override
-  final String? birthdayStr;
-  @override
-  final bool? eatsMilk;
-  @override
-  final bool? eatsEggs;
-  @override
-  final bool? eatsHoney;
-  @override
   final int? userGroup;
   @override
   final BuiltList<String>? langsPrioritized;
@@ -181,11 +116,6 @@ class _$UserParams extends UserParams {
       {this.backendId,
       this.backendClientToken,
       this.name,
-      this.genderStr,
-      this.birthdayStr,
-      this.eatsMilk,
-      this.eatsEggs,
-      this.eatsHoney,
       this.userGroup,
       this.langsPrioritized})
       : super._();
@@ -204,11 +134,6 @@ class _$UserParams extends UserParams {
         backendId == other.backendId &&
         backendClientToken == other.backendClientToken &&
         name == other.name &&
-        genderStr == other.genderStr &&
-        birthdayStr == other.birthdayStr &&
-        eatsMilk == other.eatsMilk &&
-        eatsEggs == other.eatsEggs &&
-        eatsHoney == other.eatsHoney &&
         userGroup == other.userGroup &&
         langsPrioritized == other.langsPrioritized;
   }
@@ -217,20 +142,8 @@ class _$UserParams extends UserParams {
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc(
-                                    $jc($jc(0, backendId.hashCode),
-                                        backendClientToken.hashCode),
-                                    name.hashCode),
-                                genderStr.hashCode),
-                            birthdayStr.hashCode),
-                        eatsMilk.hashCode),
-                    eatsEggs.hashCode),
-                eatsHoney.hashCode),
+            $jc($jc($jc(0, backendId.hashCode), backendClientToken.hashCode),
+                name.hashCode),
             userGroup.hashCode),
         langsPrioritized.hashCode));
   }
@@ -241,11 +154,6 @@ class _$UserParams extends UserParams {
           ..add('backendId', backendId)
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
-          ..add('genderStr', genderStr)
-          ..add('birthdayStr', birthdayStr)
-          ..add('eatsMilk', eatsMilk)
-          ..add('eatsEggs', eatsEggs)
-          ..add('eatsHoney', eatsHoney)
           ..add('userGroup', userGroup)
           ..add('langsPrioritized', langsPrioritized))
         .toString();
@@ -268,26 +176,6 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  String? _genderStr;
-  String? get genderStr => _$this._genderStr;
-  set genderStr(String? genderStr) => _$this._genderStr = genderStr;
-
-  String? _birthdayStr;
-  String? get birthdayStr => _$this._birthdayStr;
-  set birthdayStr(String? birthdayStr) => _$this._birthdayStr = birthdayStr;
-
-  bool? _eatsMilk;
-  bool? get eatsMilk => _$this._eatsMilk;
-  set eatsMilk(bool? eatsMilk) => _$this._eatsMilk = eatsMilk;
-
-  bool? _eatsEggs;
-  bool? get eatsEggs => _$this._eatsEggs;
-  set eatsEggs(bool? eatsEggs) => _$this._eatsEggs = eatsEggs;
-
-  bool? _eatsHoney;
-  bool? get eatsHoney => _$this._eatsHoney;
-  set eatsHoney(bool? eatsHoney) => _$this._eatsHoney = eatsHoney;
-
   int? _userGroup;
   int? get userGroup => _$this._userGroup;
   set userGroup(int? userGroup) => _$this._userGroup = userGroup;
@@ -306,11 +194,6 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _backendId = $v.backendId;
       _backendClientToken = $v.backendClientToken;
       _name = $v.name;
-      _genderStr = $v.genderStr;
-      _birthdayStr = $v.birthdayStr;
-      _eatsMilk = $v.eatsMilk;
-      _eatsEggs = $v.eatsEggs;
-      _eatsHoney = $v.eatsHoney;
       _userGroup = $v.userGroup;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
@@ -338,11 +221,6 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               backendId: backendId,
               backendClientToken: backendClientToken,
               name: name,
-              genderStr: genderStr,
-              birthdayStr: birthdayStr,
-              eatsMilk: eatsMilk,
-              eatsEggs: eatsEggs,
-              eatsHoney: eatsHoney,
               userGroup: userGroup,
               langsPrioritized: _langsPrioritized?.build());
     } catch (_) {

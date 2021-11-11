@@ -59,8 +59,6 @@ void main() {
       ..barcode = '123'
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts
-      ..vegetarianStatus = VegStatus.negative
-      ..vegetarianStatusSource = VegStatusSource.community
       ..nameLangs
           .addAll({LangCode.en: 'hello there', LangCode.ru: 'Privet tut'})
       ..brands.addAll(['Horns', 'Hooves'])
@@ -70,10 +68,10 @@ void main() {
         LangCode.en: BuiltList.from([
           Ingredient((v) => v
             ..name = 'water'
-            ..vegetarianStatus = VegStatus.possible),
+            ..veganStatus = VegStatus.possible),
           Ingredient((v) => v
             ..name = 'lemon'
-            ..vegetarianStatus = VegStatus.positive)
+            ..veganStatus = VegStatus.positive)
         ])
       })
       ..imageFrontLangs.addAll({
@@ -110,18 +108,16 @@ void main() {
       ..barcode = '123'
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.open_food_facts
-      ..vegetarianStatus = VegStatus.negative
-      ..vegetarianStatusSource = VegStatusSource.community
       ..name = 'hello there'
       ..brands.addAll(['Horns', 'Hooves'])
       ..ingredientsText = 'Water, lemon'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
           ..name = 'water'
-          ..vegetarianStatus = VegStatus.possible),
+          ..veganStatus = VegStatus.possible),
         Ingredient((v) => v
           ..name = 'lemon'
-          ..vegetarianStatus = VegStatus.positive)
+          ..veganStatus = VegStatus.positive)
       ])
       ..imageFront =
           Uri.parse('https://en.wikipedia.org/static/apple-touch/wikipedia.png')

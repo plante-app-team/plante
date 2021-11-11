@@ -13,19 +13,11 @@ abstract class BackendProduct
   @BuiltValueField(wireName: 'barcode')
   String get barcode;
 
-  @BuiltValueField(wireName: 'vegetarian_status')
-  String? get vegetarianStatus;
-  @BuiltValueField(wireName: 'vegetarian_status_source')
-  String? get vegetarianStatusSource;
   @BuiltValueField(wireName: 'vegan_status')
   String? get veganStatus;
   @BuiltValueField(wireName: 'vegan_status_source')
   String? get veganStatusSource;
 
-  @BuiltValueField(wireName: 'moderator_vegetarian_choice_reason')
-  int? get moderatorVegetarianChoiceReason;
-  @BuiltValueField(wireName: 'moderator_vegetarian_sources_text')
-  String? get moderatorVegetarianSourcesText;
   @BuiltValueField(wireName: 'moderator_vegan_choice_reason')
   int? get moderatorVeganChoiceReason;
   @BuiltValueField(wireName: 'moderator_vegan_sources_text')

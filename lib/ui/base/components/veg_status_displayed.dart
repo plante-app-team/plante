@@ -66,20 +66,11 @@ class VegStatusDisplayed extends StatelessWidget {
   }
 
   VegStatus _vegStatus() {
-    if (_isUserVegan()) {
-      return product.veganStatus ?? VegStatus.unknown;
-    } else {
-      return product.vegetarianStatus ?? VegStatus.unknown;
-    }
+    return product.veganStatus ?? VegStatus.unknown;
   }
 
   VegStatusSource _vegStatusSource() {
-    final VegStatusSource result;
-    if (_isUserVegan()) {
-      result = product.veganStatusSource ?? VegStatusSource.unknown;
-    } else {
-      result = product.vegetarianStatusSource ?? VegStatusSource.unknown;
-    }
+    final result = product.veganStatusSource ?? VegStatusSource.unknown;
     if (result == VegStatusSource.unknown) {
       Log.w(
           'Unknown veg status source for barcode ${product.barcode}, $product');
@@ -90,17 +81,10 @@ class VegStatusDisplayed extends StatelessWidget {
   Widget _vegStatusImage() {
     switch (_vegStatus()) {
       case VegStatus.positive:
-        if (_isUserVegan()) {
-          return SizedBox(
-              width: 18,
-              height: 18,
-              child: SvgPicture.asset('assets/veg_status_vegan.svg'));
-        } else {
-          return SizedBox(
-              width: 18,
-              height: 18,
-              child: SvgPicture.asset('assets/veg_status_vegetarian.svg'));
-        }
+        return SizedBox(
+            width: 18,
+            height: 18,
+            child: SvgPicture.asset('assets/veg_status_vegan.svg'));
       case VegStatus.negative:
         return SizedBox(
             width: 18,
@@ -117,36 +101,18 @@ class VegStatusDisplayed extends StatelessWidget {
     }
   }
 
-  bool _isUserVegan() => user.eatsVeggiesOnly ?? true;
-
   String _vegStatusText(BuildContext context) {
-    if (_isUserVegan()) {
-      switch (_vegStatus()) {
-        case VegStatus.positive:
-          return context.strings.veg_status_displayed_vegan;
-        case VegStatus.negative:
-          return context.strings.veg_status_displayed_not_vegan;
-        case VegStatus.possible:
-          return context.strings.veg_status_displayed_vegan_status_possible;
-        case VegStatus.unknown:
-          return context.strings.veg_status_displayed_vegan_status_unknown;
-        default:
-          throw Exception('Unknown veg status: ${_vegStatus()}');
-      }
-    } else {
-      switch (_vegStatus()) {
-        case VegStatus.positive:
-          return context.strings.veg_status_displayed_vegetarian;
-        case VegStatus.negative:
-          return context.strings.veg_status_displayed_not_vegetarian;
-        case VegStatus.possible:
-          return context
-              .strings.veg_status_displayed_vegetarian_status_possible;
-        case VegStatus.unknown:
-          return context.strings.veg_status_displayed_vegetarian_status_unknown;
-        default:
-          throw Exception('Unknown veg status: ${_vegStatus()}');
-      }
+    switch (_vegStatus()) {
+      case VegStatus.positive:
+        return context.strings.veg_status_displayed_vegan;
+      case VegStatus.negative:
+        return context.strings.veg_status_displayed_not_vegan;
+      case VegStatus.possible:
+        return context.strings.veg_status_displayed_vegan_status_possible;
+      case VegStatus.unknown:
+        return context.strings.veg_status_displayed_vegan_status_unknown;
+      default:
+        throw Exception('Unknown veg status: ${_vegStatus()}');
     }
   }
 

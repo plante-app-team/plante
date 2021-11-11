@@ -119,12 +119,9 @@ class _HelpWithVegStatusPageState
       _loading = true;
     });
     try {
-      // Vegan-only https://trello.com/c/eUGrj1eH/
       var savedProduct = widget.initialProduct.rebuild((e) => e
         ..veganStatus = _vegStatus
-        ..veganStatusSource = VegStatusSource.community
-        ..vegetarianStatus = VegStatus.unknown
-        ..vegetarianStatusSource = VegStatusSource.community);
+        ..veganStatusSource = VegStatusSource.community);
 
       final productResult =
           await _productsManager.createUpdateProduct(savedProduct);

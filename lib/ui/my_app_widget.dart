@@ -73,10 +73,6 @@ class _MyAppWidgetState extends State<MyAppWidget>
       return false;
     }
     if ((_userParams?.name ?? '').length < InitUserPage.MIN_NAME_LENGTH ||
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // _userParams!.eatsMilk == null ||
-        // _userParams!.eatsEggs == null ||
-        // _userParams!.eatsHoney == null ||
         _userParams!.langsPrioritized == null ||
         _userParams!.langsPrioritized!.isEmpty) {
       return false;

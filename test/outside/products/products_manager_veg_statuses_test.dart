@@ -56,7 +56,6 @@ void main() {
         equals(BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'voda'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible)
         ])));
   });
@@ -91,11 +90,9 @@ void main() {
         equals(BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'voda'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible),
           Ingredient((v) => v
             ..name = 'sol'
-            ..vegetarianStatus = VegStatus.negative
             ..veganStatus = VegStatus.possible)
         ])));
   });
@@ -130,11 +127,9 @@ void main() {
         equals(BuiltList<Ingredient>([
           Ingredient((v) => v
             ..name = 'sol'
-            ..vegetarianStatus = VegStatus.negative
             ..veganStatus = VegStatus.possible),
           Ingredient((v) => v
             ..name = 'voda'
-            ..vegetarianStatus = VegStatus.positive
             ..veganStatus = VegStatus.possible),
         ])));
   });
@@ -164,39 +159,6 @@ void main() {
   });
 
   test(
-      'if vegetarian status exists both on backend and OFF then '
-      'from backend is used', () async {
-    final offProduct = off.Product.fromJson({
-      'code': '123',
-      'ingredients_text_ru': 'water',
-      'ingredients': [
-        {
-          'vegan': 'maybe',
-          'vegetarian': 'yes',
-          'text': 'water',
-          'id': 'en:water',
-        }
-      ],
-      'ingredients_tags': ['en:water'],
-      'ingredients_tags_ru': ['voda'],
-    });
-    setUpOffProducts([offProduct]);
-
-    final backendProduct = BackendProduct((v) => v
-      ..barcode = '123'
-      ..vegetarianStatus = VegStatus.unknown.name
-      ..vegetarianStatusSource = VegStatusSource.community.name);
-    setUpBackendProducts(Ok([backendProduct]));
-
-    final productRes = await productsManager.getProduct('123', [LangCode.ru]);
-    final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, equals(VegStatus.unknown));
-    expect(product.vegetarianStatusSource, equals(VegStatusSource.community));
-    expect(product.veganStatus, equals(VegStatus.possible));
-    expect(product.veganStatusSource, equals(VegStatusSource.open_food_facts));
-  });
-
-  test(
       'if vegan status exists both on backend and OFF then '
       'from backend is used', () async {
     final offProduct = off.Product.fromJson({
@@ -223,10 +185,7 @@ void main() {
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, equals(VegStatus.positive));
-    expect(product.vegetarianStatusSource,
-        equals(VegStatusSource.open_food_facts));
-    expect(product.veganStatus, equals(VegStatus.negative));
+    expect(product!.veganStatus, equals(VegStatus.negative));
     expect(product.veganStatusSource, equals(VegStatusSource.moderator));
   });
 
@@ -236,17 +195,13 @@ void main() {
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.negative.name
-      ..vegetarianStatusSource = '${VegStatusSource.moderator.name}woop'
       ..veganStatus = VegStatus.negative.name
       ..veganStatusSource = '${VegStatusSource.moderator.name}woop');
     setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, equals(VegStatus.negative));
-    expect(product.vegetarianStatusSource, equals(VegStatusSource.community));
-    expect(product.veganStatus, equals(VegStatus.negative));
+    expect(product!.veganStatus, equals(VegStatus.negative));
     expect(product.veganStatusSource, equals(VegStatusSource.community));
   });
 
@@ -257,16 +212,13 @@ void main() {
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = '${VegStatus.negative.name}woop'
-      ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
     setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, isNull);
-    expect(product.veganStatus, isNull);
+    expect(product!.veganStatus, isNull);
   });
 
   test('invalid veg statuses from server are treated as if they do not exist',
@@ -276,16 +228,13 @@ void main() {
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = '${VegStatus.negative.name}woop'
-      ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
     setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, isNull);
-    expect(product.veganStatus, isNull);
+    expect(product!.veganStatus, isNull);
   });
 
   test('if backend veg statuses parsing failed then analysis is used',
@@ -308,17 +257,13 @@ void main() {
 
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
-      ..vegetarianStatus = '${VegStatus.negative.name}woop'
-      ..vegetarianStatusSource = VegStatusSource.moderator.name
       ..veganStatus = '${VegStatus.negative.name}woop'
       ..veganStatusSource = VegStatusSource.moderator.name);
     setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
     final product = productRes.unwrap();
-    expect(product!.vegetarianStatus, VegStatus.positive);
-    expect(product.vegetarianStatusSource, VegStatusSource.open_food_facts);
-    expect(product.veganStatus, VegStatus.possible);
+    expect(product!.veganStatus, VegStatus.possible);
     expect(product.veganStatusSource, VegStatusSource.open_food_facts);
   });
 }

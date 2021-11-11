@@ -160,8 +160,6 @@ void main() {
       bool takeImageIngredients = true,
       String? ingredientsTextOverride,
       VegStatus? veganStatusInput = VegStatus.positive,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // VegStatus? vegetarianStatusInput = VegStatus.positive,
       List<Shop>? selectShops,
       List<Shop> initialShops = const [],
       List<Shop> shopsToCancel = const [],
@@ -397,8 +395,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -410,8 +406,6 @@ void main() {
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: expectedProduct.vegetarianStatus,
       selectShops: [aShop],
       selectLang: _NOT_DEFAULT_TEST_LANG,
     );
@@ -430,8 +424,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -443,8 +435,6 @@ void main() {
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: expectedProduct.vegetarianStatus,
       selectShops: [aShop],
       selectLang: _NOT_DEFAULT_TEST_LANG,
       // Let's change the lang in the end - this would ensure
@@ -469,8 +459,6 @@ void main() {
       'brand_group',
       'ingredients_group',
       'vegan_status_group',
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // 'vegetarian_status_group',
     ];
 
     for (final key in allKeys) {
@@ -604,44 +592,6 @@ void main() {
           ..veganStatus = VegStatus.positive));
   });
 
-  // Vegan-only https://trello.com/c/eUGrj1eH/
-  // testWidgets('vegetarian group presence when product has data',
-  //     (WidgetTester tester) async {
-  //   uiInputElementPresenceGeneralTest(tester,
-  //       filledElementKey: 'vegetarian_status_group',
-  //       expectedDisplayedAfterLangChange: false,
-  //       initialProduct: ProductLangSlice((v) => v
-  //         ..lang = _DEFAULT_TEST_LANG
-  //         ..barcode = '123'
-  //         ..vegetarianStatus = VegStatus.positive
-  //         ..vegetarianStatusSource = VegStatusSource.community));
-  // });
-  //
-  // testWidgets(
-  //     'vegetarian group present when product has vegetarian data from OFF',
-  //     (WidgetTester tester) async {
-  //   uiInputElementPresenceGeneralTest(tester,
-  //       filledElementKey: 'vegetarian_status_group',
-  //       expectedInitiallyDisplayed: true,
-  //       initialProduct: ProductLangSlice((v) => v
-  //         ..lang = _DEFAULT_TEST_LANG
-  //         ..barcode = '123'
-  //         ..vegetarianStatus = VegStatus.positive
-  //         ..vegetarianStatusSource = VegStatusSource.open_food_facts));
-  // });
-  //
-  // testWidgets(
-  //     'vegetarian group present when product has vegetarian data without source',
-  //     (WidgetTester tester) async {
-  //   uiInputElementPresenceGeneralTest(tester,
-  //       filledElementKey: 'vegetarian_status_group',
-  //       expectedInitiallyDisplayed: true,
-  //       initialProduct: ProductLangSlice((v) => v
-  //         ..lang = _DEFAULT_TEST_LANG
-  //         ..barcode = '123'
-  //         ..vegetarianStatus = VegStatus.positive));
-  // });
-
   testWidgets('cannot save product without name', (WidgetTester tester) async {
     final done =
         await generalTest(tester, nameInput: null, expectedProductResult: null);
@@ -657,8 +607,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -670,8 +618,6 @@ void main() {
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: expectedProduct.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: expectedProduct.vegetarianStatus
     );
 
     expect(done, isTrue);
@@ -701,8 +647,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = '' // Empty!
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -714,8 +658,6 @@ void main() {
         takeImageIngredients: true,
         ingredientsTextOverride: '',
         veganStatusInput: expectedProduct.veganStatus,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: expectedProduct.vegetarianStatus,
         selectShops: [aShop]);
 
     expect(done, isTrue);
@@ -724,128 +666,9 @@ void main() {
   testWidgets('cannot save product without vegan status',
       (WidgetTester tester) async {
     final done = await generalTest(tester,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: VegStatus.positive,
-        veganStatusInput: null,
-        expectedProductResult: null);
+        veganStatusInput: null, expectedProductResult: null);
     expect(done, isFalse);
   });
-
-  // Vegan-only https://trello.com/c/eUGrj1eH/
-  // testWidgets('cannot save product without vegetarian status',
-  //     (WidgetTester tester) async {
-  //   final done = await generalTest(tester,
-  //       veganStatusInput: VegStatus.unknown,
-  //       vegetarianStatusInput: null,
-  //       expectedProductResult: null);
-  //   expect(done, isFalse);
-  // });
-
-  // // Vegan-only https://trello.com/c/eUGrj1eH/
-  // testWidgets('vegan positive makes vegetarian positive',
-  //     (WidgetTester tester) async {
-  //   final expectedProduct = ProductLangSlice((v) => v
-  //     ..lang = _DEFAULT_TEST_LANG
-  //     ..barcode = '123'
-  //     ..name = 'Lemon drink'
-  //     ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..ingredientsText = 'water, lemon'
-  //     ..veganStatus = VegStatus.positive
-  //     ..veganStatusSource = VegStatusSource.community
-  //     ..vegetarianStatus = VegStatus.positive // !!!!!!
-  //     ..vegetarianStatusSource = VegStatusSource.community).productForTests();
-  //
-  //   final done = await generalTest(tester,
-  //       brandInput: null,
-  //       expectedProductResult: expectedProduct,
-  //       nameInput: expectedProduct.name,
-  //       takeImageFront: expectedProduct.imageFront != null,
-  //       takeImageIngredients: expectedProduct.imageIngredients != null,
-  //       veganStatusInput: VegStatus.positive,
-  //       vegetarianStatusInput: null // !!!!!!
-  //       );
-  //
-  //   expect(done, isTrue);
-  // });
-  //
-  // testWidgets('vegetarian negative makes vegan negative',
-  //     (WidgetTester tester) async {
-  //   final expectedProduct = ProductLangSlice((v) => v
-  //     ..lang = _DEFAULT_TEST_LANG
-  //     ..barcode = '123'
-  //     ..name = 'Lemon drink'
-  //     ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..ingredientsText = 'water, lemon'
-  //     ..vegetarianStatus = VegStatus.negative
-  //     ..vegetarianStatusSource = VegStatusSource.community
-  //     ..veganStatus = VegStatus.negative // !!!!!!
-  //     ..veganStatusSource = VegStatusSource.community).productForTests();
-  //
-  //   final done = await generalTest(tester,
-  //       brandInput: null,
-  //       expectedProductResult: expectedProduct,
-  //       nameInput: expectedProduct.name,
-  //       takeImageFront: expectedProduct.imageFront != null,
-  //       takeImageIngredients: expectedProduct.imageIngredients != null,
-  //       veganStatusInput: null, // !!!!!!
-  //       vegetarianStatusInput: VegStatus.negative);
-  //
-  //   expect(done, isTrue);
-  // });
-  //
-  // testWidgets('vegetarian unknown makes vegan unknown if it was positive',
-  //     (WidgetTester tester) async {
-  //   final expectedProduct = ProductLangSlice((v) => v
-  //     ..lang = _DEFAULT_TEST_LANG
-  //     ..barcode = '123'
-  //     ..name = 'Lemon drink'
-  //     ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..ingredientsText = 'water, lemon'
-  //     ..vegetarianStatus = VegStatus.unknown
-  //     ..vegetarianStatusSource = VegStatusSource.community
-  //     ..veganStatus = VegStatus.unknown // !!!!!!
-  //     ..veganStatusSource = VegStatusSource.community).productForTests();
-  //
-  //   final done = await generalTest(tester,
-  //       brandInput: null,
-  //       expectedProductResult: expectedProduct,
-  //       nameInput: expectedProduct.name,
-  //       takeImageFront: expectedProduct.imageFront != null,
-  //       takeImageIngredients: expectedProduct.imageIngredients != null,
-  //       veganStatusInput: VegStatus.positive, // !!!!!! positive input
-  //       vegetarianStatusInput: VegStatus.unknown);
-  //
-  //   expect(done, isTrue);
-  // });
-  //
-  // testWidgets("vegetarian unknown doesn't change vegan if was negative",
-  //     (WidgetTester tester) async {
-  //   final expectedProduct = ProductLangSlice((v) => v
-  //     ..lang = _DEFAULT_TEST_LANG
-  //     ..barcode = '123'
-  //     ..name = 'Lemon drink'
-  //     ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-  //     ..ingredientsText = 'water, lemon'
-  //     ..vegetarianStatus = VegStatus.unknown
-  //     ..vegetarianStatusSource = VegStatusSource.community
-  //     ..veganStatus = VegStatus.negative // !!!!!!
-  //     ..veganStatusSource = VegStatusSource.community).productForTests();
-  //
-  //   final done = await generalTest(tester,
-  //       brandInput: null,
-  //       expectedProductResult: expectedProduct,
-  //       nameInput: expectedProduct.name,
-  //       takeImageFront: expectedProduct.imageFront != null,
-  //       takeImageIngredients: expectedProduct.imageIngredients != null,
-  //       veganStatusInput: VegStatus.negative, // !!!!!! negative input
-  //       vegetarianStatusInput: VegStatus.unknown);
-  //
-  //   expect(done, isTrue);
-  // });
 
   testWidgets('no shops selected when map opened', (WidgetTester tester) async {
     final expectedProduct = ProductLangSlice((v) => v
@@ -856,8 +679,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -868,8 +689,6 @@ void main() {
         takeImageFront: expectedProduct.imageFront != null,
         takeImageIngredients: expectedProduct.imageIngredients != null,
         veganStatusInput: expectedProduct.veganStatus,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: expectedProduct.vegetarianStatus,
         selectShops: [] // No shop
         );
 
@@ -887,8 +706,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -903,8 +720,6 @@ void main() {
         takeImageIngredients:
             perfectlyGoodExpectedProduct.imageIngredients != null,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
         selectShops: [aShop]);
 
     // Even though perfectlyGoodExpectedProduct expected to be stored,
@@ -925,8 +740,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -943,8 +756,6 @@ void main() {
       takeImageIngredients:
           perfectlyGoodExpectedProduct.imageIngredients != null,
       veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
     );
 
     // Even though perfectlyGoodExpectedProduct expected to be stored,
@@ -964,8 +775,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -976,8 +785,6 @@ void main() {
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients:
             perfectlyGoodExpectedProduct.imageIngredients != null,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         // 2 OCRs attempts will fail (first (auto) and the manual)
         // Note that we multiply the value by InitProductPageModel.OCR_RETRIES_COUNT,
@@ -1001,8 +808,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -1013,8 +818,6 @@ void main() {
         takeImageFront: perfectlyGoodExpectedProduct.imageFront != null,
         takeImageIngredients:
             perfectlyGoodExpectedProduct.imageIngredients != null,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: perfectlyGoodExpectedProduct.vegetarianStatus,
         veganStatusInput: perfectlyGoodExpectedProduct.veganStatus,
         // 2 OCRs attempts will fail (first (auto) and the first manual).
         // Note that we multiply the value by InitProductPageModel.OCR_RETRIES_COUNT,
@@ -1036,8 +839,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -1048,8 +849,6 @@ void main() {
         takeImageFront: product.imageFront != null,
         takeImageIngredients: product.imageIngredients != null,
         veganStatusInput: product.veganStatus,
-        // Vegan-only https://trello.com/c/eUGrj1eH/
-        // vegetarianStatusInput: product.vegetarianStatus,
         initialShops: [aShop]);
 
     expect(done, isTrue);
@@ -1065,8 +864,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -1099,8 +896,6 @@ void main() {
       takeImageFront: product.imageFront != null,
       takeImageIngredients: product.imageIngredients != null,
       veganStatusInput: product.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: product.vegetarianStatus,
       initialShops: [shops[0]],
       selectShops: [shops[1]],
     );
@@ -1117,8 +912,6 @@ void main() {
       ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..ingredientsText = 'water, lemon'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.community
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
@@ -1169,8 +962,6 @@ void main() {
       takeImageFront: product.imageFront != null,
       takeImageIngredients: product.imageIngredients != null,
       veganStatusInput: product.veganStatus,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: product.vegetarianStatus,
       initialShops: [shops[0], shops[1]],
       selectShops: [shops[2], shops[3]],
       shopsToCancel: [shops[1], shops[3]],
@@ -1184,8 +975,6 @@ void main() {
     final initialProduct = ProductLangSlice((v) => v
       ..lang = _NOT_DEFAULT_TEST_LANG
       ..barcode = '123'
-      ..vegetarianStatus = VegStatus.unknown
-      ..vegetarianStatusSource = VegStatusSource.moderator
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator).productForTests();
 
@@ -1199,8 +988,6 @@ void main() {
       ..ingredientsText = 'water, lemon'
       // Veg statuses and sources are expected to be same as
       // in the initial product
-      ..vegetarianStatus = initialProduct.vegetarianStatus
-      ..vegetarianStatusSource = initialProduct.vegetarianStatusSource
       ..veganStatus = initialProduct.veganStatus
       ..veganStatusSource = initialProduct.veganStatusSource).productForTests();
 
@@ -1213,8 +1000,6 @@ void main() {
       takeImageFront: expectedProduct.imageFront != null,
       takeImageIngredients: expectedProduct.imageIngredients != null,
       veganStatusInput: null,
-      // Vegan-only https://trello.com/c/eUGrj1eH/
-      // vegetarianStatusInput: null,
       selectLang: _NOT_DEFAULT_TEST_LANG,
     );
 

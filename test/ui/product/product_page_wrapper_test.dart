@@ -40,10 +40,7 @@ void main() {
     final user = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
-      ..name = 'Bob'
-      ..eatsEggs = false
-      ..eatsMilk = false
-      ..eatsHoney = false);
+      ..name = 'Bob');
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<ViewedProductsStorage>(
@@ -82,8 +79,6 @@ void main() {
     final initialProduct = ProductLangSlice((v) => v
           ..barcode = '123'
           ..name = 'name'
-          ..vegetarianStatus = VegStatus.positive
-          ..vegetarianStatusSource = VegStatusSource.community
           ..veganStatus = VegStatus.negative
           ..veganStatusSource = VegStatusSource.community
           ..ingredientsText = '1, 2, 3'
@@ -103,8 +98,6 @@ void main() {
     final initialProduct = ProductLangSlice((v) => v
           ..barcode = '123'
           ..name = 'name'
-          ..vegetarianStatus = VegStatus.positive
-          ..vegetarianStatusSource = VegStatusSource.community
           ..veganStatus = VegStatus.negative
           ..veganStatusSource = VegStatusSource.community
           ..ingredientsText = null // !!!!!!!!
@@ -124,8 +117,6 @@ void main() {
     final initialProduct = ProductLangSlice((v) => v
           ..barcode = '123'
           ..name = 'name'
-          ..vegetarianStatus = VegStatus.positive
-          ..vegetarianStatusSource = VegStatusSource.open_food_facts // OFF!
           ..veganStatus = VegStatus.negative
           ..veganStatusSource = VegStatusSource.open_food_facts // OFF!
           ..ingredientsText = '1, 2, 3'

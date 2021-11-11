@@ -60,11 +60,7 @@ class ModeratorCommentDialog extends StatelessWidget {
   }
 
   ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    if (user.eatsVeggiesOnly ?? true) {
-      return product.moderatorVeganChoiceReason;
-    } else {
-      return product.moderatorVegetarianChoiceReason;
-    }
+    return product.moderatorVeganChoiceReason;
   }
 
   String? _vegStatusModeratorChoiceReasonText(BuildContext context) {
@@ -72,10 +68,6 @@ class ModeratorCommentDialog extends StatelessWidget {
   }
 
   String? _vegStatusModeratorSourcesText() {
-    if (user.eatsVeggiesOnly ?? true) {
-      return product.moderatorVeganSourcesText;
-    } else {
-      return product.moderatorVegetarianSourcesText;
-    }
+    return product.moderatorVeganSourcesText;
   }
 }

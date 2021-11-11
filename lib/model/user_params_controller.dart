@@ -4,7 +4,6 @@ import 'package:built_collection/built_collection.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/model/gender.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/shared_preferences_extensions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,18 +52,9 @@ class UserParamsController {
     final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
     final langsPrioritized = prefs.getStringList(PREF_LANGS_PRIORITIZED);
 
-    // Vegan-only https://trello.com/c/eUGrj1eH/
-    final eatsMilk = prefs.getBool(PREF_USER_EATS_MILK) != null ? false : null;
-    final eatsEggs = prefs.getBool(PREF_USER_EATS_EGGS) != null ? false : null;
-    final eatsHoney =
-        prefs.getBool(PREF_USER_EATS_HONEY) != null ? false : null;
-
     if (name == null &&
         genderStr == null &&
         birthdayStr == null &&
-        eatsMilk == null &&
-        eatsEggs == null &&
-        eatsHoney == null &&
         backendId == null &&
         clientToken == null &&
         langsPrioritized == null) {
@@ -80,11 +70,6 @@ class UserParamsController {
       ..name = name
       ..backendId = backendId
       ..backendClientToken = clientToken
-      ..genderStr = genderStr
-      ..birthdayStr = birthdayStr
-      ..eatsMilk = eatsMilk
-      ..eatsEggs = eatsEggs
-      ..eatsHoney = eatsHoney
       ..userGroup = userGroup
       ..langsPrioritized =
           langsPrioritized != null ? ListBuilder(langsPrioritized) : null);
@@ -113,40 +98,10 @@ class UserParamsController {
       return;
     }
 
-    if (userParams.gender != null) {
-      await prefs.setString(PREF_USER_PARAMS_GENDER, userParams.gender!.name);
-    } else {
-      await prefs.safeRemove(PREF_USER_PARAMS_GENDER);
-    }
-
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       await prefs.setString(PREF_USER_PARAMS_NAME, userParams.name!);
     } else {
       await prefs.safeRemove(PREF_USER_PARAMS_NAME);
-    }
-
-    if (userParams.birthday != null) {
-      await prefs.setString(PREF_USER_BIRTHDAY, userParams.birthdayStr!);
-    } else {
-      await prefs.safeRemove(PREF_USER_BIRTHDAY);
-    }
-
-    if (userParams.eatsMilk != null) {
-      await prefs.setBool(PREF_USER_EATS_MILK, userParams.eatsMilk!);
-    } else {
-      await prefs.safeRemove(PREF_USER_EATS_MILK);
-    }
-
-    if (userParams.eatsEggs != null) {
-      await prefs.setBool(PREF_USER_EATS_EGGS, userParams.eatsEggs!);
-    } else {
-      await prefs.safeRemove(PREF_USER_EATS_EGGS);
-    }
-
-    if (userParams.eatsHoney != null) {
-      await prefs.setBool(PREF_USER_EATS_HONEY, userParams.eatsHoney!);
-    } else {
-      await prefs.safeRemove(PREF_USER_EATS_HONEY);
     }
 
     if (userParams.backendId != null) {

@@ -10,10 +10,6 @@ abstract class Ingredient implements Built<Ingredient, IngredientBuilder> {
 
   /// If null then status isn't applicable to the ingredient and
   /// should be ignored
-  VegStatus? get vegetarianStatus;
-
-  /// If null then status isn't applicable to the ingredient and
-  /// should be ignored
   VegStatus? get veganStatus;
 
   static Ingredient? fromJson(Map<String, dynamic> json) {

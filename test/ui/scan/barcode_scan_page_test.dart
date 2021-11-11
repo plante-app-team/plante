@@ -93,10 +93,7 @@ void main() {
     final user = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
-      ..name = 'Bob'
-      ..eatsEggs = false
-      ..eatsMilk = false
-      ..eatsHoney = false);
+      ..name = 'Bob');
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
 
@@ -111,19 +108,16 @@ void main() {
   });
 
   testWidgets('product found', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
-        ProductLangSlice((e) => e
-              ..lang = _DEFAULT_LANG
-              ..barcode = barcode
-              ..name = 'Product name'
-              ..imageFront = Uri.file('/tmp/asd')
-              ..imageIngredients = Uri.file('/tmp/asd')
-              ..ingredientsText = 'beans'
-              ..veganStatus = VegStatus.positive
-              ..vegetarianStatus = VegStatus.positive
-              ..veganStatusSource = VegStatusSource.community
-              ..vegetarianStatusSource = VegStatusSource.community)
-            .buildSingleLangProduct();
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = _DEFAULT_LANG
+      ..barcode = barcode
+      ..name = 'Product name'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
@@ -150,19 +144,16 @@ void main() {
   testWidgets('product found in another lang', (WidgetTester tester) async {
     final anotherLang = LangCode.nl;
     expect(anotherLang, isNot(equals(_DEFAULT_LANG)));
-    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
-        ProductLangSlice((e) => e
-              ..lang = anotherLang
-              ..barcode = barcode
-              ..name = 'Product name'
-              ..imageFront = Uri.file('/tmp/asd')
-              ..imageIngredients = Uri.file('/tmp/asd')
-              ..ingredientsText = 'beans'
-              ..veganStatus = VegStatus.positive
-              ..vegetarianStatus = VegStatus.positive
-              ..veganStatusSource = VegStatusSource.community
-              ..vegetarianStatusSource = VegStatusSource.community)
-            .buildSingleLangProduct();
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = anotherLang
+      ..barcode = barcode
+      ..name = 'Product name'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
@@ -203,19 +194,16 @@ void main() {
   });
 
   testWidgets('invalid barcode scanned', (WidgetTester tester) async {
-    productsObtainer.unknownProductsGeneratorSimple = (barcode) =>
-        ProductLangSlice((e) => e
-              ..lang = _DEFAULT_LANG
-              ..barcode = barcode
-              ..name = 'Product name'
-              ..imageFront = Uri.file('/tmp/asd')
-              ..imageIngredients = Uri.file('/tmp/asd')
-              ..ingredientsText = 'beans'
-              ..veganStatus = VegStatus.positive
-              ..vegetarianStatus = VegStatus.positive
-              ..veganStatusSource = VegStatusSource.community
-              ..vegetarianStatusSource = VegStatusSource.community)
-            .buildSingleLangProduct();
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = _DEFAULT_LANG
+      ..barcode = barcode
+      ..name = 'Product name'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -346,17 +334,15 @@ void main() {
   });
 
   testWidgets('manual barcode search', (WidgetTester tester) async {
-    productsObtainer
-        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
-      ..barcode = barcode
-      ..name = 'Product name'
-      ..imageFront = Uri.file('/tmp/asd')
-      ..imageIngredients = Uri.file('/tmp/asd')
-      ..ingredientsText = 'beans'
-      ..veganStatus = VegStatus.positive
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+    productsObtainer.unknownProductsGeneratorSimple =
+        (barcode) => ProductLangSlice((e) => e
+          ..barcode = barcode
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
@@ -381,17 +367,15 @@ void main() {
 
   testWidgets('manual barcode search, but barcode is invalid',
       (WidgetTester tester) async {
-    productsObtainer
-        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
-      ..barcode = barcode
-      ..name = 'Product name'
-      ..imageFront = Uri.file('/tmp/asd')
-      ..imageIngredients = Uri.file('/tmp/asd')
-      ..ingredientsText = 'beans'
-      ..veganStatus = VegStatus.positive
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+    productsObtainer.unknownProductsGeneratorSimple =
+        (barcode) => ProductLangSlice((e) => e
+          ..barcode = barcode
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
@@ -418,17 +402,15 @@ void main() {
   });
 
   testWidgets('cancel found product card', (WidgetTester tester) async {
-    productsObtainer
-        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
-      ..barcode = barcode
-      ..name = 'Product name'
-      ..imageFront = Uri.file('/tmp/asd')
-      ..imageIngredients = Uri.file('/tmp/asd')
-      ..ingredientsText = 'beans'
-      ..veganStatus = VegStatus.positive
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+    productsObtainer.unknownProductsGeneratorSimple =
+        (barcode) => ProductLangSlice((e) => e
+          ..barcode = barcode
+          ..name = 'Product name'
+          ..imageFront = Uri.file('/tmp/asd')
+          ..imageIngredients = Uri.file('/tmp/asd')
+          ..ingredientsText = 'beans'
+          ..veganStatus = VegStatus.positive
+          ..veganStatusSource = VegStatusSource.community).productForTests();
 
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
@@ -481,9 +463,7 @@ void main() {
       ..imageIngredients = Uri.file('/tmp/asd')
       ..ingredientsText = 'beans'
       ..veganStatus = VegStatus.positive
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+      ..veganStatusSource = VegStatusSource.community).productForTests();
     productsObtainer.addKnownProduct(product);
 
     final widget = BarcodeScanPage(addProductToShop: shop);
@@ -527,9 +507,7 @@ void main() {
       ..imageIngredients = Uri.file('/tmp/asd')
       ..ingredientsText = 'beans'
       ..veganStatus = VegStatus.positive
-      ..vegetarianStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..vegetarianStatusSource = VegStatusSource.community).productForTests();
+      ..veganStatusSource = VegStatusSource.community).productForTests();
     productsObtainer.addKnownProduct(product);
 
     final widget = BarcodeScanPage(addProductToShop: shop);

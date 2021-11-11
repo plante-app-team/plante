@@ -342,22 +342,6 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
           ),
           const SizedBox(height: 24),
         ]),
-      if (_model.askForVegetarianStatus())
-        Column(key: const Key('vegetarian_status_group'), children: [
-          VegStatusSelectionPanel(
-            keyPositive: const Key('vegetarian_positive_btn'),
-            keyNegative: const Key('vegetarian_negative_btn'),
-            keyUnknown: const Key('vegetarian_unknown_btn'),
-            title: context.strings.init_product_page_is_it_vegetarian,
-            vegStatus: _model.productSlice.vegetarianStatus,
-            onChanged: (value) {
-              setState(() {
-                _model.productSlice = _model.productSlice
-                    .rebuild((e) => e.vegetarianStatus = value);
-              });
-            },
-          ),
-        ]),
       const SizedBox(height: 24),
       SizedBox(
           width: double.infinity,

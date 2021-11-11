@@ -10,7 +10,6 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/model/gender.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
@@ -108,21 +107,6 @@ class Backend {
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params['name'] = userParams.name;
     }
-    if (userParams.gender != null) {
-      params['gender'] = userParams.gender!.name;
-    }
-    if (userParams.birthday != null) {
-      params['birthday'] = userParams.birthdayStr;
-    }
-    if (userParams.eatsMilk != null) {
-      params['eatsMilk'] = userParams.eatsMilk!.toString();
-    }
-    if (userParams.eatsEggs != null) {
-      params['eatsEggs'] = userParams.eatsEggs!.toString();
-    }
-    if (userParams.eatsHoney != null) {
-      params['eatsHoney'] = userParams.eatsHoney!.toString();
-    }
     if (userParams.langsPrioritized != null &&
         userParams.langsPrioritized!.isNotEmpty) {
       params['langsPrioritized'] = userParams.langsPrioritized;
@@ -172,19 +156,14 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
-      {VegStatus? vegetarianStatus,
-      VegStatus? veganStatus,
-      List<LangCode>? changedLangs}) async {
+      {VegStatus? veganStatus, List<LangCode>? changedLangs}) async {
     if (await _settings.testingBackends()) {
       return await _fakeBackend.createUpdateProduct(barcode,
-          vegetarianStatus: vegetarianStatus, veganStatus: veganStatus);
+          veganStatus: veganStatus);
     }
 
     final params = <String, dynamic>{};
     params['barcode'] = barcode;
-    if (vegetarianStatus != null) {
-      params['vegetarianStatus'] = vegetarianStatus.name;
-    }
     if (veganStatus != null) {
       params['veganStatus'] = veganStatus.name;
     }

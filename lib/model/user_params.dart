@@ -1,9 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:intl/intl.dart';
 import 'package:plante/base/build_value_helper.dart';
-import 'package:plante/model/gender.dart';
 
 part 'user_params.g.dart';
 
@@ -14,47 +12,12 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String? get backendClientToken;
   @BuiltValueField(wireName: 'name')
   String? get name;
-  @BuiltValueField(wireName: 'gender')
-  String? get genderStr;
-  @BuiltValueField(wireName: 'birthday')
-  String? get birthdayStr;
-  @BuiltValueField(wireName: 'eats_milk')
-  bool? get eatsMilk;
-  @BuiltValueField(wireName: 'eats_eggs')
-  bool? get eatsEggs;
-  @BuiltValueField(wireName: 'eats_honey')
-  bool? get eatsHoney;
   @BuiltValueField(wireName: 'rights_group')
   int? get userGroup;
 
   /// Please use `UserLangsManager` instead of this field.
   @BuiltValueField(wireName: 'langs_prioritized')
   BuiltList<String>? get langsPrioritized;
-
-  bool? get eatsVeggiesOnly {
-    if (eatsMilk == null && eatsEggs == null && eatsHoney == null) {
-      return null;
-    }
-    return !((eatsMilk == true) || (eatsEggs == true) || (eatsHoney == true));
-  }
-
-  Gender? get gender {
-    if (genderStr == null) {
-      return null;
-    }
-    return genderFromGenderName(genderStr!);
-  }
-
-  DateTime? get birthday {
-    if (birthdayStr == null) {
-      return null;
-    }
-    try {
-      return DateFormat('dd.MM.yyyy').parse(birthdayStr!);
-    } on FormatException {
-      return null;
-    }
-  }
 
   String requireBackendID() => backendId!;
   String requireBackendClientToken() => backendClientToken!;

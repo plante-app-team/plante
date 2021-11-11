@@ -211,17 +211,11 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
   @override
   _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> createUpdateProduct(
           String? barcode,
-          {_i21.VegStatus? vegetarianStatus,
-          _i21.VegStatus? veganStatus,
+          {_i21.VegStatus? veganStatus,
           List<_i22.LangCode>? changedLangs}) =>
       (super.noSuchMethod(
-          Invocation.method(#createUpdateProduct, [
-            barcode
-          ], {
-            #vegetarianStatus: vegetarianStatus,
-            #veganStatus: veganStatus,
-            #changedLangs: changedLangs
-          }),
+          Invocation.method(#createUpdateProduct, [barcode],
+              {#veganStatus: veganStatus, #changedLangs: changedLangs}),
           returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
               _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
           .Future<_i2.Result<_i2.None, _i19.BackendError>>);
