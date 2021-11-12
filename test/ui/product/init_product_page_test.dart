@@ -854,6 +854,33 @@ void main() {
     expect(done, isTrue);
   });
 
+  testWidgets('add non-vegan product to map', (WidgetTester tester) async {
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)
+      ..veganStatus = VegStatus.negative));
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('shops_btn')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.byType(MapPage), findsNothing);
+  });
+
+  testWidgets('add vegan product to map', (WidgetTester tester) async {
+    final widget = InitProductPage(Product((v) => v
+      ..barcode = '123'
+      ..langsPrioritized.add(_DEFAULT_TEST_LANG)
+      ..veganStatus = VegStatus.positive));
+    await tester.superPump(widget);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('shops_btn')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MapPage), findsOneWidget);
+  });
+
   testWidgets('opened with initial shops, then select shops',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v

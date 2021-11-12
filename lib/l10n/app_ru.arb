@@ -209,8 +209,9 @@
     "init_product_page_cancel_adding_product_q": "Отменить добавление продукта?",
     "init_product_page_delete_photo_q": "Удалить фото?",
     "init_product_page_where_sold_optional": "Где продаётся (не обязательно)",
-    "init_product_page_open_map": "К карте",
+    "init_product_page_open_map": "Добавить в магазин",
     "init_product_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
+    "init_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
 
     "veg_status_displayed_vegan": "Веганский",
     "veg_status_displayed_vegan_status_possible": "Неоднозначный веганский статус",
