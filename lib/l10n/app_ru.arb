@@ -168,6 +168,7 @@
     "display_product_page_no_info_in_your_langs": "Нет информации о продукте на вашем языке",
     "display_product_page_add_info_in_your_langs": "Добавить информацию",
     "display_product_page_off_licence": "Данные от Open Food Facts",
+    "display_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
 
     "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
     "product_report_dialog_send": "Отправить",

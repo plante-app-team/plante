@@ -513,12 +513,16 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   }
 
   void _markOnMap() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MapPage(
-              requestedMode: MapPageRequestedMode.ADD_PRODUCT,
-              product: _product),
-        ));
+    if (_product.veganStatus == VegStatus.negative) {
+      showSnackBar(context.strings.display_product_page_adding_non_vegan_product, context);
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MapPage(
+                requestedMode: MapPageRequestedMode.ADD_PRODUCT,
+                product: _product),
+          ));
+    }
   }
 }
