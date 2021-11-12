@@ -584,8 +584,10 @@ void main() {
       ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
       ..veganStatus = VegStatus.negative
       ..veganStatusSource = VegStatusSource.moderator
-      ..moderatorVeganChoiceReasonsIds
-          .add(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId)
+      ..moderatorVeganChoiceReasonsIds.addAll([
+        ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN.persistentId,
+        ModeratorChoiceReason.TESTED_ON_ANIMALS.persistentId,
+      ])
       ..moderatorVeganSourcesText = 'vegan source').buildSingleLangProduct();
     final vegan = UserParams((v) => v
       ..backendClientToken = '123'
@@ -602,6 +604,8 @@ void main() {
     expect(
         find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN
             .localize(context)),
+        findsNothing);
+    expect(find.text(ModeratorChoiceReason.TESTED_ON_ANIMALS.localize(context)),
         findsNothing);
     expect(
         find.text(context
@@ -620,6 +624,8 @@ void main() {
     expect(
         find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_NON_VEGAN
             .localize(context)),
+        findsOneWidget);
+    expect(find.text(ModeratorChoiceReason.TESTED_ON_ANIMALS.localize(context)),
         findsOneWidget);
     expect(
         find.text(context

@@ -23,16 +23,21 @@ class ModeratorCommentDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DialogPlante(
-        content: Column(children: [
+        content:
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
               context
                   .strings.display_product_page_moderator_comment_dialog_title,
               style: TextStyles.headline4),
           const SizedBox(height: 12),
-          Text(_vegStatusModeratorChoiceReasonText(context)!,
-              style: TextStyles.normal),
+          Container(
+              constraints: const BoxConstraints(maxHeight: 250),
+              child: ListView(
+                  shrinkWrap: true,
+                  children: _vegStatusModeratorChoiceReasonWidgets(context)
+                      .toList())),
           if (_vegStatusModeratorSourcesText() != null)
-            Column(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const SizedBox(height: 16),
               Text(
                   context.strings
@@ -59,16 +64,23 @@ class ModeratorCommentDialog extends StatelessWidget {
             )));
   }
 
-  ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    final reasons = product.moderatorVeganChoiceReasons;
-    if (reasons.isEmpty) {
-      return null;
-    }
-    return reasons.first;
+  Iterable<String> _vegStatusModeratorChoiceReasonTexts(BuildContext context) {
+    return product.moderatorVeganChoiceReasons.map((e) => e.localize(context));
   }
 
-  String? _vegStatusModeratorChoiceReasonText(BuildContext context) {
-    return _vegStatusModeratorChoiceReason()?.localize(context);
+  Iterable<Widget> _vegStatusModeratorChoiceReasonWidgets(
+      BuildContext context) {
+    final texts = _vegStatusModeratorChoiceReasonTexts(context);
+    if (texts.length == 1) {
+      return [Text(texts.first, style: TextStyles.normal)];
+    }
+    return texts.map((e) => Column(children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('•', style: TextStyles.normal),
+            Flexible(child: Text(e, style: TextStyles.normal)),
+          ]),
+          const SizedBox(height: 4),
+        ]));
   }
 
   String? _vegStatusModeratorSourcesText() {

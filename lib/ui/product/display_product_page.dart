@@ -6,7 +6,6 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
@@ -340,20 +339,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
 
   VoidCallback? _onVegStatusSourceClickCallback() {
     if (_vegStatusSource() != VegStatusSource.moderator ||
-        _vegStatusModeratorChoiceReason() == null) {
+        _product.moderatorVeganChoiceReasons.isEmpty) {
       return null;
     }
     return () {
       _onVegStatusSourceTextClick(context);
     };
-  }
-
-  ModeratorChoiceReason? _vegStatusModeratorChoiceReason() {
-    final reasons = _product.moderatorVeganChoiceReasons;
-    if (reasons.isEmpty) {
-      return null;
-    }
-    return reasons.first;
   }
 
   void _onVegStatusSourceTextClick(BuildContext context) {
