@@ -167,7 +167,7 @@
       "display_product_page_no_info_in_your_langs": "No information about the product in your language",
       "display_product_page_add_info_in_your_langs": "Add information",
       "display_product_page_off_licence": "Data from Open Food Facts",
-      "display_product_page_adding_non_vegan_product": "Non vegan products can not be added to a store",
+      "display_product_page_adding_non_vegan_product": "Non-vegan products cannot be added to a store",
 
       "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
       "product_report_dialog_send": "Send",
