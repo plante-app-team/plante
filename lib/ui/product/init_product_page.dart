@@ -547,7 +547,7 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   }
 
   void _markShopsOnMap() async {
-    if (_model.productFull!=null && _model.productFull!.veganStatus == VegStatus.negative) {
+    if (_model.productFull?.veganStatus == VegStatus.negative) {
       showSnackBar(
           context.strings.init_product_page_adding_non_vegan_product,
           context);

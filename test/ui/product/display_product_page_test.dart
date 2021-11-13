@@ -494,7 +494,7 @@ void main() {
       ..veganStatusSource = VegStatusSource.moderator
       ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
 
-    await tester.superPump(DisplayProductPage(product));
+    final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byType(MapPage), findsNothing);
 
@@ -502,6 +502,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SnackBar), findsOneWidget);
+    expect(
+        find.text(context.strings.display_product_page_adding_non_vegan_product),
+        findsOneWidget);
     expect(find.byType(MapPage), findsNothing);
   });
 
