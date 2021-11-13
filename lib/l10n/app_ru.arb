@@ -168,6 +168,7 @@
     "display_product_page_no_info_in_your_langs": "Нет информации о продукте на вашем языке",
     "display_product_page_add_info_in_your_langs": "Добавить информацию",
     "display_product_page_off_licence": "Данные от Open Food Facts",
+    "display_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
 
     "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
     "product_report_dialog_send": "Отправить",
@@ -208,8 +209,9 @@
     "init_product_page_cancel_adding_product_q": "Отменить добавление продукта?",
     "init_product_page_delete_photo_q": "Удалить фото?",
     "init_product_page_where_sold_optional": "Где продаётся (не обязательно)",
-    "init_product_page_open_map": "К карте",
+    "init_product_page_open_map": "Добавить в магазин",
     "init_product_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
+    "init_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
 
     "veg_status_displayed_vegan": "Веганский",
     "veg_status_displayed_vegan_status_possible": "Неоднозначный веганский статус",

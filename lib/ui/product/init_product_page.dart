@@ -13,6 +13,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
@@ -546,18 +547,25 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   }
 
   void _markShopsOnMap() async {
-    Log.i('InitProductPage: _markShopsOnMap start');
-    final shops = await Navigator.push<List<Shop>>(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MapPage(
-                requestedMode: MapPageRequestedMode.SELECT_SHOPS,
-                initialSelectedShops: _model.shops)));
-    if (shops == null) {
-      Log.i('InitProductPage: _markShopsOnMap no shops marked');
-      return;
+    if (_model.productFull!=null && _model.productFull!.veganStatus == VegStatus.negative) {
+      showSnackBar(
+          context.strings.init_product_page_adding_non_vegan_product,
+          context);
+    } else {
+      Log.i('InitProductPage: _markShopsOnMap start');
+      final shops = await Navigator.push<List<Shop>>(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  MapPage(
+                      requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+                      initialSelectedShops: _model.shops)));
+      if (shops == null) {
+        Log.i('InitProductPage: _markShopsOnMap no shops marked');
+        return;
+      }
+      Log.i('InitProductPage: _markShopsOnMap success: $shops');
+      _model.shops = shops;
     }
-    Log.i('InitProductPage: _markShopsOnMap success: $shops');
-    _model.shops = shops;
   }
 }

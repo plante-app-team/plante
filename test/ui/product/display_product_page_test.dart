@@ -485,6 +485,26 @@ void main() {
     expect(find.byType(MapPage), findsOneWidget);
   });
 
+  testWidgets('mark on map button non-vegan product', (WidgetTester tester) async {
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
+
+    await tester.superPump(DisplayProductPage(product));
+
+    expect(find.byType(MapPage), findsNothing);
+
+    await tester.tap(find.byKey(const Key('mark_on_map')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.byType(MapPage), findsNothing);
+  });
+
   testWidgets('ingredients text displayed when present',
       (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v

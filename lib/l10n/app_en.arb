@@ -167,6 +167,7 @@
       "display_product_page_no_info_in_your_langs": "No information about the product in your language",
       "display_product_page_add_info_in_your_langs": "Add information",
       "display_product_page_off_licence": "Data from Open Food Facts",
+      "display_product_page_adding_non_vegan_product": "Non-vegan products cannot be put on the map",
 
       "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
       "product_report_dialog_send": "Send",
@@ -207,8 +208,9 @@
       "init_product_page_cancel_adding_product_q": "Cancel product creation?",
       "init_product_page_delete_photo_q": "Delete photo?",
       "init_product_page_where_sold_optional": "Where is it sold? (optional)",
-      "init_product_page_open_map": "Open map",
+      "init_product_page_open_map": "Add to store",
       "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
+      "init_product_page_adding_non_vegan_product": "Non-vegan products cannot be added to a store",
 
       "veg_status_displayed_vegan": "Vegan",
       "veg_status_displayed_vegan_status_possible": "Ambiguous vegan status",
