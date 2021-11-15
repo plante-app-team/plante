@@ -549,17 +549,15 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
   void _markShopsOnMap() async {
     if (_model.productFull?.veganStatus == VegStatus.negative) {
       showSnackBar(
-          context.strings.init_product_page_adding_non_vegan_product,
-          context);
+          context.strings.init_product_page_adding_non_vegan_product, context);
     } else {
       Log.i('InitProductPage: _markShopsOnMap start');
       final shops = await Navigator.push<List<Shop>>(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  MapPage(
-                      requestedMode: MapPageRequestedMode.SELECT_SHOPS,
-                      initialSelectedShops: _model.shops)));
+              builder: (context) => MapPage(
+                  requestedMode: MapPageRequestedMode.SELECT_SHOPS,
+                  initialSelectedShops: _model.shops)));
       if (shops == null) {
         Log.i('InitProductPage: _markShopsOnMap no shops marked');
         return;

@@ -12,6 +12,7 @@ enum ModeratorChoiceReason {
   AMBIGUOUS_INGREDIENTS_ARE_ALMOST_ALWAYS_VEGAN_IN_MODERN_FOOD_INDUSTRY,
   MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_ABSENCE,
   INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL,
+  CERTIFIED_VEGAN,
 
   // Why negative
   SOME_INGREDIENT_IS_NON_VEGAN,
@@ -25,6 +26,7 @@ enum ModeratorChoiceReason {
   SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS,
   CANE_SUGAR_IN_INGREDIENTS,
   POSSIBLY_CANE_SUGAR_IN_INGREDIENTS,
+  NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM,
 
   // Why unknown
   SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN,
@@ -70,6 +72,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return 21;
       case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
         return 22;
+      case ModeratorChoiceReason.CERTIFIED_VEGAN:
+        return 23;
+      case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
+        return 24;
     }
   }
 
@@ -109,6 +115,10 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
       case ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS:
         return {VegStatus.possible};
       case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
+        return {VegStatus.possible};
+      case ModeratorChoiceReason.CERTIFIED_VEGAN:
+        return {VegStatus.positive};
+      case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
         return {VegStatus.possible};
     }
   }
@@ -155,7 +165,18 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return context.strings.mod_reason_cane_sugar_in_ingredients;
       case ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS:
         return context.strings.mod_reason_possibly_cane_sugar_in_ingredients;
+      case ModeratorChoiceReason.CERTIFIED_VEGAN:
+        return context.strings.mod_reason_certified_vegan;
+      case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
+        return context
+            .strings.mod_reason_non_vegan_practices_but_helps_veganism;
     }
+  }
+
+  bool get printWarningOnProduct {
+    return [
+      ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM,
+    ].contains(this);
   }
 }
 

@@ -41,6 +41,8 @@ void main() {
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL: 20,
       ModeratorChoiceReason.CANE_SUGAR_IN_INGREDIENTS: 21,
       ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS: 22,
+      ModeratorChoiceReason.CERTIFIED_VEGAN: 23,
+      ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM: 24,
     };
 
     _ensureAllReasonsHandled(idsMap.keys);
@@ -90,12 +92,30 @@ void main() {
       ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS: {
         VegStatus.possible
       },
+      ModeratorChoiceReason.CERTIFIED_VEGAN: {VegStatus.positive},
+      ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM: {
+        VegStatus.possible
+      },
     };
 
     _ensureAllReasonsHandled(statusesMap.keys);
 
     for (final item in ModeratorChoiceReason.values) {
       expect(item.targetStatuses, equals(statusesMap[item]));
+    }
+  });
+
+  test('printWarningOnProduct has not changed', () {
+    final expectations = {
+      for (final reason in ModeratorChoiceReason.values) reason: false
+    };
+    expectations[ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM] =
+        true;
+
+    _ensureAllReasonsHandled(expectations.keys);
+
+    for (final reason in ModeratorChoiceReason.values) {
+      expect(reason.printWarningOnProduct, expectations[reason]);
     }
   });
 }
