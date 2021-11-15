@@ -759,6 +759,62 @@ void main() {
         findsNothing);
   });
 
+  testWidgets(
+      'vegan status moderator reasoning displayed on product page when it should be',
+      (WidgetTester tester) async {
+    expect(
+        ModeratorChoiceReason
+            .NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM.printWarningOnProduct,
+        isTrue);
+
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVeganChoiceReasonsIds.add(ModeratorChoiceReason
+          .NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
+          .persistentId)).buildSingleLangProduct();
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.text(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
+            .localize(context)),
+        findsOneWidget);
+  });
+
+  testWidgets(
+      'vegan status moderator reasoning NOT displayed on product page when it should',
+      (WidgetTester tester) async {
+    expect(
+        ModeratorChoiceReason
+            .SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN.printWarningOnProduct,
+        isFalse);
+
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator
+      ..moderatorVeganChoiceReasonsIds.add(ModeratorChoiceReason
+          .SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN
+          .persistentId)).buildSingleLangProduct();
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(
+        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN
+            .localize(context)),
+        findsNothing);
+  });
+
   Future<void> knownLanguagesTest(WidgetTester tester,
       {required LangCode productLang,
       required bool expectedFullyFilled}) async {

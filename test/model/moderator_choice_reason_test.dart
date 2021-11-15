@@ -104,4 +104,18 @@ void main() {
       expect(item.targetStatuses, equals(statusesMap[item]));
     }
   });
+
+  test('printWarningOnProduct has not changed', () {
+    final expectations = {
+      for (final reason in ModeratorChoiceReason.values) reason: false
+    };
+    expectations[ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM] =
+        true;
+
+    _ensureAllReasonsHandled(expectations.keys);
+
+    for (final reason in ModeratorChoiceReason.values) {
+      expect(reason.printWarningOnProduct, expectations[reason]);
+    }
+  });
 }

@@ -172,6 +172,12 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
             .strings.mod_reason_non_vegan_practices_but_helps_veganism;
     }
   }
+
+  bool get printWarningOnProduct {
+    return [
+      ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM,
+    ].contains(this);
+  }
 }
 
 ModeratorChoiceReason? moderatorChoiceReasonFromPersistentId(int id) {

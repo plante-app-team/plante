@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
@@ -27,6 +28,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/product/_veg_status_warning.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/moderator_comment_dialog.dart';
@@ -175,21 +177,22 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                   ),
                 ])),
             const SizedBox(height: 16),
+            ..._veganStatusWarnings().map((e) => Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12, bottom: 8),
+                child: VegStatusWarning(
+                  color: ColorsPlante.amber,
+                  text: Text(e,
+                      style: TextStyles.hint
+                          .copyWith(color: ColorsPlante.primary)),
+                ))),
             if (_vegStatusHint() != null)
               Padding(
                   key: const Key('veg_status_hint'),
                   padding: const EdgeInsets.only(left: 12, right: 12),
-                  child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: ColorsPlante.lightGrey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 12, top: 8, right: 12, bottom: 8),
-                        child: Text(_vegStatusHint()!, style: TextStyles.hint),
-                      ))),
+                  child: VegStatusWarning(
+                    color: ColorsPlante.lightGrey,
+                    text: Text(_vegStatusHint()!, style: TextStyles.hint),
+                  )),
             const SizedBox(height: 16),
             Column(children: [
               Container(
@@ -307,6 +310,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
           _vegStatus() == VegStatus.unknown;
     }
     return false;
+  }
+
+  Iterable<String> _veganStatusWarnings() {
+    return _product.moderatorVeganChoiceReasons
+        .where((e) => e.printWarningOnProduct)
+        .map((e) => e.localize(context));
   }
 
   void _onVegStatusHelpClick() {
