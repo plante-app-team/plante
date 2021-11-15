@@ -250,5 +250,10 @@
     "shop_card_no_products_listed": "Nichts aufgelistet",
     "shop_card_directions": "Wegbeschreibung",
     "shop_address_widget_possible_address": "Ungefähre Adresse: ",
-    "user_langs_widget_system_lang": "(Systemsprache)"
+    "user_langs_widget_system_lang": "(Systemsprache)",
+    "mod_reason_non_vegan_practices_but_helps_veganism": "Bei der Herstellung des Produkts werden nicht-vegane Verfahren eingesetzt. Plante betrachtet das Produkt jedoch als ambivalent, da alle Inhaltsstoffe vegan sind und dessen allgemeine Beliebtheit der veganen Bewegung zum Wachstum verhilft.",
+    "mod_reason_certified_vegan": "Das Produkt ist zertifiziert vegan",
+    "@mod_reason_certified_vegan" : {
+        "description": "Product was certified as vegan buy a trustworthy certification organization."
+    }
 }

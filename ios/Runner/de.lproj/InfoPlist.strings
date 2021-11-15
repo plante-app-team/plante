@@ -1,0 +1,10 @@
+/* 
+  infoplist.strings
+  Runner
+
+  Created by Johan Vandingenen on 26/06/2021.
+  
+*/
+NSCameraUsageDescription = "Mit Kamerazugriff können Sie Strichcodes scannen, um nach Produkten zu suchen, und Fotos machen, um neue Produkte hinzuzufügen";
+NSLocationWhenInUseUsageDescription = "Mit Hilfe Ihres Standorts können wir Geschäfte in Ihrer Nähe finden!";
+NSPhotoLibraryUsageDescription = "Diese App benötigt Zugriff auf Ihre Galerie, um Bilder von Produkten hochzuladen";
