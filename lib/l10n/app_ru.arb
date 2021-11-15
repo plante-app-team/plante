@@ -18,7 +18,6 @@
     "global_save": "Сохранить",
     "global_meters": "м",
     "global_kilometers": "км",
-
     "lang_ar": "Арабский",
     "lang_be": "Белорусский",
     "lang_bg": "Болгарский",
@@ -58,7 +57,6 @@
     "lang_uk": "Украинский",
     "lang_vi": "Вьетнамский",
     "lang_zh": "Китайский",
-
     "mod_reason_info_found_in_external_source": "Информация из внешнего источника",
     "mod_reason_all_ingredients_are_vegan": "В составе нет невеганских ингредиентов",
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "В составе есть исторически неоднозначные ингредиенты, но в современной пищевой промышленности они почти всегда имеют растительное происхождение",
@@ -74,24 +72,19 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "В составе имеются неоднозначные ингредиенты (могут быть как веганскими, так и невеганскими, в зависимости от конкретного способа производства), но на упаковке продукта есть Веганская пометка.",
     "mod_reason_cane_sugar_in_ingredients": "В составе есть тростниковым сахар, который может фильтроваться через костяной уголь.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "В составе есть сахар, который может быть тростниковым и поэтому мог фильтроваться через костяной уголь.",
-
     "image_crop_page_title": "Обрежем!",
-
     "external_auth_page_continue_with": "Продолжить с",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",
     "external_auth_page_privacy_policy": "Политика конфиденциальности",
     "external_auth_page_continue_with_apple": "Войти с Apple",
-
     "init_user_page_title": "Как к вам обращаться?",
     "init_user_page_name_field_title": "Имя",
     "init_user_page_name_field_hint": "Мария",
     "init_user_page_next_button_title": "Далее",
     "init_user_page_done_button_title": "Готово",
     "init_user_page_langs_explanation": "Выберите языки, которые вы знаете — некоторые продукты продаются во многих странах, и поэтому их упаковки могут быть на разных языках",
-
     "main_page_bottom_btn_feed": "Новости",
     "main_page_bottom_btn_map": "Карта продуктов",
-
     "map_page_empty_shops": "Пустые магазины",
     "map_page_is_product_sold_q": "Тут продают «<PRODUCT>»?",
     "map_page_is_new_product_sold_q": "Тут продают продукт?",
@@ -112,21 +105,17 @@
     "map_page_zoom_in_to_see_shops": "Приблизьте карту, чтобы видеть магазины",
     "map_page_load_shops_of_this_area": "Загрузить магазины рядом",
     "map_page_show_found_shops_on_map": "На карте",
-
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_label": "Название магазина",
     "create_shop_page_how_new_shop_is_called_hint": "Пятёрочка",
     "create_shop_page_what_type_new_shop_has": "Укажите тип магазина",
-
     "map_search_bar_hint": "Поиск магазинов и улиц",
     "map_search_bar_button_title": "Поиск",
-
     "map_search_page_search_hint": "Введите текст и нажмите на Поиск",
     "map_search_page_shops_title": "Найденные магазины",
     "map_search_page_shops_not_found": "Магазины не найдены",
     "map_search_page_streets_title": "Найденные улицы",
     "map_search_page_streets_not_found": "Улицы не найдены",
-
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
     "barcode_scan_page_point_camera_at_barcode": "Наведите камеру на штрихкод продукта",
@@ -142,14 +131,12 @@
     "barcode_scan_page_is_product_sold_q": "Продают «<PRODUCT>» продаётся в магазине «<SHOP>»?",
     "barcode_scan_page_no_info_in_your_langs": "Нет информации о продукте на вашем языке",
     "barcode_scan_page_add_info_in_your_langs": "Добавить информацию",
-
     "display_product_page_ingredients": "Состав:",
     "display_product_page_ingredients_analysis": "Автоматический анализ состава",
     "display_product_page_report_btn": "Сообщить о неверных данных",
     "display_product_page_brand": "Бренд: ",
     "display_product_page_click_to_help_with_veg_statuses": "Хочу помочь!",
     "display_product_page_table_column1": "Продукт",
-    "display_product_page_table_column2": "Вегетарианский",
     "display_product_page_table_column3": "Веганский",
     "display_product_page_table_positive": "Да",
     "display_product_page_table_negative": "Нет",
@@ -169,17 +156,13 @@
     "display_product_page_add_info_in_your_langs": "Добавить информацию",
     "display_product_page_off_licence": "Данные от Open Food Facts",
     "display_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
-
     "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
     "product_report_dialog_send": "Отправить",
     "product_report_dialog_report_sent": "Жалоба отправлена",
-
     "veg_status_selection_panel_positive": "Да",
     "veg_status_selection_panel_negative": "Нет",
     "veg_status_selection_panel_dunno": "Не знаю",
-
     "help_with_veg_status_page_title": "Помочь определить веганский статус",
-
     "settings_page_title": "Настройки",
     "settings_page_your_id": "Ваш ID: ",
     "settings_page_general": "Общее",
@@ -192,7 +175,6 @@
     "settings_page_testing_backends": "Использовать фальшивые и тестовые серверы",
     "settings_page_testing_backends_quick_answers": "Быстрые ответы фальшивых и тестовых серверов",
     "settings_page_fake_off_scanned_product_empty": "Сканируемый продукт пуст",
-
     "init_product_page_title": "Добавление продукта",
     "init_product_page_lang_title": "Язык упаковки продукта",
     "init_product_page_please_select_lang": "Пожалуйста, выберите язык упаковки",
@@ -212,7 +194,6 @@
     "init_product_page_open_map": "Добавить в магазин",
     "init_product_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
     "init_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
-
     "veg_status_displayed_vegan": "Веганский",
     "veg_status_displayed_vegan_status_possible": "Неоднозначный веганский статус",
     "veg_status_displayed_vegan_status_unknown": "Неизвестный веганский статус",
@@ -221,12 +202,9 @@
     "veg_status_displayed_veg_status_source_off": "Авто-анализ состава",
     "veg_status_displayed_veg_status_source_moderator": "Проверено",
     "veg_status_displayed_veg_status_source_unknown": "Внутренняя ошибка: источник неизвестен",
-
     "viewed_products_history_page_title": "Недавно просмотренные",
-
     "expandable_plante_expand": "Развернуть",
     "expandable_plante_collapse": "Свернуть",
-
     "shop_type_bakery": "Пекарня",
     "shop_type_beverages": "Напитки",
     "shop_type_cheese": "Сыр",
@@ -248,21 +226,21 @@
     "shop_type_general": "Универмаг",
     "shop_type_supermarket": "Супермаркет",
     "shop_type_grocery": "Продукты",
-
     "shop_product_range_page_this_shop_has_no_product": "В этом магазине продуктов пока нет",
     "shop_product_range_page_product_last_seen_here": "Последний раз тут видели: ",
     "shop_product_range_page_have_you_seen_product_here": "Такой продукт тут есть?",
     "shop_product_range_page_you_sure_positive_vote": "Вы уверены, что видели продукт в магазине?",
     "shop_product_range_page_you_sure_negative_vote": "Вы уверены, что продукта в магазине нет?",
     "shop_product_range_page_add_product": "Добавить продукт",
-
     "shop_card_open_shop_products": "Открыть список продуктов",
     "shop_card_add_product": "Добавить продукт",
-    "shop_card_products_listed" : "Есть продукты",
-    "shop_card_no_products_listed" : "Нет продуктов",
-    "shop_card_directions" : "Маршрут",
-
+    "shop_card_products_listed": "Есть продукты",
+    "shop_card_no_products_listed": "Нет продуктов",
+    "shop_card_directions": "Маршрут",
     "shop_address_widget_possible_address": "Примерный адрес: ",
-
-    "user_langs_widget_system_lang": "(Системный язык)"
+    "user_langs_widget_system_lang": "(Системный язык)",
+    "mod_reason_non_vegan_practices_but_helps_veganism": "При производтсве продукта применяются не-веганские методы. Но продукт помечен как неоднозначный командой Plante, потому что все ингредиенты веганские, и продукт помогает росту веганства.",
+    "Product was certified as vegan buy a trustworthy certification organization.": {
+        "mod_reason_certified_vegan": "Продукт имеет веганский сертификат"
+    }
 }

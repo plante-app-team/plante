@@ -18,7 +18,6 @@
     "global_save": "Save",
     "global_meters": "meters",
     "global_kilometers": "km",
-
     "lang_ar": "Arabic",
     "lang_be": "Belarusian",
     "lang_bg": "Bulgarian",
@@ -58,7 +57,6 @@
     "lang_uk": "Ukrainian",
     "lang_vi": "Vietnamese",
     "lang_zh": "Chinese",
-
     "mod_reason_info_found_in_external_source": "Information found in an external source",
     "mod_reason_all_ingredients_are_vegan": "Product has no non-vegan ingredients",
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegan",
@@ -74,24 +72,19 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "The product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured), but it also has a Vegan label on its packaging.",
     "mod_reason_cane_sugar_in_ingredients": "Product contains cane sugar, which could be processed through Bone Black/Bone Char.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Product contains sugar, which could be obtained from sugarcane and processed through Bone Black/Bone Char.",
-
     "image_crop_page_title": "Let's crop it!",
-
     "external_auth_page_continue_with": "Continue with",
     "external_auth_page_google_email_not_verified": "Error: Google email is not verified",
     "external_auth_page_privacy_policy": "Privacy policy",
     "external_auth_page_continue_with_apple": "Continue with Apple",
-
     "init_user_page_title": "What is your name?",
     "init_user_page_name_field_title": "Name",
     "init_user_page_name_field_hint": "Jon",
     "init_user_page_next_button_title": "Next",
     "init_user_page_done_button_title": "Done",
     "init_user_page_langs_explanation": "Select the languages you know — some products are sold in many countries and thus may have packagings in different languages",
-
     "main_page_bottom_btn_feed": "News",
     "main_page_bottom_btn_map": "Products map",
-
     "map_page_empty_shops": "Empty stores",
     "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
     "map_page_is_new_product_sold_q": "Is the product being sold here?",
@@ -112,21 +105,17 @@
     "map_page_zoom_in_to_see_shops": "Please zoom in to see stores",
     "map_page_load_shops_of_this_area": "Load stores of this area",
     "map_page_show_found_shops_on_map": "Show on map",
-
     "create_shop_page_how_new_shop_is_called": "What is the name of the store?",
     "create_shop_page_how_new_shop_is_called_label": "Store's name",
     "create_shop_page_how_new_shop_is_called_hint": "Spar",
     "create_shop_page_what_type_new_shop_has": "Select store's type",
-
     "map_search_bar_hint": "Search stores and streets",
     "map_search_bar_button_title": "Search",
-
     "map_search_page_search_hint": "Enter some text and tap Search",
     "map_search_page_shops_title": "Found stores",
     "map_search_page_shops_not_found": "No stores found",
     "map_search_page_streets_title": "Found streets",
     "map_search_page_streets_not_found": "Streets not found",
-
     "barcode_scan_page_product_not_found": "Product not found",
     "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
     "barcode_scan_page_point_camera_at_barcode": "Aim the camera at the product barcode",
@@ -142,7 +131,6 @@
     "barcode_scan_page_is_product_sold_q": "Is the product «<PRODUCT>» being sold at «<SHOP>»?",
     "barcode_scan_page_no_info_in_your_langs": "No information about the product in your language",
     "barcode_scan_page_add_info_in_your_langs": "Add information",
-
     "display_product_page_ingredients": "Ingredients:",
     "display_product_page_ingredients_analysis": "Automatic ingredients analysis",
     "display_product_page_report_btn": "Report incorrect information",
@@ -168,17 +156,13 @@
     "display_product_page_add_info_in_your_langs": "Add information",
     "display_product_page_off_licence": "Data from Open Food Facts",
     "display_product_page_adding_non_vegan_product": "Non-vegan products cannot be put on the map",
-
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
     "product_report_dialog_send": "Send",
     "product_report_dialog_report_sent": "Report sent",
-
     "veg_status_selection_panel_positive": "Yes",
     "veg_status_selection_panel_negative": "No",
     "veg_status_selection_panel_dunno": "Not sure",
-
     "help_with_veg_status_page_title": "Help with vegan status",
-
     "settings_page_title": "Settings",
     "settings_page_your_id": "Your ID: ",
     "settings_page_general": "General",
@@ -191,7 +175,6 @@
     "settings_page_testing_backends": "Use fake and testing backends",
     "settings_page_testing_backends_quick_answers": "Fake and testing backends answers are quick",
     "settings_page_fake_off_scanned_product_empty": "Scanned product is empty",
-
     "init_product_page_title": "New product",
     "init_product_page_lang_title": "Product packaging language",
     "init_product_page_please_select_lang": "Please select packaging language",
@@ -211,7 +194,6 @@
     "init_product_page_open_map": "Add to store",
     "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
     "init_product_page_adding_non_vegan_product": "Non-vegan products cannot be added to a store",
-
     "veg_status_displayed_vegan": "Vegan",
     "veg_status_displayed_vegan_status_possible": "Ambiguous vegan status",
     "veg_status_displayed_vegan_status_unknown": "Unknown vegan status",
@@ -220,12 +202,9 @@
     "veg_status_displayed_veg_status_source_off": "Ingredients auto-analysis",
     "veg_status_displayed_veg_status_source_moderator": "Verified",
     "veg_status_displayed_veg_status_source_unknown": "Internal error: source unknown",
-
     "viewed_products_history_page_title": "Recently viewed",
-
     "expandable_plante_expand": "Expand",
     "expandable_plante_collapse": "Collapse",
-
     "shop_type_bakery": "Bakery",
     "shop_type_beverages": "Beverages",
     "shop_type_cheese": "Cheese",
@@ -247,21 +226,19 @@
     "shop_type_general": "General",
     "shop_type_supermarket": "Supermarket",
     "shop_type_grocery": "Grocery",
-
     "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",
     "shop_product_range_page_product_last_seen_here": "Last seen here: ",
     "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?",
     "shop_product_range_page_you_sure_positive_vote": "Are you sure you saw the product in this store?",
     "shop_product_range_page_you_sure_negative_vote": "Are you sure the product is not sold in this store?",
     "shop_product_range_page_add_product": "Add a product",
-
     "shop_card_open_shop_products": "Product list",
     "shop_card_add_product": "Add product",
-    "shop_card_products_listed" : "Products listed",
-    "shop_card_no_products_listed" : "Nothing listed",
-    "shop_card_directions" : "Directions",
-
+    "shop_card_products_listed": "Products listed",
+    "shop_card_no_products_listed": "Nothing listed",
+    "shop_card_directions": "Directions",
     "shop_address_widget_possible_address": "Approximate address: ",
-
-    "user_langs_widget_system_lang": "(System language)"
+    "user_langs_widget_system_lang": "(System language)",
+    "mod_reason_non_vegan_practices_but_helps_veganism": "Product's manufacturing process utilizes non-vegan practices. But the product is considered ambiguous by Plante because all ingredients are vegan, and its mainstream appeal to help the vegan movement grow.",
+    "mod_reason_certified_vegan": "Product is certified vegan"
 }

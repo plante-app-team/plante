@@ -485,7 +485,8 @@ void main() {
     expect(find.byType(MapPage), findsOneWidget);
   });
 
-  testWidgets('mark on map button non-vegan product', (WidgetTester tester) async {
+  testWidgets('mark on map button non-vegan product',
+      (WidgetTester tester) async {
     final product = ProductLangSlice((v) => v
       ..lang = _DEFAULT_LANG
       ..barcode = '123'

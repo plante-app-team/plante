@@ -514,7 +514,9 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
 
   void _markOnMap() {
     if (_product.veganStatus == VegStatus.negative) {
-      showSnackBar(context.strings.display_product_page_adding_non_vegan_product, context);
+      showSnackBar(
+          context.strings.display_product_page_adding_non_vegan_product,
+          context);
     } else {
       Navigator.push(
           context,
