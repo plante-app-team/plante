@@ -859,12 +859,15 @@ void main() {
       ..barcode = '123'
       ..langsPrioritized.add(_DEFAULT_TEST_LANG)
       ..veganStatus = VegStatus.negative));
-    await tester.superPump(widget);
+    final context = await tester.superPump(widget);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('shops_btn')));
     await tester.pumpAndSettle();
 
     expect(find.byType(SnackBar), findsOneWidget);
+    expect(
+        find.text(context.strings.init_product_page_adding_non_vegan_product),
+        findsOneWidget);
     expect(find.byType(MapPage), findsNothing);
   });
 
