@@ -240,7 +240,8 @@
     "shop_address_widget_possible_address": "Примерный адрес: ",
     "user_langs_widget_system_lang": "(Системный язык)",
     "mod_reason_non_vegan_practices_but_helps_veganism": "При производтсве продукта применяются не-веганские методы. Но продукт помечен как неоднозначный командой Plante, потому что все ингредиенты веганские, и продукт помогает росту веганства.",
-    "Product was certified as vegan buy a trustworthy certification organization.": {
-        "mod_reason_certified_vegan": "Продукт имеет веганский сертификат"
+    "mod_reason_certified_vegan": "Продукт имеет веганский сертификат",
+    "@mod_reason_certified_vegan" : {
+        "description": "Product was certified as vegan buy a trustworthy certification organization."
     }
 }

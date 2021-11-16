@@ -37,6 +37,14 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		401B9C74268BA7B2005F1FCB /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		40820E982687ADD9003C1E5E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40B56B062742E03E008C726D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40B56B072742E03E008C726D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		40B56B082742E051008C726D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40B56B092742E051008C726D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		40B56B0A2742E05A008C726D /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40B56B0B2742E05A008C726D /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		40B56B0C2742E063008C726D /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40B56B0D2742E063008C726D /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		40C929512680FF390052DAC3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		40F5F6052687B2820010C952 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		40F5F6072687B2890010C952 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -183,6 +191,10 @@
 				en,
 				Base,
 				ru,
+				de,
+				fr,
+				nl,
+				el,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -315,6 +327,10 @@
 			children = (
 				40F5F6052687B2820010C952 /* en */,
 				40F5F6072687B2890010C952 /* ru */,
+				40B56B072742E03E008C726D /* de */,
+				40B56B092742E051008C726D /* fr */,
+				40B56B0B2742E05A008C726D /* nl */,
+				40B56B0D2742E063008C726D /* el */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -332,6 +348,10 @@
 			children = (
 				97C147001CF9000F007C117D /* Base */,
 				40820E982687ADD9003C1E5E /* ru */,
+				40B56B062742E03E008C726D /* de */,
+				40B56B082742E051008C726D /* fr */,
+				40B56B0A2742E05A008C726D /* nl */,
+				40B56B0C2742E063008C726D /* el */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

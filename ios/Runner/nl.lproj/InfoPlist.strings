@@ -1,0 +1,10 @@
+/* 
+  infoplist.strings
+  Runner
+
+  Created by Johan Vandingenen on 26/06/2021.
+  
+*/
+NSCameraUsageDescription = "Met camera toegang kan je barcodes scannen en photos namen van producten";
+NSLocationWhenInUseUsageDescription = "Met locatie ingesteld kunnen we winkels in je buurt vinden";
+NSPhotoLibraryUsageDescription = "Met toegang tot de bibliotheek kan je foto's vanuit je bibliotheek toevoegen";
