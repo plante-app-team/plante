@@ -98,8 +98,6 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    GetIt.I.get<SysLangCodeHolder>().langCode =
-        Localizations.localeOf(context).languageCode;
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(

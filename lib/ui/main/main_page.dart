@@ -42,8 +42,6 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
 
   @override
   Widget buildPage(BuildContext context) {
-    GetIt.I.get<SysLangCodeHolder>().langCode =
-        Localizations.localeOf(context).languageCode;
     return Scaffold(
         body: WillPopScope(
             onWillPop: () async {
