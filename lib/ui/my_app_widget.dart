@@ -46,7 +46,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
         title: 'Plante',
         restorationScopeId: 'app',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: _supportedLocales(),
         theme: ThemeData(
           unselectedWidgetColor: ColorsPlante.grey,
           fontFamily: 'Poppins',
@@ -56,6 +56,13 @@ class _MyAppWidgetState extends State<MyAppWidget>
         home:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
         navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
+  }
+
+  Iterable<Locale> _supportedLocales() {
+    // We have to make English the default language
+    final withoutEnglish =
+        AppLocalizations.supportedLocales.where((e) => e.languageCode != 'en');
+    return [const Locale('en')] + withoutEnglish.toList();
   }
 
   Widget _mainWidget() {
