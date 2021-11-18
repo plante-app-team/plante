@@ -130,6 +130,7 @@ flutter:
     - assets/veg_status_source_community.svg
     - assets/veg_status_source_moderator.svg
     - assets/veg_status_source_unknown.svg
+    - assets/veg_status_warning_icon.svg
     - assets/expand_down.svg
     - assets/expand_up.svg
     - assets/marker_abstract.svg

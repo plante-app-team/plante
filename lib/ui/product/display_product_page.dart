@@ -180,10 +180,11 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
             ..._veganStatusWarnings().map((e) => Padding(
                 padding: const EdgeInsets.only(left: 12, right: 12, bottom: 8),
                 child: VegStatusWarning(
+                  showWarningImage: true,
                   color: ColorsPlante.amber,
-                  text: Text(e,
-                      style: TextStyles.hint
-                          .copyWith(color: ColorsPlante.primary)),
+                  text: e,
+                  style: TextStyles.hint
+                      .copyWith(color: ColorsPlante.mainTextBlack),
                 ))),
             if (_vegStatusHint() != null)
               Padding(
@@ -191,7 +192,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                   padding: const EdgeInsets.only(left: 12, right: 12),
                   child: VegStatusWarning(
                     color: ColorsPlante.lightGrey,
-                    text: Text(_vegStatusHint()!, style: TextStyles.hint),
+                    text: _vegStatusHint()!,
+                    style: TextStyles.hint,
                   )),
             const SizedBox(height: 16),
             Column(children: [

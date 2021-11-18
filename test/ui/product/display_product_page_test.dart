@@ -784,11 +784,12 @@ void main() {
           .persistentId)).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
+    final Finder widgetFinder = find.byKey(const Key('veg_status_warning'));
 
-    expect(
-        find.text(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
-            .localize(context)),
-        findsOneWidget);
+    final richText0Widget = tester.element(widgetFinder).widget as RichText;
+    final text = richText0Widget.text.toPlainText();
+    expect(text.endsWith(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
+        .localize(context)),true);
   });
 
   testWidgets(
