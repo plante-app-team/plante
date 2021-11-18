@@ -32,6 +32,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
+import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
 
@@ -127,4 +128,13 @@ void initDI() {
   GetIt.I.registerSingleton<OsmSearcher>(
       OsmSearcher(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<DirectionsManager>(DirectionsManager());
+  GetIt.I.registerSingleton<SafeFontEnvironmentDetector>(
+      SafeFontEnvironmentDetector(
+    GetIt.I.get<SysLangCodeHolder>(),
+    GetIt.I.get<UserLangsManager>(),
+    GetIt.I.get<LocationController>(),
+    GetIt.I.get<SharedPreferencesHolder>(),
+    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<CountriesLangCodesTable>(),
+  ));
 }

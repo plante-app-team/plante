@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 
 class HeadlineBorderedPlante extends StatelessWidget {
   static final _foregroundPaint = Paint()
@@ -14,14 +15,14 @@ class HeadlineBorderedPlante extends StatelessWidget {
     return Stack(children: <Widget>[
       Text(data,
           style: TextStyle(
-            fontFamily: 'Montserrat',
+            fontFamily: TextStyles.montserrat,
             fontWeight: FontWeight.w700,
             fontSize: 24,
             foreground: _foregroundPaint,
           )),
       Text(data,
-          style: const TextStyle(
-              fontFamily: 'Montserrat',
+          style: TextStyle(
+              fontFamily: TextStyles.montserrat,
               fontWeight: FontWeight.w700,
               fontSize: 24,
               color: Colors.white)),

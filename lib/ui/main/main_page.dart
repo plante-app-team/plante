@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';

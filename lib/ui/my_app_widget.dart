@@ -49,7 +49,6 @@ class _MyAppWidgetState extends State<MyAppWidget>
         supportedLocales: _supportedLocales(),
         theme: ThemeData(
           unselectedWidgetColor: ColorsPlante.grey,
-          fontFamily: 'Poppins',
           toggleableActiveColor: ColorsPlante.primary,
           colorScheme: colorScheme.copyWith(primary: ColorsPlante.primary),
         ),

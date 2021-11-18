@@ -208,7 +208,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                         },
                         child: Text(
                             context.strings.external_auth_page_privacy_policy,
-                            style: const TextStyle(
+                            style: TextStyles.normal.copyWith(
                                 color: Colors.blue,
                                 decoration: TextDecoration.underline)))),
                 const SizedBox(height: 10),

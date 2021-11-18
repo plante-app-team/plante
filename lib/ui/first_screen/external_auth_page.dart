@@ -76,7 +76,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                                     child: SvgPicture.asset(
                                         'assets/google_icon.svg')),
                               ])),
-                      const SizedBox(
+                      SizedBox(
                           width: double.infinity,
                           height: double.infinity,
                           child: Center(
@@ -104,7 +104,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                     },
                     child: Text(
                         context.strings.external_auth_page_privacy_policy,
-                        style: const TextStyle(
+                        style: TextStyles.normal.copyWith(
                             color: Colors.blue,
                             decoration: TextDecoration.underline)),
                   ))),

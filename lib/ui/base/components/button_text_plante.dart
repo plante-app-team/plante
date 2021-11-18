@@ -5,7 +5,7 @@ import 'package:plante/ui/base/text_styles.dart';
 
 class ButtonTextPlante extends StatelessWidget {
   final double? height;
-  final Widget child;
+  late final Widget child;
   final VoidCallback? onPressed;
   final VoidCallback? onDisabledPressed;
   final Color? overlayColor;
@@ -13,14 +13,17 @@ class ButtonTextPlante extends StatelessWidget {
   ButtonTextPlante(String text,
       {Key? key,
       required this.onPressed,
-      TextStyle enabledTextStyle = TextStyles.buttonOutlinedEnabled,
-      TextStyle disabledTextStyle = TextStyles.buttonOutlinedDisabled,
+      TextStyle? enabledTextStyle,
+      TextStyle? disabledTextStyle,
       this.onDisabledPressed,
       this.overlayColor,
       this.height})
-      : child = Text(text,
-            style: onPressed != null ? enabledTextStyle : disabledTextStyle),
-        super(key: key);
+      : super(key: key) {
+    enabledTextStyle ??= TextStyles.buttonOutlinedEnabled;
+    disabledTextStyle ??= TextStyles.buttonOutlinedDisabled;
+    child = Text(text,
+        style: onPressed != null ? enabledTextStyle : disabledTextStyle);
+  }
 
   @override
   Widget build(BuildContext context) {
