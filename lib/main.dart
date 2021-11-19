@@ -7,11 +7,14 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/di.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/off/off_http_interceptor.dart';
 import 'package:plante/ui/my_app_widget.dart';
 
 void main() {
@@ -52,6 +55,9 @@ void mainImpl() async {
   setSystemUIOverlayStyle();
 
   GetIt.I.get<SysLangCodeHolder>().langCode = window.locales.first.languageCode;
+
+  // We'll proxy all requests to OFF
+  off.HttpHelper.interceptor = OffHttpInterceptor(GetIt.I.get<Backend>());
 
   runApp(MyAppWidget(initialUserParams));
 }
