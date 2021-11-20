@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:plante/base/base.dart';
 import 'package:plante/base/device_info.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
@@ -411,18 +412,27 @@ class Backend {
       String? backendClientTokenOverride,
       String? body,
       String? contentType}) async {
-    final userParams = await _userParamsController.getUserParams();
-    final backendClientToken =
-        backendClientTokenOverride ?? userParams?.backendClientToken;
+    final url = _createUrl(path, params);
+    try {
+      final request = http.Request('GET', url);
+      await _fillHeaders(request,
+          extraHeaders: headers,
+          backendClientTokenOverride: backendClientTokenOverride,
+          contentType: contentType);
 
-    final headersReally =
-        Map<String, String>.from(headers ?? <String, String>{});
-    if (backendClientToken != null) {
-      headersReally['Authorization'] = 'Bearer $backendClientToken';
+      if (body != null) {
+        request.body = body;
+      }
+
+      final httpResponse =
+          await http.Response.fromStream(await _http.send(request));
+      return BackendResponse.fromHttpResponse(httpResponse);
+    } on IOException catch (e) {
+      return BackendResponse.fromError(e, url);
     }
-    if (contentType != null) {
-      headersReally['Content-Type'] = contentType;
-    }
+  }
+
+  Uri _createUrl(String path, Map<String, dynamic>? params) {
     final String backendAddress;
     if (_CONNECT_TO_LOCAL_SERVER) {
       backendAddress = _LOCAL_BACKEND_ADDRESS;
@@ -435,20 +445,26 @@ class Backend {
     } else {
       url = Uri.https(backendAddress, '/backend/$path', params);
     }
-    try {
-      final request = http.Request('GET', url);
-      request.headers.addAll(headersReally);
+    return url;
+  }
 
-      if (body != null) {
-        request.body = body;
-      }
+  Future<void> _fillHeaders(http.BaseRequest request,
+      {required Map<String, String>? extraHeaders,
+      required String? backendClientTokenOverride,
+      required String? contentType}) async {
+    final userParams = await _userParamsController.getUserParams();
+    final backendClientToken =
+        backendClientTokenOverride ?? userParams?.backendClientToken;
 
-      final httpResponse =
-          await http.Response.fromStream(await _http.send(request));
-      return BackendResponse.fromHttpResponse(httpResponse);
-    } on IOException catch (e) {
-      return BackendResponse.fromError(e, url);
+    final headersReally =
+        Map<String, String>.from(extraHeaders ?? <String, String>{});
+    if (backendClientToken != null) {
+      headersReally['Authorization'] = 'Bearer $backendClientToken';
     }
+    if (contentType != null) {
+      headersReally['Content-Type'] = contentType;
+    }
+    request.headers.addAll(headersReally);
   }
 
   bool _isError(Map<String, dynamic> json) {
@@ -493,6 +509,20 @@ class Backend {
       throw Exception('Backend.customGet must be called only from Web');
     }
     return await _backendGet(path, queryParams, headers: headers);
+  }
+
+  Future<R> customRequest<R extends http.BaseRequest>(
+      String path, ArgResCallback<Uri, R> createRequest,
+      {Map<String, dynamic>? queryParams, Map<String, String>? headers}) async {
+    final uri = _createUrl(path, queryParams);
+    final request = createRequest.call(uri);
+    await _fillHeaders(request,
+        extraHeaders: null,
+        backendClientTokenOverride: null,
+        contentType: null);
+    Log.i(
+        'Backend.customRequest: $uri, params: $queryParams, headers: $headers');
+    return request;
   }
 }
 

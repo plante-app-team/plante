@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
@@ -212,6 +213,13 @@ class FakeBackend implements Backend {
   Future<BackendResponse> customGet(String path,
       [Map<String, dynamic>? queryParams, Map<String, String>? headers]) {
     throw UnimplementedError('Not supposed to be used');
+  }
+
+  @override
+  Future<R> customRequest<R extends http.BaseRequest>(
+      String path, ArgResCallback<Uri, R> createRequest,
+      {Map<String, dynamic>? queryParams, Map<String, String>? headers}) {
+    throw UnimplementedError();
   }
 }
 

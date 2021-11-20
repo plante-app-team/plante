@@ -68,7 +68,6 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
     "mod_reason_some_ingredient_has_unknown_origin": "Some of the ingredients have unknown origin",
-    "mod_reason_some_ingredient_is_in_fact_a_category": "Some of the ingredients are in fact categories, and ingredients of such categories can be vegan or non-vegan. E.g. if a product had \"flavor\" within its ingredients, it wouldn't tell us much.",
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "The product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured), but it also has a Vegan label on its packaging.",
     "mod_reason_cane_sugar_in_ingredients": "Product contains cane sugar, which could be processed through Bone Black/Bone Char.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Product contains sugar, which could be obtained from sugarcane and processed through Bone Black/Bone Char.",
@@ -240,5 +239,6 @@
     "shop_address_widget_possible_address": "Approximate address: ",
     "user_langs_widget_system_lang": "(System language)",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Product's manufacturing process utilizes non-vegan practices. But the product is considered ambiguous by Plante because all ingredients are vegan, and its mainstream appeal to help the vegan movement grow.",
-    "mod_reason_certified_vegan": "Product is certified vegan"
+    "mod_reason_certified_vegan": "Product is certified vegan",
+    "mod_reason_some_ingredient_is_in_fact_a_category2": "Ingredients labeled as \"Flavors\", \"Natural Dyes\", \"Additives\" (or in a similar ambiguous fashion) come from either plant, animal, or mineral sources. As such, products with such ingredients are (sometimes intentionally) ambiguous in their suitability for vegans."
 }

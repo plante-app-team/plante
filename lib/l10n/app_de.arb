@@ -68,11 +68,7 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Das Produkt enthält unklare Inhaltsstoffe (unklare Inhaltsstoffe können vegan oder nicht-vegan sein, je nachdem, wie sie hergestellt wurden)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Einige Produktserien enthalten nicht-vegane Inhaltsstoffe, andere nicht - bitte lesen Sie die Inhaltsstoffe sorgfältig!",
     "mod_reason_some_ingredient_has_unknown_origin": "Einige Inhaltsstoffe sind unbekannter Herkunft",
-    "mod_reason_some_ingredient_is_in_fact_a_category": "Einige der Inhaltsstoffe sind eigene Kategorien, Inhaltsstoffe solcher Kategorien können vegan oder nicht-vegan sein. Wenn ein Produkt z. B. \"Aroma\" als Inhaltsstoff hätte, würde dies nicht viel aussagen.",
-    "@mod_reason_some_ingredient_is_in_fact_a_category": {
-        "description": "not sure i understand the initial text",
-        "type": "text"
-    },
+    "mod_reason_some_ingredient_is_in_fact_a_category2": "Einige der Inhaltsstoffe sind eigene Kategorien, Inhaltsstoffe solcher Kategorien können vegan oder nicht-vegan sein. Wenn ein Produkt z. B. \"Aroma\" als Inhaltsstoff hätte, würde dies nicht viel aussagen.",
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Das Produkt hat unklare Inhaltsstoffe (unklare Inhaltsstoffe können vegan oder nicht-vegan sein, je nachdem, wie sie hergestellt wurden), aber es wurde auch mit  einem Vegan-Label gekennzeichnet.",
     "mod_reason_cane_sugar_in_ingredients": "Das Produkt enthält Rohrzucker, welcher mit Hilfe von Tierkohle verarbeitet worden sein könnte.",
     "@mod_reason_cane_sugar_in_ingredients": {

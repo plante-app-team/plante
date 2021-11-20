@@ -47,5 +47,3 @@ app.*.map.json
 
 /.gradle
 /local.properties
-
-lib/outside/off/off_user.dart
