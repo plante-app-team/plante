@@ -30,21 +30,18 @@ class VegStatusWarning extends StatelessWidget {
   }
 
   Widget showText() {
-    return showWarningImage != null && showWarningImage!
-        ? RichText(
-            key: const Key('veg_status_warning'),
-            text: TextSpan(children: [
+    return RichText(
+        key: const Key('veg_status_warning'),
+        text: TextSpan(children: [
+          if (showWarningImage == true) ...[
             WidgetSpan(
                 child: SvgPicture.asset('assets/veg_status_warning_icon.svg')),
             const WidgetSpan(
                 child: SizedBox(
               width: 5,
             )),
-            TextSpan(text: text, style: style),
-          ]))
-        : Text(
-            text,
-            style: style,
-          );
+          ],
+          TextSpan(text: text, style: style),
+        ]));
   }
 }

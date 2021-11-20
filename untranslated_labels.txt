@@ -1,5 +1,6 @@
 {
   "pl": [
-    "mod_reason_certified_vegan"
+    "mod_reason_certified_vegan",
+    "mod_reason_some_ingredient_is_in_fact_a_category2"
   ]
 }

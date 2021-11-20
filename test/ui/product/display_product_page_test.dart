@@ -36,6 +36,7 @@ import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../common_finders_extension.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
@@ -784,12 +785,9 @@ void main() {
           .persistentId)).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
-    final Finder widgetFinder = find.byKey(const Key('veg_status_warning'));
+    expect(find.richTextContaining(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
+        .localize(context)),findsOneWidget);
 
-    final richText0Widget = tester.element(widgetFinder).widget as RichText;
-    final text = richText0Widget.text.toPlainText();
-    expect(text.endsWith(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
-        .localize(context)),true);
   });
 
   testWidgets(
@@ -814,9 +812,8 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(
-        find.text(ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN
-            .localize(context)),
+    expect(find.richTextContaining(ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM
+        .localize(context)),
         findsNothing);
   });
 
