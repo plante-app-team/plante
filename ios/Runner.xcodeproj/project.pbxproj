@@ -37,6 +37,8 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		401B9C74268BA7B2005F1FCB /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		40820E982687ADD9003C1E5E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40A3EE6A27440E7F00F76851 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40A3EE6B27440E7F00F76851 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		40B56B062742E03E008C726D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		40B56B072742E03E008C726D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		40B56B082742E051008C726D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 				fr,
 				nl,
 				el,
+				pl,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -331,6 +334,7 @@
 				40B56B092742E051008C726D /* fr */,
 				40B56B0B2742E05A008C726D /* nl */,
 				40B56B0D2742E063008C726D /* el */,
+				40A3EE6B27440E7F00F76851 /* pl */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -352,6 +356,7 @@
 				40B56B082742E051008C726D /* fr */,
 				40B56B0A2742E05A008C726D /* nl */,
 				40B56B0C2742E063008C726D /* el */,
+				40A3EE6A27440E7F00F76851 /* pl */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
