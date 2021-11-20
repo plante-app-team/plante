@@ -156,7 +156,7 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
       case ModeratorChoiceReason.SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN:
         return context.strings.mod_reason_some_ingredient_has_unknown_origin;
       case ModeratorChoiceReason.SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY:
-        return context.strings.mod_reason_some_ingredient_is_in_fact_a_category;
+        return context.strings.mod_reason_some_ingredient_is_in_fact_a_category2;
       case ModeratorChoiceReason
           .INGREDIENTS_LIST_HAS_AMBIGUOUS_ENTRIES_BUT_PRODUCT_HAS_VEGAN_LABEL:
         return context.strings
