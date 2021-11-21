@@ -20,8 +20,6 @@ https://planteapp.com/
 
 ![screenshots](https://github.com/plante-app-team/plante/blob/master/readme_resources/screenshots.jpg)
 
-<br />
-
 ## 🗣 Translations
 
 We don't speak that many languages - if you would help us to translate the app into a langauge you speak that would be very good for the project! 🙂
