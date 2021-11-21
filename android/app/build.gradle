@@ -26,9 +26,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 android {
     compileSdkVersion 30
@@ -43,6 +41,8 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // For https://pub.dev/packages/flutter_config
+        resValue "string", "build_config_package", "vegancheckteam.plante"
     }
 
     signingConfigs {
@@ -53,10 +53,10 @@ android {
             storePassword 'android'
         }
         release {
-            keyAlias properties['keyAlias']
-            keyPassword properties['keyPassword']
-            storeFile properties['storeFile'] ? file(properties['storeFile']) : null
-            storePassword properties['storePassword']
+            keyAlias localProperties['keyAlias']
+            keyPassword localProperties['keyPassword']
+            storeFile localProperties['storeFile'] ? file(localProperties['storeFile']) : null
+            storePassword localProperties['storePassword']
         }
     }
 

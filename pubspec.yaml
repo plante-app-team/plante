@@ -69,6 +69,7 @@ dependencies:
   sqflite_common_ffi: ^2.0.0+1
   fuzzywuzzy: ^0.1.4
   map_launcher: ^2.1.1
+  flutter_config: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -48,7 +48,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="PLANTE_ANDROID_GOOGLE_MAPS_KEY"/>
+            android:value="@string/PLANTE_ANDROID_GOOGLE_MAPS_KEY"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

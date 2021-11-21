@@ -34,7 +34,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID</string>
+				<string>$(PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID)</string>
 			</array>
 		</dict>
 	</array>
