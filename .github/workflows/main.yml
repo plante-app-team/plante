@@ -17,11 +17,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Create an OFF user credentials file
-        uses: canastro/copy-file-action@master
-        with:
-          source: "off_user.dart.example"
-          target: "lib/outside/off/off_user.dart"
       # Cache Flutter environment
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
