@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run static checks and tests 
 
 on:
   workflow_dispatch:
@@ -26,12 +26,12 @@ jobs:
           channel: stable
       - name: Check for any formatting issues in the code
         run: flutter format --set-exit-if-changed .
-      - name: Statically analyze the Dart code for any errors
-        run: flutter analyze .
-      # NOTE: submodules are being fetched _after_ formatting and
-      # analayze checks - we don't want to fail because of submodules
+      # NOTE: submodules are being fetched _after_ formatting -
+      # we don't want to fail because of bad formatting in submodules
       - name: Checkout submodules (Open Food Facts)
         run: git submodule update --init --recursive
+      - name: Statically analyze the Dart code for any errors
+        run: flutter analyze .
       - name: Run pub get   
         run: flutter pub get
       - name: Run tests
