@@ -1,6 +1,23 @@
 {
+  "de": [
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
+  "el": [
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
   "pl": [
     "mod_reason_certified_vegan",
-    "mod_reason_some_ingredient_is_in_fact_a_category2"
+    "mod_reason_some_ingredient_is_in_fact_a_category2",
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
+  "ru": [
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
   ]
 }

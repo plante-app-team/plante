@@ -29,6 +29,7 @@ extension WidgetTesterExtension on WidgetTester {
         ));
 
     await pumpWidget(widgetWrapper, duration, phase);
+    await pumpAndSettle();
     return _context;
   }
 

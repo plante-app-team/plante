@@ -33,7 +33,7 @@ bool isInTests() {
 
 /// Deprecated, new features should be developed in dedicated branches
 @deprecated
-Future<bool> enableNewestFeatures() async => isInTests();
+Future<bool> enableNewestFeatures() async => isInTests() || kDebugMode;
 
 void setSystemUIOverlayStyle() {
   if (Platform.isAndroid) {

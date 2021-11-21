@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
@@ -7,6 +10,8 @@ import 'package:plante/outside/products/products_obtainer.dart';
 
 class FakeProductsObtainer implements ProductsObtainer {
   final _knownProducts = <String, Product>{};
+  final _resumeCallbacks = <VoidCallback>[];
+  var _paused = false;
 
   /// A function which generates products for testing purposes
   ArgResCallback<String, Result<Product?, ProductsObtainerError>>?
@@ -39,6 +44,19 @@ class FakeProductsObtainer implements ProductsObtainer {
     }
   }
 
+  /// Makes all returned futures to not be resolved yet
+  void pauseProductsRetrieval() {
+    _paused = true;
+  }
+
+  /// Resolves all futures returned in the past
+  void resumeProductsRetrieval() {
+    _paused = false;
+    final copy = _resumeCallbacks.toList();
+    _resumeCallbacks.clear();
+    copy.forEach((e) => e.call());
+  }
+
   void addKnownProducts(Iterable<Product> products) {
     products.forEach(addKnownProduct);
   }
@@ -47,10 +65,27 @@ class FakeProductsObtainer implements ProductsObtainer {
     _knownProducts[product.barcode] = product;
   }
 
+  void clearKnownProducts() {
+    _knownProducts.clear();
+  }
+
   @override
   Future<Result<Product?, ProductsObtainerError>> getProduct(
       String barcode) async {
-    return _getProductNow(barcode);
+    return _turnIntoFuture(_getProductNow(barcode));
+  }
+
+  Future<T> _turnIntoFuture<T>(T value) {
+    final completer = Completer<T>();
+    final complete = () {
+      completer.complete(value);
+    };
+    if (_paused) {
+      _resumeCallbacks.add(complete);
+    } else {
+      complete.call();
+    }
+    return completer.future;
   }
 
   Result<Product?, ProductsObtainerError> _getProductNow(String barcode) {
@@ -78,14 +113,14 @@ class FakeProductsObtainer implements ProductsObtainer {
         products.add(product);
       }
     }
-    return Ok(products);
+    return _turnIntoFuture(Ok(products));
   }
 
   @override
   Future<Result<Product?, ProductsObtainerError>> inflate(
       BackendProduct backendProduct) async {
     inflatesBackendProductsCount += 1;
-    return await getProduct(backendProduct.barcode);
+    return _turnIntoFuture(_getProductNow(backendProduct.barcode));
   }
 
   @override
