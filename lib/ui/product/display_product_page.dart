@@ -410,7 +410,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
       rows.add(TableRow(
         children: <Widget>[
           const SizedBox(width: 24),
-          center(Text(ingredient.name,
+          center(Text(ingredient.cleanName(),
               style: TextStyles.normal,
               maxLines: 1,
               overflow: TextOverflow.ellipsis)),

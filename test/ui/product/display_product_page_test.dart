@@ -35,8 +35,8 @@ import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
-import '../../common_mocks.mocks.dart';
 import '../../common_finders_extension.dart';
+import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
@@ -152,7 +152,7 @@ void main() {
           ..name = 'ingredient1'
           ..veganStatus = VegStatus.positive),
         Ingredient((v) => v
-          ..name = 'ingredient2'
+          ..name = 'en:ingredient2'
           ..veganStatus = null),
       ])).buildSingleLangProduct();
 
@@ -387,10 +387,7 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(
-            context.strings.display_product_page_veg_status_positive_warning),
-        findsOneWidget);
+    expect(find.richTextContaining(context.strings.display_product_page_veg_status_positive_warning),findsOneWidget);
   });
 
   testWidgets('veg status hint - negative', (WidgetTester tester) async {
@@ -425,7 +422,7 @@ void main() {
       ..ingredientsText = 'Water, salt, sugar'
       ..ingredientsAnalyzed.addAll([
         Ingredient((v) => v
-          ..name = 'ingredient1'
+          ..name = 'ru:ingredient1'
           ..veganStatus = VegStatus.unknown),
         Ingredient((v) => v
           ..name = 'ingredient2'
@@ -435,10 +432,7 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(context
-            .strings.display_product_page_veg_status_possible_explanation),
-        findsOneWidget);
+    expect(find.richTextContaining(context.strings.display_product_page_veg_status_possible_explanation),findsOneWidget);
   });
 
   testWidgets('veg status hint - unknown', (WidgetTester tester) async {
@@ -454,17 +448,14 @@ void main() {
           ..name = 'ingredient1'
           ..veganStatus = VegStatus.unknown),
         Ingredient((v) => v
-          ..name = 'ingredient2'
+          ..name = 'nl:ingredient2'
           ..veganStatus = null),
       ])).buildSingleLangProduct();
 
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(context
-            .strings.display_product_page_veg_status_unknown_explanation),
-        findsOneWidget);
+    expect(find.richTextContaining(context.strings.display_product_page_veg_status_unknown_explanation),findsOneWidget);
   });
 
   testWidgets('mark on map button', (WidgetTester tester) async {
