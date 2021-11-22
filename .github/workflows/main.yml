@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run static checks and tests 
 
 on:
   workflow_dispatch:
@@ -15,9 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      # Cache Flutter environment
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
         with:
@@ -26,7 +23,15 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: ${{ env.flutter_version }}
-          channel: stable 
+          channel: stable
+      - name: Check for any formatting issues in the code
+        run: flutter format --set-exit-if-changed lib
+      # NOTE: submodules are being fetched _after_ formatting -
+      # we don't want to fail because of bad formatting in submodules
+      - name: Checkout submodules (Open Food Facts)
+        run: git submodule update --init --recursive
+      - name: Statically analyze the Dart code for any errors
+        run: flutter analyze .
       - name: Run pub get   
         run: flutter pub get
       - name: Run tests
