@@ -77,7 +77,7 @@ Currently used variables on Android:
 
 On iOS:
 - `PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID`
-- 'PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE'
+- `PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE`
 - `PLANTE_IOS_GOOGLE_MAPS_KEY`
 
 To contribute on iOS you will need a (generated) tmp.xconfig. 
