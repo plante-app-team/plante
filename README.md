@@ -85,7 +85,7 @@ To contribute on IOS you will need a (generated) tmp.xconfig.
 
 ## 👩🏾‍💻 Development
 
-- `flutter format` is used to enforce app's coding style - you should run `$ flutter format <file>` (or `$ find . -name *.dart | xargs flutter format`) before each commit.
+- `flutter format` is used to enforce app's coding style - you should run `$ flutter format lib` from project's root directory before each commit.
 
 - The [built_value package](https://pub.dev/packages/built_value) is used for value types. You should read its documentation if you want to edit any `implements Built` class, or if you want to create a new one. We run next command when we update/create such a class: `$ flutter pub run build_runner build --delete-conflicting-outputs`.
 

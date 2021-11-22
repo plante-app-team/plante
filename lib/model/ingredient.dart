@@ -18,13 +18,12 @@ abstract class Ingredient implements Built<Ingredient, IngredientBuilder> {
 
   Map<String, dynamic> toJson() {
     return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
-    as Map<String, dynamic>;
+        as Map<String, dynamic>;
   }
 
   String cleanName() {
     return name.replaceAll(RegExp(r'^\w\w:'), '');
   }
-
 
   factory Ingredient([void Function(IngredientBuilder) updates]) = _$Ingredient;
   Ingredient._();

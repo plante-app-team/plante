@@ -9,9 +9,11 @@ class GoogleAuthorizer {
   Future<GoogleUser?> auth() async {
     final String? clientId;
     if (Platform.isIOS) {
-      clientId = FlutterConfig.get('PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE')?.toString();
+      clientId =
+          FlutterConfig.get('PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE')?.toString();
     } else {
-      clientId = FlutterConfig.get('PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID')?.toString();
+      clientId = FlutterConfig.get('PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID')
+          ?.toString();
     }
     final GoogleSignIn googleSignIn =
         GoogleSignIn(scopes: ['email', 'profile'], clientId: clientId);
