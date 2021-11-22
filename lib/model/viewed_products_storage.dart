@@ -12,12 +12,15 @@ import 'package:plante/model/product.dart';
 /// data may become outdated.
 class ViewedProductsStorage {
   static const STORED_PRODUCTS_MAX = 20;
-  static const _FILE_NAME = 'viewed_products_storage.json';
+  static const _DEFAULT_FILE_NAME = 'viewed_products_storage.json';
+  final String storageFileName;
   final _cache = <Product>[];
 
   final _updatesStream = StreamController<void>.broadcast();
 
-  ViewedProductsStorage({bool loadPersistentProducts = true}) {
+  ViewedProductsStorage(
+      {bool loadPersistentProducts = true,
+      this.storageFileName = _DEFAULT_FILE_NAME}) {
     if (loadPersistentProducts) {
       _loadPersistentProducts();
     }
@@ -60,7 +63,7 @@ class ViewedProductsStorage {
 
   Future<File> _getStorageFile() async {
     final internalStorage = await getAppDir();
-    return File('${internalStorage.path}/$_FILE_NAME');
+    return File('${internalStorage.path}/$storageFileName');
   }
 
   List<Product> getProducts() {

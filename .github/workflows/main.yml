@@ -25,7 +25,7 @@ jobs:
           flutter-version: ${{ env.flutter_version }}
           channel: stable
       - name: Check for any formatting issues in the code
-        run: flutter format --set-exit-if-changed .
+        run: flutter format --set-exit-if-changed lib
       # NOTE: submodules are being fetched _after_ formatting -
       # we don't want to fail because of bad formatting in submodules
       - name: Checkout submodules (Open Food Facts)
