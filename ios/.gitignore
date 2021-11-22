@@ -34,3 +34,4 @@ Runner/GeneratedPluginRegistrant.*
 # security
 GoogleService-Info.plist
 Flutter/tmp.xcconfig
+.envfile
