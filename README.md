@@ -25,8 +25,8 @@ https://planteapp.com/
 We don't speak that many languages - if you would help us to translate the app into a langauge you speak that would be very good for the project! 🙂
 
 We have 2 projects in POEditor:
-- Main project for almost all of the app's text: https://poeditor.com/projects/view?id=490023
-- Project for iOS-only text: https://poeditor.com/projects/view?id=490493
+- Main project for almost all of the app's text: https://poeditor.com/join/project?hash=vQy5XjnrGL
+- Project for iOS-only text: https://poeditor.com/join/project?hash=o9hhL1K1fD
 
 
 ## 📦 How to build
