@@ -40,6 +40,8 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -71,7 +73,5 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<false/>
 </dict>
 </plist>
