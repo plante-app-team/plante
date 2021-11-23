@@ -387,10 +387,7 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(
-            context.strings.display_product_page_veg_status_positive_warning),
-        findsOneWidget);
+    expect(find.richTextContaining(context.strings.display_product_page_veg_status_positive_warning),findsOneWidget);
   });
 
   testWidgets('veg status hint - negative', (WidgetTester tester) async {
@@ -435,10 +432,8 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(context
-            .strings.display_product_page_veg_status_possible_explanation),
-        findsOneWidget);
+    expect(find.richTextContaining(context
+        .strings.display_product_page_veg_status_possible_explanation),findsOneWidget);
   });
 
   testWidgets('veg status hint - unknown', (WidgetTester tester) async {
@@ -461,10 +456,8 @@ void main() {
     final context = await tester.superPump(DisplayProductPage(product));
 
     expect(find.byKey(const Key('veg_status_hint')), findsOneWidget);
-    expect(
-        find.text(context
-            .strings.display_product_page_veg_status_unknown_explanation),
-        findsOneWidget);
+    expect(find.richTextContaining(context
+        .strings.display_product_page_veg_status_unknown_explanation),findsOneWidget);
   });
 
   testWidgets('mark on map button', (WidgetTester tester) async {

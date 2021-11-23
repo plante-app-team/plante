@@ -4,12 +4,14 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+
 
 enum OffShopsManagerError {
   NETWORK,
@@ -34,6 +36,9 @@ class OffShopsManager {
     'en:veggie-patties',
     'en:biscuits',
   ];
+  // List of countries we load the products from OFF linked to a store
+  static const enabledCountryCodes = [BELGIUM, NETHERLANDS,GERMANY,FRANCE];
+
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
@@ -117,6 +122,10 @@ class OffShopsManager {
       return Err(shopsRes.unwrapErr());
     } else if (countryCodeRes.isErr) {
       return Err(OffShopsManagerError.OTHER);
+    }
+    //when not in enabled countries, we don't load the products from OFF
+    if (!enabledCountryCodes.contains(countryCodeRes.unwrap())){
+      return Ok(const {});
     }
     final shopsWrapper = shopsRes.unwrap();
     final shops = await shopsWrapper.findAppropriateShopsFor(shopsNames);
