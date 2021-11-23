@@ -115,6 +115,16 @@ void main() {
     expect(shopsResult.isErr, isTrue);
   });
 
+  test('do not fetch shops when country not in enabled list', () async {
+    await _initShops(
+      cameraPos: Coord(lat: 10, lon: 10),
+      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = RUSSIA)),
+      offApiShops: Ok(someOffShops),
+    );
+    final shopsResult = await offShopsManager.fetchOffShops();
+    expect(shopsResult.isErr, isTrue);
+  });
+
   test('fetch shops when address does not have country code', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
@@ -196,7 +206,7 @@ void main() {
     expect(fetchedbarcodes1, equals(fetchedbarcodes2));
   });
 
-  test('fetch barcodeswhen no barcodesare available for the shop', () async {
+  test('fetch barcodes when no barcodes are available for the shop', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
       addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = BELGIUM)),
@@ -329,6 +339,6 @@ void main() {
 
     final fetchedBarcodesRes = await offShopsManager
         .fetchVeganBarcodesForShops({shop.name!}, [LangCode.be]);
-    expect(fetchedBarcodesRes.unwrap().isEmpty, isTrue);
+    expect(fetchedBarcodesRes.isErr, isTrue);
   });
 }

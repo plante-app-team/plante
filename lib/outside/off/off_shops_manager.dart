@@ -78,7 +78,11 @@ class OffShopsManager {
           'User is out of all countries! Coord: $cameraPos, addr: $address');
       return Err(None());
     }
-
+    //when not in enabled countries, we don't load the products from OFF
+    if (!enabledCountryCodes.contains(countryCode)){
+      Log.d('Country $countryCode is not in the enabled countries list $enabledCountryCodes not fetching shops and products from off');
+      return Err(None());
+    }
     return Ok(countryCode);
   }
 
@@ -122,10 +126,6 @@ class OffShopsManager {
       return Err(shopsRes.unwrapErr());
     } else if (countryCodeRes.isErr) {
       return Err(OffShopsManagerError.OTHER);
-    }
-    //when not in enabled countries, we don't load the products from OFF
-    if (!enabledCountryCodes.contains(countryCodeRes.unwrap())){
-      return Ok(const {});
     }
     final shopsWrapper = shopsRes.unwrap();
     final shops = await shopsWrapper.findAppropriateShopsFor(shopsNames);
