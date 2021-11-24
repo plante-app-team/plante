@@ -4,14 +4,13 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/model/country_code.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
-
 
 enum OffShopsManagerError {
   NETWORK,
@@ -36,8 +35,6 @@ class OffShopsManager {
     'en:veggie-patties',
     'en:biscuits',
   ];
-  // List of countries we load the products from OFF linked to a store
-  static const enabledCountryCodes = [BELGIUM, NETHERLANDS,GERMANY,FRANCE];
 
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
@@ -78,11 +75,6 @@ class OffShopsManager {
           'User is out of all countries! Coord: $cameraPos, addr: $address');
       return Err(None());
     }
-    //when not in enabled countries, we don't load the products from OFF
-    if (!enabledCountryCodes.contains(countryCode)){
-      Log.d('Country $countryCode is not in the enabled countries list $enabledCountryCodes not fetching shops and products from off');
-      return Err(None());
-    }
     return Ok(countryCode);
   }
 
@@ -99,13 +91,15 @@ class OffShopsManager {
 
   Future<Result<OffShopsListWrapper, OffShopsManagerError>>
       _fetchOffShopsImpl() async {
-    final countryCode = await _countryCodeOp.result;
+    final countryCode = await _countryCode;
     if (countryCode.isErr) {
       Log.w('offShopsManager.fetchOffShops - no country code, cannot fetch');
       return Err(OffShopsManagerError.OTHER);
+    } else if (countryCode.unwrap() == null) {
+      return Ok(await OffShopsListWrapper.create([]));
     }
 
-    final shopsRes = await _offApi.getShopsForLocation(countryCode.unwrap());
+    final shopsRes = await _offApi.getShopsForLocation(countryCode.unwrap()!);
     if (shopsRes.isErr) {
       Log.w('offShopManager.fetchOffShop error: $shopsRes');
       return Err(shopsRes.unwrapErr().convert());
@@ -120,7 +114,13 @@ class OffShopsManager {
     if (!(await enableNewestFeatures())) {
       return Ok(const {});
     }
-    final countryCodeRes = await _countryCodeOp.result;
+    final countryCodeRes = await _countryCode;
+    if (countryCodeRes.isErr) {
+      Log.w('offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
+      return Err(OffShopsManagerError.OTHER);
+    } else if (countryCodeRes.unwrap() == null) {
+      return Ok(const {});
+    }
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
@@ -140,7 +140,7 @@ class OffShopsManager {
       if (existingCache != null) {
         result[name] = existingCache;
       } else {
-        final barcodesRes = await _queryBarcodesFor(shop, countryCode);
+        final barcodesRes = await _queryBarcodesFor(shop, countryCode!);
         if (barcodesRes.isErr) {
           return Err(barcodesRes.unwrapErr());
         }
@@ -150,6 +150,14 @@ class OffShopsManager {
       }
     }
     return Ok(result);
+  }
+
+  Future<Result<String?, None>> get _countryCode async {
+    final result = await _countryCodeOp.result;
+    if (result.isOk && !Country.isEnabledCountry(result.unwrap())) {
+      return Ok(null);
+    }
+    return result;
   }
 
   Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesFor(
