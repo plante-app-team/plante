@@ -27,7 +27,6 @@ class Country {
         return context.strings.country_ad;
       case BELGIUM:
         return context.strings.country_be;
-
       default:
         Log.e('no translation found for country code $isoCode in country.dart');
         return '';
