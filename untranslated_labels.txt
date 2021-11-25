@@ -1,6 +1,59 @@
 {
+  "de": [
+    "country_ad",
+    "country_ae",
+    "country_af",
+    "country_ag",
+    "country_be",
+    "country_nl",
+    "country_de",
+    "country_fr",
+    "country_ru",
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
+  "el": [
+    "country_ad",
+    "country_ae",
+    "country_af",
+    "country_ag",
+    "country_be",
+    "country_nl",
+    "country_de",
+    "country_fr",
+    "country_ru",
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
   "pl": [
+    "country_ad",
+    "country_ae",
+    "country_af",
+    "country_ag",
+    "country_be",
+    "country_nl",
+    "country_de",
+    "country_fr",
+    "country_ru",
     "mod_reason_certified_vegan",
-    "mod_reason_some_ingredient_is_in_fact_a_category2"
+    "mod_reason_some_ingredient_is_in_fact_a_category2",
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
+  ],
+
+  "ru": [
+    "country_ad",
+    "country_ae",
+    "country_af",
+    "country_ag",
+    "country_be",
+    "country_nl",
+    "country_de",
+    "country_fr",
+    "country_ru",
+    "shop_card_off_products_listed",
+    "shop_product_range_page_suggested_products_country"
   ]
 }

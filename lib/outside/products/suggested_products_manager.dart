@@ -1,3 +1,4 @@
+import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
@@ -20,6 +21,10 @@ class SuggestedProductsManager {
 
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
       getSuggestedBarcodesFor(Iterable<Shop> shops) async {
+    if (!(await enableNewestFeatures())) {
+      return Ok(const {});
+    }
+
     shops = shops.toSet(); // Defensive copy
     final names = shops.map((e) => e.name).toSet();
     final barcodesMapRes = await _offShopsManager.fetchVeganBarcodesForShops(

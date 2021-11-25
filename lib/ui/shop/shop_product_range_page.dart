@@ -21,6 +21,7 @@ import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/fading_edge_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';
+import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -32,8 +33,7 @@ import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
   final VoidCallback? addressLoadFinishCallback;
-  final _testingStorage = _TestingStorage();
-  ShopProductRangePage._(
+  const ShopProductRangePage._(
       {Key? key, required this.shop, this.addressLoadFinishCallback})
       : super(key: key);
 
@@ -72,18 +72,6 @@ class ShopProductRangePage extends StatefulWidget {
 
   @override
   _ShopProductRangePageState createState() => _ShopProductRangePageState();
-
-  @visibleForTesting
-  void forceContentReloadForTesting() {
-    if (!isInTests()) {
-      throw Exception('forceContentReloadForTesting called not in tests');
-    }
-    _testingStorage.forceReload!.call();
-  }
-}
-
-class _TestingStorage {
-  VoidCallback? forceReload;
 }
 
 class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
@@ -112,8 +100,6 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         widget.shop,
         updateCallback);
     initializeDateFormatting();
-
-    widget._testingStorage.forceReload = _model.reloadConfirmedProducts;
   }
 
   @override
@@ -124,7 +110,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    Widget content;
+    Widget centralContent;
     final errorWrapper = (Widget child) {
       return Padding(
           padding: const EdgeInsets.all(16), child: Center(child: child));
@@ -132,100 +118,92 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     final errorText = (String text) =>
         Text(text, textAlign: TextAlign.center, style: TextStyles.normal);
 
-    if (_model.loading) {
-      content = const Center(child: CircularProgressIndicator());
-    } else if (_model.loadedRangeRes.isErr) {
-      if (_model.loadedRangeRes.unwrapErr() ==
-          ShopsManagerError.NETWORK_ERROR) {
-        content = errorWrapper(
+    if (_model.confirmedProductsLoading) {
+      centralContent = const SizedBox();
+    } else if (_model.loadingError != null) {
+      if (_model.loadingError == ShopsManagerError.NETWORK_ERROR) {
+        centralContent = errorWrapper(
             Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           errorText(context.strings.global_network_error),
           const SizedBox(height: 8),
           ButtonFilledPlante.withText(context.strings.global_try_again,
-              onPressed: _model.reloadConfirmedProducts)
+              onPressed: _model.reload)
         ]));
       } else {
-        content = errorWrapper(
+        centralContent = errorWrapper(
             errorText(context.strings.global_something_went_wrong));
       }
-    } else if (!_model.anyProductsLoaded) {
-      content = errorWrapper(errorText(
-          context.strings.shop_product_range_page_this_shop_has_no_product));
     } else {
-      final widgets = <Widget>[];
-      widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
-      if (_model.loadedProducts.isNotEmpty) {
-        widgets.addAll(_model.loadedProducts
-            .map((e) => _productToCard(e, context))
-            .toList());
+      if (_model.confirmedProducts.isEmpty &&
+          _model.suggestedProducts.isEmpty &&
+          !_model.suggestedProductsLoading) {
+        centralContent = errorWrapper(errorText(
+            context.strings.shop_product_range_page_this_shop_has_no_product));
+      } else {
+        final widgets = <Widget>[];
+        widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
+
+        final confirmedProducts = _model.confirmedProducts;
+        final suggestedProducts = _model.suggestedProducts;
+        widgets.addAll(_productsToCard(confirmedProducts, context));
+        if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
+          final title = context
+              .strings.shop_product_range_page_suggested_products_country
+              .replaceAll('<SHOP>', widget.shop.name);
+          widgets.add(Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
+              child: Text(title, style: TextStyles.headline3)));
+          widgets.addAll(_productsToCard(suggestedProducts, context));
+          if (_model.suggestedProductsLoading) {
+            widgets.add(const Center(child: CircularProgressIndicator()));
+          }
+        }
+        widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
+        centralContent =
+            ListView(key: const Key('products_list'), children: widgets);
       }
-      if (_model.suggestedProducts.isNotEmpty) {
-        widgets.add(const Text('Suggested products')); // TODO: i18n
-        widgets.addAll(_model.suggestedProducts
-            .map((e) => _productToCard(e, context))
-            .toList());
-      }
-      widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
-      content = ListView(children: widgets);
     }
-    return Scaffold(
-      backgroundColor: ColorsPlante.lightGrey,
-      body: SafeArea(
-          child: Stack(children: [
-        Column(children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    FabPlante.closeBtnPopOnClick(
-                        key: const Key('close_button')),
-                    Expanded(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                          Text(widget.shop.name, style: TextStyles.headline1),
-                          const SizedBox(height: 3),
-                          AddressWidget.forShop(widget.shop, _model.address(),
-                              loadCompletedCallback:
-                                  widget.addressLoadFinishCallback),
-                        ])),
-                  ]),
-            ]),
-          ),
-          const SizedBox(height: _LIST_GRADIENT_SIZE),
-          Expanded(
-              child: Stack(children: [
-            content,
-            const Positioned.fill(
-                top: -2,
-                child: FadingEdgePlante(
-                    direction: FadingEdgeDirection.TOP_TO_BOTTOM,
-                    size: _LIST_GRADIENT_SIZE,
-                    color: ColorsPlante.lightGrey)),
-            const Positioned.fill(
-                bottom: -2,
-                child: FadingEdgePlante(
-                    direction: FadingEdgeDirection.BOTTOM_TO_TOP,
-                    size: _LIST_GRADIENT_SIZE,
-                    color: ColorsPlante.lightGrey)),
-          ])),
-          const SizedBox(height: _LIST_GRADIENT_SIZE),
-          Padding(
-              padding: const EdgeInsets.only(
-                  left: 24, right: 24, top: 0, bottom: 21),
-              child: SizedBox(
-                  width: double.infinity,
-                  child: ButtonFilledPlante.withText(
-                      context.strings.shop_product_range_page_add_product,
-                      onPressed: _onAddProductClick))),
+
+    final content = Column(children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              textDirection: TextDirection.rtl,
+              children: [
+                FabPlante.closeBtnPopOnClick(key: const Key('close_button')),
+                Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                      Text(widget.shop.name, style: TextStyles.headline1),
+                      const SizedBox(height: 3),
+                      AddressWidget.forShop(widget.shop, _model.address,
+                          loadCompletedCallback:
+                              widget.addressLoadFinishCallback),
+                    ])),
+              ]),
         ]),
-        Positioned.fill(
-            child: AnimatedCrossFadePlante(
-          crossFadeState: _model.performingBackendAction
+      ),
+      const SizedBox(height: _LIST_GRADIENT_SIZE),
+      Expanded(
+          child: Stack(children: [
+        centralContent,
+        const Positioned.fill(
+            top: -2,
+            child: FadingEdgePlante(
+                direction: FadingEdgeDirection.TOP_TO_BOTTOM,
+                size: _LIST_GRADIENT_SIZE,
+                color: ColorsPlante.lightGrey)),
+        const Positioned.fill(
+            bottom: -2,
+            child: FadingEdgePlante(
+                direction: FadingEdgeDirection.BOTTOM_TO_TOP,
+                size: _LIST_GRADIENT_SIZE,
+                color: ColorsPlante.lightGrey)),
+        AnimatedCrossFadePlante(
+          crossFadeState: _model.confirmedProductsLoading
               ? CrossFadeState.showSecond
               : CrossFadeState.showFirst,
           firstChild: const SizedBox.shrink(),
@@ -233,9 +211,37 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             color: const Color(0x70FFFFFF),
             child: const Center(child: CircularProgressIndicator()),
           ),
-        ))
+        ),
       ])),
+      const SizedBox(height: _LIST_GRADIENT_SIZE),
+      Padding(
+          padding:
+              const EdgeInsets.only(left: 24, right: 24, top: 0, bottom: 21),
+          child: SizedBox(
+              width: double.infinity,
+              child: ButtonFilledPlante.withText(
+                  context.strings.shop_product_range_page_add_product,
+                  onPressed: _onAddProductClick))),
+    ]);
+
+    return Scaffold(
+      backgroundColor: ColorsPlante.lightGrey,
+      body: SafeArea(child: content),
     );
+  }
+
+  List<Widget> _productsToCard(List<Product> products, BuildContext context) {
+    final widgets = <Widget>[];
+    for (var index = 0; index < products.length; ++index) {
+      final product = products[index];
+      widgets.add(VisibilityDetectorPlante(
+          keyStr: product.barcode,
+          onVisibilityChanged: (visible, _) {
+            _model.onProductVisibilityChange(product, visible);
+          },
+          child: _productToCard(product, context)));
+    }
+    return widgets;
   }
 
   Widget _productToCard(Product product, BuildContext context) {

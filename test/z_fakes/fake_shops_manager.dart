@@ -1,4 +1,5 @@
 import 'package:plante/base/base.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -19,6 +20,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 class FakeShopsManager implements ShopsManager {
   final _listeners = <ShopsManagerListener>[];
   final _shopsAreas = <CoordsBounds, List<Shop>>{};
+  final _shopsRanges = <OsmUID, Result<ShopProductRange, ShopsManagerError>>{};
 
   ArgResCallback<CoordsBounds, Future<Iterable<Shop>>> _shopsLoader =
       (_) async => const [];
@@ -26,6 +28,8 @@ class FakeShopsManager implements ShopsManager {
   final _fetchShopsCalls = <CoordsBounds>[];
   final _putProductToShopsCalls = <PutProductToShopsParams>[];
   var _createShopCalls = 0;
+  var _fetchRangesCalls = 0;
+  final _productPresenceVoteCalls = <Pair<Shop, Product>, List<bool>>{};
 
   void addPreloadedArea(CoordsBounds bounds, Iterable<Shop> shops) {
     _shopsAreas[bounds] = shops.toList();
@@ -50,9 +54,18 @@ class FakeShopsManager implements ShopsManager {
     _shopsLoader = (CoordsBounds bounds) async => loader.call(bounds);
   }
 
+  void setShopRange(
+      OsmUID uid, Result<ShopProductRange, ShopsManagerError> range) {
+    _shopsRanges[uid] = range;
+    _notifyListeners();
+  }
+
   void clear_verifiedCalls() {
     _fetchShopsCalls.clear();
+    _putProductToShopsCalls.clear();
     _createShopCalls = 0;
+    _fetchRangesCalls = 0;
+    _productPresenceVoteCalls.clear();
   }
 
   void verify_fetchShops_called({int? times}) {
@@ -78,9 +91,24 @@ class FakeShopsManager implements ShopsManager {
     _verifyCalls(times, _createShopCalls, 'createShop');
   }
 
+  void verity_fetchShopProductRange_called({int? times}) {
+    _verifyCalls(times, _fetchRangesCalls, 'fetchShopProductRange');
+  }
+
+  void verity_productPresenceVote_called({int? times}) {
+    _verifyCalls(
+        times, _productPresenceVoteCalls.length, 'productPresenceVote');
+  }
+
   List<CoordsBounds> calls_fetchShop() => _fetchShopsCalls.toList();
   List<PutProductToShopsParams> calls_putProductToShops() =>
       _putProductToShopsCalls.toList();
+  List<bool> calls_productPresenceVote(Shop shop, Product product) =>
+      _productPresenceVoteCalls[Pair(shop, product)] ?? const [];
+
+  //
+  // Class implementation below
+  //
 
   @override
   int get loadedAreasCount => _shopsAreas.length;
@@ -190,6 +218,11 @@ class FakeShopsManager implements ShopsManager {
   @override
   Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
       productPresenceVote(Product product, Shop shop, bool positive) async {
+    final key = Pair(shop, product);
+    if (!_productPresenceVoteCalls.containsKey(key)) {
+      _productPresenceVoteCalls[key] = <bool>[];
+    }
+    _productPresenceVoteCalls[key]!.add(positive);
     return Ok(ProductPresenceVoteResult(productDeleted: false));
   }
 
@@ -204,8 +237,10 @@ class FakeShopsManager implements ShopsManager {
   @override
   Future<Result<ShopProductRange, ShopsManagerError>> fetchShopProductRange(
       Shop shop,
-      {bool noCache = false}) {
-    throw UnimplementedError('Not yet implemented');
+      {bool noCache = false}) async {
+    _fetchRangesCalls += 1;
+    final emptyRange = ShopProductRange((e) => e.shop.replace(shop));
+    return _shopsRanges[shop.osmUID] ?? Ok(emptyRange);
   }
 }
 

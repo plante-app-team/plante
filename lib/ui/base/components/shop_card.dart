@@ -94,22 +94,7 @@ class ShopCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               textDirection: TextDirection.rtl,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 10, top: 16),
-                  child: Material(
-                    color: _haveProducts()
-                        ? ColorsPlante.amber
-                        : ColorsPlante.lightGrey,
-                    borderRadius: BorderRadius.circular(5),
-                    child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Text(
-                            _haveProducts()
-                                ? context.strings.shop_card_products_listed
-                                : context.strings.shop_card_no_products_listed,
-                            style: TextStyles.tag)),
-                  ),
-                ),
+                _productListedLabel(context),
                 Expanded(
                     child: Padding(
                         padding: const EdgeInsets.only(left: 16, top: 16),
@@ -136,6 +121,29 @@ class ShopCard extends StatelessWidget {
                 if (checkedProduct != null) _checkIfProductSoldContent(context),
               ]))
         ]));
+  }
+
+  Widget _productListedLabel(BuildContext context) {
+    Color color = ColorsPlante.lightGrey;
+    String text = context.strings.shop_card_no_products_listed;
+    if (0 < shop.productsCount) {
+      color = ColorsPlante.amber;
+      text = context.strings.shop_card_products_listed;
+    } else if (suggestedProductsCount > 0) {
+      color = ColorsPlante.yellow;
+      text = context.strings.shop_card_off_products_listed;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 10, top: 16),
+      child: Material(
+        color: color,
+        borderRadius: BorderRadius.circular(5),
+        child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Text(text, style: TextStyles.tag)),
+      ),
+    );
   }
 
   Widget _productRangeContent(BuildContext context) {

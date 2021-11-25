@@ -23,6 +23,8 @@ class ColorsPlante {
   static const Color grey = Color(0xFF979A9C);
   static const Color divider = Color(0xFFC2D0C6);
   static const Color mainTextBlack = Color(0xFF192123);
-  static const Color amber = Color(0xFFf5bb08);
+  static const Color yellow = Color(0xFFFEEB3B);
+  static const Color amber = Color(0xFFFBBD03);
+  static const Color orange = Color(0xFFFB9805);
   static const Color lightGrey = Color(0xFFf5f7fa);
 }

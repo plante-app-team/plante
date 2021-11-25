@@ -57,6 +57,15 @@
     "lang_uk": "Ukrainian",
     "lang_vi": "Vietnamese",
     "lang_zh": "Chinese",
+    "country_ad" : "Andorra",
+    "country_ae" : "United Arab Emirates",
+    "country_af" : "Afghanistan",
+    "country_ag" : "Antigua and Barbuda",
+    "country_be" : "Belgium",
+    "country_nl" : "Netherlands",
+    "country_de" : "Germany",
+    "country_fr" : "France",
+    "country_ru" : "Russia",
     "mod_reason_info_found_in_external_source": "Information found in an external source",
     "mod_reason_all_ingredients_are_vegan": "Product has no non-vegan ingredients",
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegan",
@@ -240,5 +249,7 @@
     "user_langs_widget_system_lang": "(System language)",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Product's manufacturing process utilizes non-vegan practices. But the product is considered ambiguous by Plante because all ingredients are vegan, and its mainstream appeal to help the vegan movement grow.",
     "mod_reason_certified_vegan": "Product is certified vegan",
-    "mod_reason_some_ingredient_is_in_fact_a_category2": "Ingredients labeled as \"Flavors\", \"Natural Dyes\", \"Additives\" (or in a similar ambiguous fashion) come from either plant, animal, or mineral sources. As such, products with such ingredients are (sometimes intentionally) ambiguous in their suitability for vegans."
+    "mod_reason_some_ingredient_is_in_fact_a_category2": "Ingredients labeled as \"Flavors\", \"Natural Dyes\", \"Additives\" (or in a similar ambiguous fashion) come from either plant, animal, or mineral sources. As such, products with such ingredients are (sometimes intentionally) ambiguous in their suitability for vegans.",
+    "shop_card_off_products_listed": "Unconfirmed products",
+    "shop_product_range_page_suggested_products_country": "Products seen in other <SHOP> stores in <COUNTRY>"
 }

@@ -4,8 +4,10 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 
 const _PRIVACY_POLICY_URL_RU =
@@ -33,7 +35,8 @@ bool isInTests() {
 
 /// Deprecated, new features should be developed in dedicated branches
 @deprecated
-Future<bool> enableNewestFeatures() async => isInTests();
+Future<bool> enableNewestFeatures() async =>
+    isInTests() || await GetIt.I.get<Settings>().enableNewestFeatures();
 
 void setSystemUIOverlayStyle() {
   if (Platform.isAndroid) {

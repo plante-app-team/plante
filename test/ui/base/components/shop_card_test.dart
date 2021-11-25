@@ -143,7 +143,9 @@ void main() {
     expect(
         find.text(context.strings.shop_card_no_products_listed), findsNothing);
     expect(
-        find.text(context.strings.shop_card_products_listed), findsOneWidget);
+        find.text(context.strings.shop_card_products_listed), findsNothing);
+    expect(
+        find.text(context.strings.shop_card_off_products_listed), findsOneWidget);
     expect(find.text(context.strings.shop_card_open_shop_products),
         findsOneWidget);
     expect(find.text(context.strings.shop_card_add_product), findsNothing);
