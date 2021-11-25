@@ -79,9 +79,6 @@ class OffShopsManager {
   }
 
   Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops() async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const []);
-    }
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
@@ -111,9 +108,6 @@ class OffShopsManager {
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
       fetchVeganBarcodesForShops(
           Set<String> shopsNames, List<LangCode> langs) async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const {});
-    }
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
       Log.w('offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
