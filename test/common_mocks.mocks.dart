@@ -1256,6 +1256,10 @@ class MockViewedProductsStorage extends _i1.Mock
   }
 
   @override
+  String get storageFileName =>
+      (super.noSuchMethod(Invocation.getter(#storageFileName), returnValue: '')
+          as String);
+  @override
   _i9.Stream<void> updates() =>
       (super.noSuchMethod(Invocation.method(#updates, []),
           returnValue: Stream<void>.empty()) as _i9.Stream<void>);
