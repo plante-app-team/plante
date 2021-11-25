@@ -17,7 +17,7 @@ class Country {
 // List of countries we load the products from OFF linked to a store
   static const enabledCountryCodes = [BELGIUM, NETHERLANDS, GERMANY, FRANCE];
 
-  static bool isEnabledCountry (String isoCode) {
+  static bool isEnabledCountry(String isoCode) {
     return enabledCountryCodes.contains(isoCode);
   }
 

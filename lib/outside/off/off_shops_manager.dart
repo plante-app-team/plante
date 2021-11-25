@@ -110,7 +110,8 @@ class OffShopsManager {
           Set<String> shopsNames, List<LangCode> langs) async {
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
-      Log.w('offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
+      Log.w(
+          'offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
       return Err(OffShopsManagerError.OTHER);
     } else if (countryCodeRes.unwrap() == null) {
       return Ok(const {});
