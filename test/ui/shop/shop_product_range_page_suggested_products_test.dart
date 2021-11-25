@@ -99,7 +99,7 @@ void main() {
       (WidgetTester tester) async {
     suggestedProductsManager.clearAllSuggestions();
     suggestedProducts.clear();
-    final batchSize = SuggestedProductsModel.LOADED_BATCH_SIZE;
+    const batchSize = SuggestedProductsModel.LOADED_BATCH_SIZE;
     for (var index = 0; index < batchSize * 10; ++index) {
       suggestedProducts.add(ProductLangSlice((v) => v
         ..barcode = '$index'

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
