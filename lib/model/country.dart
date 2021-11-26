@@ -10,22 +10,31 @@ part 'country.g.dart';
 class Country extends EnumClass {
   ///Andorra
   static const Country ad = _$ad;
+
   ///United Arab Emirates
   static const Country ae = _$ae;
+
   ///Afghanistan
   static const Country af = _$af;
+
   ///Antigua and Barbuda
   static const Country ag = _$ag;
+
   ///Belgium
   static const Country be = _$be;
+
   ///Netherlands
   static const Country nl = _$nl;
+
   ///France
   static const Country fr = _$fr;
+
   ///Germany
   static const Country de = _$de;
+
   ///Luxembourg
   static const Country lu = _$lu;
+
   ///Russia
   static const Country ru = _$ru;
 
@@ -38,7 +47,7 @@ class Country extends EnumClass {
 // List of countries we load the products from OFF linked to a store
   static const enabledCountryCodes = [be, nl, de, fr, lu];
 
-  static bool isEnabledCountry (String isoCode) {
+  static bool isEnabledCountry(String isoCode) {
     return enabledCountryCodes.contains(valueOf(isoCode));
   }
 
@@ -57,8 +66,11 @@ class Country extends EnumClass {
       case fr:
         return context.strings.country_fr;
       case nl:
+        return context.strings.country_nl;
       case lu:
+        return context.strings.country_lu;
       case ru:
+        return context.strings.country_ru;
       default:
         Log.w('no translation found for country code $this in country.dart');
         return null;

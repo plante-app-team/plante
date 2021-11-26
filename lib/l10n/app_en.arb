@@ -66,6 +66,7 @@
     "country_de" : "Germany",
     "country_fr" : "France",
     "country_ru" : "Russia",
+    "country_lu" : "Luxembourg",
     "mod_reason_info_found_in_external_source": "Information found in an external source",
     "mod_reason_all_ingredients_are_vegan": "Product has no non-vegan ingredients",
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegan",

@@ -22,8 +22,9 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   static OffShop? fromJson(dynamic json, String? isoCountryCode) {
     OffShop? offShop = BuildValueHelper.jsonSerializers
         .deserializeWith(OffShop.serializer, json);
-    if (offShop!=null && isoCountryCode!=null) {
-      offShop = offShop.rebuild((p0) => p0..country = Country.valueOf(isoCountryCode));
+    if (offShop != null && isoCountryCode != null) {
+      offShop = offShop
+          .rebuild((p0) => p0..country = Country.valueOf(isoCountryCode));
     }
     return offShop;
   }

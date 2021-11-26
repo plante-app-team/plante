@@ -95,10 +95,7 @@ class OffApi {
     if (responseRes.isErr) {
       return Err(responseRes.unwrapErr());
     }
-    final Map shops = {
-      'json' : responseRes.unwrap(),
-      'countryIso' : countryIso
-    };
+    final Map shops = {'json': responseRes.unwrap(), 'countryIso': countryIso};
     final result = await compute(_parseShops, shops);
     if (result != null) {
       return Ok(result);
@@ -114,7 +111,10 @@ class OffApi {
       return null;
     }
     final shopsJson = resultJson['tags'] as List<dynamic>;
-    return shopsJson.map((shop) => OffShop.fromJson(shop, shops['countryIso'] as String)).whereType<OffShop>().toList();
+    return shopsJson
+        .map((shop) => OffShop.fromJson(shop, shops['countryIso'] as String))
+        .whereType<OffShop>()
+        .toList();
   }
 
   Future<Result<String, OffRestApiError>> _get(Uri uri) async {

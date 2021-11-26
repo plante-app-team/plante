@@ -240,7 +240,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                 child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: 14,
-                    child: const GradientSpinner(key: Key('address_placeholder'))),
+                    child:
+                        const GradientSpinner(key: Key('address_placeholder'))),
               );
             default:
               if (snapshot.hasError) {
@@ -259,13 +260,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   Future<String> _getSuggestProductsStoreLabel() async {
     final shopName = widget.shop.name;
     final offShop = await _model.offShopsmanager.findOffShopByName(shopName);
-    var title = context.strings.shop_product_range_page_suggested_products_country_unknown.replaceAll('<SHOP>', shopName);
-    if (offShop.isOk && offShop.unwrap().country!=null) {
+    var title = context
+        .strings.shop_product_range_page_suggested_products_country_unknown
+        .replaceAll('<SHOP>', shopName);
+    if (offShop.isOk && offShop.unwrap().country != null) {
       final offShopCountry = offShop.unwrap().country!.localize(context);
-      if(offShopCountry!=null){
-        title = title + context
-            .strings.shop_product_range_page_suggested_products_country
-            .replaceAll('<COUNTRY>', offShopCountry);
+      if (offShopCountry != null) {
+        title = title +
+            context.strings.shop_product_range_page_suggested_products_country
+                .replaceAll('<COUNTRY>', offShopCountry);
       }
     }
     return title;
