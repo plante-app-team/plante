@@ -11,5 +11,4 @@ void main() {
   test('test is not country enabled country list', () async {
     expect(Country.isEnabledCountry(Country.AFGHANISTAN), isFalse);
   });
-
 }
