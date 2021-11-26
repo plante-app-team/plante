@@ -52,5 +52,8 @@ app.*.map.json
 android/app/debug.keystore
 android/app/google-services.json
 ios/GoogleService-Info.plist
+ios/Flutter/tmp.xcconfig
+ios/.envfile
+
 .env
 

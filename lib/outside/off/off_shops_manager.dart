@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
@@ -94,9 +93,6 @@ class OffShopsManager {
   }
 
   Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops() async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const []);
-    }
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
@@ -126,9 +122,6 @@ class OffShopsManager {
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
       fetchVeganBarcodesForShops(
           Set<String> shopsNames, List<LangCode> langs) async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const {});
-    }
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
       Log.w(

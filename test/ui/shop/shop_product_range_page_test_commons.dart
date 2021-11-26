@@ -193,7 +193,7 @@ class ShopProductRangePageTestCommons {
   void setSuggestedProducts(List<Product> products) {
     productsObtainer.addKnownProducts(products);
     suggestedProductsManager.setSuggestionsForShop(
-        aShop.osmUID, suggestedProducts.map((e) => e.barcode));
+        aShop.osmUID, products.map((e) => e.barcode));
   }
 
   void setConfirmedProducts(List<Product> products) {

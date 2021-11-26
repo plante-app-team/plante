@@ -23,7 +23,6 @@ import 'package:plante/ui/shop/shop_product_range_page.dart';
 import '../../common_finders_extension.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_shops_manager.dart';
-import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 import 'shop_product_range_page_test_commons.dart';
 
@@ -31,7 +30,6 @@ void main() {
   late ShopProductRangePageTestCommons commons;
   late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
-  late FakeSuggestedProductsManager suggestedProductsManager;
 
   late Shop aShop;
   late List<Product> products;
@@ -46,7 +44,6 @@ void main() {
     address = commons.address;
     shopsManager = commons.shopsManager;
     userParamsController = commons.userParamsController;
-    suggestedProductsManager = commons.suggestedProductsManager;
   });
 
   testWidgets('shop name in title', (WidgetTester tester) async {
@@ -56,10 +53,8 @@ void main() {
   });
 
   testWidgets('has shop address', (WidgetTester tester) async {
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(const []));
-    shopsManager.setShopRange(aShop.osmUID, Ok(range));
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts(const []);
 
     final addressCompleter = Completer<void>();
 
@@ -93,16 +88,13 @@ void main() {
     expect(find.byType(BarcodeScanPage), findsOneWidget);
 
     final scanPage =
-    find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
+        find.byType(BarcodeScanPage).evaluate().first.widget as BarcodeScanPage;
     expect(scanPage.addProductToShop, equals(aShop));
   });
 
   testWidgets('no products', (WidgetTester tester) async {
-    final range = ShopProductRange((e) => e
-      ..shop.replace(aShop)
-      ..products.addAll(const []));
-    shopsManager.setShopRange(aShop.osmUID, Ok(range));
-    suggestedProductsManager.clearAllSuggestions();
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts(const []);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
@@ -215,62 +207,94 @@ void main() {
   }
 
   testWidgets('confirmed product update after click',
-          (WidgetTester tester) async {
-        // Remove all suggested products
-        suggestedProductsManager.clearAllSuggestions();
+      (WidgetTester tester) async {
+    // Remove all suggested products
+    commons.setSuggestedProducts(const []);
 
-        expect(products[0].veganStatus, equals(VegStatus.possible));
-        await testProductUpdateAfterClick(products[0], tester);
-      });
+    expect(products[0].veganStatus, equals(VegStatus.possible));
+    await testProductUpdateAfterClick(products[0], tester);
+  });
 
   testWidgets('suggested product update after click',
-          (WidgetTester tester) async {
-        // Remove all confirmed products
-        shopsManager.setShopRange(
-            aShop.osmUID, Ok(ShopProductRange((e) => e.shop.replace(aShop))));
+      (WidgetTester tester) async {
+    // Remove all confirmed products
+    commons.setConfirmedProducts(const []);
 
-        expect(
-            commons.suggestedProducts[0].veganStatus, equals(VegStatus.possible));
-        await testProductUpdateAfterClick(commons.suggestedProducts[0], tester);
-      });
+    expect(
+        commons.suggestedProducts[0].veganStatus, equals(VegStatus.possible));
+    await testProductUpdateAfterClick(commons.suggestedProducts[0], tester);
+  });
+
+  testWidgets(
+      'suggested product is not shown if it is already in confirmed list',
+      (WidgetTester tester) async {
+    final theProduct = ProductLangSlice((v) => v
+      ..barcode = '123'
+      ..name = 'Nice product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community
+      ..ingredientsText = 'Water, salt, sugar').productForTests();
+
+    final otherSuggestedProduct = ProductLangSlice((v) => v
+      ..barcode = '124'
+      ..name = 'Some other'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.open_food_facts
+      ..ingredientsText = 'Water, salt, sugar').productForTests();
+
+    commons.setConfirmedProducts([theProduct]);
+    commons.setSuggestedProducts([theProduct, otherSuggestedProduct]);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+
+    expect(find.text(theProduct.name!), findsNWidgets(1));
+    expect(find.text(otherSuggestedProduct.name!), findsNWidgets(1));
+
+    final suggestedProductsTitleCenter =
+        tester.getCenter(find.byKey(const Key('suggested_products_title')));
+    final theProductWidgetCenter =
+        tester.getCenter(find.text(theProduct.name!));
+    final otherSuggestedProductWidgetCenter =
+        tester.getCenter(find.text(otherSuggestedProduct.name!));
+
+    expect(
+        theProductWidgetCenter.dy, lessThan(suggestedProductsTitleCenter.dy));
+    expect(suggestedProductsTitleCenter.dy,
+        lessThan(otherSuggestedProductWidgetCenter.dy));
+  });
 
   testWidgets('non-vegan products are not shown to a vegan',
-          (WidgetTester tester) async {
-        final products = [
-          ProductLangSlice((v) => v
-            ..barcode = '123'
-            ..name = 'Milk apple'
-            ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-            ..veganStatus = VegStatus.negative
-            ..veganStatusSource = VegStatusSource.open_food_facts
-            ..ingredientsText = 'Water, salt, sugar').productForTests(),
-          ProductLangSlice((v) => v
-            ..barcode = '124'
-            ..name = 'Pineapple'
-            ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-            ..veganStatus = VegStatus.positive
-            ..veganStatusSource = VegStatusSource.open_food_facts
-            ..ingredientsText = 'Water, salt, sugar').productForTests(),
-        ];
-        final productsLastSeen = {
-          products[0]: DateTime(2012, 1, 1),
-          products[1]: DateTime(2011, 2, 2),
-        };
-        final productsLastSeenSecs = productsLastSeen.map((key, value) =>
-            MapEntry(key.barcode, (value.millisecondsSinceEpoch / 1000).round()));
-        final range = ShopProductRange((e) => e
-          ..shop.replace(aShop)
-          ..products.addAll(products)
-          ..productsLastSeenSecsUtc.addAll(productsLastSeenSecs));
-        shopsManager.setShopRange(aShop.osmUID, Ok(range));
+      (WidgetTester tester) async {
+    final products = [
+      ProductLangSlice((v) => v
+        ..barcode = '123'
+        ..name = 'Milk apple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..veganStatus = VegStatus.negative
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+      ProductLangSlice((v) => v
+        ..barcode = '124'
+        ..name = 'Pineapple'
+        ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+        ..veganStatus = VegStatus.positive
+        ..veganStatusSource = VegStatusSource.open_food_facts
+        ..ingredientsText = 'Water, salt, sugar').productForTests(),
+    ];
+    commons.setConfirmedProducts(products);
 
-        final veganUser = UserParams((v) => v.name = 'Bob');
-        await userParamsController.setUserParams(veganUser);
+    final veganUser = UserParams((v) => v.name = 'Bob');
+    await userParamsController.setUserParams(veganUser);
 
-        final widget = ShopProductRangePage.createForTesting(aShop);
-        await tester.superPump(widget);
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
 
-        expect(find.text(products[0].name!), findsNothing);
-        expect(find.text(products[1].name!), findsOneWidget);
-      });
+    expect(find.text(products[0].name!), findsNothing);
+    expect(find.text(products[1].name!), findsOneWidget);
+  });
 }
