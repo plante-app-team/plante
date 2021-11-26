@@ -87,7 +87,8 @@ void main() {
   test('fetch shops', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -98,7 +99,8 @@ void main() {
   test('fetch shops when no camera pos', () async {
     await _initShops(
       cameraPos: null,
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -139,7 +141,8 @@ void main() {
   test('fetch barcodes good scenario', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -177,7 +180,8 @@ void main() {
   test('fetch barcodesfor same shop for second time', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -210,7 +214,8 @@ void main() {
   test('fetch barcodes when no barcodes are available for the shop', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -235,7 +240,8 @@ void main() {
   test('fetch barcodeswhen only barcodeswith vegan label available', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -258,7 +264,8 @@ void main() {
       () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -280,7 +287,8 @@ void main() {
   test('fetch barcodeswhen label- and ingredients-barcodes overlap ', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -306,7 +314,8 @@ void main() {
   test('fetch barcodes when could not fetch shops', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = Country.BELGIUM)),
       offApiShops: Err(OffRestApiError.OTHER), // ERROR!!!!!!!!!!!!
     );
 

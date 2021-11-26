@@ -8,7 +8,9 @@ void main() {
   late ViewedProductsStorage storage;
 
   setUp(() async {
-    storage = ViewedProductsStorage(loadPersistentProducts: false, storageFileName: '${randInt(0, 9999999)}');
+    storage = ViewedProductsStorage(
+        loadPersistentProducts: false,
+        storageFileName: '${randInt(0, 9999999)}');
     await storage.purgeForTesting();
   });
 
@@ -61,7 +63,8 @@ void main() {
 
   test('persistent products storage', () async {
     final storageFileName = '${randInt(0, 9999999)}';
-    final storage = ViewedProductsStorage(loadPersistentProducts: false, storageFileName: storageFileName);
+    final storage = ViewedProductsStorage(
+        loadPersistentProducts: false, storageFileName: storageFileName);
     final p1 = Product((e) => e.barcode = '123');
     final p2 = Product((e) => e.barcode = '321');
     final p3 = Product((e) => e.barcode = '222');
@@ -70,19 +73,22 @@ void main() {
     storage.addProduct(p3);
     storage.dispose();
 
-    final anotherStorage = ViewedProductsStorage(loadPersistentProducts: false, storageFileName: storageFileName);
+    final anotherStorage = ViewedProductsStorage(
+        loadPersistentProducts: false, storageFileName: storageFileName);
     await anotherStorage.loadPersistentProductsForTesting();
     expect(anotherStorage.getProducts(), equals([p1, p2, p3]));
   });
 
   test('listen notification when persistent products first loaded', () async {
     final storageFileName = '${randInt(0, 9999999)}';
-    final storage = ViewedProductsStorage(loadPersistentProducts: false, storageFileName: storageFileName);
+    final storage = ViewedProductsStorage(
+        loadPersistentProducts: false, storageFileName: storageFileName);
 
     storage.addProduct(Product((e) => e.barcode = '123'));
     storage.dispose();
 
-    final anotherStorage = ViewedProductsStorage(loadPersistentProducts: false, storageFileName: storageFileName);
+    final anotherStorage = ViewedProductsStorage(
+        loadPersistentProducts: false, storageFileName: storageFileName);
     var updatesCount = 0;
     anotherStorage.updates().listen((_) {
       updatesCount += 1;

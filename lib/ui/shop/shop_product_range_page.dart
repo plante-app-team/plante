@@ -144,7 +144,12 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
 
         final confirmedProducts = _model.confirmedProducts;
-        final suggestedProducts = _model.suggestedProducts;
+        final suggestedProducts = _model.suggestedProducts.toList();
+        final confirmedBarcodes =
+            confirmedProducts.map((e) => e.barcode).toSet();
+        suggestedProducts
+            .removeWhere((e) => confirmedBarcodes.contains(e.barcode));
+
         widgets.addAll(_productsToCard(confirmedProducts, context));
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
           final title = context
@@ -152,7 +157,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               .replaceAll('<SHOP>', widget.shop.name);
           widgets.add(Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-              child: Text(title, style: TextStyles.headline3)));
+              child: Text(title,
+                  key: const Key('suggested_products_title'),
+                  style: TextStyles.headline3)));
           widgets.addAll(_productsToCard(suggestedProducts, context));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
