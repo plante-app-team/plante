@@ -253,6 +253,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
                 return const SizedBox.shrink();
               } else {
                 return Padding(
+                  key: const Key('suggested_products_title'),
                   padding:
                       const EdgeInsets.only(left: 24, right: 24, bottom: 18),
                   child: Text(snapshot.data!, style: TextStyles.headline3),
@@ -268,12 +269,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     var title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', shopName);
-    if (offShop.isOk && offShop.unwrap().country != null) {
-      final offShopCountry = offShop.unwrap().country!.localize(context);
+    if (offShop.isOk &&
+        offShop.unwrap() != null &&
+        offShop.unwrap()!.country != null) {
+      final offShopCountry = offShop.unwrap()!.country!.localize(context);
       if (offShopCountry != null) {
-        title = title +
-            context.strings.shop_product_range_page_suggested_products_country
-                .replaceAll('<COUNTRY>', offShopCountry);
+        title = context
+            .strings.shop_product_range_page_suggested_products_country
+            .replaceAll('<SHOP>', shopName)
+            .replaceAll('<COUNTRY>', offShopCountry);
       }
     }
     return title;

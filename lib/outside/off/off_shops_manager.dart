@@ -34,7 +34,14 @@ class OffShopsManager {
     'en:veggie-patties',
     'en:biscuits',
   ];
-
+  // List of countries we load the products from OFF linked to a store
+  static const enabledCountryCodes = [
+    Country.be,
+    Country.nl,
+    Country.de,
+    Country.fr,
+    Country.lu
+  ];
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
@@ -54,7 +61,11 @@ class OffShopsManager {
     _offShopsOp.result.then((offShops) => offShops.maybeOk()?.dispose());
   }
 
-  Future<Result<OffShop, OffShopsManagerError>> findOffShopByName(
+  static bool isEnabledCountry(String isoCode) {
+    return enabledCountryCodes.contains(Country.valueOf(isoCode));
+  }
+
+  Future<Result<OffShop?, OffShopsManagerError>> findOffShopByName(
       String name) async {
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
@@ -62,9 +73,9 @@ class OffShopsManager {
     }
     final offShops = await shopsRes.unwrap().findAppropriateShopsFor([name]);
     if (offShops.isEmpty) {
-      Log.w('offShopsManager.findOffShopByName: '
+      Log.d('offShopsManager.findOffShopByName: '
           'No offshops found for name $name');
-      return Err(OffShopsManagerError.OTHER);
+      return Ok(null);
     }
     return Ok(offShops[name]!);
   }
@@ -163,7 +174,7 @@ class OffShopsManager {
 
   Future<Result<String?, None>> get _countryCode async {
     final result = await _countryCodeOp.result;
-    if (result.isOk && !Country.isEnabledCountry(result.unwrap())) {
+    if (result.isOk && !isEnabledCountry(result.unwrap())) {
       return Ok(null);
     }
     return result;

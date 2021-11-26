@@ -42,42 +42,48 @@ void main() {
     commons.setConfirmedProducts(const []);
   });
 
-  testWidgets('suggested products title offShop not found', (WidgetTester tester) async {
+  testWidgets('suggested products title offShop not found',
+      (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
 
-    var title = context
+    final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
     expect(find.text(title), findsOneWidget);
-    title = title + context
-        .strings.shop_product_range_page_suggested_products_country.replaceAll('<COUNTRY>', Country.fr.localize(context)!);
-    expect(find.text(title), findsNothing);
+    final countryTitle = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    expect(find.text(countryTitle), findsNothing);
   });
 
-  testWidgets('suggested products title with country', (WidgetTester tester) async {
-    offShopsManager.setOffShop(Country.fr,aShop.name);
+  testWidgets('suggested products title with country',
+      (WidgetTester tester) async {
+    offShopsManager.setOffShop(Country.fr, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
-    var title = context
-        .strings.shop_product_range_page_suggested_products_country_unknown
-        .replaceAll('<SHOP>', aShop.name);
-    title = title + context
-        .strings.shop_product_range_page_suggested_products_country.replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    final title = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
     expect(find.text(title), findsOneWidget);
   });
 
-  testWidgets('suggested products title without country', (WidgetTester tester) async {
+  testWidgets('suggested products title without country',
+      (WidgetTester tester) async {
     offShopsManager.setOffShop(null, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
-    var title = context
+    final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
     expect(find.text(title), findsOneWidget);
-    title = title + context
-        .strings.shop_product_range_page_suggested_products_country.replaceAll('<COUNTRY>', Country.fr.localize(context)!);
-    expect(find.text(title), findsNothing);
+    final countryTitle = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    expect(find.text(countryTitle), findsNothing);
   });
 
   testWidgets(

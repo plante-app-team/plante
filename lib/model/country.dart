@@ -44,13 +44,6 @@ class Country extends EnumClass {
   static Country valueOf(String name) => _$valueOf(name);
   static Serializer<Country> get serializer => _$countrySerializer;
 
-// List of countries we load the products from OFF linked to a store
-  static const enabledCountryCodes = [be, nl, de, fr, lu];
-
-  static bool isEnabledCountry(String isoCode) {
-    return enabledCountryCodes.contains(valueOf(isoCode));
-  }
-
   String? localize(BuildContext context) {
     switch (this) {
       case ad:
