@@ -142,7 +142,7 @@ void main() {
   });
 
   testWidgets('product found in another lang', (WidgetTester tester) async {
-    final anotherLang = LangCode.nl;
+    const anotherLang = LangCode.nl;
     expect(anotherLang, isNot(equals(_DEFAULT_LANG)));
     productsObtainer
         .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e

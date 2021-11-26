@@ -21,6 +21,10 @@ abstract class Ingredient implements Built<Ingredient, IngredientBuilder> {
         as Map<String, dynamic>;
   }
 
+  String cleanName() {
+    return name.replaceAll(RegExp(r'^\w\w:'), '');
+  }
+
   factory Ingredient([void Function(IngredientBuilder) updates]) = _$Ingredient;
   Ingredient._();
   static Serializer<Ingredient> get serializer => _$ingredientSerializer;

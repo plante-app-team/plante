@@ -36,6 +36,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
   bool _testingBackends = false;
   bool _testingBackendsQuickAnswers = false;
   bool _offScannedProductEmpty = false;
+  bool _enableNewestFeatures = false;
 
   final _settings = GetIt.I.get<Settings>();
   final _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
@@ -68,6 +69,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
     _testingBackendsQuickAnswers =
         await _settings.testingBackendsQuickAnswers();
     _offScannedProductEmpty = await _settings.fakeOffApiProductNotFound();
+    _enableNewestFeatures = await _settings.enableNewestFeatures();
     setState(() {
       _loading = false;
     });
@@ -161,6 +163,17 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
 
                         exit(0);
                       })),
+                if (_developer)
+                  _CheckboxSettings(
+                      text: 'Newest features',
+                      value: _enableNewestFeatures,
+                      onChanged: (value) {
+                        setState(() {
+                          _enableNewestFeatures = value;
+                          _settings
+                              .setEnableNewestFeatures(_enableNewestFeatures);
+                        });
+                      }),
                 if (_developer)
                   _CheckboxSettings(
                       text: context.strings.settings_page_testing_backends,
