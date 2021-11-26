@@ -32,6 +32,13 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.country;
+    if (value != null) {
+      result
+        ..add('country')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -58,6 +65,10 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
           result.productsCount = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'country':
+          result.country = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
       }
     }
 
@@ -72,11 +83,14 @@ class _$OffShop extends OffShop {
   final String? name;
   @override
   final int productsCount;
+  @override
+  final String? country;
 
   factory _$OffShop([void Function(OffShopBuilder)? updates]) =>
       (new OffShopBuilder()..update(updates)).build();
 
-  _$OffShop._({required this.id, this.name, required this.productsCount})
+  _$OffShop._(
+      {required this.id, this.name, required this.productsCount, this.country})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id');
     BuiltValueNullFieldError.checkNotNull(
@@ -96,13 +110,15 @@ class _$OffShop extends OffShop {
     return other is OffShop &&
         id == other.id &&
         name == other.name &&
-        productsCount == other.productsCount;
+        productsCount == other.productsCount &&
+        country == other.country;
   }
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, id.hashCode), name.hashCode), productsCount.hashCode));
+    return $jf($jc(
+        $jc($jc($jc(0, id.hashCode), name.hashCode), productsCount.hashCode),
+        country.hashCode));
   }
 
   @override
@@ -110,7 +126,8 @@ class _$OffShop extends OffShop {
     return (newBuiltValueToStringHelper('OffShop')
           ..add('id', id)
           ..add('name', name)
-          ..add('productsCount', productsCount))
+          ..add('productsCount', productsCount)
+          ..add('country', country))
         .toString();
   }
 }
@@ -131,6 +148,10 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
   set productsCount(int? productsCount) =>
       _$this._productsCount = productsCount;
 
+  String? _country;
+  String? get country => _$this._country;
+  set country(String? country) => _$this._country = country;
+
   OffShopBuilder() {
     OffShop._setDefaults(this);
   }
@@ -141,6 +162,7 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
       _id = $v.id;
       _name = $v.name;
       _productsCount = $v.productsCount;
+      _country = $v.country;
       _$v = null;
     }
     return this;
@@ -164,7 +186,8 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
             id: BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id'),
             name: name,
             productsCount: BuiltValueNullFieldError.checkNotNull(
-                productsCount, 'OffShop', 'productsCount'));
+                productsCount, 'OffShop', 'productsCount'),
+            country: country);
     replace(_$result);
     return _$result;
   }

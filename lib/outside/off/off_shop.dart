@@ -13,7 +13,8 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   String? get name;
   @BuiltValueField(wireName: 'products')
   int get productsCount;
-  String? country;
+  @BuiltValueField(wireName: 'country')
+  String? get country;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _setDefaults(OffShopBuilder b) => b.productsCount = 0;
