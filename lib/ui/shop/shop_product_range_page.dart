@@ -11,6 +11,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
@@ -20,6 +21,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/fading_edge_plante.dart';
+import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -92,13 +94,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       }
     };
     _model = ShopProductRangePageModel(
-        GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<SuggestedProductsManager>(),
-        GetIt.I.get<ProductsObtainer>(),
-        GetIt.I.get<UserParamsController>(),
-        GetIt.I.get<AddressObtainer>(),
-        widget.shop,
-        updateCallback);
+      GetIt.I.get<ShopsManager>(),
+      GetIt.I.get<SuggestedProductsManager>(),
+      GetIt.I.get<ProductsObtainer>(),
+      GetIt.I.get<UserParamsController>(),
+      GetIt.I.get<AddressObtainer>(),
+      widget.shop,
+      updateCallback,
+      GetIt.I.get<OffShopsManager>(),
+    );
     initializeDateFormatting();
   }
 
@@ -147,12 +151,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         final suggestedProducts = _model.suggestedProducts;
         widgets.addAll(_productsToCard(confirmedProducts, context));
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
-          final title = context
-              .strings.shop_product_range_page_suggested_products_country
-              .replaceAll('<SHOP>', widget.shop.name);
-          widgets.add(Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-              child: Text(title, style: TextStyles.headline3)));
+          widgets.add(_showSuggestedProductTitle());
           widgets.addAll(_productsToCard(suggestedProducts, context));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
@@ -228,6 +227,48 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       backgroundColor: ColorsPlante.lightGrey,
       body: SafeArea(child: content),
     );
+  }
+
+  FutureBuilder<String> _showSuggestedProductTitle() {
+    return FutureBuilder(
+        future: _getSuggestProductsStoreLabel(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Padding(
+                padding: const EdgeInsets.all(8),
+                child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 14,
+                    child: const GradientSpinner(key: Key('address_placeholder'))),
+              );
+            default:
+              if (snapshot.hasError) {
+                return const SizedBox.shrink();
+              } else {
+                return Padding(
+                  padding:
+                      const EdgeInsets.only(left: 24, right: 24, bottom: 18),
+                  child: Text(snapshot.data!, style: TextStyles.headline3),
+                );
+              }
+          }
+        });
+  }
+
+  Future<String> _getSuggestProductsStoreLabel() async {
+    final shopName = widget.shop.name;
+    final offShop = await _model.offShopsmanager.findOffShopByName(shopName);
+    var title = context.strings.shop_product_range_page_suggested_products_country_unknown.replaceAll('<SHOP>', shopName);
+    if (offShop.isOk && offShop.unwrap().country!=null) {
+      final offShopCountry = offShop.unwrap().country!.localize(context);
+      if(offShopCountry!=null){
+        title = title + context
+            .strings.shop_product_range_page_suggested_products_country
+            .replaceAll('<COUNTRY>', offShopCountry);
+      }
+    }
+    return title;
   }
 
   List<Widget> _productsToCard(List<Product> products, BuildContext context) {

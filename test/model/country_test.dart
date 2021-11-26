@@ -5,11 +5,11 @@ void main() {
   setUp(() {});
 
   test('test is country enabled country list', () async {
-    expect(Country.isEnabledCountry(Country.BELGIUM), isTrue);
+    expect(Country.isEnabledCountry(Country.be.name), isTrue);
   });
 
   test('test is not country enabled country list', () async {
-    expect(Country.isEnabledCountry(Country.AFGHANISTAN), isFalse);
+    expect(Country.isEnabledCountry(Country.af.name), isFalse);
   });
 
 }

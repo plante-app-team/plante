@@ -11,6 +11,7 @@ import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/shop/_confirmed_products_model.dart';
@@ -26,6 +27,8 @@ class ShopProductRangePageModel {
   final Shop _shop;
   late final FutureShortAddress _address;
   final VoidCallback _updateCallback;
+
+  OffShopsManager offShopsmanager;
 
   UserParams get user => _userParamsController.cachedUserParams!;
   FutureShortAddress get address => _address;
@@ -50,7 +53,8 @@ class ShopProductRangePageModel {
       this._userParamsController,
       this._addressObtainer,
       this._shop,
-      this._updateCallback) {
+      this._updateCallback,
+      this.offShopsmanager) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
     _suggestedProductsModel = SuggestedProductsModel(

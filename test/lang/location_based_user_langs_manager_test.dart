@@ -6,6 +6,7 @@ import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
@@ -81,7 +82,7 @@ void main() {
   test('first init good scenario', () async {
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'be')),
+      addressResp: () => Ok(OsmAddress((e) => e.countryCode = Country.be.name)),
     );
 
     final expectedUserLangs = [LangCode.nl, LangCode.fr, LangCode.de];

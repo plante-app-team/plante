@@ -55,6 +55,21 @@ class OffShopsManager {
     _offShopsOp.result.then((offShops) => offShops.maybeOk()?.dispose());
   }
 
+  Future<Result<OffShop, OffShopsManagerError>> findOffShopByName(
+      String name) async {
+    final shopsRes = await _offShopsOp.result;
+    if (shopsRes.isErr) {
+      return Err(shopsRes.unwrapErr());
+    }
+    final offShops = await shopsRes.unwrap().findAppropriateShopsFor([name]);
+    if (offShops.isEmpty) {
+      Log.w('offShopsManager.findOffShopByName: '
+          'No offshops found for name $name');
+      return Err(OffShopsManagerError.OTHER);
+    }
+    return Ok(offShops[name]!);
+  }
+
   Future<Result<String, None>> _getCountryCodeImpl() async {
     final cameraPos = await _cameraPosStorage.get();
     if (cameraPos == null) {
@@ -116,7 +131,8 @@ class OffShopsManager {
     }
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
-      Log.w('offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
+      Log.w(
+          'offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
       return Err(OffShopsManagerError.OTHER);
     } else if (countryCodeRes.unwrap() == null) {
       return Ok(const {});

@@ -10,7 +10,8 @@
     "country_fr",
     "country_ru",
     "shop_card_off_products_listed",
-    "shop_product_range_page_suggested_products_country"
+    "shop_product_range_page_suggested_products_country",
+    "shop_product_range_page_suggested_products_country_unknown"
   ],
 
   "el": [
@@ -24,7 +25,8 @@
     "country_fr",
     "country_ru",
     "shop_card_off_products_listed",
-    "shop_product_range_page_suggested_products_country"
+    "shop_product_range_page_suggested_products_country",
+    "shop_product_range_page_suggested_products_country_unknown"
   ],
 
   "pl": [
@@ -40,7 +42,8 @@
     "mod_reason_certified_vegan",
     "mod_reason_some_ingredient_is_in_fact_a_category2",
     "shop_card_off_products_listed",
-    "shop_product_range_page_suggested_products_country"
+    "shop_product_range_page_suggested_products_country",
+    "shop_product_range_page_suggested_products_country_unknown"
   ],
 
   "ru": [
@@ -54,6 +57,7 @@
     "country_fr",
     "country_ru",
     "shop_card_off_products_listed",
-    "shop_product_range_page_suggested_products_country"
+    "shop_product_range_page_suggested_products_country",
+    "shop_product_range_page_suggested_products_country_unknown"
   ]
 }

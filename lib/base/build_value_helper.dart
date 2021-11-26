@@ -1,6 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
@@ -44,6 +45,7 @@ part 'build_value_helper.g.dart';
   ModeratorChoiceReason,
   LangCode,
   UserLangs,
+  Country,
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers = (_serializers.toBuilder()

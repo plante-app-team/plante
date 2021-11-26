@@ -251,5 +251,6 @@
     "mod_reason_certified_vegan": "Product is certified vegan",
     "mod_reason_some_ingredient_is_in_fact_a_category2": "Ingredients labeled as \"Flavors\", \"Natural Dyes\", \"Additives\" (or in a similar ambiguous fashion) come from either plant, animal, or mineral sources. As such, products with such ingredients are (sometimes intentionally) ambiguous in their suitability for vegans.",
     "shop_card_off_products_listed": "Unconfirmed products",
-    "shop_product_range_page_suggested_products_country": "Products seen in other <SHOP> stores in <COUNTRY>"
+    "shop_product_range_page_suggested_products_country": " in <COUNTRY>",
+    "shop_product_range_page_suggested_products_country_unknown": "Products seen in other <SHOP> stores"
 }

@@ -1,6 +1,5 @@
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/model/country.dart';
 import 'package:plante/model/lang_code.dart';
 
 class CountriesLangCodesTable {
@@ -29,10 +28,10 @@ class CountriesLangCodesTable {
 
 // Source: https://wiki.openstreetmap.org/wiki/Nominatim/Country_Codes
 const _COUNTRIES_LANG_CODES_TABLE = {
-  Country.ANDORRA: ['ca'],
-  Country.UNITED_ARAB_EMIRATES: ['ar'],
-  Country.AFGHANISTAN: ['fa', 'ps'],
-  Country.ANTIGUA_AND_BARBUDA: ['en'],
+  'ad': ['ca'],
+  'ae': ['ar'],
+  'af': ['fa', 'ps'],
+  'ag': ['en'],
   'ai': ['en'],
   'al': ['sq'],
   'am': ['hy'],
@@ -48,7 +47,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'ba': ['bs', 'hr', 'sr'],
   'bb': ['en'],
   'bd': ['bn'],
-  Country.BELGIUM: ['nl', 'fr', 'de'],
+  'be': ['nl', 'fr', 'de'],
   'bf': ['fr'],
   'bg': ['bg'],
   'bh': ['ar'],
@@ -85,7 +84,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'cx': ['en'],
   'cy': ['el', 'tr'],
   'cz': ['cs'],
-  Country.GERMANY: ['de'],
+  'de': ['de'],
   'dj': ['fr', 'ar', 'so', 'aa'],
   'dk': ['da'],
   'dm': ['en'],
@@ -103,7 +102,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'fk': ['en'],
   'fm': ['en'],
   'fo': ['fo', 'da'],
-  Country.FRANCE: ['fr'],
+  'fr': ['fr'],
   'ga': ['fr'],
   'gb': ['en', 'ga', 'cy', 'gd', 'kw'],
   'gd': ['en'],
@@ -195,7 +194,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'nf': ['en', 'pih'],
   'ng': ['en'],
   'ni': ['es'],
-  Country.NETHERLANDS: ['nl'],
+  'nl': ['nl'],
   'no': ['nb', 'nn', 'no', 'se'],
   'np': ['ne'],
   'nr': ['na', 'en'],
@@ -220,7 +219,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   're': ['fr'],
   'ro': ['ro'],
   'rs': ['sr'],
-  Country.RUSSIA: ['ru'],
+  'ru': ['ru'],
   'rw': ['rw', 'fr', 'en'],
   'sa': ['ar'],
   'sb': ['en'],
