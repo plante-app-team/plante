@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
@@ -49,7 +48,7 @@ void main() {
 
   testWidgets('shop name in title', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
     expect(find.text(aShop.name), findsOneWidget);
   });
 
@@ -61,7 +60,7 @@ void main() {
 
     final widget = ShopProductRangePage.createForTesting(aShop,
         addressLoadFinishCallback: addressCompleter.complete);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
     await tester.awaitableFutureFrom(addressCompleter.future);
 
     final expectedStr = AddressWidget.addressString(address, false, context)!;
@@ -70,7 +69,7 @@ void main() {
 
   testWidgets('close screen button', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     expect(find.byType(ShopProductRangePage), findsOneWidget);
     await tester.tap(find.byKey(const Key('close_button')));
@@ -80,7 +79,7 @@ void main() {
 
   testWidgets('add product behaviour', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     expect(find.byType(BarcodeScanPage), findsNothing);
     await tester
@@ -98,7 +97,7 @@ void main() {
     commons.setSuggestedProducts(const []);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     // No products title
     expect(
@@ -117,7 +116,7 @@ void main() {
         aShop.osmUID, Err(ShopsManagerError.NETWORK_ERROR));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     // Network error
     expect(find.text(context.strings.global_network_error), findsOneWidget);
@@ -145,7 +144,7 @@ void main() {
     shopsManager.setShopRange(aShop.osmUID, Err(ShopsManagerError.OTHER));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     // An error
     expect(
@@ -162,7 +161,7 @@ void main() {
   Future<void> testProductUpdateAfterClick(
       Product product, WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     var card = find.byType(ProductCard).evaluate().first.widget;
     // Verify the proper product
@@ -251,7 +250,7 @@ void main() {
     commons.setSuggestedProducts([theProduct, otherSuggestedProduct]);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     expect(find.text(theProduct.name!), findsNWidgets(1));
     expect(find.text(otherSuggestedProduct.name!), findsNWidgets(1));
@@ -293,7 +292,7 @@ void main() {
     await userParamsController.setUserParams(veganUser);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     expect(find.text(products[0].name!), findsNothing);
     expect(find.text(products[1].name!), findsOneWidget);

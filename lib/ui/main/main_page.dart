@@ -5,7 +5,7 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/scan/viewed_products_history_page.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends PagePlante {
   static const PAGE_NAME = 'MainPage';
   const MainPage({Key? key}) : super(key: key);
 

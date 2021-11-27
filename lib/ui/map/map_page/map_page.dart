@@ -46,7 +46,7 @@ enum MapPageRequestedMode {
   SELECT_SHOPS,
 }
 
-class MapPage extends StatefulWidget {
+class MapPage extends PagePlante {
   final Product? product;
   final List<Shop> initialSelectedShops;
   final MapPageRequestedMode requestedMode;

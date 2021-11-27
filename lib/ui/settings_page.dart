@@ -25,7 +25,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends PagePlante {
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }

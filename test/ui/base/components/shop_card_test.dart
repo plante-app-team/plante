@@ -82,6 +82,8 @@ void main() {
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
     offShopsManager = MockOffShopsManager();
+    when(offShopsManager.findOffShopByName(any))
+        .thenAnswer((_) async => Ok(null));
     GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
     final addressObtainer = MockAddressObtainer();
     when(addressObtainer.addressOfShop(any))
