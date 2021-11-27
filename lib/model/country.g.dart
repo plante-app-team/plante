@@ -22,7 +22,27 @@ const Country _$au = const Country._('au');
 const Country _$aw = const Country._('aw');
 const Country _$ax = const Country._('ax');
 const Country _$az = const Country._('az');
+const Country _$ba = const Country._('ba');
+const Country _$bb = const Country._('bb');
+const Country _$bd = const Country._('bd');
 const Country _$be = const Country._('be');
+const Country _$bf = const Country._('bf');
+const Country _$bg = const Country._('bg');
+const Country _$bh = const Country._('bh');
+const Country _$bi = const Country._('bi');
+const Country _$bj = const Country._('bj');
+const Country _$bl = const Country._('bl');
+const Country _$bm = const Country._('bm');
+const Country _$bn = const Country._('bn');
+const Country _$bo = const Country._('bo');
+const Country _$bq = const Country._('bq');
+const Country _$br = const Country._('br');
+const Country _$bs = const Country._('bs');
+const Country _$bt = const Country._('bt');
+const Country _$bv = const Country._('bv');
+const Country _$bw = const Country._('bw');
+const Country _$by = const Country._('by');
+const Country _$bz = const Country._('bz');
 const Country _$nl = const Country._('nl');
 const Country _$fr = const Country._('fr');
 const Country _$de = const Country._('de');
@@ -63,8 +83,48 @@ Country _$valueOf(String name) {
       return _$ax;
     case 'az':
       return _$az;
+    case 'ba':
+      return _$ba;
+    case 'bb':
+      return _$bb;
+    case 'bd':
+      return _$bd;
     case 'be':
       return _$be;
+    case 'bf':
+      return _$bf;
+    case 'bg':
+      return _$bg;
+    case 'bh':
+      return _$bh;
+    case 'bi':
+      return _$bi;
+    case 'bj':
+      return _$bj;
+    case 'bl':
+      return _$bl;
+    case 'bm':
+      return _$bm;
+    case 'bn':
+      return _$bn;
+    case 'bo':
+      return _$bo;
+    case 'bq':
+      return _$bq;
+    case 'br':
+      return _$br;
+    case 'bs':
+      return _$bs;
+    case 'bt':
+      return _$bt;
+    case 'bv':
+      return _$bv;
+    case 'bw':
+      return _$bw;
+    case 'by':
+      return _$by;
+    case 'bz':
+      return _$bz;
     case 'nl':
       return _$nl;
     case 'fr':
@@ -97,7 +157,27 @@ final BuiltSet<Country> _$values = new BuiltSet<Country>(const <Country>[
   _$aw,
   _$ax,
   _$az,
+  _$ba,
+  _$bb,
+  _$bd,
   _$be,
+  _$bf,
+  _$bg,
+  _$bh,
+  _$bi,
+  _$bj,
+  _$bl,
+  _$bm,
+  _$bn,
+  _$bo,
+  _$bq,
+  _$br,
+  _$bs,
+  _$bt,
+  _$bv,
+  _$bw,
+  _$by,
+  _$bz,
   _$nl,
   _$fr,
   _$de,

@@ -56,8 +56,68 @@ class Country extends EnumClass {
   ///Azerbaijan
   static const Country az = _$az;
 
+  ///Bosnia and Herzegovina
+  static const Country ba = _$ba;
+
+  ///Barbados
+  static const Country bb = _$bb;
+
+  ///Bangladesh
+  static const Country bd = _$bd;
+
   ///Belgium
   static const Country be = _$be;
+
+  ///Burkina Faso
+  static const Country bf = _$bf;
+
+  ///Bulgaria
+  static const Country bg = _$bg;
+
+  ///Bahrain
+  static const Country bh = _$bh;
+
+  ///Burundi
+  static const Country bi = _$bi;
+
+  ///Benin
+  static const Country bj = _$bj;
+
+  ///Saint Barthelemy
+  static const Country bl = _$bl;
+
+  ///Bermuda
+  static const Country bm = _$bm;
+
+  ///Brunei
+  static const Country bn = _$bn;
+
+  ///Bolivia
+  static const Country bo = _$bo;
+
+  ///Caribbean Netherlands
+  static const Country bq = _$bq;
+
+  ///Brazil
+  static const Country br = _$br;
+
+  ///The Bahamas
+  static const Country bs = _$bs;
+
+  ///Bhutan
+  static const Country bt = _$bt;
+
+  ///Bouvet Island
+  static const Country bv = _$bv;
+
+  ///Botswana
+  static const Country bw = _$bw;
+
+  ///Belarus
+  static const Country by = _$by;
+
+  ///Belize
+  static const Country bz = _$bz;
 
   ///Netherlands
   static const Country nl = _$nl;
@@ -114,8 +174,48 @@ class Country extends EnumClass {
         return context.strings.country_ax;
       case az:
         return context.strings.country_az;
+      case ba:
+        return context.strings.country_ba;
+      case bb:
+        return context.strings.country_bb;
+      case bd:
+        return context.strings.country_bd;
       case be:
         return context.strings.country_be;
+      case bf:
+        return context.strings.country_bf;
+      case bg:
+        return context.strings.country_bg;
+      case bh:
+        return context.strings.country_bh;
+      case bi:
+        return context.strings.country_bi;
+      case bj:
+        return context.strings.country_bj;
+      case bl:
+        return context.strings.country_bl;
+      case bm:
+        return context.strings.country_bm;
+      case bn:
+        return context.strings.country_bn;
+      case bo:
+        return context.strings.country_bo;
+      case bq:
+        return context.strings.country_bq;
+      case br:
+        return context.strings.country_br;
+      case bs:
+        return context.strings.country_bs;
+      case bt:
+        return context.strings.country_bt;
+      case bv:
+        return context.strings.country_bv;
+      case bw:
+        return context.strings.country_bw;
+      case by:
+        return context.strings.country_by;
+      case bz:
+        return context.strings.country_bz;
       case fr:
         return context.strings.country_fr;
       case nl:
