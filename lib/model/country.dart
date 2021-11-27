@@ -20,6 +20,42 @@ class Country extends EnumClass {
   ///Antigua and Barbuda
   static const Country ag = _$ag;
 
+  ///Anguilla
+  static const Country ai = _$ai;
+
+  ///Albania
+  static const Country al = _$al;
+
+  ///Armenia
+  static const Country am = _$am;
+
+  ///Angola
+  static const Country ao = _$ao;
+
+  ///Antarctica
+  static const Country aq = _$aq;
+
+  ///Argentina
+  static const Country ar = _$ar;
+
+  ///American Samoa
+  static const Country as = _$as;
+
+  ///Austria
+  static const Country at = _$at;
+
+  ///Australia
+  static const Country au = _$au;
+
+  ///Aruba
+  static const Country aw = _$aw;
+
+  ///Aland Islands
+  static const Country ax = _$ax;
+
+  ///Azerbaijan
+  static const Country az = _$az;
+
   ///Belgium
   static const Country be = _$be;
 
@@ -54,6 +90,30 @@ class Country extends EnumClass {
         return context.strings.country_af;
       case ag:
         return context.strings.country_ag;
+      case ai:
+        return context.strings.country_ai;
+      case al:
+        return context.strings.country_al;
+      case am:
+        return context.strings.country_am;
+      case ao:
+        return context.strings.country_ao;
+      case aq:
+        return context.strings.country_aq;
+      case ar:
+        return context.strings.country_ar;
+      case as:
+        return context.strings.country_as;
+      case at:
+        return context.strings.country_at;
+      case au:
+        return context.strings.country_au;
+      case aw:
+        return context.strings.country_aw;
+      case ax:
+        return context.strings.country_ax;
+      case az:
+        return context.strings.country_az;
       case be:
         return context.strings.country_be;
       case fr:

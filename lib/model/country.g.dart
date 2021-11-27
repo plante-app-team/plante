@@ -10,6 +10,18 @@ const Country _$ad = const Country._('ad');
 const Country _$ae = const Country._('ae');
 const Country _$af = const Country._('af');
 const Country _$ag = const Country._('ag');
+const Country _$ai = const Country._('ai');
+const Country _$al = const Country._('al');
+const Country _$am = const Country._('am');
+const Country _$ao = const Country._('ao');
+const Country _$aq = const Country._('aq');
+const Country _$ar = const Country._('ar');
+const Country _$as = const Country._('as');
+const Country _$at = const Country._('at');
+const Country _$au = const Country._('au');
+const Country _$aw = const Country._('aw');
+const Country _$ax = const Country._('ax');
+const Country _$az = const Country._('az');
 const Country _$be = const Country._('be');
 const Country _$nl = const Country._('nl');
 const Country _$fr = const Country._('fr');
@@ -27,6 +39,30 @@ Country _$valueOf(String name) {
       return _$af;
     case 'ag':
       return _$ag;
+    case 'ai':
+      return _$ai;
+    case 'al':
+      return _$al;
+    case 'am':
+      return _$am;
+    case 'ao':
+      return _$ao;
+    case 'aq':
+      return _$aq;
+    case 'ar':
+      return _$ar;
+    case 'as':
+      return _$as;
+    case 'at':
+      return _$at;
+    case 'au':
+      return _$au;
+    case 'aw':
+      return _$aw;
+    case 'ax':
+      return _$ax;
+    case 'az':
+      return _$az;
     case 'be':
       return _$be;
     case 'nl':
@@ -49,6 +85,18 @@ final BuiltSet<Country> _$values = new BuiltSet<Country>(const <Country>[
   _$ae,
   _$af,
   _$ag,
+  _$ai,
+  _$al,
+  _$am,
+  _$ao,
+  _$aq,
+  _$ar,
+  _$as,
+  _$at,
+  _$au,
+  _$aw,
+  _$ax,
+  _$az,
   _$be,
   _$nl,
   _$fr,
