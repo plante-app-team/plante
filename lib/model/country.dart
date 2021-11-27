@@ -179,6 +179,22 @@ class Country extends EnumClass {
   ///Germany
   static const Country de = _$de;
 
+  ///Djibouti
+  static const Country dj = _$dj;
+
+  ///Denmark
+  static const Country dk = _$dk;
+
+  ///Dominica
+  static const Country dm = _$dm;
+
+  ///Dominican Republic
+  //TODO find a way to use do
+  //static const Country do = _$do;
+
+  ///Algeria
+  static const Country dz = _$dz;
+
   ///Netherlands
   static const Country nl = _$nl;
 
@@ -313,6 +329,16 @@ class Country extends EnumClass {
         return context.strings.country_cz;
       case de:
         return context.strings.country_de;
+      case dj:
+        return context.strings.country_dj;
+      case dk:
+        return context.strings.country_dk;
+      case dm:
+        return context.strings.country_dm;
+        // case dom:
+        //return context.strings.country_do;
+      case dz:
+        return context.strings.country_dz;
       case fr:
         return context.strings.country_fr;
       case nl:
