@@ -33,7 +33,7 @@ import 'package:plante/ui/scan/barcode_scan_page_model.dart';
 import 'package:plante/ui/settings_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
-class BarcodeScanPage extends StatefulWidget {
+class BarcodeScanPage extends PagePlante {
   final Shop? addProductToShop;
   final _testingStorage = _TestingStorage();
 

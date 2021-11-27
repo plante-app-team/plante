@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
@@ -41,7 +40,7 @@ void main() {
   testWidgets('product range reloading on product range updates',
       (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     shopsManager.clear_verifiedCalls();
     await tester.pumpAndSettle();
@@ -55,7 +54,7 @@ void main() {
 
   testWidgets('displayed product range', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     final cards =
         find.byType(ProductCard).evaluate().map((e) => e.widget).toList();
@@ -81,7 +80,7 @@ void main() {
 
   testWidgets('click on a product', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text(products[0].name!));
@@ -91,7 +90,7 @@ void main() {
 
   testWidgets('vote for product presence', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
@@ -119,7 +118,7 @@ void main() {
 
   testWidgets('vote against product presence', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     final card = find.byType(ProductCard).evaluate().first.widget;
     final product = products[0];
@@ -176,7 +175,7 @@ void main() {
     shopsManager.setShopRange(aShop.osmUID, Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     final product0Center = tester.getCenter(find.text(products[0].name!));
     final product1Center = tester.getCenter(find.text(products[1].name!));
@@ -214,7 +213,7 @@ void main() {
     shopsManager.setShopRange(aShop.osmUID, Ok(range));
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     final product0Center = tester.getCenter(find.text(products[0].name!));
     final product1Center = tester.getCenter(find.text(products[1].name!));
@@ -253,7 +252,7 @@ void main() {
 
     // Create widget
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(ProviderScope(child: widget));
+    await tester.superPump(widget);
 
     // Initial order
     var product0Center = tester.getCenter(find.text(products[0].name!));
@@ -308,7 +307,7 @@ void main() {
 
   testWidgets('voting removes vote options', (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     // YES vote
 
@@ -382,7 +381,7 @@ void main() {
   testWidgets('cancelled voting does not remove vote options',
       (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(ProviderScope(child: widget));
+    final context = await tester.superPump(widget);
 
     // YES vote
 

@@ -25,7 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 typedef ExternalAuthCallback = Future<bool> Function(UserParams userParams);
 
-class ExternalAuthPage extends StatefulWidget {
+class ExternalAuthPage extends PagePlante {
   const ExternalAuthPage({Key? key}) : super(key: key);
 
   @override

@@ -33,7 +33,7 @@ import 'package:plante/ui/map/search_page/map_search_page_model.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
 
-class MapSearchPage extends StatefulWidget {
+class MapSearchPage extends PagePlante {
   final MapSearchPageResult? initialState;
   const MapSearchPage({Key? key, this.initialState}) : super(key: key);
 
