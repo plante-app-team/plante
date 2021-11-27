@@ -64,6 +64,8 @@ class Country extends EnumClass {
         return context.strings.country_lu;
       case ru:
         return context.strings.country_ru;
+      case de:
+        return context.strings.country_de;
       default:
         Log.w('no translation found for country code $this in country.dart');
         return null;

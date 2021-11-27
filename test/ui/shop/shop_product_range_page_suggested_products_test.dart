@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/country.dart';
@@ -45,7 +46,7 @@ void main() {
   testWidgets('suggested products title offShop not found',
       (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(widget);
+    final context = await tester.superPump(ProviderScope(child: widget));
 
     final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
@@ -62,7 +63,7 @@ void main() {
       (WidgetTester tester) async {
     offShopsManager.setOffShop(Country.fr, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(widget);
+    final context = await tester.superPump(ProviderScope(child: widget));
     final title = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
@@ -74,7 +75,7 @@ void main() {
       (WidgetTester tester) async {
     offShopsManager.setOffShop(null, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(widget);
+    final context = await tester.superPump(ProviderScope(child: widget));
     final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
@@ -94,7 +95,7 @@ void main() {
     commons.setConfirmedProducts(commons.confirmedProducts);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(widget);
+    final context = await tester.superPump(ProviderScope(child: widget));
 
     final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
@@ -109,7 +110,7 @@ void main() {
     commons.setSuggestedProducts([suggestedProducts.first]);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
+    await tester.superPump(ProviderScope(child: widget));
 
     final confirmedProductCenter =
         tester.getCenter(find.text(confirmedProducts.first.name!));
@@ -126,7 +127,7 @@ void main() {
     commons.setSuggestedProducts(suggestedProducts);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
+    await tester.superPump(ProviderScope(child: widget));
 
     expect(find.text(suggestedProducts[0].name!), findsNothing);
     expect(find.text(suggestedProducts[1].name!), findsOneWidget);
@@ -151,7 +152,7 @@ void main() {
     commons.setSuggestedProducts(suggestedProducts);
 
     final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
+    await tester.superPump(ProviderScope(child: widget));
 
     final scrollDown = () async {
       // NOTE: we pause products retrieval before the scroll down

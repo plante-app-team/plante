@@ -77,7 +77,7 @@ class OffShopsManager {
           'No offshops found for name $name');
       return Ok(null);
     }
-    return Ok(offShops[name]!);
+    return Ok(offShops[name]);
   }
 
   Future<Result<String, None>> _getCountryCodeImpl() async {

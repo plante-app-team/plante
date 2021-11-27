@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -31,6 +33,21 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
+
+final offShopsProvider =
+    Provider<OffShopsManager>((ref) => GetIt.I.get<OffShopsManager>());
+
+final suggestedTitleProvider =
+    FutureProvider.family<String?, String>((ref, shopName) async {
+  final offShopManager = ref.watch(offShopsProvider);
+  final offShop = await offShopManager.findOffShopByName(shopName);
+  if (offShop.isOk &&
+      offShop.unwrap() != null &&
+      offShop.unwrap()!.country != null) {
+    return offShop.unwrap()!.country!.name;
+  }
+  return null;
+});
 
 class ShopProductRangePage extends StatefulWidget {
   final Shop shop;
@@ -156,7 +173,37 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
         widgets.addAll(_productsToCard(confirmedProducts, context));
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
-          widgets.add(_showSuggestedProductTitle());
+          widgets.add(Consumer(builder: (_, WidgetRef ref, __) {
+            final title = ref.watch(suggestedTitleProvider(widget.shop.name));
+            return title.when(
+              data: (t) {
+                final countryName =
+                    t != null ? Country.valueOf(t).localize(context) : null;
+                final productTitle = countryName != null
+                    ? context.strings
+                        .shop_product_range_page_suggested_products_country
+                        .replaceAll('<SHOP>', widget.shop.name)
+                        .replaceAll('<COUNTRY>', countryName)
+                    : context.strings
+                        .shop_product_range_page_suggested_products_country_unknown
+                        .replaceAll('<SHOP>', widget.shop.name);
+                return Padding(
+                  key: const Key('suggested_products_title'),
+                  padding:
+                      const EdgeInsets.only(left: 24, right: 24, bottom: 18),
+                  child: Text(productTitle, style: TextStyles.headline3),
+                );
+              },
+              loading: () => const Padding(
+                padding: EdgeInsets.all(8),
+                child: SizedBox(
+                    height: 14,
+                    child: GradientSpinner(
+                        key: Key('suggested_product_placeholder'))),
+              ),
+              error: (_, __) => const SizedBox.shrink(),
+            );
+          }));
           widgets.addAll(_productsToCard(suggestedProducts, context));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
@@ -232,55 +279,6 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       backgroundColor: ColorsPlante.lightGrey,
       body: SafeArea(child: content),
     );
-  }
-
-  FutureBuilder<String> _showSuggestedProductTitle() {
-    return FutureBuilder(
-        future: _getSuggestProductsStoreLabel(),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return Padding(
-                padding: const EdgeInsets.all(8),
-                child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 14,
-                    child:
-                        const GradientSpinner(key: Key('address_placeholder'))),
-              );
-            default:
-              if (snapshot.hasError) {
-                return const SizedBox.shrink();
-              } else {
-                return Padding(
-                  key: const Key('suggested_products_title'),
-                  padding:
-                      const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-                  child: Text(snapshot.data!, style: TextStyles.headline3),
-                );
-              }
-          }
-        });
-  }
-
-  Future<String> _getSuggestProductsStoreLabel() async {
-    final shopName = widget.shop.name;
-    final offShop = await _model.offShopsmanager.findOffShopByName(shopName);
-    var title = context
-        .strings.shop_product_range_page_suggested_products_country_unknown
-        .replaceAll('<SHOP>', shopName);
-    if (offShop.isOk &&
-        offShop.unwrap() != null &&
-        offShop.unwrap()!.country != null) {
-      final offShopCountry = offShop.unwrap()!.country!.localize(context);
-      if (offShopCountry != null) {
-        title = context
-            .strings.shop_product_range_page_suggested_products_country
-            .replaceAll('<SHOP>', shopName)
-            .replaceAll('<COUNTRY>', offShopCountry);
-      }
-    }
-    return title;
   }
 
   List<Widget> _productsToCard(List<Product> products, BuildContext context) {
