@@ -19,7 +19,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
-class ViewedProductsHistoryPage extends StatefulWidget {
+class ViewedProductsHistoryPage extends PagePlante {
   const ViewedProductsHistoryPage({Key? key}) : super(key: key);
 
   @override

@@ -1,16 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
@@ -20,6 +23,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/fading_edge_plante.dart';
+import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -30,7 +34,7 @@ import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
-class ShopProductRangePage extends StatefulWidget {
+class ShopProductRangePage extends PagePlante {
   final Shop shop;
   final VoidCallback? addressLoadFinishCallback;
   const ShopProductRangePage._(
@@ -79,6 +83,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
 
+  final _countryNameProvider = StateProvider<String?>((ref) => null);
+
   _ShopProductRangePageState() : super('ShopProductRangePage');
 
   @override
@@ -92,14 +98,22 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       }
     };
     _model = ShopProductRangePageModel(
-        GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<SuggestedProductsManager>(),
-        GetIt.I.get<ProductsObtainer>(),
-        GetIt.I.get<UserParamsController>(),
-        GetIt.I.get<AddressObtainer>(),
-        widget.shop,
-        updateCallback);
+      GetIt.I.get<ShopsManager>(),
+      GetIt.I.get<SuggestedProductsManager>(),
+      GetIt.I.get<ProductsObtainer>(),
+      GetIt.I.get<UserParamsController>(),
+      GetIt.I.get<AddressObtainer>(),
+      GetIt.I.get<OffShopsManager>(),
+      widget.shop,
+      updateCallback,
+    );
     initializeDateFormatting();
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    final countryName = await _model.obtainCountryOfShop();
+    ref.read(_countryNameProvider.state).state = countryName ?? '';
   }
 
   @override
@@ -152,14 +166,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
         widgets.addAll(_productsToCard(confirmedProducts, context));
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
-          final title = context
-              .strings.shop_product_range_page_suggested_products_country
-              .replaceAll('<SHOP>', widget.shop.name);
-          widgets.add(Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-              child: Text(title,
-                  key: const Key('suggested_products_title'),
-                  style: TextStyles.headline3)));
+          widgets.add(_suggestedProductsTitle());
           widgets.addAll(_productsToCard(suggestedProducts, context));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
@@ -235,6 +242,40 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       backgroundColor: ColorsPlante.lightGrey,
       body: SafeArea(child: content),
     );
+  }
+
+  Widget _suggestedProductsTitle() {
+    return Consumer(builder: (context, ref, _) {
+      final countryName = ref.watch(_countryNameProvider.state).state;
+      if (countryName == null) {
+        return const Padding(
+          padding: EdgeInsets.all(8),
+          child: SizedBox(
+              height: 14,
+              child:
+                  GradientSpinner(key: Key('suggested_product_placeholder'))),
+        );
+      }
+
+      final countryNameLocalized =
+          Country.safeValueOf(countryName)?.localize(context);
+      final String suggestedProductsTitle;
+      if (countryNameLocalized != null) {
+        suggestedProductsTitle = context
+            .strings.shop_product_range_page_suggested_products_country
+            .replaceAll('<SHOP>', widget.shop.name)
+            .replaceAll('<COUNTRY>', countryNameLocalized);
+      } else {
+        suggestedProductsTitle = context
+            .strings.shop_product_range_page_suggested_products_country_unknown
+            .replaceAll('<SHOP>', widget.shop.name);
+      }
+      return Padding(
+        key: const Key('suggested_products_title'),
+        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
+        child: Text(suggestedProductsTitle, style: TextStyles.headline3),
+      );
+    });
   }
 
   List<Widget> _productsToCard(List<Product> products, BuildContext context) {

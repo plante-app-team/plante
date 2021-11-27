@@ -37,7 +37,7 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
       result
         ..add('country')
         ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
+            specifiedType: const FullType(Country)));
     }
     return result;
   }
@@ -67,7 +67,7 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
           break;
         case 'country':
           result.country = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
+              specifiedType: const FullType(Country)) as Country?;
           break;
       }
     }
@@ -84,7 +84,7 @@ class _$OffShop extends OffShop {
   @override
   final int productsCount;
   @override
-  final String? country;
+  final Country? country;
 
   factory _$OffShop([void Function(OffShopBuilder)? updates]) =>
       (new OffShopBuilder()..update(updates)).build();
@@ -148,9 +148,9 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
   set productsCount(int? productsCount) =>
       _$this._productsCount = productsCount;
 
-  String? _country;
-  String? get country => _$this._country;
-  set country(String? country) => _$this._country = country;
+  Country? _country;
+  Country? get country => _$this._country;
+  set country(Country? country) => _$this._country = country;
 
   OffShopBuilder() {
     OffShop._setDefaults(this);

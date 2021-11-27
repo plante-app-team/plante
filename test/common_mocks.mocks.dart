@@ -650,6 +650,14 @@ class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
   void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),
       returnValueForMissingStub: null);
   @override
+  _i9.Future<_i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>
+      findOffShopByName(String? name) => (super.noSuchMethod(
+          Invocation.method(#findOffShopByName, [name]),
+          returnValue: Future<
+                  _i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>.value(
+              _FakeResult_0<_i43.OffShop?, _i44.OffShopsManagerError>())) as _i9
+          .Future<_i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>);
+  @override
   _i9.Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>
       fetchOffShops() => (super.noSuchMethod(
           Invocation.method(#fetchOffShops, []),

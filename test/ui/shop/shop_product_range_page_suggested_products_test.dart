@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/model/country.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
@@ -12,6 +13,7 @@ import 'package:plante/ui/shop/_suggested_products_model.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_off_shops_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
 import 'shop_product_range_page_test_commons.dart';
@@ -20,6 +22,7 @@ void main() {
   late ShopProductRangePageTestCommons commons;
   late FakeSuggestedProductsManager suggestedProductsManager;
   late FakeProductsObtainer productsObtainer;
+  late FakeOffShopsManager offShopsManager;
 
   late Shop aShop;
   late List<Product> confirmedProducts;
@@ -32,21 +35,55 @@ void main() {
     suggestedProducts = commons.suggestedProducts;
     suggestedProductsManager = commons.suggestedProductsManager;
     productsObtainer = commons.productsObtainer;
-
+    offShopsManager = commons.offShopsmanager;
     // Let's remove the confirmed products so it would be easier
     // to test the suggested ones.
     // Some tests will reintroduce confirmed products when they need it.
     commons.setConfirmedProducts(const []);
   });
 
-  testWidgets('suggested products title', (WidgetTester tester) async {
+  testWidgets('suggested products title offShop not found',
+      (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
 
     final title = context
-        .strings.shop_product_range_page_suggested_products_country
+        .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
     expect(find.text(title), findsOneWidget);
+    final countryTitle = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    expect(find.text(countryTitle), findsNothing);
+  });
+
+  testWidgets('suggested products title with country',
+      (WidgetTester tester) async {
+    offShopsManager.setOffShop(Country.fr, aShop.name);
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+    final title = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    expect(find.text(title), findsOneWidget);
+  });
+
+  testWidgets('suggested products title without country',
+      (WidgetTester tester) async {
+    offShopsManager.setOffShop(null, aShop.name);
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+    final title = context
+        .strings.shop_product_range_page_suggested_products_country_unknown
+        .replaceAll('<SHOP>', aShop.name);
+    expect(find.text(title), findsOneWidget);
+    final countryTitle = context
+        .strings.shop_product_range_page_suggested_products_country
+        .replaceAll('<SHOP>', aShop.name)
+        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+    expect(find.text(countryTitle), findsNothing);
   });
 
   testWidgets(
@@ -60,7 +97,7 @@ void main() {
     final context = await tester.superPump(widget);
 
     final title = context
-        .strings.shop_product_range_page_suggested_products_country
+        .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
     expect(find.text(title), findsNothing);
   });

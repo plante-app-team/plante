@@ -40,7 +40,7 @@ import 'init_product_page_model.dart';
 typedef DoneCallback = void Function();
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-class InitProductPage extends StatefulWidget {
+class InitProductPage extends PagePlante {
   final Product initialProduct;
   final List<Shop> initialShops;
   final ProductUpdatedCallback? productUpdatedCallback;

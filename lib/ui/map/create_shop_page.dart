@@ -16,7 +16,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
-class CreateShopPage extends StatefulWidget {
+class CreateShopPage extends PagePlante {
   final Coord shopCoord;
   const CreateShopPage({Key? key, required this.shopCoord}) : super(key: key);
   @override

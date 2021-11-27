@@ -24,6 +24,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
@@ -41,6 +42,7 @@ import '../../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late MockShopsManager shopsManager;
+  late MockOffShopsManager offShopsManager;
   late FakeUserParamsController userParamsController;
   late MockBackend backend;
 
@@ -79,6 +81,10 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
+    offShopsManager = MockOffShopsManager();
+    when(offShopsManager.findOffShopByName(any))
+        .thenAnswer((_) async => Ok(null));
+    GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
     final addressObtainer = MockAddressObtainer();
     when(addressObtainer.addressOfShop(any))
         .thenAnswer((_) async => Ok(OsmShortAddress.empty));

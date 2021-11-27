@@ -15,7 +15,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
-class ImageCropPage extends StatefulWidget {
+class ImageCropPage extends PagePlante {
   final String imagePath;
   final Directory outFolder;
   const ImageCropPage(

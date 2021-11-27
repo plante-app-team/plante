@@ -29,6 +29,7 @@ import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_short_address.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
@@ -37,6 +38,7 @@ import 'package:plante/ui/photos_taker.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_off_shops_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
@@ -51,6 +53,7 @@ class ShopProductRangePageTestCommons {
   late final MockAddressObtainer addressObtainer;
   late final FakeProductsObtainer productsObtainer;
   late final FakeSuggestedProductsManager suggestedProductsManager;
+  late final FakeOffShopsManager offShopsmanager;
 
   late final Shop aShop;
 
@@ -168,7 +171,8 @@ class ShopProductRangePageTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-
+    offShopsmanager = FakeOffShopsManager();
+    GetIt.I.registerSingleton<OffShopsManager>(offShopsmanager);
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
     final params = UserParams((v) => v.name = 'Bob');

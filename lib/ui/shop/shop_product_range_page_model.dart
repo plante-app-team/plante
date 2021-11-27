@@ -11,6 +11,7 @@ import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/shop/_confirmed_products_model.dart';
@@ -22,6 +23,7 @@ class ShopProductRangePageModel {
 
   late final ConfirmedProductsModel _confirmedProductsModel;
   late final SuggestedProductsModel _suggestedProductsModel;
+  final OffShopsManager _offShopsManager;
 
   final Shop _shop;
   late final FutureShortAddress _address;
@@ -49,6 +51,7 @@ class ShopProductRangePageModel {
       ProductsObtainer productsObtainer,
       this._userParamsController,
       this._addressObtainer,
+      this._offShopsManager,
       this._shop,
       this._updateCallback) {
     _confirmedProductsModel =
@@ -84,5 +87,10 @@ class ShopProductRangePageModel {
 
   void onProductVisibilityChange(Product product, bool visible) {
     _suggestedProductsModel.onProductVisibilityChange(product, visible);
+  }
+
+  Future<String?> obtainCountryOfShop() async {
+    final offShop = await _offShopsManager.findOffShopByName(_shop.name);
+    return offShop.maybeOk()?.country?.name;
   }
 }

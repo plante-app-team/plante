@@ -7,6 +7,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
@@ -61,5 +62,5 @@ void mainImpl() async {
   // We'll proxy all requests to OFF
   off.HttpHelper.interceptor = OffHttpInterceptor(GetIt.I.get<Backend>());
 
-  runApp(MyAppWidget(initialUserParams));
+  runApp(ProviderScope(child: MyAppWidget(initialUserParams)));
 }

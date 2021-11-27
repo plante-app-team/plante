@@ -14,7 +14,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
 
-class UserLangsPage extends StatefulWidget {
+class UserLangsPage extends PagePlante {
   const UserLangsPage({Key? key}) : super(key: key);
 
   @override

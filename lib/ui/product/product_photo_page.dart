@@ -8,7 +8,7 @@ import 'package:plante/ui/base/components/headline_bordered_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/product/_product_images_helper.dart';
 
-class ProductPhotoPage extends StatefulWidget {
+class ProductPhotoPage extends PagePlante {
   final Product product;
   final ProductImageType imageType;
   const ProductPhotoPage(
