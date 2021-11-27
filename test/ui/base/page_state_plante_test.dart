@@ -24,7 +24,7 @@ void main() {
   });
 }
 
-class _PageForTesting extends StatefulWidget {
+class _PageForTesting extends PagePlante {
   static const NAME = 'PageForTesting';
   const _PageForTesting({Key? key}) : super(key: key);
 

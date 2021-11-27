@@ -43,7 +43,7 @@ import 'product_header_widget.dart';
 
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-class DisplayProductPage extends StatefulWidget {
+class DisplayProductPage extends PagePlante {
   final Product _initialProduct;
   final ProductUpdatedCallback? productUpdatedCallback;
 

@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 
-abstract class PageStatePlante<T extends StatefulWidget> extends State<T> {
+abstract class PagePlante extends ConsumerStatefulWidget {
+  const PagePlante({Key? key}) : super(key: key);
+}
+
+abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T> {
   late final Analytics _analytics;
   final String _pageName;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 extension WidgetTesterExtension on WidgetTester {
@@ -15,7 +16,8 @@ extension WidgetTesterExtension on WidgetTester {
 
     final Widget widgetWrapper = MediaQuery(
         data: const MediaQueryData(),
-        child: MaterialApp(
+        child: ProviderScope(
+            child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: Builder(
             builder: (BuildContext context) {
@@ -26,7 +28,7 @@ extension WidgetTesterExtension on WidgetTester {
           navigatorObservers: [
             if (navigatorObserver != null) navigatorObserver
           ],
-        ));
+        )));
 
     await pumpWidget(widgetWrapper, duration, phase);
     await pumpAndSettle();

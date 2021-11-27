@@ -23,12 +23,11 @@ class ShopProductRangePageModel {
 
   late final ConfirmedProductsModel _confirmedProductsModel;
   late final SuggestedProductsModel _suggestedProductsModel;
+  final OffShopsManager _offShopsManager;
 
   final Shop _shop;
   late final FutureShortAddress _address;
   final VoidCallback _updateCallback;
-
-  OffShopsManager offShopsmanager;
 
   UserParams get user => _userParamsController.cachedUserParams!;
   FutureShortAddress get address => _address;
@@ -52,9 +51,9 @@ class ShopProductRangePageModel {
       ProductsObtainer productsObtainer,
       this._userParamsController,
       this._addressObtainer,
+      this._offShopsManager,
       this._shop,
-      this._updateCallback,
-      this.offShopsmanager) {
+      this._updateCallback) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
     _suggestedProductsModel = SuggestedProductsModel(
@@ -88,5 +87,10 @@ class ShopProductRangePageModel {
 
   void onProductVisibilityChange(Product product, bool visible) {
     _suggestedProductsModel.onProductVisibilityChange(product, visible);
+  }
+
+  Future<String?> obtainCountryOfShop() async {
+    final offShop = await _offShopsManager.findOffShopByName(_shop.name);
+    return offShop.maybeOk()?.country?.name;
   }
 }

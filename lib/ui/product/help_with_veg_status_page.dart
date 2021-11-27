@@ -20,7 +20,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 typedef DoneCallback = void Function();
 typedef ProductUpdatedCallback = void Function(Product updatedProduct);
 
-class HelpWithVegStatusPage extends StatefulWidget {
+class HelpWithVegStatusPage extends PagePlante {
   final Product initialProduct;
   final DoneCallback? doneCallback;
   final ProductUpdatedCallback? productUpdatedCallback;

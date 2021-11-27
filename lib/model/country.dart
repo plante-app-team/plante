@@ -139,6 +139,19 @@ class Country extends EnumClass {
   static BuiltSet<Country> get values => _$values;
   static Country valueOf(String name) => _$valueOf(name);
   static Serializer<Country> get serializer => _$countrySerializer;
+  static Country? safeValueOf(String name) {
+    if (name.trim().isEmpty) {
+      return null;
+    }
+    try {
+      return valueOf(name);
+    } on ArgumentError catch (e) {
+      if (name.isNotEmpty) {
+        Log.w('Country unknown name: $name', ex: e);
+      }
+      return null;
+    }
+  }
 
   String? localize(BuildContext context) {
     switch (this) {

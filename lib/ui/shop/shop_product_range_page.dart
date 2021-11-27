@@ -34,22 +34,7 @@ import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
 
-final offShopsProvider =
-    Provider<OffShopsManager>((ref) => GetIt.I.get<OffShopsManager>());
-
-final suggestedTitleProvider =
-    FutureProvider.family<String?, String>((ref, shopName) async {
-  final offShopManager = ref.watch(offShopsProvider);
-  final offShop = await offShopManager.findOffShopByName(shopName);
-  if (offShop.isOk &&
-      offShop.unwrap() != null &&
-      offShop.unwrap()!.country != null) {
-    return offShop.unwrap()!.country!.name;
-  }
-  return null;
-});
-
-class ShopProductRangePage extends StatefulWidget {
+class ShopProductRangePage extends PagePlante {
   final Shop shop;
   final VoidCallback? addressLoadFinishCallback;
   const ShopProductRangePage._(
@@ -98,6 +83,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
 
+  final _countryNameProvider = StateProvider<String?>((ref) => null);
+
   _ShopProductRangePageState() : super('ShopProductRangePage');
 
   @override
@@ -116,11 +103,17 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<AddressObtainer>(),
+      GetIt.I.get<OffShopsManager>(),
       widget.shop,
       updateCallback,
-      GetIt.I.get<OffShopsManager>(),
     );
     initializeDateFormatting();
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    final countryName = await _model.obtainCountryOfShop();
+    ref.read(_countryNameProvider.state).state = countryName ?? '';
   }
 
   @override
@@ -173,37 +166,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
         widgets.addAll(_productsToCard(confirmedProducts, context));
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
-          widgets.add(Consumer(builder: (_, WidgetRef ref, __) {
-            final title = ref.watch(suggestedTitleProvider(widget.shop.name));
-            return title.when(
-              data: (t) {
-                final countryName =
-                    t != null ? Country.valueOf(t).localize(context) : null;
-                final productTitle = countryName != null
-                    ? context.strings
-                        .shop_product_range_page_suggested_products_country
-                        .replaceAll('<SHOP>', widget.shop.name)
-                        .replaceAll('<COUNTRY>', countryName)
-                    : context.strings
-                        .shop_product_range_page_suggested_products_country_unknown
-                        .replaceAll('<SHOP>', widget.shop.name);
-                return Padding(
-                  key: const Key('suggested_products_title'),
-                  padding:
-                      const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-                  child: Text(productTitle, style: TextStyles.headline3),
-                );
-              },
-              loading: () => const Padding(
-                padding: EdgeInsets.all(8),
-                child: SizedBox(
-                    height: 14,
-                    child: GradientSpinner(
-                        key: Key('suggested_product_placeholder'))),
-              ),
-              error: (_, __) => const SizedBox.shrink(),
-            );
-          }));
+          widgets.add(_suggestedProductsTitle());
           widgets.addAll(_productsToCard(suggestedProducts, context));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
@@ -279,6 +242,40 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       backgroundColor: ColorsPlante.lightGrey,
       body: SafeArea(child: content),
     );
+  }
+
+  Widget _suggestedProductsTitle() {
+    return Consumer(builder: (context, ref, _) {
+      final countryName = ref.watch(_countryNameProvider.state).state;
+      if (countryName == null) {
+        return const Padding(
+          padding: EdgeInsets.all(8),
+          child: SizedBox(
+              height: 14,
+              child:
+                  GradientSpinner(key: Key('suggested_product_placeholder'))),
+        );
+      }
+
+      final countryNameLocalized =
+          Country.safeValueOf(countryName)?.localize(context);
+      final String suggestedProductsTitle;
+      if (countryNameLocalized != null) {
+        suggestedProductsTitle = context
+            .strings.shop_product_range_page_suggested_products_country
+            .replaceAll('<SHOP>', widget.shop.name)
+            .replaceAll('<COUNTRY>', countryNameLocalized);
+      } else {
+        suggestedProductsTitle = context
+            .strings.shop_product_range_page_suggested_products_country_unknown
+            .replaceAll('<SHOP>', widget.shop.name);
+      }
+      return Padding(
+        key: const Key('suggested_products_title'),
+        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
+        child: Text(suggestedProductsTitle, style: TextStyles.headline3),
+      );
+    });
   }
 
   List<Widget> _productsToCard(List<Product> products, BuildContext context) {

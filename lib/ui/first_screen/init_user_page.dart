@@ -24,7 +24,7 @@ import 'package:plante/ui/langs/user_langs_widget.dart';
 typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);
 
-class InitUserPage extends StatefulWidget {
+class InitUserPage extends PagePlante {
   static const MIN_NAME_LENGTH = 3;
 
   const InitUserPage({Key? key}) : super(key: key);
