@@ -119,14 +119,71 @@ class Country extends EnumClass {
   ///Belize
   static const Country bz = _$bz;
 
+  ///Canada
+  static const Country ca = _$ca;
+
+  ///Cocos Islands
+  static const Country cc = _$cc;
+
+  ///Congo-Kinshasa
+  static const Country cd = _$cd;
+
+  ///Central African Republic
+  static const Country cf = _$cf;
+
+  ///Republic of the Congo
+  static const Country cg = _$cg;
+
+  ///Suisse
+  static const Country ch = _$ch;
+
+  ///Ivory Coast
+  static const Country ci = _$ci;
+
+  ///Cook Islands
+  static const Country ck = _$ck;
+
+  ///Chili
+  static const Country cl = _$cl;
+
+  ///Cameroon
+  static const Country cm = _$cm;
+
+  ///China
+  static const Country cn = _$cn;
+
+  ///Colombia
+  static const Country co = _$co;
+
+  ///Costa Rica
+  static const Country cr = _$cr;
+
+  ///Cuba
+  static const Country cu = _$cu;
+
+  ///Cape Verde
+  static const Country cv = _$cv;
+
+  ///Curacao
+  static const Country cw = _$cw;
+
+  ///Christmas Island
+  static const Country cx = _$cx;
+
+  ///Cyprus
+  static const Country cy = _$cy;
+
+  ///Czech Republic
+  static const Country cz = _$cz;
+
+  ///Germany
+  static const Country de = _$de;
+
   ///Netherlands
   static const Country nl = _$nl;
 
   ///France
   static const Country fr = _$fr;
-
-  ///Germany
-  static const Country de = _$de;
 
   ///Luxembourg
   static const Country lu = _$lu;
@@ -216,6 +273,46 @@ class Country extends EnumClass {
         return context.strings.country_by;
       case bz:
         return context.strings.country_bz;
+      case ca:
+        return context.strings.country_ca;
+      case cc:
+        return context.strings.country_cc;
+      case cd:
+        return context.strings.country_cd;
+      case cf:
+        return context.strings.country_cf;
+      case cg:
+        return context.strings.country_cg;
+      case ch:
+        return context.strings.country_ch;
+      case ci:
+        return context.strings.country_ci;
+      case ck:
+        return context.strings.country_ck;
+      case cl:
+        return context.strings.country_cl;
+      case cm:
+        return context.strings.country_cm;
+      case cn:
+        return context.strings.country_cn;
+      case co:
+        return context.strings.country_co;
+      case cr:
+        return context.strings.country_cr;
+      case cu:
+        return context.strings.country_cu;
+      case cv:
+        return context.strings.country_cv;
+      case cw:
+        return context.strings.country_cw;
+      case cx:
+        return context.strings.country_cx;
+      case cy:
+        return context.strings.country_cy;
+      case cz:
+        return context.strings.country_cz;
+      case de:
+        return context.strings.country_de;
       case fr:
         return context.strings.country_fr;
       case nl:
@@ -224,8 +321,6 @@ class Country extends EnumClass {
         return context.strings.country_lu;
       case ru:
         return context.strings.country_ru;
-      case de:
-        return context.strings.country_de;
       default:
         Log.w('no translation found for country code $this in country.dart');
         return null;
