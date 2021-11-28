@@ -7,11 +7,9 @@ class Country {
   final String iso2Code;
   final Localize<String> localize;
   final List<String> languages;
-  final bool showOffProducts;
 
   const Country(
       {required this.iso2Code,
       required this.localize,
-      required this.languages,
-      required this.showOffProducts});
+      required this.languages});
 }

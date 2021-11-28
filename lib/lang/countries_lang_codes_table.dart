@@ -1,6 +1,7 @@
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/country_code.dart';
+import 'package:plante/model/country_table.dart';
 import 'package:plante/model/lang_code.dart';
 
 class CountriesLangCodesTable {
@@ -9,7 +10,7 @@ class CountriesLangCodesTable {
   CountriesLangCodesTable(this._analytics);
 
   List<LangCode>? countryCodeToLangCode(String countryCode) {
-    final codesStrs = _COUNTRIES_LANG_CODES_TABLE[countryCode];
+    final codesStrs = _countriesLangCodesTable[countryCode];
     if (codesStrs == null) {
       Log.w('No language code for country $countryCode');
       _analytics
@@ -28,7 +29,7 @@ class CountriesLangCodesTable {
 }
 
 // Source: https://wiki.openstreetmap.org/wiki/Nominatim/Country_Codes
-const _COUNTRIES_LANG_CODES_TABLE = {
+final _countriesLangCodesTable = {
   'ad': ['ca'],
   'ae': ['ar'],
   'af': ['fa', 'ps'],
@@ -48,7 +49,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'ba': ['bs', 'hr', 'sr'],
   'bb': ['en'],
   'bd': ['bn'],
-  CountryCode.BELGIUM: ['nl', 'fr', 'de'],
+  CountryCode.BELGIUM: CountryTable.getCountry(CountryCode.BELGIUM)!.languages,
   'bf': ['fr'],
   'bg': ['bg'],
   'bh': ['ar'],
@@ -85,9 +86,9 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'cx': ['en'],
   'cy': ['el', 'tr'],
   'cz': ['cs'],
-  CountryCode.GERMANY: ['de'],
+  CountryCode.GERMANY: CountryTable.getCountry(CountryCode.GERMANY)!.languages,
   'dj': ['fr', 'ar', 'so', 'aa'],
-  CountryCode.DENMARK: ['da'],
+  CountryCode.DENMARK: CountryTable.getCountry(CountryCode.DENMARK)!.languages,
   'dm': ['en'],
   'do': ['es'],
   'dz': ['ar'],
@@ -96,16 +97,17 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'eg': ['ar'],
   'eh': ['ar', 'es', 'fr'],
   'er': ['ti', 'ar', 'en'],
-  CountryCode.SPAIN: ['ast', 'ca', 'es', 'eu', 'gl'],
+  CountryCode.SPAIN: CountryTable.getCountry(CountryCode.SPAIN)!.languages,
   'et': ['am', 'om'],
   'fi': ['fi', 'sv', 'se'],
   'fj': ['en'],
   'fk': ['en'],
   'fm': ['en'],
   'fo': ['fo', 'da'],
-  CountryCode.FRANCE: ['fr'],
+  CountryCode.FRANCE: CountryTable.getCountry(CountryCode.FRANCE)!.languages,
   'ga': ['fr'],
-  CountryCode.GREAT_BRITAIN: ['en', 'ga', 'cy', 'gd', 'kw'],
+  CountryCode.GREAT_BRITAIN:
+      CountryTable.getCountry(CountryCode.GREAT_BRITAIN)!.languages,
   'gd': ['en'],
   'ge': ['ka'],
   'gf': ['fr'],
@@ -117,7 +119,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'gn': ['fr'],
   'gp': ['fr'],
   'gq': ['es', 'fr', 'pt'],
-  CountryCode.GREECE: ['el'],
+  CountryCode.GREECE: CountryTable.getCountry(CountryCode.GREECE)!.languages,
   'gs': ['en'],
   'gt': ['es'],
   'gu': ['en', 'ch'],
@@ -138,7 +140,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'iq': ['ar', 'ku'],
   'ir': ['fa'],
   'is': ['is'],
-  CountryCode.ITALY: ['it', 'de', 'fr'],
+  CountryCode.ITALY: CountryTable.getCountry(CountryCode.ITALY)!.languages,
   'je': ['en'],
   'jm': ['en'],
   'jo': ['ar'],
@@ -163,7 +165,8 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'lr': ['en'],
   'ls': ['en', 'st'],
   'lt': ['lt'],
-  CountryCode.LUXEMBOURG: ['lb', 'fr', 'de'],
+  CountryCode.LUXEMBOURG:
+      CountryTable.getCountry(CountryCode.LUXEMBOURG)!.languages,
   'lv': ['lv'],
   'ly': ['ar'],
   'ma': ['fr', 'zgh', 'ar'],
@@ -195,8 +198,9 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'nf': ['en', 'pih'],
   'ng': ['en'],
   'ni': ['es'],
-  CountryCode.NETHERLANDS: ['nl'],
-  CountryCode.NORWAY: ['nb', 'nn', 'no', 'se'],
+  CountryCode.NETHERLANDS:
+      CountryTable.getCountry(CountryCode.NETHERLANDS)!.languages,
+  CountryCode.NORWAY: CountryTable.getCountry(CountryCode.NORWAY)!.languages,
   'np': ['ne'],
   'nr': ['na', 'en'],
   'nu': ['niu', 'en'],
@@ -208,12 +212,13 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'pg': ['en', 'tpi', 'ho'],
   'ph': ['en', 'tl'],
   'pk': ['en', 'ur'],
-  CountryCode.POLAND: ['pl'],
+  CountryCode.POLAND: CountryTable.getCountry(CountryCode.POLAND)!.languages,
   'pm': ['fr'],
   'pn': ['en', 'pih'],
   'pr': ['es', 'en'],
   'ps': ['ar', 'he'],
-  CountryCode.PORTUGAL: ['pt'],
+  CountryCode.PORTUGAL:
+      CountryTable.getCountry(CountryCode.PORTUGAL)!.languages,
   'pw': ['en', 'pau', 'ja', 'sov', 'tox'],
   'py': ['es', 'gn'],
   'qa': ['ar'],
@@ -226,7 +231,7 @@ const _COUNTRIES_LANG_CODES_TABLE = {
   'sb': ['en'],
   'sc': ['fr', 'en', 'crs'],
   'sd': ['ar', 'en'],
-  CountryCode.SWEDEN: ['sv'],
+  CountryCode.SWEDEN: CountryTable.getCountry(CountryCode.SWEDEN)!.languages,
   'sg': ['zh', 'en', 'ms', 'ta'],
   'sh': ['en'],
   'si': ['sl'],
