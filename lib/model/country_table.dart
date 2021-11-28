@@ -51,8 +51,7 @@ Map<String, Country> countryTable = {
       iso2Code: CountryCode.GREAT_BRITAIN,
       localize: (context) => context.strings.country_gb,
       languages: const ['en', 'ga', 'cy', 'gd', 'kw'],
-      showOffProducts:
-          false), //disabled OFF uses UK for in their url, need fix for this
+      showOffProducts: true),
   CountryCode.GREECE: Country(
       iso2Code: CountryCode.GREECE,
       localize: (context) => context.strings.country_gr,

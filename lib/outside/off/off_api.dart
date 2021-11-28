@@ -12,6 +12,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/off/fake_off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
@@ -90,6 +91,7 @@ class OffApi {
 
   Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
       String countryIso) async {
+    countryIso = _getOffCountryCode(countryIso);
     final responseRes =
         await _get(Uri.https('$countryIso.openfoodfacts.org', 'stores.json'));
     if (responseRes.isErr) {
@@ -158,6 +160,7 @@ class OffApi {
 
   Future<Result<List<String>, OffRestApiError>> _searchBarcodes(
       String countryCode, Map<String, String> additionalQueryParams) async {
+    countryCode = _getOffCountryCode(countryCode);
     final queryParams = {
       'page_size': '1000', // We want to get ALL products
       'page': '1',
@@ -207,3 +210,10 @@ Map<String, dynamic>? _jsonDecodeSafe(String str) {
     return null;
   }
 }
+
+///This method translates countryIsoCode to codes used by OFF
+///@ the moment only GB
+String _getOffCountryCode(String countryCode) =>
+    countryCode == CountryCode.GREAT_BRITAIN
+        ? CountryCode.UNITED_KINGDOM
+        : countryCode;

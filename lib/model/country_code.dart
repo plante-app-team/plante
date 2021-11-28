@@ -13,5 +13,6 @@ class CountryCode {
   static const String NORWAY = 'no';
   static const String SWEDEN = 'se';
   static const String GREAT_BRITAIN = 'gb';
+  static const String UNITED_KINGDOM = 'uk';
   static const String RUSSIA = 'ru';
 }

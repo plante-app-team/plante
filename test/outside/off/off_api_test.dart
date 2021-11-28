@@ -119,7 +119,7 @@ void main() {
   });
 
   test('fetch shops from off for belgium', () async {
-    httpClient.setResponse('.*stores.json.*', '''
+    httpClient.setResponse('be.*stores.json.*', '''
     {
       "count":2,
       "tags":[
@@ -145,6 +145,37 @@ void main() {
     expect(result.unwrap().length, equals(2));
   });
 
+  test('fetch shops from off for Great Britain', () async {
+    httpClient.setResponse('uk.*stores.json.*', '''
+    {
+      "count":2,
+      "tags":[
+        {
+          "id":"tesco",
+          "known":0,
+          "name":"tesco",
+          "products":10342,
+          "url":"https://uk.openfoodfacts.org/store/tesco"
+        },
+        {
+          "id":"waitrose",
+          "known":0,
+          "name":"waitrose",
+          "products":3410,
+          "url":"https://uk.openfoodfacts.org/store/waitrose"
+        }
+      ]
+    }
+    ''');
+
+    final result = await offApi.getShopsForLocation(CountryCode.GREAT_BRITAIN);
+    expect(result.unwrap().length, equals(2));
+    final requests = httpClient.getRequestsMatching('.*');
+    expect(requests.length, equals(1), reason: requests.toString());
+    final url = requests.single.url.toString();
+    expect(url, contains('uk.openfoodfacts.org'));
+  });
+
   test('get vegan barcodes by ingredients analysis', () async {
     httpClient.setResponse('api/v2/search', '''
     {
@@ -163,14 +194,14 @@ void main() {
 
     final shop = OffShop((e) => e.id = 'spar');
     final result = await offApi
-        .getBarcodesVeganByIngredients(CountryCode.RUSSIA, shop, ['en:banana', 'en:cocoa']);
+        .getBarcodesVeganByIngredients(CountryCode.GREAT_BRITAIN, shop, ['en:banana', 'en:cocoa']);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 
     final requests = httpClient.getRequestsMatching('.*');
     expect(requests.length, equals(1), reason: requests.toString());
     final url = requests.single.url.toString();
-    expect(url, contains('ru.openfoodfacts.org'));
+    expect(url, contains('uk.openfoodfacts.org'));
     expect(url, contains('api/v2/search'));
     expect(url, contains('ingredients_analysis_tags=en%3Avegan'));
     expect(url, isNot(contains('labels_tags=en%3Avegan')));
