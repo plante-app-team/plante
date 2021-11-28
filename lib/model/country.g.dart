@@ -66,7 +66,6 @@ const Country _$de = const Country._('de');
 const Country _$dj = const Country._('dj');
 const Country _$dk = const Country._('dk');
 const Country _$dm = const Country._('dm');
-const Country _$do = const Country._('dom');
 const Country _$dz = const Country._('dz');
 const Country _$nl = const Country._('nl');
 const Country _$fr = const Country._('fr');
@@ -195,8 +194,6 @@ Country _$valueOf(String name) {
       return _$dk;
     case 'dm':
       return _$dm;
-    case 'dom':
-      return _$do;
     case 'dz':
       return _$dz;
     case 'nl':
@@ -273,7 +270,6 @@ final BuiltSet<Country> _$values = new BuiltSet<Country>(const <Country>[
   _$dj,
   _$dk,
   _$dm,
-  _$do,
   _$dz,
   _$nl,
   _$fr,

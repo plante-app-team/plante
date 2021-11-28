@@ -7,6 +7,7 @@ import 'package:plante/base/settings.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
+@deprecated
 class FakeOffApi implements OffApi {
   final Settings _settings;
   final Map<String, off.Product> _fakeProducts = {};
@@ -134,9 +135,9 @@ class FakeOffApi implements OffApi {
   }
 
   @override
-  Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
+  Future<Result<String, OffRestApiError>> getShopsJsonForCountry(
       String countryIso) async {
-    return Ok(const []);
+    return Ok('');
   }
 
   @override

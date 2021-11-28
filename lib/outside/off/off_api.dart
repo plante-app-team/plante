@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -88,33 +87,14 @@ class OffApi {
     return result;
   }
 
-  Future<Result<List<OffShop>, OffRestApiError>> getShopsForLocation(
+  Future<Result<String, OffRestApiError>> getShopsJsonForCountry(
       String countryIso) async {
     final responseRes =
         await _get(Uri.https('$countryIso.openfoodfacts.org', 'stores.json'));
     if (responseRes.isErr) {
       return Err(responseRes.unwrapErr());
     }
-    final Map shops = {'json': responseRes.unwrap(), 'countryIso': countryIso};
-    final result = await compute(_parseShops, shops);
-    if (result != null) {
-      return Ok(result);
-    } else {
-      Log.w('OffApi.getShopsForLocation invalid JSON: $responseRes');
-      return Err(OffRestApiError.OTHER);
-    }
-  }
-
-  static List<OffShop>? _parseShops(Map shops) {
-    final resultJson = _jsonDecodeSafe(shops['json'] as String);
-    if (resultJson == null) {
-      return null;
-    }
-    final shopsJson = resultJson['tags'] as List<dynamic>;
-    return shopsJson
-        .map((shop) => OffShop.fromJson(shop, shops['countryIso'] as String))
-        .whereType<OffShop>()
-        .toList();
+    return Ok(responseRes.unwrap());
   }
 
   Future<Result<String, OffRestApiError>> _get(Uri uri) async {
@@ -182,7 +162,7 @@ class OffApi {
 
   static List<String>? _extractBarcodes(String jsonStr) {
     final result = <String>[];
-    final json = _jsonDecodeSafe(jsonStr);
+    final json = jsonDecodeSafe(jsonStr);
     if (json == null) {
       return null;
     }
@@ -196,14 +176,5 @@ class OffApi {
       result.add(productJson['code'].toString());
     }
     return result;
-  }
-}
-
-Map<String, dynamic>? _jsonDecodeSafe(String str) {
-  try {
-    return jsonDecode(str) as Map<String, dynamic>?;
-  } on FormatException catch (e) {
-    Log.w("OffApi: couldn't decode safe: %str", ex: e);
-    return null;
   }
 }

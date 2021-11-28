@@ -97,7 +97,7 @@ class OsmOverpass {
       return Err(response.unwrapErr());
     }
 
-    final shopsJson = _jsonDecodeSafe(response.unwrap());
+    final shopsJson = jsonDecodeSafe(response.unwrap());
     if (shopsJson == null) {
       return Err(OpenStreetMapError.OTHER);
     }
@@ -218,26 +218,13 @@ class OsmOverpass {
   }
 }
 
-Map<String, dynamic>? _jsonDecodeSafe(String str) {
-  return _jsonDecodeSafeImpl<Map<String, dynamic>>(str);
-}
-
-T? _jsonDecodeSafeImpl<T>(String str) {
-  try {
-    return jsonDecode(str) as T?;
-  } on FormatException catch (e) {
-    Log.w("OpenStreetMap: couldn't decode safe: %str", ex: e);
-    return null;
-  }
-}
-
 enum _ParseRoadsErr {
   INVALID_JSON,
   NO_ELEMENTS,
 }
 
 Result<List<OsmRoad>, _ParseRoadsErr> _parseRoads(String text) {
-  final roadsJson = _jsonDecodeSafe(text);
+  final roadsJson = jsonDecodeSafe(text);
   if (roadsJson == null) {
     return Err(_ParseRoadsErr.INVALID_JSON);
   }

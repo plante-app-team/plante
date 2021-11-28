@@ -94,31 +94,34 @@ void main() {
     expect(obtainedBarcodes.toSet(), equals(barcodes.toSet()));
   });
 
-  test('fetch shops network exceptions', () async {
+  test('get shops json network exceptions', () async {
     httpClient.setResponseException(
         '.openfoodfacts.org/stores.json', const SocketException(''));
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsJsonForCountry('be');
     expect(result.unwrapErr(), equals(OffRestApiError.NETWORK));
   });
 
-  test('fetch shops error response', () async {
+  test('get shops json error response', () async {
     httpClient.setResponse('.openfoodfacts.org/stores.json', '',
         responseCode: 500);
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsJsonForCountry('be');
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
-  test('fetch shops invalid JSON', () async {
-    httpClient.setResponse('.openfoodfacts.org/stores.json', '''{
+  test('get shops json invalid JSON', () async {
+    const invalidJson = '''{
       "count": 2,
       "tags": [[[[[[[[[]
-    }''');
-    final result = await offApi.getShopsForLocation('be');
-    expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
+    }''';
+    httpClient.setResponse('.openfoodfacts.org/stores.json', invalidJson);
+    final result = await offApi.getShopsJsonForCountry('be');
+    // We don't expect `result` to be Err, because it's a JSON string and
+    // we expect it to be passed as-is, without validation.
+    expect(result.unwrap(), equals(invalidJson));
   });
 
-  test('fetch shops from off for belgium', () async {
-    httpClient.setResponse('.*stores.json.*', '''
+  test('get shops json from off for belgium', () async {
+    const json = '''
     {
       "count":2,
       "tags":[
@@ -138,10 +141,11 @@ void main() {
         }
       ]
     }
-    ''');
+    ''';
+    httpClient.setResponse('.*stores.json.*', json);
 
-    final result = await offApi.getShopsForLocation('be');
-    expect(result.unwrap().length, equals(2));
+    final result = await offApi.getShopsJsonForCountry('be');
+    expect(result.unwrap(), equals(json));
   });
 
   test('get vegan barcodes by ingredients analysis', () async {
