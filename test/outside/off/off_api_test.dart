@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:test/test.dart';
@@ -97,14 +98,14 @@ void main() {
   test('fetch shops network exceptions', () async {
     httpClient.setResponseException(
         '.openfoodfacts.org/stores.json', const SocketException(''));
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.NETWORK));
   });
 
   test('fetch shops error response', () async {
     httpClient.setResponse('.openfoodfacts.org/stores.json', '',
         responseCode: 500);
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
@@ -113,7 +114,7 @@ void main() {
       "count": 2,
       "tags": [[[[[[[[[]
     }''');
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
@@ -140,7 +141,7 @@ void main() {
     }
     ''');
 
-    final result = await offApi.getShopsForLocation('be');
+    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
     expect(result.unwrap().length, equals(2));
   });
 
@@ -162,7 +163,7 @@ void main() {
 
     final shop = OffShop((e) => e.id = 'spar');
     final result = await offApi
-        .getBarcodesVeganByIngredients('ru', shop, ['en:banana', 'en:cocoa']);
+        .getBarcodesVeganByIngredients(CountryCode.RUSSIA, shop, ['en:banana', 'en:cocoa']);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 
@@ -194,7 +195,7 @@ void main() {
     ''');
 
     final shop = OffShop((e) => e.id = 'spar');
-    final result = await offApi.getBarcodesVeganByLabel('ru', shop);
+    final result = await offApi.getBarcodesVeganByLabel(CountryCode.RUSSIA, shop);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/model/country.dart';
+import 'package:plante/model/country_table.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -34,14 +34,7 @@ class OffShopsManager {
     'en:veggie-patties',
     'en:biscuits',
   ];
-  // List of countries we load the products from OFF linked to a store
-  static const enabledCountryCodes = [
-    Country.be,
-    Country.nl,
-    Country.de,
-    Country.fr,
-    Country.lu
-  ];
+
   final OffApi _offApi;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
@@ -62,7 +55,7 @@ class OffShopsManager {
   }
 
   static bool isEnabledCountry(String isoCode) {
-    return enabledCountryCodes.contains(Country.valueOf(isoCode));
+    return CountryTable.getCountry(isoCode)?.showOffProducts ?? false;
   }
 
   Future<Result<OffShop?, OffShopsManagerError>> findOffShopByName(

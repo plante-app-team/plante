@@ -1,5 +1,4 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/model/country.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
@@ -14,7 +13,7 @@ class FakeOffShopsManager implements OffShopsManager {
     _suggestedBarcodes.addAll(suggestedBarcodes);
   }
 
-  void setOffShop(Country? country, String? name){
+  void setOffShop(String? country, String? name){
      _offShop = OffShop((shop) => shop
       ..id = 'storeId'
       ..name = name
