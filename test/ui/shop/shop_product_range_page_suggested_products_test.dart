@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/country.dart';
+import 'package:plante/model/country_code.dart';
+import 'package:plante/model/country_table.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
@@ -51,22 +53,24 @@ void main() {
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
     expect(find.text(title), findsOneWidget);
+    final Country? france = CountryTable.getCountry(CountryCode.FRANCE);
     final countryTitle = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+        .replaceAll('<COUNTRY>', france!.localize(context)!);
     expect(find.text(countryTitle), findsNothing);
   });
 
   testWidgets('suggested products title with country',
       (WidgetTester tester) async {
-    offShopsManager.setOffShop(Country.fr, aShop.name);
+    final france = CountryTable.getCountry(CountryCode.FRANCE);
+    offShopsManager.setOffShop(CountryCode.FRANCE, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     final title = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+        .replaceAll('<COUNTRY>', france!.localize(context)!);
     expect(find.text(title), findsOneWidget);
   });
 
@@ -75,6 +79,7 @@ void main() {
     offShopsManager.setOffShop(null, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
+    final france = CountryTable.getCountry(CountryCode.FRANCE);
     final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
@@ -82,7 +87,7 @@ void main() {
     final countryTitle = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', Country.fr.localize(context)!);
+        .replaceAll('<COUNTRY>', france!.localize(context)!);
     expect(find.text(countryTitle), findsNothing);
   });
 

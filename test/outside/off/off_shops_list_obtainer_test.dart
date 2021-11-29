@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/model/country.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 
@@ -56,12 +55,12 @@ void main() {
         ..id = 'delhaize'
         ..name = 'Delhaize'
         ..productsCount = 10342
-        ..country = Country.ru),
+        ..country = 'ru'),
       OffShop((e) => e
         ..id = 'colruyt'
         ..name = 'Colruyt'
         ..productsCount = 3410
-        ..country = Country.ru),
+        ..country = 'ru'),
     ];
     expect(shops, equals(expectedShops));
   });

@@ -6,7 +6,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/model/country.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -112,8 +111,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   }
 
   void _initAsync() async {
-    final countryName = await _model.obtainCountryOfShop();
-    ref.read(_countryNameProvider.state).state = countryName ?? '';
+    final country = await _model.obtainCountryOfShop();
+    ref.read(_countryNameProvider.state).state =
+        country?.localize(context) ?? '';
   }
 
   @override
@@ -257,14 +257,12 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         );
       }
 
-      final countryNameLocalized =
-          Country.safeValueOf(countryName)?.localize(context);
       final String suggestedProductsTitle;
-      if (countryNameLocalized != null) {
+      if (countryName.isNotEmpty) {
         suggestedProductsTitle = context
             .strings.shop_product_range_page_suggested_products_country
             .replaceAll('<SHOP>', widget.shop.name)
-            .replaceAll('<COUNTRY>', countryNameLocalized);
+            .replaceAll('<COUNTRY>', countryName);
       } else {
         suggestedProductsTitle = context
             .strings.shop_product_range_page_suggested_products_country_unknown

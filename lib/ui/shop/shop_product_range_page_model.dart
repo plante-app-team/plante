@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/country.dart';
+import 'package:plante/model/country_table.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
@@ -89,8 +91,8 @@ class ShopProductRangePageModel {
     _suggestedProductsModel.onProductVisibilityChange(product, visible);
   }
 
-  Future<String?> obtainCountryOfShop() async {
+  Future<Country?> obtainCountryOfShop() async {
     final offShop = await _offShopsManager.findOffShopByName(_shop.name);
-    return offShop.maybeOk()?.country?.name;
+    return CountryTable.getCountry(offShop.maybeOk()?.country);
   }
 }

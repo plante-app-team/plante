@@ -1,7 +1,6 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
-import 'package:plante/model/country.dart';
 
 part 'off_shop.g.dart';
 
@@ -14,7 +13,7 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   String? get name;
   @BuiltValueField(wireName: 'products')
   int get productsCount;
-  Country? get country;
+  String? get country;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _setDefaults(OffShopBuilder b) => b.productsCount = 0;
@@ -23,8 +22,7 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
     OffShop? offShop = BuildValueHelper.jsonSerializers
         .deserializeWith(OffShop.serializer, json);
     if (offShop != null && isoCountryCode != null) {
-      offShop = offShop
-          .rebuild((p0) => p0..country = Country.valueOf(isoCountryCode));
+      offShop = offShop.rebuild((p0) => p0..country = isoCountryCode);
     }
     return offShop;
   }

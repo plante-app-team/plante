@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:test/test.dart';
@@ -97,14 +98,14 @@ void main() {
   test('get shops json network exceptions', () async {
     httpClient.setResponseException(
         '.openfoodfacts.org/stores.json', const SocketException(''));
-    final result = await offApi.getShopsJsonForCountry('be');
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.NETWORK));
   });
 
   test('get shops json error response', () async {
     httpClient.setResponse('.openfoodfacts.org/stores.json', '',
         responseCode: 500);
-    final result = await offApi.getShopsJsonForCountry('be');
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
@@ -114,7 +115,7 @@ void main() {
       "tags": [[[[[[[[[]
     }''';
     httpClient.setResponse('.openfoodfacts.org/stores.json', invalidJson);
-    final result = await offApi.getShopsJsonForCountry('be');
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     // We don't expect `result` to be Err, because it's a JSON string and
     // we expect it to be passed as-is, without validation.
     expect(result.unwrap(), equals(invalidJson));
@@ -144,8 +145,41 @@ void main() {
     ''';
     httpClient.setResponse('.*stores.json.*', json);
 
-    final result = await offApi.getShopsJsonForCountry('be');
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     expect(result.unwrap(), equals(json));
+  });
+
+  test('fetch shops from off for Great Britain', () async {
+    const responseJson = '''
+    {
+      "count":2,
+      "tags":[
+        {
+          "id":"tesco",
+          "known":0,
+          "name":"tesco",
+          "products":10342,
+          "url":"https://uk.openfoodfacts.org/store/tesco"
+        },
+        {
+          "id":"waitrose",
+          "known":0,
+          "name":"waitrose",
+          "products":3410,
+          "url":"https://uk.openfoodfacts.org/store/waitrose"
+        }
+      ]
+    }
+    ''';
+    httpClient.setResponse('uk.*stores.json.*', responseJson);
+
+    final result =
+        await offApi.getShopsJsonForCountry(CountryCode.GREAT_BRITAIN);
+    expect(result.unwrap(), equals(responseJson));
+    final requests = httpClient.getRequestsMatching('.*');
+    expect(requests.length, equals(1), reason: requests.toString());
+    final url = requests.single.url.toString();
+    expect(url, contains('uk.openfoodfacts.org'));
   });
 
   test('get vegan barcodes by ingredients analysis', () async {
@@ -165,15 +199,15 @@ void main() {
     ''');
 
     final shop = OffShop((e) => e.id = 'spar');
-    final result = await offApi
-        .getBarcodesVeganByIngredients('ru', shop, ['en:banana', 'en:cocoa']);
+    final result = await offApi.getBarcodesVeganByIngredients(
+        CountryCode.GREAT_BRITAIN, shop, ['en:banana', 'en:cocoa']);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 
     final requests = httpClient.getRequestsMatching('.*');
     expect(requests.length, equals(1), reason: requests.toString());
     final url = requests.single.url.toString();
-    expect(url, contains('ru.openfoodfacts.org'));
+    expect(url, contains('uk.openfoodfacts.org'));
     expect(url, contains('api/v2/search'));
     expect(url, contains('ingredients_analysis_tags=en%3Avegan'));
     expect(url, isNot(contains('labels_tags=en%3Avegan')));
@@ -198,7 +232,8 @@ void main() {
     ''');
 
     final shop = OffShop((e) => e.id = 'spar');
-    final result = await offApi.getBarcodesVeganByLabel('ru', shop);
+    final result =
+        await offApi.getBarcodesVeganByLabel(CountryCode.RUSSIA, shop);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 
