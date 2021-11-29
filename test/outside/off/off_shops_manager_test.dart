@@ -6,16 +6,18 @@ import 'package:plante/model/country_code.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/open_street_map.dart';
 import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
+import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_off_shops_list_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late MockOffApi offApi;
+  late FakeOffShopsListObtainer offShopsListObtainer;
   late LatestCameraPosStorage cameraPosStorage;
   late MockAddressObtainer addressObtainer;
   late OffShopsManager offShopsManager;
@@ -33,12 +35,13 @@ void main() {
 
   setUp(() async {
     offApi = MockOffApi();
+    offShopsListObtainer = FakeOffShopsListObtainer();
     cameraPosStorage =
         LatestCameraPosStorage(FakeSharedPreferences().asHolder());
     addressObtainer = MockAddressObtainer();
 
-    offShopsManager =
-        OffShopsManager(offApi, cameraPosStorage, addressObtainer);
+    offShopsManager = OffShopsManager(
+        offApi, offShopsListObtainer, cameraPosStorage, addressObtainer);
   });
 
   tearDown(() {
@@ -48,7 +51,7 @@ void main() {
   Future<void> _initShops({
     required Coord? cameraPos,
     required Result<OsmAddress, OpenStreetMapError> addressOfAnyCoords,
-    required Result<List<OffShop>, OffRestApiError> offApiShops,
+    required Result<List<OffShop>, OffShopsListObtainerError> offApiShops,
   }) async {
     if (cameraPos != null) {
       await cameraPosStorage.set(cameraPos);
@@ -59,8 +62,7 @@ void main() {
 
     final countryCode = addressOfAnyCoords.maybeOk()?.countryCode;
     if (countryCode != null) {
-      when(offApi.getShopsForLocation(countryCode))
-          .thenAnswer((_) async => offApiShops);
+      offShopsListObtainer.setShopsForCountry(countryCode, offApiShops);
     }
   }
 
@@ -87,7 +89,8 @@ void main() {
   test('fetch shops', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -98,7 +101,8 @@ void main() {
   test('fetch shops when no camera pos', () async {
     await _initShops(
       cameraPos: null,
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -118,7 +122,8 @@ void main() {
   test('do not fetch shops when country not in enabled list', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
       offApiShops: Ok(const []),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -139,7 +144,8 @@ void main() {
   test('fetch barcodes good scenario', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -177,7 +183,8 @@ void main() {
   test('fetch barcodesfor same shop for second time', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -210,7 +217,8 @@ void main() {
   test('fetch barcodes when no barcodes are available for the shop', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -235,7 +243,8 @@ void main() {
   test('fetch barcodeswhen only barcodeswith vegan label available', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -258,7 +267,8 @@ void main() {
       () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -280,7 +290,8 @@ void main() {
   test('fetch barcodeswhen label- and ingredients-barcodes overlap ', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
       offApiShops: Ok(someOffShops),
     );
 
@@ -306,8 +317,9 @@ void main() {
   test('fetch barcodes when could not fetch shops', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
-      offApiShops: Err(OffRestApiError.OTHER), // ERROR!!!!!!!!!!!!
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      offApiShops: Err(OffShopsListObtainerError.OTHER), // ERROR!!!!!!!!!!!!
     );
 
     final shop = someOffShops.first;
@@ -326,7 +338,8 @@ void main() {
   test('fetch barcodes for country not in allowedList', () async {
     await _initShops(
       cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
       offApiShops: Ok(someOffShops),
     );
 

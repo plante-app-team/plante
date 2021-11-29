@@ -6,7 +6,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/pair.dart';
+import 'package:plante/base/file_system_utils.dart';
 import 'package:plante/logging/log_level.dart';
 import 'package:share/share.dart';
 
@@ -57,39 +57,13 @@ class Log {
     _crashlyticsTree = _CrashlyticsFimberTree();
     Fimber.plantTree(_crashlyticsTree!);
 
-    // NOTE: it's async but we don't wait for it
     await maybeCleanUpLogs(logsDir, maxSizeBytes);
   }
 
   static Future<void> maybeCleanUpLogs(
       Directory logsDir, int maxSizeBytes) async {
-    if (!(await logsDir.exists())) {
-      return;
-    }
-
-    int totalSize = 0;
-    final entries =
-        await logsDir.list(recursive: true, followLinks: false).toList();
-    final files = entries.whereType<File>().toList();
-
-    final filesModified = <Pair<File, DateTime>>[];
-    for (final file in files) {
-      filesModified.add(Pair(file, await file.lastModified()));
-    }
-    // Newest first, oldest last
-    filesModified.sort((a, b) =>
-        b.second.millisecondsSinceEpoch - a.second.millisecondsSinceEpoch);
-    for (final fileModified in filesModified) {
-      final file = fileModified.first;
-      totalSize += await file.length();
-      if (maxSizeBytes < totalSize) {
-        try {
-          await file.delete();
-        } catch (e) {
-          Log.e("Couldn't delete file: ${file.path}", ex: e);
-        }
-      }
-    }
+    return await maybeCleanUpOldestFiles(
+        dir: logsDir, maxDirSizeBytes: maxSizeBytes);
   }
 
   static Future<Directory> logsDirectory() async {

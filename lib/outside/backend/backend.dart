@@ -374,7 +374,7 @@ class Backend {
     if (response.isError) {
       return Err(_errFromResp(response));
     }
-    final json = _jsonDecodeSafe(response.body);
+    final json = jsonDecodeSafe(response.body);
     if (json != null && !_isError(json)) {
       return Ok(None());
     } else {
@@ -397,7 +397,7 @@ class Backend {
       return Err(_errFromResp(response));
     }
 
-    final json = _jsonDecodeSafe(response.body);
+    final json = jsonDecodeSafe(response.body);
     if (json == null) {
       return Err(_errInvalidJson(response.body));
     }
@@ -523,14 +523,5 @@ class Backend {
     Log.i(
         'Backend.customRequest: $uri, params: $queryParams, headers: $headers');
     return request;
-  }
-}
-
-Map<String, dynamic>? _jsonDecodeSafe(String str) {
-  try {
-    return jsonDecode(str) as Map<String, dynamic>?;
-  } on FormatException catch (e) {
-    Log.w("Backend: couldn't decode safe: %str", ex: e);
-    return null;
   }
 }

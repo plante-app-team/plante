@@ -27,6 +27,7 @@ import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
@@ -99,8 +100,12 @@ void initDI() {
       GetIt.I.get<Backend>(),
       GetIt.I.get<TakenProductsImagesStorage>(),
       GetIt.I.get<Analytics>()));
+  GetIt.I.registerSingleton<OffShopsListObtainer>(OffShopsListObtainer(
+    GetIt.I.get<OffApi>(),
+  ));
   GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
     GetIt.I.get<OffApi>(),
+    GetIt.I.get<OffShopsListObtainer>(),
     GetIt.I.get<LatestCameraPosStorage>(),
     GetIt.I.get<AddressObtainer>(),
   ));

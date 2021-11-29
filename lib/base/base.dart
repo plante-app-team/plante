@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -9,6 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
+import 'package:plante/logging/log.dart';
 
 const _PRIVACY_POLICY_URL_RU =
     'https://docs.google.com/document/d/1fSeiIwDZhcf8d1ad7H8R1YCoffVxaalSIZ35SGuXkec/edit?usp=sharing';
@@ -102,4 +104,13 @@ Future<String> userAgent() async {
   final packageInfo = await getPackageInfo();
   return 'User-Agent: ${packageInfo.appName} / ${packageInfo.version} '
       '${operatingSystem()}, plante.application@gmail.com';
+}
+
+Map<String, dynamic>? jsonDecodeSafe(String str) {
+  try {
+    return jsonDecode(str) as Map<String, dynamic>?;
+  } on FormatException catch (e) {
+    Log.w("Couldn't decode safe: %str", ex: e);
+    return null;
+  }
 }

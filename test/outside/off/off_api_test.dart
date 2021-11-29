@@ -95,31 +95,34 @@ void main() {
     expect(obtainedBarcodes.toSet(), equals(barcodes.toSet()));
   });
 
-  test('fetch shops network exceptions', () async {
+  test('get shops json network exceptions', () async {
     httpClient.setResponseException(
         '.openfoodfacts.org/stores.json', const SocketException(''));
-    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.NETWORK));
   });
 
-  test('fetch shops error response', () async {
+  test('get shops json error response', () async {
     httpClient.setResponse('.openfoodfacts.org/stores.json', '',
         responseCode: 500);
-    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
     expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
   });
 
-  test('fetch shops invalid JSON', () async {
-    httpClient.setResponse('.openfoodfacts.org/stores.json', '''{
+  test('get shops json invalid JSON', () async {
+    const invalidJson = '''{
       "count": 2,
       "tags": [[[[[[[[[]
-    }''');
-    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
-    expect(result.unwrapErr(), equals(OffRestApiError.OTHER));
+    }''';
+    httpClient.setResponse('.openfoodfacts.org/stores.json', invalidJson);
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
+    // We don't expect `result` to be Err, because it's a JSON string and
+    // we expect it to be passed as-is, without validation.
+    expect(result.unwrap(), equals(invalidJson));
   });
 
-  test('fetch shops from off for belgium', () async {
-    httpClient.setResponse('be.*stores.json.*', '''
+  test('get shops json from off for belgium', () async {
+    const json = '''
     {
       "count":2,
       "tags":[
@@ -139,14 +142,15 @@ void main() {
         }
       ]
     }
-    ''');
+    ''';
+    httpClient.setResponse('.*stores.json.*', json);
 
-    final result = await offApi.getShopsForLocation(CountryCode.BELGIUM);
-    expect(result.unwrap().length, equals(2));
+    final result = await offApi.getShopsJsonForCountry(CountryCode.BELGIUM);
+    expect(result.unwrap(), equals(json));
   });
 
   test('fetch shops from off for Great Britain', () async {
-    httpClient.setResponse('uk.*stores.json.*', '''
+    const responseJson = '''
     {
       "count":2,
       "tags":[
@@ -166,10 +170,12 @@ void main() {
         }
       ]
     }
-    ''');
+    ''';
+    httpClient.setResponse('uk.*stores.json.*', responseJson);
 
-    final result = await offApi.getShopsForLocation(CountryCode.GREAT_BRITAIN);
-    expect(result.unwrap().length, equals(2));
+    final result =
+        await offApi.getShopsJsonForCountry(CountryCode.GREAT_BRITAIN);
+    expect(result.unwrap(), equals(responseJson));
     final requests = httpClient.getRequestsMatching('.*');
     expect(requests.length, equals(1), reason: requests.toString());
     final url = requests.single.url.toString();
@@ -193,8 +199,8 @@ void main() {
     ''');
 
     final shop = OffShop((e) => e.id = 'spar');
-    final result = await offApi
-        .getBarcodesVeganByIngredients(CountryCode.GREAT_BRITAIN, shop, ['en:banana', 'en:cocoa']);
+    final result = await offApi.getBarcodesVeganByIngredients(
+        CountryCode.GREAT_BRITAIN, shop, ['en:banana', 'en:cocoa']);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 
@@ -226,7 +232,8 @@ void main() {
     ''');
 
     final shop = OffShop((e) => e.id = 'spar');
-    final result = await offApi.getBarcodesVeganByLabel(CountryCode.RUSSIA, shop);
+    final result =
+        await offApi.getBarcodesVeganByLabel(CountryCode.RUSSIA, shop);
     expect(result.unwrap(),
         equals(['3046920022651', '3046920022606', '3229820021027']));
 

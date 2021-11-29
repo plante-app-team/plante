@@ -63,7 +63,7 @@ void main() {
 
   testWidgets('suggested products title with country',
       (WidgetTester tester) async {
-        final france = CountryTable.getCountry(CountryCode.FRANCE);
+    final france = CountryTable.getCountry(CountryCode.FRANCE);
     offShopsManager.setOffShop(CountryCode.FRANCE, aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);

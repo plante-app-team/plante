@@ -8,6 +8,7 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
+import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
@@ -53,6 +54,7 @@ class OffShopsManager {
   ];
 
   final OffApi _offApi;
+  final OffShopsListObtainer _shopsObtainer;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
 
@@ -62,7 +64,8 @@ class OffShopsManager {
 
   final ShopNamesAndBarcodesMap _offShopsProductsCache = {};
 
-  OffShopsManager(this._offApi, this._cameraPosStorage, this._addressObtainer) {
+  OffShopsManager(this._offApi, this._shopsObtainer, this._cameraPosStorage,
+      this._addressObtainer) {
     _offShopsOp = CachedOperation(_fetchOffShopsImpl);
     _countryCodeOp = CachedOperation(_getCountryCodeImpl);
   }
@@ -131,7 +134,8 @@ class OffShopsManager {
       return Ok(await OffShopsListWrapper.create([]));
     }
 
-    final shopsRes = await _offApi.getShopsForLocation(countryCode.unwrap()!);
+    final shopsRes =
+        await _shopsObtainer.getShopsForCountry(countryCode.unwrap()!);
     if (shopsRes.isErr) {
       Log.w('offShopManager.fetchOffShop error: $shopsRes');
       return Err(shopsRes.unwrapErr().convert());
@@ -218,6 +222,17 @@ extension _OffRestApiErrorExt on OffRestApiError {
       case OffRestApiError.NETWORK:
         return OffShopsManagerError.NETWORK;
       case OffRestApiError.OTHER:
+        return OffShopsManagerError.OTHER;
+    }
+  }
+}
+
+extension _OffShopsListObtainerErrorExt on OffShopsListObtainerError {
+  OffShopsManagerError convert() {
+    switch (this) {
+      case OffShopsListObtainerError.NETWORK:
+        return OffShopsManagerError.NETWORK;
+      case OffShopsListObtainerError.OTHER:
         return OffShopsManagerError.OTHER;
     }
   }

@@ -606,13 +606,13 @@ class MockOffApi extends _i1.Mock implements _i41.OffApi {
                   Future<_i5.SearchResult>.value(_FakeSearchResult_5()))
           as _i9.Future<_i5.SearchResult>);
   @override
-  _i9.Future<_i2.Result<List<_i43.OffShop>, _i41.OffRestApiError>>
-      getShopsForLocation(String? countryIso) => (super.noSuchMethod(
-          Invocation.method(#getShopsForLocation, [countryIso]),
-          returnValue: Future<
-                  _i2.Result<List<_i43.OffShop>, _i41.OffRestApiError>>.value(
-              _FakeResult_0<List<_i43.OffShop>, _i41.OffRestApiError>())) as _i9
-          .Future<_i2.Result<List<_i43.OffShop>, _i41.OffRestApiError>>);
+  _i9.Future<_i2.Result<String, _i41.OffRestApiError>> getShopsJsonForCountry(
+          String? countryIso) =>
+      (super.noSuchMethod(
+          Invocation.method(#getShopsJsonForCountry, [countryIso]),
+          returnValue: Future<_i2.Result<String, _i41.OffRestApiError>>.value(
+              _FakeResult_0<String, _i41.OffRestApiError>())) as _i9
+          .Future<_i2.Result<String, _i41.OffRestApiError>>);
   @override
   _i9.Future<_i2.Result<List<String>, _i41.OffRestApiError>>
       getBarcodesVeganByIngredients(String? countryCode, _i43.OffShop? shop,

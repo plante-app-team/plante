@@ -82,7 +82,8 @@ void main() {
   test('first init good scenario', () async {
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressResp: () =>
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
     );
 
     final expectedUserLangs = [LangCode.nl, LangCode.fr, LangCode.de];
@@ -93,7 +94,8 @@ void main() {
   test('first init without last known pos', () async {
     await finishSetUp(
       lastPos: null,
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressResp: () =>
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
     );
 
     expect(await userLangsManager.getUserLangs(), isNull);
@@ -136,8 +138,8 @@ void main() {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
-    when(addressObtainer.addressOfCoords(any))
-        .thenAnswer((_) async => Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)));
+    when(addressObtainer.addressOfCoords(any)).thenAnswer((_) async =>
+        Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)));
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
@@ -166,7 +168,8 @@ void main() {
 
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      addressResp: () =>
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
     );
 
     expect(analytics.wasEventSent('single_lang_country'), isTrue);
@@ -178,7 +181,8 @@ void main() {
 
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      addressResp: () =>
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
     );
 
     expect(analytics.wasEventSent('single_lang_country'), isFalse);
