@@ -35,7 +35,7 @@ class OffShopsManager {
     'en:biscuits',
   ];
 
-  static const enabledOffProductsCountries = [
+  static const _ENABLED_IN_COUNTRIES = [
     CountryCode.GREAT_BRITAIN,
     CountryCode.SWEDEN,
     CountryCode.DENMARK,
@@ -72,7 +72,7 @@ class OffShopsManager {
   }
 
   static bool isEnabledCountry(String isoCode) {
-    return enabledOffProductsCountries.contains(isoCode);
+    return _ENABLED_IN_COUNTRIES.contains(isoCode);
   }
 
   Future<Result<OffShop?, OffShopsManagerError>> findOffShopByName(
