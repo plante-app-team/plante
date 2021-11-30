@@ -23,19 +23,15 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
       'products',
       serializers.serialize(object.productsCount,
           specifiedType: const FullType(int)),
+      'country',
+      serializers.serialize(object.country,
+          specifiedType: const FullType(String)),
     ];
     Object? value;
     value = object.name;
     if (value != null) {
       result
         ..add('name')
-        ..add(serializers.serialize(value,
-            specifiedType: const FullType(String)));
-    }
-    value = object.country;
-    if (value != null) {
-      result
-        ..add('country')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
@@ -67,7 +63,7 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
           break;
         case 'country':
           result.country = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String?;
+              specifiedType: const FullType(String)) as String;
           break;
       }
     }
@@ -84,17 +80,21 @@ class _$OffShop extends OffShop {
   @override
   final int productsCount;
   @override
-  final String? country;
+  final String country;
 
   factory _$OffShop([void Function(OffShopBuilder)? updates]) =>
       (new OffShopBuilder()..update(updates)).build();
 
   _$OffShop._(
-      {required this.id, this.name, required this.productsCount, this.country})
+      {required this.id,
+      this.name,
+      required this.productsCount,
+      required this.country})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id');
     BuiltValueNullFieldError.checkNotNull(
         productsCount, 'OffShop', 'productsCount');
+    BuiltValueNullFieldError.checkNotNull(country, 'OffShop', 'country');
   }
 
   @override
@@ -187,7 +187,8 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
             name: name,
             productsCount: BuiltValueNullFieldError.checkNotNull(
                 productsCount, 'OffShop', 'productsCount'),
-            country: country);
+            country: BuiltValueNullFieldError.checkNotNull(
+                country, 'OffShop', 'country'));
     replace(_$result);
     return _$result;
   }

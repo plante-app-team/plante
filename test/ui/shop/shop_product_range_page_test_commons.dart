@@ -53,7 +53,7 @@ class ShopProductRangePageTestCommons {
   late final MockAddressObtainer addressObtainer;
   late final FakeProductsObtainer productsObtainer;
   late final FakeSuggestedProductsManager suggestedProductsManager;
-  late final FakeOffShopsManager offShopsmanager;
+  late final FakeOffShopsManager offShopsManager;
 
   late final Shop aShop;
 
@@ -171,8 +171,8 @@ class ShopProductRangePageTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-    offShopsmanager = FakeOffShopsManager();
-    GetIt.I.registerSingleton<OffShopsManager>(offShopsmanager);
+    offShopsManager = FakeOffShopsManager();
+    GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
 
     final params = UserParams((v) => v.name = 'Bob');

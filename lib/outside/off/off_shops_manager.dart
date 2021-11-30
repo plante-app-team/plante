@@ -4,12 +4,11 @@ import 'package:plante/base/cached_operation.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
+import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum OffShopsManagerError {
@@ -20,22 +19,6 @@ enum OffShopsManagerError {
 typedef ShopNamesAndBarcodesMap = Map<String, List<String>>;
 
 class OffShopsManager {
-  // OFF categories considered acceptable for products which are vegan
-  // accidentally. The field is needed to avoid returning grains and canned
-  // vegetables.
-  static const _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES = [
-    'en:desserts',
-    'en:snacks',
-    'en:meat-analogues',
-    'en:milk-substitute',
-    'en:non-dairy-yogurts',
-    'en:frozen-desserts',
-    'en:chips-and-fries',
-    'en:biscuits-and-cakes',
-    'en:veggie-patties',
-    'en:biscuits',
-  ];
-
   static const _ENABLED_IN_COUNTRIES = [
     CountryCode.GREAT_BRITAIN,
     CountryCode.SWEDEN,
@@ -53,7 +36,7 @@ class OffShopsManager {
     CountryCode.BELGIUM
   ];
 
-  final OffApi _offApi;
+  final OffVeganBarcodesObtainer _veganBarcodesObtainer;
   final OffShopsListObtainer _shopsObtainer;
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
@@ -62,10 +45,16 @@ class OffShopsManager {
       _offShopsOp;
   late final CachedOperation<String, None> _countryCodeOp;
 
-  final ShopNamesAndBarcodesMap _offShopsProductsCache = {};
+  Future<Result<String?, None>> get _countryCode async {
+    final result = await _countryCodeOp.result;
+    if (result.isOk && !isEnabledCountry(result.unwrap())) {
+      return Ok(null);
+    }
+    return result;
+  }
 
-  OffShopsManager(this._offApi, this._shopsObtainer, this._cameraPosStorage,
-      this._addressObtainer) {
+  OffShopsManager(this._veganBarcodesObtainer, this._shopsObtainer,
+      this._cameraPosStorage, this._addressObtainer) {
     _offShopsOp = CachedOperation(_fetchOffShopsImpl);
     _countryCodeOp = CachedOperation(_getCountryCodeImpl);
   }
@@ -145,85 +134,40 @@ class OffShopsManager {
   }
 
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesForShops(
-          Set<String> shopsNames, List<LangCode> langs) async {
+      fetchVeganBarcodesForShops(Set<String> shopsNames) async {
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
       Log.w(
           'offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
       return Err(OffShopsManagerError.OTHER);
-    } else if (countryCodeRes.unwrap() == null) {
+    }
+    final countryCode = countryCodeRes.unwrap();
+    if (countryCode == null) {
       return Ok(const {});
     }
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
-    } else if (countryCodeRes.isErr) {
-      return Err(OffShopsManagerError.OTHER);
     }
     final shopsWrapper = shopsRes.unwrap();
-    final shops = await shopsWrapper.findAppropriateShopsFor(shopsNames);
+    final namesAndShops =
+        await shopsWrapper.findAppropriateShopsFor(shopsNames);
+
+    final barcodesMapRes = await _veganBarcodesObtainer
+        .obtainVeganBarcodesForShops(countryCode, namesAndShops.values);
+    if (barcodesMapRes.isErr) {
+      return Err(barcodesMapRes.unwrapErr());
+    }
+    final barcodesMap = barcodesMapRes.unwrap();
+
     final ShopNamesAndBarcodesMap result = {};
-    final countryCode = countryCodeRes.unwrap();
-
-    for (final nameAndShop in shops.entries) {
-      final name = nameAndShop.key;
-      final shop = nameAndShop.value;
-
-      final existingCache = _offShopsProductsCache[name];
-      if (existingCache != null) {
-        result[name] = existingCache;
-      } else {
-        final barcodesRes = await _queryBarcodesFor(shop, countryCode!);
-        if (barcodesRes.isErr) {
-          return Err(barcodesRes.unwrapErr());
-        }
-        final barcodes = barcodesRes.unwrap();
-        result[name] = barcodes;
-        _offShopsProductsCache[name] = barcodes;
+    for (final shopName in shopsNames) {
+      final barcodes = barcodesMap[namesAndShops[shopName]];
+      if (barcodes != null) {
+        result[shopName] = barcodes;
       }
     }
     return Ok(result);
-  }
-
-  Future<Result<String?, None>> get _countryCode async {
-    final result = await _countryCodeOp.result;
-    if (result.isOk && !isEnabledCountry(result.unwrap())) {
-      return Ok(null);
-    }
-    return result;
-  }
-
-  Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesFor(
-      OffShop shop, String countryCode) async {
-    final barcodesRes1 = await _offApi.getBarcodesVeganByIngredients(
-        countryCode, shop, _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES);
-    final barcodesRes2 =
-        await _offApi.getBarcodesVeganByLabel(countryCode, shop);
-
-    if (barcodesRes1.isOk && barcodesRes2.isOk) {
-      final barcodes1 = barcodesRes1.unwrap().toSet();
-      final barcodes2Filtered =
-          barcodesRes2.unwrap().where((e) => !barcodes1.contains(e));
-      return Ok(barcodes1.toList() + barcodes2Filtered.toList());
-    } else if (barcodesRes1.isOk) {
-      return Ok(barcodesRes1.unwrap());
-    } else if (barcodesRes2.isOk) {
-      return Ok(barcodesRes2.unwrap());
-    } else {
-      return Err(barcodesRes1.unwrapErr().convert());
-    }
-  }
-}
-
-extension _OffRestApiErrorExt on OffRestApiError {
-  OffShopsManagerError convert() {
-    switch (this) {
-      case OffRestApiError.NETWORK:
-        return OffShopsManagerError.NETWORK;
-      case OffRestApiError.OTHER:
-        return OffShopsManagerError.OTHER;
-    }
   }
 }
 

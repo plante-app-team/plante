@@ -1,18 +1,20 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/model/lang_code.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 
 class FakeOffShopsManager implements OffShopsManager {
   final _suggestedBarcodes = <OffShop, List<String>>{};
-  OffShop _offShop = OffShop((shop) => shop..id = 'storeId');
+  OffShop _offShop = OffShop((shop) => shop
+    ..id = 'storeId'
+    ..country = CountryCode.BELGIUM);
 
   void setSuggestedBarcodes(Map<OffShop, List<String>> suggestedBarcodes) {
     _suggestedBarcodes.clear();
     _suggestedBarcodes.addAll(suggestedBarcodes);
   }
 
-  void setOffShop(String? country, String? name) {
+  void setOffShop(String country, String? name) {
     _offShop = OffShop((shop) => shop
       ..id = 'storeId'
       ..name = name
@@ -26,8 +28,7 @@ class FakeOffShopsManager implements OffShopsManager {
 
   @override
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesForShops(
-          Set<String> shopsNames, List<LangCode> langs) async {
+      fetchVeganBarcodesForShops(Set<String> shopsNames) async {
     final ShopNamesAndBarcodesMap result = {};
     for (final name in shopsNames) {
       for (final shop in _suggestedBarcodes.keys) {

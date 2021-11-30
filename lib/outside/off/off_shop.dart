@@ -1,11 +1,14 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
+import 'package:plante/logging/log.dart';
 
 part 'off_shop.g.dart';
 
 abstract class OffShop implements Built<OffShop, OffShopBuilder> {
-  static OffShop empty = OffShop((e) => e.id = '');
+  static OffShop empty = OffShop((e) => e
+    ..id = ''
+    ..country = '');
 
   @BuiltValueField(wireName: 'id')
   String get id;
@@ -13,18 +16,22 @@ abstract class OffShop implements Built<OffShop, OffShopBuilder> {
   String? get name;
   @BuiltValueField(wireName: 'products')
   int get productsCount;
-  String? get country;
+  @BuiltValueField(wireName: 'country')
+  String get country;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _setDefaults(OffShopBuilder b) => b.productsCount = 0;
 
-  static OffShop? fromJson(dynamic json, String? isoCountryCode) {
-    OffShop? offShop = BuildValueHelper.jsonSerializers
-        .deserializeWith(OffShop.serializer, json);
-    if (offShop != null && isoCountryCode != null) {
-      offShop = offShop.rebuild((p0) => p0..country = isoCountryCode);
+  static OffShop? fromJson(dynamic json, String isoCountryCode) {
+    if (json['country'] == null) {
+      json['country'] = isoCountryCode;
+    } else {
+      if (json['country'] != isoCountryCode) {
+        Log.e('$isoCountryCode differs from country in json: $json');
+      }
     }
-    return offShop;
+    return BuildValueHelper.jsonSerializers
+        .deserializeWith(OffShop.serializer, json);
   }
 
   static String shopNameToPossibleOffShopID(String shopName) =>

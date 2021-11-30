@@ -37,7 +37,7 @@ void main() {
     suggestedProducts = commons.suggestedProducts;
     suggestedProductsManager = commons.suggestedProductsManager;
     productsObtainer = commons.productsObtainer;
-    offShopsManager = commons.offShopsmanager;
+    offShopsManager = commons.offShopsManager;
     // Let's remove the confirmed products so it would be easier
     // to test the suggested ones.
     // Some tests will reintroduce confirmed products when they need it.
@@ -76,7 +76,7 @@ void main() {
 
   testWidgets('suggested products title without country',
       (WidgetTester tester) async {
-    offShopsManager.setOffShop(null, aShop.name);
+    offShopsManager.setOffShop('invalid_country_code', aShop.name);
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
     final france = CountryTable.getCountry(CountryCode.FRANCE);

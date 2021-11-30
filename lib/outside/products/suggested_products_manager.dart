@@ -1,7 +1,5 @@
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
@@ -15,9 +13,8 @@ typedef OsmUIDBarcodesMap = Map<OsmUID, List<String>>;
 
 class SuggestedProductsManager {
   final OffShopsManager _offShopsManager;
-  final UserLangsManager _userLangsManager;
 
-  SuggestedProductsManager(this._offShopsManager, this._userLangsManager);
+  SuggestedProductsManager(this._offShopsManager);
 
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
       getSuggestedBarcodesFor(Iterable<Shop> shops) async {
@@ -27,8 +24,8 @@ class SuggestedProductsManager {
 
     shops = shops.toSet(); // Defensive copy
     final names = shops.map((e) => e.name).toSet();
-    final barcodesMapRes = await _offShopsManager.fetchVeganBarcodesForShops(
-        names, await _userLangs());
+    final barcodesMapRes =
+        await _offShopsManager.fetchVeganBarcodesForShops(names);
     if (barcodesMapRes.isErr) {
       return Err(barcodesMapRes.unwrapErr().convert());
     }
@@ -56,11 +53,6 @@ class SuggestedProductsManager {
     }
 
     return Ok(result);
-  }
-
-  Future<List<LangCode>> _userLangs() async {
-    final userLangs = await _userLangsManager.getUserLangs();
-    return userLangs.langs.toList();
   }
 }
 
