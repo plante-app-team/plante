@@ -30,7 +30,7 @@ abstract class BackgroundWorker<BS> {
     logsFrontPort.listen((message) {
       try {
         final msgObj = message as BackgroundLogMsg;
-        Log.custom(msgObj.logLevel, msgObj.msg, ex: msgObj.exception);
+        Log.custom(msgObj.logLevel, msgObj.msg, ex: msgObj.exceptionMsg);
       } catch (e) {
         Log.e('Background $_name sent unacceptable msg: $message', ex: e);
       }
@@ -50,7 +50,13 @@ abstract class BackgroundWorker<BS> {
       port.sendPort,
       payload,
     ));
-    return port;
+    return port.map((event) {
+      if (event is _ErrorFromBack) {
+        Log.w('$_name: error $event');
+        throw event;
+      }
+      return event;
+    });
   }
 
   static void _spinBackgroundWork(_DataFromFront dataFromFront) async {
@@ -58,8 +64,9 @@ abstract class BackgroundWorker<BS> {
     final name = dataFromFront.name;
     final backgroundState = dataFromFront.initialState;
     final fn = dataFromFront.backgroundWorkFn;
-    final log = (LogLevel logLevel, String msg, {dynamic ex}) {
-      dataFromFront.logsFrontPort.send(BackgroundLogMsg(logLevel, msg, ex));
+    final log = (LogLevel logLevel, String msg, {String? exceptionMsg}) {
+      dataFromFront.logsFrontPort
+          .send(BackgroundLogMsg(logLevel, msg, exceptionMsg));
     };
 
     // Let's inform the caller about how to communicate with us...
@@ -73,8 +80,9 @@ abstract class BackgroundWorker<BS> {
         response = fn.call(incomingMsg.payload, backgroundState, log);
       } catch (e) {
         exceptionCaught = true;
-        log(LogLevel.WARNING, '$name: backgroundWorkFn threw', ex: e);
-        incomingMsg.sender.send(e);
+        log(LogLevel.WARNING, '$name: backgroundWorkFn threw',
+            exceptionMsg: e.toString());
+        incomingMsg.sender.send(_ErrorFromBack('${dataFromFront.name}: $e'));
       }
       if (!exceptionCaught) {
         incomingMsg.sender.send(response);
@@ -107,4 +115,24 @@ class _CrossIsolatesMessage {
     this.sender,
     this.payload,
   );
+}
+
+@immutable
+class _ErrorFromBack implements Exception {
+  final String msg;
+  const _ErrorFromBack(this.msg);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) {
+      return true;
+    }
+    return other is _ErrorFromBack && msg == other.msg;
+  }
+
+  @override
+  int get hashCode => msg.hashCode;
+
+  @override
+  String toString() => '_ErrorFromBack($msg)';
 }

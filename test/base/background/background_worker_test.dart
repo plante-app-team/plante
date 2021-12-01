@@ -20,7 +20,13 @@ void main() {
   test('background execution throws', () async {
     final worker = await _TestedBackgroundWorker.create();
     expect(await worker.addValue(1), equals(1));
-    await worker.throwInBackground(Exception('hello there'));
+    String? excMsgFromBack;
+    try {
+      await worker.throwInBackground(Exception('hello there'));
+    } catch (e) {
+      excMsgFromBack = e.toString();
+    }
+    expect(excMsgFromBack, contains('hello there'));
     expect(await worker.addValue(-20), equals(-19));
     worker.dispose();
   });
@@ -87,7 +93,7 @@ class _TestedBackgroundWorker extends BackgroundWorker<_SomeState> {
   static dynamic _backgroundWork(
       dynamic payload, _SomeState backgroundState, BackgroundLog log) {
     if (payload is Exception) {
-      throw Exception();
+      throw payload;
     }
     if (payload is String) {
       log(LogLevel.INFO, payload);

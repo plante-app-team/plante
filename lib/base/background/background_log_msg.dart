@@ -3,9 +3,9 @@ import 'package:plante/logging/log_level.dart';
 class BackgroundLogMsg {
   final LogLevel logLevel;
   final String msg;
-  final dynamic exception;
-  BackgroundLogMsg(this.logLevel, this.msg, this.exception);
+  final String? exceptionMsg;
+  BackgroundLogMsg(this.logLevel, this.msg, this.exceptionMsg);
 }
 
 typedef BackgroundLog = void Function(LogLevel logLevel, String msg,
-    {dynamic ex});
+    {String? exceptionMsg});
