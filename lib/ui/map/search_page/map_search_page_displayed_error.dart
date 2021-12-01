@@ -1,4 +1,4 @@
-import 'package:plante/outside/map/open_street_map.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 

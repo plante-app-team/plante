@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:plante/outside/map/osm_nominatim.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/outside/map/osm_search_result.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_search_result.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_http_client.dart';
+import '../../../z_fakes/fake_http_client.dart';
 import 'open_street_map_test_commons.dart';
 
 void main() {

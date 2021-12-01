@@ -1,9 +1,9 @@
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_http_client.dart';
+import '../../../z_fakes/fake_http_client.dart';
 import 'open_street_map_test_commons.dart';
 
 void main() {

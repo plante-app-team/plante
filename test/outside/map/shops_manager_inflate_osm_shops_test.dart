@@ -1,7 +1,7 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 

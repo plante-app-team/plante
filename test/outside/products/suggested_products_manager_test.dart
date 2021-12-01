@@ -1,6 +1,6 @@
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:test/test.dart';

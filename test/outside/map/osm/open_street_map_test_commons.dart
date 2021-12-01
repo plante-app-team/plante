@@ -1,11 +1,11 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
-import 'package:plante/outside/map/osm_nominatim.dart';
-import 'package:plante/outside/map/osm_overpass.dart';
+import 'package:plante/outside/map/osm/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_http_client.dart';
+import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_http_client.dart';
 
 class _FakeAlwaysInteractingOsmQueue implements OsmInteractionsQueue {
   @override

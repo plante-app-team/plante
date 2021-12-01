@@ -4,7 +4,7 @@ import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:test/test.dart';
 

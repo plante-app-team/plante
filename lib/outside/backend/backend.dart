@@ -26,7 +26,7 @@ import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 const BACKEND_ADDRESS = 'planteapp.com';
 const _LOCAL_BACKEND_ADDRESS = 'localhost:8080';

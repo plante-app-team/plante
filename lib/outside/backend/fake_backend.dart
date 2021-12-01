@@ -18,7 +18,7 @@ import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 class FakeBackend implements Backend {
   final Settings _settings;

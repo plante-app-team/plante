@@ -8,14 +8,14 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/http_client.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_element_type.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/outside/map/osm_search_result.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_element_type.dart';
+import 'package:plante/outside/map/osm/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_search_result.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 /// A wrapper around Open Street Map Nominatim APIs.
 ///

@@ -2,7 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/outside/map/osm_element_type.dart';
+import 'package:plante/outside/map/osm/osm_element_type.dart';
 
 @immutable
 class OsmUID {

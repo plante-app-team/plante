@@ -1,10 +1,10 @@
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_cacher.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:test/test.dart';
 
 void main() {

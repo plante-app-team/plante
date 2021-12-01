@@ -12,7 +12,7 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/product_card.dart';

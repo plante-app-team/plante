@@ -8,8 +8,8 @@ import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/country_code.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';

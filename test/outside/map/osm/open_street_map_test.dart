@@ -1,11 +1,11 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_nominatim.dart';
-import 'package:plante/outside/map/osm_search_result.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/osm_search_result.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_mobile_app_config_manager.dart';
+import '../../../z_fakes/fake_mobile_app_config_manager.dart';
 
 void main() {
   late _FakeOsmNominatim osmNominatim;

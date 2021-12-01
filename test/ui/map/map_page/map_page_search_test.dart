@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
-import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';

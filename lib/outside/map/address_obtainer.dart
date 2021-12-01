@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_nominatim.dart';
-import 'package:plante/outside/map/osm_short_address.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/osm_short_address.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 typedef AddressResult = Result<OsmAddress, OpenStreetMapError>;
 typedef FutureAddress = Future<AddressResult>;
