@@ -1,7 +1,7 @@
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 
 enum SuggestedProductsManagerError {

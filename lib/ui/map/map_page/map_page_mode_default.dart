@@ -8,7 +8,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/base/components/checkbox_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/text_styles.dart';

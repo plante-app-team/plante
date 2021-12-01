@@ -6,10 +6,10 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_short_address.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_short_address.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:test/test.dart';
 

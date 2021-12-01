@@ -1,6 +1,6 @@
 import 'package:plante/base/result.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_search_result.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_search_result.dart';
 
 class OsmSearcher {
   final OpenStreetMap _osm;

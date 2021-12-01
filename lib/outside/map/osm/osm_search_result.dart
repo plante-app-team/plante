@@ -2,8 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
-import 'package:plante/outside/map/osm_road.dart';
-import 'package:plante/outside/map/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
 
 part 'osm_search_result.g.dart';
 

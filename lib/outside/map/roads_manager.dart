@@ -3,11 +3,11 @@ import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_cached_territory.dart';
-import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_overpass.dart';
-import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_cached_territory.dart';
+import 'package:plante/outside/map/osm/osm_cacher.dart';
+import 'package:plante/outside/map/osm/osm_overpass.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
 
 enum RoadsManagerError {
   NETWORK,

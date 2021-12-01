@@ -7,9 +7,9 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
 import '../../common_mocks.mocks.dart';

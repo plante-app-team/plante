@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_overpass.dart';
-import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_overpass.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_http_client.dart';
+import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_http_client.dart';
 import 'open_street_map_test_commons.dart';
 
 void main() {

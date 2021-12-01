@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plante/outside/map/osm_element_type.dart';
+import 'package:plante/outside/map/osm/osm_element_type.dart';
 
 void main() {
   setUp(() async {});

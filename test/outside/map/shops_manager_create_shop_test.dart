@@ -5,8 +5,8 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 

@@ -16,7 +16,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';

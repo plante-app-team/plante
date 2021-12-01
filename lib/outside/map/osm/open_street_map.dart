@@ -3,11 +3,11 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
 import 'package:plante/outside/http_client.dart';
-import 'package:plante/outside/map/osm_address.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
-import 'package:plante/outside/map/osm_nominatim.dart';
-import 'package:plante/outside/map/osm_overpass.dart';
-import 'package:plante/outside/map/osm_search_result.dart';
+import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/osm/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm/osm_nominatim.dart';
+import 'package:plante/outside/map/osm/osm_overpass.dart';
+import 'package:plante/outside/map/osm/osm_search_result.dart';
 
 enum OpenStreetMapError { NETWORK, OTHER }
 

@@ -3,7 +3,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';

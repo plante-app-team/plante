@@ -7,7 +7,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/osm_short_address.dart';
+import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';

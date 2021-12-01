@@ -4,9 +4,9 @@ import 'package:plante/base/build_value_helper.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_short_address.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_short_address.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 part 'shop.g.dart';
 

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/outside/map/osm_interactions_queue.dart';
+import 'package:plante/outside/map/osm/osm_interactions_queue.dart';
 import 'package:test/test.dart';
 
 void main() {

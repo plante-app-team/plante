@@ -2,9 +2,9 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/map/open_street_map.dart';
-import 'package:plante/outside/map/osm_cacher.dart';
-import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm/open_street_map.dart';
+import 'package:plante/outside/map/osm/osm_cacher.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 

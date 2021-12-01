@@ -13,8 +13,8 @@ import 'package:plante/model/shops_list_restorable.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 import '../widget_tester_extension.dart';
 

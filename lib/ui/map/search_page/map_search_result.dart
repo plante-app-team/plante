@@ -3,7 +3,7 @@ import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_road.dart';
 
 part 'map_search_result.g.dart';
 

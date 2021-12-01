@@ -8,8 +8,8 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/map/osm_shop.dart';
-import 'package:plante/outside/map/osm_uid.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 
 void main() {
   final aShop = Shop((e) => e
