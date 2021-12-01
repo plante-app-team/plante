@@ -198,7 +198,9 @@ void main() {
     }
     ''');
 
-    final shop = OffShop((e) => e.id = 'spar');
+    final shop = OffShop((e) => e
+      ..id = 'spar'
+      ..country = CountryCode.GREAT_BRITAIN);
     final result = await offApi.getBarcodesVeganByIngredients(
         CountryCode.GREAT_BRITAIN, shop, ['en:banana', 'en:cocoa']);
     expect(result.unwrap(),
@@ -231,7 +233,9 @@ void main() {
     }
     ''');
 
-    final shop = OffShop((e) => e.id = 'spar');
+    final shop = OffShop((e) => e
+      ..id = 'spar'
+      ..country = CountryCode.RUSSIA);
     final result =
         await offApi.getBarcodesVeganByLabel(CountryCode.RUSSIA, shop);
     expect(result.unwrap(),

@@ -9,11 +9,13 @@ void main() {
     OffShop((e) => e
       ..id = 'spar'
       ..name = 'Spar'
-      ..productsCount = 2),
+      ..productsCount = 2
+      ..country = 'ru'),
     OffShop((e) => e
       ..id = 'auchan'
       ..name = 'Auchan'
-      ..productsCount = 2),
+      ..productsCount = 2
+      ..country = 'ru'),
   ];
 
   setUp(() async {

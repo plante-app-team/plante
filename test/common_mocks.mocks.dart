@@ -668,14 +668,13 @@ class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
           .Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>);
   @override
   _i9.Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>
-      fetchVeganBarcodesForShops(
-              Set<String>? shopsNames, List<_i22.LangCode>? langs) =>
-          (super.noSuchMethod(
-              Invocation.method(
-                  #fetchVeganBarcodesForShops, [shopsNames, langs]),
-              returnValue: Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>.value(
-                  _FakeResult_0<Map<String, List<String>>, _i44.OffShopsManagerError>())) as _i9
-              .Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>);
+      fetchVeganBarcodesForShops(Set<String>? shopsNames) => (super.noSuchMethod(
+              Invocation.method(#fetchVeganBarcodesForShops, [shopsNames]),
+              returnValue:
+                  Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>.value(
+                      _FakeResult_0<Map<String, List<String>>, _i44.OffShopsManagerError>()))
+          as _i9.Future<
+              _i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>);
   @override
   String toString() => super.toString();
 }

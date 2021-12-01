@@ -1,4 +1,3 @@
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm_shop.dart';
 import 'package:plante/outside/map/osm_uid.dart';
@@ -7,19 +6,15 @@ import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_off_shops_manager.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
 
 void main() {
   late FakeOffShopsManager offShopsManager;
-  late FakeUserLangsManager userLangsManager;
 
   late SuggestedProductsManager suggestedProductsManager;
 
   setUp(() async {
-    userLangsManager = FakeUserLangsManager([LangCode.be]);
     offShopsManager = FakeOffShopsManager();
-    suggestedProductsManager =
-        SuggestedProductsManager(offShopsManager, userLangsManager);
+    suggestedProductsManager = SuggestedProductsManager(offShopsManager);
   });
 
   test('getSuggestedProductsFor', () async {
@@ -27,15 +22,18 @@ void main() {
       OffShop((e) => e
         ..id = 'spar'
         ..name = 'Spar'
-        ..productsCount = 2),
+        ..productsCount = 2
+        ..country = 'ru'),
       OffShop((e) => e
         ..id = 'auchan'
         ..name = 'Auchan'
-        ..productsCount = 2),
+        ..productsCount = 2
+        ..country = 'ru'),
       OffShop((e) => e
         ..id = 'groceries'
         ..name = 'Groceries'
-        ..productsCount = 2),
+        ..productsCount = 2
+        ..country = 'ru'),
     ];
     final allSuggestions = {
       offShops[0]: ['123'],

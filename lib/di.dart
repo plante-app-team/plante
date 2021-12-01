@@ -27,8 +27,11 @@ import 'package:plante/outside/map/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
+import 'package:plante/outside/off/off_cacher.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
+import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
@@ -103,8 +106,16 @@ void initDI() {
   GetIt.I.registerSingleton<OffShopsListObtainer>(OffShopsListObtainer(
     GetIt.I.get<OffApi>(),
   ));
-  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
+  GetIt.I.registerSingleton<OffCacher>(OffCacher());
+  GetIt.I.registerSingleton<OffVeganBarcodesStorage>(OffVeganBarcodesStorage(
+    GetIt.I.get<OffCacher>(),
+  ));
+  GetIt.I.registerSingleton<OffVeganBarcodesObtainer>(OffVeganBarcodesObtainer(
     GetIt.I.get<OffApi>(),
+    GetIt.I.get<OffVeganBarcodesStorage>(),
+  ));
+  GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
+    GetIt.I.get<OffVeganBarcodesObtainer>(),
     GetIt.I.get<OffShopsListObtainer>(),
     GetIt.I.get<LatestCameraPosStorage>(),
     GetIt.I.get<AddressObtainer>(),
@@ -115,7 +126,6 @@ void initDI() {
   ));
   GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
     GetIt.I.get<OffShopsManager>(),
-    GetIt.I.get<UserLangsManager>(),
   ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<UserParamsController>(),
