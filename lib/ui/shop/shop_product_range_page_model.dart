@@ -60,8 +60,13 @@ class ShopProductRangePageModel {
       this._updateCallback) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
-    _suggestedProductsModel = SuggestedProductsModel(suggestedProductsManager,
-        productsObtainer, productsExtraProperties, _shop, _updateCallback);
+    _suggestedProductsModel = SuggestedProductsModel(
+        suggestedProductsManager,
+        productsObtainer,
+        productsExtraProperties,
+        shopsManager,
+        _shop,
+        _updateCallback);
     _address = _addressObtainer.addressOfShop(_shop);
   }
 

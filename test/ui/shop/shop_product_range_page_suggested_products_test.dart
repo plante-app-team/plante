@@ -20,6 +20,7 @@ import 'package:plante/ui/shop/shop_product_range_page.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_off_shops_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
+import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
 import 'shop_product_range_page_test_commons.dart';
 
@@ -29,6 +30,7 @@ void main() {
   late FakeProductsObtainer productsObtainer;
   late FakeOffShopsManager offShopsManager;
   late ProductsAtShopsExtraPropertiesManager productsExtraProperties;
+  late FakeShopsManager shopsManager;
 
   late Shop aShop;
   late List<Product> confirmedProducts;
@@ -43,6 +45,7 @@ void main() {
     productsObtainer = commons.productsObtainer;
     offShopsManager = commons.offShopsManager;
     productsExtraProperties = commons.productsExtraProperties;
+    shopsManager = commons.shopsManager;
     // Let's remove the confirmed products so it would be easier
     // to test the suggested ones.
     // Some tests will reintroduce confirmed products when they need it.
@@ -142,10 +145,8 @@ void main() {
     expect(find.text(suggestedProducts[1].name!), findsOneWidget);
   });
 
-  testWidgets('suggestion clicked as not being sold in a shop',
+  testWidgets('suggestion product negative presence vote',
       (WidgetTester tester) async {
-    // await tester.runAsync(() async {
-
     commons.setConfirmedProducts(const []);
     commons.setSuggestedProducts(suggestedProducts);
 
@@ -190,7 +191,52 @@ void main() {
         equals({
           commons.aShop.osmUID: {suggestedProducts[0].barcode}
         }));
-    // });
+  });
+
+  testWidgets('suggestion product positive presence vote',
+      (WidgetTester tester) async {
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts(suggestedProducts);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+
+    // Product is not yet put to the shop
+    shopsManager.verify_putProductToShops_called(times: 0);
+
+    // Both products are below the suggested products title
+    var suggestedProductsTitleCenter =
+        tester.getCenter(find.byKey(const Key('suggested_products_title')));
+    var center0 = tester.getCenter(find.text(suggestedProducts[0].name!));
+    var center1 = tester.getCenter(find.text(suggestedProducts[1].name!));
+    expect(suggestedProductsTitleCenter.dy, lessThan(center0.dy));
+    expect(suggestedProductsTitleCenter.dy, lessThan(center1.dy));
+
+    // Verify we will click the product we want to click
+    final card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(suggestedProducts[0].name!)),
+        findsOneWidget);
+    // Positive presence vote
+    await tester.superTap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_yes)));
+    await tester.superTap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_yes)));
+
+    // Product is now put to the shop
+    shopsManager.verify_putProductToShops_called(times: 1);
+
+    // Positively-voted product is now confirmed
+    suggestedProductsTitleCenter =
+        tester.getCenter(find.byKey(const Key('suggested_products_title')));
+    center0 = tester.getCenter(find.text(suggestedProducts[0].name!));
+    center1 = tester.getCenter(find.text(suggestedProducts[1].name!));
+    expect(center0.dy, lessThan(suggestedProductsTitleCenter.dy));
+    expect(suggestedProductsTitleCenter.dy, lessThan(center1.dy));
   });
 
   testWidgets('more suggestions are loaded when screen scrolled down',

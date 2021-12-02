@@ -1,4 +1,5 @@
 import 'package:plante/base/base.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
@@ -230,6 +231,17 @@ class FakeShopsManager implements ShopsManager {
   Future<Result<None, ShopsManagerError>> putProductToShops(
       Product product, List<Shop> shops) async {
     _putProductToShopsCalls.add(PutProductToShopsParams(product, shops));
+    for (final shop in shops) {
+      var range = _shopsRanges[shop.osmUID];
+      if (range?.isErr == true) {
+        return Err(range!.unwrapErr());
+      }
+      range ??= Ok(ShopProductRange((e) => e.shop = shop.toBuilder()));
+      range = Ok(range
+          .unwrap()
+          .rebuildWithProduct(product, DateTime.now().secondsSinceEpoch));
+      _shopsRanges[shop.osmUID] = range;
+    }
     _notifyListeners();
     return Ok(None());
   }
