@@ -3,9 +3,14 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/backend/product_presence_vote_result.dart';
+import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -14,6 +19,7 @@ class SuggestedProductsModel {
   static const LOADED_BATCH_SIZE = 20;
   final SuggestedProductsManager _suggestedProductsManager;
   final ProductsObtainer _productsObtainer;
+  final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
   final Shop _shop;
   final VoidCallback _updateCallback;
 
@@ -29,7 +35,7 @@ class SuggestedProductsModel {
       .toList();
 
   SuggestedProductsModel(this._suggestedProductsManager, this._productsObtainer,
-      this._shop, this._updateCallback) {
+      this._productsExtraProperties, this._shop, this._updateCallback) {
     load();
   }
 
@@ -110,6 +116,23 @@ class SuggestedProductsModel {
     }
     if (_products.last.barcode == product.barcode && visible) {
       _loadNextProductsBatch();
+    }
+  }
+
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>?>
+      productPresenceVote(Product product, bool positive) async {
+    if (positive) {
+      // TODO: later
+      return Ok(ProductPresenceVoteResult(productDeleted: false));
+    } else {
+      await _productsExtraProperties.setBoolProperty(
+          ProductAtShopExtraPropertyType.BAD_SUGGESTION,
+          _shop.osmUID,
+          product.barcode,
+          true);
+      _products.remove(product);
+      _updateCallback.call();
+      return Ok(ProductPresenceVoteResult(productDeleted: true));
     }
   }
 }

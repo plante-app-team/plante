@@ -20,6 +20,8 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -106,6 +108,8 @@ void main() {
         FakeUserLangsManager([LangCode.en]));
     GetIt.I.registerSingleton<SuggestedProductsManager>(
         FakeSuggestedProductsManager());
+    GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
+        ProductsAtShopsExtraPropertiesManager(MapExtraPropertiesCacher()));
   });
 
   testWidgets('card for range: card for empty shop',

@@ -135,8 +135,11 @@ class ConfirmedProductsModel implements ShopsManagerListener {
     _updateCallback.call();
   }
 
-  Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
+  Future<Result<ProductPresenceVoteResult, ShopsManagerError>?>
       productPresenceVote(Product product, bool positive) async {
+    if (!loadedProducts.contains(product)) {
+      return null;
+    }
     return await _loadingAction(() async =>
         await _shopsManager.productPresenceVote(product, _shop, positive));
   }

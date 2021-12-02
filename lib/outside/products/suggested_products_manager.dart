@@ -1,6 +1,8 @@
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 
@@ -13,8 +15,10 @@ typedef OsmUIDBarcodesMap = Map<OsmUID, List<String>>;
 
 class SuggestedProductsManager {
   final OffShopsManager _offShopsManager;
+  final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
 
-  SuggestedProductsManager(this._offShopsManager);
+  SuggestedProductsManager(
+      this._offShopsManager, this._productsExtraProperties);
 
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
       getSuggestedBarcodesFor(Iterable<Shop> shops) async {
@@ -50,6 +54,22 @@ class SuggestedProductsManager {
     for (final shop in shops) {
       final barcodesForName = offShopsBarcodesMap[shop.name] ?? const [];
       result[shop.osmUID] = barcodesForName;
+    }
+
+    // Let's ensure none of the suggestions we return is bad
+    final allBadSuggestions =
+        await _productsExtraProperties.getBarcodesWithBoolValue(
+            ProductAtShopExtraPropertyType.BAD_SUGGESTION, true, result.keys);
+    for (final badSuggestionsForShop in allBadSuggestions.entries) {
+      final shop = badSuggestionsForShop.key;
+      final badBarcodes = badSuggestionsForShop.value;
+      if (badBarcodes.isNotEmpty) {
+        final barcodesCopy = result[shop]?.toList();
+        if (barcodesCopy != null) {
+          barcodesCopy.removeWhere(badBarcodes.contains);
+          result[shop] = barcodesCopy;
+        }
+      }
     }
 
     return Ok(result);
