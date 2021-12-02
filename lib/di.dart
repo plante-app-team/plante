@@ -21,6 +21,8 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
@@ -124,8 +126,15 @@ void initDI() {
     GetIt.I.get<ProductsManager>(),
     GetIt.I.get<UserLangsManager>(),
   ));
+  GetIt.I
+      .registerSingleton<MapExtraPropertiesCacher>(MapExtraPropertiesCacher());
+  GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
+      ProductsAtShopsExtraPropertiesManager(
+    GetIt.I.get<MapExtraPropertiesCacher>(),
+  ));
   GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
     GetIt.I.get<OffShopsManager>(),
+    GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
   ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<UserParamsController>(),

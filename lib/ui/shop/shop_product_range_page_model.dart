@@ -11,6 +11,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
@@ -51,6 +52,7 @@ class ShopProductRangePageModel {
       ShopsManager shopsManager,
       SuggestedProductsManager suggestedProductsManager,
       ProductsObtainer productsObtainer,
+      ProductsAtShopsExtraPropertiesManager productsExtraProperties,
       this._userParamsController,
       this._addressObtainer,
       this._offShopsManager,
@@ -58,8 +60,8 @@ class ShopProductRangePageModel {
       this._updateCallback) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
-    _suggestedProductsModel = SuggestedProductsModel(
-        suggestedProductsManager, productsObtainer, _shop, _updateCallback);
+    _suggestedProductsModel = SuggestedProductsModel(suggestedProductsManager,
+        productsObtainer, productsExtraProperties, _shop, _updateCallback);
     _address = _addressObtainer.addressOfShop(_shop);
   }
 
@@ -84,7 +86,12 @@ class ShopProductRangePageModel {
 
   Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
       productPresenceVote(Product product, bool positive) async {
-    return await _confirmedProductsModel.productPresenceVote(product, positive);
+    var result =
+        await _confirmedProductsModel.productPresenceVote(product, positive);
+    result ??=
+        await _suggestedProductsModel.productPresenceVote(product, positive);
+    result ??= Ok(ProductPresenceVoteResult(productDeleted: false));
+    return result;
   }
 
   void onProductVisibilityChange(Product product, bool visible) {

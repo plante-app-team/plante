@@ -11,6 +11,9 @@ import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
+import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/shop/_suggested_products_model.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 
@@ -25,6 +28,7 @@ void main() {
   late FakeSuggestedProductsManager suggestedProductsManager;
   late FakeProductsObtainer productsObtainer;
   late FakeOffShopsManager offShopsManager;
+  late ProductsAtShopsExtraPropertiesManager productsExtraProperties;
 
   late Shop aShop;
   late List<Product> confirmedProducts;
@@ -38,6 +42,7 @@ void main() {
     suggestedProductsManager = commons.suggestedProductsManager;
     productsObtainer = commons.productsObtainer;
     offShopsManager = commons.offShopsManager;
+    productsExtraProperties = commons.productsExtraProperties;
     // Let's remove the confirmed products so it would be easier
     // to test the suggested ones.
     // Some tests will reintroduce confirmed products when they need it.
@@ -135,6 +140,57 @@ void main() {
 
     expect(find.text(suggestedProducts[0].name!), findsNothing);
     expect(find.text(suggestedProducts[1].name!), findsOneWidget);
+  });
+
+  testWidgets('suggestion clicked as not being sold in a shop',
+      (WidgetTester tester) async {
+    // await tester.runAsync(() async {
+
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts(suggestedProducts);
+
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    final context = await tester.superPump(widget);
+
+    // Both products are present
+    expect(find.text(suggestedProducts[0].name!), findsOneWidget);
+    expect(find.text(suggestedProducts[1].name!), findsOneWidget);
+    // Suggestion is not yet marked as bad
+    var badSuggestions = await productsExtraProperties.getBarcodesWithBoolValue(
+        ProductAtShopExtraPropertyType.BAD_SUGGESTION,
+        true,
+        [commons.aShop.osmUID]);
+    expect(badSuggestions, isEmpty);
+
+    // Verify the proper product
+    final card = find.byType(ProductCard).evaluate().first.widget;
+    expect(
+        find.descendant(
+            of: find.byWidget(card),
+            matching: find.text(suggestedProducts[0].name!)),
+        findsOneWidget);
+    // Negative presence vote
+    await tester.superTap(find.descendant(
+        of: find.byWidget(card),
+        matching: find.text(context.strings.global_no)));
+    await tester.superTap(find.descendant(
+        of: find.byKey(const Key('yes_no_dialog')),
+        matching: find.text(context.strings.global_yes)));
+
+    // Only 1 product is present
+    expect(find.text(suggestedProducts[0].name!), findsNothing);
+    expect(find.text(suggestedProducts[1].name!), findsOneWidget);
+    // Suggestion is now marked as bad
+    badSuggestions = await productsExtraProperties.getBarcodesWithBoolValue(
+        ProductAtShopExtraPropertyType.BAD_SUGGESTION,
+        true,
+        [commons.aShop.osmUID]);
+    expect(
+        badSuggestions,
+        equals({
+          commons.aShop.osmUID: {suggestedProducts[0].barcode}
+        }));
+    // });
   });
 
   testWidgets('more suggestions are loaded when screen scrolled down',

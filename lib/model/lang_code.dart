@@ -60,9 +60,9 @@ class LangCode extends EnumClass {
     }
     try {
       return valueOf(name);
-    } on ArgumentError catch (e) {
+    } on ArgumentError {
       if (name.isNotEmpty) {
-        Log.w('LangCode unknown name: $name', ex: e);
+        Log.w('LangCode unknown name: $name');
       }
       return null;
     }

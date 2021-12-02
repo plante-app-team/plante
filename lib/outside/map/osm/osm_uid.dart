@@ -11,6 +11,7 @@ class OsmUID {
 
   const OsmUID(this.type, this.osmId);
 
+  /// Throws ArgumentError if arg is invalid
   factory OsmUID.parse(String str) {
     if (str[1] != ':') {
       throw ArgumentError('OSM UID must include OSM element type: $str');
@@ -22,6 +23,15 @@ class OsmUID {
     final osmType = osmElementTypeFromCode(persistentCode);
     final osmId = str.substring(2);
     return OsmUID(osmType, osmId);
+  }
+
+  static OsmUID? parseSafe(String str) {
+    try {
+      return OsmUID.parse(str);
+    } on ArgumentError catch (e) {
+      Log.w('Invalid osm UID: $str', ex: e);
+      return null;
+    }
   }
 
   @override

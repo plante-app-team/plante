@@ -10,6 +10,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
@@ -100,6 +101,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       GetIt.I.get<ShopsManager>(),
       GetIt.I.get<SuggestedProductsManager>(),
       GetIt.I.get<ProductsObtainer>(),
+      GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<AddressObtainer>(),
       GetIt.I.get<OffShopsManager>(),
