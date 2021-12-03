@@ -49,7 +49,8 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
-  final _suggestedProductsBarcodes = <OsmUID, List<String>>{};
+  final _suggestedProductsBarcodes = <OsmUID, Set<String>>{};
+  StreamSubscription? _suggestedBarcodesSubscription;
 
   bool _directionsAvailable = false;
 
@@ -169,16 +170,33 @@ class MapPageModel implements ShopsManagerListener {
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values;
-    final shopsAndBarcodesRes =
-        await _suggestedProductsManager.getSuggestedBarcodesFor(shopsOnMap);
-    if (shopsAndBarcodesRes.isErr) {
-      return;
-    }
-    var shopsAndBarcodes = shopsAndBarcodesRes.unwrap();
-    shopsAndBarcodes = Map.from(shopsAndBarcodes); // Copy
-    shopsAndBarcodes.removeWhere((key, value) => value.isEmpty);
-    _suggestedProductsBarcodes.addAll(shopsAndBarcodes);
-    _updateShopsCallback.call(_shopsCache);
+
+    unawaited(_suggestedBarcodesSubscription?.cancel());
+    final collectedBarcodes = <OsmUID, List<String>>{};
+    var lastAbsorbTime = DateTime.now();
+    final absorbNewSuggestions = () {
+      for (final entry in collectedBarcodes.entries) {
+        _suggestedProductsBarcodes[entry.key] ??= {};
+        _suggestedProductsBarcodes[entry.key]!.addAll(entry.value);
+      }
+      collectedBarcodes.clear();
+      _updateShopsCallback.call(_shopsCache);
+      lastAbsorbTime = DateTime.now();
+    };
+    _suggestedBarcodesSubscription = _suggestedProductsManager
+        .getSuggestedBarcodes(shopsOnMap)
+        .listen((event) {
+      if (event.isErr) {
+        return;
+      }
+      final pair = event.unwrap();
+      collectedBarcodes[pair.first] ??= [];
+      collectedBarcodes[pair.first]!.addAll(pair.second);
+      if (DateTime.now().difference(lastAbsorbTime) >
+          const Duration(seconds: 5)) {
+        absorbNewSuggestions(); // TODO: test
+      }
+    }, onDone: absorbNewSuggestions);
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {

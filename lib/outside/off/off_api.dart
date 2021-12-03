@@ -122,8 +122,8 @@ class OffApi {
   }
 
   Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByIngredients(
-      String countryCode, OffShop shop, List<String> productsCategories) async {
-    return await _searchBarcodes(countryCode, {
+      OffShop shop, List<String> productsCategories) async {
+    return await _searchBarcodes(shop.country, {
       'ingredients_analysis_tags': 'en:vegan',
       'stores_tags': shop.id,
       'categories_tags': productsCategories.join('|')
@@ -131,8 +131,8 @@ class OffApi {
   }
 
   Future<Result<List<String>, OffRestApiError>> getBarcodesVeganByLabel(
-      String countryCode, OffShop shop) async {
-    return await _searchBarcodes(countryCode, {
+      OffShop shop) async {
+    return await _searchBarcodes(shop.country, {
       'labels_tags': 'en:vegan',
       'stores_tags': shop.id,
     });

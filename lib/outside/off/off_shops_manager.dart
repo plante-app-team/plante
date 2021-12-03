@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/country_code.dart';
@@ -17,6 +18,7 @@ enum OffShopsManagerError {
 }
 
 typedef ShopNamesAndBarcodesMap = Map<String, List<String>>;
+typedef ShopNameBarcodesPair = Pair<String, List<String>>;
 
 class OffShopsManager {
   static const _ENABLED_IN_COUNTRIES = [
@@ -134,40 +136,63 @@ class OffShopsManager {
   }
 
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesForShops(Set<String> shopsNames) async {
+      fetchVeganBarcodesMap(Set<String> shopsNames) async {
+    final ShopNamesAndBarcodesMap result = {};
+    final stream = fetchVeganBarcodes(shopsNames);
+    await for (final pairRes in stream) {
+      if (pairRes.isErr) {
+        return Err(pairRes.unwrapErr());
+      }
+      final pair = pairRes.unwrap();
+      result[pair.first] = pair.second;
+    }
+    return Ok(result);
+  }
+
+  /// NOTE: function stops data retrieval on first error
+  Stream<Result<ShopNameBarcodesPair, OffShopsManagerError>> fetchVeganBarcodes(
+      Set<String> shopsNames) async* {
     final countryCodeRes = await _countryCode;
     if (countryCodeRes.isErr) {
       Log.w(
           'offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
-      return Err(OffShopsManagerError.OTHER);
+      yield Err(OffShopsManagerError.OTHER);
+      return;
     }
     final countryCode = countryCodeRes.unwrap();
     if (countryCode == null) {
-      return Ok(const {});
+      return;
     }
     final shopsRes = await _offShopsOp.result;
     if (shopsRes.isErr) {
-      return Err(shopsRes.unwrapErr());
+      yield Err(shopsRes.unwrapErr());
+      return;
     }
     final shopsWrapper = shopsRes.unwrap();
     final namesAndShops =
         await shopsWrapper.findAppropriateShopsFor(shopsNames);
 
-    final barcodesMapRes = await _veganBarcodesObtainer
-        .obtainVeganBarcodesForShops(countryCode, namesAndShops.values);
-    if (barcodesMapRes.isErr) {
-      return Err(barcodesMapRes.unwrapErr());
+    final shopsAndNames = <OffShop, List<String>>{};
+    for (final nameShop in namesAndShops.entries) {
+      shopsAndNames[nameShop.value] ??= [];
+      shopsAndNames[nameShop.value]!.add(nameShop.key);
     }
-    final barcodesMap = barcodesMapRes.unwrap();
 
-    final ShopNamesAndBarcodesMap result = {};
-    for (final shopName in shopsNames) {
-      final barcodes = barcodesMap[namesAndShops[shopName]];
-      if (barcodes != null) {
-        result[shopName] = barcodes;
+    final shops = namesAndShops.values.toList();
+    // Shops with greater number of products will have a priority
+    shops.sort((lhs, rhs) => rhs.productsCount - lhs.productsCount);
+    final barcodesStream = _veganBarcodesObtainer.obtainVeganBarcodes(shops);
+    await for (final pairRes in barcodesStream) {
+      if (pairRes.isErr) {
+        yield Err(pairRes.unwrapErr());
+        return;
+      }
+      final pair = pairRes.unwrap();
+      final names = shopsAndNames[pair.first] ?? const [];
+      for (final name in names) {
+        yield Ok(Pair(name, pair.second));
       }
     }
-    return Ok(result);
   }
 }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
@@ -9,6 +11,8 @@ import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_off_shops_manager.dart';
+
+// ignore_for_file: cancel_subscriptions
 
 void main() {
   late FakeOffShopsManager offShopsManager;
@@ -24,7 +28,7 @@ void main() {
         SuggestedProductsManager(offShopsManager, productsExtraProperties);
   });
 
-  test('getSuggestedProductsFor', () async {
+  test('getSuggestedProducts', () async {
     final offShops = [
       OffShop((e) => e
         ..id = 'spar'
@@ -72,12 +76,12 @@ void main() {
     ];
 
     var suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesFor([shops[0]]);
+        await suggestedProductsManager.getSuggestedBarcodesMap([shops[0]]);
     var suggestions = suggestionsRes.unwrap();
     expect(suggestions, equals({shops[0].osmUID: allSuggestions[offShops[0]]}));
 
     suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesFor(shops);
+        await suggestedProductsManager.getSuggestedBarcodesMap(shops);
     suggestions = suggestionsRes.unwrap();
     expect(
         suggestions,
@@ -87,7 +91,7 @@ void main() {
         }));
   });
 
-  test('getSuggestedProductsFor - bad suggestions are not suggested', () async {
+  test('getSuggestedProducts - bad suggestions are not suggested', () async {
     final offShops = [
       OffShop((e) => e
         ..id = 'spar'
@@ -129,12 +133,80 @@ void main() {
         true);
 
     final suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesFor(shops);
+        await suggestedProductsManager.getSuggestedBarcodesMap(shops);
     final suggestions = suggestionsRes.unwrap();
     expect(
         suggestions,
         equals({
           shops[0].osmUID: ['123', '125']
         }));
+  });
+
+  test('getSuggestedProducts - can be canceled', () async {
+    final offShops = [
+      OffShop((e) => e
+        ..id = 'spar'
+        ..name = 'Spar'
+        ..productsCount = 2
+        ..country = 'ru'),
+      OffShop((e) => e
+        ..id = 'auchan'
+        ..name = 'Auchan'
+        ..productsCount = 2
+        ..country = 'ru'),
+    ];
+    final allSuggestions = {
+      offShops[0]: ['123'],
+      offShops[1]: [
+        '124',
+      ],
+    };
+    offShopsManager.setSuggestedBarcodes(allSuggestions);
+
+    final shops = [
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmUID = OsmUID.parse('1:1')
+          ..longitude = 10
+          ..latitude = 10
+          ..name = 'Spar'))),
+      Shop((e) => e
+        ..osmShop.replace(OsmShop((e) => e
+          ..osmUID = OsmUID.parse('1:2')
+          ..longitude = 10
+          ..latitude = 10
+          ..name = 'Auchan'))),
+    ];
+
+    var stream = suggestedProductsManager
+        .getSuggestedBarcodes(shops)
+        .asBroadcastStream();
+    var calls = 0;
+    StreamSubscription? subs;
+    subs = stream.listen((event) {
+      // Cancel the stream on first event
+      subs!.cancel();
+      calls += 1;
+    });
+
+    // Let's exhaust the stream
+    await for (final _ in stream) {}
+    // And check calls count
+    expect(calls, equals(1));
+
+    // Now let's do it all again, this time without
+    // cancellation.
+
+    stream = suggestedProductsManager
+        .getSuggestedBarcodes(shops)
+        .asBroadcastStream();
+    calls = 0;
+    subs = stream.listen((event) {
+      calls += 1;
+    });
+    // Let's exhaust the stream
+    await for (final _ in stream) {}
+    // And check calls count
+    expect(calls, equals(2));
   });
 }
