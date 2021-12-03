@@ -1,4 +1,5 @@
 import 'package:plante/base/base.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
@@ -12,6 +13,7 @@ enum SuggestedProductsManagerError {
 }
 
 typedef OsmUIDBarcodesMap = Map<OsmUID, List<String>>;
+typedef OsmUIDBarcodesPair = Pair<OsmUID, List<String>>;
 
 class SuggestedProductsManager {
   final OffShopsManager _offShopsManager;
@@ -21,19 +23,26 @@ class SuggestedProductsManager {
       this._offShopsManager, this._productsExtraProperties);
 
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesFor(Iterable<Shop> shops) async {
-    if (!(await enableNewestFeatures())) {
-      return Ok(const {});
+      getSuggestedBarcodesMap(Iterable<Shop> shops) async {
+    final OsmUIDBarcodesMap result = {};
+    final stream = getSuggestedBarcodes(shops);
+    await for (final pairRes in stream) {
+      if (pairRes.isErr) {
+        return Err(pairRes.unwrapErr());
+      }
+      final pair = pairRes.unwrap();
+      result[pair.first] ??= [];
+      result[pair.first]!.addAll(pair.second);
     }
+    return Ok(result);
+  }
 
-    shops = shops.toSet(); // Defensive copy
-    final names = shops.map((e) => e.name).toSet();
-    final barcodesMapRes =
-        await _offShopsManager.fetchVeganBarcodesForShops(names);
-    if (barcodesMapRes.isErr) {
-      return Err(barcodesMapRes.unwrapErr().convert());
+  /// NOTE: function stops data retrieval on first error
+  Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
+      getSuggestedBarcodes(Iterable<Shop> shops) async* {
+    if (!(await enableNewestFeatures())) {
+      return;
     }
-    final offShopsBarcodesMap = barcodesMapRes.unwrap();
 
     // There can be many shops with same name,
     // let's build a map which will let us to work with that.
@@ -47,32 +56,29 @@ class SuggestedProductsManager {
       list.add(shop.osmUID);
     }
 
-    // We have a problem - OFF shops manager gives a map of shops names and
-    // their products, but we need to return a map of OsmUID and barcodes.
-    // Let's solve the problem!
-    final OsmUIDBarcodesMap result = {};
-    for (final shop in shops) {
-      final barcodesForName = offShopsBarcodesMap[shop.name] ?? const [];
-      result[shop.osmUID] = barcodesForName;
-    }
-
-    // Let's ensure none of the suggestions we return is bad
-    final allBadSuggestions =
-        await _productsExtraProperties.getBarcodesWithBoolValue(
-            ProductAtShopExtraPropertyType.BAD_SUGGESTION, true, result.keys);
-    for (final badSuggestionsForShop in allBadSuggestions.entries) {
-      final shop = badSuggestionsForShop.key;
-      final badBarcodes = badSuggestionsForShop.value;
-      if (badBarcodes.isNotEmpty) {
-        final barcodesCopy = result[shop]?.toList();
-        if (barcodesCopy != null) {
-          barcodesCopy.removeWhere(badBarcodes.contains);
-          result[shop] = barcodesCopy;
-        }
+    shops = shops.toSet(); // Defensive copy
+    final names = shops.map((e) => e.name).toSet();
+    final stream = _offShopsManager.fetchVeganBarcodes(names);
+    await for (final pairRes in stream) {
+      if (pairRes.isErr) {
+        yield Err(pairRes.unwrapErr().convert());
+        return;
+      }
+      final pair = pairRes.unwrap();
+      final uids = namesUidsMap[pair.first] ?? const [];
+      for (final uid in uids) {
+        final badSuggestions = await _badSuggestionsFor(uid);
+        final suggestions =
+            pair.second.where((e) => !badSuggestions.contains(e));
+        yield Ok(Pair(uid, suggestions.toList()));
       }
     }
+  }
 
-    return Ok(result);
+  Future<Iterable<String>> _badSuggestionsFor(OsmUID shopUID) async {
+    final map = await _productsExtraProperties.getBarcodesWithBoolValue(
+        ProductAtShopExtraPropertyType.BAD_SUGGESTION, true, [shopUID]);
+    return map[shopUID] ?? const [];
   }
 }
 

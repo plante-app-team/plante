@@ -1,3 +1,4 @@
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -16,7 +17,7 @@ class FakeSuggestedProductsManager implements SuggestedProductsManager {
 
   @override
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesFor(Iterable<Shop> shops) async {
+      getSuggestedBarcodesMap(Iterable<Shop> shops) async {
     final OsmUIDBarcodesMap result = {};
     for (final shop in shops) {
       final suggestionsForShop = _suggestions[shop.osmUID];
@@ -25,5 +26,19 @@ class FakeSuggestedProductsManager implements SuggestedProductsManager {
       }
     }
     return Ok(result);
+  }
+
+  @override
+  Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
+      getSuggestedBarcodes(Iterable<Shop> shops) async* {
+    final mapRes = await getSuggestedBarcodesMap(shops);
+    if (mapRes.isErr) {
+      yield Err(mapRes.unwrapErr());
+      return;
+    }
+    final map = mapRes.unwrap();
+    for (final entry in map.entries) {
+      yield Ok(Pair(entry.key, entry.value));
+    }
   }
 }

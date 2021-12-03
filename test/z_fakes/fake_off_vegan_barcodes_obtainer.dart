@@ -1,3 +1,4 @@
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
@@ -16,8 +17,7 @@ class FakeOffVeganBarcodesObtainer implements OffVeganBarcodesObtainer {
 
   @override
   Future<Result<ShopsAndBarcodesMap, OffShopsManagerError>>
-      obtainVeganBarcodesForShops(
-          String countryCode, Iterable<OffShop> shops) async {
+      obtainVeganBarcodesMap(Iterable<OffShop> shops) async {
     final ShopsAndBarcodesMap result = {};
     for (final shop in shops) {
       final barcodes = _barcodes[shop];
@@ -26,5 +26,19 @@ class FakeOffVeganBarcodesObtainer implements OffVeganBarcodesObtainer {
       }
     }
     return Ok(result);
+  }
+
+  @override
+  Stream<Result<ShopBarcodesPair, OffShopsManagerError>> obtainVeganBarcodes(
+      Iterable<OffShop> shops) async* {
+    final mapRes = await obtainVeganBarcodesMap(shops);
+    if (mapRes.isErr) {
+      yield Err(mapRes.unwrapErr());
+      return;
+    }
+    final map = mapRes.unwrap();
+    for (final entry in map.entries) {
+      yield Ok(Pair(entry.key, entry.value));
+    }
   }
 }

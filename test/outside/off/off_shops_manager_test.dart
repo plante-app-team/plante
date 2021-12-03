@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
@@ -14,6 +16,8 @@ import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_off_shops_list_obtainer.dart';
 import '../../z_fakes/fake_off_vegan_barcodes_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
+
+// ignore_for_file: cancel_subscriptions
 
 void main() {
   late FakeOffVeganBarcodesObtainer barcodesObtainer;
@@ -154,7 +158,7 @@ void main() {
     );
 
     final fetchedBarcodesRes = await offShopsManager
-        .fetchVeganBarcodesForShops(someOffShops.map((e) => e.name!).toSet());
+        .fetchVeganBarcodesMap(someOffShops.map((e) => e.name!).toSet());
     final fetchedBarcodes = fetchedBarcodesRes.unwrap();
 
     final finalBarcodes1 = fetchedBarcodes[someOffShops[0].name!]!;
@@ -185,7 +189,7 @@ void main() {
     );
 
     final fetchedBarcodesRes =
-        await offShopsManager.fetchVeganBarcodesForShops({shop.name!});
+        await offShopsManager.fetchVeganBarcodesMap({shop.name!});
     expect(fetchedBarcodesRes.isErr, isTrue);
   });
 
@@ -205,8 +209,107 @@ void main() {
     );
 
     final fetchedBarcodesRes =
-        await offShopsManager.fetchVeganBarcodesForShops({shop.name!});
+        await offShopsManager.fetchVeganBarcodesMap({shop.name!});
     expect(fetchedBarcodesRes.isOk, isTrue);
     expect(fetchedBarcodesRes.unwrap().isEmpty, isTrue);
+  });
+
+  test('fetch barcodes can be canceled', () async {
+    await _initShops(
+      cameraPos: Coord(lat: 10, lon: 10),
+      addressOfAnyCoords:
+          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      offApiShops: Ok(someOffShops),
+    );
+    _initOffShopBarcodes(
+      {
+        someOffShops[0]: ['123', '124'],
+        someOffShops[1]: ['125', '126'],
+      },
+    );
+
+    var stream = offShopsManager
+        .fetchVeganBarcodes(someOffShops.map((e) => e.name!).toSet())
+        .asBroadcastStream();
+    var calls = 0;
+    StreamSubscription? subs;
+    subs = stream.listen((event) {
+      // Cancel the stream on first event
+      subs!.cancel();
+      calls += 1;
+    });
+
+    // Let's exhaust the stream
+    await for (final _ in stream) {}
+    // And check calls count
+    expect(calls, equals(1));
+
+    // Now let's do it all again, this time without
+    // cancellation.
+
+    stream = offShopsManager
+        .fetchVeganBarcodes(someOffShops.map((e) => e.name!).toSet())
+        .asBroadcastStream();
+    calls = 0;
+    subs = stream.listen((event) {
+      calls += 1;
+    });
+    // Let's exhaust the stream
+    await for (final _ in stream) {}
+    // And check calls count
+    expect(calls, equals(2));
+  });
+
+  test('fetch barcodes - shops with more products have a priority', () async {
+    final shops = someOffShops.take(2).toList();
+    shops[0] = shops[0].rebuild((e) => e.productsCount = 100000);
+    shops[1] = shops[1].rebuild((e) => e.productsCount = 10);
+
+    final initTest = () async {
+      await _initShops(
+        cameraPos: Coord(lat: 10, lon: 10),
+        addressOfAnyCoords:
+            Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+        offApiShops: Ok(shops),
+      );
+      _initOffShopBarcodes(
+        {
+          shops[0]: ['123', '124'],
+          shops[1]: ['125', '126'],
+        },
+      );
+      // Old [offShopsManager] will have cache, we don't want cache
+      offShopsManager.dispose();
+      offShopsManager = OffShopsManager(barcodesObtainer, offShopsListObtainer,
+          cameraPosStorage, addressObtainer);
+    };
+    await initTest();
+
+    var retrievedShopsResults = <String>[];
+    var stream =
+        offShopsManager.fetchVeganBarcodes(shops.map((e) => e.name!).toSet());
+    await for (final pair in stream) {
+      retrievedShopsResults.add(pair.unwrap().first);
+    }
+    // Verify order
+    expect(retrievedShopsResults, equals([shops[0].name, shops[1].name]));
+
+    // Reorder products counts
+    final count0 = shops[0].productsCount;
+    final count1 = shops[1].productsCount;
+    shops[0] = shops[0].rebuild((e) => e.productsCount = count1);
+    shops[1] = shops[1].rebuild((e) => e.productsCount = count0);
+
+    // Oh, let's do it again!
+    await initTest();
+
+    retrievedShopsResults = <String>[];
+    stream =
+        offShopsManager.fetchVeganBarcodes(shops.map((e) => e.name!).toSet());
+    await for (final pair in stream) {
+      retrievedShopsResults.add(pair.unwrap().first);
+    }
+    // Verify different order
+    expect(retrievedShopsResults, equals([shops[1].name, shops[0].name]));
   });
 }

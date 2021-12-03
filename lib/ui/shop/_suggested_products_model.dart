@@ -51,7 +51,7 @@ class SuggestedProductsModel {
   Future<void> load() async {
     await _loadingAction(() async {
       final allSuggestedBarcodesRes =
-          await _suggestedProductsManager.getSuggestedBarcodesFor([_shop]);
+          await _suggestedProductsManager.getSuggestedBarcodesMap([_shop]);
       if (allSuggestedBarcodesRes.isErr) {
         Log.w(
             'Could not load suggested products because: $allSuggestedBarcodesRes');

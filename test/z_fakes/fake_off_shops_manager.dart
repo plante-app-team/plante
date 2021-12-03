@@ -1,3 +1,4 @@
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/off/off_shop.dart';
@@ -28,7 +29,7 @@ class FakeOffShopsManager implements OffShopsManager {
 
   @override
   Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesForShops(Set<String> shopsNames) async {
+      fetchVeganBarcodesMap(Set<String> shopsNames) async {
     final ShopNamesAndBarcodesMap result = {};
     for (final name in shopsNames) {
       for (final shop in _suggestedBarcodes.keys) {
@@ -52,5 +53,19 @@ class FakeOffShopsManager implements OffShopsManager {
       return Ok(_offShop);
     }
     return Err(OffShopsManagerError.OTHER);
+  }
+
+  @override
+  Stream<Result<ShopNameBarcodesPair, OffShopsManagerError>> fetchVeganBarcodes(
+      Set<String> shopsNames) async* {
+    final mapRes = await fetchVeganBarcodesMap(shopsNames);
+    if (mapRes.isErr) {
+      yield Err(mapRes.unwrapErr());
+      return;
+    }
+    final map = mapRes.unwrap();
+    for (final entry in map.entries) {
+      yield Ok(Pair(entry.key, entry.value));
+    }
   }
 }

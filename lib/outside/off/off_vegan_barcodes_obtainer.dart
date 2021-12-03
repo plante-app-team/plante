@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shop.dart';
@@ -6,10 +8,14 @@ import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
 
 typedef ShopsAndBarcodesMap = Map<OffShop, List<String>>;
+typedef ShopBarcodesPair = Pair<OffShop, List<String>>;
+typedef _BarcodesRequest = CachedOperation<List<String>, OffShopsManagerError>;
 
 class OffVeganBarcodesObtainer {
   final OffApi _offApi;
   final OffVeganBarcodesStorage _storage;
+
+  final Map<OffShop, _BarcodesRequest> _barcodesRequests = {};
 
   // OFF categories considered acceptable for products which are vegan
   // accidentally. The field is needed to avoid returning grains and canned
@@ -30,32 +36,43 @@ class OffVeganBarcodesObtainer {
   OffVeganBarcodesObtainer(this._offApi, this._storage);
 
   Future<Result<ShopsAndBarcodesMap, OffShopsManagerError>>
-      obtainVeganBarcodesForShops(
-          String countryCode, Iterable<OffShop> shops) async {
-    _validateCountryCodes(shops, countryCode);
-
+      obtainVeganBarcodesMap(Iterable<OffShop> shops) async {
     final ShopsAndBarcodesMap result = {};
-
-    for (final shop in shops) {
-      final existingCache = await _storage.getBarcodesAtShops([shop]);
-      if (existingCache[shop] != null) {
-        result[shop] = existingCache[shop]!;
-      } else {
-        final barcodesRes = await _queryBarcodesFor(shop, countryCode);
-        if (barcodesRes.isErr) {
-          return Err(barcodesRes.unwrapErr());
-        }
-
-        final barcodes = barcodesRes.unwrap();
-        result[shop] = barcodes;
-        await _storage.setBarcodesOfShop(shop, barcodes);
+    await for (final res in obtainVeganBarcodes(shops)) {
+      if (res.isErr) {
+        return Err(res.unwrapErr());
       }
+      final pair = res.unwrap();
+      result[pair.first] = pair.second;
     }
     return Ok(result);
   }
 
-  void _validateCountryCodes(Iterable<OffShop> shops, String countryCode) {
-    if (kDebugMode) {
+  /// NOTE: function stops data retrieval on first error
+  Stream<Result<ShopBarcodesPair, OffShopsManagerError>> obtainVeganBarcodes(
+      Iterable<OffShop> shops) async* {
+    _validateCountryCodes(shops);
+
+    for (final shop in shops) {
+      final existingCache = await _storage.getBarcodesAtShops([shop]);
+      if (existingCache[shop] != null) {
+        yield Ok(Pair(shop, existingCache[shop]!));
+      } else {
+        final barcodesRes = await _queryBarcodesFor(shop);
+        if (barcodesRes.isErr) {
+          yield Err(barcodesRes.unwrapErr());
+          return;
+        }
+        final barcodes = barcodesRes.unwrap();
+        await _storage.setBarcodesOfShop(shop, barcodes);
+        yield Ok(Pair(shop, barcodes));
+      }
+    }
+  }
+
+  void _validateCountryCodes(Iterable<OffShop> shops) {
+    if (kDebugMode && shops.isNotEmpty) {
+      final countryCode = shops.first.country;
       for (final shop in shops) {
         if (shop.country != countryCode) {
           throw Exception(
@@ -66,11 +83,40 @@ class OffVeganBarcodesObtainer {
   }
 
   Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesFor(
-      OffShop shop, String countryCode) async {
+      OffShop shop) async {
+    // Magic happens below.
+    //
+    // Network operations are expensive, and barcodes can be
+    // queried quite often, sometimes barcodes for a shop can be
+    // queried while the previous request for same shop is not finished yet.
+    // We don't want a new request to start in such a scenario - we want to
+    // reuse the currently active request.
+    //
+    // To achieve this, the [_barcodesRequests] map is used.
+    // Its key is [OffShop], its value is [CachedOperation].
+    // [CachedOperation] was created precisely for our purpose - to reuse
+    // the result of an active operation without restarting it.
+
+    // Let's get an existing request ...
+    var existingRequest = _barcodesRequests[shop];
+    // ... or create a new one if no request is active at the moment.
+    existingRequest ??= CachedOperation(() async => _queryBarcodesImpl(shop));
+    // Memorize the request.
+    _barcodesRequests[shop] = existingRequest;
+    // Let's start the request OR reuse the result of an already
+    // started request - [CachedOperation.result] does either of those 2,
+    // depending on whether it's started already or not.
+    final result = await existingRequest.result;
+    // The request is finished at this point, so let's remove it.
+    _barcodesRequests.remove(shop);
+    return result;
+  }
+
+  Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesImpl(
+      OffShop shop) async {
     final barcodesRes1 = await _offApi.getBarcodesVeganByIngredients(
-        countryCode, shop, _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES);
-    final barcodesRes2 =
-        await _offApi.getBarcodesVeganByLabel(countryCode, shop);
+        shop, _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES);
+    final barcodesRes2 = await _offApi.getBarcodesVeganByLabel(shop);
 
     if (barcodesRes1.isOk && barcodesRes2.isOk) {
       final barcodes1 = barcodesRes1.unwrap().toSet();

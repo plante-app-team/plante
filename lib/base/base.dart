@@ -55,7 +55,7 @@ double degreesToRads(double deg) {
 }
 
 /// Used to disable warnings about not awaited futures
-void unawaited<T>(Future<T> future) {
+void unawaited<T>(Future<T>? future) {
   // Nothing to do
 }
 
