@@ -15,23 +15,23 @@ void main() {
   });
 
   tearDown(() async {
-    storage.dispose();
+    await storage.dispose();
   });
 
   test('add and obtain products', () async {
     final p1 = Product((e) => e.barcode = '123');
     final p2 = Product((e) => e.barcode = '321');
     final p3 = Product((e) => e.barcode = '222');
-    storage.addProduct(p1);
-    storage.addProduct(p2);
-    storage.addProduct(p3);
+    await storage.addProduct(p1);
+    await storage.addProduct(p2);
+    await storage.addProduct(p3);
     expect(storage.getProducts(), equals([p1, p2, p3]));
   });
 
   test('products have limit', () async {
     const productsNumber = 2 * ViewedProductsStorage.STORED_PRODUCTS_MAX;
     for (var i = 0; i < productsNumber; ++i) {
-      storage.addProduct(Product((e) => e.barcode = '$i'));
+      await storage.addProduct(Product((e) => e.barcode = '$i'));
     }
 
     final expectedProducts = <Product>[];
@@ -52,11 +52,11 @@ void main() {
 
     expect(updatesCount, equals(0));
 
-    storage.addProduct(Product((e) => e.barcode = '1'));
+    await storage.addProduct(Product((e) => e.barcode = '1'));
     await Future.delayed(const Duration(microseconds: 1));
     expect(updatesCount, equals(1));
 
-    storage.addProduct(Product((e) => e.barcode = '2'));
+    await storage.addProduct(Product((e) => e.barcode = '2'));
     await Future.delayed(const Duration(microseconds: 1));
     expect(updatesCount, equals(2));
   });
@@ -68,10 +68,10 @@ void main() {
     final p1 = Product((e) => e.barcode = '123');
     final p2 = Product((e) => e.barcode = '321');
     final p3 = Product((e) => e.barcode = '222');
-    storage.addProduct(p1);
-    storage.addProduct(p2);
-    storage.addProduct(p3);
-    storage.dispose();
+    await storage.addProduct(p1);
+    await storage.addProduct(p2);
+    await storage.addProduct(p3);
+    await storage.dispose();
 
     final anotherStorage = ViewedProductsStorage(
         loadPersistentProducts: false, storageFileName: storageFileName);
@@ -84,8 +84,8 @@ void main() {
     final storage = ViewedProductsStorage(
         loadPersistentProducts: false, storageFileName: storageFileName);
 
-    storage.addProduct(Product((e) => e.barcode = '123'));
-    storage.dispose();
+    await storage.addProduct(Product((e) => e.barcode = '123'));
+    await storage.dispose();
 
     final anotherStorage = ViewedProductsStorage(
         loadPersistentProducts: false, storageFileName: storageFileName);
@@ -103,13 +103,13 @@ void main() {
     final p1 = Product((e) => e.barcode = '123');
     final p2 = Product((e) => e.barcode = '321');
     final p3 = Product((e) => e.barcode = '222');
-    storage.addProduct(p1);
-    storage.addProduct(p2);
-    storage.addProduct(p3);
+    await storage.addProduct(p1);
+    await storage.addProduct(p2);
+    await storage.addProduct(p3);
     expect(storage.getProducts(), equals([p1, p2, p3]));
 
     final p2Updated = p2.rebuild((e) => e.nameLangs[LangCode.en] = 'new name');
-    storage.addProduct(p2Updated);
+    await storage.addProduct(p2Updated);
     expect(storage.getProducts(), equals([p1, p3, p2Updated]));
   });
 }
