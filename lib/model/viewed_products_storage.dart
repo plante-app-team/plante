@@ -70,14 +70,14 @@ class ViewedProductsStorage {
     return _cache.toList(growable: false);
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     _cache.removeWhere((element) => element.barcode == product.barcode);
     _cache.add(product);
     if (_cache.length > STORED_PRODUCTS_MAX) {
       _cache.removeAt(0);
     }
     _updatesStream.add(null);
-    _storeProductsPersistently();
+    await _storeProductsPersistently();
   }
 
   Future<void> _storeProductsPersistently() async {
@@ -96,7 +96,7 @@ class ViewedProductsStorage {
     }
   }
 
-  void dispose() {
-    _updatesStream.close();
+  Future<void> dispose() async {
+    await _updatesStream.close();
   }
 }

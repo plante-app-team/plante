@@ -162,7 +162,9 @@ void main() {
       callback.call(notInitialPos);
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     final map = find.byType(GoogleMap).evaluate().first.widget as GoogleMap;
@@ -191,7 +193,9 @@ void main() {
       callback.call(notInitialPos);
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     final map = find.byType(GoogleMap).evaluate().first.widget as GoogleMap;
@@ -219,7 +223,9 @@ void main() {
       callback.call(notInitialPos);
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     final map = find.byType(GoogleMap).evaluate().first.widget as GoogleMap;
@@ -251,7 +257,9 @@ void main() {
       callback.call(notInitialPos);
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     // Initial pos
@@ -291,7 +299,9 @@ void main() {
       callback.call(notInitialPos);
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     // Initial pos
@@ -330,7 +340,9 @@ void main() {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
-    final widget = MapPage(mapControllerForTesting: mapController);
+    final widget = MapPage(
+        mapControllerForTesting: mapController,
+        createMapWidgetForTesting: true);
     await tester.superPump(widget);
 
     // Initial pos

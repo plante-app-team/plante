@@ -18,6 +18,7 @@ class MapPageTestingStorage {
   final Set<Shop> displayedShops = {};
 
   GoogleMapController? mapControllerForTesting;
+  bool createMapWidgetForTesting = false;
 
   void finishForTesting<T>(T result) {
     if (!isInTests()) {

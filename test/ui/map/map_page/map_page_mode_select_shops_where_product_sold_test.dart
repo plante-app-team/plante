@@ -34,20 +34,16 @@ void main() {
     final widget = MapPage(
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS);
-    final context =
-        await tester.superPump(widget, navigatorObserver: navigationObserver);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester,
+        navigatorObserver: navigationObserver);
 
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
 
     reset(navigationObserver);
 
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     final capturedRoute = verify(navigationObserver.didPop(captureAny, any))
         .captured
@@ -66,10 +62,8 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS,
         product: product);
-    final context =
-        await tester.superPump(widget, navigatorObserver: navigationObserver);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester,
+        navigatorObserver: navigationObserver);
 
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
@@ -88,10 +82,8 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.SELECT_SHOPS,
         product: null);
-    final context =
-        await tester.superPump(widget, navigatorObserver: navigationObserver);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester,
+        navigatorObserver: navigationObserver);
 
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
@@ -103,10 +95,8 @@ void main() {
   testWidgets('select shops mode switch event', (WidgetTester tester) async {
     expect(analytics.allEvents().length, equals(0));
 
-    await tester.superPump(MapPage(
-        mapControllerForTesting: mapController,
-        requestedMode: MapPageRequestedMode.SELECT_SHOPS));
-    await tester.pumpAndSettle();
+    await commons.createIdleMapPage(tester,
+        requestedMode: MapPageRequestedMode.SELECT_SHOPS);
 
     expect(analytics.allEvents().length, equals(1));
     expect(

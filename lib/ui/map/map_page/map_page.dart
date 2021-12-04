@@ -57,12 +57,14 @@ class MapPage extends PagePlante {
       this.product,
       this.initialSelectedShops = const [],
       this.requestedMode = MapPageRequestedMode.DEFAULT,
-      GoogleMapController? mapControllerForTesting})
+      GoogleMapController? mapControllerForTesting,
+      bool createMapWidgetForTesting = false})
       : super(key: key) {
     if (mapControllerForTesting != null && !isInTests()) {
       throw Exception('MapPage: not in tests (init)');
     }
     _testingStorage.mapControllerForTesting = mapControllerForTesting;
+    _testingStorage.createMapWidgetForTesting = createMapWidgetForTesting;
   }
 
   @override
@@ -300,9 +302,11 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   void onInstancesChange() {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      setState(() {
-        // Update!
-      });
+      if (mounted) {
+        setState(() {
+          // Update!
+        });
+      }
     });
   }
 
@@ -340,32 +344,35 @@ class _MapPageState extends PageStatePlante<MapPage>
                     onPressed: _loadShops)
                 : const SizedBox()));
 
+    final createMapWidget =
+        !isInTests() || widget._testingStorage.createMapWidgetForTesting;
     final content = Stack(children: [
-      GoogleMap(
-        myLocationEnabled: _locationPermissionObtained,
-        mapToolbarEnabled: false,
-        myLocationButtonEnabled: false,
-        zoomControlsEnabled: false,
-        minMaxZoomPreference:
-            MinMaxZoomPreference(_mode.minZoom(), _mode.maxZoom()),
-        mapType: MapType.normal,
-        initialCameraPosition: initialPos,
-        onMapCreated: (GoogleMapController controller) {
-          _mapController.complete(controller);
-          _clusterManager.setMapController(controller);
-          _clusterManager.onCameraMove(initialPos!);
-          _onCameraIdle();
-        },
-        onCameraMove: _onCameraMove,
-        onCameraIdle: _onCameraIdle,
-        onTap: _onMapTap,
-        // When there are more than 2 instances of GoogleMap and both
-        // of them have markers, this screws up the markers for some reason.
-        // Couldn't figure out why, probably there's a mistake either in
-        // the Google Map lib or in the Clustering lib, but it's easier to
-        // just use markers for 1 instance at a time.
-        markers: _instances.last == this ? _displayedShopsMarkers : {},
-      ),
+      if (createMapWidget)
+        GoogleMap(
+          myLocationEnabled: _locationPermissionObtained,
+          mapToolbarEnabled: false,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          minMaxZoomPreference:
+              MinMaxZoomPreference(_mode.minZoom(), _mode.maxZoom()),
+          mapType: MapType.normal,
+          initialCameraPosition: initialPos,
+          onMapCreated: (GoogleMapController controller) {
+            _mapController.complete(controller);
+            _clusterManager.setMapController(controller);
+            _clusterManager.onCameraMove(initialPos!);
+            _onCameraIdle();
+          },
+          onCameraMove: _onCameraMove,
+          onCameraIdle: _onCameraIdle,
+          onTap: _onMapTap,
+          // When there are more than 2 instances of GoogleMap and both
+          // of them have markers, this screws up the markers for some reason.
+          // Couldn't figure out why, probably there's a mistake either in
+          // the Google Map lib or in the Clustering lib, but it's easier to
+          // just use markers for 1 instance at a time.
+          markers: _instances.last == this ? _displayedShopsMarkers : {},
+        ),
       Align(
         alignment: Alignment.bottomRight,
         child: LicenceLabel(

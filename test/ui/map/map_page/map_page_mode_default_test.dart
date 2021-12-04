@@ -40,10 +40,7 @@ void main() {
       (WidgetTester tester) async {
     expect(shops[0].productsCount, equals(0));
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     final displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops.length, equals(shops.length - 1));
@@ -57,11 +54,9 @@ void main() {
     expect(shops[0].productsCount, equals(0));
 
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     final displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops.length, equals(shops.length));
@@ -69,10 +64,7 @@ void main() {
   });
 
   testWidgets('shop click', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     expect(find.byType(ShopCard), findsNothing);
     expect(find.text(shops[1].name), findsNothing);
@@ -91,10 +83,7 @@ void main() {
   });
 
   testWidgets('marker with many shops click', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     expect(find.byType(ShopCard), findsNothing);
     expect(find.text(shops[1].name), findsNothing);
@@ -116,10 +105,7 @@ void main() {
 
   testWidgets('when many cards are shown, shops with many products are first',
       (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     widget.onMarkerClickForTesting([shops[0], shops[1]]);
     await tester.pumpAndSettle();
@@ -134,9 +120,7 @@ void main() {
     expect(shops[0].productsCount, 0);
 
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
@@ -163,10 +147,7 @@ void main() {
   });
 
   testWidgets('shops card closes on back press', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     expect(find.byType(ShopCard), findsNothing);
 
@@ -183,18 +164,16 @@ void main() {
 
   testWidgets('empty shops analytics', (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     expect(analytics.allEvents(), equals([]));
 
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     expect(analytics.wasEventSent('empty_shops_shown'), isTrue);
     analytics.clearEvents();
 
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     expect(analytics.wasEventSent('empty_shops_hidden'), isTrue);
   });
@@ -202,9 +181,7 @@ void main() {
   testWidgets('no shops hint when empty shops are not displayed',
       (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
         findsNothing);
@@ -232,12 +209,10 @@ void main() {
   testWidgets('no shops hint when empty shops are displayed',
       (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // Show empty shops
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
@@ -266,7 +241,7 @@ void main() {
 
   testWidgets('no shops hint dynamic switching', (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // No shops!
     await commons.clearFetchedShops(widget, tester, context);
@@ -278,8 +253,7 @@ void main() {
         findsNothing);
 
     // Show empty shops
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     // Hint 2
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
@@ -288,8 +262,7 @@ void main() {
         findsOneWidget);
 
     // Hide empty shops
-    await tester.tap(find.text(context.strings.map_page_empty_shops));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.map_page_empty_shops));
 
     // Hint 1
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
@@ -305,13 +278,10 @@ void main() {
     shopsManager.setAsyncShopsLoader((_) => completer.future);
 
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     await tester
-        .tap(find.text(context.strings.map_page_load_shops_of_this_area));
-    await tester.pumpAndSettle();
+        .superTap(find.text(context.strings.map_page_load_shops_of_this_area));
 
     // No hints yet!
     expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
@@ -331,10 +301,7 @@ void main() {
 
   testWidgets('shop address is shown on the shop card',
       (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     expect(find.byType(ShopCard), findsNothing);
     expect(find.byType(AddressWidget), findsNothing);
@@ -351,10 +318,7 @@ void main() {
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => true);
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     final shop = shops[1];
 
@@ -372,10 +336,7 @@ void main() {
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     widget.onMarkerClickForTesting([shops[1]]);
     await tester.pumpAndSettle();
@@ -387,9 +348,7 @@ void main() {
     await shopsManager.clearCache();
 
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // Close zoom and expected (and not expected) widgets
     await commons.moveCamera(commons.shopsBounds.center,
@@ -427,9 +386,7 @@ void main() {
   testWidgets('huge zoom out when shops ARE loaded',
       (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // Close zoom and expected (and not expected) widgets
     await commons.moveCamera(commons.shopsBounds.center,

@@ -22,21 +22,6 @@ class SuggestedProductsManager {
   SuggestedProductsManager(
       this._offShopsManager, this._productsExtraProperties);
 
-  Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesMap(Iterable<Shop> shops) async {
-    final OsmUIDBarcodesMap result = {};
-    final stream = getSuggestedBarcodes(shops);
-    await for (final pairRes in stream) {
-      if (pairRes.isErr) {
-        return Err(pairRes.unwrapErr());
-      }
-      final pair = pairRes.unwrap();
-      result[pair.first] ??= [];
-      result[pair.first]!.addAll(pair.second);
-    }
-    return Ok(result);
-  }
-
   /// NOTE: function stops data retrieval on first error
   Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
       getSuggestedBarcodes(Iterable<Shop> shops) async* {
@@ -90,5 +75,22 @@ extension _OffShopsManagerErrorExt on OffShopsManagerError {
       case OffShopsManagerError.OTHER:
         return SuggestedProductsManagerError.OTHER;
     }
+  }
+}
+
+extension SuggestedProductsManagerExt on SuggestedProductsManager {
+  Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
+      getSuggestedBarcodesMap(Iterable<Shop> shops) async {
+    final OsmUIDBarcodesMap result = {};
+    final stream = getSuggestedBarcodes(shops);
+    await for (final pairRes in stream) {
+      if (pairRes.isErr) {
+        return Err(pairRes.unwrapErr());
+      }
+      final pair = pairRes.unwrap();
+      result[pair.first] ??= [];
+      result[pair.first]!.addAll(pair.second);
+    }
+    return Ok(result);
   }
 }

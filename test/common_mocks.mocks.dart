@@ -20,9 +20,9 @@ import 'package:plante/base/base.dart' as _i30;
 import 'package:plante/base/pair.dart' as _i45;
 import 'package:plante/base/permissions_manager.dart' as _i52;
 import 'package:plante/base/result.dart' as _i2;
-import 'package:plante/lang/sys_lang_code_holder.dart' as _i67;
-import 'package:plante/lang/user_langs_manager.dart' as _i68;
-import 'package:plante/lang/user_langs_manager_error.dart' as _i69;
+import 'package:plante/lang/sys_lang_code_holder.dart' as _i68;
+import 'package:plante/lang/user_langs_manager.dart' as _i69;
+import 'package:plante/lang/user_langs_manager_error.dart' as _i70;
 import 'package:plante/location/geolocator_wrapper.dart' as _i32;
 import 'package:plante/location/ip_location_provider.dart' as _i37;
 import 'package:plante/location/location_controller.dart' as _i39;
@@ -35,9 +35,9 @@ import 'package:plante/model/shop_product_range.dart' as _i65;
 import 'package:plante/model/shop_type.dart' as _i66;
 import 'package:plante/model/user_langs.dart' as _i7;
 import 'package:plante/model/user_params.dart' as _i18;
-import 'package:plante/model/user_params_controller.dart' as _i70;
+import 'package:plante/model/user_params_controller.dart' as _i71;
 import 'package:plante/model/veg_status.dart' as _i21;
-import 'package:plante/model/viewed_products_storage.dart' as _i71;
+import 'package:plante/model/viewed_products_storage.dart' as _i72;
 import 'package:plante/outside/backend/backend.dart' as _i17;
 import 'package:plante/outside/backend/backend_error.dart' as _i19;
 import 'package:plante/outside/backend/backend_product.dart' as _i60;
@@ -74,6 +74,8 @@ import 'package:plante/outside/off/off_shops_manager.dart' as _i44;
 import 'package:plante/outside/products/products_manager.dart' as _i57;
 import 'package:plante/outside/products/products_manager_error.dart' as _i59;
 import 'package:plante/outside/products/products_obtainer.dart' as _i61;
+import 'package:plante/outside/products/suggested_products_manager.dart'
+    as _i67;
 import 'package:plante/ui/map/latest_camera_pos_storage.dart' as _i38;
 import 'package:plante/ui/photos_taker.dart' as _i53;
 
@@ -667,8 +669,8 @@ class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
           .Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>);
   @override
   _i9.Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>
-      fetchVeganBarcodesForShops(Set<String>? shopsNames) => (super.noSuchMethod(
-              Invocation.method(#fetchVeganBarcodesForShops, [shopsNames]),
+      fetchVeganBarcodesMap(Set<String>? shopsNames) => (super.noSuchMethod(
+              Invocation.method(#fetchVeganBarcodesMap, [shopsNames]),
               returnValue:
                   Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>.value(
                       _FakeResult_0<Map<String, List<String>>, _i44.OffShopsManagerError>()))
@@ -676,8 +678,8 @@ class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
               _i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>);
   @override
   _i9.Stream<_i2.Result<_i45.Pair<String, List<String>>, _i44.OffShopsManagerError>>
-      fetchVeganBarcodesForShopsStream(Set<String>? shopsNames) => (super.noSuchMethod(
-              Invocation.method(#fetchVeganBarcodesForShopsStream, [shopsNames]),
+      fetchVeganBarcodes(Set<String>? shopsNames) => (super.noSuchMethod(
+              Invocation.method(#fetchVeganBarcodes, [shopsNames]),
               returnValue:
                   Stream<_i2.Result<_i45.Pair<String, List<String>>, _i44.OffShopsManagerError>>.empty())
           as _i9.Stream<
@@ -1148,10 +1150,32 @@ class MockShopsManagerListener extends _i1.Mock
   String toString() => super.toString();
 }
 
+/// A class which mocks [SuggestedProductsManager].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSuggestedProductsManager extends _i1.Mock
+    implements _i67.SuggestedProductsManager {
+  MockSuggestedProductsManager() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i9.Stream<_i2.Result<_i45.Pair<_i25.OsmUID, List<String>>, _i67.SuggestedProductsManagerError>>
+      getSuggestedBarcodes(Iterable<_i12.Shop>? shops) => (super.noSuchMethod(
+              Invocation.method(#getSuggestedBarcodes, [shops]),
+              returnValue:
+                  Stream<_i2.Result<_i45.Pair<_i25.OsmUID, List<String>>, _i67.SuggestedProductsManagerError>>.empty())
+          as _i9.Stream<
+              _i2.Result<_i45.Pair<_i25.OsmUID, List<String>>,
+                  _i67.SuggestedProductsManagerError>>);
+  @override
+  String toString() => super.toString();
+}
+
 /// A class which mocks [SysLangCodeHolder].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSysLangCodeHolder extends _i1.Mock implements _i67.SysLangCodeHolder {
+class MockSysLangCodeHolder extends _i1.Mock implements _i68.SysLangCodeHolder {
   MockSysLangCodeHolder() {
     _i1.throwOnMissingStub(this);
   }
@@ -1179,7 +1203,7 @@ class MockSysLangCodeHolder extends _i1.Mock implements _i67.SysLangCodeHolder {
 /// A class which mocks [UserLangsManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserLangsManager extends _i1.Mock implements _i68.UserLangsManager {
+class MockUserLangsManager extends _i1.Mock implements _i69.UserLangsManager {
   MockUserLangsManager() {
     _i1.throwOnMissingStub(this);
   }
@@ -1189,11 +1213,11 @@ class MockUserLangsManager extends _i1.Mock implements _i68.UserLangsManager {
       (super.noSuchMethod(Invocation.getter(#initFuture),
           returnValue: Future<void>.value()) as _i9.Future<void>);
   @override
-  void addObserver(_i68.UserLangsManagerObserver? observer) =>
+  void addObserver(_i69.UserLangsManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i68.UserLangsManagerObserver? observer) =>
+  void removeObserver(_i69.UserLangsManagerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
@@ -1202,13 +1226,13 @@ class MockUserLangsManager extends _i1.Mock implements _i68.UserLangsManager {
               returnValue: Future<_i7.UserLangs>.value(_FakeUserLangs_8()))
           as _i9.Future<_i7.UserLangs>);
   @override
-  _i9.Future<_i2.Result<_i18.UserParams, _i69.UserLangsManagerError>>
+  _i9.Future<_i2.Result<_i18.UserParams, _i70.UserLangsManagerError>>
       setManualUserLangs(List<_i22.LangCode>? userLangs) => (super.noSuchMethod(
           Invocation.method(#setManualUserLangs, [userLangs]),
           returnValue: Future<
-                  _i2.Result<_i18.UserParams, _i69.UserLangsManagerError>>.value(
-              _FakeResult_0<_i18.UserParams, _i69.UserLangsManagerError>())) as _i9
-          .Future<_i2.Result<_i18.UserParams, _i69.UserLangsManagerError>>);
+                  _i2.Result<_i18.UserParams, _i70.UserLangsManagerError>>.value(
+              _FakeResult_0<_i18.UserParams, _i70.UserLangsManagerError>())) as _i9
+          .Future<_i2.Result<_i18.UserParams, _i70.UserLangsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -1217,7 +1241,7 @@ class MockUserLangsManager extends _i1.Mock implements _i68.UserLangsManager {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserLangsManagerObserver extends _i1.Mock
-    implements _i68.UserLangsManagerObserver {
+    implements _i69.UserLangsManagerObserver {
   MockUserLangsManagerObserver() {
     _i1.throwOnMissingStub(this);
   }
@@ -1234,17 +1258,17 @@ class MockUserLangsManagerObserver extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockUserParamsController extends _i1.Mock
-    implements _i70.UserParamsController {
+    implements _i71.UserParamsController {
   MockUserParamsController() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  void addObserver(_i70.UserParamsControllerObserver? observer) =>
+  void addObserver(_i71.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#addObserver, [observer]),
           returnValueForMissingStub: null);
   @override
-  void removeObserver(_i70.UserParamsControllerObserver? observer) =>
+  void removeObserver(_i71.UserParamsControllerObserver? observer) =>
       super.noSuchMethod(Invocation.method(#removeObserver, [observer]),
           returnValueForMissingStub: null);
   @override
@@ -1265,7 +1289,7 @@ class MockUserParamsController extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockViewedProductsStorage extends _i1.Mock
-    implements _i71.ViewedProductsStorage {
+    implements _i72.ViewedProductsStorage {
   MockViewedProductsStorage() {
     _i1.throwOnMissingStub(this);
   }
@@ -1288,17 +1312,20 @@ class MockViewedProductsStorage extends _i1.Mock
       (super.noSuchMethod(Invocation.method(#getProducts, []),
           returnValue: <_i58.Product>[]) as List<_i58.Product>);
   @override
-  void addProduct(_i58.Product? product) =>
-      super.noSuchMethod(Invocation.method(#addProduct, [product]),
-          returnValueForMissingStub: null);
+  _i9.Future<void> addProduct(_i58.Product? product) =>
+      (super.noSuchMethod(Invocation.method(#addProduct, [product]),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
   _i9.Future<void> purgeForTesting() =>
       (super.noSuchMethod(Invocation.method(#purgeForTesting, []),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
-  void dispose() => super.noSuchMethod(Invocation.method(#dispose, []),
-      returnValueForMissingStub: null);
+  _i9.Future<void> dispose() =>
+      (super.noSuchMethod(Invocation.method(#dispose, []),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
   @override
   String toString() => super.toString();
 }

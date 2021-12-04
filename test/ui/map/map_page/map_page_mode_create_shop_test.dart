@@ -103,23 +103,20 @@ void main() {
         findsOneWidget);
 
     expect(find.byType(CreateShopPage), findsNothing);
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
     expect(find.byType(CreateShopPage), findsOneWidget);
 
     await tester.enterText(
         find.byKey(const Key('new_shop_name_input')), 'new shop');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('shop_type_dropdown')));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.byKey(const Key('shop_type_dropdown')));
     await tester.tapDropDownItem(context.strings.shop_type_supermarket);
     await tester.pumpAndSettle();
 
     shopsManager.verity_createShop_called(times: 0);
 
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     // Shop is created
     shopsManager.verity_createShop_called(times: 1);
@@ -169,7 +166,7 @@ void main() {
     expect(
         widget.getModeForTesting().runtimeType, equals(MapPageModeCreateShop));
 
-    await tester.tap(find.byKey(const Key('close_create_shop_button')));
+    await tester.superTap(find.byKey(const Key('close_create_shop_button')));
 
     expect(widget.getModeForTesting().runtimeType,
         equals(MapPageModeSelectShopsWhereProductSold));

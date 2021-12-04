@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -55,8 +57,8 @@ void main() {
   });
 
   testWidgets('viewed products shown', (WidgetTester tester) async {
-    viewedProductsStorage.addProduct(_makeProduct('1'));
-    viewedProductsStorage.addProduct(_makeProduct('2'));
+    unawaited(viewedProductsStorage.addProduct(_makeProduct('1')));
+    unawaited(viewedProductsStorage.addProduct(_makeProduct('2')));
 
     await tester.superPump(const ViewedProductsHistoryPage());
 
@@ -65,14 +67,14 @@ void main() {
   });
 
   testWidgets('viewed product added', (WidgetTester tester) async {
-    viewedProductsStorage.addProduct(_makeProduct('1'));
+    unawaited(viewedProductsStorage.addProduct(_makeProduct('1')));
 
     await tester.superPump(const ViewedProductsHistoryPage());
 
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);
 
-    viewedProductsStorage.addProduct(_makeProduct('2'));
+    unawaited(viewedProductsStorage.addProduct(_makeProduct('2')));
     await tester.pumpAndSettle();
 
     expect(find.text('Product 1'), findsOneWidget);
@@ -84,8 +86,8 @@ void main() {
     final p1 = _makeProduct('1');
     final p2 = _makeProduct('2');
 
-    viewedProductsStorage.addProduct(p2);
-    viewedProductsStorage.addProduct(p1);
+    unawaited(viewedProductsStorage.addProduct(p2));
+    unawaited(viewedProductsStorage.addProduct(p1));
 
     await tester.superPump(const ViewedProductsHistoryPage());
 
@@ -93,7 +95,7 @@ void main() {
     var product2Pos = tester.getTopLeft(find.text('Product 2'));
     expect(product1Pos.dy < product2Pos.dy, isTrue);
 
-    viewedProductsStorage.addProduct(p2);
+    unawaited(viewedProductsStorage.addProduct(p2));
     await tester.pumpAndSettle();
 
     product1Pos = tester.getTopLeft(find.text('Product 1'));
@@ -106,7 +108,7 @@ void main() {
         Ok(_makeProduct('${invc.positionalArguments[0] as String} updated')));
 
     final p1 = _makeProduct('1');
-    viewedProductsStorage.addProduct(p1);
+    unawaited(viewedProductsStorage.addProduct(p1));
 
     await tester.superPump(const ViewedProductsHistoryPage());
 

@@ -5,7 +5,6 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
-import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';
@@ -45,10 +44,7 @@ void main() {
   });
 
   testWidgets('searchbar click opens search page', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.createIdleMapPage(tester);
 
     expect(find.byType(MapSearchPage), findsNothing);
     await tester.superTap(find.byType(MapSearchBar));
@@ -56,10 +52,7 @@ void main() {
   });
 
   testWidgets('shop found', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     verifyNever(mapController.animateCamera(any));
     expect(find.byType(ShopCard), findsNothing);
@@ -74,10 +67,7 @@ void main() {
   });
 
   testWidgets('many shops found', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     verifyNever(mapController.animateCamera(any));
     expect(find.byType(ShopCard), findsNothing);
@@ -92,10 +82,7 @@ void main() {
   });
 
   testWidgets('road found', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     verifyNever(mapController.animateCamera(any));
 
@@ -110,10 +97,7 @@ void main() {
   testWidgets(
       'when search is finished, map page has the last query in search bar',
       (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     expect(find.text('cool query'), findsNothing);
     widget.onSearchResultsForTesting(
@@ -130,10 +114,7 @@ void main() {
         query: 'cool road',
         allFound: MapSearchResult.create([], roads));
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     widget.onSearchResultsForTesting(searchResults);
     await tester.pumpAndSettle();
@@ -155,10 +136,7 @@ void main() {
         query: 'cool shops',
         allFound: MapSearchResult.create([], roads));
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     widget.onSearchResultsForTesting(searchResults);
     await tester.pumpAndSettle();
@@ -184,10 +162,7 @@ void main() {
         query: 'cool road',
         allFound: MapSearchResult.create([], roads));
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester);
 
     widget.onSearchResultsForTesting(searchResults);
     await tester.pumpAndSettle();
@@ -206,10 +181,7 @@ void main() {
   testWidgets(
       'when there are no search results clicks on back do not open search page',
       (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    await commons.createIdleMapPage(tester);
 
     // No search result
     // widget.onSearchResultsForTesting(searchResults);
