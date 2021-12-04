@@ -48,12 +48,12 @@ app.*.map.json
 /.gradle
 /local.properties
 
+untranslated_labels.txt
+
 # Security
 android/app/debug.keystore
 android/app/google-services.json
 ios/GoogleService-Info.plist
 ios/Flutter/tmp.xcconfig
 ios/.envfile
-
 .env
-
