@@ -12,6 +12,7 @@ import 'package:plante/location/location_controller.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
+import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -188,5 +189,30 @@ class MapPageModesTestCommons {
     widget.onMapMoveForTesting(center, zoom);
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
+  }
+
+  Future<BuildContext> initIdleMapPage(MapPage widget, WidgetTester tester,
+      {NavigatorObserver? navigatorObserver}) async {
+    final context =
+        await tester.superPump(widget, navigatorObserver: navigatorObserver);
+    widget.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+    return context;
+  }
+
+  Future<MapPage> createIdleMapPage(WidgetTester tester,
+      {Key? key,
+      Product? product,
+      List<Shop> initialSelectedShops = const [],
+      MapPageRequestedMode requestedMode =
+          MapPageRequestedMode.DEFAULT}) async {
+    final widget = MapPage(
+        key: key,
+        mapControllerForTesting: mapController,
+        product: product,
+        requestedMode: requestedMode,
+        initialSelectedShops: initialSelectedShops);
+    await initIdleMapPage(widget, tester);
+    return widget;
   }
 }

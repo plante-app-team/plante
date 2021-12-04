@@ -25,6 +25,7 @@ import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
 
@@ -54,6 +55,7 @@ import 'package:plante/ui/photos_taker.dart';
   RouteObserver,
   ShopsManager,
   ShopsManagerListener,
+  SuggestedProductsManager,
   SysLangCodeHolder,
   UserLangsManager,
   UserLangsManagerObserver,

@@ -30,6 +30,8 @@ enum MapPageModelError {
 
 class MapPageModel implements ShopsManagerListener {
   static const DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
+  static final delayBetweenSuggestionsAbsorption =
+      isInTests() ? const Duration(seconds: 1) : const Duration(seconds: 5);
 
   final ArgCallback<Map<OsmUID, Shop>> _updateShopsCallback;
   final ArgCallback<MapPageModelError> _errorCallback;
@@ -171,7 +173,7 @@ class MapPageModel implements ShopsManagerListener {
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values;
 
-    unawaited(_suggestedBarcodesSubscription?.cancel());
+    await _suggestedBarcodesSubscription?.cancel();
     final collectedBarcodes = <OsmUID, List<String>>{};
     var lastAbsorbTime = DateTime.now();
     final absorbNewSuggestions = () {
@@ -179,8 +181,10 @@ class MapPageModel implements ShopsManagerListener {
         _suggestedProductsBarcodes[entry.key] ??= {};
         _suggestedProductsBarcodes[entry.key]!.addAll(entry.value);
       }
-      collectedBarcodes.clear();
-      _updateShopsCallback.call(_shopsCache);
+      if (!collectedBarcodes.isEmpty) {
+        collectedBarcodes.clear();
+        _updateShopsCallback.call(_shopsCache);
+      }
       lastAbsorbTime = DateTime.now();
     };
     _suggestedBarcodesSubscription = _suggestedProductsManager
@@ -192,9 +196,9 @@ class MapPageModel implements ShopsManagerListener {
       final pair = event.unwrap();
       collectedBarcodes[pair.first] ??= [];
       collectedBarcodes[pair.first]!.addAll(pair.second);
-      if (DateTime.now().difference(lastAbsorbTime) >
-          const Duration(seconds: 5)) {
-        absorbNewSuggestions(); // TODO: test
+      if (DateTime.now().difference(lastAbsorbTime) >=
+          delayBetweenSuggestionsAbsorption) {
+        absorbNewSuggestions();
       }
     }, onDone: absorbNewSuggestions);
   }

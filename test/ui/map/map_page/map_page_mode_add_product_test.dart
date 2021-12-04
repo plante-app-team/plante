@@ -39,13 +39,8 @@ void main() {
       (WidgetTester tester) async {
     expect(shops[0].productsCount, equals(0));
 
-    final widget = MapPage(
-        mapControllerForTesting: mapController,
-        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
-        product: product);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT, product: product);
 
     final displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops.length, equals(shops.length));
@@ -57,7 +52,7 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
+    final context = await commons.initIdleMapPage(widget, tester);
 
     expect(find.text(context.strings.map_page_click_on_shop_where_product_sold),
         findsOneWidget);
@@ -68,24 +63,19 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
 
     widget.onMarkerClickForTesting([shops[1]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
 
     shopsManager.verity_createShop_called(times: 0);
 
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
@@ -100,9 +90,7 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     widget.onMarkerClickForTesting([shops[0], shops[1]]);
     await tester.pumpAndSettle();
@@ -110,8 +98,7 @@ void main() {
     // Button 1 click
     final yesButton1 =
         find.text(context.strings.global_yes).evaluate().first.widget;
-    await tester.tap(find.byWidget(yesButton1));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.byWidget(yesButton1));
     // Open cards again
     widget.onMarkerClickForTesting([shops[0], shops[1]]);
     await tester.pumpAndSettle();
@@ -123,13 +110,11 @@ void main() {
     await tester.pumpAndSettle();
     // Button 2 click
 
-    await tester.tap(find.byWidget(yesButton2));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.byWidget(yesButton2));
 
     shopsManager.verity_createShop_called(times: 0);
     expect(find.byKey(const Key('shop_card_scroll')), findsNothing);
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
@@ -145,12 +130,9 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     // Expecting the page to still be open
     expect(find.byType(MapPage), findsOneWidget);
@@ -163,28 +145,23 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // Select
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals({shops[0]}));
 
     // Unselect
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_no));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_no));
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals(<Shop>{}));
 
-    await tester.tap(find.text(context.strings.global_done));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_done));
 
     // Expecting the page to still be open
     expect(find.byType(MapPage), findsOneWidget);
@@ -198,21 +175,16 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     // Select
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_yes));
 
     // Cancel
-    await tester.tap(find.text(context.strings.global_cancel));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.global_yes));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_cancel));
+    await tester.superTap(find.text(context.strings.global_yes));
 
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
@@ -226,12 +198,9 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
-    await tester.tap(find.text(context.strings.global_cancel));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.text(context.strings.global_cancel));
 
     // Expecting the page to be closed
     expect(find.byType(MapPage), findsNothing);
@@ -240,20 +209,14 @@ void main() {
   });
 
   testWidgets('can cancel a shop selection', (WidgetTester tester) async {
-    final widget = MapPage(
-        mapControllerForTesting: mapController,
-        requestedMode: MapPageRequestedMode.ADD_PRODUCT,
-        product: product);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final widget = await commons.createIdleMapPage(tester,
+        requestedMode: MapPageRequestedMode.ADD_PRODUCT, product: product);
 
     // Tap
     widget.onMarkerClickForTesting([shops[0]]);
     await tester.pumpAndSettle();
     // Cancel
-    await tester.tap(find.byKey(const Key('card_cancel_btn')));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.byKey(const Key('card_cancel_btn')));
     // Verify
     expect(widget.getModeForTesting().selectedShops(), equals(<Shop>{}));
   });
@@ -278,15 +241,12 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     for (final shop in manyShops) {
       widget.onMarkerClickForTesting([shop]);
       await tester.pumpAndSettle();
-      await tester.tap(find.text(context.strings.global_yes));
-      await tester.pumpAndSettle();
+      await tester.superTap(find.text(context.strings.global_yes));
     }
     expect(widget.getModeForTesting().selectedShops(),
         equals(manyShops.take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX).toSet()));
@@ -294,14 +254,10 @@ void main() {
 
   testWidgets('can provide initially selected shops',
       (WidgetTester tester) async {
-    final widget = MapPage(
-        mapControllerForTesting: mapController,
+    final widget = await commons.createIdleMapPage(tester,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product,
         initialSelectedShops: [shops[0]]);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
 
     expect(widget.getModeForTesting().selectedShops(), equals({shops[0]}));
   });
@@ -312,17 +268,14 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsNothing);
     expect(widget.getModeForTesting().runtimeType,
         isNot(equals(MapPageModeCreateShop)));
 
-    await tester.tap(find.byKey(const Key('add_shop_fab')));
-    await tester.pumpAndSettle();
+    await tester.superTap(find.byKey(const Key('add_shop_fab')));
 
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsOneWidget);
@@ -333,14 +286,10 @@ void main() {
   testWidgets('add product mode switch event', (WidgetTester tester) async {
     expect(analytics.allEvents().length, equals(0));
 
-    final widget = MapPage(
-        mapControllerForTesting: mapController,
+    await commons.createIdleMapPage(tester,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product,
         initialSelectedShops: [shops[0]]);
-    await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.wasEventSent('map_page_mode_switch_add_product'), isTrue);
@@ -351,12 +300,7 @@ void main() {
         mapControllerForTesting: mapController,
         requestedMode: MapPageRequestedMode.ADD_PRODUCT,
         product: product);
-    final context = await tester.superPump(widget);
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
+    final context = await commons.initIdleMapPage(widget, tester);
 
     expect(
         find.text(context.strings.map_page_no_shops_hint_in_select_shops_mode),
