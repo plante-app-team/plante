@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,11 +22,9 @@ import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
-import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
-import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
@@ -35,6 +34,7 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page_progress_bar.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
@@ -106,6 +106,8 @@ class _MapPageState extends PageStatePlante<MapPage>
   MapSearchPageResult? _latestSearchResult;
 
   bool get _loading => _model.loading;
+  bool get _loadingSuggestions => _model.loadingSuggestions;
+  final _loadingAnythingProvider = StateProvider<bool>((ref) => false);
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
@@ -152,6 +154,12 @@ class _MapPageState extends PageStatePlante<MapPage>
       if (mounted) {
         _mode.onLoadingChange();
       }
+      ref.read(_loadingAnythingProvider.state).state =
+          _loading || _loadingSuggestions;
+    };
+    final suggestionsLoadingChangeCallback = () {
+      ref.read(_loadingAnythingProvider.state).state =
+          _loading || _loadingSuggestions;
     };
     final updateShopsCallback = (_) {
       updateMapCallback.call();
@@ -166,7 +174,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         updateShopsCallback,
         _onError,
         updateCallback,
-        loadingChangeCallback);
+        loadingChangeCallback,
+        suggestionsLoadingChangeCallback);
 
     /// The clustering library levels logic is complicated.
     ///
@@ -408,11 +417,7 @@ class _MapPageState extends PageStatePlante<MapPage>
             ])),
       ),
       _mode.buildOverlay(context),
-      AnimatedSwitcher(
-          duration: DURATION_DEFAULT,
-          child: _loading
-              ? const LinearProgressIndicatorPlante()
-              : const SizedBox.shrink()),
+      _progressBar(),
     ]);
 
     return WillPopScope(
@@ -423,7 +428,8 @@ class _MapPageState extends PageStatePlante<MapPage>
               child: VisibilityDetectorPlante(
             keyStr: 'map_page_visibility_detector',
             onVisibilityChanged: (visible, firstCall) {
-              // Workaround for https://trello.com/c/D33qHsGn/
+              // Workaround for: 'Google Map is blank if the app is
+              // minimized and then maximized after some time'
               // (https://github.com/flutter/flutter/issues/40284)
               if (visible && !firstCall) {
                 _initMapStyle();
@@ -473,6 +479,16 @@ class _MapPageState extends PageStatePlante<MapPage>
       _locationPermissionObtained = result;
     });
     return result;
+  }
+
+  Widget _progressBar() {
+    if (_loading) {
+      return MapPageProgressBar.forLoadingShops(inProgress: true);
+    } else if (_loadingSuggestions) {
+      return MapPageProgressBar.forLoadingProductsSuggestions(inProgress: true);
+    } else {
+      return MapPageProgressBar.stop();
+    }
   }
 
   void _onCameraMove(CameraPosition position) {

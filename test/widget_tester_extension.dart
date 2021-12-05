@@ -8,7 +8,8 @@ extension WidgetTesterExtension on WidgetTester {
   Future<BuildContext> superPump(Widget widget,
       {Duration? duration,
       NavigatorObserver? navigatorObserver,
-      EnginePhase phase = EnginePhase.sendSemanticsUpdate}) async {
+      EnginePhase phase = EnginePhase.sendSemanticsUpdate,
+      bool pumpAndSettle = true}) async {
     late BuildContext _context;
     // So that WidgetTester.pageBack() could be used
     const appBar =
@@ -31,7 +32,9 @@ extension WidgetTesterExtension on WidgetTester {
         )));
 
     await pumpWidget(widgetWrapper, duration, phase);
-    await pumpAndSettle();
+    if (pumpAndSettle) {
+      await this.pumpAndSettle();
+    }
     return _context;
   }
 
