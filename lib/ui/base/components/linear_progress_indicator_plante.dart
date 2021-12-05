@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 
 class LinearProgressIndicatorPlante extends StatelessWidget {
-  const LinearProgressIndicatorPlante({Key? key}) : super(key: key);
+  final double? value;
+  const LinearProgressIndicatorPlante({Key? key, this.value}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +13,6 @@ class LinearProgressIndicatorPlante extends StatelessWidget {
       // So in tests we don't create [LinearProgressIndicator].
       return const SizedBox();
     }
-    return const LinearProgressIndicator();
+    return LinearProgressIndicator(value: value);
   }
 }

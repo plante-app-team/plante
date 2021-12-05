@@ -14,7 +14,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/ui/base/components/button_outlined_plante.dart';
-import 'package:plante/ui/base/linear_progress_indicator_plante.dart';
+import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';

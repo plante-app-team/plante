@@ -61,7 +61,7 @@ void main() {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;
-    }, () {}, () {});
+    }, () {}, () {}, () {});
   });
 
   test('successful shops load', () async {

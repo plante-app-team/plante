@@ -37,6 +37,7 @@ class MapPageModel implements ShopsManagerListener {
   final ArgCallback<MapPageModelError> _errorCallback;
   final VoidCallback _updateCallback;
   final VoidCallback _loadingChangeCallback;
+  final VoidCallback _suggestionsLoadingChangeCallback;
   final LocationController _locationController;
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
@@ -66,7 +67,8 @@ class MapPageModel implements ShopsManagerListener {
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
-      this._loadingChangeCallback) {
+      this._loadingChangeCallback,
+      this._suggestionsLoadingChangeCallback) {
     _shopsManager.addListener(this);
     _directionsManager
         .areDirectionsAvailable()
@@ -79,6 +81,7 @@ class MapPageModel implements ShopsManagerListener {
 
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
+  bool get loadingSuggestions => _suggestedBarcodesSubscription != null;
   Iterable<OsmUID> get shopsWithSuggestedProducts =>
       _suggestedProductsBarcodes.keys;
 
@@ -200,7 +203,12 @@ class MapPageModel implements ShopsManagerListener {
           delayBetweenSuggestionsAbsorption) {
         absorbNewSuggestions();
       }
-    }, onDone: absorbNewSuggestions);
+    }, onDone: () {
+      _suggestedBarcodesSubscription = null;
+      _suggestionsLoadingChangeCallback.call();
+      absorbNewSuggestions.call();
+    });
+    _suggestionsLoadingChangeCallback.call();
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
