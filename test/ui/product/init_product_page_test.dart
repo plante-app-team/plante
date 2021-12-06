@@ -11,7 +11,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
@@ -55,7 +55,7 @@ void main() {
   late MockPhotosTaker photosTaker;
   late MockProductsManager productsManager;
   late MockShopsManager shopsManager;
-  late MockLocationController locationController;
+  late MockUserLocationManager userLocationManager;
   late MockPermissionsManager permissionsManager;
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
@@ -100,10 +100,10 @@ void main() {
 
     GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
 
-    locationController = MockLocationController();
-    when(locationController.lastKnownPositionInstant()).thenReturn(null);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    userLocationManager = MockUserLocationManager();
+    when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
+    when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
 
     permissionsManager = MockPermissionsManager();
     when(permissionsManager.status(any))

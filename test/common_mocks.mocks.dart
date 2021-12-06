@@ -25,7 +25,7 @@ import 'package:plante/lang/user_langs_manager.dart' as _i69;
 import 'package:plante/lang/user_langs_manager_error.dart' as _i70;
 import 'package:plante/location/geolocator_wrapper.dart' as _i32;
 import 'package:plante/location/ip_location_provider.dart' as _i37;
-import 'package:plante/location/location_controller.dart' as _i39;
+import 'package:plante/location/user_location_manager.dart' as _i39;
 import 'package:plante/model/coord.dart' as _i14;
 import 'package:plante/model/coords_bounds.dart' as _i27;
 import 'package:plante/model/lang_code.dart' as _i22;
@@ -507,12 +507,12 @@ class MockLatestCameraPosStorage extends _i1.Mock
   String toString() => super.toString();
 }
 
-/// A class which mocks [LocationController].
+/// A class which mocks [UserLocationManager].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocationController extends _i1.Mock
-    implements _i39.LocationController {
-  MockLocationController() {
+class MockUserLocationManager extends _i1.Mock
+    implements _i39.UserLocationManager {
+  MockUserLocationManager() {
     _i1.throwOnMissingStub(this);
   }
 

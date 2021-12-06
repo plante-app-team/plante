@@ -6,7 +6,7 @@ import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -40,7 +40,7 @@ import 'package:plante/ui/photos_taker.dart';
   GoogleMapController,
   IpLocationProvider,
   LatestCameraPosStorage,
-  LocationController,
+  UserLocationManager,
   MobileAppConfigManager,
   OffApi,
   OffShopsManager,

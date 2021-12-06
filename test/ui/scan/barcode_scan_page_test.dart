@@ -10,7 +10,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
@@ -38,10 +38,10 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
-import '../../z_fakes/fake_location_controller.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_settings.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
+import '../../z_fakes/fake_user_location_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
@@ -77,8 +77,8 @@ void main() {
         .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-    final locationController = FakeLocationController();
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    final userLocationManager = FakeUserLocationManager();
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
     GetIt.I.registerSingleton<InputProductsLangStorage>(

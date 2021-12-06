@@ -7,7 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
@@ -71,7 +71,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
       GetIt.I.get<LatestCameraPosStorage>(),
       GetIt.I.get<AddressObtainer>(),
       GetIt.I.get<OsmSearcher>(),
-      GetIt.I.get<LocationController>(),
+      GetIt.I.get<UserLocationManager>(),
       () => _querySource.query,
       _querySource.queryChanges,
       () => () {

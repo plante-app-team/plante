@@ -20,7 +20,7 @@ import 'location_based_user_langs_manager_test.mocks.dart';
 @GenerateMocks([LocationBasedUserLangsStorage])
 void main() {
   late CountriesLangCodesTable countriesLangCodesTable;
-  late MockLocationController locationController;
+  late MockUserLocationManager userLocationManager;
   late MockAddressObtainer addressObtainer;
   late MockLocationBasedUserLangsStorage storage;
   late FakeAnalytics analytics;
@@ -29,7 +29,7 @@ void main() {
   setUp(() async {
     analytics = FakeAnalytics();
     countriesLangCodesTable = CountriesLangCodesTable(analytics);
-    locationController = MockLocationController();
+    userLocationManager = MockUserLocationManager();
     addressObtainer = MockAddressObtainer();
     storage = MockLocationBasedUserLangsStorage();
 
@@ -45,19 +45,19 @@ void main() {
     required ResCallback<Result<OsmAddress, OpenStreetMapError>> addressResp,
   }) async {
     final initialLastPos = Coord(lat: 0, lon: 0);
-    when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
+    when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
       callback.call(initialLastPos);
     });
 
-    when(locationController.lastKnownPosition())
+    when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => lastPos);
     when(addressObtainer.addressOfCoords(any))
         .thenAnswer((_) async => addressResp.call());
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
-      locationController,
+      userLocationManager,
       addressObtainer,
       analytics,
       FakeSharedPreferences().asHolder(),
@@ -134,7 +134,7 @@ void main() {
 
   test('first init does not finish until user last pos is available', () async {
     ArgCallback<Coord>? initialPosCallback;
-    when(locationController.callWhenLastPositionKnown(any)).thenAnswer((invc) {
+    when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
@@ -143,7 +143,7 @@ void main() {
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
-      locationController,
+      userLocationManager,
       addressObtainer,
       FakeAnalytics(),
       FakeSharedPreferences().asHolder(),
@@ -156,7 +156,7 @@ void main() {
     expect(inited, isFalse);
 
     final lastPos = Coord(lat: 2, lon: 1);
-    when(locationController.lastKnownPosition())
+    when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => lastPos);
     initialPosCallback!.call(lastPos);
     await Future.delayed(const Duration(milliseconds: 10));

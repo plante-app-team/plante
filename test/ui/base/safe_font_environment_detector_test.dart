@@ -10,9 +10,9 @@ import 'package:test/test.dart';
 
 import '../../z_fakes/fake_address_obtainer.dart';
 import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_location_controller.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
+import '../../z_fakes/fake_user_location_manager.dart';
 
 void main() {
   final unsafeLang =
@@ -20,7 +20,7 @@ void main() {
 
   late SysLangCodeHolder sysLangCodeHolder;
   late FakeUserLangsManager userLangsManager;
-  late FakeLocationController locationController;
+  late FakeUserLocationManager userLocationManager;
   late FakeSharedPreferences prefs;
   late FakeAddressObtainer addressObtainer;
   late CountriesLangCodesTable countriesLangsTable;
@@ -30,7 +30,7 @@ void main() {
   setUp(() async {
     sysLangCodeHolder = SysLangCodeHolder();
     userLangsManager = FakeUserLangsManager([LangCode.en]);
-    locationController = FakeLocationController();
+    userLocationManager = FakeUserLocationManager();
     prefs = FakeSharedPreferences();
     addressObtainer = FakeAddressObtainer();
     countriesLangsTable = CountriesLangCodesTable(FakeAnalytics());
@@ -48,18 +48,18 @@ void main() {
       await userLangsManager.setManualUserLangs(userLangs);
     }
     if (userCountry != null) {
-      locationController.setCurrentPosition(Coord(lat: 1, lon: 1));
+      userLocationManager.setCurrentPosition(Coord(lat: 1, lon: 1));
       addressObtainer
           .setResponse(OsmAddress((e) => e.countryCode = userCountry));
     } else {
-      locationController.setCurrentPosition(null);
+      userLocationManager.setCurrentPosition(null);
       addressObtainer.setResponse(null);
     }
 
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      locationController,
+      userLocationManager,
       prefs.asHolder(),
       addressObtainer,
       countriesLangsTable,
@@ -155,7 +155,7 @@ void main() {
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      locationController,
+      userLocationManager,
       prefs.asHolder(),
       addressObtainer,
       countriesLangsTable,
@@ -174,7 +174,7 @@ void main() {
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      locationController,
+      userLocationManager,
       prefs.asHolder(),
       addressObtainer,
       countriesLangsTable,

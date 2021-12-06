@@ -77,8 +77,6 @@ class OffShopsManager {
     }
     final offShops = await shopsRes.unwrap().findAppropriateShopsFor([name]);
     if (offShops.isEmpty) {
-      Log.d('offShopsManager.findOffShopByName: '
-          'No offshops found for name $name');
       return Ok(null);
     }
     return Ok(offShops[name]);
@@ -91,7 +89,8 @@ class OffShopsManager {
       return Err(None());
     }
 
-    final addressRes = await _addressObtainer.addressOfCoords(cameraPos);
+    final addressRes =
+        await _addressObtainer.addressOfCoords(cameraPos); // TODO: this
     if (addressRes.isErr) {
       Log.w('offShopsManager._getCountryCodeImpl: '
           'could not properly initialize because of $addressRes');

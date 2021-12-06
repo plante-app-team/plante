@@ -7,7 +7,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
@@ -34,8 +34,8 @@ import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
-import '../../../z_fakes/fake_location_controller.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
+import '../../../z_fakes/fake_user_location_manager.dart';
 
 void main() {
   late MockShopsManager shopsManager;
@@ -43,7 +43,7 @@ void main() {
   late LatestCameraPosStorage cameraPosStorage;
   late MockAddressObtainer addressObtainer;
   late MockOsmSearcher osmSearcher;
-  late FakeLocationController locationController;
+  late FakeUserLocationManager userLocationManager;
   late FakeAnalytics analytics;
 
   final userPos = Coord(lat: 15, lon: 15);
@@ -130,13 +130,13 @@ void main() {
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
     osmSearcher = MockOsmSearcher();
     GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
-    locationController = FakeLocationController();
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    userLocationManager = FakeUserLocationManager();
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     analytics = FakeAnalytics();
     GetIt.I.registerSingleton<Analytics>(analytics);
 
     await cameraPosStorage.set(cameraPos);
-    locationController.setCurrentPosition(userPos);
+    userLocationManager.setCurrentPosition(userPos);
 
     when(addressObtainer.addressOfCoords(any))
         .thenAnswer((_) async => Ok(OsmAddress((e) => e
@@ -523,7 +523,7 @@ void main() {
 
   testWidgets('distance from camera to entity shown when user location unknown',
       (WidgetTester tester) async {
-    locationController.setCurrentPosition(null);
+    userLocationManager.setCurrentPosition(null);
 
     setUpFoundEntities(
         localShops: localShops,

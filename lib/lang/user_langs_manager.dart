@@ -7,7 +7,7 @@ import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/manual_user_langs_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
@@ -35,7 +35,7 @@ class UserLangsManager {
   UserLangsManager(
       this._sysLangCodeHolder,
       CountriesLangCodesTable langCodesTable,
-      LocationController locationController,
+      UserLocationManager userLocationManager,
       AddressObtainer addressObtainer,
       SharedPreferencesHolder prefsHolder,
       UserParamsController userParamsController,
@@ -43,7 +43,7 @@ class UserLangsManager {
       Analytics analytics)
       : _locationUserLangsManager = LocationBasedUserLangsManager(
             langCodesTable,
-            locationController,
+            userLocationManager,
             addressObtainer,
             analytics,
             prefsHolder),

@@ -13,7 +13,7 @@ import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 
 void main() {
-  late MockLocationController locationController;
+  late MockUserLocationManager userLocationManager;
   late FakeShopsManager fakeShopsManager;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late MockAddressObtainer addressObtainer;
@@ -40,7 +40,7 @@ void main() {
     latestLoadedShops = null;
     latestError = null;
 
-    locationController = MockLocationController();
+    userLocationManager = MockUserLocationManager();
     fakeShopsManager = FakeShopsManager();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     addressObtainer = MockAddressObtainer();
@@ -52,7 +52,7 @@ void main() {
     suggestedProductsManager = FakeSuggestedProductsManager();
 
     model = MapPageModel(
-        locationController,
+        userLocationManager,
         fakeShopsManager,
         addressObtainer,
         latestCameraPosStorage,

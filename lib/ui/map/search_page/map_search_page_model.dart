@@ -6,7 +6,7 @@ import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/fuzzy_search.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -33,7 +33,7 @@ class MapSearchPageModel {
   final LatestCameraPosStorage _cameraPosStorage;
   final AddressObtainer _addressObtainer;
   final OsmSearcher _osmSearcher;
-  final LocationController _locationController;
+  final UserLocationManager _userLocationManager;
   final ResCallback<String> _querySource;
   final Stream<String> _queryChanges;
   final VoidCallback _updateUi;
@@ -80,7 +80,7 @@ class MapSearchPageModel {
       this._cameraPosStorage,
       this._addressObtainer,
       this._osmSearcher,
-      this._locationController,
+      this._userLocationManager,
       this._querySource,
       this._queryChanges,
       this._updateUi,
@@ -134,8 +134,8 @@ class MapSearchPageModel {
   }
 
   void _updateLastKnownUserPos() async {
-    _lastKnownUserPos = await _locationController.currentPosition();
-    _lastKnownUserPos ??= await _locationController.lastKnownPosition();
+    _lastKnownUserPos = await _userLocationManager.currentPosition();
+    _lastKnownUserPos ??= await _userLocationManager.lastKnownPosition();
   }
 
   /// [resultsCallback] will be called multiple times.

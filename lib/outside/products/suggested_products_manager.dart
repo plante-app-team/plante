@@ -23,6 +23,8 @@ class SuggestedProductsManager {
       this._offShopsManager, this._productsExtraProperties);
 
   /// NOTE: function stops data retrieval on first error
+  ///
+  /// See also: [getSuggestedBarcodesMap].
   Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
       getSuggestedBarcodes(Iterable<Shop> shops) async* {
     if (!(await enableNewestFeatures())) {

@@ -1,8 +1,8 @@
 import 'package:plante/base/base.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/coord.dart';
 
-class FakeLocationController implements LocationController {
+class FakeUserLocationManager implements UserLocationManager {
   Coord? _lastKnownPosition;
   Coord? _currentPosition;
   final _lastPositionCallbacks = <ArgCallback<Coord>>[];
