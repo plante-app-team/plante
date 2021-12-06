@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -38,7 +38,7 @@ class MapPageModel implements ShopsManagerListener {
   final VoidCallback _updateCallback;
   final VoidCallback _loadingChangeCallback;
   final VoidCallback _suggestionsLoadingChangeCallback;
-  final LocationController _locationController;
+  final UserLocationManager _userLocationManager;
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
   final LatestCameraPosStorage _latestCameraPosStorage;
@@ -58,7 +58,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _directionsAvailable = false;
 
   MapPageModel(
-      this._locationController,
+      this._userLocationManager,
       this._shopsManager,
       this._addressObtainer,
       this._latestCameraPosStorage,
@@ -90,7 +90,7 @@ class MapPageModel implements ShopsManagerListener {
     if (result != null) {
       return _pointToCameraPos(result);
     }
-    result = _locationController.lastKnownPositionInstant();
+    result = _userLocationManager.lastKnownPositionInstant();
     if (result != null) {
       return _pointToCameraPos(result);
     }
@@ -102,12 +102,12 @@ class MapPageModel implements ShopsManagerListener {
     if (result != null) {
       return _pointToCameraPos(result);
     }
-    result = await _locationController.lastKnownPosition();
+    result = await _userLocationManager.lastKnownPosition();
     if (result != null) {
       return _pointToCameraPos(result);
     }
     final _completer = Completer<CameraPosition>();
-    _locationController.callWhenLastPositionKnown((pos) {
+    _userLocationManager.callWhenLastPositionKnown((pos) {
       _completer.complete(_pointToCameraPos(pos));
     });
     return _completer.future;
@@ -122,7 +122,7 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<CameraPosition?> currentUserPos() async {
-    final result = await _locationController.currentPosition();
+    final result = await _userLocationManager.currentPosition();
     if (result != null) {
       return _pointToCameraPos(result);
     }

@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_langs.dart';
@@ -23,7 +23,7 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
 
   final SysLangCodeHolder _sysLangCodeHolder;
   final UserLangsManager _locationLangsManager;
-  final LocationController _locationController;
+  final UserLocationManager _userLocationManager;
   final SharedPreferencesHolder _prefsHolder;
   final AddressObtainer _addressObtainer;
   final CountriesLangCodesTable _countriesLangsTable;
@@ -38,7 +38,7 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
   SafeFontEnvironmentDetector(
       this._sysLangCodeHolder,
       this._locationLangsManager,
-      this._locationController,
+      this._userLocationManager,
       this._prefsHolder,
       this._addressObtainer,
       this._countriesLangsTable) {
@@ -63,7 +63,7 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
   }
 
   Future<List<String>?> _obtainLocalLangCodes() async {
-    final lastKnownPos = await _locationController.lastKnownPosition();
+    final lastKnownPos = await _userLocationManager.lastKnownPosition();
     if (lastKnownPos == null) {
       Log.w('SafeFontEnvironmentDetector could not obtain last pos');
       return null;
@@ -76,7 +76,7 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
     }
 
     final address = addressRes.unwrap();
-    final countryCode = address.countryCode;
+    final countryCode = address.countryCode; // TODO: this
     if (countryCode == null) {
       Log.w('SafeFontEnvironmentDetector could not obtain country of user pos');
       return null;

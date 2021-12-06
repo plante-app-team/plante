@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
@@ -48,10 +48,10 @@ void main() {
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
     GetIt.I.registerSingleton<Backend>(MockBackend());
-    final locationController = MockLocationController();
-    when(locationController.lastKnownPositionInstant()).thenReturn(null);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    final userLocationManager = MockUserLocationManager();
+    when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
+    when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
 
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);

@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -37,7 +37,7 @@ import '../../../z_fakes/fake_suggested_products_manager.dart';
 class MapPageModesTestCommons {
   late MockPermissionsManager permissionsManager;
   late FakeShopsManager shopsManager;
-  late MockLocationController locationController;
+  late MockUserLocationManager userLocationManager;
   late MockGoogleMapController mapController;
   late FakeSharedPreferences prefs;
   late MockLatestCameraPosStorage latestCameraPosStorage;
@@ -63,8 +63,8 @@ class MapPageModesTestCommons {
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     shopsManager = FakeShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-    locationController = MockLocationController();
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    userLocationManager = MockUserLocationManager();
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     mapController = MockGoogleMapController();
     prefs = FakeSharedPreferences();
     latestCameraPosStorage = MockLatestCameraPosStorage();
@@ -83,9 +83,9 @@ class MapPageModesTestCommons {
 
     await fillFetchedShops();
 
-    when(locationController.lastKnownPositionInstant()).thenReturn(null);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
-    when(locationController.currentPosition()).thenAnswer((_) async => null);
+    when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
+    when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
+    when(userLocationManager.currentPosition()).thenAnswer((_) async => null);
     when(mapController.getVisibleRegion()).thenAnswer((_) async => LatLngBounds(
         southwest: LatLng(shopsBounds.south, shopsBounds.west),
         northeast: LatLng(shopsBounds.north, shopsBounds.east)));

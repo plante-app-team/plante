@@ -9,7 +9,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
@@ -165,7 +165,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       updateMapCallback.call();
     };
     _model = MapPageModel(
-        GetIt.I.get<LocationController>(),
+        GetIt.I.get<UserLocationManager>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<AddressObtainer>(),
         GetIt.I.get<LatestCameraPosStorage>(),

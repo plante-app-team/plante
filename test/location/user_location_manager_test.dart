@@ -1,7 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/coord.dart';
 import 'package:test/test.dart';
 
@@ -14,7 +14,7 @@ void main() {
   late MockGeolocatorWrapper geolocatorWrapper;
   late FakeSharedPreferences fakeSharedPreferences;
 
-  late LocationController locationController;
+  late UserLocationManager locationManager;
 
   setUp(() async {
     ipLocationProvider = MockIpLocationProvider();
@@ -27,7 +27,7 @@ void main() {
   });
 
   void init() async {
-    locationController = LocationController(ipLocationProvider,
+    locationManager = UserLocationManager(ipLocationProvider,
         permissionsManager, fakeSharedPreferences.asHolder(),
         geolocatorWrapper: geolocatorWrapper);
   }
@@ -43,7 +43,7 @@ void main() {
 
     init();
     Coord? receivedPosition;
-    locationController.callWhenLastPositionKnown((position) {
+    locationManager.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
 
@@ -75,7 +75,7 @@ void main() {
 
     init();
     Coord? receivedPosition;
-    locationController.callWhenLastPositionKnown((position) {
+    locationManager.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
 
@@ -107,7 +107,7 @@ void main() {
 
     init();
     Coord? receivedPosition;
-    locationController.callWhenLastPositionKnown((position) {
+    locationManager.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
 
@@ -138,12 +138,12 @@ void main() {
     when(ipLocationProvider.positionByIP()).thenAnswer((_) async => null);
 
     final lastKnownPos = Coord(lon: 10, lat: 20);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         lastKnownPos, fakeSharedPreferences.asHolder());
 
     init();
     Coord? receivedPosition;
-    locationController.callWhenLastPositionKnown((position) {
+    locationManager.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
 
@@ -167,7 +167,7 @@ void main() {
 
   test('lastKnownPosition good scenario', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -183,7 +183,7 @@ void main() {
         .thenAnswer((_) async => newPos);
 
     // Expecting the new position to be returned
-    final result = await locationController.lastKnownPosition();
+    final result = await locationManager.lastKnownPosition();
     expect(result, equals(newPos));
 
     // Expecting the new position to be stored in prefs
@@ -193,7 +193,7 @@ void main() {
 
   test('lastKnownPosition can work without permission', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -208,7 +208,7 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Expecting the initial position to be returned
-    final result = await locationController.lastKnownPosition();
+    final result = await locationManager.lastKnownPosition();
     expect(result, equals(initialPos));
 
     // Expecting the initial position to still be stored in prefs
@@ -218,7 +218,7 @@ void main() {
 
   test('lastKnownPosition on exception', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -233,7 +233,7 @@ void main() {
         .thenAnswer((_) async => throw const PermissionDeniedException(''));
 
     // Expecting the initial position to be returned
-    final result = await locationController.lastKnownPosition();
+    final result = await locationManager.lastKnownPosition();
     expect(result, equals(initialPos));
 
     // Expecting the initial position to still be stored in prefs
@@ -243,7 +243,7 @@ void main() {
 
   test('currentPosition good scenario', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -259,7 +259,7 @@ void main() {
         .thenAnswer((_) async => newPos);
 
     // Expecting the new position to be returned
-    final result = await locationController.currentPosition();
+    final result = await locationManager.currentPosition();
     expect(result, equals(newPos));
 
     // Expecting the new position to be stored in prefs
@@ -269,7 +269,7 @@ void main() {
 
   test('currentPosition cannot work without permission', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -284,7 +284,7 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Expecting null to be returned even though there's the initial position
-    final result = await locationController.currentPosition();
+    final result = await locationManager.currentPosition();
     expect(result, isNull);
 
     // Expecting the initial position to still be stored in prefs
@@ -294,7 +294,7 @@ void main() {
 
   test('currentPosition on exception', () async {
     final initialPos = Coord(lon: 10, lat: 10);
-    await LocationController.updateLastKnownPrefsPositionForTesting(
+    await UserLocationManager.updateLastKnownPrefsPositionForTesting(
         initialPos, fakeSharedPreferences.asHolder());
     when(geolocatorWrapper.getLastKnownPosition())
         .thenAnswer((_) async => null);
@@ -309,7 +309,7 @@ void main() {
         .thenAnswer((_) async => throw const PermissionDeniedException(''));
 
     // Expecting null to be returned even though there's the initial position
-    final result = await locationController.currentPosition();
+    final result = await locationManager.currentPosition();
     expect(result, isNull);
 
     // Expecting the initial position to still be stored in prefs
@@ -332,7 +332,7 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     Coord? receivedPosition;
-    locationController.callWhenLastPositionKnown((position) {
+    locationManager.callWhenLastPositionKnown((position) {
       receivedPosition = position;
     });
     expect(receivedPosition, equals(currentPos));

@@ -13,7 +13,7 @@ import 'package:plante/model/shared_preferences_holder.dart';
 
 const PREF_LAST_KNOWN_POS = 'PREF_LAST_KNOWN_POS2';
 
-class LocationController {
+class UserLocationManager {
   final IpLocationProvider _ipLocationProvider;
   final PermissionsManager _permissionsManager;
   final SharedPreferencesHolder _prefsHolder;
@@ -35,7 +35,7 @@ class LocationController {
 
   final _lastKnownPositionCallbacks = <ArgCallback<Coord>>[];
 
-  LocationController(
+  UserLocationManager(
       this._ipLocationProvider, this._permissionsManager, this._prefsHolder,
       {GeolocatorWrapper? geolocatorWrapper})
       : _geolocatorWrapper = geolocatorWrapper ?? GeolocatorWrapper() {

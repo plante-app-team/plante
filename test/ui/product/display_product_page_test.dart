@@ -10,7 +10,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
@@ -50,7 +50,7 @@ const _DEFAULT_LANG = LangCode.en;
 void main() {
   late MockProductsManager productsManager;
   late MockBackend backend;
-  late MockLocationController locationController;
+  late MockUserLocationManager userLocationManager;
   late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
@@ -90,10 +90,10 @@ void main() {
         ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
-    locationController = MockLocationController();
-    when(locationController.lastKnownPositionInstant()).thenReturn(null);
-    when(locationController.lastKnownPosition()).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<LocationController>(locationController);
+    userLocationManager = MockUserLocationManager();
+    when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
+    when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
+    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
 
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);

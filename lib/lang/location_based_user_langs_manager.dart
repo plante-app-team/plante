@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/location_based_user_langs_storage.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
@@ -12,7 +12,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 /// Please use UserLangsManager instead of this class.
 class LocationBasedUserLangsManager {
   final CountriesLangCodesTable _langCodesTable;
-  final LocationController _locationController;
+  final UserLocationManager _userLocationManager;
   final AddressObtainer _addressObtainer;
   final Analytics _analytics;
   final LocationBasedUserLangsStorage _storage;
@@ -22,13 +22,13 @@ class LocationBasedUserLangsManager {
 
   LocationBasedUserLangsManager(
       this._langCodesTable,
-      this._locationController,
+      this._userLocationManager,
       this._addressObtainer,
       this._analytics,
       SharedPreferencesHolder prefsHolder,
       {LocationBasedUserLangsStorage? storage})
       : _storage = storage ?? LocationBasedUserLangsStorage(prefsHolder) {
-    _locationController.callWhenLastPositionKnown((_) async {
+    _userLocationManager.callWhenLastPositionKnown((_) async {
       try {
         await _tryFirstInit();
       } finally {
@@ -47,7 +47,7 @@ class LocationBasedUserLangsManager {
     // We deliberately don't request current position because it
     // requires the location permission and we want to be able to work
     // without it.
-    final pos = await _locationController.lastKnownPosition();
+    final pos = await _userLocationManager.lastKnownPosition();
     if (pos == null) {
       Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
           'no user position available');
@@ -62,7 +62,7 @@ class LocationBasedUserLangsManager {
     }
 
     final address = addressRes.unwrap();
-    final countryCode = address.countryCode;
+    final countryCode = address.countryCode; // TODO: this
     if (countryCode == null) {
       Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
           'no country code: $address');

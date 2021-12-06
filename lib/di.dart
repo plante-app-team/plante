@@ -7,7 +7,7 @@ import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/ip_location_provider.dart';
-import 'package:plante/location/location_controller.dart';
+import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -58,7 +58,7 @@ void initDI() {
   GetIt.I.registerSingleton<HttpClient>(HttpClient());
   GetIt.I.registerSingleton<IpLocationProvider>(
       IpLocationProvider(GetIt.I.get<HttpClient>()));
-  GetIt.I.registerSingleton<LocationController>(LocationController(
+  GetIt.I.registerSingleton<UserLocationManager>(UserLocationManager(
       GetIt.I.get<IpLocationProvider>(),
       GetIt.I.get<PermissionsManager>(),
       GetIt.I.get<SharedPreferencesHolder>()));
@@ -84,7 +84,7 @@ void initDI() {
   GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
       GetIt.I.get<SysLangCodeHolder>(),
       GetIt.I.get<CountriesLangCodesTable>(),
-      GetIt.I.get<LocationController>(),
+      GetIt.I.get<UserLocationManager>(),
       GetIt.I.get<AddressObtainer>(),
       GetIt.I.get<SharedPreferencesHolder>(),
       GetIt.I.get<UserParamsController>(),
@@ -156,7 +156,7 @@ void initDI() {
       SafeFontEnvironmentDetector(
     GetIt.I.get<SysLangCodeHolder>(),
     GetIt.I.get<UserLangsManager>(),
-    GetIt.I.get<LocationController>(),
+    GetIt.I.get<UserLocationManager>(),
     GetIt.I.get<SharedPreferencesHolder>(),
     GetIt.I.get<AddressObtainer>(),
     GetIt.I.get<CountriesLangCodesTable>(),
