@@ -7,28 +7,27 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 
 /// Please use UserLangsManager instead of this class.
 class LocationBasedUserLangsManager {
   final CountriesLangCodesTable _langCodesTable;
-  final UserLocationManager _userLocationManager;
-  final AddressObtainer _addressObtainer;
   final Analytics _analytics;
   final LocationBasedUserLangsStorage _storage;
+  final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
   final _initCompleter = Completer<void>();
   Future<void> get initFuture => _initCompleter.future;
 
   LocationBasedUserLangsManager(
       this._langCodesTable,
-      this._userLocationManager,
-      this._addressObtainer,
+      UserLocationManager userLocationManager,
       this._analytics,
+      this._userAddressObtainer,
       SharedPreferencesHolder prefsHolder,
       {LocationBasedUserLangsStorage? storage})
       : _storage = storage ?? LocationBasedUserLangsStorage(prefsHolder) {
-    _userLocationManager.callWhenLastPositionKnown((_) async {
+    userLocationManager.callWhenLastPositionKnown((_) async {
       try {
         await _tryFirstInit();
       } finally {
@@ -44,28 +43,10 @@ class LocationBasedUserLangsManager {
       return;
     }
 
-    // We deliberately don't request current position because it
-    // requires the location permission and we want to be able to work
-    // without it.
-    final pos = await _userLocationManager.lastKnownPosition();
-    if (pos == null) {
-      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
-          'no user position available');
-      return;
-    }
-
-    final addressRes = await _addressObtainer.addressOfCoords(pos);
-    if (addressRes.isErr) {
-      Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
-          'OSM error: $addressRes');
-      return;
-    }
-
-    final address = addressRes.unwrap();
-    final countryCode = address.countryCode; // TODO: this
+    final countryCode = await _userAddressObtainer.getUserLocationCountryCode();
     if (countryCode == null) {
       Log.w('LocationBasedUserLangsManager: Cannot determine user langs - '
-          'no country code: $address');
+          'no country code');
       return;
     }
 

@@ -5,12 +5,11 @@ import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum OffShopsManagerError {
   NETWORK,
@@ -40,8 +39,7 @@ class OffShopsManager {
 
   final OffVeganBarcodesObtainer _veganBarcodesObtainer;
   final OffShopsListObtainer _shopsObtainer;
-  final LatestCameraPosStorage _cameraPosStorage;
-  final AddressObtainer _addressObtainer;
+  final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
   late final CachedOperation<OffShopsListWrapper, OffShopsManagerError>
       _offShopsOp;
@@ -56,7 +54,7 @@ class OffShopsManager {
   }
 
   OffShopsManager(this._veganBarcodesObtainer, this._shopsObtainer,
-      this._cameraPosStorage, this._addressObtainer) {
+      this._userAddressObtainer) {
     _offShopsOp = CachedOperation(_fetchOffShopsImpl);
     _countryCodeOp = CachedOperation(_getCountryCodeImpl);
   }
@@ -83,24 +81,10 @@ class OffShopsManager {
   }
 
   Future<Result<String, None>> _getCountryCodeImpl() async {
-    final cameraPos = await _cameraPosStorage.get();
-    if (cameraPos == null) {
-      Log.w('offShopsManager._getCountryCodeImpl: no camera pos');
-      return Err(None());
-    }
-
-    final addressRes =
-        await _addressObtainer.addressOfCoords(cameraPos); // TODO: this
-    if (addressRes.isErr) {
-      Log.w('offShopsManager._getCountryCodeImpl: '
-          'could not properly initialize because of $addressRes');
-      return Err(None());
-    }
-    final address = addressRes.unwrap();
-    final countryCode = address.countryCode;
+    final countryCode = await _userAddressObtainer.getCameraCountryCode();
     if (countryCode == null) {
       Log.w('offShopsManager._getCountryCodeImpl: '
-          'User is out of all countries! Coord: $cameraPos, addr: $address');
+          'could not find country code of camera');
       return Err(None());
     }
     return Ok(countryCode);

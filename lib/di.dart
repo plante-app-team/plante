@@ -28,6 +28,7 @@ import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_cacher.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
@@ -81,11 +82,18 @@ void initDI() {
   ));
   GetIt.I.registerSingleton<AddressObtainer>(
       AddressObtainer(GetIt.I.get<OpenStreetMap>()));
+  GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
+      CachingUserAddressPiecesObtainer(
+    GetIt.I.get<SharedPreferencesHolder>(),
+    GetIt.I.get<UserLocationManager>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
+    GetIt.I.get<AddressObtainer>(),
+  ));
   GetIt.I.registerSingleton<UserLangsManager>(UserLangsManager(
       GetIt.I.get<SysLangCodeHolder>(),
       GetIt.I.get<CountriesLangCodesTable>(),
       GetIt.I.get<UserLocationManager>(),
-      GetIt.I.get<AddressObtainer>(),
+      GetIt.I.get<CachingUserAddressPiecesObtainer>(),
       GetIt.I.get<SharedPreferencesHolder>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<Backend>(),
@@ -119,8 +127,7 @@ void initDI() {
   GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
     GetIt.I.get<OffVeganBarcodesObtainer>(),
     GetIt.I.get<OffShopsListObtainer>(),
-    GetIt.I.get<LatestCameraPosStorage>(),
-    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<CachingUserAddressPiecesObtainer>(),
   ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),
@@ -156,9 +163,8 @@ void initDI() {
       SafeFontEnvironmentDetector(
     GetIt.I.get<SysLangCodeHolder>(),
     GetIt.I.get<UserLangsManager>(),
-    GetIt.I.get<UserLocationManager>(),
     GetIt.I.get<SharedPreferencesHolder>(),
-    GetIt.I.get<AddressObtainer>(),
     GetIt.I.get<CountriesLangCodesTable>(),
+    GetIt.I.get<CachingUserAddressPiecesObtainer>(),
   ));
 }

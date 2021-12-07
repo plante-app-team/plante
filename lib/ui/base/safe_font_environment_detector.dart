@@ -4,11 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_langs.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 const PREF_LAST_LOCATION_LANGS =
@@ -23,10 +22,9 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
 
   final SysLangCodeHolder _sysLangCodeHolder;
   final UserLangsManager _locationLangsManager;
-  final UserLocationManager _userLocationManager;
   final SharedPreferencesHolder _prefsHolder;
-  final AddressObtainer _addressObtainer;
   final CountriesLangCodesTable _countriesLangsTable;
+  final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
   List<String>? _lastUserLangs;
   List<String>? _lastLocationLangCodes;
@@ -38,10 +36,9 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
   SafeFontEnvironmentDetector(
       this._sysLangCodeHolder,
       this._locationLangsManager,
-      this._userLocationManager,
       this._prefsHolder,
-      this._addressObtainer,
-      this._countriesLangsTable) {
+      this._countriesLangsTable,
+      this._userAddressObtainer) {
     _locationLangsManager.addObserver(this);
     _initAsync();
   }
@@ -63,20 +60,7 @@ class SafeFontEnvironmentDetector implements UserLangsManagerObserver {
   }
 
   Future<List<String>?> _obtainLocalLangCodes() async {
-    final lastKnownPos = await _userLocationManager.lastKnownPosition();
-    if (lastKnownPos == null) {
-      Log.w('SafeFontEnvironmentDetector could not obtain last pos');
-      return null;
-    }
-
-    final addressRes = await _addressObtainer.addressOfCoords(lastKnownPos);
-    if (addressRes.isErr) {
-      Log.w('SafeFontEnvironmentDetector could not obtain address of user pos');
-      return null;
-    }
-
-    final address = addressRes.unwrap();
-    final countryCode = address.countryCode; // TODO: this
+    final countryCode = await _userAddressObtainer.getUserLocationCountryCode();
     if (countryCode == null) {
       Log.w('SafeFontEnvironmentDetector could not obtain country of user pos');
       return null;

@@ -1,29 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/model/coord.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/outside/map/osm/open_street_map.dart';
-import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
-import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_off_shops_list_obtainer.dart';
 import '../../z_fakes/fake_off_vegan_barcodes_obtainer.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 
 // ignore_for_file: cancel_subscriptions
 
 void main() {
   late FakeOffVeganBarcodesObtainer barcodesObtainer;
   late FakeOffShopsListObtainer offShopsListObtainer;
-  late LatestCameraPosStorage cameraPosStorage;
-  late MockAddressObtainer addressObtainer;
+  late FakeCachingUserAddressPiecesObtainer addressObtainer;
   late OffShopsManager offShopsManager;
 
   final someOffShops = [
@@ -47,12 +42,10 @@ void main() {
   setUp(() async {
     barcodesObtainer = FakeOffVeganBarcodesObtainer();
     offShopsListObtainer = FakeOffShopsListObtainer();
-    cameraPosStorage =
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
-    addressObtainer = MockAddressObtainer();
+    addressObtainer = FakeCachingUserAddressPiecesObtainer();
 
-    offShopsManager = OffShopsManager(barcodesObtainer, offShopsListObtainer,
-        cameraPosStorage, addressObtainer);
+    offShopsManager = OffShopsManager(
+        barcodesObtainer, offShopsListObtainer, addressObtainer);
   });
 
   tearDown(() {
@@ -60,18 +53,11 @@ void main() {
   });
 
   Future<void> _initShops({
-    required Coord? cameraPos,
-    required Result<OsmAddress, OpenStreetMapError> addressOfAnyCoords,
+    required String? countryCode,
     required Result<List<OffShop>, OffShopsListObtainerError> offApiShops,
   }) async {
-    if (cameraPos != null) {
-      await cameraPosStorage.set(cameraPos);
-    }
-
-    when(addressObtainer.addressOfCoords(any))
-        .thenAnswer((_) async => addressOfAnyCoords);
-
-    final countryCode = addressOfAnyCoords.maybeOk()?.countryCode;
+    addressObtainer.setResultFor(UserAddressType.CAMERA_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, countryCode);
     if (countryCode != null) {
       offShopsListObtainer.setShopsForCountry(countryCode, offApiShops);
     }
@@ -87,9 +73,7 @@ void main() {
 
   test('fetch shops', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
       offApiShops: Ok(someOffShops),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -97,22 +81,10 @@ void main() {
     expect(shops, equals(someOffShops));
   });
 
-  test('fetch shops when no camera pos', () async {
+  test('fetch shops when no country code', () async {
     await _initShops(
-      cameraPos: null,
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: null,
       offApiShops: Ok(someOffShops),
-    );
-    final shopsResult = await offShopsManager.fetchOffShops();
-    expect(shopsResult.isErr, isTrue);
-  });
-
-  test('fetch shops when cannot obtain OSM address', () async {
-    await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Err(OpenStreetMapError.OTHER),
-      offApiShops: Ok(const []),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
     expect(shopsResult.isErr, isTrue);
@@ -120,9 +92,7 @@ void main() {
 
   test('do not fetch shops when country not in enabled list', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      countryCode: CountryCode.RUSSIA,
       offApiShops: Ok(const []),
     );
     final shopsResult = await offShopsManager.fetchOffShops();
@@ -130,21 +100,9 @@ void main() {
     expect(shopsResult.unwrap().isEmpty, isTrue);
   });
 
-  test('fetch shops when address does not have country code', () async {
-    await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords: Ok(OsmAddress((e) => e.countryCode = null)),
-      offApiShops: Ok(someOffShops),
-    );
-    final shopsResult = await offShopsManager.fetchOffShops();
-    expect(shopsResult.isErr, isTrue);
-  });
-
   test('fetch barcodes good scenario', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
       offApiShops: Ok(someOffShops),
     );
 
@@ -175,9 +133,7 @@ void main() {
 
   test('fetch barcodes when could not fetch shops', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
       offApiShops: Err(OffShopsListObtainerError.OTHER), // ERROR!!!!!!!!!!!!
     );
 
@@ -195,9 +151,7 @@ void main() {
 
   test('fetch barcodes for country not in allowedList', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      countryCode: CountryCode.RUSSIA,
       offApiShops: Ok(someOffShops),
     );
 
@@ -216,9 +170,7 @@ void main() {
 
   test('fetch barcodes can be canceled', () async {
     await _initShops(
-      cameraPos: Coord(lat: 10, lon: 10),
-      addressOfAnyCoords:
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
       offApiShops: Ok(someOffShops),
     );
     _initOffShopBarcodes(
@@ -267,9 +219,7 @@ void main() {
 
     final initTest = () async {
       await _initShops(
-        cameraPos: Coord(lat: 10, lon: 10),
-        addressOfAnyCoords:
-            Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+        countryCode: CountryCode.BELGIUM,
         offApiShops: Ok(shops),
       );
       _initOffShopBarcodes(
@@ -280,8 +230,8 @@ void main() {
       );
       // Old [offShopsManager] will have cache, we don't want cache
       offShopsManager.dispose();
-      offShopsManager = OffShopsManager(barcodesObtainer, offShopsListObtainer,
-          cameraPosStorage, addressObtainer);
+      offShopsManager = OffShopsManager(
+          barcodesObtainer, offShopsListObtainer, addressObtainer);
     };
     await initTest();
 
