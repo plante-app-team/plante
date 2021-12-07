@@ -210,9 +210,14 @@ class ShopProductRangePageTestCommons {
         aShop.osmUID, products.map((e) => e.barcode));
   }
 
-  void setConfirmedProducts(List<Product> products) {
+  void setConfirmedProducts(List<Product> products,
+      [Map<String, int>? lastSeen]) {
     productsObtainer.addKnownProducts(products);
-    shopsManager.setShopRange(aShop.osmUID,
-        Ok(range.rebuild((e) => e.products = ListBuilder(products))));
+    shopsManager.setShopRange(aShop.osmUID, Ok(range.rebuild((e) {
+      e.products = ListBuilder(products);
+      if (lastSeen != null) {
+        e.productsLastSeenSecsUtc = MapBuilder(lastSeen);
+      }
+    })));
   }
 }
