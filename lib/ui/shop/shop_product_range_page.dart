@@ -13,7 +13,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
@@ -104,7 +104,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<AddressObtainer>(),
-      GetIt.I.get<OffShopsManager>(),
+      GetIt.I.get<CachingUserAddressPiecesObtainer>(),
       widget.shop,
       updateCallback,
     );

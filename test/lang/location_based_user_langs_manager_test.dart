@@ -1,19 +1,19 @@
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/location_based_user_langs_manager.dart';
 import 'package:plante/lang/location_based_user_langs_storage.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/country_code.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/outside/map/osm/open_street_map.dart';
-import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
 import '../z_fakes/fake_analytics.dart';
+import '../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../z_fakes/fake_shared_preferences.dart';
 import 'location_based_user_langs_manager_test.mocks.dart';
 
@@ -21,7 +21,7 @@ import 'location_based_user_langs_manager_test.mocks.dart';
 void main() {
   late CountriesLangCodesTable countriesLangCodesTable;
   late MockUserLocationManager userLocationManager;
-  late MockAddressObtainer addressObtainer;
+  late FakeCachingUserAddressPiecesObtainer addressObtainer;
   late MockLocationBasedUserLangsStorage storage;
   late FakeAnalytics analytics;
   late LocationBasedUserLangsManager userLangsManager;
@@ -30,7 +30,7 @@ void main() {
     analytics = FakeAnalytics();
     countriesLangCodesTable = CountriesLangCodesTable(analytics);
     userLocationManager = MockUserLocationManager();
-    addressObtainer = MockAddressObtainer();
+    addressObtainer = FakeCachingUserAddressPiecesObtainer();
     storage = MockLocationBasedUserLangsStorage();
 
     when(storage.userLangs()).thenAnswer((_) async => null);
@@ -42,28 +42,42 @@ void main() {
 
   Future<void> finishSetUp({
     required Coord? lastPos,
-    required ResCallback<Result<OsmAddress, OpenStreetMapError>> addressResp,
+    required String? countryCode,
+    bool withInitialLastPos = true,
+    Duration? initWaitTimeout,
   }) async {
-    final initialLastPos = Coord(lat: 0, lon: 0);
-    when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
-      final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
-      callback.call(initialLastPos);
-    });
+    if (withInitialLastPos) {
+      final initialLastPos = Coord(lat: 0, lon: 0);
+      when(userLocationManager.callWhenLastPositionKnown(any))
+          .thenAnswer((invc) {
+        final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
+        callback.call(initialLastPos);
+      });
+    } else {
+      when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((_) {
+        // Nothing
+      });
+    }
 
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => lastPos);
-    when(addressObtainer.addressOfCoords(any))
-        .thenAnswer((_) async => addressResp.call());
+    addressObtainer.setResultFor(UserAddressType.USER_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, countryCode);
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
       userLocationManager,
-      addressObtainer,
       analytics,
+      addressObtainer,
       FakeSharedPreferences().asHolder(),
       storage: storage,
     );
-    await userLangsManager.initFuture;
+    if (initWaitTimeout != null) {
+      await userLangsManager.initFuture
+          .timeout(initWaitTimeout, onTimeout: () {});
+    } else {
+      await userLangsManager.initFuture;
+    }
   }
 
   test('init with existing user langs', () async {
@@ -72,7 +86,7 @@ void main() {
 
     await finishSetUp(
       lastPos: null,
-      addressResp: () => Err(OpenStreetMapError.OTHER),
+      countryCode: null,
     );
 
     expect(await userLangsManager.getUserLangs(), equals(existingLangs));
@@ -82,8 +96,7 @@ void main() {
   test('first init good scenario', () async {
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () =>
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
     );
 
     final expectedUserLangs = [LangCode.nl, LangCode.fr, LangCode.de];
@@ -93,29 +106,20 @@ void main() {
 
   test('first init without last known pos', () async {
     await finishSetUp(
+      withInitialLastPos: false,
+      initWaitTimeout: const Duration(milliseconds: 250),
       lastPos: null,
-      addressResp: () =>
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
     );
 
     expect(await userLangsManager.getUserLangs(), isNull);
     verifyNever(storage.setUserLangs(any));
   });
 
-  test('first init without osm address (on osm error)', () async {
+  test('first init without country code', () async {
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Err(OpenStreetMapError.OTHER),
-    );
-
-    expect(await userLangsManager.getUserLangs(), isNull);
-    verifyNever(storage.setUserLangs(any));
-  });
-
-  test('first init without osm country', () async {
-    await finishSetUp(
-      lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.houseNumber = '10')),
+      countryCode: null,
     );
 
     expect(await userLangsManager.getUserLangs(), isNull);
@@ -125,7 +129,7 @@ void main() {
   test('first init without lang codes for country', () async {
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () => Ok(OsmAddress((e) => e.countryCode = 'invalid_code')),
+      countryCode: 'invalid_code',
     );
 
     expect(await userLangsManager.getUserLangs(), isNull);
@@ -138,14 +142,14 @@ void main() {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
     });
 
-    when(addressObtainer.addressOfCoords(any)).thenAnswer((_) async =>
-        Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)));
+    addressObtainer.setResultFor(UserAddressType.USER_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, CountryCode.BELGIUM);
 
     userLangsManager = LocationBasedUserLangsManager(
       countriesLangCodesTable,
       userLocationManager,
-      addressObtainer,
       FakeAnalytics(),
+      addressObtainer,
       FakeSharedPreferences().asHolder(),
       storage: storage,
     );
@@ -168,8 +172,7 @@ void main() {
 
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () =>
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.RUSSIA)),
+      countryCode: CountryCode.RUSSIA,
     );
 
     expect(analytics.wasEventSent('single_lang_country'), isTrue);
@@ -181,8 +184,7 @@ void main() {
 
     await finishSetUp(
       lastPos: Coord(lat: 2, lon: 1),
-      addressResp: () =>
-          Ok(OsmAddress((e) => e.countryCode = CountryCode.BELGIUM)),
+      countryCode: CountryCode.BELGIUM,
     );
 
     expect(analytics.wasEventSent('single_lang_country'), isFalse);

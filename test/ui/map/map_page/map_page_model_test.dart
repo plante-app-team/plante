@@ -9,6 +9,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 
@@ -17,6 +18,7 @@ void main() {
   late FakeShopsManager fakeShopsManager;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late MockAddressObtainer addressObtainer;
+  late FakeCachingUserAddressPiecesObtainer userAddressObtainer;
   late FakeSuggestedProductsManager suggestedProductsManager;
   late MapPageModel model;
 
@@ -44,6 +46,7 @@ void main() {
     fakeShopsManager = FakeShopsManager();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     addressObtainer = MockAddressObtainer();
+    userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
 
     final directionsManager = MockDirectionsManager();
     when(directionsManager.areDirectionsAvailable())
@@ -57,7 +60,8 @@ void main() {
         addressObtainer,
         latestCameraPosStorage,
         directionsManager,
-        suggestedProductsManager, (shops) {
+        suggestedProductsManager,
+        userAddressObtainer, (shops) {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;

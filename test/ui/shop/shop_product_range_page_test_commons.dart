@@ -12,6 +12,7 @@ import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
@@ -30,7 +31,9 @@ import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
@@ -38,8 +41,8 @@ import 'package:plante/ui/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
-import '../../z_fakes/fake_off_shops_manager.dart';
 import '../../z_fakes/fake_products_at_shops_extra_properties_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
@@ -48,14 +51,16 @@ import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 class ShopProductRangePageTestCommons {
+  final countryCode = CountryCode.FRANCE;
+
   late final FakeShopsManager shopsManager;
   late final FakeUserParamsController userParamsController;
   late final MockProductsManager productsManager;
   late final MockPermissionsManager permissionsManager;
   late final MockAddressObtainer addressObtainer;
+  late final FakeCachingUserAddressPiecesObtainer userAddressObtainer;
   late final FakeProductsObtainer productsObtainer;
   late final FakeSuggestedProductsManager suggestedProductsManager;
-  late final FakeOffShopsManager offShopsManager;
   late final ProductsAtShopsExtraPropertiesManager productsExtraProperties;
 
   late final Shop aShop;
@@ -174,12 +179,15 @@ class ShopProductRangePageTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-    offShopsManager = FakeOffShopsManager();
-    GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
     when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
     productsExtraProperties = FakeProductsAtShopsExtraPropertiesManager();
     GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
         productsExtraProperties);
+    userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    userAddressObtainer.setResultFor(UserAddressType.CAMERA_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, countryCode);
+    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
+        userAddressObtainer);
 
     final params = UserParams((v) => v.name = 'Bob');
     await userParamsController.setUserParams(params);

@@ -16,7 +16,7 @@ class FakeSuggestedProductsManager implements SuggestedProductsManager {
 
   @override
   Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
-      getSuggestedBarcodes(Iterable<Shop> shops) async* {
+      getSuggestedBarcodes(Iterable<Shop> shops, String countryCode) async* {
     for (final shop in shops) {
       final suggestions = _suggestions[shop.osmUID];
       if (suggestions == null) {

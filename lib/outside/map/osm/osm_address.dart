@@ -26,6 +26,11 @@ abstract class OsmAddress implements Built<OsmAddress, OsmAddressBuilder> {
         .deserializeWith(OsmAddress.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory OsmAddress([void Function(OsmAddressBuilder) updates]) = _$OsmAddress;
   OsmAddress._();
   static Serializer<OsmAddress> get serializer => _$osmAddressSerializer;

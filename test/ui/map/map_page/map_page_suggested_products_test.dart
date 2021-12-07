@@ -76,7 +76,8 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStream = _SuggestionsStream();
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getSuggestedBarcodes(any)).thenAnswer((_) {
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+        .thenAnswer((_) {
       return suggestionsStream.stream;
     });
     GetIt.I.unregister(instance: commons.suggestedProductsManager);
@@ -134,7 +135,8 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStreams = <_SuggestionsStream>[];
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getSuggestedBarcodes(any)).thenAnswer((_) {
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+        .thenAnswer((_) {
       suggestionsStreams.add(_SuggestionsStream());
       return suggestionsStreams.last.stream;
     });

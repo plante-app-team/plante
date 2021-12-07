@@ -14,7 +14,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/shop/_confirmed_products_model.dart';
@@ -23,10 +23,10 @@ import 'package:plante/ui/shop/_suggested_products_model.dart';
 class ShopProductRangePageModel {
   final UserParamsController _userParamsController;
   final AddressObtainer _addressObtainer;
+  final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
   late final ConfirmedProductsModel _confirmedProductsModel;
   late final SuggestedProductsModel _suggestedProductsModel;
-  final OffShopsManager _offShopsManager;
 
   final Shop _shop;
   late final FutureShortAddress _address;
@@ -55,7 +55,7 @@ class ShopProductRangePageModel {
       ProductsAtShopsExtraPropertiesManager productsExtraProperties,
       this._userParamsController,
       this._addressObtainer,
-      this._offShopsManager,
+      this._userAddressObtainer,
       this._shop,
       this._updateCallback) {
     _confirmedProductsModel =
@@ -65,6 +65,7 @@ class ShopProductRangePageModel {
         productsObtainer,
         productsExtraProperties,
         shopsManager,
+        _obtainCountryCodeOfShop(),
         _shop,
         _updateCallback);
     _address = _addressObtainer.addressOfShop(_shop);
@@ -104,7 +105,13 @@ class ShopProductRangePageModel {
   }
 
   Future<Country?> obtainCountryOfShop() async {
-    final offShop = await _offShopsManager.findOffShopByName(_shop.name);
-    return CountryTable.getCountry(offShop.maybeOk()?.country);
+    return CountryTable.getCountry(await _obtainCountryCodeOfShop());
+  }
+
+  Future<String?> _obtainCountryCodeOfShop() async {
+    // We'll assume the opened shop is visible to the user.
+    // NOTE: it's a bad assumption if the page will ever be opened
+    // by ways other than just clicking on shops.
+    return await _userAddressObtainer.getCameraCountryCode();
   }
 }

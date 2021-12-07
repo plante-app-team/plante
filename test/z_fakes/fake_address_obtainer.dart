@@ -6,16 +6,22 @@ import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 
 class FakeAddressObtainer implements AddressObtainer {
-  OsmAddress? _addressForAllRequests;
+  OsmAddress? _defaultResponse;
+  final Map<Coord, OsmAddress> _responses = {};
 
-  void setResponse(OsmAddress? response) {
-    _addressForAllRequests = response;
+  void setDefaultResponse(OsmAddress? response) {
+    _defaultResponse = response;
+  }
+
+  void setResponse(Coord coord, OsmAddress address) {
+    _responses[coord] = address;
   }
 
   @override
   FutureAddress addressOfCoords(Coord coords) async {
-    if (_addressForAllRequests != null) {
-      return Ok(_addressForAllRequests!);
+    final response = _responses[coords] ?? _defaultResponse;
+    if (response != null) {
+      return Ok(response);
     } else {
       return Err(OpenStreetMapError.OTHER);
     }
@@ -23,8 +29,9 @@ class FakeAddressObtainer implements AddressObtainer {
 
   @override
   FutureShortAddress shortAddressOfCoords(Coord coords) async {
-    if (_addressForAllRequests != null) {
-      return Ok(_addressForAllRequests!.toShort());
+    final response = _responses[coords] ?? _defaultResponse;
+    if (response != null) {
+      return Ok(response.toShort());
     } else {
       return Err(OpenStreetMapError.OTHER);
     }

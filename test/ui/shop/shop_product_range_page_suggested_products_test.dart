@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/model/country.dart';
-import 'package:plante/model/country_code.dart';
 import 'package:plante/model/country_table.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
@@ -13,12 +11,14 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/shop/_suggested_products_model.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';
 
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_off_shops_manager.dart';
+import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
@@ -28,7 +28,7 @@ void main() {
   late ShopProductRangePageTestCommons commons;
   late FakeSuggestedProductsManager suggestedProductsManager;
   late FakeProductsObtainer productsObtainer;
-  late FakeOffShopsManager offShopsManager;
+  late FakeCachingUserAddressPiecesObtainer userAddressObtainer;
   late ProductsAtShopsExtraPropertiesManager productsExtraProperties;
   late FakeShopsManager shopsManager;
 
@@ -43,7 +43,7 @@ void main() {
     suggestedProducts = commons.suggestedProducts;
     suggestedProductsManager = commons.suggestedProductsManager;
     productsObtainer = commons.productsObtainer;
-    offShopsManager = commons.offShopsManager;
+    userAddressObtainer = commons.userAddressObtainer;
     productsExtraProperties = commons.productsExtraProperties;
     shopsManager = commons.shopsManager;
     // Let's remove the confirmed products so it would be easier
@@ -52,51 +52,52 @@ void main() {
     commons.setConfirmedProducts(const []);
   });
 
-  testWidgets('suggested products title offShop not found',
-      (WidgetTester tester) async {
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    final context = await tester.superPump(widget);
-
-    final title = context
-        .strings.shop_product_range_page_suggested_products_country_unknown
-        .replaceAll('<SHOP>', aShop.name);
-    expect(find.text(title), findsOneWidget);
-    final Country? france = CountryTable.getCountry(CountryCode.FRANCE);
-    final countryTitle = context
-        .strings.shop_product_range_page_suggested_products_country
-        .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', france!.localize(context)!);
-    expect(find.text(countryTitle), findsNothing);
-  });
-
   testWidgets('suggested products title with country',
       (WidgetTester tester) async {
-    final france = CountryTable.getCountry(CountryCode.FRANCE);
-    offShopsManager.setOffShop(CountryCode.FRANCE, aShop.name);
+    final country = CountryTable.getCountry(commons.countryCode);
+    userAddressObtainer.setResultFor(UserAddressType.CAMERA_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, commons.countryCode);
+
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
+
+    // Title here
     final title = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', france!.localize(context)!);
+        .replaceAll('<COUNTRY>', country!.localize(context)!);
     expect(find.text(title), findsOneWidget);
+
+    // Suggested products are also here (checking just in case)
+    expect(find.text(suggestedProducts[0].name!), findsOneWidget);
+    expect(find.text(suggestedProducts[1].name!), findsOneWidget);
   });
 
-  testWidgets('suggested products title without country',
+  testWidgets('no suggested products without country',
       (WidgetTester tester) async {
-    offShopsManager.setOffShop('invalid_country_code', aShop.name);
+    userAddressObtainer.setResultFor(
+        UserAddressType.CAMERA_LOCATION, UserAddressPiece.COUNTRY_CODE, null);
+
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
-    final france = CountryTable.getCountry(CountryCode.FRANCE);
+
+    // No title 1
     final title = context
         .strings.shop_product_range_page_suggested_products_country_unknown
         .replaceAll('<SHOP>', aShop.name);
-    expect(find.text(title), findsOneWidget);
+    expect(find.text(title), findsNothing);
+
+    // No title 2
+    final country = CountryTable.getCountry(commons.countryCode);
     final countryTitle = context
         .strings.shop_product_range_page_suggested_products_country
         .replaceAll('<SHOP>', aShop.name)
-        .replaceAll('<COUNTRY>', france!.localize(context)!);
+        .replaceAll('<COUNTRY>', country!.localize(context)!);
     expect(find.text(countryTitle), findsNothing);
+
+    // No suggested products
+    expect(find.text(suggestedProducts[0].name!), findsNothing);
+    expect(find.text(suggestedProducts[1].name!), findsNothing);
   });
 
   testWidgets(

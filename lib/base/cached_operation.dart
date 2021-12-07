@@ -25,6 +25,10 @@ class CachedOperation<T, E> {
 
   CachedOperation(this._fn);
 
+  static CachedOperation<T, None> alwaysOk<T>(ResCallback<Future<T>> fn) {
+    return CachedOperation(() async => Ok(await fn.call()));
+  }
+
   Future<Result<T, E>> get result {
     if (_result != null) {
       // Result is already available!

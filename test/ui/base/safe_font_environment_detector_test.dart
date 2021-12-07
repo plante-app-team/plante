@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
-import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
-import 'package:plante/outside/map/osm/osm_address.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:test/test.dart';
 
-import '../../z_fakes/fake_address_obtainer.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
-import '../../z_fakes/fake_user_location_manager.dart';
 
 void main() {
   final unsafeLang =
@@ -20,9 +19,8 @@ void main() {
 
   late SysLangCodeHolder sysLangCodeHolder;
   late FakeUserLangsManager userLangsManager;
-  late FakeUserLocationManager userLocationManager;
   late FakeSharedPreferences prefs;
-  late FakeAddressObtainer addressObtainer;
+  late FakeCachingUserAddressPiecesObtainer addressObtainer;
   late CountriesLangCodesTable countriesLangsTable;
 
   late SafeFontEnvironmentDetector safeFontEnvDetector;
@@ -30,9 +28,8 @@ void main() {
   setUp(() async {
     sysLangCodeHolder = SysLangCodeHolder();
     userLangsManager = FakeUserLangsManager([LangCode.en]);
-    userLocationManager = FakeUserLocationManager();
     prefs = FakeSharedPreferences();
-    addressObtainer = FakeAddressObtainer();
+    addressObtainer = FakeCachingUserAddressPiecesObtainer();
     countriesLangsTable = CountriesLangCodesTable(FakeAnalytics());
   });
 
@@ -47,22 +44,15 @@ void main() {
     if (userLangs != null) {
       await userLangsManager.setManualUserLangs(userLangs);
     }
-    if (userCountry != null) {
-      userLocationManager.setCurrentPosition(Coord(lat: 1, lon: 1));
-      addressObtainer
-          .setResponse(OsmAddress((e) => e.countryCode = userCountry));
-    } else {
-      userLocationManager.setCurrentPosition(null);
-      addressObtainer.setResponse(null);
-    }
+    addressObtainer.setResultFor(UserAddressType.USER_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, userCountry);
 
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      userLocationManager,
       prefs.asHolder(),
-      addressObtainer,
       countriesLangsTable,
+      addressObtainer,
     );
     await safeFontEnvDetector.initFuture;
   }
@@ -155,10 +145,9 @@ void main() {
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      userLocationManager,
       prefs.asHolder(),
-      addressObtainer,
       countriesLangsTable,
+      addressObtainer,
     );
     expect(safeFontEnvDetector.shouldUseSafeFont(), isFalse);
     await safeFontEnvDetector.initFuture;
@@ -174,10 +163,9 @@ void main() {
     safeFontEnvDetector = SafeFontEnvironmentDetector(
       sysLangCodeHolder,
       userLangsManager,
-      userLocationManager,
       prefs.asHolder(),
-      addressObtainer,
       countriesLangsTable,
+      addressObtainer,
     );
     expect(safeFontEnvDetector.shouldUseSafeFont(), isTrue);
     await safeFontEnvDetector.initFuture;

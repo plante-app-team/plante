@@ -23,6 +23,9 @@ import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -30,6 +33,7 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
@@ -80,6 +84,11 @@ class MapPageModesTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
+    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    userAddressObtainer.setResultFor(
+        UserAddressType.CAMERA_LOCATION, UserAddressPiece.COUNTRY_CODE, 'be');
+    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
+        userAddressObtainer);
 
     await fillFetchedShops();
 

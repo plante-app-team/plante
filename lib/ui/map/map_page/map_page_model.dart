@@ -20,6 +20,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
@@ -44,6 +45,7 @@ class MapPageModel implements ShopsManagerListener {
   final LatestCameraPosStorage _latestCameraPosStorage;
   final DirectionsManager _directionsManager;
   final SuggestedProductsManager _suggestedProductsManager;
+  final CachingUserAddressPiecesObtainer _userAddressPiecesObtainer;
 
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
@@ -64,6 +66,7 @@ class MapPageModel implements ShopsManagerListener {
       this._latestCameraPosStorage,
       this._directionsManager,
       this._suggestedProductsManager,
+      this._userAddressPiecesObtainer,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
@@ -172,6 +175,11 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<void> _fetchOffShopsProductsData() async {
+    final countryCode = await _userAddressPiecesObtainer.getCameraCountryCode();
+    if (countryCode == null) {
+      return;
+    }
+
     // Let's see which of the shops we display on the map
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values;
@@ -191,7 +199,7 @@ class MapPageModel implements ShopsManagerListener {
       lastAbsorbTime = DateTime.now();
     };
     _suggestedBarcodesSubscription = _suggestedProductsManager
-        .getSuggestedBarcodes(shopsOnMap)
+        .getSuggestedBarcodes(shopsOnMap, countryCode)
         .listen((event) {
       if (event.isErr) {
         return;
