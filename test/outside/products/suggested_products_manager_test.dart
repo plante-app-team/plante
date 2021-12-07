@@ -75,13 +75,13 @@ void main() {
           ..name = 'Auchan'))),
     ];
 
-    var suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesMap([shops[0]]);
+    var suggestionsRes = await suggestedProductsManager
+        .getSuggestedBarcodesMap([shops[0]], 'ru');
     var suggestions = suggestionsRes.unwrap();
     expect(suggestions, equals({shops[0].osmUID: allSuggestions[offShops[0]]}));
 
     suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesMap(shops);
+        await suggestedProductsManager.getSuggestedBarcodesMap(shops, 'ru');
     suggestions = suggestionsRes.unwrap();
     expect(
         suggestions,
@@ -133,7 +133,7 @@ void main() {
         true);
 
     final suggestionsRes =
-        await suggestedProductsManager.getSuggestedBarcodesMap(shops);
+        await suggestedProductsManager.getSuggestedBarcodesMap(shops, 'ru');
     final suggestions = suggestionsRes.unwrap();
     expect(
         suggestions,
@@ -179,7 +179,7 @@ void main() {
     ];
 
     var stream = suggestedProductsManager
-        .getSuggestedBarcodes(shops)
+        .getSuggestedBarcodes(shops, 'ru')
         .asBroadcastStream();
     var calls = 0;
     StreamSubscription? subs;
@@ -198,7 +198,7 @@ void main() {
     // cancellation.
 
     stream = suggestedProductsManager
-        .getSuggestedBarcodes(shops)
+        .getSuggestedBarcodes(shops, 'ru')
         .asBroadcastStream();
     calls = 0;
     subs = stream.listen((event) {

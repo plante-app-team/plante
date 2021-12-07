@@ -23,22 +23,9 @@ class FakeOffShopsManager implements OffShopsManager {
   }
 
   @override
-  Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops() async {
+  Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops(
+      String countryCode) async {
     return Ok(_suggestedBarcodes.keys.toList());
-  }
-
-  @override
-  Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesMap(Set<String> shopsNames) async {
-    final ShopNamesAndBarcodesMap result = {};
-    for (final name in shopsNames) {
-      for (final shop in _suggestedBarcodes.keys) {
-        if (shop.id == OffShop.shopNameToPossibleOffShopID(name)) {
-          result[name] = _suggestedBarcodes[shop]!;
-        }
-      }
-    }
-    return Ok(result);
   }
 
   @override
@@ -48,7 +35,7 @@ class FakeOffShopsManager implements OffShopsManager {
 
   @override
   Future<Result<OffShop, OffShopsManagerError>> findOffShopByName(
-      String name) async {
+      String name, String countryCode) async {
     if (_offShop.name == name) {
       return Ok(_offShop);
     }
@@ -57,15 +44,13 @@ class FakeOffShopsManager implements OffShopsManager {
 
   @override
   Stream<Result<ShopNameBarcodesPair, OffShopsManagerError>> fetchVeganBarcodes(
-      Set<String> shopsNames) async* {
-    final mapRes = await fetchVeganBarcodesMap(shopsNames);
-    if (mapRes.isErr) {
-      yield Err(mapRes.unwrapErr());
-      return;
-    }
-    final map = mapRes.unwrap();
-    for (final entry in map.entries) {
-      yield Ok(Pair(entry.key, entry.value));
+      Set<String> shopsNames, String countryCode) async* {
+    for (final name in shopsNames) {
+      for (final shop in _suggestedBarcodes.keys) {
+        if (shop.id == OffShop.shopNameToPossibleOffShopID(name)) {
+          yield Ok(Pair(name, _suggestedBarcodes[shop]!));
+        }
+      }
     }
   }
 }

@@ -652,39 +652,31 @@ class MockOffShopsManager extends _i1.Mock implements _i44.OffShopsManager {
       returnValueForMissingStub: null);
   @override
   _i9.Future<_i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>
-      findOffShopByName(String? name) => (super.noSuchMethod(
-          Invocation.method(#findOffShopByName, [name]),
+      findOffShopByName(String? name, String? countryCode) => (super.noSuchMethod(
+          Invocation.method(#findOffShopByName, [name, countryCode]),
           returnValue: Future<
                   _i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>.value(
               _FakeResult_0<_i43.OffShop?, _i44.OffShopsManagerError>())) as _i9
           .Future<_i2.Result<_i43.OffShop?, _i44.OffShopsManagerError>>);
   @override
   _i9.Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>
-      fetchOffShops() => (super.noSuchMethod(
-          Invocation.method(#fetchOffShops, []),
+      fetchOffShops(String? countryCode) => (super.noSuchMethod(
+          Invocation.method(#fetchOffShops, [countryCode]),
           returnValue:
               Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>.value(
                   _FakeResult_0<List<_i43.OffShop>,
                       _i44.OffShopsManagerError>())) as _i9
           .Future<_i2.Result<List<_i43.OffShop>, _i44.OffShopsManagerError>>);
   @override
-  _i9.Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>
-      fetchVeganBarcodesMap(Set<String>? shopsNames) => (super.noSuchMethod(
-              Invocation.method(#fetchVeganBarcodesMap, [shopsNames]),
-              returnValue:
-                  Future<_i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>.value(
-                      _FakeResult_0<Map<String, List<String>>, _i44.OffShopsManagerError>()))
-          as _i9.Future<
-              _i2.Result<Map<String, List<String>>, _i44.OffShopsManagerError>>);
-  @override
   _i9.Stream<_i2.Result<_i45.Pair<String, List<String>>, _i44.OffShopsManagerError>>
-      fetchVeganBarcodes(Set<String>? shopsNames) => (super.noSuchMethod(
-              Invocation.method(#fetchVeganBarcodes, [shopsNames]),
-              returnValue:
-                  Stream<_i2.Result<_i45.Pair<String, List<String>>, _i44.OffShopsManagerError>>.empty())
-          as _i9.Stream<
-              _i2.Result<_i45.Pair<String, List<String>>,
-                  _i44.OffShopsManagerError>>);
+      fetchVeganBarcodes(Set<String>? shopsNames, String? countryCode) =>
+          (super.noSuchMethod(
+                  Invocation.method(#fetchVeganBarcodes, [shopsNames, countryCode]),
+                  returnValue:
+                      Stream<_i2.Result<_i45.Pair<String, List<String>>, _i44.OffShopsManagerError>>.empty())
+              as _i9.Stream<
+                  _i2.Result<_i45.Pair<String, List<String>>,
+                      _i44.OffShopsManagerError>>);
   @override
   String toString() => super.toString();
 }
@@ -1161,13 +1153,14 @@ class MockSuggestedProductsManager extends _i1.Mock
 
   @override
   _i9.Stream<_i2.Result<_i45.Pair<_i25.OsmUID, List<String>>, _i67.SuggestedProductsManagerError>>
-      getSuggestedBarcodes(Iterable<_i12.Shop>? shops) => (super.noSuchMethod(
-              Invocation.method(#getSuggestedBarcodes, [shops]),
-              returnValue:
-                  Stream<_i2.Result<_i45.Pair<_i25.OsmUID, List<String>>, _i67.SuggestedProductsManagerError>>.empty())
-          as _i9.Stream<
-              _i2.Result<_i45.Pair<_i25.OsmUID, List<String>>,
-                  _i67.SuggestedProductsManagerError>>);
+      getSuggestedBarcodes(Iterable<_i12.Shop>? shops, String? countryCode) =>
+          (super.noSuchMethod(
+                  Invocation.method(#getSuggestedBarcodes, [shops, countryCode]),
+                  returnValue:
+                      Stream<_i2.Result<_i45.Pair<_i25.OsmUID, List<String>>, _i67.SuggestedProductsManagerError>>.empty())
+              as _i9.Stream<
+                  _i2.Result<_i45.Pair<_i25.OsmUID, List<String>>,
+                      _i67.SuggestedProductsManagerError>>);
   @override
   String toString() => super.toString();
 }

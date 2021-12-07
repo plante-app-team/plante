@@ -22,6 +22,7 @@ class SuggestedProductsModel {
   final ProductsObtainer _productsObtainer;
   final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
   final ShopsManager _shopsManager;
+  final Future<String?> _countryCode;
   final Shop _shop;
   final VoidCallback _updateCallback;
 
@@ -41,6 +42,7 @@ class SuggestedProductsModel {
       this._productsObtainer,
       this._productsExtraProperties,
       this._shopsManager,
+      this._countryCode,
       this._shop,
       this._updateCallback) {
     load();
@@ -50,8 +52,13 @@ class SuggestedProductsModel {
 
   Future<void> load() async {
     await _loadingAction(() async {
-      final allSuggestedBarcodesRes =
-          await _suggestedProductsManager.getSuggestedBarcodesMap([_shop]);
+      final countryCode = await _countryCode;
+      if (countryCode == null) {
+        return;
+      }
+
+      final allSuggestedBarcodesRes = await _suggestedProductsManager
+          .getSuggestedBarcodesMap([_shop], countryCode);
       if (allSuggestedBarcodesRes.isErr) {
         Log.w(
             'Could not load suggested products because: $allSuggestedBarcodesRes');

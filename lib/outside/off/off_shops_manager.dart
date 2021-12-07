@@ -5,7 +5,6 @@ import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_list_wrapper.dart';
@@ -39,28 +38,17 @@ class OffShopsManager {
 
   final OffVeganBarcodesObtainer _veganBarcodesObtainer;
   final OffShopsListObtainer _shopsObtainer;
-  final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
-  late final CachedOperation<OffShopsListWrapper, OffShopsManagerError>
-      _offShopsOp;
-  late final CachedOperation<String, None> _countryCodeOp;
+  late final Map<String,
+          CachedOperation<OffShopsListWrapper, OffShopsManagerError>>
+      _offShopsMap = {};
 
-  Future<Result<String?, None>> get _countryCode async {
-    final result = await _countryCodeOp.result;
-    if (result.isOk && !isEnabledCountry(result.unwrap())) {
-      return Ok(null);
-    }
-    return result;
-  }
-
-  OffShopsManager(this._veganBarcodesObtainer, this._shopsObtainer,
-      this._userAddressObtainer) {
-    _offShopsOp = CachedOperation(_fetchOffShopsImpl);
-    _countryCodeOp = CachedOperation(_getCountryCodeImpl);
-  }
+  OffShopsManager(this._veganBarcodesObtainer, this._shopsObtainer);
 
   void dispose() {
-    _offShopsOp.result.then((offShops) => offShops.maybeOk()?.dispose());
+    for (final shops in _offShopsMap.values) {
+      shops.result.then((offShops) => offShops.maybeOk()?.dispose());
+    }
   }
 
   static bool isEnabledCountry(String isoCode) {
@@ -68,8 +56,12 @@ class OffShopsManager {
   }
 
   Future<Result<OffShop?, OffShopsManagerError>> findOffShopByName(
-      String name) async {
-    final shopsRes = await _offShopsOp.result;
+      String name, String countryCode) async {
+    if (!isEnabledCountry(countryCode)) {
+      return Ok(null);
+    }
+
+    final shopsRes = await _offShopsFor(countryCode);
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
     }
@@ -80,36 +72,30 @@ class OffShopsManager {
     return Ok(offShops[name]);
   }
 
-  Future<Result<String, None>> _getCountryCodeImpl() async {
-    final countryCode = await _userAddressObtainer.getCameraCountryCode();
-    if (countryCode == null) {
-      Log.w('offShopsManager._getCountryCodeImpl: '
-          'could not find country code of camera');
-      return Err(None());
-    }
-    return Ok(countryCode);
+  Future<Result<OffShopsListWrapper, OffShopsManagerError>> _offShopsFor(
+      String countryCode) async {
+    var shops = _offShopsMap[countryCode];
+    shops ??= CachedOperation(() => _fetchOffShopsImpl(countryCode));
+    _offShopsMap[countryCode] = shops;
+    return shops.result;
   }
 
-  Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops() async {
-    final shopsRes = await _offShopsOp.result;
+  Future<Result<List<OffShop>, OffShopsManagerError>> fetchOffShops(
+      String countryCode) async {
+    final shopsRes = await _offShopsFor(countryCode);
     if (shopsRes.isErr) {
       return Err(shopsRes.unwrapErr());
     }
     return Ok(shopsRes.unwrap().shops);
   }
 
-  Future<Result<OffShopsListWrapper, OffShopsManagerError>>
-      _fetchOffShopsImpl() async {
-    final countryCode = await _countryCode;
-    if (countryCode.isErr) {
-      Log.w('offShopsManager.fetchOffShops - no country code, cannot fetch');
-      return Err(OffShopsManagerError.OTHER);
-    } else if (countryCode.unwrap() == null) {
+  Future<Result<OffShopsListWrapper, OffShopsManagerError>> _fetchOffShopsImpl(
+      String countryCode) async {
+    if (!isEnabledCountry(countryCode)) {
       return Ok(await OffShopsListWrapper.create([]));
     }
 
-    final shopsRes =
-        await _shopsObtainer.getShopsForCountry(countryCode.unwrap()!);
+    final shopsRes = await _shopsObtainer.getShopsForCountry(countryCode);
     if (shopsRes.isErr) {
       Log.w('offShopManager.fetchOffShop error: $shopsRes');
       return Err(shopsRes.unwrapErr().convert());
@@ -118,35 +104,14 @@ class OffShopsManager {
     return Ok(await OffShopsListWrapper.create(shops));
   }
 
-  Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
-      fetchVeganBarcodesMap(Set<String> shopsNames) async {
-    final ShopNamesAndBarcodesMap result = {};
-    final stream = fetchVeganBarcodes(shopsNames);
-    await for (final pairRes in stream) {
-      if (pairRes.isErr) {
-        return Err(pairRes.unwrapErr());
-      }
-      final pair = pairRes.unwrap();
-      result[pair.first] = pair.second;
-    }
-    return Ok(result);
-  }
-
   /// NOTE: function stops data retrieval on first error
   Stream<Result<ShopNameBarcodesPair, OffShopsManagerError>> fetchVeganBarcodes(
-      Set<String> shopsNames) async* {
-    final countryCodeRes = await _countryCode;
-    if (countryCodeRes.isErr) {
-      Log.w(
-          'offShopsManager.fetchVeganBarcodesForShops - no country code, cannot fetch');
-      yield Err(OffShopsManagerError.OTHER);
+      Set<String> shopsNames, String countryCode) async* {
+    if (!isEnabledCountry(countryCode)) {
       return;
     }
-    final countryCode = countryCodeRes.unwrap();
-    if (countryCode == null) {
-      return;
-    }
-    final shopsRes = await _offShopsOp.result;
+
+    final shopsRes = await _offShopsFor(countryCode);
     if (shopsRes.isErr) {
       yield Err(shopsRes.unwrapErr());
       return;
@@ -176,6 +141,22 @@ class OffShopsManager {
         yield Ok(Pair(name, pair.second));
       }
     }
+  }
+}
+
+extension OffShopsManagerExt on OffShopsManager {
+  Future<Result<ShopNamesAndBarcodesMap, OffShopsManagerError>>
+      fetchVeganBarcodesMap(Set<String> shopsNames, String countryCode) async {
+    final ShopNamesAndBarcodesMap result = {};
+    final stream = fetchVeganBarcodes(shopsNames, countryCode);
+    await for (final pairRes in stream) {
+      if (pairRes.isErr) {
+        return Err(pairRes.unwrapErr());
+      }
+      final pair = pairRes.unwrap();
+      result[pair.first] = pair.second;
+    }
+    return Ok(result);
   }
 }
 

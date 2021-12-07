@@ -26,7 +26,7 @@ class SuggestedProductsManager {
   ///
   /// See also: [getSuggestedBarcodesMap].
   Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
-      getSuggestedBarcodes(Iterable<Shop> shops) async* {
+      getSuggestedBarcodes(Iterable<Shop> shops, String countryCode) async* {
     if (!(await enableNewestFeatures())) {
       return;
     }
@@ -45,7 +45,7 @@ class SuggestedProductsManager {
 
     shops = shops.toSet(); // Defensive copy
     final names = shops.map((e) => e.name).toSet();
-    final stream = _offShopsManager.fetchVeganBarcodes(names);
+    final stream = _offShopsManager.fetchVeganBarcodes(names, countryCode);
     await for (final pairRes in stream) {
       if (pairRes.isErr) {
         yield Err(pairRes.unwrapErr().convert());
@@ -82,9 +82,9 @@ extension _OffShopsManagerErrorExt on OffShopsManagerError {
 
 extension SuggestedProductsManagerExt on SuggestedProductsManager {
   Future<Result<OsmUIDBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesMap(Iterable<Shop> shops) async {
+      getSuggestedBarcodesMap(Iterable<Shop> shops, String countryCode) async {
     final OsmUIDBarcodesMap result = {};
-    final stream = getSuggestedBarcodes(shops);
+    final stream = getSuggestedBarcodes(shops, countryCode);
     await for (final pairRes in stream) {
       if (pairRes.isErr) {
         return Err(pairRes.unwrapErr());

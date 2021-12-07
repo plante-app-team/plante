@@ -127,7 +127,6 @@ void initDI() {
   GetIt.I.registerSingleton<OffShopsManager>(OffShopsManager(
     GetIt.I.get<OffVeganBarcodesObtainer>(),
     GetIt.I.get<OffShopsListObtainer>(),
-    GetIt.I.get<CachingUserAddressPiecesObtainer>(),
   ));
   GetIt.I.registerSingleton<ProductsObtainer>(ProductsObtainer(
     GetIt.I.get<ProductsManager>(),

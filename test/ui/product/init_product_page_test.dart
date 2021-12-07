@@ -28,6 +28,7 @@ import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
@@ -41,6 +42,7 @@ import 'package:plante/ui/product/init_product_page_model.dart';
 import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
@@ -134,6 +136,9 @@ void main() {
 
     GetIt.I.registerSingleton<SuggestedProductsManager>(
         FakeSuggestedProductsManager());
+    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
+        userAddressObtainer);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {

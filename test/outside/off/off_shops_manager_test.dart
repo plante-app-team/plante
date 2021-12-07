@@ -3,13 +3,10 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/outside/map/user_address/user_address_piece.dart';
-import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/off/off_shop.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 
-import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_off_shops_list_obtainer.dart';
 import '../../z_fakes/fake_off_vegan_barcodes_obtainer.dart';
 
@@ -18,7 +15,6 @@ import '../../z_fakes/fake_off_vegan_barcodes_obtainer.dart';
 void main() {
   late FakeOffVeganBarcodesObtainer barcodesObtainer;
   late FakeOffShopsListObtainer offShopsListObtainer;
-  late FakeCachingUserAddressPiecesObtainer addressObtainer;
   late OffShopsManager offShopsManager;
 
   final someOffShops = [
@@ -42,10 +38,8 @@ void main() {
   setUp(() async {
     barcodesObtainer = FakeOffVeganBarcodesObtainer();
     offShopsListObtainer = FakeOffShopsListObtainer();
-    addressObtainer = FakeCachingUserAddressPiecesObtainer();
 
-    offShopsManager = OffShopsManager(
-        barcodesObtainer, offShopsListObtainer, addressObtainer);
+    offShopsManager = OffShopsManager(barcodesObtainer, offShopsListObtainer);
   });
 
   tearDown(() {
@@ -53,14 +47,10 @@ void main() {
   });
 
   Future<void> _initShops({
-    required String? countryCode,
+    required String countryCode,
     required Result<List<OffShop>, OffShopsListObtainerError> offApiShops,
   }) async {
-    addressObtainer.setResultFor(UserAddressType.CAMERA_LOCATION,
-        UserAddressPiece.COUNTRY_CODE, countryCode);
-    if (countryCode != null) {
-      offShopsListObtainer.setShopsForCountry(countryCode, offApiShops);
-    }
+    offShopsListObtainer.setShopsForCountry(countryCode, offApiShops);
   }
 
   void _initOffShopBarcodes(
@@ -76,18 +66,10 @@ void main() {
       countryCode: CountryCode.BELGIUM,
       offApiShops: Ok(someOffShops),
     );
-    final shopsResult = await offShopsManager.fetchOffShops();
+    final shopsResult =
+        await offShopsManager.fetchOffShops(CountryCode.BELGIUM);
     final shops = shopsResult.unwrap();
     expect(shops, equals(someOffShops));
-  });
-
-  test('fetch shops when no country code', () async {
-    await _initShops(
-      countryCode: null,
-      offApiShops: Ok(someOffShops),
-    );
-    final shopsResult = await offShopsManager.fetchOffShops();
-    expect(shopsResult.isErr, isTrue);
   });
 
   test('do not fetch shops when country not in enabled list', () async {
@@ -95,7 +77,7 @@ void main() {
       countryCode: CountryCode.RUSSIA,
       offApiShops: Ok(const []),
     );
-    final shopsResult = await offShopsManager.fetchOffShops();
+    final shopsResult = await offShopsManager.fetchOffShops(CountryCode.RUSSIA);
     expect(shopsResult.isOk, isTrue);
     expect(shopsResult.unwrap().isEmpty, isTrue);
   });
@@ -115,8 +97,8 @@ void main() {
       },
     );
 
-    final fetchedBarcodesRes = await offShopsManager
-        .fetchVeganBarcodesMap(someOffShops.map((e) => e.name!).toSet());
+    final fetchedBarcodesRes = await offShopsManager.fetchVeganBarcodesMap(
+        someOffShops.map((e) => e.name!).toSet(), CountryCode.BELGIUM);
     final fetchedBarcodes = fetchedBarcodesRes.unwrap();
 
     final finalBarcodes1 = fetchedBarcodes[someOffShops[0].name!]!;
@@ -144,8 +126,8 @@ void main() {
       },
     );
 
-    final fetchedBarcodesRes =
-        await offShopsManager.fetchVeganBarcodesMap({shop.name!});
+    final fetchedBarcodesRes = await offShopsManager
+        .fetchVeganBarcodesMap({shop.name!}, CountryCode.BELGIUM);
     expect(fetchedBarcodesRes.isErr, isTrue);
   });
 
@@ -162,8 +144,8 @@ void main() {
       },
     );
 
-    final fetchedBarcodesRes =
-        await offShopsManager.fetchVeganBarcodesMap({shop.name!});
+    final fetchedBarcodesRes = await offShopsManager
+        .fetchVeganBarcodesMap({shop.name!}, CountryCode.RUSSIA);
     expect(fetchedBarcodesRes.isOk, isTrue);
     expect(fetchedBarcodesRes.unwrap().isEmpty, isTrue);
   });
@@ -181,7 +163,8 @@ void main() {
     );
 
     var stream = offShopsManager
-        .fetchVeganBarcodes(someOffShops.map((e) => e.name!).toSet())
+        .fetchVeganBarcodes(
+            someOffShops.map((e) => e.name!).toSet(), CountryCode.BELGIUM)
         .asBroadcastStream();
     var calls = 0;
     StreamSubscription? subs;
@@ -200,7 +183,8 @@ void main() {
     // cancellation.
 
     stream = offShopsManager
-        .fetchVeganBarcodes(someOffShops.map((e) => e.name!).toSet())
+        .fetchVeganBarcodes(
+            someOffShops.map((e) => e.name!).toSet(), CountryCode.BELGIUM)
         .asBroadcastStream();
     calls = 0;
     subs = stream.listen((event) {
@@ -230,14 +214,13 @@ void main() {
       );
       // Old [offShopsManager] will have cache, we don't want cache
       offShopsManager.dispose();
-      offShopsManager = OffShopsManager(
-          barcodesObtainer, offShopsListObtainer, addressObtainer);
+      offShopsManager = OffShopsManager(barcodesObtainer, offShopsListObtainer);
     };
     await initTest();
 
     var retrievedShopsResults = <String>[];
-    var stream =
-        offShopsManager.fetchVeganBarcodes(shops.map((e) => e.name!).toSet());
+    var stream = offShopsManager.fetchVeganBarcodes(
+        shops.map((e) => e.name!).toSet(), CountryCode.BELGIUM);
     await for (final pair in stream) {
       retrievedShopsResults.add(pair.unwrap().first);
     }
@@ -254,12 +237,36 @@ void main() {
     await initTest();
 
     retrievedShopsResults = <String>[];
-    stream =
-        offShopsManager.fetchVeganBarcodes(shops.map((e) => e.name!).toSet());
+    stream = offShopsManager.fetchVeganBarcodes(
+        shops.map((e) => e.name!).toSet(), CountryCode.BELGIUM);
     await for (final pair in stream) {
       retrievedShopsResults.add(pair.unwrap().first);
     }
     // Verify different order
     expect(retrievedShopsResults, equals([shops[1].name, shops[0].name]));
+  });
+
+  test('different shops for different countries', () async {
+    final belgiumShops = someOffShops;
+    final franceShops = belgiumShops
+        .toList()
+        .map((e) => e.rebuild((e) => e.name = '${e.name!}fr'))
+        .toList();
+    expect(belgiumShops, isNot(equals(franceShops)));
+
+    await _initShops(
+      countryCode: CountryCode.BELGIUM,
+      offApiShops: Ok(someOffShops),
+    );
+    await _initShops(
+      countryCode: CountryCode.FRANCE,
+      offApiShops: Ok(franceShops),
+    );
+
+    var shopsResult = await offShopsManager.fetchOffShops(CountryCode.BELGIUM);
+    expect(shopsResult.unwrap(), equals(belgiumShops));
+
+    shopsResult = await offShopsManager.fetchOffShops(CountryCode.FRANCE);
+    expect(shopsResult.unwrap(), equals(franceShops));
   });
 }

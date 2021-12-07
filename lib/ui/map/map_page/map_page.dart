@@ -17,6 +17,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -171,6 +172,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         GetIt.I.get<LatestCameraPosStorage>(),
         GetIt.I.get<DirectionsManager>(),
         GetIt.I.get<SuggestedProductsManager>(),
+        GetIt.I.get<CachingUserAddressPiecesObtainer>(),
         updateShopsCallback,
         _onError,
         updateCallback,

@@ -26,6 +26,7 @@ import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
@@ -38,6 +39,7 @@ import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 import '../../../z_fakes/fake_user_langs_manager.dart';
 import '../../../z_fakes/fake_user_params_controller.dart';
@@ -84,7 +86,7 @@ void main() {
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
     offShopsManager = MockOffShopsManager();
-    when(offShopsManager.findOffShopByName(any))
+    when(offShopsManager.findOffShopByName(any, any))
         .thenAnswer((_) async => Ok(null));
     GetIt.I.registerSingleton<OffShopsManager>(offShopsManager);
     final addressObtainer = MockAddressObtainer();
@@ -110,6 +112,9 @@ void main() {
         FakeSuggestedProductsManager());
     GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
         ProductsAtShopsExtraPropertiesManager(MapExtraPropertiesCacher()));
+    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
+        userAddressObtainer);
   });
 
   testWidgets('card for range: card for empty shop',
