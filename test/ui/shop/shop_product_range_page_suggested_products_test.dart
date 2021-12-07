@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/country_table.dart';
 import 'package:plante/model/product.dart';
@@ -299,5 +300,30 @@ void main() {
     // verify its first product
     await tester.pumpAndSettle();
     expect(find.text(suggestedProducts[batchSize * 2].name!), findsOneWidget);
+  });
+
+  testWidgets('suggested products do not have "Last seen" str',
+      (WidgetTester tester) async {
+    final confirmedProducts = commons.confirmedProducts.toList();
+    final suggestedProducts = commons.suggestedProducts.toList();
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts([suggestedProducts[0]]);
+
+    var widget = ShopProductRangePage.createForTesting(aShop);
+    var context = await tester.superPump(widget);
+    final lastSeenStr =
+        context.strings.shop_product_range_page_product_last_seen_here;
+
+    // Nope
+    expect(find.textContaining(lastSeenStr), findsNothing);
+
+    commons.setConfirmedProducts([confirmedProducts[0]],
+        {confirmedProducts[0].barcode: DateTime.now().secondsSinceEpoch});
+    commons.setSuggestedProducts(const []);
+    widget = ShopProductRangePage.createForTesting(aShop);
+    context = await tester.superPump(widget);
+
+    // Yep
+    expect(find.textContaining(lastSeenStr), findsOneWidget);
   });
 }

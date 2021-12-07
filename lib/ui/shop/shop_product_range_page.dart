@@ -43,12 +43,14 @@ class ShopProductRangePage extends PagePlante {
 
   @visibleForTesting
   static ShopProductRangePage createForTesting(Shop shop,
-      {VoidCallback? addressLoadFinishCallback}) {
+      {Key? key, VoidCallback? addressLoadFinishCallback}) {
     if (!isInTests()) {
       throw Exception('!isInTests()');
     }
     return ShopProductRangePage._(
-        shop: shop, addressLoadFinishCallback: addressLoadFinishCallback);
+        key: key,
+        shop: shop,
+        addressLoadFinishCallback: addressLoadFinishCallback);
   }
 
   static void show(
@@ -293,7 +295,13 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   }
 
   Widget _productToCard(Product product, BuildContext context) {
-    final dateStr = secsSinceEpochToStr(_model.lastSeenSecs(product), context);
+    String? dateStrLocalized;
+    if (_model.lastSeenSecs(product) != 0) {
+      final dateStr =
+          secsSinceEpochToStr(_model.lastSeenSecs(product), context);
+      dateStrLocalized =
+          '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr';
+    }
 
     final cardExtraContent = Padding(
         padding: const EdgeInsets.only(left: 6, right: 6, bottom: 6),
@@ -331,8 +339,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ProductCard(
               product: product,
-              hint:
-                  '${context.strings.shop_product_range_page_product_last_seen_here}$dateStr',
+              hint: dateStrLocalized,
               beholder: _model.user,
               extraContentBottom: _votedProducts.contains(product.barcode)
                   ? null
