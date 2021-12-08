@@ -23,6 +23,16 @@ class FakeOsmCacher implements OsmCacher {
   Future<Database> get dbForTesting => throw UnimplementedError();
 
   @override
+  Future<String> dbFilePath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteDatabase() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<OsmCachedTerritory<OsmShop>> cacheShops(DateTime whenObtained,
       CoordsBounds bounds, Iterable<OsmShop> shops) async {
     final shopsCopy = shops.toList();

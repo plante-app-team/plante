@@ -11,6 +11,16 @@ class FakeMapExtraPropertiesCacher implements MapExtraPropertiesCacher {
   Future<Database> get dbForTesting => throw UnimplementedError();
 
   @override
+  Future<String> dbFilePath() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteDatabase() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> setProductAtShopProperty(
       ProductAtShopExtraProperty property) async {
     await deleteProductAtShopProperty(

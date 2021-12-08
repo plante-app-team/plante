@@ -172,8 +172,17 @@
     "map_page_show_found_shops_on_map": "Show on map",
     "map_page_zoom_in_to_see_shops": "Please zoom in to see stores",
     "map_page_loading_shops_hint1": "Loading stores in the area",
+    "@map_page_loading_shops_hint1": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
     "map_page_loading_shops_hint2": "Still loading stores - seems the area has a big number of organizations",
+    "@map_page_loading_shops_hint2": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
     "map_page_loading_shops_hint3": "Still loading stores - it takes longer than usual, sorry!",
+    "@map_page_loading_shops_hint3": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
     "map_page_loading_suggested_products_hint1": "Figuring out all possibly sold products nearby",
     "map_search_bar_button_title": "Search",
     "map_search_bar_hint": "Search stores and streets",
@@ -186,6 +195,9 @@
     "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Some ingredients are historically ambiguous, but in the modern food industry are almost always vegan",
     "mod_reason_cane_sugar_in_ingredients": "Product contains cane sugar, which could be processed through Bone Black/Bone Char.",
     "mod_reason_certified_vegan": "Product is certified vegan",
+    "@mod_reason_certified_vegan": {
+        "description": "Product was certified as vegan buy a trustworthy certification organization."
+    },
     "mod_reason_honey_in_ingredients": "Product contains honey",
     "mod_reason_info_found_in_external_source": "Information found in an external source",
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "The product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured), but it also has a Vegan label on its packaging.",
@@ -195,6 +207,9 @@
     "mod_reason_possibly_cane_sugar_in_ingredients": "Product contains sugar, which could be obtained from sugarcane and processed through Bone Black/Bone Char.",
     "mod_reason_some_ingredient_has_unknown_origin": "Some of the ingredients have unknown origin",
     "mod_reason_some_ingredient_is_in_fact_a_category2": "Ingredients labeled as \"Flavors\", \"Natural Dyes\", \"Additives\" (or in a similar ambiguous fashion) come from either plant, animal, or mineral sources. As such, products with such ingredients are (sometimes intentionally) ambiguous in their suitability for vegans.",
+    "@mod_reason_some_ingredient_is_in_fact_a_category2": {
+        "description": "Explanation of why is certain product's vegan status is set to \"ambiguous\""
+    },
     "mod_reason_some_ingredient_is_non_vegan": "Product has non-vegan ingredients",
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
@@ -202,7 +217,7 @@
     "product_report_dialog_report_sent": "Report sent",
     "product_report_dialog_send": "Send",
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
-    "settings_page_clear_map_cache": "Clear map cache",
+    "settings_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_page_crash_on_errors": "Crash on errors",
     "settings_page_developer_options": "Developer options",
     "settings_page_erase_user_data": "Clear user data and exit",
@@ -219,12 +234,18 @@
     "shop_card_directions": "Directions",
     "shop_card_no_products_listed": "Nothing listed",
     "shop_card_off_products_listed": "Unconfirmed products",
+    "@shop_card_off_products_listed": {
+        "description": "Products that we can link to the store name, but are not confirmed being sold there by a user. This is a label shown on a shop_card"
+    },
     "shop_card_open_shop_products": "Product list",
     "shop_card_products_listed": "Products listed",
     "shop_product_range_page_add_product": "Add a product",
     "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?",
     "shop_product_range_page_product_last_seen_here": "Last seen here: ",
     "shop_product_range_page_suggested_products_country": "Products seen in other stores <SHOP> of <COUNTRY>",
+    "@shop_product_range_page_suggested_products_country": {
+        "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's country, which are named in the same way as the displayed store. For example, if an \"Aldi\" shop has some chocolate bar, then all other \"Aldi\" shops will have this products section with same chocolate bar."
+    },
     "shop_product_range_page_suggested_products_country_unknown": "Products seen in other <SHOP> stores in this country",
     "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",
     "shop_product_range_page_you_sure_negative_vote": "Are you sure the product is not sold in this store?",

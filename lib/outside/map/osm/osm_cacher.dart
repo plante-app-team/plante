@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
+import 'package:plante/base/database_base.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
@@ -47,7 +48,7 @@ enum OsmCacherError {
   TERRITORY_NOT_FOUND,
 }
 
-class OsmCacher {
+class OsmCacher extends DatabaseBase {
   final _dbCompleter = Completer<Database>();
   Future<Database> get _db => _dbCompleter.future;
 
@@ -69,13 +70,16 @@ class OsmCacher {
     _initAsync(db);
   }
 
+  @override
+  Future<String> dbFilePath() async {
+    final appDir = await getAppDir();
+    return '${appDir.path}/osm_cache.sqlite';
+  }
+
   void _initAsync([Database? db]) async {
     Log.i('OsmCacher._initAsync start');
-    if (db == null) {
-      final appDir = await getAppDir();
-      db = await openDB('${appDir.path}/osm_cache.sqlite',
-          version: 4, onUpgrade: _onUpgradeDb);
-    }
+    db ??=
+        await openDB(await dbFilePath(), version: 4, onUpgrade: _onUpgradeDb);
     Log.i('OsmCacher._initAsync db loaded');
 
     final shopsAndTerritoriesIds = await _extractShopsWithTerritoriesIds(db);

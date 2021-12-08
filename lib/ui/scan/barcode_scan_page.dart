@@ -30,7 +30,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
-import 'package:plante/ui/settings_page.dart';
+import 'package:plante/ui/settings/settings_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 class BarcodeScanPage extends PagePlante {
