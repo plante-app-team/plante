@@ -168,7 +168,6 @@
     "settings_page_general": "Γενικές ρυθμίσεις",
     "settings_page_langs_i_know": "Οι γλώσσες μου",
     "settings_page_send_logs": "Αποστολή logs",
-    "settings_page_clear_map_cache": "Καθαρισμός cache χάρτη",
     "settings_page_erase_user_data": "Καθαρισμός δεδομένων χρήστη και έξοδος",
     "settings_page_developer_options": "Επιλογές για προγραμματιστές",
     "settings_page_crash_on_errors": "Κρασάρισμα στα σφάλματα",

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
+import 'package:plante/base/database_base.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property.dart';
@@ -18,7 +19,7 @@ const _PRODUCT_AT_SHOP_PROPERTY_SHOP_UID = 'shop_uid';
 const _PRODUCT_AT_SHOP_PROPERTY_BARCODE = 'barcode';
 const _PRODUCT_AT_SHOP_PROPERTY_PROPERTY_INT_VAL = 'property_int_val';
 
-class MapExtraPropertiesCacher {
+class MapExtraPropertiesCacher extends DatabaseBase {
   final _dbCompleter = Completer<Database>();
   Future<Database> get _db => _dbCompleter.future;
 
@@ -37,13 +38,16 @@ class MapExtraPropertiesCacher {
     _initAsync(db);
   }
 
+  @override
+  Future<String> dbFilePath() async {
+    final appDir = await getAppDir();
+    return '${appDir.path}/map_extra_properties_cache.sqlite';
+  }
+
   void _initAsync([Database? db]) async {
     Log.i('MapExtraPropertiesCacher._initAsync start');
-    if (db == null) {
-      final appDir = await getAppDir();
-      db = await openDB('${appDir.path}/map_extra_properties_cache.sqlite',
-          version: 1, onUpgrade: _onUpgradeDb);
-    }
+    db ??=
+        await openDB(await dbFilePath(), version: 1, onUpgrade: _onUpgradeDb);
     _dbCompleter.complete(db);
     Log.i('MapExtraPropertiesCacher._initAsync finish');
   }

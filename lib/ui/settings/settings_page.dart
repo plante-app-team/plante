@@ -14,7 +14,6 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -23,6 +22,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
+import 'package:plante/ui/settings/settings_cache_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends PagePlante {
@@ -40,7 +40,6 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
 
   final _settings = GetIt.I.get<Settings>();
   final _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
-  final _shopsManager = GetIt.I.get<ShopsManager>();
   late UserParams _user;
   late PackageInfo _packageInfo;
 
@@ -136,8 +135,8 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_clear_map_cache,
-                        onPressed: _clearMapCache)),
+                        'Manage app cache', // TODO: i18n
+                        onPressed: _openCachePage)),
                 if (_developer) const SizedBox(height: 24),
                 if (_developer)
                   SizedBox(
@@ -240,9 +239,9 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
         ]))));
   }
 
-  void _clearMapCache() async {
-    await _shopsManager.clearCache();
-    showSnackBar(context.strings.global_done, context);
+  void _openCachePage() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const SettingsCachePage()));
   }
 }
 

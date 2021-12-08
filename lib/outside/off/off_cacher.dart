@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/database_base.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/sqlite/sqlite.dart';
@@ -28,7 +29,7 @@ class BarcodesAtShop {
       this.shopId, this.countryCode, this.whenObtained, this.barcodes);
 }
 
-class OffCacher {
+class OffCacher extends DatabaseBase {
   final _dbCompleter = Completer<Database>();
   Future<Database> get _db => _dbCompleter.future;
 
@@ -47,13 +48,16 @@ class OffCacher {
     _initAsync(db);
   }
 
+  @override
+  Future<String> dbFilePath() async {
+    final appDir = await getAppDir();
+    return '${appDir.path}/off_cache.sqlite';
+  }
+
   void _initAsync([Database? db]) async {
     Log.i('OffCacher._initAsync start');
-    if (db == null) {
-      final appDir = await getAppDir();
-      db = await openDB('${appDir.path}/off_cache.sqlite',
-          version: 1, onUpgrade: _onUpgradeDb);
-    }
+    db ??=
+        await openDB(await dbFilePath(), version: 1, onUpgrade: _onUpgradeDb);
     _dbCompleter.complete(db);
     Log.i('OffCacher._initAsync finish');
   }
