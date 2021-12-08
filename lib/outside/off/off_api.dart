@@ -126,7 +126,8 @@ class OffApi {
     return await _searchBarcodes(shop.country, {
       'ingredients_analysis_tags': 'en:vegan',
       'stores_tags': shop.id,
-      'categories_tags': productsCategories.join('|')
+      'categories_tags': productsCategories.join('|'),
+      'sort_by': 'created_t',
     });
   }
 
@@ -135,6 +136,7 @@ class OffApi {
     return await _searchBarcodes(shop.country, {
       'labels_tags': 'en:vegan',
       'stores_tags': shop.id,
+      'sort_by': 'created_t',
     });
   }
 
