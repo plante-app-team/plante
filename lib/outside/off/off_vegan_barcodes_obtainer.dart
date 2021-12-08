@@ -114,14 +114,15 @@ class OffVeganBarcodesObtainer {
 
   Future<Result<List<String>, OffShopsManagerError>> _queryBarcodesImpl(
       OffShop shop) async {
-    final barcodesRes1 = await _offApi.getBarcodesVeganByIngredients(
+    final barcodesRes1 = await _offApi.getBarcodesVeganByLabel(shop);
+    final barcodesRes2 = await _offApi.getBarcodesVeganByIngredients(
         shop, _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES);
-    final barcodesRes2 = await _offApi.getBarcodesVeganByLabel(shop);
 
     if (barcodesRes1.isOk && barcodesRes2.isOk) {
-      final barcodes1 = barcodesRes1.unwrap().toSet();
+      final barcodes1 = barcodesRes1.unwrap().toList();
+      final barcodes1Set = barcodes1.toSet();
       final barcodes2Filtered =
-          barcodesRes2.unwrap().where((e) => !barcodes1.contains(e));
+          barcodesRes2.unwrap().where((e) => !barcodes1Set.contains(e));
       return Ok(barcodes1.toList() + barcodes2Filtered.toList());
     } else if (barcodesRes1.isOk) {
       return Ok(barcodesRes1.unwrap());

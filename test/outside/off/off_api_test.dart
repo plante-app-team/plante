@@ -215,6 +215,7 @@ void main() {
     expect(url, isNot(contains('labels_tags=en%3Avegan')));
     expect(url, contains('categories_tags=en%3Abanana%7Cen%3Acocoa'));
     expect(url, contains('stores_tags=spar'));
+    expect(url, contains('sort_by=created_t'));
   });
 
   test('get vegan barcodes by labels', () async {
@@ -249,5 +250,6 @@ void main() {
     expect(url, contains('labels_tags=en%3Avegan'));
     expect(url, isNot(contains('categories_tags')));
     expect(url, contains('stores_tags=spar'));
+    expect(url, contains('sort_by=created_t'));
   });
 }
