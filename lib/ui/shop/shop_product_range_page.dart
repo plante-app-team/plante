@@ -33,6 +33,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
+import 'package:plante/ui/shop/shop_product_range_products_title.dart';
 
 class ShopProductRangePage extends PagePlante {
   final Shop shop;
@@ -159,7 +160,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             context.strings.shop_product_range_page_this_shop_has_no_product));
       } else {
         final widgets = <Widget>[];
-        widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
+        widgets
+            .add(Container(color: Colors.white, height: _LIST_GRADIENT_SIZE));
 
         final confirmedProducts = _model.confirmedProducts;
         final suggestedProducts = _model.suggestedProducts.toList();
@@ -168,10 +170,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         suggestedProducts
             .removeWhere((e) => confirmedBarcodes.contains(e.barcode));
 
-        widgets.addAll(_productsToCard(confirmedProducts, context));
+        if (confirmedProducts.isNotEmpty) {
+          widgets.add(_confirmedProductsTitle());
+          widgets.addAll(
+              _productsToCard(confirmedProducts, context, suggestions: false));
+        }
         if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
           widgets.add(_suggestedProductsTitle());
-          widgets.addAll(_productsToCard(suggestedProducts, context));
+          widgets.addAll(
+              _productsToCard(suggestedProducts, context, suggestions: true));
           if (_model.suggestedProductsLoading) {
             widgets.add(const Center(child: CircularProgressIndicator()));
           }
@@ -183,28 +190,37 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     }
 
     final content = Column(children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              textDirection: TextDirection.rtl,
-              children: [
-                FabPlante.closeBtnPopOnClick(key: const Key('close_button')),
-                Expanded(
-                    child: Column(
+      Container(
+          color: Colors.white,
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        textDirection: TextDirection.rtl,
                         children: [
-                      Text(widget.shop.name, style: TextStyles.headline1),
-                      const SizedBox(height: 3),
-                      AddressWidget.forShop(widget.shop, _model.address,
-                          loadCompletedCallback:
-                              widget.addressLoadFinishCallback),
-                    ])),
-              ]),
-        ]),
-      ),
-      const SizedBox(height: _LIST_GRADIENT_SIZE),
+                          FabPlante.closeBtnPopOnClick(
+                              key: const Key('close_button')),
+                          Expanded(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                Text(widget.shop.name,
+                                    style: TextStyles.headline1),
+                                const SizedBox(height: 3),
+                                AddressWidget.forShop(
+                                    widget.shop, _model.address,
+                                    loadCompletedCallback:
+                                        widget.addressLoadFinishCallback),
+                              ])),
+                        ]),
+                  ]),
+            ),
+            const SizedBox(height: _LIST_GRADIENT_SIZE),
+          ])),
       Expanded(
           child: Stack(children: [
         centralContent,
@@ -213,7 +229,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             child: FadingEdgePlante(
                 direction: FadingEdgeDirection.TOP_TO_BOTTOM,
                 size: _LIST_GRADIENT_SIZE,
-                color: ColorsPlante.lightGrey)),
+                color: Colors.white)),
         const Positioned.fill(
             bottom: -2,
             child: FadingEdgePlante(
@@ -248,6 +264,15 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     );
   }
 
+  Widget _confirmedProductsTitle() {
+    return ShopProductRangeProductsTitle(
+      context.strings.shop_product_range_page_confirmed_products_country,
+      key: const Key('confirmed_products_title'),
+      verticalPadding: 24,
+      horizontalPaddings: _LIST_GRADIENT_SIZE,
+    );
+  }
+
   Widget _suggestedProductsTitle() {
     return Consumer(builder: (context, ref, _) {
       final countryName = ref.watch(_countryNameProvider.state).state;
@@ -272,15 +297,18 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             .strings.shop_product_range_page_suggested_products_country_unknown
             .replaceAll('<SHOP>', widget.shop.name);
       }
-      return Padding(
+
+      return ShopProductRangeProductsTitle(
+        suggestedProductsTitle,
         key: const Key('suggested_products_title'),
-        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 18),
-        child: Text(suggestedProductsTitle, style: TextStyles.headline3),
+        verticalPadding: 24,
+        horizontalPaddings: _LIST_GRADIENT_SIZE,
       );
     });
   }
 
-  List<Widget> _productsToCard(List<Product> products, BuildContext context) {
+  List<Widget> _productsToCard(List<Product> products, BuildContext context,
+      {required bool suggestions}) {
     final widgets = <Widget>[];
     for (var index = 0; index < products.length; ++index) {
       final product = products[index];
@@ -289,12 +317,13 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           onVisibilityChanged: (visible, _) {
             _model.onProductVisibilityChange(product, visible);
           },
-          child: _productToCard(product, context)));
+          child: _productToCard(product, context, suggestions)));
     }
     return widgets;
   }
 
-  Widget _productToCard(Product product, BuildContext context) {
+  Widget _productToCard(
+      Product product, BuildContext context, bool suggestion) {
     String? dateStrLocalized;
     if (_model.lastSeenSecs(product) != 0) {
       final dateStr =
@@ -333,13 +362,33 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           ])
         ]));
 
+    Widget? hint;
+    if (suggestion) {
+      hint = Padding(
+        padding: const EdgeInsets.only(right: 4, top: 4),
+        child: Material(
+          color: ColorsPlante.yellow,
+          borderRadius: BorderRadius.circular(5),
+          child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Text(
+                  context
+                      .strings.shop_product_range_page_suggested_product_hint,
+                  style: TextStyles.tag)),
+        ),
+      );
+    } else if (dateStrLocalized != null) {
+      hint = Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(dateStrLocalized, style: TextStyles.hint));
+    }
     return Padding(
         key: Key('product_${product.barcode}'),
         padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ProductCard(
               product: product,
-              hint: dateStrLocalized,
+              hint: hint,
               beholder: _model.user,
               extraContentBottom: _votedProducts.contains(product.barcode)
                   ? null
