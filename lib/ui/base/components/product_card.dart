@@ -13,7 +13,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 class ProductCard extends StatefulWidget {
   final Product product;
   final UserParams beholder;
-  final String? hint;
+  final Widget? hint;
   final VoidCallback onTap;
   final Widget? extraContentMiddle;
   final Widget? extraContentBottom;
@@ -101,11 +101,7 @@ class _ProductCardState extends State<ProductCard> {
                               style: TextStyles.normalBold,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis),
-                          if (widget.hint != null)
-                            Column(children: [
-                              const SizedBox(height: 4),
-                              Text(widget.hint!, style: TextStyles.hint),
-                            ]),
+                          if (widget.hint != null) widget.hint!,
                           const SizedBox(height: 8),
                           VegStatusDisplayed(
                               product: widget.product, user: widget.beholder),

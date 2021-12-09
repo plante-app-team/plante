@@ -242,6 +242,10 @@
     "shop_product_range_page_add_product": "Add a product",
     "shop_product_range_page_have_you_seen_product_here": "Do they sell it here?",
     "shop_product_range_page_product_last_seen_here": "Last seen here: ",
+    "shop_product_range_page_confirmed_products_country": "Products seen in this store by other users of Plante",
+    "@shop_product_range_page_confirmed_products_country": {
+        "description": "A title of sections of products in a screen of a store. The products in the section were put into this store by other users of Plante."
+    },
     "shop_product_range_page_suggested_products_country": "Products seen in other stores <SHOP> of <COUNTRY>",
     "@shop_product_range_page_suggested_products_country": {
         "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's country, which are named in the same way as the displayed store. For example, if an \"Aldi\" shop has some chocolate bar, then all other \"Aldi\" shops will have this products section with same chocolate bar."
@@ -250,6 +254,10 @@
     "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",
     "shop_product_range_page_you_sure_negative_vote": "Are you sure the product is not sold in this store?",
     "shop_product_range_page_you_sure_positive_vote": "Are you sure you saw the product in this store?",
+    "shop_product_range_page_suggested_product_hint": "Seen in other stores with same name",
+    "@shop_product_range_page_suggested_product_hint": {
+        "description": "A hint within product's description, letting the user know this product is displayed only because it was seen in some other store with the same name. The hint shouldn't be too verbose. There probably will be many hints visible to the user - each suggested product will have such a hint."
+    },
     "shop_type_bakery": "Bakery",
     "shop_type_beverages": "Beverages",
     "shop_type_cheese": "Cheese",

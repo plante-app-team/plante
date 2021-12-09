@@ -326,4 +326,35 @@ void main() {
     // Yep
     expect(find.textContaining(lastSeenStr), findsOneWidget);
   });
+
+  testWidgets('suggested products have a distinct hint',
+      (WidgetTester tester) async {
+    final confirmedProducts = commons.confirmedProducts.toList();
+    final suggestedProducts = commons.suggestedProducts.toList();
+    commons.setConfirmedProducts([confirmedProducts[0]],
+        {confirmedProducts[0].barcode: DateTime.now().secondsSinceEpoch});
+    commons.setSuggestedProducts(const []);
+
+    var widget =
+        ShopProductRangePage.createForTesting(aShop, key: const Key('page1'));
+    var context = await tester.superPump(widget);
+
+    // Nope
+    expect(
+        find.text(
+            context.strings.shop_product_range_page_suggested_product_hint),
+        findsNothing);
+
+    commons.setConfirmedProducts(const []);
+    commons.setSuggestedProducts([suggestedProducts[0]]);
+    widget =
+        ShopProductRangePage.createForTesting(aShop, key: const Key('page2'));
+    context = await tester.superPump(widget);
+
+    // Yep
+    expect(
+        find.text(
+            context.strings.shop_product_range_page_suggested_product_hint),
+        findsOneWidget);
+  });
 }
