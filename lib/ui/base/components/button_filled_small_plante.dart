@@ -17,6 +17,7 @@ class ButtonFilledSmallPlante extends StatelessWidget {
   final EdgeInsets? paddings;
   final double? spaceBetweenTextAndIcon;
   final BorderSide? side;
+  final double elevation;
 
   const ButtonFilledSmallPlante._({
     Key? key,
@@ -32,6 +33,7 @@ class ButtonFilledSmallPlante extends StatelessWidget {
     this.paddings,
     this.spaceBetweenTextAndIcon,
     this.side,
+    required this.elevation,
   }) : super(key: key);
 
   ButtonFilledSmallPlante.green({
@@ -44,6 +46,7 @@ class ButtonFilledSmallPlante extends StatelessWidget {
     Widget? icon,
     EdgeInsets? paddings,
     double? spaceBetweenTextAndIcon,
+    double elevation = 0.0,
   }) : this._(
             key: key,
             onPressed: onPressed,
@@ -58,7 +61,8 @@ class ButtonFilledSmallPlante extends StatelessWidget {
             colorDisabled: ColorsPlante.primaryDisabled,
             splashColor: ColorsPlante.splashColor,
             paddings: paddings,
-            spaceBetweenTextAndIcon: spaceBetweenTextAndIcon);
+            spaceBetweenTextAndIcon: spaceBetweenTextAndIcon,
+            elevation: elevation);
 
   ButtonFilledSmallPlante.lightGreen(
       {Key? key,
@@ -69,7 +73,8 @@ class ButtonFilledSmallPlante extends StatelessWidget {
       String? text,
       Widget? icon,
       EdgeInsets? paddings,
-      double? spaceBetweenTextAndIcon})
+      double? spaceBetweenTextAndIcon,
+      double elevation = 0.0})
       : this._(
             key: key,
             onPressed: onPressed,
@@ -85,40 +90,45 @@ class ButtonFilledSmallPlante extends StatelessWidget {
             colorDisabled: ColorsPlante.grey,
             splashColor: ColorsPlante.primaryDisabled,
             paddings: paddings,
-            spaceBetweenTextAndIcon: spaceBetweenTextAndIcon);
+            spaceBetweenTextAndIcon: spaceBetweenTextAndIcon,
+            elevation: elevation);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
-        highlightColor: Colors.transparent,
-        onTap: onPressed != null ? null : onDisabledPressed,
-        child: SizedBox(
-            width: width,
-            height: height ?? 32,
-            child: OutlinedButton(
-                style: ButtonStyle(
-                    padding: MaterialStateProperty.all(
-                        paddings ?? const EdgeInsets.only(left: 10, right: 10)),
-                    overlayColor: MaterialStateProperty.all(splashColor),
-                    backgroundColor: MaterialStateProperty.all(
-                        onPressed != null ? color : colorDisabled),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8))),
-                    side: side != null
-                        ? MaterialStateProperty.all<BorderSide>(side!)
-                        : null),
-                onPressed: onPressed,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (label != null) Flexible(child: label!),
-                    if (label != null && icon != null)
-                      SizedBox(width: spaceBetweenTextAndIcon ?? 2),
-                    if (icon != null) icon!
-                  ],
-                ))));
+    return Material(
+        elevation: elevation,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+            highlightColor: Colors.transparent,
+            onTap: onPressed != null ? null : onDisabledPressed,
+            child: SizedBox(
+                width: width,
+                height: height ?? 32,
+                child: OutlinedButton(
+                    style: ButtonStyle(
+                        padding: MaterialStateProperty.all(paddings ??
+                            const EdgeInsets.only(left: 10, right: 10)),
+                        overlayColor: MaterialStateProperty.all(splashColor),
+                        backgroundColor: MaterialStateProperty.all(
+                            onPressed != null ? color : colorDisabled),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8))),
+                        side: side != null
+                            ? MaterialStateProperty.all<BorderSide>(side!)
+                            : null),
+                    onPressed: onPressed,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (label != null) Flexible(child: label!),
+                        if (label != null && icon != null)
+                          SizedBox(width: spaceBetweenTextAndIcon ?? 2),
+                        if (icon != null) icon!
+                      ],
+                    )))));
   }
 }
