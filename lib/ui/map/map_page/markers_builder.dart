@@ -50,8 +50,8 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
     } else if (shops
         .any((shop) => extraData.withSuggestedProducts.contains(shop.osmUID))) {
-      return _bitmapDescriptorFromSvgAsset(
-          context, 'assets/marker_abstract.svg', 1, TextStyles.markerFilled);
+      return _bitmapDescriptorFromSvgAsset(context,
+          'assets/map_marker_suggestions.svg', 1, TextStyles.markerFilled);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);
@@ -80,8 +80,11 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           TextStyles.markerFilled);
     } else if (shops
         .any((shop) => extraData.withSuggestedProducts.contains(shop.osmUID))) {
-      return _bitmapDescriptorFromSvgAsset(context,
-          'assets/marker_abstract.svg', shops.length, TextStyles.markerEmpty);
+      return _bitmapDescriptorFromSvgAsset(
+          context,
+          'assets/map_marker_group_suggestions.svg',
+          shops.length,
+          TextStyles.markerEmpty);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context,
