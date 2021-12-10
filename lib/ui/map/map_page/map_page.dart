@@ -20,7 +20,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -345,14 +345,16 @@ class _MapPageState extends PageStatePlante<MapPage>
                 })));
 
     final loadShopsButton = Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.only(bottom: 32),
         child: AnimatedMapWidget(
             child: !_model.viewPortShopsLoaded() &&
                     _mode.loadNewShops() &&
                     !_model.loading
-                ? ButtonFilledPlante.withText(
-                    context.strings.map_page_load_shops_of_this_area,
-                    onPressed: _loadShops)
+                ? ButtonFilledSmallPlante.lightGreen(
+                    elevation: 5,
+                    onPressed: _loadShops,
+                    text: context.strings.map_page_load_shops_of_this_area,
+                  )
                 : const SizedBox()));
 
     final createMapWidget =
