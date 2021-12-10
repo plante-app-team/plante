@@ -135,7 +135,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
-                        'Manage app cache', // TODO: i18n
+                        context.strings.settings_page_open_cache_settings,
                         onPressed: _openCachePage)),
                 if (_developer) const SizedBox(height: 24),
                 if (_developer)

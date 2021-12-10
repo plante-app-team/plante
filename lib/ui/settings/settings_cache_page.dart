@@ -35,7 +35,7 @@ class _SettingsCachePageState extends PageStatePlante<SettingsCachePage> {
             child: SingleChildScrollView(
                 child: Column(children: [
           HeaderPlante(
-              title: Text('App cache', // TODO: i18n
+              title: Text(context.strings.settings_cache_page_title,
                   style: TextStyles.headline1),
               leftAction: FabPlante.backBtnPopOnClick()),
           Container(
@@ -44,7 +44,8 @@ class _SettingsCachePageState extends PageStatePlante<SettingsCachePage> {
                 SizedBox(
                     width: double.infinity,
                     child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_clear_map_cache_and_exit,
+                        context.strings
+                            .settings_cache_page_clear_map_cache_and_exit,
                         onPressed: _clearMapCacheAndRestart)),
               ]))
         ]))));
