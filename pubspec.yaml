@@ -155,6 +155,7 @@ flutter:
     - assets/map_marker_group_accented.svg
     - assets/map_marker_group_selected.svg
     - assets/map_marker_group_suggestions.svg
+    - assets/map_filters.svg
     - assets/my_location.svg
     - assets/plus_shop.svg
     - assets/cancel_circle_light.svg

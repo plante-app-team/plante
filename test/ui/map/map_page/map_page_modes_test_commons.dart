@@ -13,6 +13,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -89,6 +90,8 @@ class MapPageModesTestCommons {
         UserAddressType.CAMERA_LOCATION, UserAddressPiece.COUNTRY_CODE, 'be');
     GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
         userAddressObtainer);
+    GetIt.I.registerSingleton<SharedPreferencesHolder>(
+        FakeSharedPreferences().asHolder());
 
     await fillFetchedShops();
 

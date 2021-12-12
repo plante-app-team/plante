@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/l10n/strings.dart';
@@ -12,16 +13,15 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 
+import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
-import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
 void main() {
   late MapPageModesTestCommons commons;
   late MockGoogleMapController mapController;
-  late FakeAnalytics analytics;
   late FakeShopsManager shopsManager;
   late MockDirectionsManager directionsManager;
   late List<Shop> shops;
@@ -31,7 +31,6 @@ void main() {
     await commons.setUp();
     mapController = commons.mapController;
     shops = commons.shops;
-    analytics = commons.analytics;
     shopsManager = commons.shopsManager;
     directionsManager = commons.directionsManager;
   });
@@ -47,20 +46,6 @@ void main() {
     expect(displayedShops, contains(shops[1]));
     expect(displayedShops, contains(shops[2]));
     expect(displayedShops, contains(shops[3]));
-  });
-
-  testWidgets('empty shops are displayed only when user wants',
-      (WidgetTester tester) async {
-    expect(shops[0].productsCount, equals(0));
-
-    final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await commons.initIdleMapPage(widget, tester);
-
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    final displayedShops = widget.getDisplayedShopsForTesting();
-    expect(displayedShops.length, equals(shops.length));
-    expect(displayedShops, containsAll(shops));
   });
 
   testWidgets('shop click', (WidgetTester tester) async {
@@ -162,116 +147,28 @@ void main() {
     expect(find.byType(ShopCard), findsNothing);
   });
 
-  testWidgets('empty shops analytics', (WidgetTester tester) async {
+  testWidgets('no shops hint', (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await commons.initIdleMapPage(widget, tester);
 
-    expect(analytics.allEvents(), equals([]));
-
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    expect(analytics.wasEventSent('empty_shops_shown'), isTrue);
-    analytics.clearEvents();
-
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    expect(analytics.wasEventSent('empty_shops_hidden'), isTrue);
-  });
-
-  testWidgets('no shops hint when empty shops are not displayed',
-      (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await commons.initIdleMapPage(widget, tester);
-
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
         findsNothing);
 
     // No shops!
     await commons.clearFetchedShops(widget, tester, context);
 
-    // No shops hint is expected
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsOneWidget);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
-
-    // Fetch shops!
-    await commons.fillFetchedShops(widget, tester);
-
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
-  });
-
-  testWidgets('no shops hint when empty shops are displayed',
-      (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await commons.initIdleMapPage(widget, tester);
-
-    // Show empty shops
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    widget.onMapIdleForTesting();
-    await tester.pumpAndSettle();
-
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
-
-    // No shops!
-    await commons.clearFetchedShops(widget, tester, context);
-
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+    // 'No shops' hint is expected
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
         findsOneWidget);
 
     // Fetch shops!
     await commons.fillFetchedShops(widget, tester);
 
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
         findsNothing);
   });
 
-  testWidgets('no shops hint dynamic switching', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await commons.initIdleMapPage(widget, tester);
-
-    // No shops!
-    await commons.clearFetchedShops(widget, tester, context);
-
-    // Hint 1
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsOneWidget);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
-
-    // Show empty shops
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    // Hint 2
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsOneWidget);
-
-    // Hide empty shops
-    await tester.superTap(find.text(context.strings.map_page_empty_shops));
-
-    // Hint 1
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsOneWidget);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
-  });
-
-  testWidgets('no shops hint is shown until shops are loaded',
+  testWidgets('"no shops" hint is not shown until shops are loaded',
       (WidgetTester tester) async {
     await shopsManager.clearCache();
     final completer = Completer<List<Shop>>();
@@ -284,19 +181,15 @@ void main() {
         .superTap(find.text(context.strings.map_page_load_shops_of_this_area));
 
     // No hints yet!
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
-        findsNothing);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
         findsNothing);
 
     // Shops loaded, and there are no shops!
     completer.complete([]);
     await tester.pumpAndSettle();
 
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_1),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
         findsOneWidget);
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
-        findsNothing);
   });
 
   testWidgets('shop address is shown on the shop card',
@@ -358,7 +251,7 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsNothing);
-    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+    expect(find.byKey(const Key('filter_shops_icon')), findsNothing);
 
     // Map zoomed out really much
     await commons.moveCamera(commons.shopsBounds.center,
@@ -370,7 +263,7 @@ void main() {
     expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
         findsOneWidget);
     expect(find.byType(MapSearchBar), findsNothing);
-    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+    expect(find.byKey(const Key('filter_shops_icon')), findsNothing);
 
     // Map zoomed back in - first check done again
     await commons.moveCamera(commons.shopsBounds.center,
@@ -380,7 +273,7 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsNothing);
-    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+    expect(find.byKey(const Key('filter_shops_icon')), findsNothing);
   });
 
   testWidgets('huge zoom out when shops ARE loaded',
@@ -396,7 +289,7 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsOneWidget);
-    expect(find.text(context.strings.map_page_empty_shops), findsOneWidget);
+    expect(find.byKey(const Key('filter_shops_icon')), findsOneWidget);
 
     // Map zoomed out really much
     await commons.moveCamera(commons.shopsBounds.center,
@@ -408,7 +301,7 @@ void main() {
     expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
         findsOneWidget);
     expect(find.byType(MapSearchBar), findsNothing);
-    expect(find.text(context.strings.map_page_empty_shops), findsNothing);
+    expect(find.byKey(const Key('filter_shops_icon')), findsNothing);
 
     // Map zoomed back in - first check done again
     await commons.moveCamera(commons.shopsBounds.center,
@@ -418,6 +311,6 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsOneWidget);
-    expect(find.text(context.strings.map_page_empty_shops), findsOneWidget);
+    expect(find.byKey(const Key('filter_shops_icon')), findsOneWidget);
   });
 }

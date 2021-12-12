@@ -109,7 +109,7 @@ class MapPageModeCreateShop extends MapPageMode {
   }
 
   @override
-  Widget buildHeader(BuildContext context) {
+  Widget buildHeader() {
     return Align(
         alignment: Alignment.centerRight,
         child: Padding(
@@ -134,7 +134,7 @@ class MapPageModeCreateShop extends MapPageMode {
   }
 
   @override
-  List<Widget> buildBottomActions(BuildContext context) {
+  List<Widget> buildBottomActions() {
     // TODO(https://trello.com/c/rb2w42J5/): remove the function after
     // the ticket from the Trello URL will be fixed.
     return const [SizedBox.shrink(key: Key('map_page_done'))];

@@ -1,4 +1,3 @@
-import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/shop.dart';
@@ -27,10 +26,6 @@ class SuggestedProductsManager {
   /// See also: [getSuggestedBarcodesMap].
   Stream<Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>
       getSuggestedBarcodes(Iterable<Shop> shops, String countryCode) async* {
-    if (!(await enableNewestFeatures())) {
-      return;
-    }
-
     // There can be many shops with same name,
     // let's build a map which will let us to work with that.
     final namesUidsMap = <String, List<OsmUID>>{};

@@ -10,6 +10,7 @@ import 'package:plante/ui/base/components/button_outlined_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/pseudo_popup_menu_item.dart';
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
@@ -20,13 +21,6 @@ Future<T?> showMenuPlante<T>(
     required List<Widget> children}) async {
   assert(values.length == children.length);
 
-  final box = target.currentContext?.findRenderObject() as RenderBox?;
-  if (box == null) {
-    Log.e('showMenuPlante is called when no render box is available');
-    return null;
-  }
-  final position = box.localToGlobal(Offset.zero);
-
   final items = <PopupMenuItem<T>>[];
   for (var index = 0; index < values.length; ++index) {
     items.add(PopupMenuItem<T>(
@@ -35,12 +29,47 @@ Future<T?> showMenuPlante<T>(
     ));
   }
 
+  return await _showPopupPlante(
+    target: target,
+    context: context,
+    items: items,
+  );
+}
+
+Future<T?> _showPopupPlante<T>(
+    {required GlobalKey target,
+    required BuildContext context,
+    required List<PopupMenuEntry<T>> items}) async {
+  final box = target.currentContext?.findRenderObject() as RenderBox?;
+  if (box == null) {
+    Log.e('showMenuPlante is called when no render box is available');
+    return null;
+  }
+  final position = box.localToGlobal(Offset.zero);
+
   return await showMenu(
     context: context,
     position: RelativeRect.fromLTRB(position.dx - box.size.width,
         position.dy + box.size.height, position.dx, position.dy),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     items: items,
+  );
+}
+
+/// Uses Flutter's [showMenu] functions to display a completely custom child.
+/// Note that Flutter's popup menu has a limited width, which _cannot_ be
+/// enlarged - the custom pop up won't be able to be wider than
+/// a half of the screen.
+Future<void> showCustomPopUp(
+    {required GlobalKey target,
+    required BuildContext context,
+    required Widget child}) async {
+  return await _showPopupPlante(
+    target: target,
+    context: context,
+    items: [
+      PseudoPopupMenuItem(child: child),
+    ],
   );
 }
 

@@ -85,7 +85,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   @protected
-  Widget shopsCardsWidget(BuildContext context) {
+  Widget shopsCardsWidget() {
     return AnimatedSwitcher(
         duration: DURATION_DEFAULT,
         child: _displayedShops.isEmpty

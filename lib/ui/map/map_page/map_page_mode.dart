@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
@@ -16,7 +18,7 @@ class MapPageModeParams {
   final ResCallback<Iterable<Shop>> displayedShopsSource;
   final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
-  final ArgCallback<String?> bottomHintCallback;
+  final ArgCallback<RichText?> bottomHintCallback;
   final ArgCallback<Coord> moveMapCallback;
   final ArgCallback<MapPageMode> modeSwitchCallback;
   final ResCallback<bool> isLoadingCallback;
@@ -50,6 +52,7 @@ abstract class MapPageMode {
   MapPageModel get model => params.model;
   MapPage get widget => params.widgetSource.call();
   BuildContext get context => params.contextSource.call();
+  WidgetRef get ref => context as WidgetRef;
   MapHintsListController get hintsController => params.hintsListController;
   Analytics get analytics => params.analytics;
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
@@ -74,11 +77,10 @@ abstract class MapPageMode {
   double maxZoom() => DEFAULT_MAX_ZOOM;
   bool loadNewShops() => true;
 
-  Widget buildOverlay(BuildContext context) => const SizedBox.shrink();
-  Widget buildHeader(BuildContext context) => const SizedBox.shrink();
-  Widget buildTopActions(BuildContext context) => const SizedBox.shrink();
-  List<Widget> buildBottomActions(BuildContext context) =>
-      const [SizedBox.shrink()];
+  Widget buildOverlay() => const SizedBox.shrink();
+  Widget buildHeader() => const SizedBox.shrink();
+  Widget buildTopActions() => const SizedBox.shrink();
+  List<Widget> buildBottomActions() => const [SizedBox.shrink()];
   List<Widget> buildFABs() => const [];
   void deselectShops() {}
   void onMarkerClick(Iterable<Shop> shops) {}
@@ -99,7 +101,12 @@ abstract class MapPageMode {
   @protected
   void updateMap() => params.updateMapCallback.call();
   @protected
-  void setBottomHint(String? hint) => params.bottomHintCallback.call(hint);
+  void setBottomHintSimple(String? hint) =>
+      params.bottomHintCallback.call(hint != null
+          ? RichText(text: TextSpan(text: hint, style: TextStyles.normal))
+          : null);
+  @protected
+  void setBottomHint(RichText? hint) => params.bottomHintCallback.call(hint);
   @protected
   void switchModeTo(MapPageMode mode) {
     params.modeSwitchCallback.call(mode);
