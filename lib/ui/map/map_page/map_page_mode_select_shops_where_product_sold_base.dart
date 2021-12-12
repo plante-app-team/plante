@@ -54,7 +54,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   void deinit() {
     hintsController.removeHint(_HINT_ID);
-    setBottomHint(null);
+    setBottomHintSimple(null);
     super.deinit();
   }
 
@@ -100,8 +100,8 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  Widget buildOverlay(BuildContext context) {
-    return Stack(children: [shopsCardsWidget(context)]);
+  Widget buildOverlay() {
+    return Stack(children: [shopsCardsWidget()]);
   }
 
   @override
@@ -114,7 +114,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  List<Widget> buildBottomActions(BuildContext context) {
+  List<Widget> buildBottomActions() {
     return [
       SizedBox(
           key: const Key('map_page_cancel'),
@@ -162,10 +162,10 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   void onDisplayedShopsChange(Iterable<Shop> shops) {
     if (shops.isEmpty) {
-      setBottomHint(
+      setBottomHintSimple(
           context.strings.map_page_no_shops_hint_in_select_shops_mode);
     } else {
-      setBottomHint(null);
+      setBottomHintSimple(null);
     }
   }
 }

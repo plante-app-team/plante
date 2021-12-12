@@ -10,6 +10,7 @@ import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
+import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 
@@ -55,6 +56,7 @@ void main() {
     suggestedProductsManager = FakeSuggestedProductsManager();
 
     model = MapPageModel(
+        FakeSharedPreferences().asHolder(),
         userLocationManager,
         fakeShopsManager,
         addressObtainer,

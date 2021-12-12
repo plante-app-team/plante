@@ -12,6 +12,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -39,6 +40,7 @@ class MapPageModel implements ShopsManagerListener {
   final VoidCallback _updateCallback;
   final VoidCallback _loadingChangeCallback;
   final VoidCallback _suggestionsLoadingChangeCallback;
+  final SharedPreferencesHolder _prefs;
   final UserLocationManager _userLocationManager;
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
@@ -60,6 +62,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _directionsAvailable = false;
 
   MapPageModel(
+      this._prefs,
       this._userLocationManager,
       this._shopsManager,
       this._addressObtainer,
@@ -87,6 +90,8 @@ class MapPageModel implements ShopsManagerListener {
   bool get loadingSuggestions => _suggestedBarcodesSubscription != null;
   Iterable<OsmUID> get shopsWithSuggestedProducts =>
       _suggestedProductsBarcodes.keys;
+
+  SharedPreferencesHolder get prefs => _prefs;
 
   CameraPosition? initialCameraPosInstant() {
     var result = _latestCameraPosStorage.getCached();

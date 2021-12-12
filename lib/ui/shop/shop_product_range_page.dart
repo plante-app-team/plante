@@ -30,6 +30,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
@@ -86,7 +87,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
 
-  final _countryNameProvider = StateProvider<String?>((ref) => null);
+  final _countryName = UIValueWrapper<String?>(null);
 
   _ShopProductRangePageState() : super('ShopProductRangePage');
 
@@ -117,8 +118,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
   void _initAsync() async {
     final country = await _model.obtainCountryOfShop();
-    ref.read(_countryNameProvider.state).state =
-        country?.localize(context) ?? '';
+    _countryName.setValue(country?.localize(context) ?? '', ref);
   }
 
   @override
@@ -275,7 +275,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
   Widget _suggestedProductsTitle() {
     return Consumer(builder: (context, ref, _) {
-      final countryName = ref.watch(_countryNameProvider.state).state;
+      final countryName = _countryName.watch(ref);
       if (countryName == null) {
         return const Padding(
           padding: EdgeInsets.all(8),

@@ -454,7 +454,7 @@ void main() {
         .superTap(find.text(context.strings.map_page_load_shops_of_this_area));
 
     // Now the button should disappear
-    expect(find.text(context.strings.map_page_no_shops_hint_default_mode_2),
+    expect(find.text(context.strings.map_page_load_shops_of_this_area),
         findsNothing);
     commons.shopsManager.verify_fetchShops_called();
   });

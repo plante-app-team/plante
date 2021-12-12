@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,6 +12,7 @@ import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
@@ -102,13 +102,12 @@ class _MapPageState extends PageStatePlante<MapPage>
   Timer? _mapUpdatesTimer;
 
   final _hintsController = MapHintsListController();
-  String? _bottomHint;
+  RichText? _bottomHint;
 
   MapSearchPageResult? _latestSearchResult;
 
   bool get _loading => _model.loading;
   bool get _loadingSuggestions => _model.loadingSuggestions;
-  final _loadingAnythingProvider = StateProvider<bool>((ref) => false);
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
@@ -155,17 +154,13 @@ class _MapPageState extends PageStatePlante<MapPage>
       if (mounted) {
         _mode.onLoadingChange();
       }
-      ref.read(_loadingAnythingProvider.state).state =
-          _loading || _loadingSuggestions;
     };
-    final suggestionsLoadingChangeCallback = () {
-      ref.read(_loadingAnythingProvider.state).state =
-          _loading || _loadingSuggestions;
-    };
+    final suggestionsLoadingChangeCallback = () {};
     final updateShopsCallback = (_) {
       updateMapCallback.call();
     };
     _model = MapPageModel(
+        GetIt.I.get<SharedPreferencesHolder>(),
         GetIt.I.get<UserLocationManager>(),
         GetIt.I.get<ShopsManager>(),
         GetIt.I.get<AddressObtainer>(),
@@ -192,7 +187,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
-    final updateBottomHintCallback = (String? hint) {
+    final updateBottomHintCallback = (RichText? hint) {
       if (!mounted) {
         return;
       }
@@ -403,8 +398,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                     child: AnimatedListSimplePlante(children: _fabs()))),
             loadShopsButton,
             MapBottomHint(_bottomHint),
-            AnimatedListSimplePlante(
-                children: _mode.buildBottomActions(context)),
+            AnimatedListSimplePlante(children: _mode.buildBottomActions()),
           ])),
       Align(
         alignment: Alignment.topCenter,
@@ -415,12 +409,12 @@ class _MapPageState extends PageStatePlante<MapPage>
                   child: _mode.loadNewShops() && _model.viewPortShopsLoaded()
                       ? searchBar
                       : const SizedBox()),
-              AnimatedMapWidget(child: _mode.buildHeader(context)),
+              AnimatedMapWidget(child: _mode.buildHeader()),
               MapHintsList(controller: _hintsController),
-              AnimatedMapWidget(child: _mode.buildTopActions(context)),
+              AnimatedMapWidget(child: _mode.buildTopActions()),
             ])),
       ),
-      _mode.buildOverlay(context),
+      _mode.buildOverlay(),
       _progressBar(),
     ]);
 

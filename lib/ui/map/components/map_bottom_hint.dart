@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 class MapBottomHint extends StatefulWidget {
-  final String? text;
+  final RichText? text;
   final EdgeInsets padding;
   const MapBottomHint(this.text,
       {Key? key,
@@ -19,8 +18,8 @@ class _MapBottomHintState extends State<MapBottomHint>
   late AnimationController _animationController;
   late Animation<double> _animation;
 
-  String _displayedText = '';
-  bool _shown = false;
+  RichText? _displayedText;
+  bool get _shown => widget.text != null;
   AnimationStatusListener _animationStatusListener = (_) {};
 
   @override
@@ -30,8 +29,7 @@ class _MapBottomHintState extends State<MapBottomHint>
         AnimationController(vsync: this, duration: DURATION_DEFAULT);
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
 
-    _displayedText = widget.text ?? '';
-    _shown = _displayedText.isNotEmpty;
+    _displayedText = widget.text;
     _animationController.animateTo(_shown ? 1 : 0, duration: Duration.zero);
   }
 
@@ -40,13 +38,12 @@ class _MapBottomHintState extends State<MapBottomHint>
     super.didUpdateWidget(oldWidget);
 
     if (widget.text != null) {
-      _displayedText = widget.text!;
+      _displayedText = widget.text;
     } else {
       // If text is null, we will play the hide animation.
       // We want to keep the old text during the animation
       // so that the widget won't flicker.
     }
-    _shown = widget.text != null;
     _animationController.animateTo(_shown ? 1 : 0, duration: DURATION_DEFAULT);
 
     _animationController.removeStatusListener(_animationStatusListener);
@@ -57,7 +54,7 @@ class _MapBottomHintState extends State<MapBottomHint>
         // able to see that the hint is gone.
         if (widget.text == null) {
           setState(() {
-            _displayedText = '';
+            _displayedText = null;
           });
         }
       }
@@ -76,7 +73,7 @@ class _MapBottomHintState extends State<MapBottomHint>
           child: Padding(
             padding:
                 const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 13),
-            child: Text(_displayedText, style: TextStyles.normal),
+            child: _displayedText,
           ),
         ));
 

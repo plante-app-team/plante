@@ -16,6 +16,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
@@ -139,6 +140,8 @@ void main() {
     final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
     GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
         userAddressObtainer);
+    GetIt.I.registerSingleton<SharedPreferencesHolder>(
+        FakeSharedPreferences().asHolder());
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
