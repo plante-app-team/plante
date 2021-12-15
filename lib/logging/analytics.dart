@@ -1,5 +1,4 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:plante/base/settings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/main/main_page.dart';
 
@@ -11,10 +10,9 @@ class Analytics {
     MainPage.PAGE_NAME,
   ];
   final _analytics = FirebaseAnalytics();
-  final Settings _settings;
   String? _lastPage;
 
-  Analytics(this._settings);
+  Analytics();
 
   void sendEvent(String event, [Map<String, dynamic>? params]) {
     _sendEventImpl(event, params);
@@ -22,9 +20,6 @@ class Analytics {
 
   void _sendEventImpl(String event, [Map<String, dynamic>? params]) async {
     Log.i('Analytics event: $event, $params');
-    if (await _settings.testingBackends()) {
-      return;
-    }
     await _analytics.logEvent(name: event, parameters: params);
   }
 
@@ -42,9 +37,6 @@ class Analytics {
       return;
     }
     Log.i('Analytics page shown: $pageName');
-    if (await _settings.testingBackends()) {
-      return;
-    }
     _lastPage = pageName;
     await _analytics.setCurrentScreen(screenName: pageName);
     await _analytics.logEvent(name: 'page_shown_$pageName');

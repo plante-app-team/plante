@@ -20,7 +20,6 @@ import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:plante/ui/settings/settings_cache_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,9 +32,6 @@ class SettingsPage extends PagePlante {
 class _SettingsPageState extends PageStatePlante<SettingsPage> {
   bool _loading = true;
   bool _developer = false;
-  bool _testingBackends = false;
-  bool _testingBackendsQuickAnswers = false;
-  bool _offScannedProductEmpty = false;
   bool _enableNewestFeatures = false;
 
   final _settings = GetIt.I.get<Settings>();
@@ -64,10 +60,6 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
     }
 
     _developer = true;
-    _testingBackends = await _settings.testingBackends();
-    _testingBackendsQuickAnswers =
-        await _settings.testingBackendsQuickAnswers();
-    _offScannedProductEmpty = await _settings.fakeOffApiProductNotFound();
     _enableNewestFeatures = await _settings.enableNewestFeatures();
     setState(() {
       _loading = false;
@@ -173,45 +165,6 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
                               .setEnableNewestFeatures(_enableNewestFeatures);
                         });
                       }),
-                if (_developer)
-                  _CheckboxSettings(
-                      text: context.strings.settings_page_testing_backends,
-                      value: _testingBackends,
-                      onChanged: (value) {
-                        setState(() {
-                          _testingBackends = value;
-                          _settings.setTestingBackends(_testingBackends);
-                        });
-                      }),
-                if (_developer)
-                  AnimatedSwitcher(
-                      duration: DURATION_DEFAULT,
-                      child: !_testingBackends
-                          ? const SizedBox.shrink()
-                          : Column(children: [
-                              _CheckboxSettings(
-                                  text: context.strings
-                                      .settings_page_fake_off_scanned_product_empty,
-                                  value: _offScannedProductEmpty,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _offScannedProductEmpty = value;
-                                      _settings.setFakeOffApiProductNotFound(
-                                          _offScannedProductEmpty);
-                                    });
-                                  }),
-                              _CheckboxSettings(
-                                  text: context.strings
-                                      .settings_page_testing_backends_quick_answers,
-                                  value: _testingBackendsQuickAnswers,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _testingBackendsQuickAnswers = value;
-                                      _settings.setTestingBackendsQuickAnswers(
-                                          _testingBackendsQuickAnswers);
-                                    });
-                                  }),
-                            ])),
                 const SizedBox(height: 10),
                 Center(
                     child: InkWell(

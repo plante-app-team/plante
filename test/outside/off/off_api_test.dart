@@ -8,17 +8,14 @@ import 'package:plante/outside/off/off_shop.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_http_client.dart';
-import '../../z_fakes/fake_settings.dart';
 
 void main() {
   late OffApi offApi;
-  late FakeSettings fakeSettings;
   late FakeHttpClient httpClient;
 
   setUp(() async {
-    fakeSettings = FakeSettings();
     httpClient = FakeHttpClient();
-    offApi = OffApi(fakeSettings, httpClient);
+    offApi = OffApi(httpClient);
   });
 
   test('getProducts - integration', () async {
