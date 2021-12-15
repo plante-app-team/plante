@@ -6,6 +6,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
@@ -23,6 +24,7 @@ class MapPageModeParams {
   final ArgCallback<MapPageMode> modeSwitchCallback;
   final ResCallback<bool> isLoadingCallback;
   final ResCallback<bool> areShopsForViewPortLoadedCallback;
+  final UIValueWrapper<bool> shouldLoadNewShops;
   final Analytics analytics;
   MapPageModeParams(
       this.model,
@@ -37,6 +39,7 @@ class MapPageModeParams {
       this.modeSwitchCallback,
       this.isLoadingCallback,
       this.areShopsForViewPortLoadedCallback,
+      this.shouldLoadNewShops,
       this.analytics);
 }
 
@@ -59,9 +62,13 @@ abstract class MapPageMode {
   bool get loading => params.isLoadingCallback.call();
   bool get shopsForViewPortLoaded =>
       params.areShopsForViewPortLoadedCallback.call();
+  UIValueWrapper<bool> get shouldLoadNewShops => params.shouldLoadNewShops;
 
   @mustCallSuper
-  void init(MapPageMode? previousMode) {}
+  void init(MapPageMode? previousMode) {
+    shouldLoadNewShops.setValue(true, ref);
+  }
+
   @mustCallSuper
   void deinit() {}
   Iterable<Shop> filter(
@@ -75,7 +82,6 @@ abstract class MapPageMode {
   bool showWhereAmIFAB() => true;
   double minZoom() => DEFAULT_MIN_ZOOM;
   double maxZoom() => DEFAULT_MAX_ZOOM;
-  bool loadNewShops() => true;
 
   Widget buildOverlay() => const SizedBox.shrink();
   Widget buildHeader() => const SizedBox.shrink();

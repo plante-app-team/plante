@@ -6,6 +6,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
@@ -63,7 +64,8 @@ void main() {
         latestCameraPosStorage,
         directionsManager,
         suggestedProductsManager,
-        userAddressObtainer, (shops) {
+        userAddressObtainer,
+        UIValueWrapper<bool>(true), (shops) {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;

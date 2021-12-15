@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,6 +27,7 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
+import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
@@ -106,6 +108,8 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   MapSearchPageResult? _latestSearchResult;
 
+  final _loadNewShops = UIValueWrapper<bool>(true);
+
   bool get _loading => _model.loading;
   bool get _loadingSuggestions => _model.loadingSuggestions;
 
@@ -160,19 +164,21 @@ class _MapPageState extends PageStatePlante<MapPage>
       updateMapCallback.call();
     };
     _model = MapPageModel(
-        GetIt.I.get<SharedPreferencesHolder>(),
-        GetIt.I.get<UserLocationManager>(),
-        GetIt.I.get<ShopsManager>(),
-        GetIt.I.get<AddressObtainer>(),
-        GetIt.I.get<LatestCameraPosStorage>(),
-        GetIt.I.get<DirectionsManager>(),
-        GetIt.I.get<SuggestedProductsManager>(),
-        GetIt.I.get<CachingUserAddressPiecesObtainer>(),
-        updateShopsCallback,
-        _onError,
-        updateCallback,
-        loadingChangeCallback,
-        suggestionsLoadingChangeCallback);
+      GetIt.I.get<SharedPreferencesHolder>(),
+      GetIt.I.get<UserLocationManager>(),
+      GetIt.I.get<ShopsManager>(),
+      GetIt.I.get<AddressObtainer>(),
+      GetIt.I.get<LatestCameraPosStorage>(),
+      GetIt.I.get<DirectionsManager>(),
+      GetIt.I.get<SuggestedProductsManager>(),
+      GetIt.I.get<CachingUserAddressPiecesObtainer>(),
+      _loadNewShops,
+      updateShopsCallback,
+      _onError,
+      updateCallback,
+      loadingChangeCallback,
+      suggestionsLoadingChangeCallback,
+    );
 
     /// The clustering library levels logic is complicated.
     ///
@@ -221,7 +227,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         moveMapCallback: moveMapCallback,
         modeSwitchCallback: switchModeCallback,
         isLoadingCallback: () => _loading,
-        areShopsForViewPortLoadedCallback: _model.viewPortShopsLoaded);
+        areShopsForViewPortLoadedCallback: _model.viewPortShopsLoaded,
+        shouldLoadNewShops: _loadNewShops);
 
     _asyncInit();
     _instances.add(this);
@@ -324,33 +331,42 @@ class _MapPageState extends PageStatePlante<MapPage>
       initialPos = _model.defaultUserPos();
     }
 
-    final searchBar = Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Hero(
-            tag: 'search_bar',
-            child: MapSearchBar(
-                queryOverride: _latestSearchResult?.query,
-                enabled: false,
-                onDisabledTap: _onSearchBarTap,
-                onCleared: () {
-                  setState(() {
-                    _latestSearchResult = null;
-                    _mode.deselectShops();
-                  });
-                })));
+    final searchBar = Consumer(builder: (context, ref, _) {
+      final loadNewShops = _loadNewShops.watch(ref);
+      if (!loadNewShops || !_model.viewPortShopsLoaded()) {
+        return const SizedBox();
+      }
+      return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Hero(
+              tag: 'search_bar',
+              child: MapSearchBar(
+                  queryOverride: _latestSearchResult?.query,
+                  enabled: false,
+                  onDisabledTap: _onSearchBarTap,
+                  onCleared: () {
+                    setState(() {
+                      _latestSearchResult = null;
+                      _mode.deselectShops();
+                    });
+                  })));
+    });
 
-    final loadShopsButton = Padding(
-        padding: const EdgeInsets.only(bottom: 32),
-        child: AnimatedMapWidget(
-            child: !_model.viewPortShopsLoaded() &&
-                    _mode.loadNewShops() &&
-                    !_model.loading
-                ? ButtonFilledSmallPlante.lightGreen(
-                    elevation: 5,
-                    onPressed: _loadShops,
-                    text: context.strings.map_page_load_shops_of_this_area,
-                  )
-                : const SizedBox()));
+    final loadShopsButton = Consumer(builder: (context, ref, _) {
+      final loadNewShops = _loadNewShops.watch(ref);
+      return Padding(
+          padding: const EdgeInsets.only(bottom: 32),
+          child: AnimatedMapWidget(
+              child: !_model.viewPortShopsLoaded() &&
+                      loadNewShops &&
+                      !_model.loading
+                  ? ButtonFilledSmallPlante.lightGreen(
+                      elevation: 5,
+                      onPressed: _loadShops,
+                      text: context.strings.map_page_load_shops_of_this_area,
+                    )
+                  : const SizedBox()));
+    });
 
     final createMapWidget =
         !isInTests() || widget._testingStorage.createMapWidgetForTesting;
@@ -405,10 +421,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
-              AnimatedMapWidget(
-                  child: _mode.loadNewShops() && _model.viewPortShopsLoaded()
-                      ? searchBar
-                      : const SizedBox()),
+              AnimatedMapWidget(child: searchBar),
               AnimatedMapWidget(child: _mode.buildHeader()),
               MapHintsList(controller: _hintsController),
               AnimatedMapWidget(child: _mode.buildTopActions()),
