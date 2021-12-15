@@ -51,7 +51,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       required ArgCallback<Coord> moveMapCallback,
       required ArgCallback<MapPageMode> modeSwitchCallback,
       required ResCallback<bool> isLoadingCallback,
-      required ResCallback<bool> areShopsForViewPortLoadedCallback})
+      required ResCallback<bool> areShopsForViewPortLoadedCallback,
+      required UIValueWrapper<bool> shouldLoadNewShops})
       : super(
             MapPageModeParams(
                 model,
@@ -66,6 +67,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 modeSwitchCallback,
                 isLoadingCallback,
                 areShopsForViewPortLoadedCallback,
+                shouldLoadNewShops,
                 analytics),
             nameForAnalytics: 'default');
 

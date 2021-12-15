@@ -23,6 +23,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -48,6 +49,7 @@ class MapPageModel implements ShopsManagerListener {
   final DirectionsManager _directionsManager;
   final SuggestedProductsManager _suggestedProductsManager;
   final CachingUserAddressPiecesObtainer _userAddressPiecesObtainer;
+  final UIValueWrapper<bool> _shouldLoadNewShops;
 
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
@@ -70,6 +72,7 @@ class MapPageModel implements ShopsManagerListener {
       this._directionsManager,
       this._suggestedProductsManager,
       this._userAddressPiecesObtainer,
+      this._shouldLoadNewShops,
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
@@ -79,6 +82,12 @@ class MapPageModel implements ShopsManagerListener {
     _directionsManager
         .areDirectionsAvailable()
         .then((value) => _directionsAvailable = value);
+    _shouldLoadNewShops.callOnChanges((shouldLoadShops) {
+      if (!shouldLoadShops) {
+        _suggestedBarcodesSubscription?.cancel();
+        _suggestedBarcodesSubscription = null;
+      }
+    });
   }
 
   void dispose() {
@@ -181,7 +190,7 @@ class MapPageModel implements ShopsManagerListener {
 
   Future<void> _fetchOffShopsProductsData() async {
     final countryCode = await _userAddressPiecesObtainer.getCameraCountryCode();
-    if (countryCode == null) {
+    if (countryCode == null || !_shouldLoadNewShops.cachedVal) {
       return;
     }
 

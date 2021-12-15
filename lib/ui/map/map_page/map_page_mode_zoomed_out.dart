@@ -17,6 +17,7 @@ class MapPageModeZoomedOut extends MapPageMode {
     super.init(previousMode);
     hintsController.addHint(
         _ZOOM_HINT_ID, context.strings.map_page_zoom_in_to_see_shops);
+    shouldLoadNewShops.setValue(false, ref);
   }
 
   @override
@@ -24,9 +25,6 @@ class MapPageModeZoomedOut extends MapPageMode {
     hintsController.removeHint(_ZOOM_HINT_ID);
     super.deinit();
   }
-
-  @override
-  bool loadNewShops() => false;
 
   @override
   Iterable<Shop> filter(

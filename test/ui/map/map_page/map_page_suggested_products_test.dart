@@ -10,6 +10,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/products/suggested_products_manager.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
@@ -158,6 +159,48 @@ void main() {
 
     // Ensure the first stream subscription has been canceled
     // and another stream has been requested.
+    expect(suggestionsStreams.length, equals(2));
+    expect(suggestionsStreams[0].hasListener, isFalse);
+    expect(suggestionsStreams[1].hasListener, isTrue);
+  });
+
+  testWidgets('suggested products loading gets canceled on map zoom out',
+      (WidgetTester tester) async {
+    final suggestionsStreams = <_SuggestionsStream>[];
+    final suggestedProductsManager = MockSuggestedProductsManager();
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+        .thenAnswer((_) {
+      suggestionsStreams.add(_SuggestionsStream());
+      return suggestionsStreams.last.stream;
+    });
+    GetIt.I.unregister(instance: commons.suggestedProductsManager);
+    GetIt.I
+        .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
+
+    final page = await commons.createIdleMapPage(tester);
+
+    // Ensure the first stream is being listened to.
+    expect(suggestionsStreams.length, equals(1));
+    expect(suggestionsStreams[0].hasListener, isTrue);
+
+    // Zoom out
+    await tester.runAsync(() async {
+      await commons.moveCamera(commons.shopsBounds.center,
+          MapPageModeDefault.MIN_ZOOM, page, tester);
+    });
+
+    // Ensure the first stream subscription has been canceled
+    // and another stream has not been requested yet.
+    expect(suggestionsStreams.length, equals(1));
+    expect(suggestionsStreams[0].hasListener, isFalse);
+
+    // Map zoomed back in - we expect suggestions load to restart.
+    await tester.runAsync(() async {
+      await commons.moveCamera(commons.shopsBounds.center,
+          MapPageMode.DEFAULT_MAX_ZOOM, page, tester);
+    });
+
+    // Ensure another suggestions loading has started.
     expect(suggestionsStreams.length, equals(2));
     expect(suggestionsStreams[0].hasListener, isFalse);
     expect(suggestionsStreams[1].hasListener, isTrue);
