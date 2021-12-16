@@ -13,6 +13,7 @@ import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_cacher.dart';
@@ -209,14 +210,16 @@ class ShopsManager {
   }
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
-      Product product, List<Shop> shops) async {
-    final result = await _backendWorker.putProductToShops(product, shops);
+      Product product, List<Shop> shops, ProductAtShopSource source) async {
+    final result =
+        await _backendWorker.putProductToShops(product, shops, source);
     final eventParam = {
       'barcode': product.barcode,
-      'shops': shops.map((e) => e.osmUID).join(', ')
+      'shops': shops.map((e) => e.osmUID).join(', '),
     };
     if (result.isOk) {
-      _analytics.sendEvent('product_put_to_shop', eventParam);
+      _analytics.sendEvent(
+          _putProductToShopEventName(source, success: true), eventParam);
       for (final shop in shops) {
         var rangeCache = _rangesCache[shop.osmUID];
         if (rangeCache != null) {
@@ -248,9 +251,33 @@ class ShopsManager {
       }
       _notifyListeners();
     } else {
-      _analytics.sendEvent('product_put_to_shop_failure', eventParam);
+      _analytics.sendEvent(
+          _putProductToShopEventName(source, success: false), eventParam);
     }
     return result;
+  }
+
+  String _putProductToShopEventName(ProductAtShopSource source,
+      {required bool success}) {
+    if (success) {
+      switch (source) {
+        case ProductAtShopSource.MANUAL:
+          return 'product_put_to_shop';
+        case ProductAtShopSource.OFF_SUGGESTION:
+          return 'product_put_to_shop_off_suggestion';
+        case ProductAtShopSource.RADIUS_SUGGESTION:
+          return 'product_put_to_shop_radius_suggestion';
+      }
+    } else {
+      switch (source) {
+        case ProductAtShopSource.MANUAL:
+          return 'product_put_to_shop_failure';
+        case ProductAtShopSource.OFF_SUGGESTION:
+          return 'product_put_to_shop_off_suggestion_failure';
+        case ProductAtShopSource.RADIUS_SUGGESTION:
+          return 'product_put_to_shop_radius_suggestion_failure';
+      }
+    }
   }
 
   Future<Result<Shop, ShopsManagerError>> createShop(

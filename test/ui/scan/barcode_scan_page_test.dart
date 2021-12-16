@@ -23,6 +23,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -103,7 +104,7 @@ void main() {
     when(permissionsManager.request(any))
         .thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
-    when(shopsManager.putProductToShops(any, any))
+    when(shopsManager.putProductToShops(any, any, any))
         .thenAnswer((_) async => Ok(None()));
   });
 
@@ -479,13 +480,14 @@ void main() {
     expect(find.text(expectedQuestion), findsOneWidget);
 
     expect(find.byType(BarcodeScanPage), findsOneWidget);
-    verifyNever(shopsManager.putProductToShops(any, any));
+    verifyNever(shopsManager.putProductToShops(any, any, any));
     await tester.tap(find.text(context.strings.global_yes));
     await tester.pumpAndSettle();
     // Expecting the page to close
     expect(find.byType(BarcodeScanPage), findsNothing);
     // Expecting the product to be put to the shop
-    verify(shopsManager.putProductToShops(product, [shop]));
+    verify(shopsManager.putProductToShops(
+        product, [shop], ProductAtShopSource.MANUAL));
   });
 
   testWidgets(
@@ -523,13 +525,13 @@ void main() {
     expect(find.text(expectedQuestion), findsOneWidget);
 
     expect(find.byType(BarcodeScanPage), findsOneWidget);
-    verifyNever(shopsManager.putProductToShops(any, any));
+    verifyNever(shopsManager.putProductToShops(any, any, any));
     await tester.tap(find.text(context.strings.global_no));
     await tester.pumpAndSettle();
     // Expecting the page to close
     expect(find.byType(BarcodeScanPage), findsNothing);
     // Expecting the product to be NOT put to the shop
-    verifyNever(shopsManager.putProductToShops(any, any));
+    verifyNever(shopsManager.putProductToShops(any, any, any));
   });
 
   testWidgets('opened to add a product to shop, new product',
@@ -556,7 +558,7 @@ void main() {
 
     expect(find.byType(BarcodeScanPage), findsOneWidget);
     expect(find.byType(InitProductPage), findsNothing);
-    verifyNever(shopsManager.putProductToShops(any, any));
+    verifyNever(shopsManager.putProductToShops(any, any, any));
     await tester.tap(find.text(context.strings.barcode_scan_page_add_product));
     await tester.pumpAndSettle();
     // Expecting the page to close

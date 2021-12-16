@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/device_info.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/base/settings.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
@@ -21,8 +20,8 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/backend/fake_backend.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
@@ -39,38 +38,24 @@ class BackendObserver {
 }
 
 class Backend {
-  late final Backend _fakeBackend;
   final Analytics _analytics;
   final UserParamsController _userParamsController;
   final HttpClient _http;
-  final Settings _settings;
 
   final _observers = <BackendObserver>[];
 
-  Backend(
-      this._analytics, this._userParamsController, this._http, this._settings) {
-    _fakeBackend = FakeBackend(_settings);
-  }
+  Backend(this._analytics, this._userParamsController, this._http);
 
   void addObserver(BackendObserver observer) => _observers.add(observer);
   void removeObserver(BackendObserver observer) => _observers.remove(observer);
 
   Future<bool> isLoggedIn() async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.isLoggedIn();
-    }
     final userParams = await _userParamsController.getUserParams();
     return userParams?.backendClientToken != null;
   }
 
   Future<Result<UserParams, BackendError>> loginOrRegister(
       {String? googleIdToken, String? appleAuthorizationCode}) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.loginOrRegister(
-          googleIdToken: googleIdToken,
-          appleAuthorizationCode: appleAuthorizationCode);
-    }
-
     if (await isLoggedIn()) {
       final userParams = await _userParamsController.getUserParams();
       return Ok(userParams!);
@@ -99,11 +84,6 @@ class Backend {
 
   Future<Result<bool, BackendError>> updateUserParams(UserParams userParams,
       {String? backendClientTokenOverride}) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.updateUserParams(userParams,
-          backendClientTokenOverride: backendClientTokenOverride);
-    }
-
     final params = <String, dynamic>{};
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params['name'] = userParams.name;
@@ -127,10 +107,6 @@ class Backend {
 
   Future<Result<RequestedProductsResult, BackendError>> requestProducts(
       List<String> barcodes, int page) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestProducts(barcodes, page);
-    }
-
     final jsonRes = await _backendGetJson(
         'products_data/', {'barcodes': barcodes, 'page': '$page'});
     if (jsonRes.isErr) {
@@ -158,11 +134,6 @@ class Backend {
 
   Future<Result<None, BackendError>> createUpdateProduct(String barcode,
       {VegStatus? veganStatus, List<LangCode>? changedLangs}) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.createUpdateProduct(barcode,
-          veganStatus: veganStatus);
-    }
-
     final params = <String, dynamic>{};
     params['barcode'] = barcode;
     if (veganStatus != null) {
@@ -179,10 +150,6 @@ class Backend {
       String barcode, String reportText) async {
     _analytics
         .sendEvent('report_sent', {'barcode': barcode, 'report': reportText});
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.sendReport(barcode, reportText);
-    }
-
     final params = <String, String>{};
     params['barcode'] = barcode;
     params['text'] = reportText;
@@ -191,10 +158,6 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> sendProductScan(String barcode) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.sendProductScan(barcode);
-    }
-
     final params = <String, String>{};
     params['barcode'] = barcode;
     final response = await _backendGet('product_scan/', params);
@@ -202,9 +165,6 @@ class Backend {
   }
 
   Future<Result<MobileAppConfig, BackendError>> mobileAppConfig() async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.mobileAppConfig();
-    }
     final jsonRes = await _backendGetJson('mobile_app_config/', {});
     if (jsonRes.isErr) {
       return Err(jsonRes.unwrapErr());
@@ -215,10 +175,6 @@ class Backend {
 
   Future<Result<List<BackendProductsAtShop>, BackendError>>
       requestProductsAtShops(Iterable<OsmUID> osmUIDs) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestProductsAtShops(osmUIDs);
-    }
-
     final jsonRes = await _backendGetJson('products_at_shops_data/',
         {'osmShopsUIDs': osmUIDs.map((e) => e.toString())});
     if (jsonRes.isErr) {
@@ -245,10 +201,6 @@ class Backend {
 
   Future<Result<List<BackendShop>, BackendError>> requestShopsByOsmUIDs(
       Iterable<OsmUID> osmUIDs) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestShopsByOsmUIDs(osmUIDs);
-    }
-
     final jsonRes = await _backendGetJson('shops_data/', {},
         body:
             jsonEncode({'osm_uids': osmUIDs.map((e) => e.toString()).toList()}),
@@ -276,10 +228,6 @@ class Backend {
 
   Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
       CoordsBounds bounds) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.requestShopsWithin(bounds);
-    }
-
     final jsonRes = await _backendGetJson('/shops_in_bounds_data/', {
       'north': '${bounds.north}',
       'south': '${bounds.south}',
@@ -311,10 +259,6 @@ class Backend {
       String barcode, OsmUID osmUID, bool positive) async {
     _analytics.sendEvent('product_presence_vote',
         {'barcode': barcode, 'shop': osmUID.toString(), 'vote': positive});
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.productPresenceVote(barcode, osmUID, positive);
-    }
-
     final response = await _backendGetJson('product_presence_vote/', {
       'barcode': barcode,
       'shopOsmUID': osmUID.toString(),
@@ -329,16 +273,13 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, Shop shop) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.putProductToShop(barcode, shop);
-    }
-
+      String barcode, Shop shop, ProductAtShopSource source) async {
     final response = await _backendGet('put_product_to_shop/', {
       'barcode': barcode,
       'shopOsmUID': shop.osmUID.toString(),
       'lon': shop.coord.lon.toString(),
       'lat': shop.coord.lat.toString(),
+      'source': source.persistentName,
     });
     return _noneOrErrorFrom(response);
   }
@@ -347,11 +288,6 @@ class Backend {
       {required String name,
       required Coord coord,
       required String type}) async {
-    if (await _settings.testingBackends()) {
-      return await _fakeBackend.createShop(
-          name: name, coord: coord, type: type);
-    }
-
     final jsonRes = await _backendGetJson('create_shop/', {
       'lon': coord.lon.toString(),
       'lat': coord.lat.toString(),

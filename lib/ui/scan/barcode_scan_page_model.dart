@@ -11,6 +11,7 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
@@ -249,6 +250,7 @@ class BarcodeScanPageModel
   Future<Result<None, ShopsManagerError>> _addProductToShop() async {
     final product = _foundProduct!;
     final shop = _widget.addProductToShop!;
-    return _shopsManager.putProductToShops(product, [shop]);
+    return _shopsManager.putProductToShops(
+        product, [shop], ProductAtShopSource.MANUAL);
   }
 }

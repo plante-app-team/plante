@@ -4,6 +4,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -84,6 +85,7 @@ void main() {
     final createShopParams = shopsManager.calls_putProductToShops().single;
     expect(createShopParams.product, equals(product));
     expect(createShopParams.shops, equals([shops[0], shops[1]]));
+    expect(createShopParams.source, equals(ProductAtShopSource.MANUAL));
   });
 
   testWidgets('can put products to shops cluster', (WidgetTester tester) async {

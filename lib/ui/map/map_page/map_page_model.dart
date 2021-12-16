@@ -15,6 +15,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -247,9 +248,9 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
-      Product product, List<Shop> shops) async {
+      Product product, List<Shop> shops, ProductAtShopSource source) async {
     return await _networkOperation(() async {
-      return await _shopsManager.putProductToShops(product, shops);
+      return await _shopsManager.putProductToShops(product, shops, source);
     });
   }
 

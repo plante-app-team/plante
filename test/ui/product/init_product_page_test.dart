@@ -22,6 +22,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -98,7 +99,7 @@ void main() {
 
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-    when(shopsManager.putProductToShops(any, any))
+    when(shopsManager.putProductToShops(any, any, any))
         .thenAnswer((_) async => Ok(None()));
 
     GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
@@ -366,13 +367,16 @@ void main() {
     }
     expectedShops.removeWhere((shop) => shopsToCancel.contains(shop));
     if (expectedProductResult != null && expectedShops.isNotEmpty) {
-      final sentShops = verify(
-              shopsManager.putProductToShops(expectedProductResult, captureAny))
-          .captured
-          .first as List<Shop>;
+      final captured = verify(shopsManager.putProductToShops(
+              expectedProductResult, captureAny, captureAny))
+          .captured;
+      final sentShops = captured[0] as List<Shop>;
+      final source = captured[1] as ProductAtShopSource;
+
       expect(expectedShops.toSet(), equals(sentShops.toSet()));
+      expect(source, equals(ProductAtShopSource.MANUAL));
     } else {
-      verifyNever(shopsManager.putProductToShops(any, any));
+      verifyNever(shopsManager.putProductToShops(any, any, any));
     }
 
     // If done, cache dir must be deleted
@@ -717,7 +721,7 @@ void main() {
       ..veganStatus = VegStatus.positive
       ..veganStatusSource = VegStatusSource.community).productForTests();
 
-    when(shopsManager.putProductToShops(any, any))
+    when(shopsManager.putProductToShops(any, any, any))
         .thenAnswer((_) async => Err(ShopsManagerError.OTHER));
 
     final done = await generalTest(tester,

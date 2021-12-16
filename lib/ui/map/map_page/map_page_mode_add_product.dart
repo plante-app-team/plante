@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
@@ -13,7 +14,7 @@ class MapPageModeAddProduct extends MapPageModeSelectShopsWhereProductSoldBase {
   @override
   void onDoneClick() async {
     final result = await model.putProductToShops(
-        widget.product!, selectedShops().toList());
+        widget.product!, selectedShops().toList(), ProductAtShopSource.MANUAL);
     if (result.isErr) {
       if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
         showSnackBar(context.strings.global_network_error, context);

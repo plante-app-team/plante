@@ -7,6 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
@@ -136,7 +137,8 @@ class SuggestedProductsModel {
   Future<Result<ProductPresenceVoteResult, ShopsManagerError>?>
       productPresenceVote(Product product, bool positive) async {
     if (positive) {
-      final putRes = await _shopsManager.putProductToShops(product, [_shop]);
+      final putRes = await _shopsManager.putProductToShops(
+          product, [_shop], ProductAtShopSource.OFF_SUGGESTION);
       if (putRes.isErr) {
         return Err(putRes.unwrapErr());
       }

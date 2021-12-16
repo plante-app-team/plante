@@ -46,7 +46,7 @@ import 'package:plante/ui/photos_taker.dart';
 void initDI() {
   GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
   GetIt.I.registerSingleton<Settings>(Settings());
-  GetIt.I.registerSingleton<Analytics>(Analytics(GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<Analytics>(Analytics());
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());
@@ -66,11 +66,8 @@ void initDI() {
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
-  GetIt.I.registerSingleton<Backend>(Backend(
-      GetIt.I.get<Analytics>(),
-      GetIt.I.get<UserParamsController>(),
-      GetIt.I.get<HttpClient>(),
-      GetIt.I.get<Settings>()));
+  GetIt.I.registerSingleton<Backend>(Backend(GetIt.I.get<Analytics>(),
+      GetIt.I.get<UserParamsController>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(
       GetIt.I.get<Backend>(),
       GetIt.I.get<UserParamsController>(),
@@ -104,8 +101,7 @@ void initDI() {
       GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
-  GetIt.I.registerSingleton<OffApi>(
-      OffApi(GetIt.I.get<Settings>(), GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<TakenProductsImagesStorage>(
       TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(

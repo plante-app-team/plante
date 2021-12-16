@@ -8,6 +8,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
@@ -158,9 +159,10 @@ class ShopsManagerBackendWorker {
   }
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
-      Product product, List<Shop> shops) async {
+      Product product, List<Shop> shops, ProductAtShopSource source) async {
     for (final shop in shops) {
-      final res = await _backend.putProductToShop(product.barcode, shop);
+      final res =
+          await _backend.putProductToShop(product.barcode, shop, source);
       if (res.isErr) {
         return Err(res.unwrapErr().convert());
       }

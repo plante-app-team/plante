@@ -5,6 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
@@ -78,11 +79,12 @@ void main() {
     expect(productsObtainer.inflatesBackendProductsCount, equals(0));
 
     // Range update
-    verifyNever(backend.putProductToShop(any, any));
-    final putRes =
-        await shopsManager.putProductToShops(rangeProducts[2], [shop]);
+    verifyNever(backend.putProductToShop(any, any, any));
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [shop], ProductAtShopSource.MANUAL);
     expect(putRes.isOk, isTrue);
-    verify(backend.putProductToShop(any, any));
+    verify(backend.putProductToShop(
+        rangeProducts[2].barcode, shop, ProductAtShopSource.MANUAL));
 
     // Third fetch
     final rangeRes3 = await shopsManager.fetchShopProductRange(shop);
@@ -144,8 +146,8 @@ void main() {
     verifyNever(listener.onLocalShopsChange());
 
     // Product is put to the shop
-    final putRes =
-        await shopsManager.putProductToShops(rangeProducts[2], [shop]);
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [shop], ProductAtShopSource.MANUAL);
     expect(putRes.isOk, isTrue);
     // Listener expected to be notified about cache update -
     // new product appeared!
