@@ -10,6 +10,7 @@ import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/user_address/user_address_piece.dart';
@@ -231,6 +232,11 @@ void main() {
 
     // Product is now put to the shop
     shopsManager.verify_putProductToShops_called(times: 1);
+    final productToShopCall = shopsManager.calls_putProductToShops().first;
+    expect(productToShopCall.product, equals(suggestedProducts[0]));
+    expect(productToShopCall.shops, equals([aShop]));
+    expect(
+        productToShopCall.source, equals(ProductAtShopSource.OFF_SUGGESTION));
 
     // Positively-voted product is now confirmed
     suggestedProductsTitleCenter =

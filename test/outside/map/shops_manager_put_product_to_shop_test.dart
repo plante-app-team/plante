@@ -5,6 +5,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -50,8 +51,8 @@ void main() {
     clearInteractions(backend);
 
     // A range update
-    final putRes = await shopsManager
-        .putProductToShops(rangeProducts[2], [shops1.values.first]);
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [shops1.values.first], ProductAtShopSource.MANUAL);
     expect(putRes.isOk, isTrue);
 
     // Fetch #2
@@ -101,8 +102,8 @@ void main() {
     clearInteractions(backend);
 
     // A range update
-    final putRes = await shopsManager
-        .putProductToShops(rangeProducts[2], [shops1.values.first]);
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [shops1.values.first], ProductAtShopSource.MANUAL);
     expect(putRes.isOk, isTrue);
 
     // Fetch #2
@@ -126,38 +127,48 @@ void main() {
   test('put product to shop analytics', () async {
     expect(analytics.allEvents(), equals([]));
 
+    final product = rangeProducts[2];
+
+    final verifyEvent = (String event, ProductAtShopSource source) async {
+      await shopsManager.putProductToShops(
+          product, fullShops.values.toList(), source);
+      expect(analytics.allEvents().length, equals(1));
+      expect(
+          analytics.firstSentEvent(event).second,
+          equals({
+            'barcode': product.barcode,
+            'shops': fullShops.values
+                .toList()
+                .map((e) => e.osmUID)
+                .toList()
+                .join(', '),
+          }));
+      analytics.clearEvents();
+    };
+
     // Success
-    await shopsManager.putProductToShops(
-        rangeProducts[2], fullShops.values.toList());
-    expect(analytics.allEvents().length, equals(1));
-    expect(
-        analytics.firstSentEvent('product_put_to_shop').second,
-        equals({
-          'barcode': rangeProducts[2].barcode,
-          'shops': fullShops.values
-              .toList()
-              .map((e) => e.osmUID)
-              .toList()
-              .join(', '),
-        }));
-    analytics.clearEvents();
+    var sourceEventsMap = {
+      ProductAtShopSource.MANUAL: 'product_put_to_shop',
+      ProductAtShopSource.OFF_SUGGESTION: 'product_put_to_shop_off_suggestion',
+      ProductAtShopSource.RADIUS_SUGGESTION:
+          'product_put_to_shop_radius_suggestion',
+    };
+    for (final source in sourceEventsMap.keys) {
+      await verifyEvent(sourceEventsMap[source]!, source);
+    }
 
     // Failure
-    when(backend.putProductToShop(any, any))
+    when(backend.putProductToShop(any, any, any))
         .thenAnswer((_) async => Err(BackendError.other()));
-    await shopsManager.putProductToShops(
-        rangeProducts[2], fullShops.values.toList());
-    expect(analytics.allEvents().length, equals(1));
-    expect(
-        analytics.firstSentEvent('product_put_to_shop_failure').second,
-        equals({
-          'barcode': rangeProducts[2].barcode,
-          'shops': fullShops.values
-              .toList()
-              .map((e) => e.osmUID)
-              .toList()
-              .join(', '),
-        }));
-    analytics.clearEvents();
+    sourceEventsMap = {
+      ProductAtShopSource.MANUAL: 'product_put_to_shop_failure',
+      ProductAtShopSource.OFF_SUGGESTION:
+          'product_put_to_shop_off_suggestion_failure',
+      ProductAtShopSource.RADIUS_SUGGESTION:
+          'product_put_to_shop_radius_suggestion_failure',
+    };
+    for (final source in sourceEventsMap.keys) {
+      await verifyEvent(sourceEventsMap[source]!, source);
+    }
   });
 }

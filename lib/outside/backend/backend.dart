@@ -21,6 +21,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/http_client.dart';
@@ -272,12 +273,13 @@ class Backend {
   }
 
   Future<Result<None, BackendError>> putProductToShop(
-      String barcode, Shop shop) async {
+      String barcode, Shop shop, ProductAtShopSource source) async {
     final response = await _backendGet('put_product_to_shop/', {
       'barcode': barcode,
       'shopOsmUID': shop.osmUID.toString(),
       'lon': shop.coord.lon.toString(),
       'lat': shop.coord.lat.toString(),
+      'source': source.persistentName,
     });
     return _noneOrErrorFrom(response);
   }

@@ -47,6 +47,7 @@ class FakeHttpClient extends HttpClient {
 
   void reset() {
     _responses.clear();
+    _requests.clear();
   }
 
   @override

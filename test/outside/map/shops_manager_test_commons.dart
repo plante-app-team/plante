@@ -95,7 +95,7 @@ class ShopsManagerTestCommons {
     osmCacher = FakeOsmCacher();
     shopsManager = createShopsManager();
 
-    when(backend.putProductToShop(any, any))
+    when(backend.putProductToShop(any, any, any))
         .thenAnswer((_) async => Ok(None()));
     when(osm.fetchShops(
             bounds: anyNamed('bounds'), osmUIDs: anyNamed('osmUIDs')))

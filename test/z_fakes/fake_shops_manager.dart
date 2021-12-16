@@ -9,6 +9,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/osm/osm_element_type.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -229,8 +230,9 @@ class FakeShopsManager implements ShopsManager {
 
   @override
   Future<Result<None, ShopsManagerError>> putProductToShops(
-      Product product, List<Shop> shops) async {
-    _putProductToShopsCalls.add(PutProductToShopsParams(product, shops));
+      Product product, List<Shop> shops, ProductAtShopSource source) async {
+    _putProductToShopsCalls
+        .add(PutProductToShopsParams(product, shops, source));
     for (final shop in shops) {
       var range = _shopsRanges[shop.osmUID];
       if (range?.isErr == true) {
@@ -259,5 +261,6 @@ class FakeShopsManager implements ShopsManager {
 class PutProductToShopsParams {
   final Product product;
   final List<Shop> shops;
-  PutProductToShopsParams(this.product, this.shops);
+  final ProductAtShopSource source;
+  PutProductToShopsParams(this.product, this.shops, this.source);
 }

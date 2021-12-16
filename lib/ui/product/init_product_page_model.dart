@@ -16,6 +16,7 @@ import 'package:plante/model/product_restorable.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shops_list_restorable.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
@@ -308,8 +309,8 @@ class InitProductPageModel {
 
       if (shops.isNotEmpty) {
         Log.i('InitProductPageModel: saveProduct: saving shops');
-        final shopsResult =
-            await _shopsManager.putProductToShops(savedProduct, shops);
+        final shopsResult = await _shopsManager.putProductToShops(
+            savedProduct, shops, ProductAtShopSource.MANUAL);
         if (shopsResult.isErr) {
           _analytics.sendEvent(
               'product_save_shops_failure', {'barcode': productSlice.barcode});

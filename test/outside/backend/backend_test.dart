@@ -14,6 +14,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:test/test.dart';
@@ -982,13 +983,39 @@ void main() {
         ..longitude = 11
         ..latitude = 12
         ..name = 'Spar2')));
-    final result = await backend.putProductToShop('123456', shop);
+    final result = await backend.putProductToShop(
+        '123456', shop, ProductAtShopSource.MANUAL);
     expect(result.isOk, isTrue);
 
     final request = httpClient.getRequestsMatching('.*').single;
     final url = request.url.toString();
     expect(url, contains('lat=12'));
     expect(url, contains('lon=11'));
+  });
+
+  test('put product to shop all sources', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    final shop = Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmUID = OsmUID.parse('1:2')
+        ..longitude = 11
+        ..latitude = 12
+        ..name = 'Spar2')));
+
+    for (final source in ProductAtShopSource.values) {
+      httpClient.reset();
+      httpClient
+          .setResponse('.*put_product_to_shop.*', ''' { "result": "ok" } ''');
+
+      final result = await backend.putProductToShop('123456', shop, source);
+      expect(result.isOk, isTrue);
+
+      final request = httpClient.getRequestsMatching('.*').single;
+      final url = request.url.toString();
+      expect(url, contains('source=${source.persistentName}'));
+    }
   });
 
   test('put product to shop error', () async {
@@ -1003,7 +1030,8 @@ void main() {
         ..longitude = 11
         ..latitude = 12
         ..name = 'Spar2')));
-    final result = await backend.putProductToShop('123456', shop);
+    final result = await backend.putProductToShop(
+        '123456', shop, ProductAtShopSource.MANUAL);
     expect(result.isErr, isTrue);
   });
 
