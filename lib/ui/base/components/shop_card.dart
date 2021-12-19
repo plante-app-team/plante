@@ -131,7 +131,7 @@ class ShopCard extends StatelessWidget {
       text = context.strings.shop_card_products_listed;
     } else if (suggestedProductsCount > 0) {
       color = ColorsPlante.yellow;
-      text = context.strings.shop_card_off_products_listed;
+      text = context.strings.shop_card_suggested_products_listed;
     }
 
     return Padding(

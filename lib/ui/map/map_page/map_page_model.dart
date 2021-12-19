@@ -23,7 +23,9 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
 import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
@@ -59,7 +61,7 @@ class MapPageModel implements ShopsManagerListener {
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
-  final _suggestedProductsBarcodes = <OsmUID, Set<String>>{};
+  final _barcodesSuggestions = SuggestedBarcodesMapFull({});
   StreamSubscription? _suggestedBarcodesSubscription;
 
   bool _directionsAvailable = false;
@@ -98,9 +100,8 @@ class MapPageModel implements ShopsManagerListener {
   bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
   bool get loadingSuggestions => _suggestedBarcodesSubscription != null;
-  Iterable<OsmUID> get shopsWithSuggestedProducts =>
-      _suggestedProductsBarcodes.keys;
-
+  SuggestedBarcodesMapFull get barcodesSuggestions =>
+      _barcodesSuggestions.unmodifiable();
   SharedPreferencesHolder get prefs => _prefs;
 
   CameraPosition? initialCameraPosInstant() {
@@ -190,8 +191,13 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<void> _fetchOffShopsProductsData() async {
+    await _suggestedBarcodesSubscription?.cancel();
+
     final countryCode = await _userAddressPiecesObtainer.getCameraCountryCode();
-    if (countryCode == null || !_shouldLoadNewShops.cachedVal) {
+    final center = _latestViewPort?.center;
+    if (countryCode == null ||
+        center == null ||
+        !_shouldLoadNewShops.cachedVal) {
       return;
     }
 
@@ -199,29 +205,28 @@ class MapPageModel implements ShopsManagerListener {
     // has products in Open Food Facts.
     final shopsOnMap = _shopsCache.values;
 
-    await _suggestedBarcodesSubscription?.cancel();
-    final collectedBarcodes = <OsmUID, List<String>>{};
+    final collectedSuggestions = <OsmUID, List<SuggestionsForShop>>{};
     var lastAbsorbTime = DateTime.now();
     final absorbNewSuggestions = () {
-      for (final entry in collectedBarcodes.entries) {
-        _suggestedProductsBarcodes[entry.key] ??= {};
-        _suggestedProductsBarcodes[entry.key]!.addAll(entry.value);
+      for (final entry in collectedSuggestions.entries) {
+        entry.value.forEach(_applySuggestions);
       }
-      if (!collectedBarcodes.isEmpty) {
-        collectedBarcodes.clear();
+      if (!collectedSuggestions.isEmpty) {
+        collectedSuggestions.clear();
         _updateShopsCallback.call(_shopsCache);
       }
       lastAbsorbTime = DateTime.now();
     };
-    _suggestedBarcodesSubscription = _suggestedProductsManager
-        .getSuggestedBarcodes(shopsOnMap, countryCode)
-        .listen((event) {
+
+    final stream = _suggestedProductsManager.getAllSuggestedBarcodes(
+        shopsOnMap, center, countryCode);
+    _suggestedBarcodesSubscription = stream.listen((event) {
       if (event.isErr) {
         return;
       }
-      final pair = event.unwrap();
-      collectedBarcodes[pair.first] ??= [];
-      collectedBarcodes[pair.first]!.addAll(pair.second);
+      final suggestion = event.unwrap();
+      collectedSuggestions[suggestion.osmUID] ??= [];
+      collectedSuggestions[suggestion.osmUID]!.add(suggestion);
       if (DateTime.now().difference(lastAbsorbTime) >=
           delayBetweenSuggestionsAbsorption) {
         absorbNewSuggestions();
@@ -232,6 +237,10 @@ class MapPageModel implements ShopsManagerListener {
       absorbNewSuggestions.call();
     });
     _suggestionsLoadingChangeCallback.call();
+  }
+
+  void _applySuggestions(SuggestionsForShop suggestions) {
+    _barcodesSuggestions.add(suggestions);
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
@@ -285,10 +294,6 @@ class MapPageModel implements ShopsManagerListener {
     _directionsManager.direct(shop.coord, shop.name);
   }
 
-  int suggestedProductsCount(Shop shop) {
-    return _suggestedProductsBarcodes[shop.osmUID]?.length ?? 0;
-  }
-
   void finishWith<T>(BuildContext context, T result) {
     Navigator.pop(context, result);
   }
@@ -305,6 +310,6 @@ MapPageModelError _convertShopsManagerError(ShopsManagerError error) {
   }
 }
 
-extension _CoordExt on Coord {
+extension on Coord {
   LatLng toLatLng() => LatLng(lat, lon);
 }

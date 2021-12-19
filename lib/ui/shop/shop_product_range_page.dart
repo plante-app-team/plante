@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +17,8 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
@@ -83,6 +86,10 @@ class ShopProductRangePage extends PagePlante {
 }
 
 class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
+  static const _SUGGESTIONS_PRIORITIES = [
+    SuggestionType.RADIUS,
+    SuggestionType.OFF,
+  ];
   static const _LIST_GRADIENT_SIZE = 12.0;
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
@@ -153,9 +160,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             errorText(context.strings.global_something_went_wrong));
       }
     } else {
-      if (_model.confirmedProducts.isEmpty &&
-          _model.suggestedProducts.isEmpty &&
-          !_model.suggestedProductsLoading) {
+      if (_noProducts()) {
         centralContent = errorWrapper(errorText(
             context.strings.shop_product_range_page_this_shop_has_no_product));
       } else {
@@ -164,23 +169,35 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             .add(Container(color: Colors.white, height: _LIST_GRADIENT_SIZE));
 
         final confirmedProducts = _model.confirmedProducts;
-        final suggestedProducts = _model.suggestedProducts.toList();
-        final confirmedBarcodes =
-            confirmedProducts.map((e) => e.barcode).toSet();
-        suggestedProducts
-            .removeWhere((e) => confirmedBarcodes.contains(e.barcode));
+        // Ordered map
+        final LinkedHashMap<SuggestionType, List<Product>> suggestedProducts =
+            LinkedHashMap();
+        for (final type in _SUGGESTIONS_PRIORITIES) {
+          suggestedProducts[type] = _model.suggestedProductsFor(type);
+        }
+
+        // Remove duplicates among suggestions
+        final metBarcodes = confirmedProducts.map((e) => e.barcode).toSet();
+        for (final products in suggestedProducts.values) {
+          products.removeWhere((e) => metBarcodes.contains(e.barcode));
+          metBarcodes.addAll(products.map((e) => e.barcode));
+        }
 
         if (confirmedProducts.isNotEmpty) {
           widgets.add(_confirmedProductsTitle());
           widgets.addAll(
               _productsToCard(confirmedProducts, context, suggestions: false));
         }
-        if (suggestedProducts.isNotEmpty || _model.suggestedProductsLoading) {
-          widgets.add(_suggestedProductsTitle());
-          widgets.addAll(
-              _productsToCard(suggestedProducts, context, suggestions: true));
-          if (_model.suggestedProductsLoading) {
-            widgets.add(const Center(child: CircularProgressIndicator()));
+        for (final entry in suggestedProducts.entries) {
+          final type = entry.key;
+          final products = entry.value;
+          if (products.isNotEmpty || _model.areSuggestionsLoading(type)) {
+            widgets.add(_suggestedProductsTitleFor(type));
+            widgets
+                .addAll(_productsToCard(products, context, suggestions: true));
+            if (_model.areSuggestionsLoading(type)) {
+              widgets.add(const Center(child: CircularProgressIndicator()));
+            }
           }
         }
         widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
@@ -264,6 +281,21 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     );
   }
 
+  bool _noProducts() {
+    if (_model.confirmedProducts.isNotEmpty) {
+      return false;
+    }
+    const suggestionsTypes = SuggestionType.values;
+    if (suggestionsTypes.any(_model.areSuggestionsLoading)) {
+      return false;
+    }
+    if (suggestionsTypes
+        .any((type) => _model.suggestedProductsFor(type).isNotEmpty)) {
+      return false;
+    }
+    return true;
+  }
+
   Widget _confirmedProductsTitle() {
     return ShopProductRangeProductsTitle(
       context.strings.shop_product_range_page_confirmed_products_country,
@@ -273,7 +305,29 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     );
   }
 
-  Widget _suggestedProductsTitle() {
+  Widget _suggestedProductsTitleFor(SuggestionType type) {
+    switch (type) {
+      case SuggestionType.RADIUS:
+        return _radSuggestedProductsTitle();
+      case SuggestionType.OFF:
+        return _offSuggestedProductsTitle();
+    }
+  }
+
+  Widget _radSuggestedProductsTitle() {
+    final suggestedProductsTitle = context
+        .strings.shop_product_range_page_suggested_products_city
+        .replaceAll('<SHOP>', widget.shop.name);
+
+    return ShopProductRangeProductsTitle(
+      suggestedProductsTitle,
+      key: const Key('rad_suggested_products_title'),
+      verticalPadding: 24,
+      horizontalPaddings: _LIST_GRADIENT_SIZE,
+    );
+  }
+
+  Widget _offSuggestedProductsTitle() {
     return Consumer(builder: (context, ref, _) {
       final countryName = _countryName.watch(ref);
       if (countryName == null) {
@@ -281,8 +335,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           padding: EdgeInsets.all(8),
           child: SizedBox(
               height: 14,
-              child:
-                  GradientSpinner(key: Key('suggested_product_placeholder'))),
+              child: GradientSpinner(
+                  key: Key('off_suggested_product_placeholder'))),
         );
       }
 
@@ -300,7 +354,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
       return ShopProductRangeProductsTitle(
         suggestedProductsTitle,
-        key: const Key('suggested_products_title'),
+        key: const Key('off_suggested_products_title'),
         verticalPadding: 24,
         horizontalPaddings: _LIST_GRADIENT_SIZE,
       );

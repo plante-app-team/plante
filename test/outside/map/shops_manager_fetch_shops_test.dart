@@ -75,6 +75,34 @@ void main() {
     verifyZeroInteractions(listener);
   });
 
+  test('shops fetch creates barcodes cache', () async {
+    final shops = fullShops.values.toList();
+    final uids = shops.map((e) => e.osmUID).toList();
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
+      return Ok(
+          commons.createShopsInBoundsResponse(shops: backendShops, barcodes: {
+        uids[0]: ['123', '345'],
+        uids[1]: ['567', '789'],
+      }));
+    });
+
+    expect(shopsManager.getBarcodesCache(), isEmpty);
+    await shopsManager.fetchShops(bounds);
+    expect(
+        shopsManager.getBarcodesCache(),
+        equals({
+          uids[0]: ['123', '345'],
+          uids[1]: ['567', '789'],
+        }));
+  });
+
+  test('shops fetch creates shops cache', () async {
+    final uids = fullShops.values.map((e) => e.osmUID).toList();
+    expect(shopsManager.getCachedShopsFor(uids), isEmpty);
+    await shopsManager.fetchShops(bounds);
+    expect(shopsManager.getCachedShopsFor(uids), equals(fullShops));
+  });
+
   test('cache behaviour when multiple shops fetches started at the same time',
       () async {
     verifyZeroInteractions(osm);
@@ -137,7 +165,7 @@ void main() {
       if (backendLoadsCount == 1) {
         return Err(BackendError.other());
       } else {
-        return Ok(backendShops);
+        return Ok(commons.createShopsInBoundsResponse(shops: backendShops));
       }
     });
 
@@ -175,7 +203,7 @@ void main() {
       }
     });
     when(backend.requestShopsWithin(any)).thenAnswer((_) async {
-      return Ok(backendShops);
+      return Ok(commons.createShopsInBoundsResponse(shops: backendShops));
     });
 
     final shopsRes = await shopsManager.fetchShops(bounds);
@@ -201,7 +229,8 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async => Ok(const []));
+    when(backend.requestShopsWithin(any)).thenAnswer(
+        (_) async => Ok(commons.createShopsInBoundsResponse(shops: const [])));
 
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isOk, isTrue);
@@ -327,8 +356,8 @@ void main() {
     ];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async =>
+        Ok(commons.createShopsInBoundsResponse(shops: backendShops)));
 
     final northeast = Coord(lat: 15, lon: 15);
     final southwest = Coord(lat: 14.999, lon: 14.999);

@@ -148,4 +148,9 @@ class ConfirmedProductsModel implements ShopsManagerListener {
   void onLocalShopsChange() {
     reload();
   }
+
+  void onProductDeleted(Product product) {
+    // Nothing to do - we depend directly on ShopsManager
+    // and represent the state of our shop in it
+  }
 }

@@ -29,7 +29,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -158,7 +158,7 @@ void main() {
     expect(
         find.text(context.strings.shop_card_no_products_listed), findsNothing);
     expect(find.text(context.strings.shop_card_products_listed), findsNothing);
-    expect(find.text(context.strings.shop_card_off_products_listed),
+    expect(find.text(context.strings.shop_card_suggested_products_listed),
         findsOneWidget);
     expect(find.text(context.strings.shop_card_open_shop_products),
         findsOneWidget);

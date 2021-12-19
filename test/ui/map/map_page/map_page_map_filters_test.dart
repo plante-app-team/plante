@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/map/components/map_shops_filter_checkbox.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 
@@ -54,25 +55,44 @@ void main() {
     expect(displayedShops, containsAll(shops));
   });
 
-  testWidgets('user can disable display of shops with suggested products',
-      (WidgetTester tester) async {
+  Future<void> userCanDisableSuggestions(WidgetTester tester,
+      {required String filterKey, required SuggestionType type}) async {
+    suggestedProductsManager.clearAllSuggestions();
     // Now shop[0] has some suggested products
-    suggestedProductsManager
-        .setSuggestionsForShop(shops[0].osmUID, ['123', '321']);
+    suggestedProductsManager.setSuggestionsForShop(
+        shops[0].osmUID, ['123', '321'], type);
 
-    final widget = await commons.createIdleMapPage(tester);
+    final widget =
+        await commons.createIdleMapPage(tester, key: Key('map_for_$filterKey'));
 
     // Shop[0] is displayed
     var displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops, contains(shops[0]));
 
     await tester.superTap(find.byKey(const Key('filter_shops_icon')));
-    await tester.superTap(
-        find.byKey(const Key('filter_shops_with_suggested_products')));
+    await tester.superTap(find.byKey(Key(filterKey)));
+    await tester.pageBack();
 
     // Shop[0] is no longer displayed
     displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops, isNot(contains(shops[0])));
+  }
+
+  testWidgets('user can disable display of shops with suggested products',
+      (WidgetTester tester) async {
+    for (final type in SuggestionType.values) {
+      final String filterKey;
+      switch (type) {
+        case SuggestionType.OFF:
+          filterKey = 'filter_shops_with_off_suggested_products';
+          break;
+        case SuggestionType.RADIUS:
+          filterKey = 'filter_shops_with_rad_suggested_products';
+          break;
+      }
+
+      await userCanDisableSuggestions(tester, filterKey: filterKey, type: type);
+    }
   });
 
   testWidgets('user can disable display of shops with confirmed products',
@@ -128,15 +148,31 @@ void main() {
     );
   });
 
-  testWidgets('suggested shops filter analytics', (WidgetTester tester) async {
+  testWidgets('suggested radius shops filter analytics',
+      (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await commons.initIdleMapPage(widget, tester);
     await shopFilterTest(
       tester,
-      filterText: context.strings.map_page_filter_shops_with_suggested_products,
+      filterText:
+          context.strings.map_page_filter_shops_with_radius_suggested_products,
       enabledByDefault: true,
-      eventShown: 'shops_with_suggestions_shown',
-      eventHidden: 'shops_with_suggestions_hidden',
+      eventShown: 'shops_with_rad_suggestions_shown',
+      eventHidden: 'shops_with_rad_suggestions_hidden',
+    );
+  });
+
+  testWidgets('suggested OFF shops filter analytics',
+      (WidgetTester tester) async {
+    final widget = MapPage(mapControllerForTesting: mapController);
+    final context = await commons.initIdleMapPage(widget, tester);
+    await shopFilterTest(
+      tester,
+      filterText:
+          context.strings.map_page_filter_shops_with_off_suggested_products,
+      enabledByDefault: true,
+      eventShown: 'shops_with_off_suggestions_shown',
+      eventHidden: 'shops_with_off_suggestions_hidden',
     );
   });
 
@@ -163,30 +199,38 @@ void main() {
     // Verify initial values
     var checkboxNotEmptyShops = firstWidgetWith<MapShopsFilterCheckbox>(
         'checkbox_filter_not_empty_shops');
-    var checkboxSuggestions = firstWidgetWith<MapShopsFilterCheckbox>(
-        'filter_shops_with_suggested_products');
+    var checkboxSuggestionsOFF = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_off_suggested_products');
+    var checkboxSuggestionsRad = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_rad_suggested_products');
     var checkboxEmptyShops =
         firstWidgetWith<MapShopsFilterCheckbox>('filter_empty_shops');
     expect(checkboxNotEmptyShops.value, isTrue);
-    expect(checkboxSuggestions.value, isTrue);
+    expect(checkboxSuggestionsOFF.value, isTrue);
+    expect(checkboxSuggestionsRad.value, isTrue);
     expect(checkboxEmptyShops.value, isFalse);
 
     // Change each value
     await tester
         .superTap(find.byKey(const Key('checkbox_filter_not_empty_shops')));
     await tester.superTap(
-        find.byKey(const Key('filter_shops_with_suggested_products')));
+        find.byKey(const Key('filter_shops_with_off_suggested_products')));
+    await tester.superTap(
+        find.byKey(const Key('filter_shops_with_rad_suggested_products')));
     await tester.superTap(find.byKey(const Key('filter_empty_shops')));
 
     // Verify each value is changed
     checkboxNotEmptyShops = firstWidgetWith<MapShopsFilterCheckbox>(
         'checkbox_filter_not_empty_shops');
-    checkboxSuggestions = firstWidgetWith<MapShopsFilterCheckbox>(
-        'filter_shops_with_suggested_products');
+    checkboxSuggestionsOFF = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_off_suggested_products');
+    checkboxSuggestionsRad = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_rad_suggested_products');
     checkboxEmptyShops =
         firstWidgetWith<MapShopsFilterCheckbox>('filter_empty_shops');
     expect(checkboxNotEmptyShops.value, isFalse);
-    expect(checkboxSuggestions.value, isFalse);
+    expect(checkboxSuggestionsOFF.value, isFalse);
+    expect(checkboxSuggestionsRad.value, isFalse);
     expect(checkboxEmptyShops.value, isTrue);
 
     // Create a new page
@@ -197,12 +241,15 @@ void main() {
     // Verify each value is still the same
     checkboxNotEmptyShops = firstWidgetWith<MapShopsFilterCheckbox>(
         'checkbox_filter_not_empty_shops');
-    checkboxSuggestions = firstWidgetWith<MapShopsFilterCheckbox>(
-        'filter_shops_with_suggested_products');
+    checkboxSuggestionsOFF = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_off_suggested_products');
+    checkboxSuggestionsRad = firstWidgetWith<MapShopsFilterCheckbox>(
+        'filter_shops_with_rad_suggested_products');
     checkboxEmptyShops =
         firstWidgetWith<MapShopsFilterCheckbox>('filter_empty_shops');
     expect(checkboxNotEmptyShops.value, isFalse);
-    expect(checkboxSuggestions.value, isFalse);
+    expect(checkboxSuggestionsOFF.value, isFalse);
+    expect(checkboxSuggestionsRad.value, isFalse);
     expect(checkboxEmptyShops.value, isTrue);
   });
 }

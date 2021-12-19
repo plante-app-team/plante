@@ -1,7 +1,6 @@
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 
@@ -27,9 +26,7 @@ class MapPageModeZoomedOut extends MapPageMode {
   }
 
   @override
-  Iterable<Shop> filter(
-          Iterable<Shop> shops, Iterable<OsmUID> withSuggestedProducts) =>
-      const [];
+  Iterable<Shop> filter(Iterable<Shop> shops) => const [];
 
   @override
   double minZoom() => MIN_ZOOM;

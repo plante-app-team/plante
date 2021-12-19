@@ -19,7 +19,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
@@ -150,8 +150,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         _mode.onShopsUpdated(_model.shopsCache);
         allShops.addAll(_model.shopsCache.values);
         allShops.addAll(_mode.additionalShops());
-        _onShopsUpdated(
-            _mode.filter(allShops, _model.shopsWithSuggestedProducts));
+        _onShopsUpdated(_mode.filter(allShops));
       }
     };
     final loadingChangeCallback = () {
@@ -252,7 +251,7 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
     final extraData = ShopsMarkersExtraData(_mode.selectedShops(),
-        _mode.accentedShops(), _model.shopsWithSuggestedProducts);
+        _mode.accentedShops(), _model.barcodesSuggestions);
     return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 

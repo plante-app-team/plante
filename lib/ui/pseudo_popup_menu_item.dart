@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// See class usage
 class PseudoPopupMenuItem extends PopupMenuEntry {
   final Widget child;
 

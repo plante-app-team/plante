@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
@@ -13,9 +13,9 @@ typedef MarkerClickCallback = void Function(Iterable<Shop> shops);
 class ShopsMarkersExtraData {
   final Set<Shop> selectedShops;
   final Set<Shop> accentedShops;
-  final Iterable<OsmUID> withSuggestedProducts;
+  final SuggestedBarcodesMapFull barcodesSuggestions;
   ShopsMarkersExtraData(
-      this.selectedShops, this.accentedShops, this.withSuggestedProducts);
+      this.selectedShops, this.accentedShops, this.barcodesSuggestions);
 }
 
 Future<Marker> markersBuilder(
@@ -38,6 +38,9 @@ Future<Marker> markersBuilder(
 
 Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     ShopsMarkersExtraData extraData, BuildContext context) async {
+  final hasSuggestions = (Shop shop) {
+    return extraData.barcodesSuggestions.suggestionsCountFor(shop.osmUID) > 0;
+  };
   if (shops.length == 1) {
     if (extraData.accentedShops.contains(shops.first)) {
       return _bitmapDescriptorFromSvgAsset(context,
@@ -48,8 +51,7 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
     } else if (shops.any((e) => e.productsCount > 0)) {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
-    } else if (shops
-        .any((shop) => extraData.withSuggestedProducts.contains(shop.osmUID))) {
+    } else if (shops.any(hasSuggestions)) {
       return _bitmapDescriptorFromSvgAsset(context,
           'assets/map_marker_suggestions.svg', 1, TextStyles.markerFilled);
     } else {
@@ -78,8 +80,7 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           'assets/map_marker_group_filled.svg',
           shops.length,
           TextStyles.markerFilled);
-    } else if (shops
-        .any((shop) => extraData.withSuggestedProducts.contains(shop.osmUID))) {
+    } else if (shops.any(hasSuggestions)) {
       return _bitmapDescriptorFromSvgAsset(
           context,
           'assets/map_marker_group_suggestions.svg',

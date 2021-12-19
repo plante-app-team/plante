@@ -803,30 +803,29 @@ void main() {
                 "osm_uid" : "1:8771781029",
                 "products_count" : 2
               }
+            },
+            "barcodes" : {
+              "1:8711880917" : [ "123", "345" ],
+              "1:8771781029" : [ "678", "890" ]
             }
           }
         ''');
 
-    final result = await backend.requestShopsWithin(CoordsBounds(
+    final responseRes = await backend.requestShopsWithin(CoordsBounds(
         southwest: Coord(lat: 14.999, lon: 14.999),
         northeast: Coord(lat: 15.001, lon: 15.001)));
-    expect(result.isOk, isTrue);
+    expect(responseRes.isOk, isTrue);
 
-    final shops = result.unwrap();
-    expect(shops.length, equals(2));
+    final response = responseRes.unwrap();
+    expect(response.shops.length, equals(2));
 
-    final BackendShop shop1;
-    final BackendShop shop2;
-    if (shops[0].osmUID == OsmUID.parse('1:8711880917')) {
-      shop1 = shops[0];
-      shop2 = shops[1];
-    } else {
-      shop1 = shops[1];
-      shop2 = shops[0];
-    }
-
+    final shop1 = response.shops['1:8711880917']!;
+    final shop2 = response.shops['1:8771781029']!;
     expect(shop1.productsCount, equals(1));
     expect(shop2.productsCount, equals(2));
+
+    expect(response.barcodes['1:8711880917'], equals(['123', '345']));
+    expect(response.barcodes['1:8771781029'], equals(['678', '890']));
   });
 
   test('requesting shops by bounds empty response', () async {
@@ -834,14 +833,16 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
     httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
           {
-            "results" : {}
+            "results" : {},
+            "barcodes" : {}
           }
         ''');
 
     final result = await backend.requestShopsWithin(CoordsBounds(
         southwest: Coord(lat: 14.999, lon: 14.999),
         northeast: Coord(lat: 15.001, lon: 15.001)));
-    expect(result.unwrap().length, equals(0));
+    expect(result.unwrap().shops, isEmpty);
+    expect(result.unwrap().barcodes, isEmpty);
   });
 
   test('requesting shops by bounds invalid JSON response', () async {
@@ -865,7 +866,7 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
     httpClient.setResponse('.*/shops_in_bounds_data/.*', '''
           {
-            "rezzzults" : {}
+            "rezzzults" : {},
           }
         ''');
 

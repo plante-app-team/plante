@@ -23,6 +23,7 @@ class FakeShopsManager implements ShopsManager {
   final _listeners = <ShopsManagerListener>[];
   final _shopsAreas = <CoordsBounds, List<Shop>>{};
   final _shopsRanges = <OsmUID, Result<ShopProductRange, ShopsManagerError>>{};
+  final _barcodesCache = <Shop, List<String>>{};
 
   ArgResCallback<CoordsBounds, Future<Iterable<Shop>>> _shopsLoader =
       (_) async => const [];
@@ -60,6 +61,10 @@ class FakeShopsManager implements ShopsManager {
       OsmUID uid, Result<ShopProductRange, ShopsManagerError> range) {
     _shopsRanges[uid] = range;
     _notifyListeners();
+  }
+
+  void setBarcodesCacheFor(Shop shop, List<String> barcodes) {
+    _barcodesCache[shop] = barcodes;
   }
 
   void clear_verifiedCalls() {
@@ -127,6 +132,32 @@ class FakeShopsManager implements ShopsManager {
 
   void _notifyListeners() {
     _listeners.forEach((listener) => listener.onLocalShopsChange());
+  }
+
+  @override
+  Map<OsmUID, List<String>> getBarcodesCache() {
+    return _barcodesCache.map((key, value) => MapEntry(key.osmUID, value));
+  }
+
+  @override
+  Map<OsmUID, Shop> getCachedShopsFor(Iterable<OsmUID> uids) {
+    final allKnownShops = <OsmUID, Shop>{};
+    for (final shop in _barcodesCache.keys) {
+      allKnownShops[shop.osmUID] = shop;
+    }
+    for (final shopGroup in _shopsAreas.values) {
+      for (final shop in shopGroup) {
+        allKnownShops[shop.osmUID] = shop;
+      }
+    }
+    final result = <OsmUID, Shop>{};
+    for (final uid in uids) {
+      final shop = allKnownShops[uid];
+      if (shop != null) {
+        result[uid] = shop;
+      }
+    }
+    return result;
   }
 
   @override

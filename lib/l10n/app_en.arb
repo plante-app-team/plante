@@ -159,9 +159,13 @@
     "@map_page_filter_empty_shops": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
     },
-    "map_page_filter_shops_with_suggested_products": "Stores with guessed products",
-    "@map_page_filter_shops_with_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with guessed products"
+    "map_page_filter_shops_with_radius_suggested_products": "Products seen similar stores of the city",
+    "@map_page_filter_shops_with_radius_suggested_products": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
+    },
+    "map_page_filter_shops_with_off_suggested_products": "Products seen similar stores of the country",
+    "@map_page_filter_shops_with_off_suggested_products": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
     },
     "map_page_filter_not_empty_shops": "Stores with products",
     "@map_page_filter_not_empty_shops": {
@@ -245,8 +249,8 @@
     "shop_card_add_product": "Add product",
     "shop_card_directions": "Directions",
     "shop_card_no_products_listed": "Nothing listed",
-    "shop_card_off_products_listed": "Unconfirmed products",
-    "@shop_card_off_products_listed": {
+    "shop_card_suggested_products_listed": "Unconfirmed products",
+    "@shop_card_suggested_products_listed": {
         "description": "Products that we can link to the store name, but are not confirmed being sold there by a user. This is a label shown on a shop_card"
     },
     "shop_card_open_shop_products": "Product list",
@@ -261,6 +265,10 @@
     "shop_product_range_page_suggested_products_country": "Products seen in other <SHOP> stores in <COUNTRY>",
     "@shop_product_range_page_suggested_products_country": {
         "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's country, which are named in the same way as the displayed store. For example, if an \"Aldi\" store has some chocolate bar, then all other \"Aldi\" stores will have this products section with same chocolate bar."
+    },
+    "shop_product_range_page_suggested_products_city": "Products seen in other <SHOP> stores nearby",
+    "@shop_product_range_page_suggested_products_city": {
+        "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's city, which are named in the same way as the displayed store. For example, if an \"Aldi\" store has some chocolate bar, then all other \"Aldi\" stores will have this products section with same chocolate bar."
     },
     "shop_product_range_page_suggested_products_country_unknown": "Products seen in other <SHOP> stores in this country",
     "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",

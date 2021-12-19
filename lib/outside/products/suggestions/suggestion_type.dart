@@ -1,0 +1,4 @@
+enum SuggestionType {
+  OFF,
+  RADIUS,
+}

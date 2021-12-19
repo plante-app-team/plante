@@ -24,6 +24,7 @@ import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
+import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 
@@ -226,7 +227,7 @@ class Backend {
     return Ok(shops);
   }
 
-  Future<Result<List<BackendShop>, BackendError>> requestShopsWithin(
+  Future<Result<ShopsInBoundsResponse, BackendError>> requestShopsWithin(
       CoordsBounds bounds) async {
     final jsonRes = await _backendGetJson('/shops_in_bounds_data/', {
       'north': '${bounds.north}',
@@ -239,20 +240,12 @@ class Backend {
     }
     final json = jsonRes.unwrap();
 
-    if (!json.containsKey('results')) {
-      Log.w('Invalid shops_in_bounds_data response: $json');
+    try {
+      return Ok(ShopsInBoundsResponse.fromJson(json)!);
+    } catch (e) {
+      Log.w('Invalid shops_in_bounds_data response: $json', ex: e);
       return Err(BackendError.invalidDecodedJson(json));
     }
-
-    final results = json['results'] as Map<String, dynamic>;
-    final shops = <BackendShop>[];
-    for (final result in results.values) {
-      final shop = BackendShop.fromJson(result as Map<String, dynamic>);
-      if (shop != null) {
-        shops.add(shop);
-      }
-    }
-    return Ok(shops);
   }
 
   Future<Result<ProductPresenceVoteResult, BackendError>> productPresenceVote(
