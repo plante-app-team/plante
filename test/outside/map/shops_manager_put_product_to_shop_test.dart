@@ -69,6 +69,25 @@ void main() {
         equals(shops1.values.first.productsCount + 1));
   });
 
+  test('shops products range update changes barcodes cache', () async {
+    final shopsRes = await shopsManager.fetchShops(bounds);
+    final shops = shopsRes.unwrap();
+    final targetShop = shops.values.first;
+
+    expect(shopsManager.getBarcodesCache(), isEmpty);
+
+    // A range update
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [targetShop], ProductAtShopSource.MANUAL);
+    expect(putRes.isOk, isTrue);
+
+    expect(
+        shopsManager.getBarcodesCache(),
+        equals({
+          targetShop.osmUID: [rangeProducts[2].barcode]
+        }));
+  });
+
   test(
       'shops products range update changes shops cache when '
       'the shop had no backend shop before', () async {
@@ -83,8 +102,8 @@ void main() {
     final backendShops = <BackendShop>[];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(backendShops));
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async =>
+        Ok(commons.createShopsInBoundsResponse(shops: backendShops)));
     final fullShops = {
       osmShops[0].osmUID: Shop((e) => e..osmShop.replace(osmShops[0])),
     };

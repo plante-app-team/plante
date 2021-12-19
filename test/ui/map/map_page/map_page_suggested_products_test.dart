@@ -7,7 +7,9 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
@@ -18,7 +20,7 @@ import '../../../z_fakes/fake_suggested_products_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
 typedef _SuggestionsStream = StreamController<
-    Result<OsmUIDBarcodesPair, SuggestedProductsManagerError>>;
+    Result<SuggestionsForShop, SuggestedProductsManagerError>>;
 
 void main() {
   late MapPageModesTestCommons commons;
@@ -38,46 +40,57 @@ void main() {
       (WidgetTester tester) async {
     expect(shops[0].productsCount, equals(0));
 
-    // Map 1
-    var widget =
-        await commons.createIdleMapPage(tester, key: const Key('map1'));
+    for (final type in SuggestionType.values) {
+      final mapKeyPrefix = type.toString();
+      suggestedProductsManager.clearAllSuggestions();
 
-    // Shop[0] is not displayed because it has 0 products
-    var displayedShops = widget.getDisplayedShopsForTesting();
-    expect(displayedShops, isNot(contains(shops[0])));
+      // Map 1
+      var widget = await commons.createIdleMapPage(tester,
+          key: Key('${mapKeyPrefix}map1'));
 
-    // Now shop[0] has some suggested products
-    suggestedProductsManager
-        .setSuggestionsForShop(shops[0].osmUID, ['123', '321']);
+      // Shop[0] is not displayed because it has 0 products
+      var displayedShops = widget.getDisplayedShopsForTesting();
+      expect(displayedShops, isNot(contains(shops[0])));
 
-    // Map 2
-    widget = await commons.createIdleMapPage(tester, key: const Key('map2'));
+      // Now shop[0] has some suggested products
+      suggestedProductsManager.setSuggestionsForShop(
+          shops[0].osmUID, ['123', '321'], type);
 
-    // Shop[0] is now displayed because it has several suggestions
-    displayedShops = widget.getDisplayedShopsForTesting();
-    expect(displayedShops, contains(shops[0]));
+      // Map 2
+      widget = await commons.createIdleMapPage(tester,
+          key: Key('${mapKeyPrefix}map2'));
+
+      // Shop[0] is now displayed because it has several suggestions
+      displayedShops = widget.getDisplayedShopsForTesting();
+      expect(displayedShops, contains(shops[0]));
+    }
   });
 
   testWidgets('suggested products marker click', (WidgetTester tester) async {
-    suggestedProductsManager
-        .setSuggestionsForShop(shops[0].osmUID, ['123', '321']);
+    for (final type in SuggestionType.values) {
+      suggestedProductsManager.clearAllSuggestions();
+      suggestedProductsManager.setSuggestionsForShop(
+          shops[0].osmUID, ['123', '321'], type);
 
-    final widget = MapPage(mapControllerForTesting: mapController);
-    final context = await commons.initIdleMapPage(widget, tester);
+      final mapKey = type.toString();
+      final widget =
+          MapPage(mapControllerForTesting: mapController, key: Key(mapKey));
+      final context = await commons.initIdleMapPage(widget, tester);
 
-    expect(
-        find.text(context.strings.shop_card_off_products_listed), findsNothing);
-    widget.onMarkerClickForTesting([shops[0]]);
-    await tester.pumpAndSettle();
-    expect(find.text(context.strings.shop_card_off_products_listed),
-        findsOneWidget);
+      expect(find.text(context.strings.shop_card_suggested_products_listed),
+          findsNothing);
+      widget.onMarkerClickForTesting([shops[0]]);
+      await tester.pumpAndSettle();
+      expect(find.text(context.strings.shop_card_suggested_products_listed),
+          findsOneWidget);
+    }
   });
 
   testWidgets('markers of suggested products are loaded gradually',
       (WidgetTester tester) async {
     final suggestionsStream = _SuggestionsStream();
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
         .thenAnswer((_) {
       return suggestionsStream.stream;
     });
@@ -92,7 +105,7 @@ void main() {
         commons.shops.map((e) => e.rebuildWith(productsCount: 0)).toList();
     await commons.replaceFetchedShops(shops, tester);
 
-    final pushSuggestion = (OsmUIDBarcodesPair suggestion) async {
+    final pushSuggestion = (SuggestionsForShop suggestion) async {
       await tester.runAsync(() async => suggestionsStream.add(Ok(suggestion)));
       await tester.pumpAndSettle();
     };
@@ -108,23 +121,27 @@ void main() {
 
     // Still no markers even after we push a suggestion - suggestions
     // are being loaded/absorbed gradually to not make the map freeze
-    await pushSuggestion(OsmUIDBarcodesPair(shops[0].osmUID, const ['123']));
+    await pushSuggestion(
+        SuggestionsForShop(shops[0].osmUID, SuggestionType.OFF, const ['123']));
     expect(page.getDisplayedShopsForTesting(), isEmpty);
 
     // Wait for the needed delay and push another suggestion - this time it
     // is expected to be displayed, because we waited the needed time.
     await absorptionDelay();
-    await pushSuggestion(OsmUIDBarcodesPair(shops[1].osmUID, const ['123']));
+    await pushSuggestion(SuggestionsForShop(
+        shops[1].osmUID, SuggestionType.RADIUS, const ['123']));
     expect(page.getDisplayedShopsForTesting(), equals([shops[0], shops[1]]));
 
     // Push a third suggestion, and check it's not displayed yet,
     // because no time was waited
-    await pushSuggestion(OsmUIDBarcodesPair(shops[2].osmUID, const ['123']));
+    await pushSuggestion(
+        SuggestionsForShop(shops[2].osmUID, SuggestionType.OFF, const ['123']));
     expect(page.getDisplayedShopsForTesting(), equals([shops[0], shops[1]]));
 
     // Now wait again, push again, and verify every suggestion is displayed
     await absorptionDelay();
-    await pushSuggestion(OsmUIDBarcodesPair(shops[3].osmUID, const ['123']));
+    await pushSuggestion(SuggestionsForShop(
+        shops[3].osmUID, SuggestionType.RADIUS, const ['123']));
     expect(page.getDisplayedShopsForTesting(),
         equals([shops[0], shops[1], shops[2], shops[3]]));
 
@@ -136,7 +153,7 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStreams = <_SuggestionsStream>[];
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
         .thenAnswer((_) {
       suggestionsStreams.add(_SuggestionsStream());
       return suggestionsStreams.last.stream;
@@ -168,7 +185,7 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStreams = <_SuggestionsStream>[];
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getSuggestedBarcodes(any, any))
+    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
         .thenAnswer((_) {
       suggestionsStreams.add(_SuggestionsStream());
       return suggestionsStreams.last.stream;

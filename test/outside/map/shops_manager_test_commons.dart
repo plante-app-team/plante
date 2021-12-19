@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
@@ -7,6 +8,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -125,7 +127,7 @@ class ShopsManagerTestCommons {
           result.add(backendShop);
         }
       }
-      return Ok(result);
+      return Ok(createShopsInBoundsResponse(shops: result));
     });
     when(backend.requestShopsByOsmUIDs(any)).thenAnswer((invc) async {
       final uids = invc.positionalArguments[0] as Iterable<OsmUID>;
@@ -171,5 +173,19 @@ class ShopsManagerTestCommons {
         productsObtainer,
         analytics,
         osmCacher);
+  }
+
+  ShopsInBoundsResponse createShopsInBoundsResponse({
+    Iterable<BackendShop> shops = const [],
+    Map<OsmUID, List<String>> barcodes = const {},
+  }) {
+    final shopsConverted = {
+      for (final shop in shops) shop.osmUID.toString(): shop
+    };
+    final barcodesConverted = barcodes.map(
+        (key, value) => MapEntry(key.toString(), BuiltList<String>(value)));
+    return ShopsInBoundsResponse((e) => e
+      ..shops.addAll(shopsConverted)
+      ..barcodes.addAll(barcodesConverted));
   }
 }

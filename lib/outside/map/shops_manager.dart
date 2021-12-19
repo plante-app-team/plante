@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:plante/base/base.dart';
 import 'package:plante/base/date_time_extensions.dart';
@@ -43,6 +44,7 @@ class ShopsManager {
   final _shopsCache = <OsmUID, Shop>{};
   final _loadedAreas = <CoordsBounds, List<OsmUID>>{};
   final _rangesCache = <OsmUID, ShopProductRange>{};
+  final _barcodesCache = <OsmUID, List<String>>{};
 
   int get loadedAreasCount => _loadedAreas.length;
 
@@ -65,6 +67,27 @@ class ShopsManager {
     _listeners.forEach((listener) {
       listener.onLocalShopsChange();
     });
+  }
+
+  Map<OsmUID, List<String>> getBarcodesCache() {
+    final result = <OsmUID, List<String>>{};
+    for (final cache in _barcodesCache.entries) {
+      final osmUID = cache.key;
+      result[osmUID] = UnmodifiableListView(cache.value);
+    }
+    return result;
+  }
+
+  Map<OsmUID, Shop> getCachedShopsFor(Iterable<OsmUID> uids) {
+    final result = <OsmUID, Shop>{};
+    for (final uid in uids) {
+      final shop = _shopsCache[uid];
+      if (shop == null) {
+        continue;
+      }
+      result[uid] = shop;
+    }
+    return result;
   }
 
   Future<bool> osmShopsCacheExistFor(CoordsBounds bounds) async {
@@ -134,6 +157,7 @@ class ShopsManager {
     _shopsCache.addAll(fetchResult.shops);
     final ids = fetchResult.shops.values.map((shop) => shop.osmUID).toList();
     _loadedAreas[fetchResult.shopsBounds] = ids;
+    _barcodesCache.addAll(fetchResult.shopsBarcodes);
     final result = ids
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
@@ -203,10 +227,21 @@ class ShopsManager {
     }
     final result = await _backendWorker.fetchShopProductRange(shop);
     if (result.isOk) {
-      _rangesCache[shop.osmUID] = result.unwrap();
+      final range = result.unwrap();
+      _rangesCache[shop.osmUID] = range;
+      _barcodesCache[shop.osmUID] =
+          range.products.map((e) => e.barcode).toList();
     }
     _notifyListeners();
     return result;
+  }
+
+  void _cacheBarcode(String barcode, OsmUID osmUID) {
+    final barcodes = _barcodesCache[osmUID] ?? [];
+    if (!barcodes.contains(barcode)) {
+      barcodes.add(barcode);
+    }
+    _barcodesCache[osmUID] = barcodes;
   }
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
@@ -221,6 +256,8 @@ class ShopsManager {
       _analytics.sendEvent(
           _putProductToShopEventName(source, success: true), eventParam);
       for (final shop in shops) {
+        _cacheBarcode(product.barcode, shop.osmUID);
+
         var rangeCache = _rangesCache[shop.osmUID];
         if (rangeCache != null) {
           final now = DateTime.now().secondsSinceEpoch;
@@ -325,6 +362,7 @@ class ShopsManager {
         return result;
       }
       if (positive) {
+        _cacheBarcode(product.barcode, shop.osmUID);
         if (cachedShop != null &&
             !cachedRange.hasProductWith(product.barcode)) {
           _shopsCache[shop.osmUID] = cachedShop.rebuildWith(
@@ -334,6 +372,7 @@ class ShopsManager {
             product, DateTime.now().secondsSinceEpoch);
         _notifyListeners();
       } else if (result.unwrap().productDeleted) {
+        _barcodesCache[shop.osmUID]?.remove(product.barcode);
         _rangesCache[shop.osmUID] =
             cachedRange.rebuildWithoutProduct(product.barcode);
         if (cachedShop != null) {
@@ -351,6 +390,7 @@ class ShopsManager {
     _shopsCache.clear();
     _loadedAreas.clear();
     _rangesCache.clear();
+    _barcodesCache.clear();
     _notifyListeners();
   }
 }

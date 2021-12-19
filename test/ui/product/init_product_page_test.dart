@@ -33,7 +33,7 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';

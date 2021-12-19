@@ -14,6 +14,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/product/display_product_page.dart';
@@ -54,7 +55,7 @@ void main() {
 
   testWidgets('has shop address', (WidgetTester tester) async {
     commons.setConfirmedProducts(const []);
-    commons.setSuggestedProducts(const []);
+    commons.setSuggestedProducts(const {});
 
     final addressCompleter = Completer<void>();
 
@@ -94,7 +95,7 @@ void main() {
 
   testWidgets('no products', (WidgetTester tester) async {
     commons.setConfirmedProducts(const []);
-    commons.setSuggestedProducts(const []);
+    commons.setSuggestedProducts(const {});
 
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
@@ -158,9 +159,9 @@ void main() {
   });
 
   /// Oh boi, ain't that a very fragile test
-  Future<void> testProductUpdateAfterClick(
-      Product product, WidgetTester tester) async {
-    final widget = ShopProductRangePage.createForTesting(aShop);
+  Future<void> testProductUpdateAfterClick(WidgetTester tester, Product product,
+      [Key? key]) async {
+    final widget = ShopProductRangePage.createForTesting(aShop, key: key);
     final context = await tester.superPump(widget);
 
     var card = find.byType(ProductCard).evaluate().first.widget;
@@ -209,63 +210,26 @@ void main() {
   testWidgets('confirmed product update after click',
       (WidgetTester tester) async {
     // Remove all suggested products
-    commons.setSuggestedProducts(const []);
+    commons.setSuggestedProducts(const {});
 
     expect(products[0].veganStatus, equals(VegStatus.possible));
-    await testProductUpdateAfterClick(products[0], tester);
+    await testProductUpdateAfterClick(tester, products[0]);
   });
 
   testWidgets('suggested product update after click',
       (WidgetTester tester) async {
-    // Remove all confirmed products
-    commons.setConfirmedProducts(const []);
+    for (final type in SuggestionType.values) {
+      // Remove all confirmed products
+      commons.setConfirmedProducts(const []);
+      commons.setSuggestedProducts({
+        type: commons.suggestedProducts,
+      });
 
-    expect(
-        commons.suggestedProducts[0].veganStatus, equals(VegStatus.possible));
-    await testProductUpdateAfterClick(commons.suggestedProducts[0], tester);
-  });
-
-  testWidgets(
-      'suggested product is not shown if it is already in confirmed list',
-      (WidgetTester tester) async {
-    final theProduct = ProductLangSlice((v) => v
-      ..barcode = '123'
-      ..name = 'Nice product'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.community
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
-
-    final otherSuggestedProduct = ProductLangSlice((v) => v
-      ..barcode = '124'
-      ..name = 'Some other'
-      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
-      ..veganStatus = VegStatus.positive
-      ..veganStatusSource = VegStatusSource.open_food_facts
-      ..ingredientsText = 'Water, salt, sugar').productForTests();
-
-    commons.setConfirmedProducts([theProduct]);
-    commons.setSuggestedProducts([theProduct, otherSuggestedProduct]);
-
-    final widget = ShopProductRangePage.createForTesting(aShop);
-    await tester.superPump(widget);
-
-    expect(find.text(theProduct.name!), findsNWidgets(1));
-    expect(find.text(otherSuggestedProduct.name!), findsNWidgets(1));
-
-    final suggestedProductsTitleCenter =
-        tester.getCenter(find.byKey(const Key('suggested_products_title')));
-    final theProductWidgetCenter =
-        tester.getCenter(find.text(theProduct.name!));
-    final otherSuggestedProductWidgetCenter =
-        tester.getCenter(find.text(otherSuggestedProduct.name!));
-
-    expect(
-        theProductWidgetCenter.dy, lessThan(suggestedProductsTitleCenter.dy));
-    expect(suggestedProductsTitleCenter.dy,
-        lessThan(otherSuggestedProductWidgetCenter.dy));
+      expect(
+          commons.suggestedProducts[0].veganStatus, equals(VegStatus.possible));
+      await testProductUpdateAfterClick(
+          tester, commons.suggestedProducts[0], Key(type.toString()));
+    }
   });
 
   testWidgets('non-vegan products are not shown to a vegan',

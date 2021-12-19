@@ -48,8 +48,7 @@ class MapPageModeCreateShop extends MapPageMode {
   // Let's hide markers of all other shops so that
   // they wouldn't mess user's taps
   @override
-  Iterable<Shop> filter(
-          Iterable<Shop> shops, Iterable<OsmUID> withSuggestedProducts) =>
+  Iterable<Shop> filter(Iterable<Shop> shops) =>
       shops.where((shop) => shop.osmUID == _NEW_SHOP_PSEUDO_OSM_ID);
 
   @override

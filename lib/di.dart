@@ -37,7 +37,7 @@ import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -134,10 +134,6 @@ void initDI() {
       ProductsAtShopsExtraPropertiesManager(
     GetIt.I.get<MapExtraPropertiesCacher>(),
   ));
-  GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
-    GetIt.I.get<OffShopsManager>(),
-    GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
-  ));
   GetIt.I.registerSingleton<UserParamsFetcher>(UserParamsFetcher(
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<MobileAppConfigManager>()));
@@ -149,6 +145,11 @@ void initDI() {
       GetIt.I.get<ProductsObtainer>(),
       GetIt.I.get<Analytics>(),
       GetIt.I.get<OsmCacher>()));
+  GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
+    GetIt.I.get<ShopsManager>(),
+    GetIt.I.get<OffShopsManager>(),
+    GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
+  ));
   GetIt.I.registerSingleton<RoadsManager>(
       RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
   GetIt.I.registerSingleton<OsmSearcher>(

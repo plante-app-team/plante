@@ -14,16 +14,15 @@ import 'package:plante/outside/map/extra_properties/products_at_shops_extra_prop
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
-class SuggestedProductsModel {
+abstract class SuggestedProductsModel {
   static const LOADED_BATCH_SIZE = 20;
-  final SuggestedProductsManager _suggestedProductsManager;
   final ProductsObtainer _productsObtainer;
   final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
   final ShopsManager _shopsManager;
-  final Future<String?> _countryCode;
   final Shop _shop;
   final VoidCallback _updateCallback;
 
@@ -38,28 +37,20 @@ class SuggestedProductsModel {
       .where(ProductPageWrapper.isProductFilledEnoughForDisplay)
       .toList();
 
-  SuggestedProductsModel(
-      this._suggestedProductsManager,
-      this._productsObtainer,
-      this._productsExtraProperties,
-      this._shopsManager,
-      this._countryCode,
-      this._shop,
-      this._updateCallback) {
+  SuggestedProductsModel(this._productsObtainer, this._productsExtraProperties,
+      this._shopsManager, this._shop, this._updateCallback) {
     load();
   }
+
+  @protected
+  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
+      obtainSuggestedProducts();
 
   void dispose() {}
 
   Future<void> load() async {
     await _loadingAction(() async {
-      final countryCode = await _countryCode;
-      if (countryCode == null) {
-        return;
-      }
-
-      final allSuggestedBarcodesRes = await _suggestedProductsManager
-          .getSuggestedBarcodesMap([_shop], countryCode);
+      final allSuggestedBarcodesRes = await obtainSuggestedProducts();
       if (allSuggestedBarcodesRes.isErr) {
         Log.w(
             'Could not load suggested products because: $allSuggestedBarcodesRes');
@@ -109,6 +100,7 @@ class SuggestedProductsModel {
             'Could not load suggested products because: $suggestedProductsRes');
         return;
       }
+
       _products.addAll(suggestedProductsRes.unwrap());
     });
   }
@@ -150,9 +142,14 @@ class SuggestedProductsModel {
           _shop.osmUID,
           product.barcode,
           true);
-      _products.remove(product);
       _updateCallback.call();
       return Ok(ProductPresenceVoteResult(productDeleted: true));
+    }
+  }
+
+  void onProductDeleted(Product product) {
+    if (_products.remove(product)) {
+      _updateCallback.call();
     }
   }
 }

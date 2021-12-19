@@ -40,17 +40,25 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
     ..road = road
     ..houseNumber = houseNumber);
 
-  Shop rebuildWith({int? productsCount}) {
+  Shop rebuildWith({String? name, int? productsCount, Coord? coord}) {
     return rebuild((e) {
-      final oldBackendShop = backendShop ??
-          BackendShop((e) => e
-            ..osmUID = osmUID
-            ..productsCount = 0);
       if (productsCount != null) {
+        final oldBackendShop = backendShop ??
+            BackendShop((e) => e
+              ..osmUID = osmUID
+              ..productsCount = 0);
         e.backendShop = oldBackendShop
             .rebuild((e) => e.productsCount = productsCount)
             .toBuilder();
       }
+      coord ??= this.coord;
+      name ??= this.name;
+      e.osmShop = osmShop
+          .rebuild((e) => e
+            ..name = name
+            ..longitude = coord!.lon
+            ..latitude = coord!.lat)
+          .toBuilder();
     });
   }
 

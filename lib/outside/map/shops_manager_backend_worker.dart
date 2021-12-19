@@ -42,14 +42,15 @@ class ShopsManagerBackendWorker {
     }
 
     // Request Plante shops
-    final backendShopsResult = await _backend.requestShopsWithin(planteBounds);
-    if (backendShopsResult.isErr) {
-      return Err(backendShopsResult.unwrapErr().convert());
+    final backendShopsResponseRes =
+        await _backend.requestShopsWithin(planteBounds);
+    if (backendShopsResponseRes.isErr) {
+      return Err(backendShopsResponseRes.unwrapErr().convert());
     }
 
     final osmShopsWithinPlanteBounds =
         osmShops.where((e) => planteBounds.contains(e.coord)).toList();
-    final backendShops = backendShopsResult.unwrap();
+    final backendShopsResponse = backendShopsResponseRes.unwrap();
     // It's quite possible that [backendShops] would have some shops
     // which are not present in [osmShopsWithinPlanteBounds].
     // That happens when another user adds a new shop to the map and
@@ -58,6 +59,7 @@ class ShopsManagerBackendWorker {
     // NOTE: we don't persistently cache Plante shops, that's why
     // we treat the Plante shops returned from the Plante backend as
     // the source of truth.
+    final backendShops = backendShopsResponse.shops.values;
     final reqRes = await _acquireMissingOsmShops(
         osmShopsWithinPlanteBounds, backendShops, overpass);
     if (reqRes.isErr) {
@@ -73,8 +75,12 @@ class ShopsManagerBackendWorker {
       for (final osmShop in osmShops) osmShop.osmUID: osmShop
     };
 
+    final barcodesMap = backendShopsResponse.barcodes
+        .toMap()
+        .map((key, value) => MapEntry(OsmUID.parse(key), value.toList()));
     return Ok(FetchedShops(
       shops,
+      barcodesMap,
       planteBounds,
       osmShopsMap,
       osmBounds,
@@ -83,7 +89,7 @@ class ShopsManagerBackendWorker {
 
   Future<Result<List<OsmShop>, ShopsManagerError>> _acquireMissingOsmShops(
       Iterable<OsmShop> osmShops,
-      List<BackendShop> backendShops,
+      Iterable<BackendShop> backendShops,
       OsmOverpass overpass) async {
     final backendUids = backendShops.map((e) => e.osmUID);
     final osmUids = osmShops.map((e) => e.osmUID);
@@ -101,7 +107,7 @@ class ShopsManagerBackendWorker {
   }
 
   Map<OsmUID, Shop> _combineOsmAndPlanteShops(
-      Iterable<OsmShop> osmShops, List<BackendShop> backendShops) {
+      Iterable<OsmShop> osmShops, Iterable<BackendShop> backendShops) {
     final backendShopsMap = {
       for (final backendShop in backendShops) backendShop.osmUID: backendShop
     };

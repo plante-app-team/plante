@@ -165,6 +165,47 @@ void main() {
     expect(finalProductsCount, equals(initialProductsCount));
   });
 
+  test('positive vote adds a barcode to cache if it was not there before',
+      () async {
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+
+    final shopsRes = await shopsManager.fetchShops(commons.bounds);
+    final uid = shopsRes.unwrap().values.first.osmUID;
+    final newProduct = Product((e) => e.barcode = '777');
+
+    expect(shopsManager.getBarcodesCache()[uid],
+        isNot(contains(newProduct.barcode)));
+
+    // Vote!
+    final voteResult =
+        await shopsManager.productPresenceVote(newProduct, shop, true);
+    expect(voteResult.isOk, isTrue);
+
+    expect(shopsManager.getBarcodesCache()[uid], contains(newProduct.barcode));
+  });
+
+  test('positive vote does not add a barcode to cache if it is there already',
+      () async {
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+
+    final shopsRes = await shopsManager.fetchShops(commons.bounds);
+    final uid = shopsRes.unwrap().values.first.osmUID;
+
+    expect(shopsManager.getBarcodesCache()[uid],
+        equals(rangeProducts.map((e) => e.barcode).toList()));
+
+    // Vote!
+    final voteResult =
+        await shopsManager.productPresenceVote(rangeProducts.first, shop, true);
+    expect(voteResult.isOk, isTrue);
+
+    // Same barcode as before
+    expect(shopsManager.getBarcodesCache()[uid],
+        equals(rangeProducts.map((e) => e.barcode).toList()));
+  });
+
   test('negative vote deletes a product from a shop if backend says so',
       () async {
     final targetProduct = rangeProducts[0];
@@ -238,6 +279,47 @@ void main() {
     final shopsRes2 = await shopsManager.fetchShops(commons.bounds);
     final finalProductsCount = shopsRes2.unwrap()[shop.osmUID]!.productsCount;
     expect(finalProductsCount, equals(initialProductsCount));
+  });
+
+  test('negative vote removes a barcode from cache if backend did same',
+      () async {
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: true)));
+
+    final shopsRes = await shopsManager.fetchShops(commons.bounds);
+    final uid = shopsRes.unwrap().values.first.osmUID;
+
+    final expectedBarcodes = rangeProducts.map((e) => e.barcode).toList();
+    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+
+    // Vote!
+    final voteResult = await shopsManager.productPresenceVote(
+        rangeProducts.first, shop, false);
+    expect(voteResult.isOk, isTrue);
+
+    // The barcode expected to be deleted
+    expectedBarcodes.removeAt(0);
+    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+  });
+
+  test('negative vote does not remove a barcode from cache if backend did not',
+      () async {
+    when(backend.productPresenceVote(any, any, any)).thenAnswer(
+        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+
+    final shopsRes = await shopsManager.fetchShops(commons.bounds);
+    final uid = shopsRes.unwrap().values.first.osmUID;
+
+    final expectedBarcodes = rangeProducts.map((e) => e.barcode).toList();
+    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+
+    // Vote!
+    final voteResult = await shopsManager.productPresenceVote(
+        rangeProducts.first, shop, false);
+    expect(voteResult.isOk, isTrue);
+
+    // The barcode expected to be still there
+    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
   });
 
   test('votes notify listeners', () async {

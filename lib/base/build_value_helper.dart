@@ -15,6 +15,7 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -44,6 +45,7 @@ part 'build_value_helper.g.dart';
   ModeratorChoiceReason,
   LangCode,
   UserLangs,
+  ShopsInBoundsResponse,
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers = (_serializers.toBuilder()

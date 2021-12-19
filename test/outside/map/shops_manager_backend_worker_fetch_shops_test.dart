@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
@@ -5,6 +6,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -37,11 +39,30 @@ void main() {
         ShopsManagerBackendWorker(backend, productsObtainer);
   });
 
-  test('fetchShops with simple bounds without preloaded data', () async {
+  void setUpShopsResponses({
+    Iterable<OsmShop> osmShops = const [],
+    Iterable<BackendShop> backendShops = const [],
+    Map<OsmUID, Iterable<String>> barcodes = const {},
+  }) {
     when(osm.fetchShops(bounds: anyNamed('bounds')))
-        .thenAnswer((_) async => Ok(someOsmShops.values.toList()));
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
+        .thenAnswer((_) async => Ok(osmShops.toList()));
+
+    final shopsConverted = {
+      for (final shop in backendShops) shop.osmUID.toString(): shop
+    };
+    final barcodesConverted = barcodes.map(
+        (key, value) => MapEntry(key.toString(), BuiltList<String>(value)));
+    final response = ShopsInBoundsResponse((e) => e
+      ..shops.addAll(shopsConverted)
+      ..barcodes.addAll(barcodesConverted));
+    when(backend.requestShopsWithin(any)).thenAnswer((_) async => Ok(response));
+  }
+
+  test('fetchShops with simple bounds without preloaded data', () async {
+    setUpShopsResponses(
+      osmShops: someOsmShops.values,
+      backendShops: someBackendShops.values,
+    );
 
     final expectedShops = someOsmShops.map((key, value) => MapEntry(
         key,
@@ -54,7 +75,7 @@ void main() {
       northeast: Coord(lat: 99999, lon: 99999),
     );
     final expectedFetchResult =
-        FetchedShops(expectedShops, bounds, someOsmShops, bounds);
+        FetchedShops(expectedShops, const {}, bounds, someOsmShops, bounds);
 
     final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
@@ -63,8 +84,9 @@ void main() {
   });
 
   test('fetchShops with preloaded data', () async {
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(someBackendShops.values.toList()));
+    setUpShopsResponses(
+      backendShops: someBackendShops.values,
+    );
     // OSM would return an error if it would be queried...
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Err(OpenStreetMapError.OTHER));
@@ -81,7 +103,7 @@ void main() {
       northeast: Coord(lat: 99999, lon: 99999),
     );
     final expectedFetchResult =
-        FetchedShops(expectedShops, bounds, someOsmShops, bounds);
+        FetchedShops(expectedShops, const {}, bounds, someOsmShops, bounds);
 
     // ...Because [preloadedOsmShops] is specified
     final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
@@ -113,12 +135,11 @@ void main() {
           ..longitude = 100000);
       }
     }
-    when(osm.fetchShops(bounds: anyNamed('bounds')))
-        .thenAnswer((_) async => Ok(osmShops.values.toList()));
-    // Prepare backend shops
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
-      return Ok([someBackendShops[theOnlyExpectedShopIs]!]);
-    });
+
+    setUpShopsResponses(
+      osmShops: osmShops.values,
+      backendShops: [someBackendShops[theOnlyExpectedShopIs]!],
+    );
 
     final bounds = CoordsBounds(
       southwest: Coord(lat: 0, lon: 0),
@@ -132,7 +153,7 @@ void main() {
     };
 
     final expectedFetchResult =
-        FetchedShops(expectedShops, bounds, osmShops, bounds);
+        FetchedShops(expectedShops, const {}, bounds, osmShops, bounds);
 
     final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
         osmBounds: bounds, planteBounds: bounds);
@@ -140,20 +161,37 @@ void main() {
     expect(shops, equals(expectedFetchResult));
   });
 
+  test('fetchShops barcodes', () async {
+    final osmUids = someOsmShops.keys.toList();
+    setUpShopsResponses(
+        osmShops: someOsmShops.values,
+        backendShops: someBackendShops.values,
+        barcodes: {
+          osmUids[0]: ['123', '345'],
+          osmUids[1]: ['567', '789'],
+        });
+
+    final bounds = CoordsBounds(
+      southwest: Coord(lat: 0, lon: 0),
+      northeast: Coord(lat: 99999, lon: 99999),
+    );
+    final fetchedShopsRes = await shopsManagerBackendWorker.fetchShops(osm,
+        osmBounds: bounds, planteBounds: bounds);
+    final fetchedShops = fetchedShopsRes.unwrap();
+    expect(
+        fetchedShops.shopsBarcodes,
+        equals({
+          osmUids[0]: ['123', '345'],
+          osmUids[1]: ['567', '789'],
+        }));
+  });
+
   test('fetchShops osm error', () async {
+    setUpShopsResponses(
+      backendShops: someBackendShops.values,
+    );
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Err(OpenStreetMapError.NETWORK));
-
-    final backendShops = [
-      BackendShop((e) => e
-        ..osmUID = OsmUID.parse('1:1')
-        ..productsCount = 2),
-      BackendShop((e) => e
-        ..osmUID = OsmUID.parse('1:2')
-        ..productsCount = 1),
-    ];
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Ok(backendShops));
 
     final bounds = CoordsBounds(
       southwest: Coord(lat: 0, lon: 0),
@@ -165,16 +203,9 @@ void main() {
   });
 
   test('fetchShops backend error', () async {
-    final osmShops = [
-      OsmShop((e) => e
-        ..osmUID = OsmUID.parse('1:1')
-        ..name = 'shop1'
-        ..type = 'supermarket'
-        ..longitude = 123
-        ..latitude = 321)
-    ];
-    when(osm.fetchShops(bounds: anyNamed('bounds')))
-        .thenAnswer((_) async => Ok(osmShops));
+    setUpShopsResponses(
+      osmShops: someOsmShops.values,
+    );
     when(backend.requestShopsWithin(any))
         .thenAnswer((_) async => Err(BackendError.other()));
 

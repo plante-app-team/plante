@@ -36,7 +36,8 @@ import 'package:plante/outside/map/user_address/user_address_piece.dart';
 import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -195,8 +196,8 @@ class ShopProductRangePageTestCommons {
     shopsManager.setShopRange(aShop.osmUID, Ok(range));
     productsObtainer.addKnownProducts(confirmedProducts);
     productsObtainer.addKnownProducts(suggestedProducts);
-    suggestedProductsManager.setSuggestionsForShop(
-        aShop.osmUID, suggestedProducts.map((e) => e.barcode));
+    suggestedProductsManager.setSuggestionsForShop(aShop.osmUID,
+        suggestedProducts.map((e) => e.barcode), SuggestionType.OFF);
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
     when(productsManager.createUpdateProduct(any))
@@ -204,10 +205,13 @@ class ShopProductRangePageTestCommons {
     when(addressObtainer.addressOfShop(any)).thenAnswer((_) => readyAddress);
   }
 
-  void setSuggestedProducts(List<Product> products) {
-    productsObtainer.addKnownProducts(products);
-    suggestedProductsManager.setSuggestionsForShop(
-        aShop.osmUID, products.map((e) => e.barcode));
+  void setSuggestedProducts(Map<SuggestionType, List<Product>> products) {
+    suggestedProductsManager.clearAllSuggestions();
+    for (final entry in products.entries) {
+      productsObtainer.addKnownProducts(entry.value);
+      suggestedProductsManager.setSuggestionsForShop(
+          aShop.osmUID, entry.value.map((e) => e.barcode), entry.key);
+    }
   }
 
   void setConfirmedProducts(List<Product> products,

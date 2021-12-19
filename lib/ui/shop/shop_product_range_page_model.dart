@@ -16,8 +16,11 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/shop/_confirmed_products_model.dart';
+import 'package:plante/ui/shop/_off_suggested_products_model.dart';
+import 'package:plante/ui/shop/_radius_suggested_products_model.dart';
 import 'package:plante/ui/shop/_suggested_products_model.dart';
 
 class ShopProductRangePageModel {
@@ -26,7 +29,7 @@ class ShopProductRangePageModel {
   final CachingUserAddressPiecesObtainer _userAddressObtainer;
 
   late final ConfirmedProductsModel _confirmedProductsModel;
-  late final SuggestedProductsModel _suggestedProductsModel;
+  final _suggestedProductsModels = <SuggestionType, SuggestedProductsModel>{};
 
   final Shop _shop;
   late final FutureShortAddress _address;
@@ -35,9 +38,10 @@ class ShopProductRangePageModel {
   UserParams get user => _userParamsController.cachedUserParams!;
   FutureShortAddress get address => _address;
 
-  bool get loading => confirmedProductsLoading || suggestedProductsLoading;
+  bool get loading =>
+      confirmedProductsLoading ||
+      _suggestedProductsModels.values.any((model) => model.loading);
   bool get confirmedProductsLoading => _confirmedProductsModel.loading;
-  bool get suggestedProductsLoading => _suggestedProductsModel.loading;
   ShopsManagerError? get loadingError =>
       _confirmedProductsModel.loadedRangeRes?.maybeErr();
 
@@ -45,8 +49,6 @@ class ShopProductRangePageModel {
   List<Product> get confirmedProducts => confirmedProductsLoaded
       ? _confirmedProductsModel.loadedProducts
       : const [];
-  List<Product> get suggestedProducts =>
-      _suggestedProductsModel.suggestedProducts;
 
   ShopProductRangePageModel(
       ShopsManager shopsManager,
@@ -60,7 +62,10 @@ class ShopProductRangePageModel {
       this._updateCallback) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
-    _suggestedProductsModel = SuggestedProductsModel(
+    _suggestedProductsModels[SuggestionType.RADIUS] =
+        RadiusSuggestedProductsModel(suggestedProductsManager, productsObtainer,
+            productsExtraProperties, shopsManager, _shop, _updateCallback);
+    _suggestedProductsModels[SuggestionType.OFF] = OFFSuggestedProductsModel(
         suggestedProductsManager,
         productsObtainer,
         productsExtraProperties,
@@ -73,12 +78,12 @@ class ShopProductRangePageModel {
 
   void dispose() {
     _confirmedProductsModel.dispose();
-    _suggestedProductsModel.dispose();
+    _suggestedProductsModels.values.forEach((model) => model.dispose());
   }
 
   void reload() {
     _confirmedProductsModel.reload();
-    // NOTE: we don't reload _suggestedProductsModel, because those are
+    // NOTE: we don't reload the suggestions models, because those are
     // suggestions and we can live without them
   }
 
@@ -87,21 +92,29 @@ class ShopProductRangePageModel {
 
   void onProductUpdate(Product updatedProduct) {
     _confirmedProductsModel.onProductUpdate(updatedProduct);
-    _suggestedProductsModel.onProductUpdate(updatedProduct);
+    _suggestedProductsModels.values
+        .forEach((model) => model.onProductUpdate(updatedProduct));
   }
 
   Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
       productPresenceVote(Product product, bool positive) async {
     var result =
         await _confirmedProductsModel.productPresenceVote(product, positive);
-    result ??=
-        await _suggestedProductsModel.productPresenceVote(product, positive);
+    for (final model in _suggestedProductsModels.values) {
+      result ??= await model.productPresenceVote(product, positive);
+    }
     result ??= Ok(ProductPresenceVoteResult(productDeleted: false));
+    if (result.maybeOk()?.productDeleted == true) {
+      _confirmedProductsModel.onProductDeleted(product);
+      _suggestedProductsModels.values
+          .forEach((model) => model.onProductDeleted(product));
+    }
     return result;
   }
 
   void onProductVisibilityChange(Product product, bool visible) {
-    _suggestedProductsModel.onProductVisibilityChange(product, visible);
+    _suggestedProductsModels.values
+        .forEach((model) => model.onProductVisibilityChange(product, visible));
   }
 
   Future<Country?> obtainCountryOfShop() async {
@@ -113,5 +126,13 @@ class ShopProductRangePageModel {
     // NOTE: it's a bad assumption if the page will ever be opened
     // by ways other than just clicking on shops.
     return await _userAddressObtainer.getCameraCountryCode();
+  }
+
+  bool areSuggestionsLoading(SuggestionType type) {
+    return _suggestedProductsModels[type]?.loading ?? false;
+  }
+
+  List<Product> suggestedProductsFor(SuggestionType type) {
+    return _suggestedProductsModels[type]?.suggestedProducts ?? const [];
   }
 }
