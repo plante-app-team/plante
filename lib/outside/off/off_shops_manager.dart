@@ -33,7 +33,8 @@ class OffShopsManager {
     CountryCode.GERMANY,
     CountryCode.FRANCE,
     CountryCode.NETHERLANDS,
-    CountryCode.BELGIUM
+    CountryCode.BELGIUM,
+    CountryCode.USA,
   ];
 
   final OffVeganBarcodesObtainer _veganBarcodesObtainer;
