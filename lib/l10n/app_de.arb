@@ -280,44 +280,5 @@
     "mod_reason_some_ingredient_is_in_fact_a_category2": "Inhaltsstoffe, die als \"Aromen\", \"natürliche Farbstoffe\", \"Zusatzstoffe\" ( oder ähnlich unklar) bezeichnet werden, stammen entweder aus pflanzlichen, tierischen oder mineralischen Quellen. Daher sind Produkte mit solchen Inhaltsstoffen (manchmal absichtlich) nicht unbedingt für Veganer geeignet.",
     "@mod_reason_some_ingredient_is_in_fact_a_category2": {
         "description": "Explanation of why is certain product's vegan status is set to \"ambiguous\""
-    },
-    "map_page_filter_empty_shops": "",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
-    },
-    "map_page_filter_shops_with_radius_suggested_products": "",
-    "@map_page_filter_shops_with_radius_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
-    },
-    "map_page_filter_shops_with_off_suggested_products": "",
-    "@map_page_filter_shops_with_off_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
-    },
-    "map_page_filter_not_empty_shops": "",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
-    },
-    "map_page_no_shops_hint2": "",
-    "@map_page_no_shops_hint2": {
-        "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
-    },
-    "settings_cache_page_clear_map_cache_and_exit": "",
-    "settings_cache_page_title": "",
-    "settings_page_open_cache_settings": "",
-    "shop_card_suggested_products_listed": "",
-    "@shop_card_suggested_products_listed": {
-        "description": "Products that we can link to the store name, but are not confirmed being sold there by a user. This is a label shown on a shop_card"
-    },
-    "shop_product_range_page_confirmed_products_country": "",
-    "@shop_product_range_page_confirmed_products_country": {
-        "description": "A title of sections of products in a screen of a store. The products in the section were put into this store by other users of Plante."
-    },
-    "shop_product_range_page_suggested_products_city": "",
-    "@shop_product_range_page_suggested_products_city": {
-        "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's city, which are named in the same way as the displayed store. For example, if an \"Aldi\" store has some chocolate bar, then all other \"Aldi\" stores will have this products section with same chocolate bar."
-    },
-    "shop_product_range_page_suggested_product_hint": "",
-    "@shop_product_range_page_suggested_product_hint": {
-        "description": "A hint within product's description, letting the user know this product is displayed only because it was seen in some other store with the same name. The hint shouldn't be too verbose. There probably will be many hints visible to the user - each suggested product will have such a hint."
     }
 }
