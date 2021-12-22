@@ -77,12 +77,12 @@ void main() {
           MapPage(mapControllerForTesting: mapController, key: Key(mapKey));
       final context = await commons.initIdleMapPage(widget, tester);
 
-      expect(find.text(context.strings.shop_card_suggested_products_listed),
-          findsNothing);
+      expect(
+          find.text(context.strings.shop_card_products_listed), findsNothing);
       widget.onMarkerClickForTesting([shops[0]]);
       await tester.pumpAndSettle();
-      expect(find.text(context.strings.shop_card_suggested_products_listed),
-          findsOneWidget);
+      expect(
+          find.text(context.strings.shop_card_products_listed), findsOneWidget);
     }
   });
 

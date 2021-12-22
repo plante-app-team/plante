@@ -126,12 +126,9 @@ class ShopCard extends StatelessWidget {
   Widget _productListedLabel(BuildContext context) {
     Color color = ColorsPlante.lightGrey;
     String text = context.strings.shop_card_no_products_listed;
-    if (0 < shop.productsCount) {
+    if (0 < shop.productsCount || 0 < suggestedProductsCount) {
       color = ColorsPlante.amber;
       text = context.strings.shop_card_products_listed;
-    } else if (suggestedProductsCount > 0) {
-      color = ColorsPlante.yellow;
-      text = context.strings.shop_card_suggested_products_listed;
     }
 
     return Padding(

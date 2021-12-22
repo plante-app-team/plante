@@ -249,10 +249,6 @@
     "shop_card_add_product": "Add product",
     "shop_card_directions": "Directions",
     "shop_card_no_products_listed": "Nothing listed",
-    "shop_card_suggested_products_listed": "Unconfirmed products",
-    "@shop_card_suggested_products_listed": {
-        "description": "Products that we can link to the store name, but are not confirmed being sold there by a user. This is a label shown on a shop_card"
-    },
     "shop_card_open_shop_products": "Product list",
     "shop_card_products_listed": "Products listed",
     "shop_product_range_page_add_product": "Add a product",
