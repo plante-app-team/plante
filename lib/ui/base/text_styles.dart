@@ -5,6 +5,7 @@ import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 
 class TextStyles {
+  static const _MARKER_FONT_SIZE = 15.0;
   TextStyles._();
 
   static const TextStyle normal =
@@ -132,19 +133,25 @@ class TextStyles {
   static TextStyle markerFilled = TextStyle(
       fontFamily: montserrat,
       fontWeight: FontWeight.bold,
-      fontSize: 17,
+      fontSize: _MARKER_FONT_SIZE,
       color: ColorsPlante.primary);
+
+  static TextStyle markerSuggestion = TextStyle(
+      fontFamily: montserrat,
+      fontWeight: FontWeight.bold,
+      fontSize: _MARKER_FONT_SIZE,
+      color: const Color(0xFF255B55));
 
   static TextStyle markerAccented = TextStyle(
       fontFamily: montserrat,
       fontWeight: FontWeight.bold,
-      fontSize: 17,
+      fontSize: _MARKER_FONT_SIZE,
       color: const Color(0xFFF02222));
 
   static TextStyle markerEmpty = TextStyle(
       fontFamily: montserrat,
       fontWeight: FontWeight.bold,
-      fontSize: 17,
+      fontSize: _MARKER_FONT_SIZE,
       color: ColorsPlante.grey);
 
   static TextStyle licenceMarker = TextStyle(
