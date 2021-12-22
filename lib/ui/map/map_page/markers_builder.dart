@@ -53,7 +53,7 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           context, 'assets/map_marker_filled.svg', 1, TextStyles.markerFilled);
     } else if (shops.any(hasSuggestions)) {
       return _bitmapDescriptorFromSvgAsset(context,
-          'assets/map_marker_suggestions.svg', 1, TextStyles.markerFilled);
+          'assets/map_marker_suggestions.svg', 1, TextStyles.markerSuggestion);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context, 'assets/map_marker_empty.svg', 1, TextStyles.markerEmpty);
@@ -85,7 +85,7 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
           context,
           'assets/map_marker_group_suggestions.svg',
           shops.length,
-          TextStyles.markerEmpty);
+          TextStyles.markerSuggestion);
     } else {
       return _bitmapDescriptorFromSvgAsset(
           context,
@@ -152,7 +152,7 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
       xOffset = 21.5 * devicePixelRatio;
     }
 
-    final yOffset = 10.5 * devicePixelRatio;
+    final yOffset = 11.5 * devicePixelRatio;
     _textPainter.paint(
         canvas, Offset(xOffset - _textPainter.width / 2, yOffset));
   }
