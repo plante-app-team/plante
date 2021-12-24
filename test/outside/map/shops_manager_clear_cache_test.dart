@@ -16,12 +16,16 @@ void main() {
   late CoordsBounds bounds;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     bounds = commons.bounds;
     osm = commons.osm;
     backend = commons.backend;
     osmCacher = commons.osmCacher;
     shopsManager = commons.shopsManager;
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('clear cache', () async {

@@ -54,7 +54,7 @@ void main() {
     shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
     shopsManager.setBarcodesCacheFor(shopsWithProducts[2], ['345', '678']);
 
-    final suggestions = suggestionsManager.getSuggestedBarcodesByRadius(
+    final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
     expect(
         suggestions,
@@ -75,7 +75,7 @@ void main() {
     shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
     shopsManager.setBarcodesCacheFor(shopsWithProducts[2], ['345', '678']);
 
-    final suggestions = suggestionsManager.getSuggestedBarcodesByRadius(
+    final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
     expect(
         suggestions,
@@ -91,7 +91,7 @@ void main() {
     shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
     shopsManager.setBarcodesCacheFor(shopsWithProducts[1], ['345', '890']);
 
-    final suggestions = suggestionsManager.getSuggestedBarcodesByRadius(
+    final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
     // NOTE: we expect the list to have no duplicates, even though
     // some duplicates are present in the original data
@@ -116,7 +116,7 @@ void main() {
       '345',
     ]);
 
-    final suggestions = suggestionsManager.getSuggestedBarcodesByRadius(
+    final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
     expect(
         suggestions,

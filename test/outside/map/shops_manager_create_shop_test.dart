@@ -30,7 +30,7 @@ void main() {
   late CoordsBounds bounds;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     fullShops = commons.fullShops;
     bounds = commons.bounds;
 
@@ -40,6 +40,10 @@ void main() {
     analytics = commons.analytics;
     osmCacher = commons.osmCacher;
     shopsManager = commons.shopsManager;
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('shop creation', () async {

@@ -14,10 +14,14 @@ void main() {
   late ShopsManager shopsManager;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
 
     backend = commons.backend;
     shopsManager = commons.shopsManager;
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('shops inflated and then cached', () async {

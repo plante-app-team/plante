@@ -26,7 +26,7 @@ void main() {
   late List<Product> rangeProducts;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     fullShops = commons.fullShops;
     rangeBackendProducts = commons.rangeBackendProducts;
     rangeProducts = commons.rangeProducts;
@@ -34,6 +34,10 @@ void main() {
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     shopsManager = commons.shopsManager;
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('shops products range fetch and update', () async {

@@ -53,8 +53,8 @@ class SuggestedProductsManager {
   /// NOTE: function stops data retrieval on first error
   SuggestionsStream getSuggestedBarcodesByRadius(
       Iterable<Shop> shops, Coord center) async* {
-    final barcodesMap =
-        _radiusSuggestionsManager.getSuggestedBarcodesByRadius(center, shops);
+    final barcodesMap = await _radiusSuggestionsManager
+        .getSuggestedBarcodesByRadius(center, shops);
     for (final entry in barcodesMap.entries) {
       final shop = entry.key;
       final barcodes = entry.value;

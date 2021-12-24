@@ -31,7 +31,7 @@ void main() {
   late CoordsBounds farBounds;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     osmShops = commons.osmShops;
     backendShops = commons.backendShops;
     fullShops = commons.fullShops;
@@ -42,6 +42,10 @@ void main() {
     backend = commons.backend;
     osmCacher = commons.osmCacher;
     shopsManager = commons.shopsManager;
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('shops fetched and then cached', () async {
@@ -86,10 +90,10 @@ void main() {
       }));
     });
 
-    expect(shopsManager.getBarcodesCache(), isEmpty);
+    expect(await shopsManager.getBarcodesCacheFor(uids), isEmpty);
     await shopsManager.fetchShops(bounds);
     expect(
-        shopsManager.getBarcodesCache(),
+        await shopsManager.getBarcodesCacheFor(uids),
         equals({
           uids[0]: ['123', '345'],
           uids[1]: ['567', '789'],
@@ -98,9 +102,9 @@ void main() {
 
   test('shops fetch creates shops cache', () async {
     final uids = fullShops.values.map((e) => e.osmUID).toList();
-    expect(shopsManager.getCachedShopsFor(uids), isEmpty);
+    expect(await shopsManager.getCachedShopsFor(uids), isEmpty);
     await shopsManager.fetchShops(bounds);
-    expect(shopsManager.getCachedShopsFor(uids), equals(fullShops));
+    expect(await shopsManager.getCachedShopsFor(uids), equals(fullShops));
   });
 
   test('cache behaviour when multiple shops fetches started at the same time',
@@ -424,7 +428,7 @@ void main() {
     verifyZeroInteractions(backend);
 
     // Perform fetch with a new ShopsManager
-    final newShopsManager = commons.createShopsManager();
+    final newShopsManager = await commons.createShopsManager();
     fetchedShopsRes = await newShopsManager.fetchShops(bounds);
     fetchedShops = fetchedShopsRes.unwrap();
     // Ensure new ShopsManager knows of the new shop

@@ -401,8 +401,8 @@ class _FakeRadiusProductsSuggestionsManager
   }
 
   @override
-  Map<Shop, List<String>> getSuggestedBarcodesByRadius(
-      Coord center, Iterable<Shop> shops) {
+  Future<Map<Shop, List<String>>> getSuggestedBarcodesByRadius(
+      Coord center, Iterable<Shop> shops) async {
     final result = <Shop, List<String>>{};
     for (final shop in shops) {
       final barcodes = _suggestions[shop];

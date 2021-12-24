@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:plante/base/base.dart';
 import 'package:plante/base/date_time_extensions.dart';
@@ -13,7 +12,6 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
@@ -21,6 +19,7 @@ import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/map/shops_large_local_cache_wrapper.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -41,10 +40,11 @@ class ShopsManager {
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
-  final _shopsCache = <OsmUID, Shop>{};
-  final _loadedAreas = <CoordsBounds, List<OsmUID>>{};
+  final _slowCacheCompleter = Completer<ShopsLargeLocalCacheWrapper>();
+  Future<ShopsLargeLocalCacheWrapper> get _slowCache =>
+      _slowCacheCompleter.future;
   final _rangesCache = <OsmUID, ShopProductRange>{};
-  final _barcodesCache = <OsmUID, List<String>>{};
+  final _loadedAreas = <CoordsBounds, List<OsmUID>>{};
 
   int get loadedAreasCount => _loadedAreas.length;
 
@@ -53,6 +53,15 @@ class ShopsManager {
       : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
     _fetchShopsHelper =
         ShopsManagerFetchShopsHelper(_backendWorker, _osmCacher);
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    _slowCacheCompleter.complete(await ShopsLargeLocalCacheWrapper.create());
+  }
+
+  Future<void> dispose() async {
+    (await _slowCache).dispose();
   }
 
   void addListener(ShopsManagerListener listener) {
@@ -69,29 +78,22 @@ class ShopsManager {
     });
   }
 
-  Map<OsmUID, List<String>> getBarcodesCache() {
-    final result = <OsmUID, List<String>>{};
-    for (final cache in _barcodesCache.entries) {
-      final osmUID = cache.key;
-      result[osmUID] = UnmodifiableListView(cache.value);
-    }
-    return result;
+  Future<Map<OsmUID, List<String>>> getBarcodesWithin(
+      CoordsBounds bounds) async {
+    return await (await _slowCache).getBarcodesWithin(bounds);
   }
 
-  Map<OsmUID, Shop> getCachedShopsFor(Iterable<OsmUID> uids) {
-    final result = <OsmUID, Shop>{};
-    for (final uid in uids) {
-      final shop = _shopsCache[uid];
-      if (shop == null) {
-        continue;
-      }
-      result[uid] = shop;
-    }
-    return result;
+  Future<Map<OsmUID, List<String>>> getBarcodesCacheFor(
+      Iterable<OsmUID> uids) async {
+    return await (await _slowCache).getBarcodes(uids);
+  }
+
+  Future<Map<OsmUID, Shop>> getCachedShopsFor(Iterable<OsmUID> uids) async {
+    return await (await _slowCache).getShops(uids);
   }
 
   Future<bool> osmShopsCacheExistFor(CoordsBounds bounds) async {
-    if (_loadShopsFromCache(bounds) != null) {
+    if (await _loadShopsFromCache(bounds) != null) {
       return true;
     }
     for (final territory in await _osmCacher.getCachedShops()) {
@@ -104,7 +106,7 @@ class ShopsManager {
 
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
-    final existingCache = _loadShopsFromCache(bounds);
+    final existingCache = await _loadShopsFromCache(bounds);
     if (existingCache != null) {
       return Ok(existingCache);
     }
@@ -112,14 +114,15 @@ class ShopsManager {
         await _maybeLoadShops(overpass, bounds, attemptNumber: 1));
   }
 
-  Map<OsmUID, Shop>? _loadShopsFromCache(CoordsBounds bounds) {
+  Future<Map<OsmUID, Shop>?> _loadShopsFromCache(CoordsBounds bounds) async {
+    final slowCache = await _slowCache;
     for (final loadedArea in _loadedAreas.keys) {
       // Already loaded
       if (loadedArea.containsBounds(bounds)) {
         final ids = _loadedAreas[loadedArea]!;
-        final shops = ids
-            .map((id) => _shopsCache[id]!)
-            .where((shop) => bounds.containsShop(shop));
+        final shopsCache = await slowCache.getShops(ids);
+        final shops =
+            shopsCache.values.where((shop) => bounds.containsShop(shop));
         return {for (var shop in shops) shop.osmUID: shop};
       }
     }
@@ -129,7 +132,7 @@ class ShopsManager {
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> _maybeLoadShops(
       OsmOverpass overpass, CoordsBounds bounds,
       {required int attemptNumber}) async {
-    final existingCache = _loadShopsFromCache(bounds);
+    final existingCache = await _loadShopsFromCache(bounds);
     if (existingCache != null) {
       return Ok(existingCache);
     }
@@ -152,12 +155,14 @@ class ShopsManager {
       }
     }
 
+    final slowCache = await _slowCache;
+
     final fetchResult = shopsFetchResult.unwrap();
     _ensureAllShopsArePresentInOsmCache(fetchResult.shops.values);
-    _shopsCache.addAll(fetchResult.shops);
+    await slowCache.addShops(fetchResult.shops.values);
+    await slowCache.addBarcodes(fetchResult.shopsBarcodes);
     final ids = fetchResult.shops.values.map((shop) => shop.osmUID).toList();
     _loadedAreas[fetchResult.shopsBounds] = ids;
-    _barcodesCache.addAll(fetchResult.shopsBarcodes);
     final result = ids
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
@@ -181,10 +186,13 @@ class ShopsManager {
 
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> inflateOsmShops(
       Iterable<OsmShop> shops) async {
+    final slowCache = await _slowCache;
+
     final loadedShops = <OsmUID, Shop>{};
     final osmShopsToLoad = <OsmShop>[];
+    final shopsCache = await slowCache.getShops(shops.map((e) => e.osmUID));
     for (final osmShop in shops) {
-      final loadedShop = _shopsCache[osmShop.osmUID];
+      final loadedShop = shopsCache[osmShop.osmUID];
       if (loadedShop != null) {
         loadedShops[loadedShop.osmUID] = loadedShop;
       } else {
@@ -203,9 +211,7 @@ class ShopsManager {
       final inflatedShops = inflateResult.unwrap();
       loadedShops.addAll(inflatedShops);
 
-      for (final inflatedShop in inflatedShops.values) {
-        _shopsCache[inflatedShop.osmUID] = inflatedShop;
-      }
+      await slowCache.addShops(inflatedShops.values);
       _notifyListeners();
       // NOTE: we don't put the shop into [_loadedAreas] because the
       // [_loadedAreas] field is an entire area of already loaded shops -
@@ -229,19 +235,12 @@ class ShopsManager {
     if (result.isOk) {
       final range = result.unwrap();
       _rangesCache[shop.osmUID] = range;
-      _barcodesCache[shop.osmUID] =
-          range.products.map((e) => e.barcode).toList();
+      final slowCache = await _slowCache;
+      await slowCache.addBarcodes(
+          {shop.osmUID: range.products.map((e) => e.barcode).toList()});
     }
     _notifyListeners();
     return result;
-  }
-
-  void _cacheBarcode(String barcode, OsmUID osmUID) {
-    final barcodes = _barcodesCache[osmUID] ?? [];
-    if (!barcodes.contains(barcode)) {
-      barcodes.add(barcode);
-    }
-    _barcodesCache[osmUID] = barcodes;
   }
 
   Future<Result<None, ShopsManagerError>> putProductToShops(
@@ -255,8 +254,9 @@ class ShopsManager {
     if (result.isOk) {
       _analytics.sendEvent(
           _putProductToShopEventName(source, success: true), eventParam);
+      final slowCache = await _slowCache;
       for (final shop in shops) {
-        _cacheBarcode(product.barcode, shop.osmUID);
+        await slowCache.addBarcode(shop.osmUID, product.barcode);
 
         var rangeCache = _rangesCache[shop.osmUID];
         if (rangeCache != null) {
@@ -267,20 +267,11 @@ class ShopsManager {
           _rangesCache[shop.osmUID] = rangeCache;
         }
 
-        var shopCache = _shopsCache[shop.osmUID];
+        var shopCache = await slowCache.getShop(shop.osmUID);
         if (shopCache != null) {
-          var backendShop = shopCache.backendShop;
-          if (backendShop != null) {
-            backendShop = backendShop.rebuild(
-                (e) => e.productsCount = backendShop!.productsCount + 1);
-          } else {
-            backendShop = BackendShop((e) => e
-              ..osmUID = shop.osmUID
-              ..productsCount = 1);
-          }
           shopCache =
-              shopCache.rebuild((e) => e.backendShop.replace(backendShop!));
-          _shopsCache[shop.osmUID] = shopCache;
+              shopCache.rebuildWith(productsCount: shopCache.productsCount + 1);
+          await slowCache.addShop(shopCache);
         } else {
           Log.w('A product is put into a shop while there '
               'was no cache for the shop. Shop: $shop');
@@ -327,7 +318,8 @@ class ShopsManager {
       final shop = result.unwrap();
       _analytics.sendEvent('create_shop_success',
           {'name': name, 'lat': coord.lat, 'lon': coord.lon});
-      _shopsCache[shop.osmUID] = shop;
+      final slowCache = await _slowCache;
+      await slowCache.addShop(shop);
       for (final loadedArea in _loadedAreas.keys) {
         if (loadedArea.containsShop(shop)) {
           _loadedAreas[loadedArea]!.add(shop.osmUID);
@@ -351,8 +343,9 @@ class ShopsManager {
     final result =
         await _backendWorker.productPresenceVote(product, shop, positive);
     if (result.isOk) {
+      final slowCache = await _slowCache;
       final cachedRange = _rangesCache[shop.osmUID];
-      final cachedShop = _shopsCache[shop.osmUID];
+      final cachedShop = await slowCache.getShop(shop.osmUID);
       if (cachedShop == null) {
         Log.w('productPresenceVote: '
             'cachedShop is null - it is rare but possible');
@@ -362,22 +355,22 @@ class ShopsManager {
         return result;
       }
       if (positive) {
-        _cacheBarcode(product.barcode, shop.osmUID);
+        await slowCache.addBarcode(shop.osmUID, product.barcode);
         if (cachedShop != null &&
             !cachedRange.hasProductWith(product.barcode)) {
-          _shopsCache[shop.osmUID] = cachedShop.rebuildWith(
-              productsCount: cachedShop.productsCount + 1);
+          await slowCache.addShop(cachedShop.rebuildWith(
+              productsCount: cachedShop.productsCount + 1));
         }
         _rangesCache[shop.osmUID] = cachedRange.rebuildWithProduct(
             product, DateTime.now().secondsSinceEpoch);
         _notifyListeners();
       } else if (result.unwrap().productDeleted) {
-        _barcodesCache[shop.osmUID]?.remove(product.barcode);
+        await slowCache.removeBarcode(shop.osmUID, product.barcode);
         _rangesCache[shop.osmUID] =
             cachedRange.rebuildWithoutProduct(product.barcode);
         if (cachedShop != null) {
-          _shopsCache[shop.osmUID] = cachedShop.rebuildWith(
-              productsCount: cachedShop.productsCount - 1);
+          await slowCache.addShop(cachedShop.rebuildWith(
+              productsCount: cachedShop.productsCount - 1));
         }
         _notifyListeners();
       }
@@ -387,10 +380,9 @@ class ShopsManager {
 
   Future<void> clearCache() async {
     await _fetchShopsHelper.clearCache();
-    _shopsCache.clear();
+    await (await _slowCache).clear();
     _loadedAreas.clear();
     _rangesCache.clear();
-    _barcodesCache.clear();
     _notifyListeners();
   }
 }
