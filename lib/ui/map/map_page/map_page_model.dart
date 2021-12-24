@@ -218,7 +218,7 @@ class MapPageModel implements ShopsManagerListener {
       lastAbsorbTime = DateTime.now();
     };
 
-    final stream = _suggestedProductsManager.getAllSuggestedBarcodes(
+    final stream = _suggestedProductsManager.getSuggestedBarcodes(
         shopsOnMap, center, countryCode);
     _suggestedBarcodesSubscription = stream.listen((event) {
       if (event.isErr) {

@@ -147,7 +147,7 @@ void main() {
     expect(find.text(title), findsOneWidget);
   });
 
-  testWidgets('radius suggested products title does not need country',
+  testWidgets('no radius suggested products without country',
       (WidgetTester tester) async {
     // No country code
     userAddressObtainer.setResultFor(
@@ -160,11 +160,14 @@ void main() {
     final widget = ShopProductRangePage.createForTesting(aShop);
     final context = await tester.superPump(widget);
 
+    // No title
     final title = context
         .strings.shop_product_range_page_suggested_products_city
         .replaceAll('<SHOP>', aShop.name);
-
-    expect(find.text(title), findsOneWidget);
+    expect(find.text(title), findsNothing);
+    // No suggested products
+    expect(find.text(suggestedProducts[0].name!), findsNothing);
+    expect(find.text(suggestedProducts[1].name!), findsNothing);
   });
 
   testWidgets(

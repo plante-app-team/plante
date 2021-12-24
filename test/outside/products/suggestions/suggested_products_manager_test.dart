@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
@@ -40,7 +41,11 @@ void main() {
         radiusManager: radiusSuggestionsManager);
   });
 
-  test('getSuggestedBarcodesByOFF', () async {
+  test('getSuggestedBarcodes - by OFF', () async {
+    final center = Coord(
+      lat: 10,
+      lon: 10,
+    );
     final offShops = [
       OffShop((e) => e
         ..id = 'spar'
@@ -88,7 +93,7 @@ void main() {
     ];
 
     var suggestionsRes = await suggestedProductsManager
-        .getSuggestedBarcodesByOFFMap([shops[0]], 'ru');
+        .getSuggestedBarcodesByOFFMap([shops[0]], center, 'ru');
     var suggestions = suggestionsRes.unwrap();
     expect(
         suggestions.equals(SuggestedBarcodesMap(
@@ -96,7 +101,7 @@ void main() {
         isTrue);
 
     suggestionsRes = await suggestedProductsManager
-        .getSuggestedBarcodesByOFFMap(shops, 'ru');
+        .getSuggestedBarcodesByOFFMap(shops, center, 'ru');
     suggestions = suggestionsRes.unwrap();
     expect(
         suggestions.equals(SuggestedBarcodesMap({
@@ -106,7 +111,7 @@ void main() {
         isTrue);
   });
 
-  test('getSuggestedBarcodesByRadius', () async {
+  test('getSuggestedBarcodes - by radius', () async {
     final center = Coord(
       lat: 10,
       lon: 10,
@@ -129,7 +134,7 @@ void main() {
     radiusSuggestionsManager.setSuggestionsFor(shops[1], ['567', '789']);
 
     final result = await suggestedProductsManager
-        .getSuggestedBarcodesByRadiusMap(shops, center);
+        .getSuggestedBarcodesByRadiusMap(shops, center, 'ru');
     expect(
         result.unwrap().equals(SuggestedBarcodesMap({
               OsmUID.parse('1:1'): ['123', '345'],
@@ -165,8 +170,12 @@ void main() {
         isTrue);
   }
 
-  test('getSuggestedBarcodesByOFF - bad suggestions are not suggested',
+  test('getSuggestedBarcodes by OFF - bad suggestions are not suggested',
       () async {
+    final center = Coord(
+      lat: 10,
+      lon: 10,
+    );
     final offShops = [
       OffShop((e) => e
         ..id = 'spar'
@@ -190,12 +199,12 @@ void main() {
       return shops[0].osmUID;
     }, getSuggestions: () async {
       final res = await suggestedProductsManager.getSuggestedBarcodesByOFFMap(
-          shops, 'ru');
+          shops, center, 'ru');
       return res.unwrap();
     });
   });
 
-  test('getSuggestedBarcodesByRadius - bad suggestions are not suggested',
+  test('getSuggestedBarcodes by radius - bad suggestions are not suggested',
       () async {
     final center = Coord(
       lat: 10,
@@ -214,7 +223,7 @@ void main() {
       return shops[0].osmUID;
     }, getSuggestions: () async {
       final res = await suggestedProductsManager
-          .getSuggestedBarcodesByRadiusMap(shops, center);
+          .getSuggestedBarcodesByRadiusMap(shops, center, 'ru');
       return res.unwrap();
     });
   });
@@ -270,7 +279,11 @@ void main() {
     expect(calls, equals(2));
   }
 
-  test('getSuggestedBarcodesByOFF - can be canceled', () async {
+  test('getSuggestedBarcodes by OFF - can be canceled', () async {
+    final center = Coord(
+      lat: 10,
+      lon: 10,
+    );
     await getSuggestionsCanBeCanceledTest(setUpSuggestions: (suggestions) {
       final offSuggestions = <OffShop, List<String>>{};
       for (final entry in suggestions.entries) {
@@ -284,11 +297,12 @@ void main() {
       }
       offShopsManager.setSuggestedBarcodes(offSuggestions);
     }, getSuggestionsStream: (shops) {
-      return suggestedProductsManager.getSuggestedBarcodesByOFF(shops, 'ru');
+      return suggestedProductsManager.getSuggestedBarcodes(shops, center, 'ru',
+          types: {SuggestionType.OFF});
     });
   });
 
-  test('getSuggestedBarcodesByRadius - can be canceled', () async {
+  test('getSuggestedBarcodes by radius - can be canceled', () async {
     Coord? center;
     await getSuggestionsCanBeCanceledTest(setUpSuggestions: (suggestions) {
       center = suggestions.keys.first.coord;
@@ -296,12 +310,12 @@ void main() {
         radiusSuggestionsManager.setSuggestionsFor(entry.key, entry.value);
       }
     }, getSuggestionsStream: (shops) {
-      return suggestedProductsManager.getSuggestedBarcodesByRadius(
-          shops, center!);
+      return suggestedProductsManager.getSuggestedBarcodes(shops, center!, 'ru',
+          types: {SuggestionType.RADIUS});
     });
   });
 
-  test('getAllSuggestedBarcodes', () async {
+  test('getSuggestedBarcodes', () async {
     final offShops = [
       OffShop((e) => e
         ..id = 'spar'
@@ -348,7 +362,7 @@ void main() {
     radiusSuggestionsManager.setSuggestionsFor(shops[2], ['789']);
 
     final allSuggestions = await suggestedProductsManager
-        .getAllSuggestedBarcodesMap(shops, center, 'ru');
+        .getSuggestedBarcodesMap(shops, center, 'ru');
 
     final expected = SuggestedBarcodesMapFull({
       SuggestionType.RADIUS: SuggestedBarcodesMap({
@@ -386,7 +400,7 @@ void main() {
         radiusSuggestionsManager.setSuggestionsFor(shop, suggestions[shop]!);
       }
     }, getSuggestionsStream: (shops) {
-      return suggestedProductsManager.getAllSuggestedBarcodes(
+      return suggestedProductsManager.getSuggestedBarcodes(
           shops, center!, 'ru');
     });
   });
@@ -411,5 +425,33 @@ class _FakeRadiusProductsSuggestionsManager
       }
     }
     return result;
+  }
+}
+
+extension on SuggestedProductsManager {
+  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
+      getSuggestedBarcodesByRadiusMap(
+          Iterable<Shop> shops, Coord center, String countryCode) async {
+    return await getSuggestedBarcodesForType(
+        SuggestionType.RADIUS, shops, center, countryCode);
+  }
+
+  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
+      getSuggestedBarcodesByOFFMap(
+          Iterable<Shop> shops, Coord center, String countryCode) async {
+    return await getSuggestedBarcodesForType(
+        SuggestionType.OFF, shops, center, countryCode);
+  }
+
+  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
+      getSuggestedBarcodesForType(SuggestionType type, Iterable<Shop> shops,
+          Coord center, String countryCode) async {
+    final mapFullRes = await getSuggestedBarcodesMap(shops, center, countryCode,
+        types: {type});
+    if (mapFullRes.isErr) {
+      return Err(mapFullRes.unwrapErr());
+    }
+    final mapFull = mapFullRes.unwrap();
+    return Ok(mapFull[type] ?? SuggestedBarcodesMap({}));
   }
 }

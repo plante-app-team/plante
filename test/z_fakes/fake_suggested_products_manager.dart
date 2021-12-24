@@ -24,20 +24,25 @@ class FakeSuggestedProductsManager implements SuggestedProductsManager {
 
   @override
   Stream<Result<SuggestionsForShop, SuggestedProductsManagerError>>
-      getAllSuggestedBarcodes(
-          Iterable<Shop> shops, Coord center, String countryCode) async* {
-    await for (final suggestion
-        in getSuggestedBarcodesByRadius(shops, center)) {
-      yield suggestion;
-      if (suggestion.isErr) {
-        return;
+      getSuggestedBarcodes(
+          Iterable<Shop> shops, Coord center, String countryCode,
+          {Set<SuggestionType>? types}) async* {
+    if (types == null || types.contains(SuggestionType.RADIUS)) {
+      final suggestions = _getSuggestedBarcodesByRadius(shops, center);
+      await for (final suggestion in suggestions) {
+        yield suggestion;
+        if (suggestion.isErr) {
+          return;
+        }
       }
     }
-    await for (final suggestion
-        in getSuggestedBarcodesByOFF(shops, countryCode)) {
-      yield suggestion;
-      if (suggestion.isErr) {
-        return;
+    if (types == null || types.contains(SuggestionType.OFF)) {
+      final suggestions = _getSuggestedBarcodesByOFF(shops, countryCode);
+      await for (final suggestion in suggestions) {
+        yield suggestion;
+        if (suggestion.isErr) {
+          return;
+        }
       }
     }
   }
@@ -52,15 +57,13 @@ class FakeSuggestedProductsManager implements SuggestedProductsManager {
     }
   }
 
-  @override
   Stream<Result<SuggestionsForShop, SuggestedProductsManagerError>>
-      getSuggestedBarcodesByOFF(Iterable<Shop> shops, String countryCode) {
+      _getSuggestedBarcodesByOFF(Iterable<Shop> shops, String countryCode) {
     return _suggestionsFor(shops, SuggestionType.OFF);
   }
 
-  @override
   Stream<Result<SuggestionsForShop, SuggestedProductsManagerError>>
-      getSuggestedBarcodesByRadius(Iterable<Shop> shops, Coord center) {
+      _getSuggestedBarcodesByRadius(Iterable<Shop> shops, Coord center) {
     return _suggestionsFor(shops, SuggestionType.RADIUS);
   }
 }

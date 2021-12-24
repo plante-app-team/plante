@@ -32,26 +32,33 @@ class SuggestedProductsManager {
             radiusManager ?? RadiusProductsSuggestionsManager(shopsManager);
 
   /// NOTE: function stops data retrieval on first error
-  SuggestionsStream getAllSuggestedBarcodes(
-      Iterable<Shop> shops, Coord center, String countryCode) async* {
-    await for (final suggestion
-        in getSuggestedBarcodesByRadius(shops, center)) {
-      yield suggestion;
-      if (suggestion.isErr) {
-        return;
+  ///
+  /// See also [getSuggestedBarcodesMap].
+  SuggestionsStream getSuggestedBarcodes(
+      Iterable<Shop> shops, Coord center, String countryCode,
+      {Set<SuggestionType>? types}) async* {
+    if (types == null || types.contains(SuggestionType.RADIUS)) {
+      final suggestions = _getSuggestedBarcodesByRadius(shops, center);
+      await for (final suggestion in suggestions) {
+        yield suggestion;
+        if (suggestion.isErr) {
+          return;
+        }
       }
     }
-    await for (final suggestion
-        in getSuggestedBarcodesByOFF(shops, countryCode)) {
-      yield suggestion;
-      if (suggestion.isErr) {
-        return;
+    if (types == null || types.contains(SuggestionType.OFF)) {
+      final suggestions = _getSuggestedBarcodesByOFF(shops, countryCode);
+      await for (final suggestion in suggestions) {
+        yield suggestion;
+        if (suggestion.isErr) {
+          return;
+        }
       }
     }
   }
 
   /// NOTE: function stops data retrieval on first error
-  SuggestionsStream getSuggestedBarcodesByRadius(
+  SuggestionsStream _getSuggestedBarcodesByRadius(
       Iterable<Shop> shops, Coord center) async* {
     final barcodesMap = await _radiusSuggestionsManager
         .getSuggestedBarcodesByRadius(center, shops);
@@ -66,9 +73,7 @@ class SuggestedProductsManager {
   }
 
   /// NOTE: function stops data retrieval on first error
-  ///
-  /// See also: [getSuggestedBarcodesByOFFMap].
-  SuggestionsStream getSuggestedBarcodesByOFF(
+  SuggestionsStream _getSuggestedBarcodesByOFF(
       Iterable<Shop> shops, String countryCode) async* {
     // There can be many shops with same name,
     // let's build a map which will let us to work with that.
@@ -122,45 +127,22 @@ extension _OffShopsManagerErrorExt on OffShopsManagerError {
 
 extension SuggestedProductsManagerExt on SuggestedProductsManager {
   Future<Result<SuggestedBarcodesMapFull, SuggestedProductsManagerError>>
-      getAllSuggestedBarcodesMap(
-          Iterable<Shop> shops, Coord center, String countryCode) async {
-    final radMap = await getSuggestedBarcodesByRadiusMap(shops, center);
-    if (radMap.isErr) {
-      return Err(radMap.unwrapErr());
-    }
-    final offMap = await getSuggestedBarcodesByOFFMap(shops, countryCode);
-    if (offMap.isErr) {
-      return Err(offMap.unwrapErr());
-    }
-    return Ok(SuggestedBarcodesMapFull({
-      SuggestionType.RADIUS: radMap.unwrap(),
-      SuggestionType.OFF: offMap.unwrap(),
-    }));
-  }
+      getSuggestedBarcodesMap(
+          Iterable<Shop> shops, Coord center, String countryCode,
+          {Set<SuggestionType>? types}) async {
+    final stream =
+        getSuggestedBarcodes(shops, center, countryCode, types: types);
+    final result = <SuggestionType, SuggestedBarcodesMap>{};
 
-  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesByRadiusMap(
-          Iterable<Shop> shops, Coord center) async {
-    return await _streamToMap(getSuggestedBarcodesByRadius(shops, center));
-  }
-
-  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
-      getSuggestedBarcodesByOFFMap(
-          Iterable<Shop> shops, String countryCode) async {
-    return await _streamToMap(getSuggestedBarcodesByOFF(shops, countryCode));
-  }
-
-  Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
-      _streamToMap(SuggestionsStream stream) async {
-    final SuggestedBarcodesMap result = SuggestedBarcodesMap({});
     await for (final suggestionRes in stream) {
       if (suggestionRes.isErr) {
         return Err(suggestionRes.unwrapErr());
       }
       final suggestion = suggestionRes.unwrap();
-      result[suggestion.osmUID] ??= [];
-      result[suggestion.osmUID]!.addAll(suggestion.barcodes);
+      result[suggestion.type] ??= SuggestedBarcodesMap({});
+      result[suggestion.type]!.add(suggestion.osmUID, suggestion.barcodes);
     }
-    return Ok(result);
+
+    return Ok(SuggestedBarcodesMapFull(result));
   }
 }

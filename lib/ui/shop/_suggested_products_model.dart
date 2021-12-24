@@ -16,15 +16,19 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
-abstract class SuggestedProductsModel {
+class SuggestedProductsModel {
   static const LOADED_BATCH_SIZE = 20;
+  final SuggestionType _suggestionType;
+  final SuggestedProductsManager _suggestedProductsManager;
   final ProductsObtainer _productsObtainer;
   final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
   final ShopsManager _shopsManager;
   final Shop _shop;
   final VoidCallback _updateCallback;
+  final Future<String?> _countryCode;
 
   bool _loading = false;
   bool _initialLoadingFinished = false;
@@ -37,14 +41,33 @@ abstract class SuggestedProductsModel {
       .where(ProductPageWrapper.isProductFilledEnoughForDisplay)
       .toList();
 
-  SuggestedProductsModel(this._productsObtainer, this._productsExtraProperties,
-      this._shopsManager, this._shop, this._updateCallback) {
+  SuggestedProductsModel(
+      this._suggestionType,
+      this._suggestedProductsManager,
+      this._productsObtainer,
+      this._productsExtraProperties,
+      this._shopsManager,
+      this._shop,
+      this._updateCallback,
+      this._countryCode) {
     load();
   }
 
-  @protected
   Future<Result<SuggestedBarcodesMap, SuggestedProductsManagerError>>
-      obtainSuggestedProducts();
+      obtainSuggestedProducts() async {
+    final countryCode = await _countryCode;
+    if (countryCode == null) {
+      return Ok(SuggestedBarcodesMap({}));
+    }
+    final mapFullRes = await _suggestedProductsManager.getSuggestedBarcodesMap(
+        [_shop], _shop.coord, countryCode,
+        types: {_suggestionType});
+    if (mapFullRes.isErr) {
+      return Err(mapFullRes.unwrapErr());
+    }
+    final mapFull = mapFullRes.unwrap();
+    return Ok(mapFull[_suggestionType] ?? SuggestedBarcodesMap({}));
+  }
 
   void dispose() {}
 
