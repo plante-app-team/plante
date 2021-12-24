@@ -1054,6 +1054,11 @@ class MockShopsManager extends _i1.Mock implements _i65.ShopsManager {
       (super.noSuchMethod(Invocation.getter(#loadedAreasCount), returnValue: 0)
           as int);
   @override
+  _i9.Future<void> dispose() =>
+      (super.noSuchMethod(Invocation.method(#dispose, []),
+          returnValue: Future<void>.value(),
+          returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
+  @override
   void addListener(_i66.ShopsManagerListener? listener) =>
       super.noSuchMethod(Invocation.method(#addListener, [listener]),
           returnValueForMissingStub: null);
@@ -1062,15 +1067,26 @@ class MockShopsManager extends _i1.Mock implements _i65.ShopsManager {
       super.noSuchMethod(Invocation.method(#removeListener, [listener]),
           returnValueForMissingStub: null);
   @override
-  Map<_i25.OsmUID, List<String>> getBarcodesCache() =>
-      (super.noSuchMethod(Invocation.method(#getBarcodesCache, []),
-              returnValue: <_i25.OsmUID, List<String>>{})
-          as Map<_i25.OsmUID, List<String>>);
+  _i9.Future<Map<_i25.OsmUID, List<String>>> getBarcodesWithin(
+          _i28.CoordsBounds? bounds) =>
+      (super.noSuchMethod(Invocation.method(#getBarcodesWithin, [bounds]),
+              returnValue: Future<Map<_i25.OsmUID, List<String>>>.value(
+                  <_i25.OsmUID, List<String>>{}))
+          as _i9.Future<Map<_i25.OsmUID, List<String>>>);
   @override
-  Map<_i25.OsmUID, _i12.Shop> getCachedShopsFor(Iterable<_i25.OsmUID>? uids) =>
+  _i9.Future<Map<_i25.OsmUID, List<String>>> getBarcodesCacheFor(
+          Iterable<_i25.OsmUID>? uids) =>
+      (super.noSuchMethod(Invocation.method(#getBarcodesCacheFor, [uids]),
+              returnValue: Future<Map<_i25.OsmUID, List<String>>>.value(
+                  <_i25.OsmUID, List<String>>{}))
+          as _i9.Future<Map<_i25.OsmUID, List<String>>>);
+  @override
+  _i9.Future<Map<_i25.OsmUID, _i12.Shop>> getCachedShopsFor(
+          Iterable<_i25.OsmUID>? uids) =>
       (super.noSuchMethod(Invocation.method(#getCachedShopsFor, [uids]),
-              returnValue: <_i25.OsmUID, _i12.Shop>{})
-          as Map<_i25.OsmUID, _i12.Shop>);
+              returnValue: Future<Map<_i25.OsmUID, _i12.Shop>>.value(
+                  <_i25.OsmUID, _i12.Shop>{}))
+          as _i9.Future<Map<_i25.OsmUID, _i12.Shop>>);
   @override
   _i9.Future<bool> osmShopsCacheExistFor(_i28.CoordsBounds? bounds) =>
       (super.noSuchMethod(Invocation.method(#osmShopsCacheExistFor, [bounds]),

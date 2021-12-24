@@ -135,12 +135,29 @@ class FakeShopsManager implements ShopsManager {
   }
 
   @override
-  Map<OsmUID, List<String>> getBarcodesCache() {
-    return _barcodesCache.map((key, value) => MapEntry(key.osmUID, value));
+  Future<void> dispose() async {
+    // Nothing to do
   }
 
   @override
-  Map<OsmUID, Shop> getCachedShopsFor(Iterable<OsmUID> uids) {
+  Future<Map<OsmUID, List<String>>> getBarcodesCacheFor(
+      Iterable<OsmUID> uids) async {
+    final result =
+        _barcodesCache.map((key, value) => MapEntry(key.osmUID, value));
+    result.removeWhere((key, value) => !uids.contains(key));
+    return result;
+  }
+
+  @override
+  Future<Map<OsmUID, List<String>>> getBarcodesWithin(
+      CoordsBounds bounds) async {
+    final result = {..._barcodesCache};
+    result.removeWhere((key, value) => !bounds.contains(key.coord));
+    return result.map((key, value) => MapEntry(key.osmUID, value));
+  }
+
+  @override
+  Future<Map<OsmUID, Shop>> getCachedShopsFor(Iterable<OsmUID> uids) async {
     final allKnownShops = <OsmUID, Shop>{};
     for (final shop in _barcodesCache.keys) {
       allKnownShops[shop.osmUID] = shop;

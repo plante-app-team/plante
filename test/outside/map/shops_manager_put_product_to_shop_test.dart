@@ -27,7 +27,7 @@ void main() {
   late List<Product> rangeProducts;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     fullShops = commons.fullShops;
     bounds = commons.bounds;
     rangeProducts = commons.rangeProducts;
@@ -38,7 +38,11 @@ void main() {
     shopsManager = commons.shopsManager;
   });
 
-  test('shops products range update changes shops cache', () async {
+  tearDown(() async {
+    await commons.dispose();
+  });
+
+  test('shops products range update changes shops cache (1)', () async {
     // Fetch #1
     final shopsRes1 = await shopsManager.fetchShops(bounds);
     final shops1 = shopsRes1.unwrap();
@@ -74,7 +78,8 @@ void main() {
     final shops = shopsRes.unwrap();
     final targetShop = shops.values.first;
 
-    expect(shopsManager.getBarcodesCache(), isEmpty);
+    expect(
+        await shopsManager.getBarcodesCacheFor([targetShop.osmUID]), isEmpty);
 
     // A range update
     final putRes = await shopsManager.putProductToShops(
@@ -82,7 +87,7 @@ void main() {
     expect(putRes.isOk, isTrue);
 
     expect(
-        shopsManager.getBarcodesCache(),
+        await shopsManager.getBarcodesCacheFor([targetShop.osmUID]),
         equals({
           targetShop.osmUID: [rangeProducts[2].barcode]
         }));

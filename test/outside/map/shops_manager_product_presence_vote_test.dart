@@ -29,7 +29,7 @@ void main() {
   late Shop shop;
 
   setUp(() async {
-    commons = ShopsManagerTestCommons();
+    commons = await ShopsManagerTestCommons.create();
     fullShops = commons.fullShops;
     rangeProducts = commons.rangeProducts;
     rangeBackendProducts = commons.rangeBackendProducts;
@@ -55,6 +55,10 @@ void main() {
     await shopsManager.fetchShops(commons.bounds);
     await shopsManager.fetchShopProductRange(shop);
     clearInteractions(backend);
+  });
+
+  tearDown(() async {
+    await commons.dispose();
   });
 
   test('positive vote changes last seen time to now', () async {
@@ -174,7 +178,7 @@ void main() {
     final uid = shopsRes.unwrap().values.first.osmUID;
     final newProduct = Product((e) => e.barcode = '777');
 
-    expect(shopsManager.getBarcodesCache()[uid],
+    expect(shopsManager.getBarcodesCacheFor1(uid),
         isNot(contains(newProduct.barcode)));
 
     // Vote!
@@ -182,7 +186,8 @@ void main() {
         await shopsManager.productPresenceVote(newProduct, shop, true);
     expect(voteResult.isOk, isTrue);
 
-    expect(shopsManager.getBarcodesCache()[uid], contains(newProduct.barcode));
+    expect(await shopsManager.getBarcodesCacheFor1(uid),
+        contains(newProduct.barcode));
   });
 
   test('positive vote does not add a barcode to cache if it is there already',
@@ -193,7 +198,7 @@ void main() {
     final shopsRes = await shopsManager.fetchShops(commons.bounds);
     final uid = shopsRes.unwrap().values.first.osmUID;
 
-    expect(shopsManager.getBarcodesCache()[uid],
+    expect(await shopsManager.getBarcodesCacheFor1(uid),
         equals(rangeProducts.map((e) => e.barcode).toList()));
 
     // Vote!
@@ -202,7 +207,7 @@ void main() {
     expect(voteResult.isOk, isTrue);
 
     // Same barcode as before
-    expect(shopsManager.getBarcodesCache()[uid],
+    expect(await shopsManager.getBarcodesCacheFor1(uid),
         equals(rangeProducts.map((e) => e.barcode).toList()));
   });
 
@@ -290,7 +295,8 @@ void main() {
     final uid = shopsRes.unwrap().values.first.osmUID;
 
     final expectedBarcodes = rangeProducts.map((e) => e.barcode).toList();
-    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+    expect(
+        await shopsManager.getBarcodesCacheFor1(uid), equals(expectedBarcodes));
 
     // Vote!
     final voteResult = await shopsManager.productPresenceVote(
@@ -299,7 +305,8 @@ void main() {
 
     // The barcode expected to be deleted
     expectedBarcodes.removeAt(0);
-    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+    expect(
+        await shopsManager.getBarcodesCacheFor1(uid), equals(expectedBarcodes));
   });
 
   test('negative vote does not remove a barcode from cache if backend did not',
@@ -311,7 +318,8 @@ void main() {
     final uid = shopsRes.unwrap().values.first.osmUID;
 
     final expectedBarcodes = rangeProducts.map((e) => e.barcode).toList();
-    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+    expect(
+        await shopsManager.getBarcodesCacheFor1(uid), equals(expectedBarcodes));
 
     // Vote!
     final voteResult = await shopsManager.productPresenceVote(
@@ -319,7 +327,8 @@ void main() {
     expect(voteResult.isOk, isTrue);
 
     // The barcode expected to be still there
-    expect(shopsManager.getBarcodesCache()[uid], equals(expectedBarcodes));
+    expect(
+        await shopsManager.getBarcodesCacheFor1(uid), equals(expectedBarcodes));
   });
 
   test('votes notify listeners', () async {
@@ -356,4 +365,10 @@ void main() {
     expect(voteResult.isOk, isTrue);
     verify(listener.onLocalShopsChange());
   });
+}
+
+extension on ShopsManager {
+  Future<List<String>?> getBarcodesCacheFor1(OsmUID uid) async {
+    return (await getBarcodesCacheFor([uid]))[uid];
+  }
 }

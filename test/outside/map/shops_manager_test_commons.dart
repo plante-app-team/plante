@@ -32,7 +32,6 @@ class ShopsManagerTestCommons {
   final osmUID2 = OsmUID.parse('1:2');
   var osmShops = <OsmShop>[];
   var backendShops = <BackendShop>[];
-  // var fullShops = <OsmUID, Shop>{};
   Map<OsmUID, Shop> get fullShops {
     final result = <OsmUID, Shop>{};
     for (final osmShop in osmShops) {
@@ -66,7 +65,19 @@ class ShopsManagerTestCommons {
     Product((e) => e.barcode = '125'),
   ];
 
-  ShopsManagerTestCommons() {
+  ShopsManagerTestCommons._();
+
+  static Future<ShopsManagerTestCommons> create() async {
+    final instance = ShopsManagerTestCommons._();
+    await instance._initAsync();
+    return instance;
+  }
+
+  Future<void> dispose() async {
+    await shopsManager.dispose();
+  }
+
+  Future<void> _initAsync() async {
     osmShops = [
       OsmShop((e) => e
         ..osmUID = osmUID1
@@ -95,7 +106,7 @@ class ShopsManagerTestCommons {
     productsObtainer = FakeProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
-    shopsManager = createShopsManager();
+    shopsManager = await createShopsManager(first: true);
 
     when(backend.putProductToShop(any, any, any))
         .thenAnswer((_) async => Ok(None()));
@@ -165,7 +176,10 @@ class ShopsManagerTestCommons {
     });
   }
 
-  ShopsManager createShopsManager() {
+  Future<ShopsManager> createShopsManager({bool first = false}) async {
+    if (!first) {
+      await shopsManager.dispose();
+    }
     return ShopsManager(
         OpenStreetMap.forTesting(
             overpass: osm, configManager: FakeMobileAppConfigManager()),

@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
 class RadiusProductsSuggestionsManager {
@@ -9,12 +11,25 @@ class RadiusProductsSuggestionsManager {
 
   RadiusProductsSuggestionsManager(this._shopsManager);
 
-  Map<Shop, List<String>> getSuggestedBarcodesByRadius(
-      Coord center, Iterable<Shop> shops) {
+  Future<Map<Shop, List<String>>> getSuggestedBarcodesByRadius(
+      Coord center, Iterable<Shop> shops) async {
     final goodSquare = center.makeSquare(kmToGrad(RADIUS_KMS));
 
-    final barcodesMap = _shopsManager.getBarcodesCache();
-    final shopsMap = _shopsManager.getCachedShopsFor(barcodesMap.keys);
+    final barcodesMap = await _shopsManager.getBarcodesWithin(goodSquare);
+    final shopsMap = await _shopsManager.getCachedShopsFor(barcodesMap.keys);
+
+    return await compute(
+        _calculateSuggestions,
+        _CalculateSuggestionsArgs(
+            targetShops: shops, barcodesMap: barcodesMap, shopsMap: shopsMap));
+  }
+
+  static Map<Shop, List<String>> _calculateSuggestions(
+      _CalculateSuggestionsArgs args) {
+    final targetShops = args.targetShops;
+    final barcodesMap = args.barcodesMap;
+    final shopsMap = args.shopsMap;
+
     final shopsBarcodesMap = <Shop, List<String>>{};
     for (final shop in shopsMap.values) {
       final barcodes = barcodesMap[shop.osmUID];
@@ -22,8 +37,6 @@ class RadiusProductsSuggestionsManager {
         shopsBarcodesMap[shop] = barcodes;
       }
     }
-    shopsBarcodesMap
-        .removeWhere((key, value) => !goodSquare.contains(key.coord));
 
     final namesBarcodesMap = <String, List<String>>{};
     for (final entry in shopsBarcodesMap.entries) {
@@ -36,7 +49,7 @@ class RadiusProductsSuggestionsManager {
     }
 
     final Map<Shop, List<String>> result = {};
-    for (final shop in shops) {
+    for (final shop in targetShops) {
       final barcodes = namesBarcodesMap[shop.nameClean];
       if (barcodes != null && barcodes.isNotEmpty) {
         result[shop] = barcodes;
@@ -44,6 +57,16 @@ class RadiusProductsSuggestionsManager {
     }
     return result;
   }
+}
+
+class _CalculateSuggestionsArgs {
+  final Iterable<Shop> targetShops;
+  final Map<OsmUID, List<String>> barcodesMap;
+  final Map<OsmUID, Shop> shopsMap;
+  _CalculateSuggestionsArgs(
+      {required this.targetShops,
+      required this.barcodesMap,
+      required this.shopsMap});
 }
 
 extension on Shop {
