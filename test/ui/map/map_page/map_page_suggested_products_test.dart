@@ -90,7 +90,8 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStream = _SuggestionsStream();
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any, any,
+            types: anyNamed('types')))
         .thenAnswer((_) {
       return suggestionsStream.stream;
     });
@@ -153,7 +154,8 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStreams = <_SuggestionsStream>[];
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any, any,
+            types: anyNamed('types')))
         .thenAnswer((_) {
       suggestionsStreams.add(_SuggestionsStream());
       return suggestionsStreams.last.stream;
@@ -185,7 +187,8 @@ void main() {
       (WidgetTester tester) async {
     final suggestionsStreams = <_SuggestionsStream>[];
     final suggestedProductsManager = MockSuggestedProductsManager();
-    when(suggestedProductsManager.getAllSuggestedBarcodes(any, any, any))
+    when(suggestedProductsManager.getSuggestedBarcodes(any, any, any,
+            types: anyNamed('types')))
         .thenAnswer((_) {
       suggestionsStreams.add(_SuggestionsStream());
       return suggestionsStreams.last.stream;

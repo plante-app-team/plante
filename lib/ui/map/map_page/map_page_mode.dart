@@ -22,7 +22,8 @@ class MapPageModeParams {
   final ArgCallback<RichText?> bottomHintCallback;
   final ArgCallback<Coord> moveMapCallback;
   final ArgCallback<MapPageMode> modeSwitchCallback;
-  final ResCallback<bool> isLoadingCallback;
+  final UIValueWrapper<bool> isLoading;
+  final UIValueWrapper<bool> isLoadingSuggestions;
   final ResCallback<bool> areShopsForViewPortLoadedCallback;
   final UIValueWrapper<bool> shouldLoadNewShops;
   final Analytics analytics;
@@ -37,7 +38,8 @@ class MapPageModeParams {
       this.bottomHintCallback,
       this.moveMapCallback,
       this.modeSwitchCallback,
-      this.isLoadingCallback,
+      this.isLoading,
+      this.isLoadingSuggestions,
       this.areShopsForViewPortLoadedCallback,
       this.shouldLoadNewShops,
       this.analytics);
@@ -59,7 +61,8 @@ abstract class MapPageMode {
   MapHintsListController get hintsController => params.hintsListController;
   Analytics get analytics => params.analytics;
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
-  bool get loading => params.isLoadingCallback.call();
+  bool get loading => params.isLoading.cachedVal;
+  bool get loadingSuggestions => params.isLoadingSuggestions.cachedVal;
   bool get shopsForViewPortLoaded =>
       params.areShopsForViewPortLoadedCallback.call();
   UIValueWrapper<bool> get shouldLoadNewShops => params.shouldLoadNewShops;

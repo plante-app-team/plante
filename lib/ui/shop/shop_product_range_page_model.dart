@@ -19,8 +19,6 @@ import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/shop/_confirmed_products_model.dart';
-import 'package:plante/ui/shop/_off_suggested_products_model.dart';
-import 'package:plante/ui/shop/_radius_suggested_products_model.dart';
 import 'package:plante/ui/shop/_suggested_products_model.dart';
 
 class ShopProductRangePageModel {
@@ -62,17 +60,25 @@ class ShopProductRangePageModel {
       this._updateCallback) {
     _confirmedProductsModel =
         ConfirmedProductsModel(shopsManager, _shop, _updateCallback);
-    _suggestedProductsModels[SuggestionType.RADIUS] =
-        RadiusSuggestedProductsModel(suggestedProductsManager, productsObtainer,
-            productsExtraProperties, shopsManager, _shop, _updateCallback);
-    _suggestedProductsModels[SuggestionType.OFF] = OFFSuggestedProductsModel(
+    final countryCode = _obtainCountryCodeOfShop();
+    _suggestedProductsModels[SuggestionType.RADIUS] = SuggestedProductsModel(
+        SuggestionType.RADIUS,
         suggestedProductsManager,
         productsObtainer,
         productsExtraProperties,
         shopsManager,
-        _obtainCountryCodeOfShop(),
         _shop,
-        _updateCallback);
+        _updateCallback,
+        countryCode);
+    _suggestedProductsModels[SuggestionType.OFF] = SuggestedProductsModel(
+        SuggestionType.OFF,
+        suggestedProductsManager,
+        productsObtainer,
+        productsExtraProperties,
+        shopsManager,
+        _shop,
+        _updateCallback,
+        countryCode);
     _address = _addressObtainer.addressOfShop(_shop);
   }
 
