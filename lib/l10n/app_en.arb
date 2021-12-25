@@ -192,11 +192,11 @@
     "@map_page_loading_shops_hint1": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_shops_hint2": "Still loading stores - seems the area has a big number of them",
+    "map_page_loading_shops_hint2": "Still loading stores - seems there are a lot of stores in this area",
     "@map_page_loading_shops_hint2": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_shops_hint3": "Still loading stores - it takes longer than usual, sorry!",
+    "map_page_loading_shops_hint3": "Loading stores seems to take longer then expected, thank you for being patient",
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
