@@ -196,7 +196,7 @@
     "@map_page_loading_shops_hint2": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_shops_hint3": "Loading stores seems to take longer then expected, thank you for being patient",
+    "map_page_loading_shops_hint3": "Loading stores takes longer than expected, thank you for being patient",
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
