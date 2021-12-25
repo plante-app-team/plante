@@ -110,8 +110,8 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   final _loadNewShops = UIValueWrapper<bool>(true);
 
-  bool get _loading => _model.loading;
-  bool get _loadingSuggestions => _model.loadingSuggestions;
+  final _loading = UIValueWrapper(false);
+  final _loadingSuggestions = UIValueWrapper(false);
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
@@ -156,9 +156,17 @@ class _MapPageState extends PageStatePlante<MapPage>
     final loadingChangeCallback = () {
       if (mounted) {
         _mode.onLoadingChange();
+        _loading.setValue(_model.loading, ref);
       }
     };
-    final suggestionsLoadingChangeCallback = () {};
+    final suggestionsLoadingChangeCallback = () {
+      if (mounted) {
+        _loadingSuggestions.setValue(_model.loadingSuggestions, ref);
+        setState(() {
+          // Updated!
+        });
+      }
+    };
     final updateShopsCallback = (_) {
       updateMapCallback.call();
     };
@@ -225,7 +233,8 @@ class _MapPageState extends PageStatePlante<MapPage>
         bottomHintCallback: updateBottomHintCallback,
         moveMapCallback: moveMapCallback,
         modeSwitchCallback: switchModeCallback,
-        isLoadingCallback: () => _loading,
+        isLoading: _loading,
+        isLoadingSuggestions: _loadingSuggestions,
         areShopsForViewPortLoadedCallback: _model.viewPortShopsLoaded,
         shouldLoadNewShops: _loadNewShops);
 
@@ -492,13 +501,18 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Widget _progressBar() {
-    if (_loading) {
-      return MapPageProgressBar.forLoadingShops(inProgress: true);
-    } else if (_loadingSuggestions) {
-      return MapPageProgressBar.forLoadingProductsSuggestions(inProgress: true);
-    } else {
-      return MapPageProgressBar.stop();
-    }
+    return Consumer(builder: (context, ref, _) {
+      final loading = _loading.watch(ref);
+      final loadingSuggestions = _loadingSuggestions.watch(ref);
+      if (loading) {
+        return MapPageProgressBar.forLoadingShops(inProgress: true);
+      } else if (loadingSuggestions) {
+        return MapPageProgressBar.forLoadingProductsSuggestions(
+            inProgress: true);
+      } else {
+        return MapPageProgressBar.stop();
+      }
+    });
   }
 
   void _onCameraMove(CameraPosition position) {

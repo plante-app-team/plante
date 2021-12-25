@@ -50,7 +50,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       required ArgCallback<RichText?> bottomHintCallback,
       required ArgCallback<Coord> moveMapCallback,
       required ArgCallback<MapPageMode> modeSwitchCallback,
-      required ResCallback<bool> isLoadingCallback,
+      required UIValueWrapper<bool> isLoading,
+      required UIValueWrapper<bool> isLoadingSuggestions,
       required ResCallback<bool> areShopsForViewPortLoadedCallback,
       required UIValueWrapper<bool> shouldLoadNewShops})
       : super(
@@ -65,7 +66,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                 bottomHintCallback,
                 moveMapCallback,
                 modeSwitchCallback,
-                isLoadingCallback,
+                isLoading,
+                isLoadingSuggestions,
                 areShopsForViewPortLoadedCallback,
                 shouldLoadNewShops,
                 analytics),
@@ -313,7 +315,10 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   void _updateBottomHint() {
-    if (displayedShops.isNotEmpty || loading || !shopsForViewPortLoaded) {
+    if (displayedShops.isNotEmpty ||
+        loading ||
+        loadingSuggestions ||
+        !shopsForViewPortLoaded) {
       setBottomHint(null);
       return;
     }

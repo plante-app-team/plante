@@ -27,6 +27,7 @@ import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
 import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/map/components/delayed_loading_notifier.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -42,8 +43,6 @@ class MapPageModel implements ShopsManagerListener {
   final ArgCallback<Map<OsmUID, Shop>> _updateShopsCallback;
   final ArgCallback<MapPageModelError> _errorCallback;
   final VoidCallback _updateCallback;
-  final VoidCallback _loadingChangeCallback;
-  final VoidCallback _suggestionsLoadingChangeCallback;
   final SharedPreferencesHolder _prefs;
   final UserLocationManager _userLocationManager;
   final ShopsManager _shopsManager;
@@ -57,7 +56,6 @@ class MapPageModel implements ShopsManagerListener {
   bool _viewPortShopsFetched = false;
   CoordsBounds? _latestViewPort;
   CoordsBounds? _latestFetchedViewPort;
-  bool _networkOperationInProgress = false;
   bool _firstTerritoryLoadDone = false;
 
   Map<OsmUID, Shop> _shopsCache = {};
@@ -65,6 +63,9 @@ class MapPageModel implements ShopsManagerListener {
   StreamSubscription? _suggestedBarcodesSubscription;
 
   bool _directionsAvailable = false;
+
+  late final DelayedLoadingNotifier _loadingNotifier;
+  late final DelayedLoadingNotifier _loadingSuggestionsNotifier;
 
   MapPageModel(
       this._prefs,
@@ -79,8 +80,8 @@ class MapPageModel implements ShopsManagerListener {
       this._updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
-      this._loadingChangeCallback,
-      this._suggestionsLoadingChangeCallback) {
+      VoidCallback loadingChangeCallback,
+      VoidCallback suggestionsLoadingChangeCallback) {
     _shopsManager.addListener(this);
     _directionsManager
         .areDirectionsAvailable()
@@ -89,17 +90,29 @@ class MapPageModel implements ShopsManagerListener {
       if (!shouldLoadShops) {
         _suggestedBarcodesSubscription?.cancel();
         _suggestedBarcodesSubscription = null;
+        _loadingSuggestionsNotifier.onLoadingEnd();
       }
     });
+
+    _loadingNotifier = DelayedLoadingNotifier(
+      firstLoadingInstantNotification: true,
+      delay: const Duration(milliseconds: 250),
+      callback: loadingChangeCallback,
+    );
+    _loadingSuggestionsNotifier = DelayedLoadingNotifier(
+      firstLoadingInstantNotification: true,
+      delay: const Duration(seconds: 2),
+      callback: suggestionsLoadingChangeCallback,
+    );
   }
 
   void dispose() {
     _shopsManager.removeListener(this);
   }
 
-  bool get loading => _networkOperationInProgress || !_firstTerritoryLoadDone;
+  bool get loading => _loadingNotifier.isLoading || !_firstTerritoryLoadDone;
+  bool get loadingSuggestions => _loadingSuggestionsNotifier.isLoading;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
-  bool get loadingSuggestions => _suggestedBarcodesSubscription != null;
   SuggestedBarcodesMapFull get barcodesSuggestions =>
       _barcodesSuggestions.unmodifiable();
   SharedPreferencesHolder get prefs => _prefs;
@@ -192,12 +205,15 @@ class MapPageModel implements ShopsManagerListener {
 
   Future<void> _fetchOffShopsProductsData() async {
     await _suggestedBarcodesSubscription?.cancel();
+    _loadingSuggestionsNotifier.onLoadingEnd();
+    _loadingSuggestionsNotifier.onLoadingStart();
 
     final countryCode = await _userAddressPiecesObtainer.getCameraCountryCode();
     final center = _latestViewPort?.center;
     if (countryCode == null ||
         center == null ||
         !_shouldLoadNewShops.cachedVal) {
+      _loadingSuggestionsNotifier.onLoadingEnd();
       return;
     }
 
@@ -211,7 +227,7 @@ class MapPageModel implements ShopsManagerListener {
       for (final entry in collectedSuggestions.entries) {
         entry.value.forEach(_applySuggestions);
       }
-      if (!collectedSuggestions.isEmpty) {
+      if (collectedSuggestions.isNotEmpty) {
         collectedSuggestions.clear();
         _updateShopsCallback.call(_shopsCache);
       }
@@ -233,10 +249,9 @@ class MapPageModel implements ShopsManagerListener {
       }
     }, onDone: () {
       _suggestedBarcodesSubscription = null;
-      _suggestionsLoadingChangeCallback.call();
+      _loadingSuggestionsNotifier.onLoadingEnd();
       absorbNewSuggestions.call();
     });
-    _suggestionsLoadingChangeCallback.call();
   }
 
   void _applySuggestions(SuggestionsForShop suggestions) {
@@ -244,15 +259,11 @@ class MapPageModel implements ShopsManagerListener {
   }
 
   Future<T> _networkOperation<T>(Future<T> Function() operation) async {
-    _networkOperationInProgress = true;
-    _updateCallback.call();
-    _loadingChangeCallback.call();
+    _loadingNotifier.onLoadingStart();
     try {
       return await operation.call();
     } finally {
-      _networkOperationInProgress = false;
-      _updateCallback.call();
-      _loadingChangeCallback.call();
+      _loadingNotifier.onLoadingEnd();
     }
   }
 

@@ -172,7 +172,8 @@ class ShopsManager {
 
   void _ensureAllShopsArePresentInOsmCache(Iterable<Shop> shops) async {
     for (final territory in await _osmCacher.getCachedShops()) {
-      final territoryShopsUids = territory.entities.map((e) => e.osmUID);
+      final territoryShopsUids =
+          territory.entities.map((e) => e.osmUID).toSet();
       final shopsToInsert = <OsmUID, OsmShop>{};
       for (final shop in shops) {
         if (territory.bounds.containsShop(shop) &&
