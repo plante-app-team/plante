@@ -101,7 +101,6 @@ class _MapPageState extends PageStatePlante<MapPage>
   var _displayedShopsMarkers = <Marker>{};
   Iterable<Shop> _displayedShops = const [];
   late final ClusterManager _clusterManager;
-  Timer? _mapUpdatesTimer;
 
   final _hintsController = MapHintsListController();
   RichText? _bottomHint;
@@ -313,7 +312,6 @@ class _MapPageState extends PageStatePlante<MapPage>
       instance.onInstancesChange();
     });
     _model.dispose();
-    _mapUpdatesTimer?.cancel();
     () async {
       final mapController = await _mapController.future;
       mapController.dispose();
@@ -523,7 +521,6 @@ class _MapPageState extends PageStatePlante<MapPage>
   void _onCameraIdle() async {
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
-    _updateMap(delay: const Duration(milliseconds: 1000));
     await _model.onCameraIdle(viewBounds.toCoordsBounds());
     _mode.onCameraIdle();
   }
@@ -538,13 +535,7 @@ class _MapPageState extends PageStatePlante<MapPage>
         .map((shop) =>
             ClusterItem(LatLng(shop.latitude, shop.longitude), item: shop))
         .toList());
-    _updateMap(delay: const Duration(seconds: 0));
-  }
-
-  void _updateMap({required Duration delay}) async {
-    // Too frequent map updates make for terrible performance
-    _mapUpdatesTimer?.cancel();
-    _mapUpdatesTimer = Timer(delay, _clusterManager.updateMap);
+    _clusterManager.updateMap();
   }
 
   void _onError(MapPageModelError error) {
