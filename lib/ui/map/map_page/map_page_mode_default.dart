@@ -196,7 +196,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
             key: const Key('filter_shops_with_rad_suggested_products'),
             text: context
                 .strings.map_page_filter_shops_with_radius_suggested_products,
-            markerColor: const Color(0xFF3D948D),
+            markerColor: ColorsPlante.suggestedProductsMarker,
             value: _showSuggestionsAtShop[SuggestionType.RADIUS]!.watch(ref),
             onChanged: _setShowRadSuggestedShops,
           ),
@@ -204,7 +204,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
             key: const Key('filter_shops_with_off_suggested_products'),
             text: context
                 .strings.map_page_filter_shops_with_off_suggested_products,
-            markerColor: const Color(0xFF3D948D),
+            markerColor: ColorsPlante.suggestedProductsMarker,
             value: _showSuggestionsAtShop[SuggestionType.OFF]!.watch(ref),
             onChanged: _setShowOffSuggestedShops,
           ),
