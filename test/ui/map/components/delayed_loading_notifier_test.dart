@@ -10,9 +10,11 @@ void main() {
       callsCount += 1;
     };
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: false,
-        callback: callback,
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: false,
+      callback: callback,
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     notifier.onLoadingStart();
     expect(callsCount, equals(0));
@@ -37,9 +39,11 @@ void main() {
       callsCount += 1;
     };
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: true,
-        callback: callback,
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: true,
+      callback: callback,
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     notifier.onLoadingStart();
     await tester.pump(const Duration(microseconds: 1));
@@ -58,9 +62,11 @@ void main() {
       callsCount += 1;
     };
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: false,
-        callback: callback,
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: false,
+      callback: callback,
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     // Start #1
     notifier.onLoadingStart();
@@ -90,9 +96,11 @@ void main() {
       callsCount += 1;
     };
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: false,
-        callback: callback,
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: false,
+      callback: callback,
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     notifier.onLoadingStart();
     expect(notifier.isLoading, isFalse);
@@ -108,9 +116,11 @@ void main() {
 
   testWidgets('several loading starts', (WidgetTester tester) async {
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: true,
-        callback: () {},
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: true,
+      callback: () {},
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     notifier.onLoadingStart();
     await tester.pump(const Duration(seconds: 10));
@@ -130,9 +140,11 @@ void main() {
 
   testWidgets('too many loadings ends', (WidgetTester tester) async {
     final notifier = DelayedLoadingNotifier(
-        firstLoadingInstantNotification: true,
-        callback: () {},
-        delay: const Duration(seconds: 2));
+      firstLoadingInstantNotification: true,
+      callback: () {},
+      delay: const Duration(seconds: 2),
+      enabledInTests: true,
+    );
 
     // First loading
     notifier.onLoadingStart();

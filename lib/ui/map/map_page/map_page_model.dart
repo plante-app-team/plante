@@ -28,6 +28,7 @@ import 'package:plante/outside/products/suggestions/suggested_products_manager.d
 import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
 import 'package:plante/ui/base/ui_value_wrapper.dart';
 import 'package:plante/ui/map/components/delayed_loading_notifier.dart';
+import 'package:plante/ui/map/components/delayed_lossy_arg_callback.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 enum MapPageModelError {
@@ -40,7 +41,8 @@ class MapPageModel implements ShopsManagerListener {
   static final delayBetweenSuggestionsAbsorption =
       isInTests() ? const Duration(seconds: 1) : const Duration(seconds: 5);
 
-  final ArgCallback<Map<OsmUID, Shop>> _updateShopsCallback;
+  late final DelayedLossyArgCallback<Map<OsmUID, Shop>>
+      _updateShopsAndUICallback;
   final ArgCallback<MapPageModelError> _errorCallback;
   final VoidCallback _updateCallback;
   final SharedPreferencesHolder _prefs;
@@ -77,21 +79,28 @@ class MapPageModel implements ShopsManagerListener {
       this._suggestedProductsManager,
       this._userAddressPiecesObtainer,
       this._shouldLoadNewShops,
-      this._updateShopsCallback,
+      ArgCallback<Map<OsmUID, Shop>> updateShopsCallback,
       this._errorCallback,
       this._updateCallback,
       VoidCallback loadingChangeCallback,
       VoidCallback suggestionsLoadingChangeCallback) {
     _shopsManager.addListener(this);
+
     _directionsManager
         .areDirectionsAvailable()
         .then((value) => _directionsAvailable = value);
     _shouldLoadNewShops.callOnChanges((shouldLoadShops) {
-      if (!shouldLoadShops) {
+      if (!shouldLoadShops && _suggestedBarcodesSubscription != null) {
         _suggestedBarcodesSubscription?.cancel();
         _suggestedBarcodesSubscription = null;
         _loadingSuggestionsNotifier.onLoadingEnd();
       }
+    });
+
+    _updateShopsAndUICallback =
+        DelayedLossyArgCallback(const Duration(milliseconds: 500), (shops) {
+      updateShopsCallback.call(shops);
+      _updateCallback.call();
     });
 
     _loadingNotifier = DelayedLoadingNotifier(
@@ -166,17 +175,23 @@ class MapPageModel implements ShopsManagerListener {
     _latestViewPort = viewBounds;
     unawaited(_latestCameraPosStorage.set(viewBounds.center));
 
-    // NOTE: we intentionally load shops each time
-    // camera is idle - this is because [ShopsManager] filters
-    // out shops which are not within the bounds it receives, thus
-    // we need to give it new bounds all the time.
+    final viewPortShopsFetched = _viewPortShopsFetched;
+    final firstTerritoryLoadDone = _firstTerritoryLoadDone;
+
+    // NOTE: we load shops only when they're in cache already.
+    // If they're not in cache, setting of [_viewPortShopsFetched] will
+    // show to the user button with a prompt to load the shops.
     if (await _shopsManager.osmShopsCacheExistFor(viewBounds)) {
       unawaited(_loadShopsImpl(viewBounds));
     } else {
       _viewPortShopsFetched = false;
     }
     _firstTerritoryLoadDone = true;
-    _updateCallback.call();
+
+    if (viewPortShopsFetched != _viewPortShopsFetched ||
+        firstTerritoryLoadDone != _firstTerritoryLoadDone) {
+      _updateCallback.call();
+    }
   }
 
   Future<void> loadShops() async {
@@ -193,17 +208,18 @@ class MapPageModel implements ShopsManagerListener {
     });
     if (result.isOk) {
       _shopsCache = result.unwrap();
-      _viewPortShopsFetched = true;
       _latestFetchedViewPort = viewPort;
-      _updateShopsCallback.call(result.unwrap());
-      unawaited(_fetchOffShopsProductsData());
+      _viewPortShopsFetched = true;
+      _updateShopsAndUICallback.call(result.unwrap());
+      unawaited(_fetchSuggestions());
     } else {
       _errorCallback.call(_convertShopsManagerError(result.unwrapErr()));
     }
-    _updateCallback.call();
+    // NOTE: we don't call [_updateCallback] here, because
+    // [_updateShopsAndUICallback] will update the UI anyways.
   }
 
-  Future<void> _fetchOffShopsProductsData() async {
+  Future<void> _fetchSuggestions() async {
     await _suggestedBarcodesSubscription?.cancel();
     if (!_loadingSuggestionsNotifier.isLoading) {
       _loadingSuggestionsNotifier.onLoadingStart();
@@ -230,7 +246,7 @@ class MapPageModel implements ShopsManagerListener {
       }
       if (collectedSuggestions.isNotEmpty) {
         collectedSuggestions.clear();
-        _updateShopsCallback.call(_shopsCache);
+        _updateShopsAndUICallback.call(_shopsCache);
       }
       lastAbsorbTime = DateTime.now();
     };
