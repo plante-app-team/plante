@@ -205,8 +205,9 @@ class MapPageModel implements ShopsManagerListener {
 
   Future<void> _fetchOffShopsProductsData() async {
     await _suggestedBarcodesSubscription?.cancel();
-    _loadingSuggestionsNotifier.onLoadingEnd();
-    _loadingSuggestionsNotifier.onLoadingStart();
+    if (!_loadingSuggestionsNotifier.isLoading) {
+      _loadingSuggestionsNotifier.onLoadingStart();
+    }
 
     final countryCode = await _userAddressPiecesObtainer.getCameraCountryCode();
     final center = _latestViewPort?.center;
