@@ -168,11 +168,11 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
     final img = await pictureRecorder
         .endRecording()
         .toImage(size.round(), size.round());
-    markerData = (await img.toByteData(format: ui.ImageByteFormat.png))!;
+    markerData = await img.toByteData(format: ui.ImageByteFormat.png);
     if (_markersCache[assetName] == null) {
       _markersCache[assetName] = {};
     }
-    _markersCache[assetName]![shops] = markerData;
+    _markersCache[assetName]![shops] = markerData!;
   }
 
   return BitmapDescriptor.fromBytes(markerData.buffer.asUint8List());
