@@ -19,6 +19,7 @@ class ColorsPlante {
   });
   static const Color primaryDisabled = Color.fromARGB(255, 132, 161, 142);
   static const Color splashColor = Color(0xFF3D8257);
+  static const Color suggestedProductsMarker = Color(0xFF75A8A4);
   static const Color greenLight = Color(0xFFEBF0ED);
   static const Color grey = Color(0xFF979A9C);
   static const Color divider = Color(0xFFC2D0C6);
