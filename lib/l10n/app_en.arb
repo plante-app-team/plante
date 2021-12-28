@@ -270,7 +270,7 @@
     "shop_product_range_page_this_shop_has_no_product": "No products are added to this store yet",
     "shop_product_range_page_you_sure_negative_vote": "Are you sure the product is not sold in this store?",
     "shop_product_range_page_you_sure_positive_vote": "Are you sure you saw the product in this store?",
-    "shop_product_range_page_suggested_product_hint": "Seen in similar stores",
+    "shop_product_range_page_suggested_product_hint": "Seen in other <SHOP> stores",
     "@shop_product_range_page_suggested_product_hint": {
         "description": "A hint within product's description, letting the user know this product is displayed only because it was seen in some other store with the same name. The hint shouldn't be too verbose. There probably will be many hints visible to the user - each suggested product will have such a hint."
     },
