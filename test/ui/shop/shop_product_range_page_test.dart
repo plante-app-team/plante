@@ -32,7 +32,6 @@ void main() {
   late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
 
-
   late Shop aShop;
   late List<Product> products;
   late ShopProductRange range;
@@ -70,16 +69,19 @@ void main() {
 
     // scrollable finders
     final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
-    final scrollableOfList = find.descendant(of: listFinder, matching: scrollable);
+    final scrollableOfList =
+        find.descendant(of: listFinder, matching: scrollable);
 
     // Scroll until the item to be found appears.
-    await tester.scrollUntilVisible(itemFinder, 60, scrollable: scrollableOfList);
+    await tester.scrollUntilVisible(itemFinder, 60,
+        scrollable: scrollableOfList);
     await tester.pumpAndSettle();
 
     expect(itemFinder, findsOneWidget);
   });
 
-  testWidgets('scroll to top button, scrolling to top', (WidgetTester tester) async {
+  testWidgets('scroll to top button, scrolling to top',
+      (WidgetTester tester) async {
     final widget = ShopProductRangePage.createForTesting(aShop);
     await tester.superPump(widget);
 
@@ -88,10 +90,12 @@ void main() {
 
     // scrollable finders
     final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
-    final scrollableOfList = find.descendant(of: listFinder, matching: scrollable);
+    final scrollableOfList =
+        find.descendant(of: listFinder, matching: scrollable);
 
     // Scroll until the item to be found appears.
-    await tester.scrollUntilVisible(toTopButton, 60, scrollable: scrollableOfList);
+    await tester.scrollUntilVisible(toTopButton, 60,
+        scrollable: scrollableOfList);
     await tester.pumpAndSettle();
 
     expect(toTopButton, findsOneWidget);
@@ -100,7 +104,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(toTopButton, findsNothing);
   });
-
 
   testWidgets('has shop address', (WidgetTester tester) async {
     commons.setConfirmedProducts(const []);
