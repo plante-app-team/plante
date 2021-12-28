@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:plante/base/base.dart';
@@ -93,7 +94,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   static const _LIST_GRADIENT_SIZE = 12.0;
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
-
+  late ScrollController _scrollController;
+  bool _showBackToTop = false;
   final _countryName = UIValueWrapper<String?>(null);
 
   _ShopProductRangePageState() : super('ShopProductRangePage');
@@ -120,6 +122,16 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       updateCallback,
     );
     initializeDateFormatting();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        setState(() {
+          if (_scrollController.offset >= 40) {
+            _showBackToTop = true;
+          } else {
+            _showBackToTop = false;
+          }
+        });
+      });
     _initAsync();
   }
 
@@ -131,12 +143,14 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   @override
   void dispose() {
     _model.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget buildPage(BuildContext context) {
     Widget centralContent;
+
     final errorWrapper = (Widget child) {
       return Padding(
           padding: const EdgeInsets.all(16), child: Center(child: child));
@@ -165,8 +179,6 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             context.strings.shop_product_range_page_this_shop_has_no_product));
       } else {
         final widgets = <Widget>[];
-        widgets
-            .add(Container(color: Colors.white, height: _LIST_GRADIENT_SIZE));
 
         final confirmedProducts = _model.confirmedProducts;
         // Ordered map
@@ -200,44 +212,17 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             }
           }
         }
-        widgets.add(const SizedBox(height: _LIST_GRADIENT_SIZE));
-        centralContent =
-            ListView(key: const Key('products_list'), children: widgets);
+        centralContent = MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: ListView(
+              key: const Key('products_list'),
+              children: widgets,
+            ));
       }
     }
 
     final content = Column(children: [
-      Container(
-          color: Colors.white,
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          FabPlante.closeBtnPopOnClick(
-                              key: const Key('close_button')),
-                          Expanded(
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                Text(widget.shop.name,
-                                    style: TextStyles.headline1),
-                                const SizedBox(height: 3),
-                                AddressWidget.forShop(
-                                    widget.shop, _model.address,
-                                    loadCompletedCallback:
-                                        widget.addressLoadFinishCallback),
-                              ])),
-                        ]),
-                  ]),
-            ),
-            const SizedBox(height: _LIST_GRADIENT_SIZE),
-          ])),
       Expanded(
           child: Stack(children: [
         centralContent,
@@ -246,13 +231,13 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
             child: FadingEdgePlante(
                 direction: FadingEdgeDirection.TOP_TO_BOTTOM,
                 size: _LIST_GRADIENT_SIZE,
-                color: Colors.white)),
+                color: Colors.transparent)),
         const Positioned.fill(
             bottom: -2,
             child: FadingEdgePlante(
                 direction: FadingEdgeDirection.BOTTOM_TO_TOP,
                 size: _LIST_GRADIENT_SIZE,
-                color: ColorsPlante.lightGrey)),
+                color: Colors.transparent)),
         AnimatedCrossFadePlante(
           crossFadeState: _model.confirmedProductsLoading
               ? CrossFadeState.showSecond
@@ -265,19 +250,72 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         ),
       ])),
       const SizedBox(height: _LIST_GRADIENT_SIZE),
-      Padding(
-          padding:
-              const EdgeInsets.only(left: 24, right: 24, top: 0, bottom: 21),
-          child: SizedBox(
-              width: double.infinity,
-              child: ButtonFilledPlante.withText(
-                  context.strings.shop_product_range_page_add_product,
-                  onPressed: _onAddProductClick))),
     ]);
 
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: _showBackToTop
+          ? FloatingActionButton(
+              key: const Key('back_to_top_button'),
+              onPressed: _scrollToTop,
+              backgroundColor: Colors.white,
+              splashColor: ColorsPlante.primaryDisabled,
+              child: Center(
+                child: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: SvgPicture.asset('assets/scroll_to_top.svg')),
+              ),
+            )
+          : const SizedBox.shrink(),
       backgroundColor: ColorsPlante.lightGrey,
-      body: SafeArea(child: content),
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverOverlapAbsorber(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+              sliver: SliverAppBar(
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  expandedHeight: 75,
+                  collapsedHeight: 70,
+                  automaticallyImplyLeading: false,
+                  actions: [
+                    Container(
+                      margin: const EdgeInsets.only(right: 25, bottom: 2),
+                      child: FabPlante.closeBtnPopOnClick(
+                          key: const Key('close_button')),
+                    ),
+                  ],
+                  title: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.shop.name, style: TextStyles.headline1),
+                          const SizedBox(height: 3),
+                          AddressWidget.forShop(widget.shop, _model.address,
+                              loadCompletedCallback:
+                                  widget.addressLoadFinishCallback),
+                        ]),
+                  )),
+            )
+          ];
+        },
+        body: content,
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        child: Padding(
+            padding:
+                const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 21),
+            child: SizedBox(
+                width: double.infinity,
+                child: ButtonFilledPlante.withText(
+                    context.strings.shop_product_range_page_add_product,
+                    onPressed: _onAddProductClick))),
+      ),
     );
   }
 
@@ -300,7 +338,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     return ShopProductRangeProductsTitle(
       context.strings.shop_product_range_page_confirmed_products_country,
       key: const Key('confirmed_products_title'),
-      verticalPadding: 24,
+      verticalPadding: 10,
       horizontalPaddings: _LIST_GRADIENT_SIZE,
     );
   }
@@ -322,7 +360,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     return ShopProductRangeProductsTitle(
       suggestedProductsTitle,
       key: const Key('rad_suggested_products_title'),
-      verticalPadding: 24,
+      verticalPadding: 10,
       horizontalPaddings: _LIST_GRADIENT_SIZE,
     );
   }
@@ -456,6 +494,11 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   void _openProductPage(Product product) {
     ProductPageWrapper.show(context, product,
         productUpdatedCallback: _model.onProductUpdate);
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(_scrollController.position.minScrollExtent,
+        duration: const Duration(seconds: 1), curve: Curves.ease);
   }
 
   void _onProductPresenceVote(Product product, bool positive) async {

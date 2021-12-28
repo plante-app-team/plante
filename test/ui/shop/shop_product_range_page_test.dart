@@ -32,6 +32,7 @@ void main() {
   late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
 
+
   late Shop aShop;
   late List<Product> products;
   late ShopProductRange range;
@@ -52,6 +53,54 @@ void main() {
     await tester.superPump(widget);
     expect(find.text(aShop.name), findsOneWidget);
   });
+
+  testWidgets('scroll to top button not visible', (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+
+    expect(find.byKey(const Key('back_to_top_button')), findsNothing);
+  });
+
+  testWidgets('scroll to top button visible', (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+
+    final listFinder = find.byKey(const Key('products_list'));
+    final itemFinder = find.byKey(const Key('back_to_top_button'));
+
+    // scrollable finders
+    final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
+    final scrollableOfList = find.descendant(of: listFinder, matching: scrollable);
+
+    // Scroll until the item to be found appears.
+    await tester.scrollUntilVisible(itemFinder, 60, scrollable: scrollableOfList);
+    await tester.pumpAndSettle();
+
+    expect(itemFinder, findsOneWidget);
+  });
+
+  testWidgets('scroll to top button, scrolling to top', (WidgetTester tester) async {
+    final widget = ShopProductRangePage.createForTesting(aShop);
+    await tester.superPump(widget);
+
+    final listFinder = find.byKey(const Key('products_list'));
+    final toTopButton = find.byKey(const Key('back_to_top_button'));
+
+    // scrollable finders
+    final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
+    final scrollableOfList = find.descendant(of: listFinder, matching: scrollable);
+
+    // Scroll until the item to be found appears.
+    await tester.scrollUntilVisible(toTopButton, 60, scrollable: scrollableOfList);
+    await tester.pumpAndSettle();
+
+    expect(toTopButton, findsOneWidget);
+
+    await tester.tap(toTopButton);
+    await tester.pumpAndSettle();
+    expect(toTopButton, findsNothing);
+  });
+
 
   testWidgets('has shop address', (WidgetTester tester) async {
     commons.setConfirmedProducts(const []);
