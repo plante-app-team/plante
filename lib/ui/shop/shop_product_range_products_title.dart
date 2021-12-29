@@ -5,9 +5,13 @@ import 'package:plante/ui/base/text_styles.dart';
 class ShopProductRangeProductsTitle extends StatelessWidget {
   final String text;
   final double horizontalPaddings;
-  final double verticalPadding;
+  final double topPadding;
+  final double bottomPadding;
   const ShopProductRangeProductsTitle(this.text,
-      {Key? key, this.horizontalPaddings = 0.0, this.verticalPadding = 0.0})
+      {Key? key,
+      this.horizontalPaddings = 0.0,
+      this.topPadding = 0.0,
+      this.bottomPadding = 0.0})
       : super(key: key);
 
   @override
@@ -20,8 +24,8 @@ class ShopProductRangeProductsTitle extends StatelessWidget {
       padding: EdgeInsets.only(
           left: horizontalPaddings,
           right: horizontalPaddings,
-          top: verticalPadding,
-          bottom: verticalPadding),
+          top: topPadding,
+          bottom: bottomPadding),
       child: Text(text, style: TextStyles.headline2),
     );
   }
