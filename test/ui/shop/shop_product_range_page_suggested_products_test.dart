@@ -494,8 +494,9 @@ void main() {
 
       // Yep
       expect(
-          find.text(
-              context.strings.shop_product_range_page_suggested_product_hint),
+          find.text(context
+              .strings.shop_product_range_page_suggested_product_hint
+              .replaceAll('<SHOP>', widget.shop.name)),
           findsOneWidget);
     }
   });

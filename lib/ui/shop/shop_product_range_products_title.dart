@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/ui/base/components/fading_edge_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class ShopProductRangeProductsTitle extends StatelessWidget {
   final String text;
   final double horizontalPaddings;
-  final double verticalPadding;
+  final double topPadding;
+  final double bottomPadding;
   const ShopProductRangeProductsTitle(this.text,
-      {Key? key, this.horizontalPaddings = 0.0, this.verticalPadding = 0.0})
+      {Key? key,
+      this.horizontalPaddings = 0.0,
+      this.topPadding = 0.0,
+      this.bottomPadding = 0.0})
       : super(key: key);
 
   @override
@@ -17,21 +20,13 @@ class ShopProductRangeProductsTitle extends StatelessWidget {
       // Large title makes it harder to test the widget
       return Text(text, style: TextStyles.hint);
     }
-    return Column(children: [
-      Container(
-          color: Colors.white,
-          child: Padding(
-            padding: EdgeInsets.only(
-                left: horizontalPaddings,
-                right: horizontalPaddings,
-                top: verticalPadding,
-                bottom: verticalPadding),
-            child: Text(text, style: TextStyles.headline2),
-          )),
-      FadingEdgePlante(
-          direction: FadingEdgeDirection.TOP_TO_BOTTOM,
-          size: verticalPadding,
-          color: Colors.white),
-    ]);
+    return Padding(
+      padding: EdgeInsets.only(
+          left: horizontalPaddings,
+          right: horizontalPaddings,
+          top: topPadding,
+          bottom: bottomPadding),
+      child: Text(text, style: TextStyles.headline2),
+    );
   }
 }
