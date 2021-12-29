@@ -35,7 +35,7 @@ void main() {
 
   setUp(() async {
     nominatim = MockOsmNominatim();
-    when(nominatim.fetchAddress(any, any))
+    when(nominatim.fetchAddress(any, any, langCode: anyNamed('langCode')))
         .thenAnswer((_) async => Ok(anAddress));
     addressObtainer = AddressObtainer(OpenStreetMap.forTesting(
         nominatim: nominatim, configManager: FakeMobileAppConfigManager()));
@@ -150,6 +150,37 @@ void main() {
 
     // Verify OSM _IS_ touched
     verify(nominatim.fetchAddress(any, any)).called(1);
+  });
+
+  test('fetched shop address is cached on country-code basis', () async {
+    verifyZeroInteractions(nominatim);
+
+    // Fetch #1, no cache, Nominatim is touched
+    await addressObtainer.addressOfShop(aShop);
+    verify(nominatim.fetchAddress(any, any, langCode: anyNamed('langCode')));
+
+    clearInteractions(nominatim);
+    // Fetch #2, cache expected, Nominatim isn't touched
+    await addressObtainer.addressOfShop(aShop);
+    verifyZeroInteractions(nominatim);
+
+    // Fetch #3, with a country code - Fetch #1 behaviour expected
+    await addressObtainer.addressOfShop(aShop, langCode: 'ru');
+    verify(nominatim.fetchAddress(any, any, langCode: anyNamed('langCode')));
+
+    clearInteractions(nominatim);
+    // Fetch #4, with a country code - cache is expected now
+    await addressObtainer.addressOfShop(aShop, langCode: 'ru');
+    verifyZeroInteractions(nominatim);
+
+    // Fetch #5, with a second country code - Fetch #1 behaviour expected
+    await addressObtainer.addressOfShop(aShop, langCode: 'en');
+    verify(nominatim.fetchAddress(any, any, langCode: anyNamed('langCode')));
+
+    clearInteractions(nominatim);
+    // Fetch #6, with the second country code - cache is expected now
+    await addressObtainer.addressOfShop(aShop, langCode: 'en');
+    verifyZeroInteractions(nominatim);
   });
 }
 

@@ -30,18 +30,23 @@ class OsmNominatim {
   OsmNominatim(this._http, this._interactionsQueue);
 
   Future<Result<OsmAddress, OpenStreetMapError>> fetchAddress(
-      double lat, double lon) async {
+      double lat, double lon,
+      {String? langCode}) async {
     if (!_interactionsQueue.isInteracting(OsmInteractionService.NOMINATIM)) {
       Log.e('OSM.fetchAddress called outside of the queue');
     }
     final Response r;
     try {
+      final params = {
+        'lat': lat.toString(),
+        'lon': lon.toString(),
+        'format': 'json',
+      };
+      if (langCode != null) {
+        params['accept-language'] = langCode;
+      }
       r = await _http.get(
-          Uri.https('nominatim.openstreetmap.org', 'reverse', {
-            'lat': lat.toString(),
-            'lon': lon.toString(),
-            'format': 'json',
-          }),
+          Uri.https('nominatim.openstreetmap.org', 'reverse', params),
           headers: {'User-Agent': await userAgent()});
     } on IOException catch (e) {
       Log.w('OSM nominatim network error', ex: e);

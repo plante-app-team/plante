@@ -123,17 +123,18 @@ class MockAddressObtainer extends _i1.Mock implements _i8.AddressObtainer {
 
   @override
   _i9.Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>
-      addressOfShop(_i12.Shop? shop) => (super.noSuchMethod(
-          Invocation.method(#addressOfShop, [shop]),
+      addressOfShop(_i12.Shop? shop, {String? langCode}) => (super.noSuchMethod(
+          Invocation.method(#addressOfShop, [shop], {#langCode: langCode}),
           returnValue:
               Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>.value(
-                  _FakeResult_0<_i10.OsmShortAddress,
-                      _i11.OpenStreetMapError>())) as _i9
+                  _FakeResult_0<_i10.OsmShortAddress, _i11.OpenStreetMapError>())) as _i9
           .Future<_i2.Result<_i10.OsmShortAddress, _i11.OpenStreetMapError>>);
   @override
-  _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>
-      addressOfCoords(_i14.Coord? coords) => (super.noSuchMethod(
-          Invocation.method(#addressOfCoords, [coords]),
+  _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>> addressOfCoords(
+          _i14.Coord? coords,
+          {String? langCode}) =>
+      (super.noSuchMethod(
+          Invocation.method(#addressOfCoords, [coords], {#langCode: langCode}),
           returnValue: Future<
                   _i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>.value(
               _FakeResult_0<_i13.OsmAddress, _i11.OpenStreetMapError>())) as _i9
@@ -699,12 +700,13 @@ class MockOsmNominatim extends _i1.Mock implements _i48.OsmNominatim {
 
   @override
   _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>> fetchAddress(
-          double? lat, double? lon) =>
-      (super.noSuchMethod(Invocation.method(#fetchAddress, [lat, lon]),
-          returnValue: Future<
-                  _i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>.value(
-              _FakeResult_0<_i13.OsmAddress, _i11.OpenStreetMapError>())) as _i9
-          .Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>);
+          double? lat, double? lon, {String? langCode}) =>
+      (super.noSuchMethod(
+              Invocation.method(#fetchAddress, [lat, lon], {#langCode: langCode}),
+              returnValue: Future<
+                      _i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>.value(
+                  _FakeResult_0<_i13.OsmAddress, _i11.OpenStreetMapError>()))
+          as _i9.Future<_i2.Result<_i13.OsmAddress, _i11.OpenStreetMapError>>);
   @override
   _i9.Future<_i2.Result<_i49.OsmSearchResult, _i11.OpenStreetMapError>> search(
           String? country, String? city, String? query) =>

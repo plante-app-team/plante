@@ -337,4 +337,16 @@ void main() {
     final addressRes = await nominatim.fetchAddress(123, 321);
     expect(addressRes.unwrapErr(), equals(OpenStreetMapError.OTHER));
   });
+
+  test('fetchAddress langCode param', () async {
+    await nominatim.fetchAddress(123, 321, langCode: 'ru');
+    var request = http.getRequestsMatching('.*nominatim.*').first;
+    expect(request.url.queryParameters['accept-language'], equals('ru'));
+
+    http.reset();
+
+    await nominatim.fetchAddress(123, 321, langCode: null);
+    request = http.getRequestsMatching('.*nominatim.*').first;
+    expect(request.url.queryParameters['accept-language'], isNull);
+  });
 }
