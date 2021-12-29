@@ -26,7 +26,6 @@ import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
-import 'package:plante/ui/base/components/fading_edge_plante.dart';
 import 'package:plante/ui/base/components/gradient_spinner.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
@@ -91,7 +90,6 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     SuggestionType.RADIUS,
     SuggestionType.OFF,
   ];
-  static const _LIST_GRADIENT_SIZE = 12.0;
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
   late ScrollController _scrollController;
