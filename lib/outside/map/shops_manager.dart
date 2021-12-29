@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:plante/base/base.dart';
 import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
@@ -23,6 +24,7 @@ import 'package:plante/outside/map/shops_large_local_cache_wrapper.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/off/off_geo_helper.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 /// NOTE: this class is a total mess among with both
@@ -33,6 +35,7 @@ class ShopsManager {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 90;
   final Analytics _analytics;
   final OsmCacher _osmCacher;
+  final OffGeoHelper _offGeoHelper;
   late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
   final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _osm;
@@ -49,7 +52,7 @@ class ShopsManager {
   int get loadedAreasCount => _loadedAreas.length;
 
   ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
-      this._analytics, this._osmCacher)
+      this._analytics, this._osmCacher, this._offGeoHelper)
       : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
     _fetchShopsHelper =
         ShopsManagerFetchShopsHelper(_backendWorker, _osmCacher);
@@ -279,11 +282,17 @@ class ShopsManager {
         }
       }
       _notifyListeners();
+      unawaited(_sendShopsToOFF(product, shops));
     } else {
       _analytics.sendEvent(
           _putProductToShopEventName(source, success: false), eventParam);
     }
     return result;
+  }
+
+  Future<Result<None, GeneralError>> _sendShopsToOFF(
+      Product product, List<Shop> shops) async {
+    return await _offGeoHelper.addGeodataToProduct(product.barcode, shops);
   }
 
   String _putProductToShopEventName(ProductAtShopSource source,

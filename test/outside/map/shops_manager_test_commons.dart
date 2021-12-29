@@ -17,6 +17,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_mobile_app_config_manager.dart';
+import '../../z_fakes/fake_off_geo_helper.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 
@@ -26,6 +27,7 @@ class ShopsManagerTestCommons {
   late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
+  late FakeOffGeoHelper offGeoHelper;
   late ShopsManager shopsManager;
 
   final osmUID1 = OsmUID.parse('1:1');
@@ -106,6 +108,7 @@ class ShopsManagerTestCommons {
     productsObtainer = FakeProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
+    offGeoHelper = FakeOffGeoHelper();
     shopsManager = await createShopsManager(first: true);
 
     when(backend.putProductToShop(any, any, any))
@@ -186,7 +189,8 @@ class ShopsManagerTestCommons {
         backend,
         productsObtainer,
         analytics,
-        osmCacher);
+        osmCacher,
+        offGeoHelper);
   }
 
   ShopsInBoundsResponse createShopsInBoundsResponse({

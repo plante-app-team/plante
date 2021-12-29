@@ -112,7 +112,8 @@ void main() {
         backend,
         productsObtainer,
         analytics,
-        osmCacher);
+        osmCacher,
+        commons.offGeoHelper);
     // Expecting the new shop to be in the cache
     expect((await shopsManager.fetchShops(bounds)).unwrap(),
         equals(expectedAllShops));

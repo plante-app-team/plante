@@ -13,6 +13,7 @@ import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_off_geo_helper.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
@@ -20,6 +21,7 @@ void main() {
   late MockOsmOverpass osm;
   late MockBackend backend;
   late FakeAnalytics analytics;
+  late FakeOffGeoHelper offGeoHelper;
   late ShopsManager shopsManager;
 
   late Map<OsmUID, Shop> fullShops;
@@ -35,6 +37,7 @@ void main() {
     osm = commons.osm;
     backend = commons.backend;
     analytics = commons.analytics;
+    offGeoHelper = commons.offGeoHelper;
     shopsManager = commons.shopsManager;
   });
 
@@ -194,5 +197,23 @@ void main() {
     for (final source in sourceEventsMap.keys) {
       await verifyEvent(sourceEventsMap[source]!, source);
     }
+  });
+
+  test('put product to shop - OFF geo help', () async {
+    final shopsRes = await shopsManager.fetchShops(bounds);
+    final shops = shopsRes.unwrap();
+    final targetShop = shops.values.first;
+    final targetProduct = rangeProducts[2];
+
+    expect(offGeoHelper.addedGeodata_testing(), isEmpty);
+
+    await shopsManager.putProductToShops(
+        targetProduct, [targetShop], ProductAtShopSource.MANUAL);
+
+    expect(
+        offGeoHelper.addedGeodata_testing(),
+        equals({
+          targetProduct.barcode: {targetShop.osmUID}
+        }));
   });
 }

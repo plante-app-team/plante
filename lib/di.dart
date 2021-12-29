@@ -31,6 +31,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_cacher.dart';
+import 'package:plante/outside/off/off_geo_helper.dart';
 import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
@@ -102,6 +103,11 @@ void initDI() {
   GetIt.I.registerSingleton<UserParamsAutoWiper>(UserParamsAutoWiper(
       GetIt.I.get<Backend>(), GetIt.I.get<UserParamsController>()));
   GetIt.I.registerSingleton<OffApi>(OffApi(GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<OffGeoHelper>(OffGeoHelper(
+    GetIt.I.get<OffApi>(),
+    GetIt.I.get<AddressObtainer>(),
+    GetIt.I.get<Analytics>(),
+  ));
   GetIt.I.registerSingleton<TakenProductsImagesStorage>(
       TakenProductsImagesStorage());
   GetIt.I.registerSingleton<ProductsManager>(ProductsManager(
@@ -140,11 +146,13 @@ void initDI() {
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
   GetIt.I.registerSingleton<OsmCacher>(OsmCacher());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
-      GetIt.I.get<OpenStreetMap>(),
-      GetIt.I.get<Backend>(),
-      GetIt.I.get<ProductsObtainer>(),
-      GetIt.I.get<Analytics>(),
-      GetIt.I.get<OsmCacher>()));
+    GetIt.I.get<OpenStreetMap>(),
+    GetIt.I.get<Backend>(),
+    GetIt.I.get<ProductsObtainer>(),
+    GetIt.I.get<Analytics>(),
+    GetIt.I.get<OsmCacher>(),
+    GetIt.I.get<OffGeoHelper>(),
+  ));
   GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
     GetIt.I.get<ShopsManager>(),
     GetIt.I.get<OffShopsManager>(),
