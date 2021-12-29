@@ -95,7 +95,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
   late ScrollController _scrollController;
-  bool _showBackToTop = false;
+  final _showBackToTop = UIValueWrapper<bool>(false);
   final _countryName = UIValueWrapper<String?>(null);
 
   _ShopProductRangePageState() : super('ShopProductRangePage');
@@ -124,13 +124,11 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     initializeDateFormatting();
     _scrollController = ScrollController()
       ..addListener(() {
-        setState(() {
-          if (_scrollController.offset >= 40) {
-            _showBackToTop = true;
-          } else {
-            _showBackToTop = false;
-          }
-        });
+        if (_scrollController.offset >= 40) {
+          _showBackToTop.setValue(true, ref);
+        } else {
+          _showBackToTop.setValue(false, ref);
+        }
       });
     _initAsync();
   }
@@ -149,7 +147,98 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
   @override
   Widget buildPage(BuildContext context) {
-    Widget centralContent;
+    final content = Column(children: [
+      Expanded(
+          child: Stack(children: [
+        _createListView(context),
+        _createOverlayContent(context),
+      ])),
+      Container(
+          padding:
+              const EdgeInsets.only(left: 24, right: 24, top: 16, bottom: 21),
+          color: Colors.white,
+          child: SizedBox(
+              width: double.infinity,
+              child: ButtonFilledPlante.withText(
+                  context.strings.shop_product_range_page_add_product,
+                  onPressed: _onAddProductClick))),
+    ]);
+
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Consumer(builder: (context, ref, _) {
+        final showBackToTop = _showBackToTop.watch(ref);
+        final Widget result;
+        if (!showBackToTop) {
+          result = const SizedBox.shrink();
+        } else {
+          result = Padding(
+              padding: const EdgeInsets.only(bottom: 98),
+              child: SizedBox(
+                  width: 44,
+                  height: 44,
+                  child: FloatingActionButton(
+                    key: const Key('back_to_top_button'),
+                    onPressed: _scrollToTop,
+                    backgroundColor: Colors.white,
+                    splashColor: ColorsPlante.primaryDisabled,
+                    child: Center(
+                      child: SvgPicture.asset('assets/scroll_to_top.svg'),
+                    ),
+                  )));
+        }
+        return AnimatedSwitcher(duration: DURATION_DEFAULT, child: result);
+      }),
+      backgroundColor: ColorsPlante.lightGrey,
+      body: SafeArea(child: content),
+    );
+  }
+
+  ListView _createListView(BuildContext context) {
+    final listWidgets = <Widget>[];
+    listWidgets.add(_pageHeader());
+    if (_model.confirmedProductsLoaded) {
+      final confirmedProducts = _model.confirmedProducts;
+      // Ordered map
+      final LinkedHashMap<SuggestionType, List<Product>> suggestedProducts =
+          LinkedHashMap();
+      for (final type in _SUGGESTIONS_PRIORITIES) {
+        suggestedProducts[type] = _model.suggestedProductsFor(type);
+      }
+
+      // Remove duplicates among suggestions
+      final metBarcodes = confirmedProducts.map((e) => e.barcode).toSet();
+      for (final products in suggestedProducts.values) {
+        products.removeWhere((e) => metBarcodes.contains(e.barcode));
+        metBarcodes.addAll(products.map((e) => e.barcode));
+      }
+
+      if (confirmedProducts.isNotEmpty) {
+        listWidgets.add(_confirmedProductsTitle());
+        listWidgets.addAll(
+            _productsToCard(confirmedProducts, context, suggestions: false));
+      }
+      for (final entry in suggestedProducts.entries) {
+        final type = entry.key;
+        final products = entry.value;
+        if (products.isNotEmpty || _model.areSuggestionsLoading(type)) {
+          listWidgets.add(_suggestedProductsTitleFor(type));
+          listWidgets
+              .addAll(_productsToCard(products, context, suggestions: true));
+          if (_model.areSuggestionsLoading(type)) {
+            listWidgets.add(const Center(child: CircularProgressIndicator()));
+          }
+        }
+      }
+    }
+    return ListView(
+        key: const Key('products_list'),
+        controller: _scrollController,
+        children: listWidgets);
+  }
+
+  Widget _createOverlayContent(BuildContext context) {
+    Widget overlayContent;
 
     final errorWrapper = (Widget child) {
       return Padding(
@@ -159,10 +248,19 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
         Text(text, textAlign: TextAlign.center, style: TextStyles.normal);
 
     if (_model.confirmedProductsLoading) {
-      centralContent = const SizedBox();
+      overlayContent = AnimatedCrossFadePlante(
+        crossFadeState: _model.confirmedProductsLoading
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
+        firstChild: const SizedBox.shrink(),
+        secondChild: Container(
+          color: const Color(0x70FFFFFF),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
     } else if (_model.loadingError != null) {
       if (_model.loadingError == ShopsManagerError.NETWORK_ERROR) {
-        centralContent = errorWrapper(
+        overlayContent = errorWrapper(
             Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           errorText(context.strings.global_network_error),
           const SizedBox(height: 8),
@@ -170,153 +268,44 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               onPressed: _model.reload)
         ]));
       } else {
-        centralContent = errorWrapper(
+        overlayContent = errorWrapper(
             errorText(context.strings.global_something_went_wrong));
       }
     } else {
       if (_noProducts()) {
-        centralContent = errorWrapper(errorText(
+        overlayContent = errorWrapper(errorText(
             context.strings.shop_product_range_page_this_shop_has_no_product));
       } else {
-        final widgets = <Widget>[];
-
-        final confirmedProducts = _model.confirmedProducts;
-        // Ordered map
-        final LinkedHashMap<SuggestionType, List<Product>> suggestedProducts =
-            LinkedHashMap();
-        for (final type in _SUGGESTIONS_PRIORITIES) {
-          suggestedProducts[type] = _model.suggestedProductsFor(type);
-        }
-
-        // Remove duplicates among suggestions
-        final metBarcodes = confirmedProducts.map((e) => e.barcode).toSet();
-        for (final products in suggestedProducts.values) {
-          products.removeWhere((e) => metBarcodes.contains(e.barcode));
-          metBarcodes.addAll(products.map((e) => e.barcode));
-        }
-
-        if (confirmedProducts.isNotEmpty) {
-          widgets.add(_confirmedProductsTitle());
-          widgets.addAll(
-              _productsToCard(confirmedProducts, context, suggestions: false));
-        }
-        for (final entry in suggestedProducts.entries) {
-          final type = entry.key;
-          final products = entry.value;
-          if (products.isNotEmpty || _model.areSuggestionsLoading(type)) {
-            widgets.add(_suggestedProductsTitleFor(type));
-            widgets
-                .addAll(_productsToCard(products, context, suggestions: true));
-            if (_model.areSuggestionsLoading(type)) {
-              widgets.add(const Center(child: CircularProgressIndicator()));
-            }
-          }
-        }
-        centralContent = MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: ListView(
-              key: const Key('products_list'),
-              children: widgets,
-            ));
+        overlayContent = const SizedBox();
       }
     }
+    return overlayContent;
+  }
 
-    final content = Column(children: [
-      Expanded(
-          child: Stack(children: [
-        centralContent,
-        const Positioned.fill(
-            top: -2,
-            child: FadingEdgePlante(
-                direction: FadingEdgeDirection.TOP_TO_BOTTOM,
-                size: _LIST_GRADIENT_SIZE,
-                color: Colors.transparent)),
-        const Positioned.fill(
-            bottom: -2,
-            child: FadingEdgePlante(
-                direction: FadingEdgeDirection.BOTTOM_TO_TOP,
-                size: _LIST_GRADIENT_SIZE,
-                color: Colors.transparent)),
-        AnimatedCrossFadePlante(
-          crossFadeState: _model.confirmedProductsLoading
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-          firstChild: const SizedBox.shrink(),
-          secondChild: Container(
-            color: const Color(0x70FFFFFF),
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-        ),
-      ])),
-      const SizedBox(height: _LIST_GRADIENT_SIZE),
-    ]);
-
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: _showBackToTop
-          ? FloatingActionButton(
-              key: const Key('back_to_top_button'),
-              onPressed: _scrollToTop,
-              backgroundColor: Colors.white,
-              splashColor: ColorsPlante.primaryDisabled,
-              child: Center(
-                child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: SvgPicture.asset('assets/scroll_to_top.svg')),
-              ),
-            )
-          : const SizedBox.shrink(),
-      backgroundColor: ColorsPlante.lightGrey,
-      body: NestedScrollView(
-        controller: _scrollController,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return [
-            SliverOverlapAbsorber(
-              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              sliver: SliverAppBar(
-                  elevation: 0,
-                  backgroundColor: Colors.transparent,
-                  expandedHeight: 75,
-                  collapsedHeight: 70,
-                  automaticallyImplyLeading: false,
-                  actions: [
-                    Container(
-                      margin: const EdgeInsets.only(right: 25, bottom: 2),
-                      child: FabPlante.closeBtnPopOnClick(
-                          key: const Key('close_button')),
-                    ),
-                  ],
-                  title: Padding(
-                    padding: const EdgeInsets.only(top: 10),
+  Widget _pageHeader() {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              textDirection: TextDirection.rtl,
+              children: [
+                FabPlante.closeBtnPopOnClick(key: const Key('close_button')),
+                Expanded(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.shop.name, style: TextStyles.headline1),
-                          const SizedBox(height: 3),
-                          AddressWidget.forShop(widget.shop, _model.address,
-                              loadCompletedCallback:
-                                  widget.addressLoadFinishCallback),
-                        ]),
-                  )),
-            )
-          ];
-        },
-        body: content,
+                      Text(widget.shop.name, style: TextStyles.headline1),
+                      const SizedBox(height: 3),
+                      AddressWidget.forShop(widget.shop, _model.address,
+                          loadCompletedCallback:
+                              widget.addressLoadFinishCallback),
+                    ])),
+              ]),
+        ]),
       ),
-      bottomNavigationBar: Container(
-        color: Colors.white,
-        child: Padding(
-            padding:
-                const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 21),
-            child: SizedBox(
-                width: double.infinity,
-                child: ButtonFilledPlante.withText(
-                    context.strings.shop_product_range_page_add_product,
-                    onPressed: _onAddProductClick))),
-      ),
-    );
+    ]);
   }
 
   bool _noProducts() {
@@ -338,8 +327,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     return ShopProductRangeProductsTitle(
       context.strings.shop_product_range_page_confirmed_products_country,
       key: const Key('confirmed_products_title'),
-      verticalPadding: 10,
-      horizontalPaddings: _LIST_GRADIENT_SIZE,
+      topPadding: 24,
+      bottomPadding: 16,
+      horizontalPaddings: 24,
     );
   }
 
@@ -360,8 +350,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     return ShopProductRangeProductsTitle(
       suggestedProductsTitle,
       key: const Key('rad_suggested_products_title'),
-      verticalPadding: 10,
-      horizontalPaddings: _LIST_GRADIENT_SIZE,
+      topPadding: 32,
+      bottomPadding: 16,
+      horizontalPaddings: 24,
     );
   }
 
@@ -393,8 +384,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
       return ShopProductRangeProductsTitle(
         suggestedProductsTitle,
         key: const Key('off_suggested_products_title'),
-        verticalPadding: 24,
-        horizontalPaddings: _LIST_GRADIENT_SIZE,
+        topPadding: 32,
+        bottomPadding: 16,
+        horizontalPaddings: 24,
       );
     });
   }

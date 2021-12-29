@@ -65,19 +65,21 @@ void main() {
     await tester.superPump(widget);
 
     final listFinder = find.byKey(const Key('products_list'));
-    final itemFinder = find.byKey(const Key('back_to_top_button'));
+    final toTopButton = find.byKey(const Key('back_to_top_button'));
 
     // scrollable finders
     final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
     final scrollableOfList =
         find.descendant(of: listFinder, matching: scrollable);
 
+    expect(toTopButton, findsNothing);
+
     // Scroll until the item to be found appears.
-    await tester.scrollUntilVisible(itemFinder, 60,
+    await tester.scrollUntilVisible(toTopButton, 60,
         scrollable: scrollableOfList);
     await tester.pumpAndSettle();
 
-    expect(itemFinder, findsOneWidget);
+    expect(toTopButton, findsOneWidget);
   });
 
   testWidgets('scroll to top button, scrolling to top',
