@@ -447,16 +447,16 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     Widget? hint;
     if (suggestion) {
       hint = Padding(
-        padding: const EdgeInsets.only(right: 4, top: 4),
+        padding: const EdgeInsets.only(right: 4, top: 8, bottom: 4),
         child: Material(
-          color: ColorsPlante.yellow,
-          borderRadius: BorderRadius.circular(5),
+          color: ColorsPlante.amber,
+          borderRadius: BorderRadius.circular(4),
           child: Padding(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.only(bottom: 2, left: 6, right: 6),
               child: Text(
                   context.strings.shop_product_range_page_suggested_product_hint
                       .replaceAll('<SHOP>', widget.shop.name),
-                  style: TextStyles.tag)),
+                  style: TextStyles.smallBoldBlack)),
         ),
       );
     } else if (dateStrLocalized != null) {
