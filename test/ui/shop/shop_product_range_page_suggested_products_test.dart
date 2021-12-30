@@ -481,7 +481,7 @@ void main() {
       // Nope
       expect(
           find.text(
-              context.strings.shop_product_range_page_suggested_product_hint),
+              context.strings.shop_product_range_page_suggested_product_hint2),
           findsNothing);
 
       commons.setConfirmedProducts(const []);
@@ -495,7 +495,7 @@ void main() {
       // Yep
       expect(
           find.text(context
-              .strings.shop_product_range_page_suggested_product_hint
+              .strings.shop_product_range_page_suggested_product_hint2
               .replaceAll('<SHOP>', widget.shop.name)),
           findsOneWidget);
     }

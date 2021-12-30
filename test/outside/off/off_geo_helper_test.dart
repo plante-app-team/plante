@@ -147,7 +147,7 @@ void main() {
   });
 
   test('address is requested only once if 2 shops are close', () async {
-    final closeDistanceMeters = OffGeoHelper.CLOSE_SHOPS_DISTANCE_METERS / 2;
+    const closeDistanceMeters = OffGeoHelper.CLOSE_SHOPS_DISTANCE_METERS / 2;
     final closeDistance = kmToGrad(closeDistanceMeters / 1000);
     final coord1 = Coord(
       lat: 10,

@@ -454,7 +454,8 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
           child: Padding(
               padding: const EdgeInsets.only(bottom: 2, left: 6, right: 6),
               child: Text(
-                  context.strings.shop_product_range_page_suggested_product_hint
+                  context
+                      .strings.shop_product_range_page_suggested_product_hint2
                       .replaceAll('<SHOP>', widget.shop.name),
                   style: TextStyles.smallBoldBlack)),
         ),
