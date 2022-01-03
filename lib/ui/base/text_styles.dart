@@ -171,8 +171,16 @@ class TextStyles {
 
   static const TextStyle searchBarText =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
-  static const TextStyle searchBarHint =
-      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: ColorsPlante.grey);
+  static const TextStyle searchBarHint = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      color: Colors.grey,
+      fontWeight: FontWeight.bold);
+  static const TextStyle progressbarHint = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      color: Colors.white,
+      fontWeight: FontWeight.bold);
   static const TextStyle searchResultDistance = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 12,

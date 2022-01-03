@@ -7,6 +7,7 @@ import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/coord_utils.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/user_location_manager.dart';
@@ -33,6 +34,7 @@ import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
+import 'package:plante/ui/map/components/timed_hints.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
@@ -420,6 +422,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                     child: AnimatedListSimplePlante(children: _fabs()))),
             loadShopsButton,
             MapBottomHint(_bottomHint),
+            _progressBar(),
             AnimatedListSimplePlante(children: _mode.buildBottomActions()),
           ])),
       Align(
@@ -430,11 +433,11 @@ class _MapPageState extends PageStatePlante<MapPage>
               AnimatedMapWidget(child: searchBar),
               AnimatedMapWidget(child: _mode.buildHeader()),
               MapHintsList(controller: _hintsController),
+              _timedHints(),
               AnimatedMapWidget(child: _mode.buildTopActions()),
             ])),
       ),
       _mode.buildOverlay(),
-      _progressBar(),
     ]);
 
     return WillPopScope(
@@ -509,6 +512,35 @@ class _MapPageState extends PageStatePlante<MapPage>
             inProgress: true);
       } else {
         return MapPageProgressBar.stop();
+      }
+    });
+  }
+
+  Widget _timedHints() {
+    return Consumer(builder: (context, ref, _) {
+      final loading = _loading.watch(ref);
+      final loadingSuggestions = _loadingSuggestions.watch(ref);
+      if (loading) {
+        return TimedHints(
+          inProgress: true,
+          hints: [
+            const Pair('', Duration(seconds: 5)),
+            Pair(context.strings.map_page_loading_shops_hint1,
+                const Duration(seconds: 10)),
+            Pair(context.strings.map_page_loading_shops_hint2,
+                const Duration(seconds: 20)),
+            Pair(context.strings.map_page_loading_shops_hint3,
+                const Duration(days: 1)),
+          ],
+        );
+      } else if (loadingSuggestions) {
+        return TimedHints(inProgress: true, hints: [
+          const Pair('', Duration(seconds: 5)),
+          Pair(context.strings.map_page_loading_suggested_products_hint1,
+              const Duration(days: 1)),
+        ]);
+      } else {
+        return const TimedHints(inProgress: false, hints: []);
       }
     });
   }
