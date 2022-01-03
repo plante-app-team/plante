@@ -124,17 +124,18 @@ class MockAddressObtainer extends _i1.Mock implements _i9.AddressObtainer {
 
   @override
   _i10.Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>
-      addressOfShop(_i13.Shop? shop) => (super.noSuchMethod(
-          Invocation.method(#addressOfShop, [shop]),
+      addressOfShop(_i13.Shop? shop, {String? langCode}) => (super.noSuchMethod(
+          Invocation.method(#addressOfShop, [shop], {#langCode: langCode}),
           returnValue:
               Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>.value(
-                  _FakeResult_0<_i11.OsmShortAddress,
-                      _i12.OpenStreetMapError>())) as _i10
+                  _FakeResult_0<_i11.OsmShortAddress, _i12.OpenStreetMapError>())) as _i10
           .Future<_i2.Result<_i11.OsmShortAddress, _i12.OpenStreetMapError>>);
   @override
-  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>
-      addressOfCoords(_i15.Coord? coords) => (super.noSuchMethod(
-          Invocation.method(#addressOfCoords, [coords]),
+  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>> addressOfCoords(
+          _i15.Coord? coords,
+          {String? langCode}) =>
+      (super.noSuchMethod(
+          Invocation.method(#addressOfCoords, [coords], {#langCode: langCode}),
           returnValue: Future<
                   _i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>.value(
               _FakeResult_0<_i14.OsmAddress, _i12.OpenStreetMapError>())) as _i10
@@ -703,9 +704,10 @@ class MockOsmNominatim extends _i1.Mock implements _i49.OsmNominatim {
   }
 
   @override
-  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>
-      fetchAddress(double? lat, double? lon, {String? langCode}) => (super.noSuchMethod(
-          Invocation.method(#fetchAddress, [lat, lon], {#langCode: langCode}),
+  _i10.Future<_i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>> fetchAddress(
+          double? lat, double? lon, {String? langCode}) =>
+      (super.noSuchMethod(
+              Invocation.method(#fetchAddress, [lat, lon], {#langCode: langCode}),
               returnValue: Future<
                       _i2.Result<_i14.OsmAddress, _i12.OpenStreetMapError>>.value(
                   _FakeResult_0<_i14.OsmAddress, _i12.OpenStreetMapError>()))
