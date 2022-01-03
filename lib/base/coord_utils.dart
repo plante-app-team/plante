@@ -7,11 +7,16 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 
 /// Note: it's very approximate since Earth is all round and complex.
+/// **ALSO** please note that this function and [metersBetween] return
+/// **different** results for same physical distance.
 double kmToGrad(double km) {
   return km * 1 / 111;
 }
 
 // Taken from https://stackoverflow.com/a/27943
+/// Note: it's very approximate since Earth is all round and complex.
+/// **ALSO** please note that this function and [kmToGrad] return
+/// **different** results for same physical distance.
 double metersBetween(Coord coord1, Coord coord2) {
   const R = 6371; // Radius of the earth in km
   final dLat = _deg2rad(coord2.lat - coord1.lat); // deg2rad below

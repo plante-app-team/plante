@@ -67,7 +67,8 @@ class _DisabledOsmNominatim implements OsmNominatim {
 
   @override
   Future<Result<OsmAddress, OpenStreetMapError>> fetchAddress(
-      double lat, double lon) async {
+      double lat, double lon,
+      {String? langCode}) async {
     return Err(OpenStreetMapError.OTHER);
   }
 
