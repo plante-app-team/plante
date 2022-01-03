@@ -72,5 +72,4 @@ void main() {
     found = find.byType(LinearProgressIndicator).evaluate();
     expect(found, isNot(isEmpty));
   });
-
 }
