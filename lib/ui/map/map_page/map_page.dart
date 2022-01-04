@@ -39,11 +39,10 @@ import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 import 'package:plante/ui/map/map_page/map_page_progress_bar.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
+import 'package:plante/ui/map/map_page/map_page_timed_hints.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
-
-import 'map_page_timed_hints.dart';
 
 enum MapPageRequestedMode {
   DEFAULT,
