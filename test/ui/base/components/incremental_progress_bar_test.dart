@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plante/ui/base/components/progress_bar.dart';
+import 'package:plante/ui/base/components/incremental_progress_bar.dart';
 
 import '../../../widget_tester_extension.dart';
 
@@ -17,7 +17,7 @@ void main() {
   }
 
   testWidgets('normal scenario', (WidgetTester tester) async {
-    final widget = ProgressBar(
+    final widget = IncrementalProgressBar(
       enableInTests: true,
       inProgress: true,
       progresses: {
@@ -48,7 +48,7 @@ void main() {
   });
 
   testWidgets('inProgress : false', (WidgetTester tester) async {
-    var widget = ProgressBar(
+    var widget = IncrementalProgressBar(
       enableInTests: true,
       inProgress: false,
       progresses: {
@@ -60,7 +60,7 @@ void main() {
     var found = find.byType(LinearProgressIndicator).evaluate();
     expect(found, isEmpty);
 
-    widget = ProgressBar(
+    widget = IncrementalProgressBar(
       enableInTests: true,
       inProgress: true,
       progresses: {

@@ -182,11 +182,8 @@ class TextStyles {
       fontSize: 14,
       color: Colors.grey,
       fontWeight: FontWeight.bold);
-  static const TextStyle progressbarHint = TextStyle(
-      fontFamily: 'OpenSans',
-      fontSize: 14,
-      color: Colors.white,
-      fontWeight: FontWeight.bold);
+  static const TextStyle progressbarHint =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Colors.white);
   static const TextStyle searchResultDistance = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 12,

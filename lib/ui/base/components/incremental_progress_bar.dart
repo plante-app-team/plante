@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 
-class ProgressBar extends StatefulWidget {
+class IncrementalProgressBar extends StatefulWidget {
   final bool inProgress;
   late final List<Pair<double, Duration>> progresses;
   final bool enableInTests;
 
-  ProgressBar(
+  IncrementalProgressBar(
       {Key? key,
       required this.inProgress,
       required Map<double, Duration> progresses,
@@ -28,19 +28,19 @@ class ProgressBar extends StatefulWidget {
   }
 
   @override
-  State<ProgressBar> createState() => isInTests() && !enableInTests
+  State<IncrementalProgressBar> createState() => isInTests() && !enableInTests
       ? _ProgressBarStateForTests()
-      : _ProgressBarState();
+      : _IncrementalProgressBarState();
 }
 
-class _ProgressBarStateForTests extends State<ProgressBar> {
+class _ProgressBarStateForTests extends State<IncrementalProgressBar> {
   @override
   Widget build(BuildContext context) {
     return const SizedBox();
   }
 }
 
-class _ProgressBarState extends State<ProgressBar>
+class _IncrementalProgressBarState extends State<IncrementalProgressBar>
     with SingleTickerProviderStateMixin {
   static const _PROGRESS_APPEARANCE_DURATION_MILLIS = 1000;
   var _progressIndex = -1;
@@ -71,7 +71,7 @@ class _ProgressBarState extends State<ProgressBar>
   }
 
   @override
-  void didUpdateWidget(ProgressBar oldWidget) {
+  void didUpdateWidget(IncrementalProgressBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.inProgress == true && widget.inProgress == false) {
       // Automatic progress animation changes no longer active

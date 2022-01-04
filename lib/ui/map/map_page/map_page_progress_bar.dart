@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/ui/base/components/progress_bar.dart';
+import 'package:plante/ui/base/components/incremental_progress_bar.dart';
 
 class MapPageProgressBar extends StatelessWidget {
   static const _STOP = 0;
@@ -42,7 +42,7 @@ class MapPageProgressBar extends StatelessWidget {
   }
 
   Widget _forStop(BuildContext context) {
-    return ProgressBar(
+    return IncrementalProgressBar(
       inProgress: false,
       progresses: {
         1: Duration.zero,
@@ -51,7 +51,7 @@ class MapPageProgressBar extends StatelessWidget {
   }
 
   Widget _forShops(BuildContext context) {
-    return ProgressBar(
+    return IncrementalProgressBar(
       inProgress: inProgress,
       progresses: {
         0.20: const Duration(seconds: 4),
@@ -65,7 +65,7 @@ class MapPageProgressBar extends StatelessWidget {
   }
 
   Widget _forProductsSuggestions(BuildContext context) {
-    return ProgressBar(
+    return IncrementalProgressBar(
       inProgress: inProgress,
       progresses: {
         0.1: const Duration(seconds: 1),
