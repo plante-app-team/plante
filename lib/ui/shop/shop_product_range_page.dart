@@ -33,7 +33,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:plante/ui/shop/shop_product_range_page_model.dart';
@@ -93,14 +93,16 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   late final ShopProductRangePageModel _model;
   final _votedProducts = <String>[];
   late ScrollController _scrollController;
-  final _showBackToTop = UIValueWrapper<bool>(false);
-  final _countryName = UIValueWrapper<String?>(null);
+  late final UIValue<bool> _showBackToTop;
+  late final UIValue<String?> _countryName;
 
   _ShopProductRangePageState() : super('ShopProductRangePage');
 
   @override
   void initState() {
     super.initState();
+    _showBackToTop = UIValue(false, ref);
+    _countryName = UIValue(null, ref);
     final updateCallback = () {
       if (mounted) {
         setState(() {
@@ -123,9 +125,9 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.offset >= 40) {
-          _showBackToTop.setValue(true, ref);
+          _showBackToTop.setValue(true);
         } else {
-          _showBackToTop.setValue(false, ref);
+          _showBackToTop.setValue(false);
         }
       });
     _initAsync();
@@ -133,7 +135,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
   void _initAsync() async {
     final country = await _model.obtainCountryOfShop();
-    _countryName.setValue(country?.localize(context) ?? '', ref);
+    _countryName.setValue(country?.localize(context) ?? '');
   }
 
   @override

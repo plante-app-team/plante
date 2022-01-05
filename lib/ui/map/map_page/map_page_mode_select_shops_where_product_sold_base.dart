@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
@@ -9,6 +10,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/button_text_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/fab_add_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
@@ -18,13 +20,14 @@ const MAP_PAGE_MODE_SELECTED_SHOPS_MAX = 10;
 abstract class MapPageModeSelectShopsWhereProductSoldBase
     extends MapPageModeShopsCardBase {
   static const _HINT_ID = 'MapPageModeSelectShopsWhereProductSoldBase hint 1';
-  final _selectedShops = <Shop>{};
-  final _unselectedShops = <Shop>{};
+  late final UIValue<Set<Shop>> _selectedShops;
+  late final UIValue<Set<Shop>> _unselectedShops;
 
   MapPageModeSelectShopsWhereProductSoldBase(MapPageModeParams params,
       {required String nameForAnalytics})
       : super(params, nameForAnalytics: nameForAnalytics) {
-    _selectedShops.addAll(widget.initialSelectedShops);
+    _selectedShops = createUIValue({...widget.initialSelectedShops});
+    _unselectedShops = createUIValue({});
   }
 
   @protected
@@ -33,7 +36,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   void onAddShopClicked();
 
   @override
-  Set<Shop> selectedShops() => _selectedShops;
+  Set<Shop> selectedShops() => _selectedShops.cachedVal;
 
   @mustCallSuper
   @override
@@ -41,8 +44,10 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
     super.init(previousMode);
 
     if (previousMode != null) {
-      _selectedShops.addAll(
+      final selectedShops = _selectedShops.cachedVal.toSet();
+      selectedShops.addAll(
           previousMode.selectedShops().take(MAP_PAGE_MODE_SELECTED_SHOPS_MAX));
+      _selectedShops.setValue(selectedShops);
     }
 
     hintsController.addHint(
@@ -59,44 +64,54 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   }
 
   @override
-  ShopCard createCardFor(Shop shop, FutureShortAddress address,
+  Widget createCardFor(Shop shop, FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback) {
-    final Product product;
-    if (widget.product != null) {
-      product = widget.product!;
-    } else {
-      product = Product((e) => e.barcode = 'fake_product');
-    }
+    return Consumer(builder: (context, ref, _) {
+      final Product product;
+      if (widget.product != null) {
+        product = widget.product!;
+      } else {
+        product = Product((e) => e.barcode = 'fake_product');
+      }
 
-    bool? isSold;
-    if (_selectedShops.contains(shop)) {
-      isSold = true;
-    } else if (_unselectedShops.contains(shop)) {
-      isSold = false;
-    }
+      bool? isSold;
+      final selectedShops = _selectedShops.watch(ref);
+      final unselectedShops = _unselectedShops.watch(ref);
+      if (selectedShops.contains(shop)) {
+        isSold = true;
+      } else if (unselectedShops.contains(shop)) {
+        isSold = false;
+      }
 
-    return ShopCard.askIfProductIsSold(
-        product: product,
-        shop: shop,
-        address: address,
-        isProductSold: isSold,
-        onIsProductSoldChanged: _onProductSoldChange,
-        cancelCallback: cancelCallback);
+      return ShopCard.askIfProductIsSold(
+          product: product,
+          shop: shop,
+          address: address,
+          isProductSold: isSold,
+          onIsProductSoldChanged: _onProductSoldChange,
+          cancelCallback: cancelCallback);
+    });
   }
 
   void _onProductSoldChange(Shop shop, bool? isSold) {
-    _selectedShops.remove(shop);
-    _unselectedShops.remove(shop);
+    final selectedShops = _selectedShops.cachedVal.toSet();
+    final unselectedShops = _unselectedShops.cachedVal.toSet();
+
+    selectedShops.remove(shop);
+    unselectedShops.remove(shop);
     if (isSold == true) {
-      if (_selectedShops.length < MAP_PAGE_MODE_SELECTED_SHOPS_MAX) {
-        _selectedShops.add(shop);
+      if (selectedShops.length < MAP_PAGE_MODE_SELECTED_SHOPS_MAX) {
+        selectedShops.add(shop);
       } else {
         Log.w('Not allowing to select more than 10 shops');
       }
     } else if (isSold == false) {
-      _unselectedShops.add(shop);
+      unselectedShops.add(shop);
     }
     hideShopsCard();
+
+    _selectedShops.setValue(selectedShops);
+    _unselectedShops.setValue(unselectedShops);
   }
 
   @override
@@ -107,9 +122,12 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   List<Widget> buildFABs() {
     return [
-      FabAddShop(
-          key: const Key('add_shop_fab'),
-          onPressed: !model.loading ? onAddShopClicked : null)
+      Consumer(builder: (context, ref, _) {
+        final loading = super.loading.watch(ref);
+        return FabAddShop(
+            key: const Key('add_shop_fab'),
+            onPressed: !loading ? onAddShopClicked : null);
+      }),
     ];
   }
 
@@ -128,10 +146,14 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
           width: double.infinity,
           child: Padding(
               padding: const EdgeInsets.only(left: 26, right: 26, bottom: 24),
-              child: ButtonFilledPlante.withText(context.strings.global_done,
-                  onPressed: selectedShops().isNotEmpty && !model.loading
-                      ? onDoneClick
-                      : null))),
+              child: Consumer(builder: (context, ref, _) {
+                final loading = super.loading.watch(ref);
+                final selectedShops = _selectedShops.watch(ref);
+                return ButtonFilledPlante.withText(context.strings.global_done,
+                    onPressed: selectedShops.isNotEmpty && !loading
+                        ? onDoneClick
+                        : null);
+              }))),
     ];
   }
 

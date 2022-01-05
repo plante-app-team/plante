@@ -30,11 +30,19 @@ class _AnimatedListSimplePlanteState extends State<AnimatedListSimplePlante> {
     final listState = _listKey.currentState!;
     for (final update in diffResult.getUpdates(batch: false)) {
       update.when(
-        insert: (pos, count) => listState.insertItem(pos),
-        remove: (pos, count) => listState.removeItem(
-            pos,
-            (context, animation) =>
-                _wrapChild(oldWidget.children[pos], animation)),
+        insert: (pos, count) {
+          for (var index = pos; index < pos + count; ++index) {
+            listState.insertItem(index);
+          }
+        },
+        remove: (pos, count) {
+          for (var index = pos; index < pos + count; ++index) {
+            listState.removeItem(
+                index,
+                (context, animation) =>
+                    _wrapChild(oldWidget.children[index], animation));
+          }
+        },
         change: (pos, payload) {/* nothing to do */},
         move: (from, to) => throw Exception(
             'detectMoves: false was passed, moves not expected'),

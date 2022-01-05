@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
@@ -16,8 +15,7 @@ import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
-import 'package:plante/ui/map/components/map_hints_list.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/map_shops_filter_checkbox.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
@@ -25,7 +23,6 @@ import 'package:plante/ui/map/map_page/map_page_mode_add_product.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_zoomed_out.dart';
-import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 class MapPageModeDefault extends MapPageModeShopsCardBase {
   static const MIN_ZOOM = 6.0;
@@ -36,54 +33,24 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   final _filtersButtonKey = GlobalKey();
 
-  final _showNotEmptyShops = UIValueWrapper<bool>(true);
-  final _showSuggestionsAtShop = <SuggestionType, UIValueWrapper<bool>>{};
-  final _showEmptyShops = UIValueWrapper<bool>(false);
+  late final UIValue<bool> _showNotEmptyShops;
+  final _showSuggestionsAtShop = <SuggestionType, UIValue<bool>>{};
+  late final UIValue<bool> _showEmptyShops;
 
-  MapPageModeDefault(Analytics analytics, MapPageModel model,
-      MapHintsListController hintsController,
-      {required ResCallback<MapPage> widgetSource,
-      required ResCallback<BuildContext> contextSource,
-      required ResCallback<Iterable<Shop>> displayedShopsSource,
-      required VoidCallback updateCallback,
-      required VoidCallback updateMapCallback,
-      required ArgCallback<RichText?> bottomHintCallback,
-      required ArgCallback<Coord> moveMapCallback,
-      required ArgCallback<MapPageMode> modeSwitchCallback,
-      required UIValueWrapper<bool> isLoading,
-      required UIValueWrapper<bool> isLoadingSuggestions,
-      required ResCallback<bool> areShopsForViewPortLoadedCallback,
-      required UIValueWrapper<bool> shouldLoadNewShops})
-      : super(
-            MapPageModeParams(
-                model,
-                hintsController,
-                widgetSource,
-                contextSource,
-                displayedShopsSource,
-                updateCallback,
-                updateMapCallback,
-                bottomHintCallback,
-                moveMapCallback,
-                modeSwitchCallback,
-                isLoading,
-                isLoadingSuggestions,
-                areShopsForViewPortLoadedCallback,
-                shouldLoadNewShops,
-                analytics),
-            nameForAnalytics: 'default');
+  ArgCallback<bool>? _onLoadingChange;
 
-  MapPageModeDefault.withParams(MapPageModeParams params)
-      : super(params, nameForAnalytics: 'default');
+  MapPageModeDefault(MapPageModeParams params)
+      : super(params, nameForAnalytics: 'default') {
+    _showNotEmptyShops = createUIValue(true);
+    _showEmptyShops = createUIValue(false);
+    for (final type in SuggestionType.values) {
+      _showSuggestionsAtShop[type] = createUIValue(true);
+    }
+  }
 
   @override
   void init(MapPageMode? previousMode) {
     super.init(previousMode);
-
-    for (final type in SuggestionType.values) {
-      _showSuggestionsAtShop[type] = UIValueWrapper<bool>(true);
-    }
-
     switch (widget.requestedMode) {
       case MapPageRequestedMode.ADD_PRODUCT:
         if (widget.product == null) {
@@ -109,19 +76,29 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         _showNotEmptyShops.cachedVal;
     final showEmptyShops =
         prefs.getBool(_PREF_SHOW_EMPTY_SHOPS) ?? _showEmptyShops.cachedVal;
-    _showNotEmptyShops.setValue(showNotEmptyShops, ref);
-    _showEmptyShops.setValue(showEmptyShops, ref);
+    _showNotEmptyShops.setValue(
+      showNotEmptyShops,
+    );
+    _showEmptyShops.setValue(showEmptyShops);
 
     for (final type in SuggestionType.values) {
       final prefVal = prefs.getBool(type.prefName);
       if (prefVal != null) {
-        _showSuggestionsAtShop[type]?.setValue(prefVal, ref);
+        _showSuggestionsAtShop[type]?.setValue(prefVal);
       }
     }
+
+    _onLoadingChange = (_) {
+      _updateBottomHint();
+    };
+    loading.callOnChanges(_onLoadingChange!);
   }
 
   @override
   void deinit() {
+    if (_onLoadingChange != null) {
+      loading.unregisterCallback(_onLoadingChange!);
+    }
     setBottomHint(null);
     super.deinit();
   }
@@ -159,24 +136,26 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Widget buildTopActions() {
-    if (!shopsForViewPortLoaded) {
-      return super.buildTopActions();
-    }
-
-    return Align(
-        alignment: Alignment.centerRight,
-        child: ButtonFilledSmallPlante.lightGreen(
-          key: _filtersButtonKey,
-          elevation: 5,
-          onPressed: () {
-            _onFiltersClick(context);
-          },
-          paddings: EdgeInsets.zero,
-          height: 32,
-          width: 32,
-          icon: SvgPicture.asset('assets/map_filters.svg',
-              key: const Key('filter_shops_icon')),
-        ));
+    return Consumer(builder: (context, ref, _) {
+      final shopsForViewPortLoaded = super.shopsForViewPortLoaded.watch(ref);
+      if (!shopsForViewPortLoaded) {
+        return super.buildTopActions();
+      }
+      return Align(
+          alignment: Alignment.centerRight,
+          child: ButtonFilledSmallPlante.lightGreen(
+            key: _filtersButtonKey,
+            elevation: 5,
+            onPressed: () {
+              _onFiltersClick(context);
+            },
+            paddings: EdgeInsets.zero,
+            height: 32,
+            width: 32,
+            icon: SvgPicture.asset('assets/map_filters.svg',
+                key: const Key('filter_shops_icon')),
+          ));
+    });
   }
 
   void _onFiltersClick(BuildContext context) async {
@@ -231,12 +210,11 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   void _setFilterValue(bool value,
-      {required UIValueWrapper<bool> target,
+      {required UIValue<bool> target,
       required String pref,
       required String eventShown,
       required String eventHidden}) async {
-    target.setValue(value, ref);
-    updateWidget();
+    target.setValue(value);
     updateMap();
     if (target.cachedVal) {
       analytics.sendEvent(eventShown);
@@ -300,11 +278,6 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 
   @override
-  void onLoadingChange() {
-    _updateBottomHint();
-  }
-
-  @override
   void onDisplayedShopsChange(Iterable<Shop> shops) {
     _updateBottomHint();
   }
@@ -316,9 +289,9 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   void _updateBottomHint() {
     if (displayedShops.isNotEmpty ||
-        loading ||
-        loadingSuggestions ||
-        !shopsForViewPortLoaded) {
+        loading.cachedVal ||
+        loadingSuggestions.cachedVal ||
+        !shopsForViewPortLoaded.cachedVal) {
       setBottomHint(null);
       return;
     }

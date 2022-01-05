@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:plante/base/base.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
@@ -16,6 +17,11 @@ class SuggestedBarcodesMapFull {
       _map[type] = suggestions;
 
   SuggestedBarcodesMapFull unmodifiable() {
+    if (!isInTests()) {
+      // Somehow this functions is too slow for the app,
+      // so we'll check the map being not modified only in tests.
+      return this;
+    }
     final map = <SuggestionType, SuggestedBarcodesMap>{};
     for (final entry in _map.entries) {
       map[entry.key] = entry.value.unmodifiable();

@@ -1,15 +1,22 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
@@ -41,6 +48,9 @@ void main() {
   };
 
   setUp(() async {
+    await GetIt.I.reset();
+    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
+
     latestLoadedShops = null;
     latestError = null;
 
@@ -50,11 +60,17 @@ void main() {
     addressObtainer = MockAddressObtainer();
     userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
 
+    suggestedProductsManager = FakeSuggestedProductsManager();
+  });
+
+  Future<void> createModel(WidgetTester tester) async {
     final directionsManager = MockDirectionsManager();
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
 
-    suggestedProductsManager = FakeSuggestedProductsManager();
+    await tester.superPump(const HelperWidget());
+    final state = tester.state<_HelperWidgetState>(find.byType(HelperWidget));
+    final uiValuesFactory = UIValuesFactory(() => state.ref);
 
     model = MapPageModel(
         FakeSharedPreferences().asHolder(),
@@ -65,14 +81,16 @@ void main() {
         directionsManager,
         suggestedProductsManager,
         userAddressObtainer,
-        UIValueWrapper<bool>(true), (shops) {
+        UIValue<bool>(false, state.ref), (shops) {
       latestLoadedShops = shops;
     }, (error) {
       latestError = error;
-    }, () {}, () {}, () {});
-  });
+    }, uiValuesFactory);
+  }
 
-  test('successful shops load', () async {
+  testWidgets('successful shops load', (WidgetTester tester) async {
+    await createModel(tester);
+
     fakeShopsManager.addPreloadedArea(
         CoordsBounds(
             southwest: Coord(lat: 14, lon: 14),
@@ -95,7 +113,10 @@ void main() {
     expect(latestError, isNull);
   });
 
-  test('shops reloaded on shops manager change notification', () async {
+  testWidgets('shops reloaded on shops manager change notification',
+      (WidgetTester tester) async {
+    await createModel(tester);
+
     fakeShopsManager.addPreloadedArea(
         CoordsBounds(
             southwest: Coord(lat: 14, lon: 14),
@@ -120,11 +141,14 @@ void main() {
             northeast: Coord(lat: 16, lon: 16)),
         shops.values);
 
-    await Future.delayed(const Duration(milliseconds: 1));
+    await tester.pumpAndSettle();
     fakeShopsManager.verify_fetchShops_called();
   });
 
-  test('shops from same view port reloaded on shops manager change', () async {
+  testWidgets('shops from same view port reloaded on shops manager change',
+      (WidgetTester tester) async {
+    await createModel(tester);
+
     final preloadedBounds = CoordsBounds(
         southwest: Coord(lat: 14, lon: 14), northeast: Coord(lat: 16, lon: 16));
     fakeShopsManager.addPreloadedArea(preloadedBounds, shops.values);
@@ -146,16 +170,35 @@ void main() {
     // Reload is expected for already loaded view port
     fakeShopsManager.clear_verifiedCalls();
     fakeShopsManager.updatePreloadedArea(preloadedBounds, shops.values);
-    await Future.delayed(const Duration(milliseconds: 1));
+    await tester.pumpAndSettle();
     fakeShopsManager.verify_fetchShops_called(times: 1);
     expect(fakeShopsManager.calls_fetchShop().first, equals(initialViewPort));
   });
 
-  test('loading == true until first onCameraIdle is handled', () async {
-    expect(model.loading, isTrue);
+  testWidgets('loading == true until first onCameraIdle is handled',
+      (WidgetTester tester) async {
+    await createModel(tester);
+
+    expect(model.loading.cachedVal, isTrue);
     await model.onCameraIdle(CoordsBounds(
         southwest: Coord(lat: 14.999, lon: 14.999),
         northeast: Coord(lat: 15.001, lon: 15.001)));
-    expect(model.loading, isFalse);
+    expect(model.loading.cachedVal, isFalse);
   });
+}
+
+class HelperWidget extends PagePlante {
+  const HelperWidget({Key? key}) : super(key: key);
+
+  @override
+  _HelperWidgetState createState() => _HelperWidgetState();
+}
+
+class _HelperWidgetState extends PageStatePlante<HelperWidget> {
+  _HelperWidgetState() : super('_HelperWidgetState');
+
+  @override
+  Widget buildPage(BuildContext context) {
+    return Container();
+  }
 }

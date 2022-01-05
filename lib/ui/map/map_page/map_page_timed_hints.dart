@@ -2,20 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/timed_hints.dart';
 
 class MapPageTimedHints extends StatelessWidget {
   const MapPageTimedHints({
     Key? key,
-    required UIValueWrapper<bool> loading,
-    required UIValueWrapper<bool> loadingSuggestions,
+    required UIValueBase<bool> loading,
+    required UIValueBase<bool> loadingSuggestions,
   })  : _loading = loading,
         _loadingSuggestions = loadingSuggestions,
         super(key: key);
 
-  final UIValueWrapper<bool> _loading;
-  final UIValueWrapper<bool> _loadingSuggestions;
+  final UIValueBase<bool> _loading;
+  final UIValueBase<bool> _loadingSuggestions;
 
   @override
   Widget build(BuildContext context) {
