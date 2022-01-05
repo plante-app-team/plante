@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 
 class SuggestedBarcodesMap {
@@ -12,6 +13,11 @@ class SuggestedBarcodesMap {
   operator []=(OsmUID uid, List<String> barcodes) => _map[uid] = barcodes;
 
   SuggestedBarcodesMap unmodifiable() {
+    if (!isInTests()) {
+      // Somehow this functions is too slow for the app,
+      // so we'll check the map being not modified only in tests.
+      return this;
+    }
     final map = <OsmUID, List<String>>{};
     for (final entry in _map.entries) {
       map[entry.key] = UnmodifiableListView(entry.value);

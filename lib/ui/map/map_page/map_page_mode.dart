@@ -5,8 +5,9 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
@@ -17,32 +18,32 @@ class MapPageModeParams {
   final ResCallback<MapPage> widgetSource;
   final ResCallback<BuildContext> contextSource;
   final ResCallback<Iterable<Shop>> displayedShopsSource;
-  final VoidCallback updateCallback;
   final VoidCallback updateMapCallback;
   final ArgCallback<RichText?> bottomHintCallback;
   final ArgCallback<Coord> moveMapCallback;
   final ArgCallback<MapPageMode> modeSwitchCallback;
-  final UIValueWrapper<bool> isLoading;
-  final UIValueWrapper<bool> isLoadingSuggestions;
-  final ResCallback<bool> areShopsForViewPortLoadedCallback;
-  final UIValueWrapper<bool> shouldLoadNewShops;
+  final UIValuesFactory uiValuesFactory;
+  final UIValueBase<bool> isLoading;
+  final UIValueBase<bool> isLoadingSuggestions;
+  final UIValueBase<bool> areShopsForViewPortLoaded;
+  final UIValue<bool> shouldLoadNewShops;
   final Analytics analytics;
   MapPageModeParams(
-      this.model,
-      this.hintsListController,
-      this.widgetSource,
-      this.contextSource,
-      this.displayedShopsSource,
-      this.updateCallback,
-      this.updateMapCallback,
-      this.bottomHintCallback,
-      this.moveMapCallback,
-      this.modeSwitchCallback,
-      this.isLoading,
-      this.isLoadingSuggestions,
-      this.areShopsForViewPortLoadedCallback,
-      this.shouldLoadNewShops,
-      this.analytics);
+      {required this.model,
+      required this.hintsListController,
+      required this.widgetSource,
+      required this.contextSource,
+      required this.displayedShopsSource,
+      required this.updateMapCallback,
+      required this.bottomHintCallback,
+      required this.moveMapCallback,
+      required this.modeSwitchCallback,
+      required this.uiValuesFactory,
+      required this.isLoading,
+      required this.isLoadingSuggestions,
+      required this.areShopsForViewPortLoaded,
+      required this.shouldLoadNewShops,
+      required this.analytics});
 }
 
 abstract class MapPageMode {
@@ -61,15 +62,15 @@ abstract class MapPageMode {
   MapHintsListController get hintsController => params.hintsListController;
   Analytics get analytics => params.analytics;
   Iterable<Shop> get displayedShops => params.displayedShopsSource.call();
-  bool get loading => params.isLoading.cachedVal;
-  bool get loadingSuggestions => params.isLoadingSuggestions.cachedVal;
-  bool get shopsForViewPortLoaded =>
-      params.areShopsForViewPortLoadedCallback.call();
-  UIValueWrapper<bool> get shouldLoadNewShops => params.shouldLoadNewShops;
+  UIValueBase<bool> get loading => params.isLoading;
+  UIValueBase<bool> get loadingSuggestions => params.isLoadingSuggestions;
+  UIValueBase<bool> get shopsForViewPortLoaded =>
+      params.areShopsForViewPortLoaded;
+  UIValue<bool> get shouldLoadNewShops => params.shouldLoadNewShops;
 
   @mustCallSuper
   void init(MapPageMode? previousMode) {
-    shouldLoadNewShops.setValue(true, ref);
+    shouldLoadNewShops.setValue(true);
   }
 
   @mustCallSuper
@@ -80,7 +81,6 @@ abstract class MapPageMode {
 
   /// Extra shops added to what MapPageModel has
   Set<Shop> additionalShops() => {};
-  bool showWhereAmIFAB() => true;
   double minZoom() => DEFAULT_MIN_ZOOM;
   double maxZoom() => DEFAULT_MAX_ZOOM;
 
@@ -94,7 +94,6 @@ abstract class MapPageMode {
   void onShopsUpdated(Map<OsmUID, Shop> shops) {}
   void onMapClick(Coord coord) {}
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
-  void onLoadingChange() {}
   void onCameraMove(Coord coord, double zoom) {}
   void onCameraIdle() {}
 
@@ -102,9 +101,11 @@ abstract class MapPageMode {
   Future<bool> onWillPop() async => true;
 
   @protected
-  void moveMapTo(Coord coord) => params.moveMapCallback.call(coord);
+  UIValue<T> createUIValue<T>(T initialValue) =>
+      params.uiValuesFactory.create(initialValue);
+
   @protected
-  void updateWidget() => params.updateCallback.call();
+  void moveMapTo(Coord coord) => params.moveMapCallback.call(coord);
   @protected
   void updateMap() => params.updateMapCallback.call();
   @protected
@@ -117,7 +118,6 @@ abstract class MapPageMode {
   @protected
   void switchModeTo(MapPageMode mode) {
     params.modeSwitchCallback.call(mode);
-    updateWidget();
     updateMap();
   }
 }

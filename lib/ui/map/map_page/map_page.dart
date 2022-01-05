@@ -27,7 +27,7 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
 import 'package:plante/ui/map/components/map_bottom_hint.dart';
@@ -94,23 +94,20 @@ class _MapPageState extends PageStatePlante<MapPage>
   final PermissionsManager _permissionsManager;
   late final MapPageModel _model;
   var _modeInited = false;
-  late MapPageMode _mode;
-  bool _locationPermissionObtained = false;
+  late final UIValue<MapPageMode> _mode;
+  late final UIValue<bool> _locationPermissionObtained;
 
   final _mapController = Completer<GoogleMapController>();
-  var _displayedShopsMarkers = <Marker>{};
+  late final UIValue<Set<Marker>> _displayedShopsMarkers;
   Iterable<Shop> _displayedShops = const [];
   late final ClusterManager _clusterManager;
 
   final _hintsController = MapHintsListController();
-  RichText? _bottomHint;
+  late final UIValue<RichText?> _bottomHint;
 
-  MapSearchPageResult? _latestSearchResult;
+  late final UIValue<MapSearchPageResult?> _latestSearchResult;
 
-  final _loadNewShops = UIValueWrapper<bool>(true);
-
-  final _loading = UIValueWrapper(false);
-  final _loadingSuggestions = UIValueWrapper(false);
+  late final UIValue<bool> _loadNewShops;
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
@@ -119,6 +116,12 @@ class _MapPageState extends PageStatePlante<MapPage>
   @override
   void initState() {
     super.initState();
+    _locationPermissionObtained = UIValue(false, ref);
+    _displayedShopsMarkers = UIValue({}, ref);
+    _bottomHint = UIValue(null, ref);
+    _latestSearchResult = UIValue(null, ref);
+    _loadNewShops = UIValue(true, ref);
+
     widget._testingStorage.finishCallback = (result) {
       _model.finishWith(context, result);
     };
@@ -132,38 +135,17 @@ class _MapPageState extends PageStatePlante<MapPage>
       _onMapTap(LatLng(coord.lat, coord.lon));
     };
     widget._testingStorage.modeCallback = () {
-      return _mode;
+      return _mode.cachedVal;
     };
     widget._testingStorage.onSearchResultCallback = _onSearchResult;
 
-    final updateCallback = () {
-      if (mounted) {
-        setState(() {
-          // Updated!
-        });
-      }
-    };
     final updateMapCallback = () {
       if (mounted) {
         final allShops = <Shop>{};
-        _mode.onShopsUpdated(_model.shopsCache);
+        _mode.cachedVal.onShopsUpdated(_model.shopsCache);
         allShops.addAll(_model.shopsCache.values);
-        allShops.addAll(_mode.additionalShops());
-        _onShopsUpdated(_mode.filter(allShops));
-      }
-    };
-    final loadingChangeCallback = () {
-      if (mounted) {
-        _mode.onLoadingChange();
-        _loading.setValue(_model.loading, ref);
-      }
-    };
-    final suggestionsLoadingChangeCallback = () {
-      if (mounted) {
-        _loadingSuggestions.setValue(_model.loadingSuggestions, ref);
-        setState(() {
-          // Updated!
-        });
+        allShops.addAll(_mode.cachedVal.additionalShops());
+        _onShopsUpdated(_mode.cachedVal.filter(allShops));
       }
     };
     final updateShopsCallback = (_) {
@@ -178,12 +160,10 @@ class _MapPageState extends PageStatePlante<MapPage>
       GetIt.I.get<DirectionsManager>(),
       GetIt.I.get<SuggestedProductsManager>(),
       GetIt.I.get<CachingUserAddressPiecesObtainer>(),
-      _loadNewShops,
+      _loadNewShops.unmodifiable(),
       updateShopsCallback,
       _onError,
-      updateCallback,
-      loadingChangeCallback,
-      suggestionsLoadingChangeCallback,
+      uiValuesFactory,
     );
 
     /// The clustering library levels logic is complicated.
@@ -199,14 +179,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     _clusterManager = ClusterManager<Shop>([], _updateMarkers,
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
-    final updateBottomHintCallback = (RichText? hint) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _bottomHint = hint;
-      });
-    };
+    final updateBottomHintCallback = _bottomHint.setValue;
     final moveMapCallback = (Coord coord) async {
       final mapController = await _mapController.future;
       await mapController.animateCamera(CameraUpdate.newCameraPosition(
@@ -215,27 +188,30 @@ class _MapPageState extends PageStatePlante<MapPage>
               zoom: await mapController.getZoomLevel())));
     };
     final switchModeCallback = (MapPageMode newMode) {
-      setState(() {
-        analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
-        final oldMode = _mode;
-        oldMode.deinit();
-        _mode = newMode;
-        _mode.init(oldMode);
-      });
+      analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
+      final oldMode = _mode.cachedVal;
+      oldMode.deinit();
+      _mode.setValue(newMode);
+      newMode.init(oldMode);
     };
-    _mode = MapPageModeDefault(analytics, _model, _hintsController,
-        widgetSource: () => widget,
-        contextSource: () => context,
-        displayedShopsSource: () => _displayedShops,
-        updateCallback: updateCallback,
-        updateMapCallback: updateMapCallback,
-        bottomHintCallback: updateBottomHintCallback,
-        moveMapCallback: moveMapCallback,
-        modeSwitchCallback: switchModeCallback,
-        isLoading: _loading,
-        isLoadingSuggestions: _loadingSuggestions,
-        areShopsForViewPortLoadedCallback: _model.viewPortShopsLoaded,
-        shouldLoadNewShops: _loadNewShops);
+    _mode = UIValue(
+        MapPageModeDefault(MapPageModeParams(
+            analytics: analytics,
+            model: _model,
+            hintsListController: _hintsController,
+            widgetSource: () => widget,
+            contextSource: () => context,
+            displayedShopsSource: () => _displayedShops,
+            updateMapCallback: updateMapCallback,
+            bottomHintCallback: updateBottomHintCallback,
+            moveMapCallback: moveMapCallback,
+            modeSwitchCallback: switchModeCallback,
+            uiValuesFactory: uiValuesFactory,
+            isLoading: _model.loading,
+            isLoadingSuggestions: _model.loadingSuggestions,
+            areShopsForViewPortLoaded: _model.viewPortShopsLoaded,
+            shouldLoadNewShops: _loadNewShops)),
+        ref);
 
     _asyncInit();
     _instances.add(this);
@@ -252,14 +228,25 @@ class _MapPageState extends PageStatePlante<MapPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_modeInited) {
-      _mode.init(null);
-      _modeInited = true;
+      // NOTE: didChangeDependencies is called indirectly from
+      // a [Widget.build] function.
+      // The Riverpod library _hates_ it when values managed by it
+      // are changed from [Widget.build] and causes exceptions.
+      // Meanwhile, [MapPageMode.init] can (and does) cause different
+      // UIValues to be changed. To avoid exceptions, we delay [init] call
+      // until the next frame.
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        if (!_modeInited) {
+          _mode.cachedVal.init(null);
+          _modeInited = true;
+        }
+      });
     }
   }
 
   Future<Marker> _markersBuilder(Cluster<Shop> cluster) async {
-    final extraData = ShopsMarkersExtraData(_mode.selectedShops(),
-        _mode.accentedShops(), _model.barcodesSuggestions);
+    final extraData = ShopsMarkersExtraData(_mode.cachedVal.selectedShops(),
+        _mode.cachedVal.accentedShops(), _model.barcodesSuggestions);
     return markersBuilder(cluster, extraData, context, _onMarkerClick);
   }
 
@@ -269,17 +256,16 @@ class _MapPageState extends PageStatePlante<MapPage>
     }
     analytics.sendEvent(
         'map_shops_click', {'shops': shops.map((e) => e.osmUID).join(', ')});
-    _mode.onMarkerClick(shops);
+    _mode.cachedVal.onMarkerClick(shops);
   }
 
   void _asyncInit() async {
     await _initMapStyle();
     final permission =
         await _permissionsManager.status(PermissionKind.LOCATION);
-    setState(() {
-      _locationPermissionObtained = permission == PermissionState.granted ||
-          permission == PermissionState.limited;
-    });
+    final permissionObtained = permission == PermissionState.granted ||
+        permission == PermissionState.limited;
+    _locationPermissionObtained.setValue(permissionObtained);
   }
 
   Future<void> _initMapStyle() async {
@@ -339,33 +325,33 @@ class _MapPageState extends PageStatePlante<MapPage>
 
     final searchBar = Consumer(builder: (context, ref, _) {
       final loadNewShops = _loadNewShops.watch(ref);
-      if (!loadNewShops || !_model.viewPortShopsLoaded()) {
+      final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
+      if (!loadNewShops || !viewPortShopsLoaded) {
         return const SizedBox();
       }
       return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Hero(
               tag: 'search_bar',
-              child: MapSearchBar(
-                  queryOverride: _latestSearchResult?.query,
-                  enabled: false,
-                  onDisabledTap: _onSearchBarTap,
-                  onCleared: () {
-                    setState(() {
-                      _latestSearchResult = null;
-                      _mode.deselectShops();
-                    });
-                  })));
+              child: Consumer(
+                  builder: (context, ref, _) => MapSearchBar(
+                      queryOverride: _latestSearchResult.watch(ref)?.query,
+                      enabled: false,
+                      onDisabledTap: _onSearchBarTap,
+                      onCleared: () {
+                        _latestSearchResult.setValue(null);
+                        _mode.cachedVal.deselectShops();
+                      }))));
     });
 
     final loadShopsButton = Consumer(builder: (context, ref, _) {
       final loadNewShops = _loadNewShops.watch(ref);
+      final loading = _model.loading.watch(ref);
+      final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
       return Padding(
           padding: const EdgeInsets.only(bottom: 32),
           child: AnimatedMapWidget(
-              child: !_model.viewPortShopsLoaded() &&
-                      loadNewShops &&
-                      !_model.loading
+              child: !viewPortShopsLoaded && loadNewShops && !loading
                   ? ButtonFilledSmallPlante.lightGreen(
                       elevation: 5,
                       onPressed: _loadShops,
@@ -378,31 +364,34 @@ class _MapPageState extends PageStatePlante<MapPage>
         !isInTests() || widget._testingStorage.createMapWidgetForTesting;
     final content = Stack(children: [
       if (createMapWidget)
-        GoogleMap(
-          myLocationEnabled: _locationPermissionObtained,
-          mapToolbarEnabled: false,
-          myLocationButtonEnabled: false,
-          zoomControlsEnabled: false,
-          minMaxZoomPreference:
-              MinMaxZoomPreference(_mode.minZoom(), _mode.maxZoom()),
-          mapType: MapType.normal,
-          initialCameraPosition: initialPos,
-          onMapCreated: (GoogleMapController controller) {
-            _mapController.complete(controller);
-            _clusterManager.setMapController(controller);
-            _clusterManager.onCameraMove(initialPos!);
-            _onCameraIdle();
-          },
-          onCameraMove: _onCameraMove,
-          onCameraIdle: _onCameraIdle,
-          onTap: _onMapTap,
-          // When there are more than 2 instances of GoogleMap and both
-          // of them have markers, this screws up the markers for some reason.
-          // Couldn't figure out why, probably there's a mistake either in
-          // the Google Map lib or in the Clustering lib, but it's easier to
-          // just use markers for 1 instance at a time.
-          markers: _instances.last == this ? _displayedShopsMarkers : {},
-        ),
+        Consumer(
+            builder: (context, ref, _) => GoogleMap(
+                  myLocationEnabled: _locationPermissionObtained.watch(ref),
+                  mapToolbarEnabled: false,
+                  myLocationButtonEnabled: false,
+                  zoomControlsEnabled: false,
+                  minMaxZoomPreference: MinMaxZoomPreference(
+                      _mode.watch(ref).minZoom(), _mode.watch(ref).maxZoom()),
+                  mapType: MapType.normal,
+                  initialCameraPosition: initialPos!,
+                  onMapCreated: (GoogleMapController controller) {
+                    _mapController.complete(controller);
+                    _clusterManager.setMapController(controller);
+                    _clusterManager.onCameraMove(initialPos!);
+                    _onCameraIdle();
+                  },
+                  onCameraMove: _onCameraMove,
+                  onCameraIdle: _onCameraIdle,
+                  onTap: _onMapTap,
+                  // When there are more than 2 instances of GoogleMap and both
+                  // of them have markers, this screws up the markers for some reason.
+                  // Couldn't figure out why, probably there's a mistake either in
+                  // the Google Map lib or in the Clustering lib, but it's easier to
+                  // just use markers for 1 instance at a time.
+                  markers: _instances.last == this
+                      ? _displayedShopsMarkers.watch(ref)
+                      : {},
+                )),
       Align(
         alignment: Alignment.bottomRight,
         child: LicenceLabel(
@@ -415,12 +404,14 @@ class _MapPageState extends PageStatePlante<MapPage>
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Align(
                 alignment: Alignment.centerRight,
-                child: SizedBox(
-                    width: 80,
-                    child: AnimatedListSimplePlante(children: _fabs()))),
+                child: SizedBox(width: 80, child: _fabs())),
             loadShopsButton,
-            MapBottomHint(_bottomHint),
-            AnimatedListSimplePlante(children: _mode.buildBottomActions()),
+            Consumer(
+                builder: (context, ref, _) =>
+                    MapBottomHint(_bottomHint.watch(ref))),
+            Consumer(
+                builder: (context, ref, _) => AnimatedListSimplePlante(
+                    children: _mode.watch(ref).buildBottomActions())),
           ])),
       Align(
         alignment: Alignment.topCenter,
@@ -428,12 +419,16 @@ class _MapPageState extends PageStatePlante<MapPage>
             padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
             child: Column(children: [
               AnimatedMapWidget(child: searchBar),
-              AnimatedMapWidget(child: _mode.buildHeader()),
+              Consumer(
+                  builder: (context, ref, _) =>
+                      AnimatedMapWidget(child: _mode.watch(ref).buildHeader())),
               MapHintsList(controller: _hintsController),
-              AnimatedMapWidget(child: _mode.buildTopActions()),
+              Consumer(
+                  builder: (context, ref, _) => AnimatedMapWidget(
+                      child: _mode.watch(ref).buildTopActions())),
             ])),
       ),
-      _mode.buildOverlay(),
+      Consumer(builder: (context, ref, _) => _mode.watch(ref).buildOverlay()),
       _progressBar(),
     ]);
 
@@ -457,17 +452,21 @@ class _MapPageState extends PageStatePlante<MapPage>
         ));
   }
 
-  List<Widget> _fabs() {
-    final fabs = _mode.buildFABs() +
-        [
-          FabMyLocation(key: const Key('my_location_fab'), onPressed: _showUser)
-        ];
-    return fabs
-        .map((e) => Padding(
-            key: Key('${e.key}_wrapped'),
-            padding: const EdgeInsets.only(right: 24, bottom: 24),
-            child: e))
-        .toList();
+  Widget _fabs() {
+    return Consumer(builder: (context, ref, _) {
+      final modeFabs = _mode.watch(ref).buildFABs() +
+          [
+            FabMyLocation(
+                key: const Key('my_location_fab'), onPressed: _showUser)
+          ];
+      final fabs = modeFabs
+          .map((e) => Padding(
+              key: Key('${e.key}_wrapped'),
+              padding: const EdgeInsets.only(right: 24, bottom: 24),
+              child: e))
+          .toList();
+      return AnimatedListSimplePlante(children: fabs);
+    });
   }
 
   Future<void> _showUser() async {
@@ -492,16 +491,14 @@ class _MapPageState extends PageStatePlante<MapPage>
             context.strings.map_page_location_permission_cancel_go_to_settings,
         settingsDialogTitle:
             context.strings.map_page_location_permission_title);
-    setState(() {
-      _locationPermissionObtained = result;
-    });
+    _locationPermissionObtained.setValue(result);
     return result;
   }
 
   Widget _progressBar() {
     return Consumer(builder: (context, ref, _) {
-      final loading = _loading.watch(ref);
-      final loadingSuggestions = _loadingSuggestions.watch(ref);
+      final loading = _model.loading.watch(ref);
+      final loadingSuggestions = _model.loadingSuggestions.watch(ref);
       if (loading) {
         return MapPageProgressBar.forLoadingShops(inProgress: true);
       } else if (loadingSuggestions) {
@@ -515,21 +512,21 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   void _onCameraMove(CameraPosition position) {
     _clusterManager.onCameraMove(position);
-    _mode.onCameraMove(position.target.toCoord(), position.zoom);
+    _mode.cachedVal.onCameraMove(position.target.toCoord(), position.zoom);
   }
 
   void _onCameraIdle() async {
     final mapController = await _mapController.future;
     final viewBounds = await mapController.getVisibleRegion();
     await _model.onCameraIdle(viewBounds.toCoordsBounds());
-    _mode.onCameraIdle();
+    _mode.cachedVal.onCameraIdle();
   }
 
   void _onShopsUpdated(Iterable<Shop> shops) {
     _displayedShops = shops;
     widget._testingStorage.displayedShops.clear();
     widget._testingStorage.displayedShops.addAll(shops);
-    _mode.onDisplayedShopsChange(shops);
+    _mode.cachedVal.onDisplayedShopsChange(shops);
 
     _clusterManager.setItems(shops
         .map((shop) =>
@@ -553,15 +550,11 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   void _updateMarkers(Set<Marker> markers) {
-    if (mounted) {
-      setState(() {
-        _displayedShopsMarkers = markers;
-      });
-    }
+    _displayedShopsMarkers.setValue(markers);
   }
 
   void _onMapTap(LatLng coord) {
-    _mode.onMapClick(coord.toCoord());
+    _mode.cachedVal.onMapClick(coord.toCoord());
   }
 
   void _onSearchBarTap() async {
@@ -569,23 +562,21 @@ class _MapPageState extends PageStatePlante<MapPage>
         context,
         MaterialPageRoute(
             builder: (context) =>
-                MapSearchPage(initialState: _latestSearchResult)));
+                MapSearchPage(initialState: _latestSearchResult.cachedVal)));
     if (result is MapSearchPageResult?) {
       await _onSearchResult(result);
     }
   }
 
   Future<void> _onSearchResult(MapSearchPageResult? result) async {
-    setState(() {
-      _latestSearchResult = result;
-    });
+    _latestSearchResult.setValue(result);
     if (result == null) {
       return;
     }
     final shops = result.chosenShops;
     final road = result.chosenRoad;
     if (shops != null && shops.isNotEmpty) {
-      _mode.deselectShops();
+      _mode.cachedVal.deselectShops();
       if (shops.length == 1) {
         await _moveCameraTo(
             CameraPosition(target: shops.first.coord.toLatLng(), zoom: 17));
@@ -595,7 +586,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       }
       _onMarkerClick(shops);
     } else if (road != null) {
-      _mode.deselectShops();
+      _mode.cachedVal.deselectShops();
       await _moveCameraTo(
           CameraPosition(target: road.coord.toLatLng(), zoom: 17));
     }
@@ -642,11 +633,11 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Future<bool> _onWillPop() async {
-    if (_latestSearchResult != null) {
+    if (_latestSearchResult.cachedVal != null) {
       _onSearchBarTap();
       return false;
     }
-    return await _mode.onWillPop();
+    return await _mode.cachedVal.onWillPop();
   }
 
   void _loadShops() {
@@ -654,15 +645,15 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 }
 
-extension _CoordExt on LatLng {
+extension on LatLng {
   Coord toCoord() => Coord(lat: latitude, lon: longitude);
 }
 
-extension _LatLngExt on Coord {
+extension on Coord {
   LatLng toLatLng() => LatLng(lat, lon);
 }
 
-extension _CoordBoundsExt on LatLngBounds {
+extension on LatLngBounds {
   CoordsBounds toCoordsBounds() => CoordsBounds(
       southwest: southwest.toCoord(), northeast: northeast.toCoord());
 }

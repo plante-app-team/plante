@@ -16,7 +16,7 @@ class MapPageModeZoomedOut extends MapPageMode {
     super.init(previousMode);
     hintsController.addHint(
         _ZOOM_HINT_ID, context.strings.map_page_zoom_in_to_see_shops);
-    shouldLoadNewShops.setValue(false, ref);
+    shouldLoadNewShops.setValue(false);
   }
 
   @override
@@ -34,7 +34,7 @@ class MapPageModeZoomedOut extends MapPageMode {
   @override
   void onCameraMove(Coord coord, double zoom) {
     if (zoom >= super.minZoom()) {
-      switchModeTo(MapPageModeDefault.withParams(params));
+      switchModeTo(MapPageModeDefault(params));
     }
   }
 }

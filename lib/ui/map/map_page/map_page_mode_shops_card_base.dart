@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
@@ -10,24 +11,20 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 
 abstract class MapPageModeShopsCardBase extends MapPageMode {
-  final _displayedShops = <Shop>[];
+  late final UIValue<List<Shop>> _displayedShops;
   final _actuallyVisibleShops = <Shop>{};
   late final UiListAddressesObtainer addressesObtainer;
 
   MapPageModeShopsCardBase(MapPageModeParams params,
       {required String nameForAnalytics})
-      : super(params, nameForAnalytics: nameForAnalytics);
-
-  @mustCallSuper
-  @override
-  void init(MapPageMode? previousMode) {
-    super.init(previousMode);
+      : super(params, nameForAnalytics: nameForAnalytics) {
+    _displayedShops = createUIValue([]);
     addressesObtainer = model.createListAddressesObtainer();
   }
 
@@ -40,16 +37,12 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   @protected
-  ShopCard createCardFor(
+  Widget createCardFor(
       Shop shop, FutureShortAddress address, ArgCallback<Shop>? cancelCallback);
 
   @mustCallSuper
   @override
-  bool showWhereAmIFAB() => _displayedShops.isEmpty;
-
-  @mustCallSuper
-  @override
-  Set<Shop> accentedShops() => _displayedShops.toSet();
+  Set<Shop> accentedShops() => _displayedShops.cachedVal.toSet();
 
   @mustCallSuper
   @override
@@ -58,44 +51,49 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   }
 
   void _setDisplayedShops(Iterable<Shop> shops) {
-    if (listEquals(shops.toList(), _displayedShops)) {
+    if (listEquals(shops.toList(), _displayedShops.cachedVal)) {
       return;
     }
-    _displayedShops.clear();
-    _displayedShops.addAll(shops.toList());
-    _displayedShops.sort((a, b) => b.productsCount - a.productsCount);
-    updateWidget();
+    final displayedShops = shops.toList();
+    displayedShops.sort((a, b) => b.productsCount - a.productsCount);
+    _displayedShops.setValue(displayedShops);
     updateMap();
   }
 
   @override
   void onShopsUpdated(Map<OsmUID, Shop> shops) {
-    if (_displayedShops.isEmpty) {
+    if (_displayedShops.cachedVal.isEmpty) {
       return;
     }
-    final oldDisplayedShops = _displayedShops.toList();
-    for (var index = 0; index < _displayedShops.length; ++index) {
-      final shop = _displayedShops[index];
-      _displayedShops[index] = shops[shop.osmUID] ?? shop;
+    final displayedShops = _displayedShops.cachedVal.toList();
+    final oldDisplayedShops = displayedShops.toList();
+    for (var index = 0; index < displayedShops.length; ++index) {
+      final shop = displayedShops[index];
+      displayedShops[index] = shops[shop.osmUID] ?? shop;
     }
-    if (!listEquals(oldDisplayedShops, _displayedShops)) {
-      updateWidget();
+    if (!listEquals(oldDisplayedShops, displayedShops)) {
+      _displayedShops.setValue(displayedShops);
       updateMap();
     }
   }
 
   @protected
   Widget shopsCardsWidget() {
-    return AnimatedSwitcher(
-        duration: DURATION_DEFAULT,
-        child: _displayedShops.isEmpty
-            ? const SizedBox.shrink()
-            : _displayedShops.length > 1
-                ? _draggableScrollableSheet()
-                : _onlyOneShopSheet());
+    return Consumer(builder: (context, ref, _) {
+      final displayedShops = _displayedShops.watch(ref);
+      final Widget actualWidget;
+      if (displayedShops.isEmpty) {
+        actualWidget = const SizedBox.shrink();
+      } else if (displayedShops.length == 1) {
+        actualWidget = _onlyOneShopSheet(displayedShops);
+      } else {
+        actualWidget = _draggableScrollableSheet(displayedShops);
+      }
+      return AnimatedSwitcher(duration: DURATION_DEFAULT, child: actualWidget);
+    });
   }
 
-  Widget _onlyOneShopSheet() {
+  Widget _onlyOneShopSheet(List<Shop> displayedShops) {
     return Align(
         alignment: Alignment.bottomCenter,
         child: GestureDetector(
@@ -132,7 +130,9 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               textDirection: TextDirection.rtl,
                               children: [
-                                Expanded(child: _buildShopCard(context, 0)),
+                                Expanded(
+                                    child: _buildShopCard(
+                                        context, displayedShops, 0)),
                               ]),
                         ]),
                   ),
@@ -143,7 +143,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
         ));
   }
 
-  Widget _draggableScrollableSheet() {
+  Widget _draggableScrollableSheet(List<Shop> displayedShops) {
     double draggableSize = 0.35;
     double maxChildSize = 0.75;
     if (Platform.isIOS) {
@@ -214,7 +214,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
                       child: Container(), //hack to make appbar smaller
                     ),
                   ),
-                  _shopCards()
+                  _shopCards(displayedShops)
                 ],
               ),
             );
@@ -222,19 +222,21 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
     );
   }
 
-  Widget _shopCards() {
+  Widget _shopCards(List<Shop> displayedShops) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        _buildShopCard,
-        childCount: math.max(0, _displayedShops.length * 2 - 1),
+        (BuildContext context, int index) =>
+            _buildShopCard(context, displayedShops, index),
+        childCount: math.max(0, displayedShops.length * 2 - 1),
       ),
     );
   }
 
-  Widget _buildShopCard(BuildContext context, int index) {
+  Widget _buildShopCard(
+      BuildContext context, List<Shop> displayedShops, int index) {
     final int itemIndex = index ~/ 2;
     if (index.isEven) {
-      final shop = _displayedShops[itemIndex];
+      final shop = displayedShops[itemIndex];
       return Column(children: [
         VisibilityDetectorPlante(
             keyStr: shop.osmUID.toString(),
@@ -246,7 +248,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
               }
               addressesObtainer.onDisplayedEntitiesChanged(
                   displayedEntities: _actuallyVisibleShops,
-                  allEntitiesOrdered: _displayedShops);
+                  allEntitiesOrdered: displayedShops);
             },
             child: createCardFor(shop, addressesObtainer.requestAddressOf(shop),
                 (Shop shop) => hideShopsCard())),
@@ -263,8 +265,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
 
   @protected
   void hideShopsCard() {
-    _displayedShops.clear();
-    updateWidget();
+    _displayedShops.setValue([]);
     updateMap();
   }
 
@@ -276,7 +277,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
   @mustCallSuper
   @override
   Future<bool> onWillPop() async {
-    if (_displayedShops.isNotEmpty) {
+    if (_displayedShops.cachedVal.isNotEmpty) {
       hideShopsCard();
       return false;
     }

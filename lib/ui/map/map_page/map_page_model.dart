@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
@@ -26,7 +24,8 @@ import 'package:plante/outside/map/user_address/caching_user_address_pieces_obta
 import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
-import 'package:plante/ui/base/ui_value_wrapper.dart';
+import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/delayed_loading_notifier.dart';
 import 'package:plante/ui/map/components/delayed_lossy_arg_callback.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -44,7 +43,6 @@ class MapPageModel implements ShopsManagerListener {
   late final DelayedLossyArgCallback<Map<OsmUID, Shop>>
       _updateShopsAndUICallback;
   final ArgCallback<MapPageModelError> _errorCallback;
-  final VoidCallback _updateCallback;
   final SharedPreferencesHolder _prefs;
   final UserLocationManager _userLocationManager;
   final ShopsManager _shopsManager;
@@ -53,12 +51,14 @@ class MapPageModel implements ShopsManagerListener {
   final DirectionsManager _directionsManager;
   final SuggestedProductsManager _suggestedProductsManager;
   final CachingUserAddressPiecesObtainer _userAddressPiecesObtainer;
-  final UIValueWrapper<bool> _shouldLoadNewShops;
+  final UIValueBase<bool> _shouldLoadNewShops;
 
-  bool _viewPortShopsFetched = false;
+  var _disposed = false;
+
+  late final UIValue<bool> _viewPortShopsFetched;
   CoordsBounds? _latestViewPort;
   CoordsBounds? _latestFetchedViewPort;
-  bool _firstTerritoryLoadDone = false;
+  late final UIValue<bool> _firstTerritoryLoadDone;
 
   Map<OsmUID, Shop> _shopsCache = {};
   final _barcodesSuggestions = SuggestedBarcodesMapFull({});
@@ -68,6 +68,9 @@ class MapPageModel implements ShopsManagerListener {
 
   late final DelayedLoadingNotifier _loadingNotifier;
   late final DelayedLoadingNotifier _loadingSuggestionsNotifier;
+
+  late final UIValue<bool> _loading;
+  late final UIValue<bool> _loadingSuggestions;
 
   MapPageModel(
       this._prefs,
@@ -81,9 +84,7 @@ class MapPageModel implements ShopsManagerListener {
       this._shouldLoadNewShops,
       ArgCallback<Map<OsmUID, Shop>> updateShopsCallback,
       this._errorCallback,
-      this._updateCallback,
-      VoidCallback loadingChangeCallback,
-      VoidCallback suggestionsLoadingChangeCallback) {
+      UIValuesFactory uiValuesFactory) {
     _shopsManager.addListener(this);
 
     _directionsManager
@@ -100,27 +101,44 @@ class MapPageModel implements ShopsManagerListener {
     _updateShopsAndUICallback =
         DelayedLossyArgCallback(const Duration(milliseconds: 500), (shops) {
       updateShopsCallback.call(shops);
-      _updateCallback.call();
     });
 
     _loadingNotifier = DelayedLoadingNotifier(
       firstLoadingInstantNotification: true,
       delay: const Duration(milliseconds: 250),
-      callback: loadingChangeCallback,
+      callback: _updateLoadingValues,
     );
     _loadingSuggestionsNotifier = DelayedLoadingNotifier(
       firstLoadingInstantNotification: true,
       delay: const Duration(seconds: 2),
-      callback: suggestionsLoadingChangeCallback,
+      callback: _updateLoadingValues,
     );
+    _viewPortShopsFetched = uiValuesFactory.create<bool>(false);
+    _firstTerritoryLoadDone = uiValuesFactory.create<bool>(false);
+    _loading = uiValuesFactory.create<bool>(_computeLoading());
+    _loadingSuggestions =
+        uiValuesFactory.create<bool>(_computeLoadingSuggestions());
+    _firstTerritoryLoadDone.callOnChanges((unused) => _updateLoadingValues());
+  }
+
+  bool _computeLoading() =>
+      _loadingNotifier.isLoading || !_firstTerritoryLoadDone.cachedVal;
+  bool _computeLoadingSuggestions() => _loadingSuggestionsNotifier.isLoading;
+  void _updateLoadingValues() {
+    if (_disposed) {
+      return;
+    }
+    _loading.setValue(_computeLoading());
+    _loadingSuggestions.setValue(_computeLoadingSuggestions());
   }
 
   void dispose() {
+    _disposed = true;
     _shopsManager.removeListener(this);
   }
 
-  bool get loading => _loadingNotifier.isLoading || !_firstTerritoryLoadDone;
-  bool get loadingSuggestions => _loadingSuggestionsNotifier.isLoading;
+  UIValueBase<bool> get loading => _loading;
+  UIValueBase<bool> get loadingSuggestions => _loadingSuggestions;
   Map<OsmUID, Shop> get shopsCache => UnmodifiableMapView(_shopsCache);
   SuggestedBarcodesMapFull get barcodesSuggestions =>
       _barcodesSuggestions.unmodifiable();
@@ -169,14 +187,11 @@ class MapPageModel implements ShopsManagerListener {
     }
   }
 
-  bool viewPortShopsLoaded() => _viewPortShopsFetched;
+  UIValueBase<bool> get viewPortShopsLoaded => _viewPortShopsFetched;
 
   Future<void> onCameraIdle(CoordsBounds viewBounds) async {
     _latestViewPort = viewBounds;
     unawaited(_latestCameraPosStorage.set(viewBounds.center));
-
-    final viewPortShopsFetched = _viewPortShopsFetched;
-    final firstTerritoryLoadDone = _firstTerritoryLoadDone;
 
     // NOTE: we load shops only when they're in cache already.
     // If they're not in cache, setting of [_viewPortShopsFetched] will
@@ -184,14 +199,9 @@ class MapPageModel implements ShopsManagerListener {
     if (await _shopsManager.osmShopsCacheExistFor(viewBounds)) {
       unawaited(_loadShopsImpl(viewBounds));
     } else {
-      _viewPortShopsFetched = false;
+      _viewPortShopsFetched.setValue(false);
     }
-    _firstTerritoryLoadDone = true;
-
-    if (viewPortShopsFetched != _viewPortShopsFetched ||
-        firstTerritoryLoadDone != _firstTerritoryLoadDone) {
-      _updateCallback.call();
-    }
+    _firstTerritoryLoadDone.setValue(true);
   }
 
   Future<void> loadShops() async {
@@ -209,7 +219,7 @@ class MapPageModel implements ShopsManagerListener {
     if (result.isOk) {
       _shopsCache = result.unwrap();
       _latestFetchedViewPort = viewPort;
-      _viewPortShopsFetched = true;
+      _viewPortShopsFetched.setValue(true);
       _updateShopsAndUICallback.call(result.unwrap());
       unawaited(_fetchSuggestions());
     } else {
