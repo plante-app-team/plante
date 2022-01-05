@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:plante/base/pair.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/ui/base/components/progress_bar_with_hints.dart';
+import 'package:plante/ui/base/components/incremental_progress_bar.dart';
 
 class MapPageProgressBar extends StatelessWidget {
   static const _STOP = 0;
@@ -44,17 +42,16 @@ class MapPageProgressBar extends StatelessWidget {
   }
 
   Widget _forStop(BuildContext context) {
-    return ProgressBarWithHints(
+    return IncrementalProgressBar(
       inProgress: false,
       progresses: {
         1: Duration.zero,
       },
-      hints: const [],
     );
   }
 
   Widget _forShops(BuildContext context) {
-    return ProgressBarWithHints(
+    return IncrementalProgressBar(
       inProgress: inProgress,
       progresses: {
         0.20: const Duration(seconds: 4),
@@ -64,20 +61,11 @@ class MapPageProgressBar extends StatelessWidget {
         0.99: const Duration(seconds: 24),
         1: const Duration(days: 1),
       },
-      hints: [
-        const Pair('', Duration(seconds: 5)),
-        Pair(context.strings.map_page_loading_shops_hint1,
-            const Duration(seconds: 10)),
-        Pair(context.strings.map_page_loading_shops_hint2,
-            const Duration(seconds: 20)),
-        Pair(context.strings.map_page_loading_shops_hint3,
-            const Duration(days: 1)),
-      ],
     );
   }
 
   Widget _forProductsSuggestions(BuildContext context) {
-    return ProgressBarWithHints(
+    return IncrementalProgressBar(
       inProgress: inProgress,
       progresses: {
         0.1: const Duration(seconds: 1),
@@ -92,11 +80,6 @@ class MapPageProgressBar extends StatelessWidget {
         0.95: const Duration(seconds: 28),
         1: const Duration(seconds: 60),
       },
-      hints: [
-        const Pair('', Duration(seconds: 5)),
-        Pair(context.strings.map_page_loading_suggested_products_hint1,
-            const Duration(days: 1)),
-      ],
     );
   }
 }

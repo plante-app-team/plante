@@ -39,6 +39,7 @@ import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 import 'package:plante/ui/map/map_page/map_page_progress_bar.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
+import 'package:plante/ui/map/map_page/map_page_timed_hints.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
@@ -421,6 +422,7 @@ class _MapPageState extends PageStatePlante<MapPage>
             loadShopsButton,
             MapBottomHint(_bottomHint),
             AnimatedListSimplePlante(children: _mode.buildBottomActions()),
+            _progressBar(),
           ])),
       Align(
         alignment: Alignment.topCenter,
@@ -430,11 +432,12 @@ class _MapPageState extends PageStatePlante<MapPage>
               AnimatedMapWidget(child: searchBar),
               AnimatedMapWidget(child: _mode.buildHeader()),
               MapHintsList(controller: _hintsController),
+              MapPageTimedHints(
+                  loading: _loading, loadingSuggestions: _loadingSuggestions),
               AnimatedMapWidget(child: _mode.buildTopActions()),
             ])),
       ),
       _mode.buildOverlay(),
-      _progressBar(),
     ]);
 
     return WillPopScope(
