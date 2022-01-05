@@ -425,12 +425,13 @@ class _MapPageState extends PageStatePlante<MapPage>
                   builder: (context, ref, _) =>
                       AnimatedMapWidget(child: _mode.watch(ref).buildHeader())),
               MapHintsList(controller: _hintsController),
-              MapPageTimedHints(
-                  loading: _model.loading,
-                  loadingSuggestions: _model.loadingSuggestions),
               Consumer(
                   builder: (context, ref, _) => AnimatedMapWidget(
                       child: _mode.watch(ref).buildTopActions())),
+              IgnorePointer(
+                  child: MapPageTimedHints(
+                      loading: _model.loading,
+                      loadingSuggestions: _model.loadingSuggestions)),
             ])),
       ),
       Consumer(builder: (context, ref, _) => _mode.watch(ref).buildOverlay()),
