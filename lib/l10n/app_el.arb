@@ -174,7 +174,7 @@
     "map_page_is_new_product_sold_q": "Πωλείται εδώ το προϊόν;",
     "map_page_is_product_sold_q": "Πωλείται εδώ το «<PRODUCT>»;",
     "map_page_is_shop_location_correct": "Είναι σωστή η τοποθεσία του καταστήματος;",
-    "map_page_load_shops_of_this_area": "Φόρτωσε τα μαγαζιά αυτής της περιοχής",
+    "map_page_load_shops_of_this_area": "Φόρτωσε τα καταστήματα αυτής της περιοχής",
     "map_page_loading_shops_hint1": "Φόρτωση καταστημάτων στην περιοχή",
     "@map_page_loading_shops_hint1": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
@@ -198,11 +198,11 @@
         "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
     },
     "map_page_open_street_map_licence": "Δεδομένα από το Open Street Map",
-    "map_page_shop_added_to_map": "Το μαγαζί προστέθηκε στο χάρτη",
+    "map_page_shop_added_to_map": "Το κατάστημα προστέθηκε στο χάρτη",
     "map_page_show_found_shops_on_map": "Δείξε στον χάρτη",
     "map_page_zoom_in_to_see_shops": "Παρακαλώ κάντε μεγέθυνση για να δείτε καταστήματα",
     "map_search_bar_button_title": "Αναζήτηση",
-    "map_search_bar_hint": "Αναζήτηση μαγαζιών και δρόμων",
+    "map_search_bar_hint": "Αναζήτηση καταστημάτων και δρόμων",
     "map_search_page_search_hint": "Εισάγετε κείμενο και πατήστε Αναζήτηση",
     "map_search_page_shops_not_found": "Δε βρέθηκαν καταστήματα",
     "map_search_page_shops_title": "Βρέθηκαν καταστήματα",

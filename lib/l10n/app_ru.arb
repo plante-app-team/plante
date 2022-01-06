@@ -179,11 +179,11 @@
     "@map_page_loading_shops_hint1": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_shops_hint2": "Всё ещё загружаем магазины - очень уж много организация вокруг",
+    "map_page_loading_shops_hint2": "Всё ещё загружаем магазины - кажется, их здесь очень много",
     "@map_page_loading_shops_hint2": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_shops_hint3": "Всё ещё загружаем магазины - обычно загрузка проходит быстрее, извините!",
+    "map_page_loading_shops_hint3": "Загрузка магазинов занимает больше времени, чем обычно. Спасибо за ваше терпение",
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
