@@ -289,7 +289,7 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsOneWidget);
-    expect(find.byKey(const Key('filter_shops_icon')), findsOneWidget);
+    expect(find.byKey(const Key('filter_listview')), findsOneWidget);
 
     // Map zoomed out really much
     await commons.moveCamera(commons.shopsBounds.center,
@@ -301,7 +301,7 @@ void main() {
     expect(find.text(context.strings.map_page_zoom_in_to_see_shops),
         findsOneWidget);
     expect(find.byType(MapSearchBar), findsNothing);
-    expect(find.byKey(const Key('filter_shops_icon')), findsNothing);
+    expect(find.byKey(const Key('filter_listview')), findsNothing);
 
     // Map zoomed back in - first check done again
     await commons.moveCamera(commons.shopsBounds.center,
@@ -311,6 +311,6 @@ void main() {
     expect(
         find.text(context.strings.map_page_zoom_in_to_see_shops), findsNothing);
     expect(find.byType(MapSearchBar), findsOneWidget);
-    expect(find.byKey(const Key('filter_shops_icon')), findsOneWidget);
+    expect(find.byKey(const Key('filter_listview')), findsOneWidget);
   });
 }

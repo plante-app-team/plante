@@ -14,6 +14,18 @@ class TextStyles {
   static const TextStyle normalWhite =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFFFFFFFF));
 
+  static const TextStyle checkButtonUnChecked = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      color: ColorsPlante.primary,
+      fontWeight: FontWeight.bold);
+
+  static const TextStyle checkButtonChecked = TextStyle(
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      color: Colors.white,
+      fontWeight: FontWeight.bold);
+
   static const TextStyle normalBold = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 14,

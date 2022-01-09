@@ -6,22 +6,26 @@ class CheckButtonPlante extends StatelessWidget {
   final bool checked;
   final String text;
   final dynamic Function(bool value) onChanged;
+  final bool? showBorder;
 
   const CheckButtonPlante(
       {Key? key,
       required this.checked,
       required this.text,
-      required this.onChanged})
+      required this.onChanged,
+      this.showBorder})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final BorderSide border = showBorder != null && showBorder! && !checked
+        ? const BorderSide(width: 1, color: Colors.grey)
+        : const BorderSide(style: BorderStyle.none);
     return SizedBox(
         height: 43,
         child: OutlinedButton(
             style: ButtonStyle(
-                side: MaterialStateProperty.all<BorderSide>(
-                    const BorderSide(style: BorderStyle.none)),
+                side: MaterialStateProperty.all<BorderSide>(border),
                 overlayColor: MaterialStateProperty.all(checked
                     ? ColorsPlante.splashColor
                     : ColorsPlante.primaryDisabled),
@@ -34,6 +38,8 @@ class CheckButtonPlante extends StatelessWidget {
               onChanged.call(!checked);
             },
             child: Text(text,
-                style: checked ? TextStyles.normalWhite : TextStyles.normal)));
+                style: checked
+                    ? TextStyles.checkButtonChecked
+                    : TextStyles.checkButtonUnChecked)));
   }
 }
