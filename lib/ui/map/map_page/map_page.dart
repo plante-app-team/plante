@@ -418,20 +418,32 @@ class _MapPageState extends PageStatePlante<MapPage>
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+            padding: const EdgeInsets.only(top: 44),
             child: Column(children: [
-              AnimatedMapWidget(child: searchBar),
-              Consumer(
-                  builder: (context, ref, _) =>
-                      AnimatedMapWidget(child: _mode.watch(ref).buildHeader())),
-              MapHintsList(controller: _hintsController),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: AnimatedMapWidget(child: searchBar),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: Consumer(
+                    builder: (context, ref, _) => AnimatedMapWidget(
+                        child: _mode.watch(ref).buildHeader())),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: MapHintsList(controller: _hintsController),
+              ),
               Consumer(
                   builder: (context, ref, _) => AnimatedMapWidget(
                       child: _mode.watch(ref).buildTopActions())),
-              IgnorePointer(
-                  child: MapPageTimedHints(
-                      loading: _model.loading,
-                      loadingSuggestions: _model.loadingSuggestions)),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: IgnorePointer(
+                    child: MapPageTimedHints(
+                        loading: _model.loading,
+                        loadingSuggestions: _model.loadingSuggestions)),
+              ),
             ])),
       ),
       Consumer(builder: (context, ref, _) => _mode.watch(ref).buildOverlay()),
