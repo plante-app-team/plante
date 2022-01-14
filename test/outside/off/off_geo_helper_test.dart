@@ -13,6 +13,7 @@ import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/off/off_geo_helper.dart';
+import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_address_obtainer.dart';
@@ -61,9 +62,13 @@ void main() {
     expect(products[0].barcode, equals('123'));
     expect(products[0].stores, equals(shops.map((e) => e.name).join(',')));
     expect(products[0].countries, equals('en:$defaultCountry'));
+    expect(products[0].categories,
+        equals(OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED));
     expect(products[1].barcode, equals('234'));
     expect(products[1].stores, equals(shops.map((e) => e.name).join(',')));
     expect(products[1].countries, equals('en:$defaultCountry'));
+    expect(products[1].categories,
+        equals(OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED));
   });
 
   test('analytics', () async {
@@ -368,6 +373,8 @@ void main() {
             barcode: e,
             countries: defaultCountry,
             countriesTags: [defaultCountry],
+            categories: 'Plant-based foods',
+            categoriesTags: [OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED],
             stores: shopsStr,
           ));
     });
@@ -376,5 +383,52 @@ void main() {
     expect(result.isOk, isTrue, reason: result.toString());
 
     expect(offApi.saveProductCalls_testing(), isEmpty);
+  });
+
+  test('product already had a few categories', () async {
+    offApi.setProductsListResponsesSimple_testing((config) {
+      return config.barcodes.map((e) => Product(
+            barcode: e,
+            categories: 'Pickles,Apples',
+            categoriesTags: ['en:pickles', 'en:apples'],
+          ));
+    });
+
+    final result = await geoHelper.addGeodataToProducts(['123'], shops);
+    expect(result.isOk, isTrue, reason: result.toString());
+
+    final products = offApi.saveProductCalls_testing();
+    expect(
+        products[0].categories,
+        equals(
+            'Pickles,Apples,${OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED}'));
+  });
+
+  test('product category duplicate is not inserted', () async {
+    offApi.setProductsListResponsesSimple_testing((config) {
+      return config.barcodes.map((e) => Product(
+            barcode: e,
+            categories: 'Pickles,Plant-based foods,Apples',
+            categoriesTags: [
+              'en:pickles',
+              OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED,
+              'en:apples'
+            ],
+          ));
+    });
+
+    final result = await geoHelper.addGeodataToProducts(['123'], shops);
+    expect(result.isOk, isTrue, reason: result.toString());
+
+    // Initial categories have not changed
+    final products = offApi.saveProductCalls_testing();
+    expect(products[0].categories, equals('Pickles,Plant-based foods,Apples'));
+    expect(
+        products[0].categoriesTags,
+        equals([
+          'en:pickles',
+          OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED,
+          'en:apples'
+        ]));
   });
 }

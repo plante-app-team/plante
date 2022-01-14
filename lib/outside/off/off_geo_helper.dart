@@ -15,11 +15,14 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
+import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 
 class OffGeoHelper {
   static const CLOSE_SHOPS_DISTANCE_METERS = 2000;
   static const _NEEDED_OFF_FIELDS = [
     off.ProductField.BARCODE,
+    off.ProductField.CATEGORIES,
+    off.ProductField.CATEGORIES_TAGS,
     off.ProductField.COUNTRIES,
     off.ProductField.COUNTRIES_TAGS,
     off.ProductField.STORES,
@@ -69,6 +72,7 @@ class OffGeoHelper {
 
     _addCountriesToProducts(shopsCountries.values.toSet(), products);
     _addShopsToProducts(shops, products);
+    _addPlantBasedCategoryToProducts(products);
 
     return await _saveProducts(products, initialProductsData);
   }
@@ -188,6 +192,27 @@ class OffGeoHelper {
         }
       }
       product.stores = offStores.join(',');
+    }
+  }
+
+  void _addPlantBasedCategoryToProducts(Iterable<off.Product> products) {
+    // If we won't add the "Plant-based foods" category, then
+    // the product won't be found in stores with same name in other
+    // cities of user's country.
+    // See OffVeganBarcodesObtainer.
+    for (final product in products) {
+      final categoriesTags = product.categoriesTags?.toList() ?? [];
+      if (categoriesTags
+          .contains(OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED)) {
+        continue;
+      }
+      final categoriesStr = product.categories;
+      if (categoriesStr == null || categoriesStr.isEmpty) {
+        product.categories = OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED;
+      } else {
+        product.categories =
+            '$categoriesStr,${OffVeganBarcodesObtainer.CATEGORY_PLANT_BASED}';
+      }
     }
   }
 
