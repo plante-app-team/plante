@@ -12,7 +12,6 @@ typedef ShopBarcodesPair = Pair<OffShop, List<String>>;
 typedef _BarcodesRequest = CachedOperation<List<String>, OffShopsManagerError>;
 
 class OffVeganBarcodesObtainer {
-  static const CATEGORY_PLANT_BASED = 'en:plant-based-foods';
   final OffApi _offApi;
   final OffVeganBarcodesStorage _storage;
 
@@ -22,14 +21,6 @@ class OffVeganBarcodesObtainer {
   // accidentally. The field is needed to avoid returning grains and canned
   // vegetables.
   static const _ACCIDENTALLY_VEGAN_ACCEPTABLE_CATEGORIES = [
-    // "Plant-based foods" is a a very general category, maybe a little bit
-    // too general. But we need to request products with it because products
-    // added to the map by Plante users automatically acquire this category.
-    // So if we won't search for it here, then country-wide products
-    // added to the map by our users won't be found in other cities of the
-    // country.
-    CATEGORY_PLANT_BASED,
-    //
     'en:desserts',
     'en:snacks',
     'en:meat-analogues',
