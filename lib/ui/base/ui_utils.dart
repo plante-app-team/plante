@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
@@ -13,6 +15,11 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/pseudo_popup_menu_item.dart';
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
+
+// TODO: use more
+Consumer consumer(ArgResCallback<WidgetRef, Widget> fn) {
+  return Consumer(builder: (context, ref, _) => fn.call(ref));
+}
 
 Future<T?> showMenuPlante<T>(
     {required GlobalKey target,

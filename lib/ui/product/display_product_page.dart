@@ -116,8 +116,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                 child: Stack(children: [
           Column(children: [
             HeaderPlante(
-              leftAction: FabPlante.backBtnPopOnClick(
-                  key: const Key('back_button'), heroTag: 'left_action'),
+              leftAction: const FabPlante.backBtnPopOnClick(
+                  key: Key('back_button'), heroTag: 'left_action'),
               // Sized box is only for the key
               rightAction: SizedBox(
                   key: const Key('options_button'),

@@ -121,8 +121,12 @@ flutter:
     - assets/add_photo.svg
     - assets/back_arrow.svg
     - assets/barcode_scan_mode.svg
-    - assets/barcode.svg
     - assets/barcode_type_mode.svg
+    - assets/bottom_bar_barcode.svg
+    - assets/bottom_bar_history.svg
+    - assets/bottom_bar_map.svg
+    - assets/bottom_bar_plus.svg
+    - assets/bottom_bar_profile.svg
     - assets/cancel_circle_light.svg
     - assets/cancel_circle.svg
     - assets/cancel.svg
@@ -133,7 +137,6 @@ flutter:
     - assets/flash_disabled.svg
     - assets/flash_enabled.svg
     - assets/google_icon.svg
-    - assets/history.svg
     - assets/info_icon.svg
     - assets/list_drag_n_drop.svg
     - assets/location.svg
@@ -149,7 +152,6 @@ flutter:
     - assets/map_marker_group_suggestions.svg
     - assets/map_marker_selected.svg
     - assets/map_marker_suggestions.svg
-    - assets/marker_abstract.svg
     - assets/menu_ellipsis.svg
     - assets/my_location.svg
     - assets/plus_shop.svg

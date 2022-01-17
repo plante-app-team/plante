@@ -291,7 +291,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               textDirection: TextDirection.rtl,
               children: [
-                FabPlante.closeBtnPopOnClick(key: const Key('close_button')),
+                const FabPlante.closeBtnPopOnClick(key: Key('close_button')),
                 Expanded(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
