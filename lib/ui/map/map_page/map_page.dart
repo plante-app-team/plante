@@ -27,6 +27,7 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
@@ -324,7 +325,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       initialPos = _model.defaultUserPos();
     }
 
-    final searchBar = Consumer(builder: (context, ref, _) {
+    final searchBar = consumer((ref) {
       final loadNewShops = _loadNewShops.watch(ref);
       final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
       if (!loadNewShops || !viewPortShopsLoaded) {
@@ -345,7 +346,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                       }))));
     });
 
-    final loadShopsButton = Consumer(builder: (context, ref, _) {
+    final loadShopsButton = consumer((ref) {
       final loadNewShops = _loadNewShops.watch(ref);
       final loading = _model.loading.watch(ref);
       final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
@@ -434,7 +435,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                       loadingSuggestions: _model.loadingSuggestions)),
             ])),
       ),
-      Consumer(builder: (context, ref, _) => _mode.watch(ref).buildOverlay()),
+      consumer((ref) => _mode.watch(ref).buildOverlay()),
     ]);
 
     return WillPopScope(
@@ -458,7 +459,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Widget _fabs() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final modeFabs = _mode.watch(ref).buildFABs() +
           [
             FabMyLocation(
@@ -501,7 +502,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Widget _progressBar() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final loading = _model.loading.watch(ref);
       final loadingSuggestions = _model.loadingSuggestions.watch(ref);
       if (loading) {

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/timed_hints.dart';
 
@@ -19,7 +19,7 @@ class MapPageTimedHints extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final loading = _loading.watch(ref);
       final loadingSuggestions = _loadingSuggestions.watch(ref);
       if (loading) {

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
@@ -136,7 +135,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   @override
   Widget buildTopActions() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final shopsForViewPortLoaded = super.shopsForViewPortLoaded.watch(ref);
       if (!shopsForViewPortLoaded) {
         return super.buildTopActions();
@@ -162,7 +161,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
     await showCustomPopUp(
       target: _filtersButtonKey,
       context: context,
-      child: Consumer(builder: (context, ref, _) {
+      child: consumer((ref) {
         return Column(children: [
           MapShopsFilterCheckbox(
             key: const Key('checkbox_filter_not_empty_shops'),

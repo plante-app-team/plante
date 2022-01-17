@@ -16,7 +16,6 @@ import 'package:plante/ui/pseudo_popup_menu_item.dart';
 
 const DURATION_DEFAULT = Duration(milliseconds: 250);
 
-// TODO: use more
 Consumer consumer(ArgResCallback<WidgetRef, Widget> fn) {
   return Consumer(builder: (context, ref, _) => fn.call(ref));
 }

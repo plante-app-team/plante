@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
@@ -66,7 +65,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   Widget createCardFor(Shop shop, FutureShortAddress address,
       ArgCallback<Shop>? cancelCallback) {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final Product product;
       if (widget.product != null) {
         product = widget.product!;
@@ -122,7 +121,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
   @override
   List<Widget> buildFABs() {
     return [
-      Consumer(builder: (context, ref, _) {
+      consumer((ref) {
         final loading = super.loading.watch(ref);
         return FabAddShop(
             key: const Key('add_shop_fab'),
@@ -146,7 +145,7 @@ abstract class MapPageModeSelectShopsWhereProductSoldBase
           width: double.infinity,
           child: Padding(
               padding: const EdgeInsets.only(left: 26, right: 26, bottom: 24),
-              child: Consumer(builder: (context, ref, _) {
+              child: consumer((ref) {
                 final loading = super.loading.watch(ref);
                 final selectedShops = _selectedShops.watch(ref);
                 return ButtonFilledPlante.withText(context.strings.global_done,
