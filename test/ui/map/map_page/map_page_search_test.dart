@@ -5,6 +5,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 import 'package:plante/ui/map/search_page/map_search_result.dart';

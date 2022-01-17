@@ -12,6 +12,7 @@ import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
+import 'package:plante/ui/base/popup/popup_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';

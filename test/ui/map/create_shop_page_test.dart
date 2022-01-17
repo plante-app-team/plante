@@ -74,10 +74,8 @@ void main() {
     }
 
     if (shopType != null) {
-      await tester.tap(find.byKey(const Key('shop_type_dropdown')));
-      await tester.pumpAndSettle();
-      await tester.tapDropDownItem(shopType.localize(context));
-      await tester.pumpAndSettle();
+      await tester.superTap(find.byKey(const Key('shop_type_dropdown')));
+      await tester.superTapDropDownItem(shopType.localize(context));
     }
 
     await tester.tap(find.text(context.strings.global_done));

@@ -149,8 +149,15 @@
     "lang_uk": "Ukrainian",
     "lang_vi": "Vietnamese",
     "lang_zh": "Chinese",
-    "main_page_bottom_btn_feed": "News",
-    "main_page_bottom_btn_map": "Products map",
+    "main_page_add_product": "Add a product",
+    "@main_page_add_product": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new product (opens the barcodes scanning screen)."
+    },
+    "main_page_add_product_hint": "Please scan product's barcode",
+    "main_page_add_shop": "Add a store",
+    "@main_page_add_shop": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new store (opens the map and asks the user where the store is located)."
+    },
     "map_page_cancel_putting_product_q": "Cancel putting the product to the map?",
     "map_page_cancel_shop_creation_q": "Cancel new store creation?",
     "map_page_click_on_shop_where_product_sold": "Click the store marker, where the product is being sold",

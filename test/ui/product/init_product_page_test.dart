@@ -37,6 +37,7 @@ import 'package:plante/outside/products/suggestions/suggested_products_manager.d
 import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
