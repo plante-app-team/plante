@@ -118,6 +118,5 @@ abstract class MapPageMode {
   @protected
   void switchModeTo(MapPageMode mode) {
     params.modeSwitchCallback.call(mode);
-    updateMap();
   }
 }

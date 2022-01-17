@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 /// See class usage
 class PseudoPopupMenuItem extends PopupMenuEntry {
+  final _stateKey = GlobalKey();
   final Widget child;
 
-  const PseudoPopupMenuItem({required this.child});
+  PseudoPopupMenuItem({required this.child});
 
   @override
   State<StatefulWidget> createState() => _PseudoPopupMenuItemState();
@@ -18,5 +19,6 @@ class PseudoPopupMenuItem extends PopupMenuEntry {
 
 class _PseudoPopupMenuItemState extends State<PseudoPopupMenuItem> {
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) =>
+      Container(key: widget._stateKey, child: widget.child);
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
@@ -14,7 +13,6 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
-import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold_base.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
   static const _NEW_SHOP_PSEUDO_OSM_ID =
@@ -29,12 +27,7 @@ class MapPageModeCreateShop extends MapPageMode {
   @override
   void init(MapPageMode? previousMode) {
     super.init(previousMode);
-    if (previousMode == null ||
-        previousMode is! MapPageModeSelectShopsWhereProductSoldBase) {
-      Log.e('MapPageModeSelectShopsBase expected, got $previousMode');
-    }
     _selectedShops.addAll(previousMode!.selectedShops());
-
     hintsController.addHint(
         _HINT_ID, context.strings.map_page_click_where_new_shop_located);
   }

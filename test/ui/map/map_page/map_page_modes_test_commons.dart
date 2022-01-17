@@ -30,6 +30,7 @@ import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';

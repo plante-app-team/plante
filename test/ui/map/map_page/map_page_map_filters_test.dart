@@ -8,6 +8,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/map/components/map_shops_filter_checkbox.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';

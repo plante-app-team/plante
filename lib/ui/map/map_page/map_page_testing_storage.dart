@@ -4,6 +4,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
 
@@ -75,4 +76,20 @@ class MapPageTestingStorage {
     }
     return onSearchResultCallback?.call(searchResult);
   }
+}
+
+extension MapPageTestingExtensions on MapPage {
+  void finishForTesting<T>(T res) => testingStorage.finishForTesting(res);
+  void onMapIdleForTesting() => testingStorage.onMapIdleForTesting();
+  void onMapMoveForTesting(Coord coord, double zoom) =>
+      testingStorage.onMapMoveForTesting(coord, zoom);
+  void onMarkerClickForTesting(Iterable<Shop> markerShops) =>
+      testingStorage.onMarkerClickForTesting(markerShops);
+  void onMapClickForTesting(Coord coords) =>
+      testingStorage.onMapClickForTesting(coords);
+  MapPageMode getModeForTesting() => testingStorage.getModeForTesting();
+  Set<Shop> getDisplayedShopsForTesting() =>
+      testingStorage.getDisplayedShopsForTesting();
+  void onSearchResultsForTesting(MapSearchPageResult searchResult) =>
+      testingStorage.onSearchResultsForTesting(searchResult);
 }
