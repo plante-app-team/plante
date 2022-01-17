@@ -84,7 +84,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
           HeaderPlante(
               title: Text(context.strings.settings_page_title,
                   style: TextStyles.headline1),
-              leftAction: FabPlante.backBtnPopOnClick()),
+              leftAction: const FabPlante.backBtnPopOnClick()),
           Container(
               padding: const EdgeInsets.only(left: 24, right: 24),
               child: Column(children: [

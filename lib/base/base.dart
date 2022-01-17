@@ -35,8 +35,6 @@ bool isInTests() {
   }
 }
 
-/// Deprecated, new features should be developed in dedicated branches
-@deprecated
 Future<bool> enableNewestFeatures() async =>
     isInTests() || await GetIt.I.get<Settings>().enableNewestFeatures();
 

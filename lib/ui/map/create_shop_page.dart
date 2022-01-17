@@ -55,7 +55,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             textDirection: TextDirection.rtl,
             children: [
-              FabPlante.closeBtnPopOnClick(),
+              const FabPlante.closeBtnPopOnClick(),
               Expanded(
                   child: Column(
                       textDirection: TextDirection.ltr,

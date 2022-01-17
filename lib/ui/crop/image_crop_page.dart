@@ -79,7 +79,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
           HeaderPlante(
             title: Text(context.strings.image_crop_page_title,
                 style: TextStyles.headline3),
-            leftAction: FabPlante.backBtnPopOnClick(),
+            leftAction: const FabPlante.backBtnPopOnClick(),
             rightAction: Row(children: [
               _RotateButton(
                   color: TextStyles.headline4.color!, onTap: _rotate90),
