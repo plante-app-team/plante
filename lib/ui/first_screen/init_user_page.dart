@@ -11,7 +11,6 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -20,13 +19,12 @@ import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
+import 'package:plante/ui/profile/edit_user_data_widget.dart';
 
 typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);
 
 class InitUserPage extends PagePlante {
-  static const MIN_NAME_LENGTH = 3;
-
   const InitUserPage({Key? key}) : super(key: key);
 
   @override
@@ -36,54 +34,52 @@ class InitUserPage extends PagePlante {
 class _InitUserPageState extends PageStatePlante<InitUserPage> {
   bool _loading = false;
 
-  UserParams _userParams = UserParams();
+  late final Future<UserParams> _initialUserParams;
+  late final EditUserDataWidgetController _editUserDataController;
+
   final _userParamsController = GetIt.I.get<UserParamsController>();
   final _userLangsManager = GetIt.I.get<UserLangsManager>();
   final _backend = GetIt.I.get<Backend>();
   UserLangs? _userLangs;
 
   final _stepperController = CustomizableStepperController();
-  final _nameController = TextEditingController();
 
   var _firstPageHasData = false;
+
+  UserParams get _userParams => _editUserDataController.userParams;
+  set _userParams(UserParams params) =>
+      _editUserDataController.userParams = params;
 
   _InitUserPageState() : super('InitUserPage');
 
   @override
   void initState() {
     super.initState();
+    final initialUserParamsFun = () async =>
+        await _userParamsController.getUserParams() ??
+        UserParams((e) => e.name = 'WHAT THE F'); // TODO: no
+    _initialUserParams = initialUserParamsFun.call();
+    _editUserDataController =
+        EditUserDataWidgetController(initialUserParams: _initialUserParams)
+          ..registerChangeCallback(_validateFirstPageInputs);
     _initAsync();
   }
 
   void _initAsync() {
     _longAction(() async {
-      _userParams = await _userParamsController.getUserParams() ?? UserParams();
-
-      _nameController.text = _userParams.name ?? '';
-      _nameController.addListener(() {
-        if (_validateFirstPageInputs()) {
-          _userParams =
-              _userParams.rebuild((v) => v.name = _nameController.text);
-        }
-      });
-
       _validateFirstPageInputs();
       _initUserLangs();
     });
   }
 
   bool _validateFirstPageInputs() {
-    final firstPageHasData = _calcFirstPageHasData();
+    final firstPageHasData = _editUserDataController.isDataValid();
     if (firstPageHasData != _firstPageHasData) {
       setState(() {
         _firstPageHasData = firstPageHasData;
       });
     }
     return firstPageHasData;
-  }
-
-  bool _calcFirstPageHasData() {
-    return InitUserPage.MIN_NAME_LENGTH <= _nameController.text.trim().length;
   }
 
   void _initUserLangs() async {
@@ -120,24 +116,12 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
     final content = Padding(
         padding: const EdgeInsets.only(left: 24, right: 24),
         child: Column(children: [
-          Expanded(
-            child: Stack(children: [
-              Center(
-                  child: SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                          padding: const EdgeInsets.only(bottom: 132),
-                          child: Text(context.strings.init_user_page_title,
-                              style: TextStyles.headline1)))),
-              Center(
-                  child: InputFieldPlante(
-                key: const Key('name'),
-                textCapitalization: TextCapitalization.sentences,
-                label: context.strings.init_user_page_name_field_title,
-                controller: _nameController,
-              ))
-            ]),
-          ),
+          SizedBox(
+              width: double.infinity,
+              child: Text(context.strings.init_user_page_title,
+                  style: TextStyles.headline1)),
+          const SizedBox(height: 24),
+          EditUserDataWidget(controller: _editUserDataController),
         ]));
 
     final onNextPressed = () {
