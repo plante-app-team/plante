@@ -122,11 +122,6 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         child: Padding(
             padding: const EdgeInsets.only(left: 24, right: 24),
             child: Column(children: [
-              SizedBox(
-                  width: double.infinity,
-                  child: Text(context.strings.init_user_page_title,
-                      style: TextStyles.headline1)),
-              const SizedBox(height: 24),
               EditUserDataWidget(controller: _editUserDataController),
             ])));
 
@@ -190,6 +185,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           _showError(langRes.unwrapErr().convert());
           return;
         }
+        _userParams = langRes.unwrap();
 
         // Update avatar
         if (_userAvatar?.isScheme('FILE') == true) {
@@ -199,8 +195,15 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
             _showError(avatarUploadRes.unwrapErr().convert());
             return;
           }
+        } else if (_userAvatar == null) {
+          final avatarDeleteRes = await _avatarManager.deleteUserAvatar();
+          if (avatarDeleteRes.isErr) {
+            _showError(avatarDeleteRes.unwrapErr().convert());
+            return;
+          }
         }
-        _userParams = langRes.unwrap();
+
+        _userParams = (await _userParamsController.getUserParams())!;
       });
     };
 

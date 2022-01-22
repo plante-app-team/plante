@@ -71,4 +71,11 @@ class FakeUserAvatarManager implements UserAvatarManager {
 
   @override
   Future<Uri?> userAvatarUri() async => _userAvatar;
+
+  @override
+  Future<Result<None, BackendError>> deleteUserAvatar() async {
+    _userAvatar = null;
+    _observers.forEach((o) => o.onUserAvatarChange());
+    return Ok(None());
+  }
 }

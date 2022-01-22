@@ -1102,6 +1102,16 @@ void main() {
     expect(request.method, equals('POST'));
   });
 
+  test('delete user avatar', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+    httpClient
+        .setResponse('.*user_avatar_delete.*', ''' { "result": "ok" } ''');
+
+    final result = await backend.deleteUserAvatar();
+    expect(result.isOk, isTrue);
+  });
+
   test('user avatar', () async {
     final httpClient = FakeHttpClient();
     final backend = Backend(analytics, await _initUserParams(), httpClient);

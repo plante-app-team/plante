@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 
 class AvatarWidget extends ConsumerStatefulWidget {
@@ -59,7 +60,7 @@ class _AvatarWidgetState extends ConsumerState<AvatarWidget> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(100),
           child: Stack(children: [
-            image,
+            AnimatedSwitcher(duration: DURATION_DEFAULT, child: image),
             if (widget.onChangeClick != null)
               Material(
                   key: const Key('change_avatar_button'),

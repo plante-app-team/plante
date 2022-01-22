@@ -121,7 +121,7 @@ class VegStatusDisplayed extends StatelessWidget {
       case VegStatus.positive:
         return ColorsPlante.primary;
       case VegStatus.negative:
-        return const Color(0xFFF02222);
+        return ColorsPlante.red;
       case VegStatus.possible:
         return ColorsPlante.mainTextBlack;
       case VegStatus.unknown:

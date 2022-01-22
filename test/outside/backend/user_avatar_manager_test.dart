@@ -33,6 +33,7 @@ void main() {
       ..name = 'Bob'));
 
     when(backend.updateUserAvatar(any)).thenAnswer((_) async => Ok(None()));
+    when(backend.deleteUserAvatar()).thenAnswer((_) async => Ok(None()));
     when(backend.userAvatarUrl(any)).thenAnswer((_) => avatarUrl);
   });
 
@@ -42,14 +43,14 @@ void main() {
     final avatarBytes = await File.fromUri(imagePath).readAsBytes();
 
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, equals(false));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
     verifyNever(backend.updateUserAvatar(any));
 
     final result = await userAvatarManager.updateUserAvatar(imagePath);
     expect(result.isOk, isTrue);
 
     expect(observer.notificationsCount, equals(1));
-    expect(userParamsController.cachedUserParams?.hasAvatar, equals(true));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
     final capturedBytes = verify(backend.updateUserAvatar(captureAny))
         .captured
         .first as Uint8List;
@@ -68,7 +69,45 @@ void main() {
 
     verify(backend.updateUserAvatar(any));
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, equals(false));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
+  });
+
+  test('delete avatar', () async {
+    final observer = _UserAvatarManagerObserver();
+    userAvatarManager.addObserver(observer);
+
+    await userParamsController.setUserParams(UserParams((e) => e
+      ..hasAvatar = true
+      ..name = 'Bob'));
+
+    expect(observer.notificationsCount, equals(0));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
+    verifyNever(backend.deleteUserAvatar());
+
+    final result = await userAvatarManager.deleteUserAvatar();
+    expect(result.isOk, isTrue);
+
+    expect(observer.notificationsCount, equals(1));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
+    verify(backend.deleteUserAvatar());
+  });
+
+  test('delete avatar failure', () async {
+    when(backend.deleteUserAvatar())
+        .thenAnswer((_) async => Err(BackendError.other()));
+
+    final observer = _UserAvatarManagerObserver();
+    userAvatarManager.addObserver(observer);
+
+    await userParamsController.setUserParams(UserParams((e) => e
+      ..hasAvatar = true
+      ..name = 'Bob'));
+
+    final result = await userAvatarManager.deleteUserAvatar();
+    expect(result.isErr, isTrue);
+
+    expect(observer.notificationsCount, equals(0));
+    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
   });
 
   test('user avatar', () async {

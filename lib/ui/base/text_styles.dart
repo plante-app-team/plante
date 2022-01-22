@@ -152,7 +152,7 @@ class TextStyles {
       fontFamily: montserrat,
       fontWeight: FontWeight.bold,
       fontSize: _MARKER_FONT_SIZE,
-      color: const Color(0xFFF02222));
+      color: ColorsPlante.red);
 
   static TextStyle markerEmpty = TextStyle(
       fontFamily: montserrat,
@@ -177,13 +177,16 @@ class TextStyles {
 
   static const TextStyle searchBarText =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Color(0xFF192123));
+
   static const TextStyle searchBarHint =
       TextStyle(fontFamily: 'OpenSans', fontSize: 14, color: Colors.grey);
+
   static const TextStyle progressbarHint = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 14,
       color: Colors.white,
       fontWeight: FontWeight.bold);
+
   static const TextStyle searchResultDistance = TextStyle(
       fontFamily: 'OpenSans',
       fontSize: 12,
