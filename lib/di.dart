@@ -14,6 +14,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/backend/user_params_fetcher.dart';
 import 'package:plante/outside/http_client.dart';
@@ -73,6 +74,11 @@ void initDI() {
       GetIt.I.get<Backend>(),
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<SharedPreferencesHolder>()));
+  GetIt.I.registerSingleton<UserAvatarManager>(UserAvatarManager(
+    GetIt.I.get<Backend>(),
+    GetIt.I.get<UserParamsController>(),
+    GetIt.I.get<PhotosTaker>(),
+  ));
   GetIt.I.registerSingleton<OpenStreetMap>(OpenStreetMap(
     GetIt.I.get<HttpClient>(),
     GetIt.I.get<Analytics>(),

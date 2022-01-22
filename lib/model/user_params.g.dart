@@ -17,7 +17,11 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
   @override
   Iterable<Object?> serialize(Serializers serializers, UserParams object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[];
+    final result = <Object?>[
+      'has_avatar',
+      serializers.serialize(object.hasAvatar,
+          specifiedType: const FullType(bool)),
+    ];
     Object? value;
     value = object.backendId;
     if (value != null) {
@@ -80,6 +84,10 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'has_avatar':
+          result.hasAvatar = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool;
+          break;
         case 'rights_group':
           result.userGroup = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
@@ -105,6 +113,8 @@ class _$UserParams extends UserParams {
   @override
   final String? name;
   @override
+  final bool hasAvatar;
+  @override
   final int? userGroup;
   @override
   final BuiltList<String>? langsPrioritized;
@@ -116,9 +126,12 @@ class _$UserParams extends UserParams {
       {this.backendId,
       this.backendClientToken,
       this.name,
+      required this.hasAvatar,
       this.userGroup,
       this.langsPrioritized})
-      : super._();
+      : super._() {
+    BuiltValueNullFieldError.checkNotNull(hasAvatar, 'UserParams', 'hasAvatar');
+  }
 
   @override
   UserParams rebuild(void Function(UserParamsBuilder) updates) =>
@@ -134,6 +147,7 @@ class _$UserParams extends UserParams {
         backendId == other.backendId &&
         backendClientToken == other.backendClientToken &&
         name == other.name &&
+        hasAvatar == other.hasAvatar &&
         userGroup == other.userGroup &&
         langsPrioritized == other.langsPrioritized;
   }
@@ -142,8 +156,12 @@ class _$UserParams extends UserParams {
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc($jc($jc(0, backendId.hashCode), backendClientToken.hashCode),
-                name.hashCode),
+            $jc(
+                $jc(
+                    $jc($jc(0, backendId.hashCode),
+                        backendClientToken.hashCode),
+                    name.hashCode),
+                hasAvatar.hashCode),
             userGroup.hashCode),
         langsPrioritized.hashCode));
   }
@@ -154,6 +172,7 @@ class _$UserParams extends UserParams {
           ..add('backendId', backendId)
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
+          ..add('hasAvatar', hasAvatar)
           ..add('userGroup', userGroup)
           ..add('langsPrioritized', langsPrioritized))
         .toString();
@@ -176,6 +195,10 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
+  bool? _hasAvatar;
+  bool? get hasAvatar => _$this._hasAvatar;
+  set hasAvatar(bool? hasAvatar) => _$this._hasAvatar = hasAvatar;
+
   int? _userGroup;
   int? get userGroup => _$this._userGroup;
   set userGroup(int? userGroup) => _$this._userGroup = userGroup;
@@ -186,7 +209,9 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   set langsPrioritized(ListBuilder<String>? langsPrioritized) =>
       _$this._langsPrioritized = langsPrioritized;
 
-  UserParamsBuilder();
+  UserParamsBuilder() {
+    UserParams._setDefaults(this);
+  }
 
   UserParamsBuilder get _$this {
     final $v = _$v;
@@ -194,6 +219,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _backendId = $v.backendId;
       _backendClientToken = $v.backendClientToken;
       _name = $v.name;
+      _hasAvatar = $v.hasAvatar;
       _userGroup = $v.userGroup;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
@@ -221,6 +247,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               backendId: backendId,
               backendClientToken: backendClientToken,
               name: name,
+              hasAvatar: BuiltValueNullFieldError.checkNotNull(
+                  hasAvatar, 'UserParams', 'hasAvatar'),
               userGroup: userGroup,
               langsPrioritized: _langsPrioritized?.build());
     } catch (_) {

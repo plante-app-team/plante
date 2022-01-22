@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
+import 'package:plante/base/base.dart';
+import 'package:plante/base/size_int.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
@@ -15,11 +17,29 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
+/// NOTE: this class is not tested at all, because the flutter_image_compress
+/// package supports only mobile platforms.
 class ImageCropPage extends PagePlante {
+  static const _COMPRESSION_DEFAULT = 95;
   final String imagePath;
   final Directory outFolder;
+  final bool withCircleUi;
+
+  /// In pixels, first width, second height.
+  /// Note that the final image might be larger than the target size,
+  /// for more info:
+  /// https://pub.dev/packages/flutter_image_compress#minwidth-and-minheight
+  final SizeInt? targetSize;
+
+  /// JPEG image property
+  final int compressQuality;
   const ImageCropPage(
-      {Key? key, required this.imagePath, required this.outFolder})
+      {Key? key,
+      required this.imagePath,
+      required this.outFolder,
+      this.withCircleUi = false,
+      this.targetSize,
+      this.compressQuality = _COMPRESSION_DEFAULT})
       : super(key: key);
 
   @override
@@ -44,9 +64,9 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
     Log.i('ImageCropPage loading image start, ${widget.imagePath}');
     _originalImage = await FlutterImageCompress.compressWithFile(
       widget.imagePath,
-      minWidth: window.physicalSize.width.toInt(),
-      minHeight: window.physicalSize.height.toInt(),
-      quality: 95,
+      minWidth: _screenSize.width,
+      minHeight: _screenSize.height,
+      quality: widget.compressQuality,
     );
     _cropController = CropController();
     Log.i('ImageCropPage loading image done');
@@ -55,6 +75,12 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
         _loading = false;
       }
     });
+  }
+
+  SizeInt get _screenSize {
+    return SizeInt(
+        width: window.physicalSize.width.toInt(),
+        height: window.physicalSize.height.toInt());
   }
 
   @override
@@ -85,7 +111,6 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
                   color: TextStyles.headline4.color!, onTap: _rotate90),
               Padding(
                   padding: const EdgeInsets.only(
-                    // left: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS / 2,
                     right: HeaderPlante.DEFAULT_ACTIONS_SIDE_PADDINGS / 2,
                   ),
                   child: InkWell(
@@ -110,7 +135,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
             child: _cropWidget(),
           ))
         ]),
-        if (_loading)
+        if (_loading && !isInTests())
           Positioned.fill(
               child: Container(
             color: const Color(0x70FFFFFF),
@@ -130,6 +155,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
         baseColor: Colors.white,
         initialSize: 0.5,
         onCropped: _onCropped,
+        withCircleUi: widget.withCircleUi,
       );
     }
     return const SizedBox.shrink();
@@ -144,8 +170,10 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   }
 
   void _onCropped(Uint8List image) async {
-    final now = DateTime.now().millisecondsSinceEpoch;
     Log.i('ImageCropPage crop finished, saving start');
+    image = await _compressIfNeeded(image);
+
+    final now = DateTime.now().millisecondsSinceEpoch;
     var file = File('${widget.outFolder.path}/$now');
     if (!(await file.exists())) {
       Log.i('ImageCropPage creating out file: $file');
@@ -158,6 +186,22 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
       _loading = false;
     });
     Navigator.of(context).pop(file.uri);
+  }
+
+  Future<Uint8List> _compressIfNeeded(Uint8List image) async {
+    if (widget.targetSize != null ||
+        widget.compressQuality != ImageCropPage._COMPRESSION_DEFAULT) {
+      final targetSize = widget.targetSize ?? _screenSize;
+      Log.i(
+          'ImageCropPage compressing and downsizing, target: $targetSize, ${widget.compressQuality}');
+      image = await FlutterImageCompress.compressWithList(
+        image,
+        minWidth: targetSize.width,
+        minHeight: targetSize.height,
+        quality: widget.compressQuality,
+      );
+    }
+    return image;
   }
 
   void _rotate90() async {

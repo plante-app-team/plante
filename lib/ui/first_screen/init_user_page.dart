@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/general_error.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
@@ -10,6 +11,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -40,6 +42,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   final _userParamsController = GetIt.I.get<UserParamsController>();
   final _userLangsManager = GetIt.I.get<UserLangsManager>();
   final _backend = GetIt.I.get<Backend>();
+  final _avatarManager = GetIt.I.get<UserAvatarManager>();
   UserLangs? _userLangs;
 
   final _stepperController = CustomizableStepperController();
@@ -50,18 +53,20 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   set _userParams(UserParams params) =>
       _editUserDataController.userParams = params;
 
+  Uri? get _userAvatar => _editUserDataController.userAvatar;
+
   _InitUserPageState() : super('InitUserPage');
 
   @override
   void initState() {
     super.initState();
-    final initialUserParamsFun = () async =>
-        await _userParamsController.getUserParams() ??
-        UserParams((e) => e.name = 'WHAT THE F'); // TODO: no
-    _initialUserParams = initialUserParamsFun.call();
-    _editUserDataController =
-        EditUserDataWidgetController(initialUserParams: _initialUserParams)
-          ..registerChangeCallback(_validateFirstPageInputs);
+    final initialUserParamsFn =
+        () async => await _userParamsController.getUserParams() ?? UserParams();
+    _initialUserParams = initialUserParamsFn.call();
+    _editUserDataController = EditUserDataWidgetController(
+        userAvatarManager: _avatarManager,
+        initialUserParams: _initialUserParams)
+      ..registerChangeCallback(_validateFirstPageInputs);
     _initAsync();
   }
 
@@ -113,16 +118,17 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   }
 
   StepperPage _page1() {
-    final content = Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
-          SizedBox(
-              width: double.infinity,
-              child: Text(context.strings.init_user_page_title,
-                  style: TextStyles.headline1)),
-          const SizedBox(height: 24),
-          EditUserDataWidget(controller: _editUserDataController),
-        ]));
+    final content = SingleChildScrollView(
+        child: Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24),
+            child: Column(children: [
+              SizedBox(
+                  width: double.infinity,
+                  child: Text(context.strings.init_user_page_title,
+                      style: TextStyles.headline1)),
+              const SizedBox(height: 24),
+              EditUserDataWidget(controller: _editUserDataController),
+            ])));
 
     final onNextPressed = () {
       FocusScope.of(context).unfocus();
@@ -169,12 +175,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         // Update on backend
         final paramsRes = await _backend.updateUserParams(_userParams);
         if (paramsRes.isErr) {
-          if (paramsRes.unwrapErr().errorKind ==
-              BackendErrorKind.NETWORK_ERROR) {
-            showSnackBar(context.strings.global_network_error, context);
-          } else {
-            showSnackBar(context.strings.global_something_went_wrong, context);
-          }
+          _showError(paramsRes.unwrapErr().convert());
           return;
         }
 
@@ -186,12 +187,18 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         final langRes = await _userLangsManager
             .setManualUserLangs(_userLangs!.langs.toList());
         if (langRes.isErr) {
-          if (langRes.unwrapErr() == UserLangsManagerError.NETWORK) {
-            showSnackBar(context.strings.global_network_error, context);
-          } else {
-            showSnackBar(context.strings.global_something_went_wrong, context);
-          }
+          _showError(langRes.unwrapErr().convert());
           return;
+        }
+
+        // Update avatar
+        if (_userAvatar?.isScheme('FILE') == true) {
+          final avatarUploadRes =
+              await _avatarManager.updateUserAvatar(_userAvatar!);
+          if (avatarUploadRes.isErr) {
+            _showError(avatarUploadRes.unwrapErr().convert());
+            return;
+          }
         }
         _userParams = langRes.unwrap();
       });
@@ -212,6 +219,14 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
     return StepperPage(content, bottomControls);
   }
 
+  void _showError(GeneralError error) {
+    if (error == GeneralError.NETWORK) {
+      showSnackBar(context.strings.global_network_error, context);
+    } else {
+      showSnackBar(context.strings.global_something_went_wrong, context);
+    }
+  }
+
   void _longAction(Future<void> Function() action) async {
     try {
       setState(() {
@@ -224,6 +239,28 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           _loading = false;
         });
       }
+    }
+  }
+}
+
+extension on BackendError {
+  GeneralError convert() {
+    switch (errorKind) {
+      case BackendErrorKind.NETWORK_ERROR:
+        return GeneralError.NETWORK;
+      default:
+        return GeneralError.OTHER;
+    }
+  }
+}
+
+extension on UserLangsManagerError {
+  GeneralError convert() {
+    switch (this) {
+      case UserLangsManagerError.NETWORK:
+        return GeneralError.NETWORK;
+      default:
+        return GeneralError.OTHER;
     }
   }
 }

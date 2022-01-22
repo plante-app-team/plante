@@ -20,6 +20,7 @@ const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
     'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
 const PREF_USER_CLIENT_USER_GROUP = 'PREF_USER_CLIENT_USER_GROUP2';
 const PREF_LANGS_PRIORITIZED = 'PREF_LANGS_PRIORITIZED';
+const PREF_HAS_AVATAR = 'PREF_HAS_AVATAR';
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 
 class UserParamsControllerObserver {
@@ -51,6 +52,7 @@ class UserParamsController {
     final clientToken = prefs.getString(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
     final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
     final langsPrioritized = prefs.getStringList(PREF_LANGS_PRIORITIZED);
+    final hasAvatar = prefs.getBool(PREF_HAS_AVATAR);
 
     if (name == null &&
         genderStr == null &&
@@ -72,7 +74,8 @@ class UserParamsController {
       ..backendClientToken = clientToken
       ..userGroup = userGroup
       ..langsPrioritized =
-          langsPrioritized != null ? ListBuilder(langsPrioritized) : null);
+          langsPrioritized != null ? ListBuilder(langsPrioritized) : null
+      ..hasAvatar = hasAvatar);
   }
 
   /// Same as [UserParamsController.getUserParams] but will work only
@@ -92,6 +95,7 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
       await prefs.safeRemove(PREF_LANGS_PRIORITIZED);
+      await prefs.safeRemove(PREF_HAS_AVATAR);
       _observers.forEach((obs) {
         obs.onUserParamsUpdate(null);
       });
@@ -129,6 +133,8 @@ class UserParamsController {
     } else {
       await prefs.safeRemove(PREF_LANGS_PRIORITIZED);
     }
+
+    await prefs.setBool(PREF_HAS_AVATAR, userParams.hasAvatar);
 
     _cachedUserParams = userParams;
     _observers.forEach((obs) {
