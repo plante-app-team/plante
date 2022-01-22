@@ -28,4 +28,5 @@ class ColorsPlante {
   static const Color amber = Color(0xFFFBBC05);
   static const Color orange = Color(0xFFFB9805);
   static const Color lightGrey = Color(0xFFf5f7fa);
+  static const Color red = Color(0xFFF02222);
 }

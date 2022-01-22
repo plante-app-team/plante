@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
@@ -189,5 +190,44 @@ void main() {
     // Which we expect to recover the lost avatar
     expect(controller.userParams.hasAvatar, isTrue);
     expect(controller.userAvatar, equals(imagePath));
+  });
+
+  testWidgets('user avatar deletion', (WidgetTester tester) async {
+    userAvatarManager.setUserAvatar_testing(imagePath);
+    final userParams = () async => UserParams((e) => e
+      ..name = ''
+      ..hasAvatar = true);
+    final controller = EditUserDataWidgetController(
+        userAvatarManager: userAvatarManager,
+        initialUserParams: userParams.call());
+    final context =
+        await tester.superPump(EditUserDataWidget(controller: controller));
+
+    var notificationsCount = 0;
+    controller.registerChangeCallback(() => notificationsCount += 1);
+
+    expect(notificationsCount, equals(0));
+    expect(controller.userParams.hasAvatar, isTrue);
+    expect(controller.userAvatar, imagePath);
+    expect(find.text(context.strings.edit_user_data_widget_avatar_delete),
+        findsOneWidget);
+    expect(find.text(context.strings.edit_user_data_widget_avatar_description),
+        findsNothing);
+    expect(find.byType(UriImagePlante), findsOneWidget);
+
+    await tester.superTap(
+        find.text(context.strings.edit_user_data_widget_avatar_delete));
+
+    // Callback is notified
+    expect(notificationsCount, equals(1));
+    // Avatar is deleted
+    expect(controller.userParams.hasAvatar, isFalse);
+    expect(controller.userAvatar, isNull);
+    // UI has changed
+    expect(find.text(context.strings.edit_user_data_widget_avatar_delete),
+        findsNothing);
+    expect(find.text(context.strings.edit_user_data_widget_avatar_description),
+        findsOneWidget);
+    expect(find.byType(UriImagePlante), findsNothing);
   });
 }

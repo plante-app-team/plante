@@ -114,6 +114,11 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
+  Future<Result<None, BackendError>> deleteUserAvatar() async {
+    final response = await _backendGet('user_avatar_delete/', const {});
+    return _noneOrErrorFrom(response);
+  }
+
   Uri? userAvatarUrl(UserParams user) {
     if (user.hasAvatar != true) {
       return null;

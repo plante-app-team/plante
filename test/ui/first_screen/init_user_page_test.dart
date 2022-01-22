@@ -17,6 +17,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -50,7 +51,7 @@ void main() {
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
   });
 
-  testWidgets('Can fill all data and get user params',
+  testWidgets('can fill all data and get user params',
       (WidgetTester tester) async {
     // Avatar selection will be successful
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
@@ -92,7 +93,37 @@ void main() {
           ..langs.addAll([LangCode.en, LangCode.be]))));
   });
 
-  testWidgets('User avatar not set if avatar selection canceled by user',
+  testWidgets('can set and then delete user avatar',
+      (WidgetTester tester) async {
+    // Avatar selection will be successful
+    final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
+    userAvatarManager.setSelectedGalleryImage_testing(imagePath);
+
+    final context = await tester.superPump(const InitUserPage());
+
+    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+
+    expect(find.byType(UriImagePlante), findsNothing);
+    await tester.superTap(find.byKey(const Key('change_avatar_button')));
+    expect(find.byType(UriImagePlante), findsOneWidget);
+    await tester.superTap(
+        find.text(context.strings.edit_user_data_widget_avatar_delete));
+    expect(find.byType(UriImagePlante), findsNothing);
+
+    await tester
+        .superTap(find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .superTap(find.text(context.strings.init_user_page_done_button_title));
+
+    expect(await userAvatarManager.userAvatarUri(), isNull);
+    final expectedParams = UserParams((v) => v
+      ..name = 'Bob'
+      ..langsPrioritized.addAll([LangCode.en].map((e) => e.name))
+      ..hasAvatar = false);
+    expect(await userParamsController.getUserParams(), equals(expectedParams));
+  });
+
+  testWidgets('user avatar not set if avatar selection canceled by user',
       (WidgetTester tester) async {
     // FakeUserAvatarManager will act as if the user hasn't selected any avatar
     userAvatarManager.setSelectedGalleryImage_testing(null);
@@ -122,7 +153,7 @@ void main() {
           ..hasAvatar = false)));
   });
 
-  testWidgets('User avatar not set if avatar selection not started by user',
+  testWidgets('user avatar not set if avatar selection not started by user',
       (WidgetTester tester) async {
     // IF the user will start avatar selection, it will be successful
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
@@ -153,7 +184,7 @@ void main() {
         equals(0));
   });
 
-  testWidgets('Uses initial user name and avatar', (WidgetTester tester) async {
+  testWidgets('uses initial user name and avatar', (WidgetTester tester) async {
     final initialParams = UserParams((v) => v
       ..name = 'Nora'
       ..hasAvatar = true);
@@ -179,7 +210,32 @@ void main() {
     expect(await userAvatarManager.userAvatarUri(), equals(imagePath));
   });
 
-  testWidgets("Doesn't allow too short names", (WidgetTester tester) async {
+  testWidgets('can delete preset user avatar', (WidgetTester tester) async {
+    final initialParams = UserParams((v) => v
+      ..name = 'Nora'
+      ..hasAvatar = true);
+    await userParamsController.setUserParams(initialParams);
+
+    final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
+    userAvatarManager.setUserAvatar_testing(imagePath);
+
+    final context = await tester.superPump(const InitUserPage());
+    await tester.superTap(
+        find.text(context.strings.edit_user_data_widget_avatar_delete));
+    await tester
+        .superTap(find.text(context.strings.init_user_page_next_button_title));
+    await tester
+        .superTap(find.text(context.strings.init_user_page_done_button_title));
+
+    final expectedParams = UserParams((v) => v
+      ..name = 'Nora'
+      ..langsPrioritized.add(LangCode.en.name)
+      ..hasAvatar = false);
+    expect(await userParamsController.getUserParams(), equals(expectedParams));
+    expect(await userAvatarManager.userAvatarUri(), isNull);
+  });
+
+  testWidgets("doesn't allow too short names", (WidgetTester tester) async {
     final context = await tester.superPump(const InitUserPage());
     await tester.superEnterText(find.byKey(const Key('name')), 'Bo');
     await tester
@@ -191,7 +247,7 @@ void main() {
         findsNothing);
   });
 
-  testWidgets('Langs saving error', (WidgetTester tester) async {
+  testWidgets('langs saving error', (WidgetTester tester) async {
     userLangsManager.savingLangsError = UserLangsManagerError.NETWORK;
 
     final context = await tester.superPump(const InitUserPage());
@@ -232,7 +288,7 @@ void main() {
     expect(await userParamsController.getUserParams(), equals(expectedParams));
   });
 
-  testWidgets('Avatar saving error', (WidgetTester tester) async {
+  testWidgets('avatar saving error', (WidgetTester tester) async {
     // Avatar selection will be successful
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
     userAvatarManager.setSelectedGalleryImage_testing(imagePath);

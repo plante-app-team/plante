@@ -53,6 +53,20 @@ class UserAvatarManager {
     return result;
   }
 
+  Future<Result<None, BackendError>> deleteUserAvatar() async {
+    Log.i('Deleting user avatar');
+    final result = await _backend.deleteUserAvatar();
+    if (result.isOk) {
+      final existingParams = await _userParamsController.getUserParams();
+      if (existingParams != null && existingParams.hasAvatar != false) {
+        await _userParamsController.setUserParams(
+            existingParams.rebuild((params) => params.hasAvatar = false));
+      }
+      _observers.forEach((observer) => observer.onUserAvatarChange());
+    }
+    return result;
+  }
+
   /// NOTE: the URI is most likely URL, but it's not guaranteed to not change
   /// in the future.
   /// Please use the [UriImagePlante] class to show the image to avoid

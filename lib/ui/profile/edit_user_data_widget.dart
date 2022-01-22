@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
+import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/avatar_widget.dart';
@@ -137,9 +139,29 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
           uri: _avatarUri.watch(ref),
           authHeaders: widget.controller._avatarManager.userAvatarAuthHeaders(),
           onChangeClick: _onChangeAvatarClick)),
+      const SizedBox(height: 4),
+      consumer((ref) => InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: _avatarUri.watch(ref) != null ? _onDeleteAvatarClick : null,
+          child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: AnimatedSwitcher(
+                  duration: DURATION_DEFAULT,
+                  child: _avatarUri.watch(ref) != null
+                      ? Text(
+                          context.strings.edit_user_data_widget_avatar_delete,
+                          style: TextStyles.normalColored
+                              .copyWith(color: ColorsPlante.red))
+                      : Text(
+                          context
+                              .strings.edit_user_data_widget_avatar_description,
+                          style: TextStyles.normalColored
+                              .copyWith(color: ColorsPlante.grey)))))),
+      const SizedBox(height: 20),
       InputFieldPlante(
         key: const Key('name'),
         textCapitalization: TextCapitalization.sentences,
+        label: context.strings.edit_user_data_widget_name_label,
         hint: context.strings.edit_user_data_widget_name_hint,
         controller: _controller._inited ? _nameController : null,
       ),
@@ -153,5 +175,9 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
     if (selectedPhoto != null) {
       _avatarUri.setValue(selectedPhoto);
     }
+  }
+
+  void _onDeleteAvatarClick() {
+    _avatarUri.setValue(null);
   }
 }

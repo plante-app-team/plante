@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
@@ -52,16 +53,26 @@ class FakeUserLangsManager implements UserLangsManager {
     if (fakeUserParamsController != null) {
       params = (await fakeUserParamsController!.getUserParams())!;
       params = params.rebuild(
-          (e) => e.langsPrioritized.addAll(userLangs.map((e) => e.name)));
+          (e) => e.langsPrioritized.addAllUnique(userLangs.map((e) => e.name)));
       await fakeUserParamsController!.setUserParams(params);
     } else {
       params = UserParams((e) => e
         ..name = 'Bob'
-        ..langsPrioritized.addAll(userLangs.map((e) => e.name)));
+        ..langsPrioritized.addAllUnique(userLangs.map((e) => e.name)));
     }
     _observers.forEach((o) {
       o.onUserLangsChange(_userLangs);
     });
     return Ok(params);
+  }
+}
+
+extension<T> on ListBuilder<T> {
+  void addAllUnique(Iterable<T> iterable) {
+    for (final item in iterable) {
+      if (!build().contains(item)) {
+        add(item);
+      }
+    }
   }
 }
