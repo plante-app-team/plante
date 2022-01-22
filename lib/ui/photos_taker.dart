@@ -6,26 +6,40 @@ import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/size_int.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/ui/crop/image_crop_page.dart';
 
 class PhotosTaker {
-  Future<Uri?> takeAndCropPhoto(
-      BuildContext context, Directory outFolder) async {
-    Log.i('takeAndCropPhoto start');
+  Future<Uri?> takeAndCropPhoto(BuildContext context, Directory outFolder,
+      {bool cropCircle = false, SizeInt? targetSize}) async {
+    return await _pickAndCropPhoto(context, outFolder, ImageSource.camera,
+        cropCircle: cropCircle, targetSize: targetSize);
+  }
+
+  Future<Uri?> selectAndCropPhoto(BuildContext context, Directory outFolder,
+      {bool cropCircle = false, SizeInt? targetSize}) async {
+    return await _pickAndCropPhoto(context, outFolder, ImageSource.gallery,
+        cropCircle: cropCircle, targetSize: targetSize);
+  }
+
+  Future<Uri?> _pickAndCropPhoto(
+      BuildContext context, Directory outFolder, ImageSource source,
+      {required bool cropCircle, required SizeInt? targetSize}) async {
+    Log.i('_pickAndCropPhoto start');
     final imagePicker = ImagePicker();
 
     try {
-      Log.i('takeAndCropPhoto imagePicker.getImage');
-      final pickedFile =
-          await imagePicker.pickImage(source: ImageSource.camera);
+      Log.i('_pickAndCropPhoto imagePicker.getImage');
+      final pickedFile = await imagePicker.pickImage(source: source);
       if (pickedFile == null) {
-        Log.i('takeAndCropPhoto pickedFile == null');
+        Log.i('_pickAndCropPhoto pickedFile == null');
         return null;
       }
-      Log.i('takeAndCropPhoto image is taken successfully');
+      Log.i('_pickAndCropPhoto image is taken successfully');
 
-      return cropPhoto(pickedFile.path, context, outFolder);
+      return cropPhoto(pickedFile.path, context, outFolder,
+          cropCircle: cropCircle, targetSize: targetSize);
     } finally {
       // External (3rd-party) activities can change what system controls looks like -
       // let's set our nice style back
@@ -34,12 +48,16 @@ class PhotosTaker {
   }
 
   Future<Uri?> cropPhoto(
-      String photoPath, BuildContext context, Directory outFolder) async {
+      String photoPath, BuildContext context, Directory outFolder,
+      {bool cropCircle = false, SizeInt? targetSize}) async {
     final result = await Navigator.push<Uri>(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                ImageCropPage(imagePath: photoPath, outFolder: outFolder)));
+            builder: (context) => ImageCropPage(
+                imagePath: photoPath,
+                outFolder: outFolder,
+                withCircleUi: cropCircle,
+                targetSize: targetSize)));
     if (result == null) {
       Log.i('cropPhoto finished without image');
     } else {

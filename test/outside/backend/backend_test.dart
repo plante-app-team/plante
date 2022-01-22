@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
@@ -502,7 +503,11 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
     httpClient.setResponse('.*mobile_app_config.*', '''
         {
-          "user_data": { "name": "Bob Kelso", "user_id": "123" },
+          "user_data": {
+            "name": "Bob Kelso",
+            "user_id": "123",
+            "has_avatar": true
+           },
           "nominatim_enabled": false
         }
         ''');
@@ -515,6 +520,7 @@ void main() {
     final obtainedParams = obtainedConfig.remoteUserParams;
     expect(obtainedParams.name, equals('Bob Kelso'));
     expect(obtainedParams.backendId, equals('123'));
+    expect(obtainedParams.hasAvatar, isTrue);
   });
 
   test('mobile app config obtaining invalid JSON response', () async {
@@ -1077,6 +1083,63 @@ void main() {
     // 'osm_uid' was expected, not 'result'
     expect(result.isErr, isTrue);
     expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
+  });
+
+  test('update user avatar', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+    httpClient
+        .setResponse('.*user_avatar_upload.*', ''' { "result": "ok" } ''');
+
+    final result =
+        await backend.updateUserAvatar(Uint8List.fromList([123, 321]));
+
+    expect(result.isOk, isTrue);
+
+    final requests = httpClient.getRequestsMatching('.*user_avatar_upload.*');
+    expect(requests.length, equals(1));
+    final request = requests.first;
+    expect(request.method, equals('POST'));
+  });
+
+  test('user avatar', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    final result = backend.userAvatarUrl(UserParams((e) => e
+      ..backendId = '123321'
+      ..hasAvatar = true));
+
+    expect(result.toString(), contains('user_avatar_data/123321'));
+  });
+
+  test('no user avatar', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    final result = backend.userAvatarUrl(UserParams((e) => e
+      ..backendId = '123321'
+      ..hasAvatar = false));
+
+    expect(result, isNull);
+  });
+
+  test('auth headers', () async {
+    final httpClient = FakeHttpClient();
+    final userParams = await _initUserParams();
+    final backend = Backend(analytics, userParams, httpClient);
+
+    var authHeaders = await backend.authHeaders();
+    expect(
+        authHeaders,
+        equals({
+          'Authorization':
+              'Bearer ${userParams.cachedUserParams!.backendClientToken}'
+        }));
+
+    authHeaders =
+        await backend.authHeaders(backendClientTokenOverride: 'nice_override');
+    expect(authHeaders, equals({'Authorization': 'Bearer nice_override'}));
   });
 }
 

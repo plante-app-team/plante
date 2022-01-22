@@ -58,6 +58,10 @@
     "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's veg-status manually before buying it, just in case",
     "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
     "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
+    "edit_user_data_widget_name_hint": "Name",
+    "@edit_user_data_widget_name_hint": {
+        "description": "A hint for the user name input text field"
+    },
     "expandable_plante_collapse": "Collapse",
     "expandable_plante_expand": "Expand",
     "external_auth_page_continue_with": "Continue with",
@@ -106,8 +110,6 @@
     "init_product_page_where_sold_optional": "Where is it sold? (optional)",
     "init_user_page_done_button_title": "Done",
     "init_user_page_langs_explanation": "Select the languages you know — some products are sold in many countries and thus may have packagings in different languages",
-    "init_user_page_name_field_hint": "Jon",
-    "init_user_page_name_field_title": "Name",
     "init_user_page_next_button_title": "Next",
     "init_user_page_title": "What is your name?",
     "lang_ar": "Arabic",

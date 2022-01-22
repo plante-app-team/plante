@@ -119,6 +119,7 @@ flutter:
 
   assets:
     - assets/add_photo.svg
+    - assets/add_photo_background.svg
     - assets/back_arrow.svg
     - assets/barcode_scan_mode.svg
     - assets/barcode_type_mode.svg

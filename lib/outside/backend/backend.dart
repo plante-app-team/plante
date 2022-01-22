@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -104,6 +105,20 @@ class Backend {
     } else {
       return Err(_errFromResp(response));
     }
+  }
+
+  Future<Result<None, BackendError>> updateUserAvatar(
+      Uint8List avatarBytes) async {
+    final response =
+        await _backendPost('user_avatar_upload/', null, bodyBytes: avatarBytes);
+    return _noneOrErrorFrom(response);
+  }
+
+  Uri? userAvatarUrl(UserParams user) {
+    if (user.hasAvatar != true) {
+      return null;
+    }
+    return _createUrl('user_avatar_data/${user.backendId}', const {});
   }
 
   Future<Result<RequestedProductsResult, BackendError>> requestProducts(
@@ -341,16 +356,45 @@ class Backend {
       String? backendClientTokenOverride,
       String? body,
       String? contentType}) async {
+    return await _backendReq(path, params, 'GET',
+        headers: headers,
+        backendClientTokenOverride: backendClientTokenOverride,
+        body: body,
+        contentType: contentType);
+  }
+
+  Future<BackendResponse> _backendPost(
+      String path, Map<String, dynamic>? params,
+      {Map<String, String>? headers, Uint8List? bodyBytes}) async {
+    return await _backendReq(path, params, 'POST',
+        headers: headers,
+        backendClientTokenOverride: null,
+        bodyBytes: bodyBytes);
+  }
+
+  Future<BackendResponse> _backendReq(
+      String path, Map<String, dynamic>? params, String requestType,
+      {Map<String, String>? headers,
+      String? backendClientTokenOverride,
+      String? body,
+      Uint8List? bodyBytes,
+      String? contentType}) async {
     final url = _createUrl(path, params);
     try {
-      final request = http.Request('GET', url);
+      final request = http.Request(requestType, url);
       await _fillHeaders(request,
           extraHeaders: headers,
           backendClientTokenOverride: backendClientTokenOverride,
           contentType: contentType);
 
+      if (body != null && bodyBytes != null) {
+        throw Exception('body and bodyBytes must not be both set');
+      }
       if (body != null) {
         request.body = body;
+      }
+      if (bodyBytes != null) {
+        request.bodyBytes = bodyBytes;
       }
 
       final httpResponse =
@@ -381,19 +425,29 @@ class Backend {
       {required Map<String, String>? extraHeaders,
       required String? backendClientTokenOverride,
       required String? contentType}) async {
-    final userParams = await _userParamsController.getUserParams();
-    final backendClientToken =
-        backendClientTokenOverride ?? userParams?.backendClientToken;
-
     final headersReally =
         Map<String, String>.from(extraHeaders ?? <String, String>{});
-    if (backendClientToken != null) {
-      headersReally['Authorization'] = 'Bearer $backendClientToken';
-    }
     if (contentType != null) {
       headersReally['Content-Type'] = contentType;
     }
+
+    final auth = await authHeaders(
+        backendClientTokenOverride: backendClientTokenOverride);
+    headersReally.addAll(auth);
+
     request.headers.addAll(headersReally);
+  }
+
+  Future<Map<String, String>> authHeaders(
+      {String? backendClientTokenOverride}) async {
+    final headers = <String, String>{};
+    final userParams = await _userParamsController.getUserParams();
+    final backendClientToken =
+        backendClientTokenOverride ?? userParams?.backendClientToken;
+    if (backendClientToken != null) {
+      headers['Authorization'] = 'Bearer $backendClientToken';
+    }
+    return headers;
   }
 
   bool _isError(Map<String, dynamic> json) {

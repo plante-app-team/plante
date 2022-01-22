@@ -12,12 +12,17 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String? get backendClientToken;
   @BuiltValueField(wireName: 'name')
   String? get name;
+  @BuiltValueField(wireName: 'has_avatar')
+  bool get hasAvatar;
   @BuiltValueField(wireName: 'rights_group')
   int? get userGroup;
 
   /// Please use `UserLangsManager` instead of this field.
   @BuiltValueField(wireName: 'langs_prioritized')
   BuiltList<String>? get langsPrioritized;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _setDefaults(UserParamsBuilder b) => b.hasAvatar = false;
 
   String requireBackendID() => backendId!;
   String requireBackendClientToken() => backendClientToken!;

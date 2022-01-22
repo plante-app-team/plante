@@ -12,6 +12,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/main/main_page.dart';
@@ -28,6 +29,7 @@ import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
+import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 import '../map/map_page/map_page_modes_test_commons.dart';
@@ -64,6 +66,8 @@ void main() {
     when(photosTaker.retrieveLostPhoto())
         .thenAnswer((realInvocation) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
+
+    GetIt.I.registerSingleton<UserAvatarManager>(FakeUserAvatarManager());
   });
 
   Widget currentPage() {
