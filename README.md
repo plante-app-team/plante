@@ -53,7 +53,7 @@ This means that while the `flutter test` command will work out of the box, to bu
 
 #### Obtain existing secrets
 
-If you're willing to help the project, you can get in touch with us on our Discord server: https://discord.com/invite/2QCgRbba
+If you're willing to help the project, you can get in touch with us on our Discord server: https://discord.gg/kXgXrTVpGY
 
 We will gladly provide you any needed information and will help you with any problems 🙂
 
