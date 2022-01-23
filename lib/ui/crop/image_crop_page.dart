@@ -265,8 +265,11 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
     neededFactorHeight ??= 1;
 
     // Now let's enlarge the crop area!
-    final newRect = Rect.fromLTWH(rect.left, rect.top,
-        rect.width * neededFactorWidth, rect.height * neededFactorHeight);
+    final newRect = Rect.fromLTWH(
+        rect.left,
+        rect.top,
+        rect.width * neededFactorWidth + 1,
+        rect.height * neededFactorHeight + 1);
     try {
       _modifyingCropArea = true;
       _cropController?.rect = newRect;
