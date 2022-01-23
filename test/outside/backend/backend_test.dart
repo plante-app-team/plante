@@ -408,6 +408,7 @@ void main() {
     final request = requests[0];
     expect(request.url.queryParameters['veganStatus'],
         equals(VegStatus.negative.name));
+    expect(request.url.queryParameters['edited'], equals('true'));
     expect(request.url.toString().contains('langs=en&langs=ru'), isTrue);
     expect(request.headers['Authorization'], equals('Bearer aaa'));
   });
