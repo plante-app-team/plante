@@ -11,6 +11,7 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -33,6 +34,7 @@ class BarcodeScanPageModel
   final PermissionsManager _permissionsManager;
   final UserParamsController _userParamsController;
   final UserLangsManager _userLangsManager;
+  final ViewedProductsStorage _viewedProductsStorage;
   final Analytics _analytics;
 
   String? _barcode;
@@ -65,6 +67,7 @@ class BarcodeScanPageModel
       this._permissionsManager,
       this._userParamsController,
       this._userLangsManager,
+      this._viewedProductsStorage,
       this._analytics) {
     _updateCameraPermission();
     WidgetsBinding.instance!.addObserver(this);
@@ -225,6 +228,11 @@ class BarcodeScanPageModel
       } else {
         _analytics.sendEvent('scanned_product_in_foreign_lang');
       }
+    }
+
+    if (foundProduct != null &&
+        ProductPageWrapper.isProductFilledEnoughForDisplay(foundProduct)) {
+      await _viewedProductsStorage.addProduct(foundProduct);
     }
 
     if (foundProductResult.isErr) {
