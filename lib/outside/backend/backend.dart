@@ -157,6 +157,7 @@ class Backend {
       {VegStatus? veganStatus, List<LangCode>? changedLangs}) async {
     final params = <String, dynamic>{};
     params['barcode'] = barcode;
+    params['edited'] = 'true';
     if (veganStatus != null) {
       params['veganStatus'] = veganStatus.name;
     }

@@ -205,7 +205,7 @@ class OffGeoHelper {
       try {
         offResult = await _off.saveProduct(_offUser(), product);
       } on IOException catch (e) {
-        Log.w('ProductsManager.createUpdateProduct 1, e', ex: e);
+        Log.w('OffGeoHelper._saveProducts 1, e', ex: e);
         return Err(GeneralError.NETWORK);
       }
       if (offResult.error != null) {
