@@ -17,6 +17,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -115,6 +116,8 @@ void main() {
     final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
     GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
         userAddressObtainer);
+    GetIt.I.registerSingleton<ViewedProductsStorage>(
+        ViewedProductsStorage(loadPersistentProducts: false));
   });
 
   testWidgets('card for range: card for empty shop',
