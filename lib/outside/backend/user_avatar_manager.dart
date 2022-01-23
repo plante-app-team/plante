@@ -22,6 +22,10 @@ class UserAvatarManager {
     width: 460,
     height: 460,
   );
+  static const _AVATAR_SIZE_MIN = SizeInt(
+    width: 256,
+    height: 256,
+  );
   final _observers = <UserAvatarManagerObserver>[];
   final Backend _backend;
   final UserParamsController _userParamsController;
@@ -92,7 +96,7 @@ class UserAvatarManager {
       throw Exception('bruh');
     }
     return await _photosTaker.selectAndCropPhoto(context, await _avatarDir(),
-        cropCircle: true, targetSize: _AVATAR_SIZE);
+        cropCircle: true, targetSize: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
   }
 
   Future<Directory> _avatarDir() async {
@@ -117,7 +121,7 @@ class UserAvatarManager {
     final lostPhoto = lostPhotoRes.unwrap();
     return await _photosTaker.cropPhoto(
         lostPhoto.path, context, await _avatarDir(),
-        cropCircle: true, targetSize: _AVATAR_SIZE);
+        cropCircle: true, targetSize: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
   }
 
   void addObserver(UserAvatarManagerObserver observer) {

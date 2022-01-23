@@ -98,6 +98,10 @@
     "global_yes": "Yes",
     "help_with_veg_status_page_title": "Help with vegan status",
     "image_crop_page_title": "Let's crop it!",
+    "image_crop_page_error_small_image": "The image is too small",
+    "@image_crop_page_error_small_image": {
+        "description": "Error message shown when the user selects an image from device's gallery, but the selected image is too small."
+    },
     "init_product_page_adding_non_vegan_product": "Non-vegan products cannot be added to a store",
     "init_product_page_brand_optional": "Brand (optional)",
     "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
