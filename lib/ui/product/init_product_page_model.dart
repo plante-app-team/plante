@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/size_int.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
@@ -37,6 +38,10 @@ enum InitProductPageModelError {
 
 class InitProductPageModel {
   static const OCR_RETRIES_COUNT = 3;
+  static const _IMAGES_MIN_SIZE = SizeInt(
+    width: 640,
+    height: 160,
+  );
   static const _NO_PHOTO = -1;
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
@@ -181,7 +186,8 @@ class InitProductPageModel {
 
       Log.i('InitProductPageModel obtained photo, cropping');
       final outPath = await _photosTaker.cropPhoto(
-          lostPhoto.unwrap().path, context, cacheDir);
+          lostPhoto.unwrap().path, context, cacheDir,
+          minSize: _IMAGES_MIN_SIZE);
       if (outPath == null) {
         Log.i('InitProductPageModel cropping finished without photo');
         return;
@@ -203,7 +209,8 @@ class InitProductPageModel {
     _photoBeingTaken.value = imageType.index;
     try {
       Log.i('InitProductPageModel: takePhoto start, imageType: $imageType');
-      final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!);
+      final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!,
+          minSize: _IMAGES_MIN_SIZE);
       if (outPath == null) {
         Log.i('InitProductPageModel: takePhoto, outPath == null');
         // Cancelled
