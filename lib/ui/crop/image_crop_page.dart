@@ -14,6 +14,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
@@ -25,11 +26,16 @@ class ImageCropPage extends PagePlante {
   final Directory outFolder;
   final bool withCircleUi;
 
-  /// In pixels, first width, second height.
+  /// In pixels.
   /// Note that the final image might be larger than the target size,
   /// for more info:
   /// https://pub.dev/packages/flutter_image_compress#minwidth-and-minheight
   final SizeInt? targetSize;
+
+  /// In pixels, smallest accepted image.
+  /// The page will try to disallow cropping size
+  /// smaller than the provided value.
+  final SizeInt? minSize;
 
   /// JPEG image property
   final int compressQuality;
@@ -39,6 +45,7 @@ class ImageCropPage extends PagePlante {
       required this.outFolder,
       this.withCircleUi = false,
       this.targetSize,
+      this.minSize,
       this.compressQuality = _COMPRESSION_DEFAULT})
       : super(key: key);
 
@@ -47,9 +54,13 @@ class ImageCropPage extends PagePlante {
 }
 
 class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
+  final _cropImageContainerKey = GlobalKey();
   Uint8List? _originalImage;
+  SizeInt? _originalImageSize;
   CropController? _cropController;
   bool _loading = true;
+
+  bool _modifyingCropArea = false;
 
   _ImageCropPageState() : super('ImageCropPage');
 
@@ -68,13 +79,44 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
       minHeight: _screenSize.height,
       quality: widget.compressQuality,
     );
+
+    final imageData = await decodeImageFromList(_originalImage!);
+    _originalImageSize = SizeInt(
+      width: imageData.width,
+      height: imageData.height,
+    );
+
     _cropController = CropController();
-    Log.i('ImageCropPage loading image done');
+
     setState(() {
       if (mounted) {
         _loading = false;
       }
     });
+
+    if (_isImageTooSmall()) {
+      Log.i('ImageCropPage closing because of too small image');
+      showSnackBar(context.strings.image_crop_page_error_small_image, context);
+      Navigator.of(context).pop(null);
+      return;
+    }
+
+    Log.i('ImageCropPage loading image done');
+  }
+
+  bool _isImageTooSmall() {
+    final minSize = widget.minSize;
+    final imageSize = _originalImageSize;
+    if (minSize == null || imageSize == null) {
+      return false;
+    }
+    if (imageSize.width < minSize.width) {
+      return true;
+    }
+    if (imageSize.height < minSize.height) {
+      return true;
+    }
+    return false;
   }
 
   SizeInt get _screenSize {
@@ -87,6 +129,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   void didUpdateWidget(ImageCropPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     _originalImage = null;
+    _originalImageSize = null;
     _cropController = null;
     setState(() {
       _loading = true;
@@ -146,8 +189,9 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   }
 
   Widget _cropWidget() {
+    final Widget result;
     if (_originalImage != null) {
-      return Crop(
+      result = Crop(
         // So that the widget will be recreated on image rotation
         key: UniqueKey(),
         image: _originalImage!,
@@ -155,10 +199,80 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
         baseColor: Colors.white,
         initialSize: 0.5,
         onCropped: _onCropped,
+        onMoved: _onCropAreaMoved,
         withCircleUi: widget.withCircleUi,
       );
+    } else {
+      result = const SizedBox.shrink();
     }
-    return const SizedBox.shrink();
+    return Container(key: _cropImageContainerKey, child: result);
+  }
+
+  void _onCropAreaMoved(Rect rect) {
+    // Let's see if the crop area smaller than the minimum image size, and
+    // then enlarge it if it is indeed smaller.
+
+    if (_modifyingCropArea) {
+      // Recursive call, let's return - stack overflow will happen otherwise
+      return;
+    }
+    final widgetSize =
+        _cropImageContainerKey.currentContext?.findRenderObject() as RenderBox?;
+    final imageSizePixels = _originalImageSize;
+    final minSizePixels = widget.minSize;
+    if (widgetSize == null ||
+        imageSizePixels == null ||
+        minSizePixels == null) {
+      return;
+    }
+
+    final imagePixelsWidth = imageSizePixels.width.toDouble();
+    final imagePixelsHeight = imageSizePixels.height.toDouble();
+    final widgetWidth = widgetSize.size.width;
+    final widgetHeight = widgetSize.size.height;
+    final widgetAspectRatio = widgetWidth / widgetHeight;
+    final imageAspectRatio = imagePixelsWidth / imagePixelsHeight;
+
+    // Let's see whether the image fits the screen horizontally or vertically,
+    // then let's figure out how much smaller/bigger than the
+    // image is the widget.
+    final double factor;
+    if (widgetAspectRatio < imageAspectRatio) {
+      factor = imagePixelsWidth / widgetWidth;
+    } else {
+      factor = imagePixelsHeight / widgetHeight;
+    }
+
+    // Now let's calculate the crop area size in pixels
+    final cropAreaPixelsWidth = rect.width * factor;
+    final cropAreaPixelsHeight = rect.height * factor;
+
+    // If the crop area size in pixels is smaller than the min image size,
+    // then let's calculate the factor needed to be applied to the crop
+    // area to enlarge it.
+    double? neededFactorWidth;
+    double? neededFactorHeight;
+    if (cropAreaPixelsWidth < minSizePixels.width) {
+      neededFactorWidth = minSizePixels.width / cropAreaPixelsWidth;
+    }
+    if (cropAreaPixelsHeight < minSizePixels.height) {
+      neededFactorHeight = minSizePixels.height / cropAreaPixelsHeight;
+    }
+    if (neededFactorWidth == null && neededFactorHeight == null) {
+      return;
+    }
+    neededFactorWidth ??= 1;
+    neededFactorHeight ??= 1;
+
+    // Now let's enlarge the crop area!
+    final newRect = Rect.fromLTWH(rect.left, rect.top,
+        rect.width * neededFactorWidth, rect.height * neededFactorHeight);
+    try {
+      _modifyingCropArea = true;
+      _cropController?.rect = newRect;
+    } finally {
+      _modifyingCropArea = false;
+    }
   }
 
   void _onDoneClick() async {
@@ -211,25 +325,31 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
     }
     Uint8List? rotated;
     final originalImage = _originalImage!;
+    setState(() {
+      _loading = true;
+      _originalImage = null;
+      _originalImageSize = null;
+    });
     try {
-      setState(() {
-        _loading = true;
-        _originalImage = null;
-      });
       Log.i('ImageCropPage rotation start');
       rotated = await compute(_rotate90Impl, originalImage);
     } finally {
-      setState(() {
-        if (rotated != null) {
-          Log.i('ImageCropPage rotation success');
-          _originalImage = rotated;
-        } else {
-          Log.w('ImageCropPage rotation failure');
-          _originalImage = originalImage;
-        }
-        _loading = false;
-      });
+      if (rotated == null) {
+        Log.w('ImageCropPage rotation failure');
+        rotated = originalImage;
+      } else {
+        Log.i('ImageCropPage rotation success');
+      }
     }
+    final imageData = await decodeImageFromList(rotated);
+    setState(() {
+      _originalImage = rotated;
+      _originalImageSize = SizeInt(
+        width: imageData.width,
+        height: imageData.height,
+      );
+      _loading = false;
+    });
   }
 }
 
