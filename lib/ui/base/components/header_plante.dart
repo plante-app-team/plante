@@ -10,18 +10,22 @@ class HeaderPlante extends StatelessWidget {
   final Widget? title;
   final Widget? leftAction;
   final Widget? rightAction;
+  final double spacingTop;
   final double spacingBottom;
   final double leftActionPadding;
   final double rightActionPadding;
+  final double? height;
   const HeaderPlante(
       {Key? key,
       this.title,
       this.color = Colors.white,
       this.leftAction,
       this.rightAction,
+      this.spacingTop = DEFAULT_TOP_SPACING,
       this.spacingBottom = 0,
       this.leftActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS,
-      this.rightActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS})
+      this.rightActionPadding = DEFAULT_ACTIONS_SIDE_PADDINGS,
+      this.height = DEFAULT_HEIGHT})
       : super(key: key);
 
   @override
@@ -30,9 +34,9 @@ class HeaderPlante extends StatelessWidget {
         color: color,
         child: SizedBox(
           width: double.infinity,
-          height: DEFAULT_HEIGHT + spacingBottom,
+          height: (height ?? 0) + spacingBottom,
           child: Column(children: [
-            const SizedBox(height: DEFAULT_TOP_SPACING), // spacing
+            SizedBox(height: spacingTop), // spacing
             Expanded(
                 child: Stack(children: [
               Align(

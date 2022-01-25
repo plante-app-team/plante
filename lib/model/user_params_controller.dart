@@ -10,11 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 const PREF_USER_PARAMS_NAME = 'USER_PARAMS_NAME2';
+const PREF_USER_PARAMS_SELF_DESCRIPTION = 'USER_PARAMS_SELF_DESCRIPTION';
 const PREF_USER_PARAMS_GENDER = 'USER_PARAMS_GENDER2';
 const PREF_USER_BIRTHDAY = 'PREF_USER_BIRTHDAY2';
-const PREF_USER_EATS_MILK = 'PREF_USER_EATS_MILK2';
-const PREF_USER_EATS_EGGS = 'PREF_USER_EATS_EGGS2';
-const PREF_USER_EATS_HONEY = 'PREF_USER_EATS_HONEY2';
 const PREF_USER_ID_ON_BACKEND = 'USER_ID_ON_BACKEND2';
 const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
     'PREF_USER_CLIENT_TOKEN_FOR_BACKEND2';
@@ -46,6 +44,7 @@ class UserParamsController {
   Future<UserParams?> getUserParams() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString(PREF_USER_PARAMS_NAME);
+    final selfDescription = prefs.getString(PREF_USER_PARAMS_SELF_DESCRIPTION);
     final genderStr = prefs.getString(PREF_USER_PARAMS_GENDER);
     final birthdayStr = prefs.getString(PREF_USER_BIRTHDAY);
     final backendId = prefs.getString(PREF_USER_ID_ON_BACKEND);
@@ -70,6 +69,7 @@ class UserParamsController {
 
     return UserParams((v) => v
       ..name = name
+      ..selfDescription = selfDescription
       ..backendId = backendId
       ..backendClientToken = clientToken
       ..userGroup = userGroup
@@ -86,11 +86,9 @@ class UserParamsController {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     if (userParams == null) {
       await prefs.safeRemove(PREF_USER_PARAMS_NAME);
+      await prefs.safeRemove(PREF_USER_PARAMS_SELF_DESCRIPTION);
       await prefs.safeRemove(PREF_USER_PARAMS_GENDER);
       await prefs.safeRemove(PREF_USER_BIRTHDAY);
-      await prefs.safeRemove(PREF_USER_EATS_MILK);
-      await prefs.safeRemove(PREF_USER_EATS_EGGS);
-      await prefs.safeRemove(PREF_USER_EATS_HONEY);
       await prefs.safeRemove(PREF_USER_ID_ON_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_TOKEN_FOR_BACKEND);
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
@@ -106,6 +104,14 @@ class UserParamsController {
       await prefs.setString(PREF_USER_PARAMS_NAME, userParams.name!);
     } else {
       await prefs.safeRemove(PREF_USER_PARAMS_NAME);
+    }
+
+    if (userParams.selfDescription != null &&
+        userParams.selfDescription!.isNotEmpty) {
+      await prefs.setString(
+          PREF_USER_PARAMS_SELF_DESCRIPTION, userParams.selfDescription!);
+    } else {
+      await prefs.safeRemove(PREF_USER_PARAMS_SELF_DESCRIPTION);
     }
 
     if (userParams.backendId != null) {

@@ -22,9 +22,6 @@ class FakeUserAvatarManager implements UserAvatarManager {
       _lostSelectedGalleryImage = image;
 
   // ignore: non_constant_identifier_names
-  void setUserAvatar_testing(Uri? image) => _userAvatar = image;
-
-  // ignore: non_constant_identifier_names
   void setUpdateUserAvatarError_testing(BackendError? error) =>
       _updateUserAvatarError = error;
 

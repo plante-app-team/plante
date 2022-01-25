@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -81,6 +83,8 @@ class EditUserDataWidgetController {
 
 class EditUserDataWidget extends ConsumerStatefulWidget {
   static const MIN_NAME_LENGTH = 3;
+  static const MAX_NAME_LENGTH = 40;
+  static const MAX_SELF_DESCRIPTION_LENGTH = 512;
   final EditUserDataWidgetController controller;
   const EditUserDataWidget({Key? key, required this.controller})
       : super(key: key);
@@ -92,6 +96,7 @@ class EditUserDataWidget extends ConsumerStatefulWidget {
 class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   UserAvatarManager get _avatarManager => _controller._avatarManager;
   final _nameController = TextEditingController();
+  final _selfDescriptionController = TextEditingController();
   late final UIValue<Uri?> _avatarUri =
       UIValue(widget.controller.userAvatar, ref);
 
@@ -103,6 +108,10 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
     _nameController.addListener(() {
       _controller.userParams = _controller.userParams
           .rebuild((v) => v.name = _nameController.text.trim());
+    });
+    _selfDescriptionController.addListener(() {
+      _controller.userParams = _controller.userParams.rebuild(
+          (v) => v.selfDescription = _selfDescriptionController.text.trim());
     });
     _avatarUri.callOnChanges((uri) => _controller.userAvatar = uri);
     _controller.registerChangeCallback(_onControllerDataChanged);
@@ -119,8 +128,14 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   }
 
   void _onControllerDataChanged() {
-    if (_nameController.text.trim() != (_controller.userParams.name ?? '')) {
-      _nameController.text = _controller.userParams.name ?? '';
+    final controllerName = _controller.userParams.name ?? '';
+    final controllerSelfDescription =
+        _controller.userParams.selfDescription ?? '';
+    if (_nameController.text.trim() != controllerName) {
+      _nameController.text = controllerName;
+    }
+    if (_selfDescriptionController.text.trim() != controllerSelfDescription) {
+      _selfDescriptionController.text = controllerSelfDescription;
     }
     // It won't change if the value is the same
     _avatarUri.setValue(_controller.userAvatar);
@@ -135,10 +150,14 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      consumer((ref) => AvatarWidget(
-          uri: _avatarUri.watch(ref),
-          authHeaders: widget.controller._avatarManager.userAvatarAuthHeaders(),
-          onChangeClick: _onChangeAvatarClick)),
+      consumer((ref) => SizedBox(
+          width: 127,
+          height: 127,
+          child: AvatarWidget(
+              uri: _avatarUri.watch(ref),
+              authHeaders:
+                  widget.controller._avatarManager.userAvatarAuthHeaders(),
+              onChangeClick: _onChangeAvatarClick))),
       const SizedBox(height: 4),
       consumer((ref) => InkWell(
           borderRadius: BorderRadius.circular(8),
@@ -159,11 +178,25 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
                               .copyWith(color: ColorsPlante.grey)))))),
       const SizedBox(height: 20),
       InputFieldPlante(
-        key: const Key('name'),
+        key: const Key('name_input'),
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(EditUserDataWidget.MAX_NAME_LENGTH),
+        ],
         textCapitalization: TextCapitalization.sentences,
         label: context.strings.edit_user_data_widget_name_label,
         hint: context.strings.edit_user_data_widget_name_hint,
         controller: _controller._inited ? _nameController : null,
+      ),
+      const SizedBox(height: 24),
+      InputFieldMultilinePlante(
+        key: const Key('self_description_input'),
+        maxLines: 2,
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(
+              EditUserDataWidget.MAX_SELF_DESCRIPTION_LENGTH),
+        ],
+        label: context.strings.edit_user_data_widget_about_me_label,
+        controller: _controller._inited ? _selfDescriptionController : null,
       ),
     ]);
   }

@@ -12,6 +12,8 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String? get backendClientToken;
   @BuiltValueField(wireName: 'name')
   String? get name;
+  @BuiltValueField(wireName: 'self_description')
+  String? get selfDescription;
   @BuiltValueField(wireName: 'has_avatar')
   bool get hasAvatar;
   @BuiltValueField(wireName: 'rights_group')

@@ -73,7 +73,10 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-        child: const Center(child: CircularProgressIndicator()),
+        child: Center(
+            child: !isInTests()
+                ? const CircularProgressIndicator()
+                : const SizedBox()),
       );
     }
     return Scaffold(
