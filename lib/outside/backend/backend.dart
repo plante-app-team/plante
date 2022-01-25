@@ -90,6 +90,10 @@ class Backend {
     if (userParams.name != null && userParams.name!.isNotEmpty) {
       params['name'] = userParams.name;
     }
+    if (userParams.selfDescription != null &&
+        userParams.selfDescription!.isNotEmpty) {
+      params['selfDescription'] = userParams.selfDescription;
+    }
     if (userParams.langsPrioritized != null &&
         userParams.langsPrioritized!.isNotEmpty) {
       params['langsPrioritized'] = userParams.langsPrioritized;

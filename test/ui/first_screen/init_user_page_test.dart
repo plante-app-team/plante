@@ -59,7 +59,7 @@ void main() {
 
     final context = await tester.superPump(const InitUserPage());
 
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
     await tester.superTap(find.byKey(const Key('change_avatar_button')));
 
     await tester
@@ -101,7 +101,7 @@ void main() {
 
     final context = await tester.superPump(const InitUserPage());
 
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
 
     expect(find.byType(UriImagePlante), findsNothing);
     await tester.superTap(find.byKey(const Key('change_avatar_button')));
@@ -129,7 +129,7 @@ void main() {
     userAvatarManager.setSelectedGalleryImage_testing(null);
 
     final context = await tester.superPump(const InitUserPage());
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
 
     // We expect the user to be asked to change the avatar
     expect(userAvatarManager.askUserToSelectImageFromGallery_callsCount(),
@@ -160,7 +160,7 @@ void main() {
     userAvatarManager.setSelectedGalleryImage_testing(imagePath);
 
     final context = await tester.superPump(const InitUserPage());
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
 
     // NOTE: the user does not click the "change avatar" button:
     // await tester.superTap(find.byKey(const Key('change_avatar_button')));
@@ -191,7 +191,7 @@ void main() {
     await userParamsController.setUserParams(initialParams);
 
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
-    userAvatarManager.setUserAvatar_testing(imagePath);
+    await userAvatarManager.updateUserAvatar(imagePath);
 
     final context = await tester.superPump(const InitUserPage());
     await tester
@@ -217,7 +217,7 @@ void main() {
     await userParamsController.setUserParams(initialParams);
 
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
-    userAvatarManager.setUserAvatar_testing(imagePath);
+    await userAvatarManager.updateUserAvatar(imagePath);
 
     final context = await tester.superPump(const InitUserPage());
     await tester.superTap(
@@ -237,7 +237,7 @@ void main() {
 
   testWidgets("doesn't allow too short names", (WidgetTester tester) async {
     final context = await tester.superPump(const InitUserPage());
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bo');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bo');
     await tester
         .superTap(find.text(context.strings.init_user_page_next_button_title));
 
@@ -252,7 +252,7 @@ void main() {
 
     final context = await tester.superPump(const InitUserPage());
 
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
     await tester
         .superTap(find.text(context.strings.init_user_page_next_button_title));
 
@@ -297,7 +297,7 @@ void main() {
 
     final context = await tester.superPump(const InitUserPage());
 
-    await tester.superEnterText(find.byKey(const Key('name')), 'Bob');
+    await tester.superEnterText(find.byKey(const Key('name_input')), 'Bob');
     await tester.superTap(find.byKey(const Key('change_avatar_button')));
     await tester
         .superTap(find.text(context.strings.init_user_page_next_button_title));

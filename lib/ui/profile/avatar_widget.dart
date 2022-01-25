@@ -54,28 +54,25 @@ class _AvatarWidgetState extends ConsumerState<AvatarWidget> {
     } else {
       image = Container(color: const Color(0xFFC0C0C0));
     }
-    return SizedBox(
-        width: 127,
-        height: 127,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: Stack(children: [
-            AnimatedSwitcher(duration: DURATION_DEFAULT, child: image),
-            if (widget.onChangeClick != null)
-              Material(
-                  key: const Key('change_avatar_button'),
-                  color: const Color(0x4E979A9C),
-                  child: InkWell(
-                      onTap: widget.onChangeClick,
-                      splashColor: ColorsPlante.splashColor,
-                      borderRadius: BorderRadius.circular(100),
-                      child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: SvgPicture.asset('assets/add_photo.svg',
-                                  color: Colors.white))))),
-          ]),
-        ));
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(100),
+      child: Stack(children: [
+        AnimatedSwitcher(duration: DURATION_DEFAULT, child: image),
+        if (widget.onChangeClick != null)
+          Material(
+              key: const Key('change_avatar_button'),
+              color: const Color(0x4E979A9C),
+              child: InkWell(
+                  onTap: widget.onChangeClick,
+                  splashColor: ColorsPlante.splashColor,
+                  borderRadius: BorderRadius.circular(100),
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: SvgPicture.asset('assets/add_photo.svg',
+                              color: Colors.white))))),
+      ]),
+    );
   }
 }

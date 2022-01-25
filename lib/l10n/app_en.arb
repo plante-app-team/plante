@@ -58,6 +58,10 @@
     "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's veg-status manually before buying it, just in case",
     "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
     "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
+    "edit_user_data_widget_about_me_label": "About me (optional)",
+    "@edit_user_data_widget_about_me_label": {
+        "description": "Title of the \"About me\" input text field, which the user can use to write a short self-description."
+    },
     "edit_user_data_widget_avatar_delete": "Delete user avatar",
     "edit_user_data_widget_avatar_description": "User avatar (optional)",
     "@edit_user_data_widget_avatar_description": {
@@ -255,6 +259,10 @@
     "product_report_dialog_report_sent": "Report sent",
     "product_report_dialog_send": "Send",
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
+    "profile_page_edit_profile": "Edit profile",
+    "@profile_page_edit_profile": {
+        "description": "A button in User Profile which initiates user profile editing (changes of name, avatar, ...)"
+    },
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
     "settings_page_crash_on_errors": "Crash on errors",

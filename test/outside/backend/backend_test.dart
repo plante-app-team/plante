@@ -165,6 +165,7 @@ void main() {
 
     final updatedParams = initialParams.rebuild((v) => v
       ..name = 'Jack'
+      ..selfDescription = 'Hello there'
       ..langsPrioritized.replace(['en', 'nl']));
     final result = await backend.updateUserParams(updatedParams);
     expect(result.isOk, isTrue);
@@ -174,6 +175,8 @@ void main() {
     final request = requests[0];
 
     expect(request.url.queryParameters['name'], equals('Jack'));
+    expect(
+        request.url.queryParameters['selfDescription'], equals('Hello there'));
     expect(
         request.url
             .toString()
@@ -506,6 +509,7 @@ void main() {
         {
           "user_data": {
             "name": "Bob Kelso",
+            "self_description": "Hello there",
             "user_id": "123",
             "has_avatar": true
            },
@@ -520,6 +524,7 @@ void main() {
     expect(obtainedConfig.nominatimEnabled, isFalse);
     final obtainedParams = obtainedConfig.remoteUserParams;
     expect(obtainedParams.name, equals('Bob Kelso'));
+    expect(obtainedParams.selfDescription, equals('Hello there'));
     expect(obtainedParams.backendId, equals('123'));
     expect(obtainedParams.hasAvatar, isTrue);
   });

@@ -31,7 +31,6 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
-import 'package:plante/ui/settings/settings_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 class BarcodeScanPage extends PagePlante {
@@ -125,30 +124,27 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
             child: Stack(children: [
           Column(children: [
             HeaderPlante(
-                color: ColorsPlante.lightGrey,
-                title: SwitchPlante(
-                  key: const Key('input_mode_switch'),
-                  leftSelected: _showCameraInput,
-                  callback: _switchInputMode,
-                  leftSvgAsset: 'assets/barcode_scan_mode.svg',
-                  rightSvgAsset: 'assets/barcode_type_mode.svg',
-                  boxShadow: BoxShadow(
-                    color: Colors.grey.withOpacity(0.25),
-                    blurRadius: 4,
-                    offset: const Offset(0, 4),
-                  ),
+              color: ColorsPlante.lightGrey,
+              title: SwitchPlante(
+                key: const Key('input_mode_switch'),
+                leftSelected: _showCameraInput,
+                callback: _switchInputMode,
+                leftSvgAsset: 'assets/barcode_scan_mode.svg',
+                rightSvgAsset: 'assets/barcode_type_mode.svg',
+                boxShadow: BoxShadow(
+                  color: Colors.grey.withOpacity(0.25),
+                  blurRadius: 4,
+                  offset: const Offset(0, 4),
                 ),
-                spacingBottom: 24,
-                leftActionPadding: 12,
-                rightActionPadding: 12,
-                leftAction: IconButton(
-                    onPressed: _toggleFlash,
-                    icon: SvgPicture.asset(_flashOn
-                        ? 'assets/flash_enabled.svg'
-                        : 'assets/flash_disabled.svg')),
-                rightAction: IconButton(
-                    onPressed: _openSettings,
-                    icon: SvgPicture.asset('assets/settings.svg'))),
+              ),
+              spacingBottom: 24,
+              rightActionPadding: 12,
+              rightAction: IconButton(
+                  onPressed: _toggleFlash,
+                  icon: SvgPicture.asset(_flashOn
+                      ? 'assets/flash_enabled.svg'
+                      : 'assets/flash_disabled.svg')),
+            ),
             AnimatedCrossFadePlante(
                 firstChild:
                     _boxWithCutout(context, color: ColorsPlante.lightGrey),
@@ -357,11 +353,6 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     } on qr.CameraException catch (e) {
       Log.w('QrScanPage._toggleFlash error', ex: e);
     }
-  }
-
-  void _openSettings() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SettingsPage()));
   }
 
   void _switchInputMode(bool showCameraInput) {

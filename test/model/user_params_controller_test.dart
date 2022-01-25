@@ -47,6 +47,10 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.selfDescription = 'Nice man');
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     params = params.rebuild((v) => v.backendId = '123');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
@@ -73,6 +77,7 @@ void main() {
 
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
+      ..selfDescription = 'Nice man'
       ..backendId = '123'
       ..backendClientToken = '321'
       ..userGroup = 123

@@ -44,6 +44,13 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.selfDescription;
+    if (value != null) {
+      result
+        ..add('self_description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.userGroup;
     if (value != null) {
       result
@@ -84,6 +91,10 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'self_description':
+          result.selfDescription = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'has_avatar':
           result.hasAvatar = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
@@ -113,6 +124,8 @@ class _$UserParams extends UserParams {
   @override
   final String? name;
   @override
+  final String? selfDescription;
+  @override
   final bool hasAvatar;
   @override
   final int? userGroup;
@@ -126,6 +139,7 @@ class _$UserParams extends UserParams {
       {this.backendId,
       this.backendClientToken,
       this.name,
+      this.selfDescription,
       required this.hasAvatar,
       this.userGroup,
       this.langsPrioritized})
@@ -147,6 +161,7 @@ class _$UserParams extends UserParams {
         backendId == other.backendId &&
         backendClientToken == other.backendClientToken &&
         name == other.name &&
+        selfDescription == other.selfDescription &&
         hasAvatar == other.hasAvatar &&
         userGroup == other.userGroup &&
         langsPrioritized == other.langsPrioritized;
@@ -158,9 +173,11 @@ class _$UserParams extends UserParams {
         $jc(
             $jc(
                 $jc(
-                    $jc($jc(0, backendId.hashCode),
-                        backendClientToken.hashCode),
-                    name.hashCode),
+                    $jc(
+                        $jc($jc(0, backendId.hashCode),
+                            backendClientToken.hashCode),
+                        name.hashCode),
+                    selfDescription.hashCode),
                 hasAvatar.hashCode),
             userGroup.hashCode),
         langsPrioritized.hashCode));
@@ -172,6 +189,7 @@ class _$UserParams extends UserParams {
           ..add('backendId', backendId)
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
+          ..add('selfDescription', selfDescription)
           ..add('hasAvatar', hasAvatar)
           ..add('userGroup', userGroup)
           ..add('langsPrioritized', langsPrioritized))
@@ -194,6 +212,11 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   String? _name;
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
+
+  String? _selfDescription;
+  String? get selfDescription => _$this._selfDescription;
+  set selfDescription(String? selfDescription) =>
+      _$this._selfDescription = selfDescription;
 
   bool? _hasAvatar;
   bool? get hasAvatar => _$this._hasAvatar;
@@ -219,6 +242,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _backendId = $v.backendId;
       _backendClientToken = $v.backendClientToken;
       _name = $v.name;
+      _selfDescription = $v.selfDescription;
       _hasAvatar = $v.hasAvatar;
       _userGroup = $v.userGroup;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
@@ -247,6 +271,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               backendId: backendId,
               backendClientToken: backendClientToken,
               name: name,
+              selfDescription: selfDescription,
               hasAvatar: BuiltValueNullFieldError.checkNotNull(
                   hasAvatar, 'UserParams', 'hasAvatar'),
               userGroup: userGroup,
