@@ -18,8 +18,8 @@ Consumer consumer(ArgResCallback<WidgetRef, Widget> fn) {
   return Consumer(builder: (context, ref, _) => fn.call(ref));
 }
 
-Future<bool?> showYesNoDialog<bool>(
-    BuildContext context, String title, VoidCallback onYes) async {
+Future<bool?> showYesNoDialog<bool>(BuildContext context, String title,
+    [VoidCallback onYes = _noOp]) async {
   return await showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
@@ -129,3 +129,5 @@ String millisSinceEpochToStr(int millis, BuildContext context) {
 String dateToStr(DateTime date, BuildContext context) {
   return intl.DateFormat.yMMMMd(context.langCode).format(date);
 }
+
+void _noOp() {}

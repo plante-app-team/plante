@@ -9,12 +9,14 @@ import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/profile/edit_profile_page.dart';
 import 'package:plante/ui/profile/profile_page.dart';
 import 'package:plante/ui/settings/settings_page.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
@@ -37,6 +39,7 @@ void main() {
     GetIt.I.registerSingleton<Settings>(Settings());
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
+    GetIt.I.registerSingleton<Backend>(MockBackend());
   });
 
   testWidgets('filled profile', (WidgetTester tester) async {

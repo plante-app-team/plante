@@ -12,6 +12,7 @@ class FakeUserAvatarManager implements UserAvatarManager {
 
   var _callsCountSelectAvatar = 0;
   var _callsCountRetrieveLostAvatar = 0;
+  var _callsUpdateUserAvatar = 0;
 
   // ignore: non_constant_identifier_names
   void setSelectedGalleryImage_testing(Uri? image) =>
@@ -30,6 +31,9 @@ class FakeUserAvatarManager implements UserAvatarManager {
 
   // ignore: non_constant_identifier_names
   int retrieveLostSelectedAvatar_callsCount() => _callsCountRetrieveLostAvatar;
+
+  // ignore: non_constant_identifier_names
+  int callsUpdateUserAvatar_callsCount() => _callsUpdateUserAvatar;
 
   @override
   void addObserver(UserAvatarManagerObserver observer) =>
@@ -58,6 +62,7 @@ class FakeUserAvatarManager implements UserAvatarManager {
   @override
   Future<Result<None, BackendError>> updateUserAvatar(
       Uri avatarFilePath) async {
+    _callsUpdateUserAvatar += 1;
     if (_updateUserAvatarError != null) {
       return Err(_updateUserAvatarError!);
     }
