@@ -58,6 +58,14 @@
     "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's veg-status manually before buying it, just in case",
     "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
     "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
+    "edit_profile_page_title": "Edit profile",
+    "@edit_profile_page_title": {
+        "description": "Title of the \"Edit profile\" page."
+    },
+    "edit_profile_page_cancel_editing_q": "Cancel profile editing?",
+    "@edit_profile_page_cancel_editing_q": {
+        "description": "Question the user is asked when they started editing their profile but then clicked a Cancel button."
+    },
     "edit_user_data_widget_about_me_label": "About me (optional)",
     "@edit_user_data_widget_about_me_label": {
         "description": "Title of the \"About me\" input text field, which the user can use to write a short self-description."

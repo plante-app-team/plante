@@ -57,6 +57,9 @@ class TextStyles {
       color: ColorsPlante.primary,
       decoration: TextDecoration.underline);
 
+  static const TextStyle pageTitle =
+      TextStyle(fontFamily: 'OpenSans', fontSize: 16, color: ColorsPlante.grey);
+
   static TextStyle headline1 = TextStyle(
       fontFamily: montserrat,
       fontWeight: FontWeight.bold,

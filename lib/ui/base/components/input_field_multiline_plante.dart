@@ -10,6 +10,7 @@ class InputFieldMultilinePlante extends StatelessWidget {
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
+  final int? minLines;
   final bool readOnly;
 
   const InputFieldMultilinePlante(
@@ -19,6 +20,7 @@ class InputFieldMultilinePlante extends StatelessWidget {
       this.controller,
       this.inputFormatters,
       this.maxLines,
+      this.minLines,
       this.readOnly = false})
       : super(key: key);
 
@@ -29,6 +31,7 @@ class InputFieldMultilinePlante extends StatelessWidget {
       style: TextStyles.normal,
       textCapitalization: textCapitalization,
       maxLines: maxLines,
+      minLines: minLines,
       readOnly: readOnly,
       inputFormatters: inputFormatters,
       decoration: InputDecoration(

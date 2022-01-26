@@ -97,8 +97,9 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   UserAvatarManager get _avatarManager => _controller._avatarManager;
   final _nameController = TextEditingController();
   final _selfDescriptionController = TextEditingController();
-  late final UIValue<Uri?> _avatarUri =
-      UIValue(widget.controller.userAvatar, ref);
+  late final _avatarUri = UIValue<Uri?>(widget.controller.userAvatar, ref);
+
+  late final _controllerInited = UIValue<bool>(false, ref);
 
   EditUserDataWidgetController get _controller => widget.controller;
 
@@ -115,8 +116,12 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
     });
     _avatarUri.callOnChanges((uri) => _controller.userAvatar = uri);
     _controller.registerChangeCallback(_onControllerDataChanged);
-    _onControllerDataChanged();
-    _initAsync();
+    // UIValue cannot be changed from [initState], so we'll call it
+    // during next frame.
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _onControllerDataChanged();
+      _initAsync();
+    });
   }
 
   void _initAsync() async {
@@ -128,6 +133,7 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   }
 
   void _onControllerDataChanged() {
+    _controllerInited.setValue(_controller._inited);
     final controllerName = _controller.userParams.name ?? '';
     final controllerSelfDescription =
         _controller.userParams.selfDescription ?? '';
@@ -185,18 +191,20 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
         textCapitalization: TextCapitalization.sentences,
         label: context.strings.edit_user_data_widget_name_label,
         hint: context.strings.edit_user_data_widget_name_hint,
-        controller: _controller._inited ? _nameController : null,
+        controller: _controllerInited.watch(ref) ? _nameController : null,
       ),
       const SizedBox(height: 24),
       InputFieldMultilinePlante(
         key: const Key('self_description_input'),
-        maxLines: 2,
+        minLines: 2,
+        maxLines: 4,
         inputFormatters: [
           LengthLimitingTextInputFormatter(
               EditUserDataWidget.MAX_SELF_DESCRIPTION_LENGTH),
         ],
         label: context.strings.edit_user_data_widget_about_me_label,
-        controller: _controller._inited ? _selfDescriptionController : null,
+        controller:
+            _controllerInited.watch(ref) ? _selfDescriptionController : null,
       ),
     ]);
   }
