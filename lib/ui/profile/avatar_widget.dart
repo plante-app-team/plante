@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
@@ -47,7 +48,10 @@ class _AvatarWidgetState extends ConsumerState<AvatarWidget> {
     final Widget image;
     if (widget.uri != null) {
       if (headers == null) {
-        image = const Center(child: CircularProgressIndicator());
+        image = Center(
+            child: !isInTests()
+                ? const CircularProgressIndicator()
+                : const SizedBox.shrink());
       } else {
         image = UriImagePlante(widget.uri!, httpHeaders: headers);
       }

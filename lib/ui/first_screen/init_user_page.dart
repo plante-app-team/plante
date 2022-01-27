@@ -36,7 +36,6 @@ class InitUserPage extends PagePlante {
 class _InitUserPageState extends PageStatePlante<InitUserPage> {
   bool _loading = false;
 
-  late final Future<UserParams> _initialUserParams;
   late final EditUserDataWidgetController _editUserDataController;
 
   final _userParamsController = GetIt.I.get<UserParamsController>();
@@ -60,18 +59,30 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   @override
   void initState() {
     super.initState();
-    final initialUserParamsFn =
+    final initialUserParams =
         () async => await _userParamsController.getUserParams() ?? UserParams();
-    _initialUserParams = initialUserParamsFn.call();
+    final initialUserAvatar = () async => await _avatarManager.userAvatarUri();
     _editUserDataController = EditUserDataWidgetController(
-        userAvatarManager: _avatarManager,
-        initialUserParams: _initialUserParams)
+        initialUserParams: initialUserParams.call(),
+        initialAvatar: initialUserAvatar.call(),
+        userAvatarHttpHeaders: _avatarManager.userAvatarAuthHeaders(),
+        selectImageFromGallery: _selectImageFromGallery)
       ..registerChangeCallback(_validateFirstPageInputs);
     _initAsync();
   }
 
+  Future<Uri?> _selectImageFromGallery() async {
+    return _avatarManager.askUserToSelectImageFromGallery(context,
+        iHaveTriedRetrievingLostImage: true);
+  }
+
   void _initAsync() {
     _longAction(() async {
+      final lostAvatar =
+          await _avatarManager.retrieveLostSelectedAvatar(context);
+      if (lostAvatar != null) {
+        _editUserDataController.userAvatar = lostAvatar;
+      }
       _validateFirstPageInputs();
       _initUserLangs();
     });

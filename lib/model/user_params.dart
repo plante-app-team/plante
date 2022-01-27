@@ -29,7 +29,7 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String requireBackendID() => backendId!;
   String requireBackendClientToken() => backendClientToken!;
 
-  static UserParams? fromJson(Map<String, dynamic> json) {
+  static UserParams? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(UserParams.serializer, json);
   }
