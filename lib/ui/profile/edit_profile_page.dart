@@ -4,6 +4,9 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
+import 'package:plante/logging/log.dart';
+import 'package:plante/model/restorable/uri_restorable.dart';
+import 'package:plante/model/restorable/user_params_restorable.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -21,40 +24,113 @@ import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/edit_user_data_widget.dart';
 
 class EditProfilePage extends PagePlante {
-  const EditProfilePage({Key? key}) : super(key: key);
+  final UserParams initialUserParams;
+  final Uri? initialUserAvatar;
+  const EditProfilePage._(
+      {Key? key,
+      required this.initialUserParams,
+      required this.initialUserAvatar})
+      : super(key: key);
+
+  @visibleForTesting
+  static EditProfilePage createForTesting(
+      UserParams initialUserParams, Uri? initialUserAvatar,
+      {Key? key}) {
+    if (!isInTests()) {
+      throw Exception('!isInTests()');
+    }
+    return EditProfilePage._(
+        key: key,
+        initialUserParams: initialUserParams,
+        initialUserAvatar: initialUserAvatar);
+  }
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
+
+  static void show(
+      {Key? key,
+      required BuildContext context,
+      required UserParams initialUserParams,
+      required Uri? initialUserAvatar}) {
+    final args = [
+      initialUserParams.toJson(),
+      initialUserAvatar?.toString() ?? '',
+    ];
+    Navigator.restorablePush(context, _routeBuilder, arguments: args);
+  }
+
+  static Route<void> _routeBuilder(BuildContext context, Object? arguments) {
+    return MaterialPageRoute<void>(builder: (BuildContext context) {
+      UserParams userParams = UserParams();
+      Uri? avatarUri;
+      if (arguments != null) {
+        final args = arguments as List<dynamic>;
+        userParams = UserParams.fromJson(args[0] as Map<dynamic, dynamic>) ??
+            UserParams();
+        avatarUri = args[1] == '' ? null : Uri.tryParse(args[1] as String);
+      }
+      if (userParams == UserParams()) {
+        Log.w(
+            'EditProfilePage is created with empty user params. Args: $arguments');
+      }
+      return EditProfilePage._(
+          initialUserParams: userParams, initialUserAvatar: avatarUri);
+    });
+  }
 }
 
-class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
+class _EditProfilePageState extends PageStatePlante<EditProfilePage>
+    with RestorationMixin {
   final _userParamsController = GetIt.I.get<UserParamsController>();
   final _avatarManager = GetIt.I.get<UserAvatarManager>();
   final _backend = GetIt.I.get<Backend>();
   late final EditUserDataWidgetController _editUserDataController;
 
-  late final UserParams? _initialUserParams;
-  late final Uri? _initialUserAvatar;
-
+  late final UserParamsRestorable _userParamsRestorable;
+  late final UriRestorable _userAvatarRestorable;
   late final _loading = UIValue<bool>(false, ref);
 
   _EditProfilePageState() : super('EditProfilePage');
 
   @override
-  void initState() {
-    super.initState();
-    final initialUserParamsFn =
-        () async => await _userParamsController.getUserParams() ?? UserParams();
-    final initialUserParams = initialUserParamsFn.call();
+  String? get restorationId => 'edit_profile_page';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    _userParamsRestorable = UserParamsRestorable(widget.initialUserParams);
+    _userAvatarRestorable = UriRestorable(widget.initialUserAvatar);
+    registerForRestoration(_userParamsRestorable, 'user_params');
+    registerForRestoration(_userAvatarRestorable, 'user_avatar');
+
+    final initialUserParams = () async => _userParamsRestorable.value;
+    final initialUserAvatar = () async => _userAvatarRestorable.value;
     _editUserDataController = EditUserDataWidgetController(
-        userAvatarManager: _avatarManager,
-        initialUserParams: initialUserParams);
+        initialUserParams: initialUserParams.call(),
+        initialAvatar: initialUserAvatar.call(),
+        userAvatarHttpHeaders: _avatarManager.userAvatarAuthHeaders(),
+        selectImageFromGallery: _selectImageFromGallery);
+
+    _editUserDataController.registerChangeCallback(_onUserDataChanged);
+
     _initAsync();
   }
 
+  void _onUserDataChanged() {
+    _userParamsRestorable.value = _editUserDataController.userParams;
+    _userAvatarRestorable.value = _editUserDataController.userAvatar;
+  }
+
+  Future<Uri?> _selectImageFromGallery() async {
+    return _avatarManager.askUserToSelectImageFromGallery(context,
+        iHaveTriedRetrievingLostImage: true);
+  }
+
   void _initAsync() async {
-    _initialUserParams = await _userParamsController.getUserParams();
-    _initialUserAvatar = await _avatarManager.userAvatarUri();
+    final lostAvatar = await _avatarManager.retrieveLostSelectedAvatar(context);
+    if (lostAvatar != null) {
+      _editUserDataController.userAvatar = lostAvatar;
+    }
   }
 
   @override
@@ -111,9 +187,9 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
 
   Future<bool> _onWillPop() async {
     final userParamsChanged =
-        _editUserDataController.userParams != _initialUserParams;
+        _editUserDataController.userParams != widget.initialUserParams;
     final avatarChanged =
-        _editUserDataController.userAvatar != _initialUserAvatar;
+        _editUserDataController.userAvatar != widget.initialUserAvatar;
     if (!userParamsChanged && !avatarChanged) {
       return true;
     }
@@ -125,7 +201,7 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
 
   void _onSavePress() async {
     _longAction(() async {
-      if (_initialUserParams != _editUserDataController.userParams) {
+      if (widget.initialUserParams != _editUserDataController.userParams) {
         final userParamsChangeRes =
             await _backend.updateUserParams(_editUserDataController.userParams);
         if (userParamsChangeRes.isErr) {
@@ -137,7 +213,7 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
         }
       }
 
-      if (_initialUserAvatar != _editUserDataController.userAvatar) {
+      if (widget.initialUserAvatar != _editUserDataController.userAvatar) {
         final Result<None, BackendError> avatarChangeRes;
         if (_editUserDataController.userAvatar != null) {
           avatarChangeRes = await _avatarManager

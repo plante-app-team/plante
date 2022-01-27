@@ -118,8 +118,10 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
   }
 
   void _onEditProfileClick() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const EditProfilePage()));
+    EditProfilePage.show(
+        context: context,
+        initialUserParams: _userParams.cachedVal!,
+        initialUserAvatar: _avatar.cachedVal);
   }
 
   void _openSettings() {

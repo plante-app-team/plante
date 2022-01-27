@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
@@ -16,9 +16,10 @@ import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/avatar_widget.dart';
 
 class EditUserDataWidgetController {
-  final UserAvatarManager _avatarManager;
   UserParams? _userParams;
   Uri? _userAvatar;
+  final Future<Map<String, String>> _userAvatarHttpHeaders;
+  final ResCallback<Future<Uri?>> _selectImageFromGallery;
   final _callbacks = <VoidCallback>[];
 
   bool get _inited => _userParams != null;
@@ -47,14 +48,19 @@ class EditUserDataWidgetController {
   }
 
   EditUserDataWidgetController(
-      {required UserAvatarManager userAvatarManager,
-      required Future<UserParams> initialUserParams})
-      : _avatarManager = userAvatarManager {
-    _initAsync(initialUserParams);
+      {required Future<UserParams> initialUserParams,
+      required Future<Uri?> initialAvatar,
+      required Future<Map<String, String>> userAvatarHttpHeaders,
+      required ResCallback<Future<Uri?>> selectImageFromGallery})
+      : _selectImageFromGallery = selectImageFromGallery,
+        _userAvatarHttpHeaders = userAvatarHttpHeaders {
+    _initAsync(initialUserParams, initialAvatar);
   }
 
-  void _initAsync(Future<UserParams> initialUserParams) async {
-    userAvatar = await _avatarManager.userAvatarUri();
+  void _initAsync(
+      Future<UserParams> initialUserParams, Future<Uri?> initialAvatar) async {
+    userAvatar = await initialAvatar;
+    // Must be the last statement of _initAsync
     userParams = await initialUserParams;
   }
 
@@ -94,7 +100,6 @@ class EditUserDataWidget extends ConsumerStatefulWidget {
 }
 
 class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
-  UserAvatarManager get _avatarManager => _controller._avatarManager;
   final _nameController = TextEditingController();
   final _selfDescriptionController = TextEditingController();
   late final _avatarUri = UIValue<Uri?>(widget.controller.userAvatar, ref);
@@ -120,16 +125,7 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
     // during next frame.
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       _onControllerDataChanged();
-      _initAsync();
     });
-  }
-
-  void _initAsync() async {
-    final selectedPhoto =
-        await _avatarManager.retrieveLostSelectedAvatar(context);
-    if (selectedPhoto != null) {
-      _avatarUri.setValue(selectedPhoto);
-    }
   }
 
   void _onControllerDataChanged() {
@@ -161,8 +157,7 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
           height: 127,
           child: AvatarWidget(
               uri: _avatarUri.watch(ref),
-              authHeaders:
-                  widget.controller._avatarManager.userAvatarAuthHeaders(),
+              authHeaders: widget.controller._userAvatarHttpHeaders,
               onChangeClick: _onChangeAvatarClick))),
       const SizedBox(height: 4),
       consumer((ref) => InkWell(
@@ -210,9 +205,7 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
   }
 
   void _onChangeAvatarClick() async {
-    final selectedPhoto = await _avatarManager.askUserToSelectImageFromGallery(
-        context,
-        iHaveTriedRetrievingLostImage: true);
+    final selectedPhoto = await _controller._selectImageFromGallery.call();
     if (selectedPhoto != null) {
       _avatarUri.setValue(selectedPhoto);
     }

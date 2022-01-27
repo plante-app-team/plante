@@ -44,26 +44,33 @@ void main() {
   });
 
   testWidgets('with initial params', (WidgetTester tester) async {
-    await userParamsController.setUserParams(UserParams((e) => e
+    final initialUserParams = UserParams((e) => e
       ..name = 'Bob Kelso'
       ..selfDescription = 'Hello there!'
-      ..hasAvatar = true));
-    await userAvatarManager.updateUserAvatar(imagePath);
+      ..hasAvatar = true);
+    final initialAvatar = imagePath;
+    await userParamsController.setUserParams(initialUserParams);
+    await userAvatarManager.updateUserAvatar(initialAvatar);
 
-    await tester.superPump(const EditProfilePage());
+    await tester.superPump(
+        EditProfilePage.createForTesting(initialUserParams, initialAvatar));
     expect(find.text('Bob Kelso'), findsOneWidget);
     expect(find.text('Hello there!'), findsOneWidget);
     expect(find.byType(UriImagePlante), findsOneWidget);
   });
 
   testWidgets('without initial params', (WidgetTester tester) async {
-    await userParamsController.setUserParams(UserParams((e) => e
+    final initialUserParams = UserParams((e) => e
       ..name = null
       ..selfDescription = null
-      ..hasAvatar = false));
+      ..hasAvatar = false);
+    const Uri? initialAvatar = null;
+
+    await userParamsController.setUserParams(initialUserParams);
     await userAvatarManager.deleteUserAvatar();
 
-    await tester.superPump(const EditProfilePage());
+    await tester.superPump(
+        EditProfilePage.createForTesting(initialUserParams, initialAvatar));
     expect(find.byType(UriImagePlante), findsNothing);
     // We mostly test that the widget does not crash
   });
@@ -74,7 +81,8 @@ void main() {
       ..selfDescription = 'Hello there!');
     await userParamsController.setUserParams(initialParams);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     await tester.superEnterText(
         find.byKey(const Key('name_input')), 'Perry Cox');
@@ -105,7 +113,8 @@ void main() {
     await userParamsController.setUserParams(initialParams);
     userAvatarManager.setSelectedGalleryImage_testing(imagePath);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     // No avatar
     expect(find.byType(UriImagePlante), findsNothing);
@@ -136,7 +145,8 @@ void main() {
     await userParamsController.setUserParams(initialParams);
     userAvatarManager.setSelectedGalleryImage_testing(imagePath);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
     await tester.superTap(find.text(context.strings.global_save));
 
     // Local user params are not changed
@@ -153,7 +163,8 @@ void main() {
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);
 
-    await tester.superPump(const EditProfilePage());
+    await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     await tester.superTap(find.byKey(const Key('back_button')));
 
@@ -172,7 +183,8 @@ void main() {
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
     await tester.superEnterText(
         find.byKey(const Key('name_input')), 'Perry Cox');
 
@@ -201,7 +213,8 @@ void main() {
     await userParamsController.setUserParams(initialParams);
     userAvatarManager.setSelectedGalleryImage_testing(imagePath);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     // Select an avatar
     expect(find.byType(UriImagePlante), findsNothing);
@@ -233,7 +246,8 @@ void main() {
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
     await tester.superEnterText(
         find.byKey(const Key('name_input')), 'Perry Cox');
 
@@ -268,7 +282,8 @@ void main() {
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     // Change name
     await tester.superEnterText(
@@ -294,7 +309,8 @@ void main() {
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);
 
-    final context = await tester.superPump(const EditProfilePage());
+    final context = await tester
+        .superPump(EditProfilePage.createForTesting(initialParams, null));
 
     // Select an avatar
     expect(find.byType(UriImagePlante), findsNothing);
@@ -308,5 +324,36 @@ void main() {
     // Error shown
     expect(
         find.text(context.strings.global_something_went_wrong), findsOneWidget);
+  });
+
+  testWidgets('lost photo is retrieved on start', (WidgetTester tester) async {
+    expect(
+        userAvatarManager.retrieveLostSelectedAvatar_callsCount(), equals(0));
+
+    final initialParams = UserParams((e) => e.name = 'Bob Kelso');
+    await userParamsController.setUserParams(initialParams);
+    await tester.superPump(EditProfilePage.createForTesting(initialParams, null,
+        key: const Key('widget1')));
+
+    // We expect the widget to try to recover a lost avatar ...
+    expect(
+        userAvatarManager.retrieveLostSelectedAvatar_callsCount(), equals(1));
+
+    // ... but the first widget is without a lost gallery avatar
+    expect(find.byType(UriImagePlante), findsNothing);
+
+    // Now let's put some lost avatar out there
+    userAvatarManager.setLostSelectedGalleryImage_testing(imagePath);
+
+    // And create a second widget
+    await tester.superPump(EditProfilePage.createForTesting(initialParams, null,
+        key: const Key('widget2')));
+
+    // We expect the widget to try to recover a lost avatar again
+    expect(
+        userAvatarManager.retrieveLostSelectedAvatar_callsCount(), equals(2));
+
+    // Second widget is expected to recover the lost avatar
+    expect(find.byType(UriImagePlante), findsOneWidget);
   });
 }

@@ -11,15 +11,12 @@ import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/profile/edit_user_data_widget.dart';
 
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_user_avatar_manager.dart';
 
 void main() {
+  final userAvatarHeaders = () async {
+    return const {'auth': 'cool'};
+  };
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
-  late FakeUserAvatarManager userAvatarManager;
-
-  setUp(() async {
-    userAvatarManager = FakeUserAvatarManager();
-  });
 
   InputFieldPlante nameWidget() {
     return find.byKey(const Key('name_input')).evaluate().first.widget
@@ -36,9 +33,12 @@ void main() {
 
   testWidgets('no initial data', (WidgetTester tester) async {
     final emptyUserParams = () async => UserParams();
+    final emptyAvatar = () async => null;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
 
     await tester.superPump(EditUserDataWidget(controller: controller));
 
@@ -48,13 +48,15 @@ void main() {
   });
 
   testWidgets('with initial data', (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final userParams = () async => UserParams((e) => e
       ..name = 'Bob'
       ..selfDescription = 'Hello there');
+    final avatar = () async => imagePath;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: userParams.call());
+        initialAvatar: avatar.call(),
+        initialUserParams: userParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
 
     await tester.superPump(EditUserDataWidget(controller: controller));
 
@@ -65,11 +67,13 @@ void main() {
 
   testWidgets('short user name is not valid user data',
       (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final userParams = () async => UserParams((e) => e.name = 'Bob Kelso');
+    final avatar = () async => imagePath;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: userParams.call());
+        initialAvatar: avatar.call(),
+        initialUserParams: userParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     // Long name
@@ -87,11 +91,13 @@ void main() {
   });
 
   testWidgets('long user name is shortened', (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final userParams = () async => UserParams((e) => e.name = 'Bob Kelso');
+    final avatar = () async => imagePath;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: userParams.call());
+        initialAvatar: avatar.call(),
+        initialUserParams: userParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     // Not too long name
@@ -110,11 +116,13 @@ void main() {
 
   testWidgets('controller can change user name in widget',
       (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final emptyUserParams = () async => UserParams();
+    final emptyAvatar = () async => null;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     expect(nameWidget().controller!.text, isEmpty);
@@ -128,11 +136,13 @@ void main() {
 
   testWidgets('controller can change user self description in widget',
       (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final emptyUserParams = () async => UserParams();
+    final emptyAvatar = () async => null;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     expect(selfDescriptionWidget().controller!.text, isEmpty);
@@ -146,11 +156,13 @@ void main() {
 
   testWidgets('controller can change user avatar in widget',
       (WidgetTester tester) async {
-    await userAvatarManager.deleteUserAvatar();
+    final emptyAvatar = () async => null;
     final emptyUserParams = () async => UserParams();
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     expect(find.byType(UriImagePlante), findsNothing);
@@ -165,9 +177,12 @@ void main() {
 
   testWidgets('user name in widget changes', (WidgetTester tester) async {
     final emptyUserParams = () async => UserParams((e) => e.name = '');
+    final emptyAvatar = () async => null;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     var notificationsCount = 0;
@@ -188,9 +203,12 @@ void main() {
       (WidgetTester tester) async {
     final emptyUserParams =
         () async => UserParams((e) => e.selfDescription = '');
+    final emptyAvatar = () async => null;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     var notificationsCount = 0;
@@ -209,12 +227,14 @@ void main() {
   });
 
   testWidgets('user avatar in widget changes', (WidgetTester tester) async {
-    userAvatarManager.setSelectedGalleryImage_testing(imagePath);
-
     final emptyUserParams = () async => UserParams((e) => e.name = '');
+    final emptyAvatar = () async => null;
+    final selectImageFromGallery = () async => imagePath;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
+        initialAvatar: emptyAvatar.call(),
+        initialUserParams: emptyUserParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: selectImageFromGallery);
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     var notificationsCount = 0;
@@ -233,47 +253,16 @@ void main() {
     expect(controller.userAvatar, equals(imagePath));
   });
 
-  testWidgets('lost photo is retrieved on start', (WidgetTester tester) async {
-    expect(
-        userAvatarManager.retrieveLostSelectedAvatar_callsCount(), equals(0));
-
-    final emptyUserParams = () async => UserParams((e) => e.name = '');
-    var controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
-    await tester.superPump(
-        EditUserDataWidget(key: const Key('widget1'), controller: controller));
-
-    // We expect the widget to try to recover a lost avatar ...
-    expect(
-        userAvatarManager.retrieveLostSelectedAvatar_callsCount(), equals(1));
-
-    // ... but the first widget is without a lost gallery avatar
-    expect(controller.userParams.hasAvatar, isFalse);
-    expect(controller.userAvatar, isNull);
-
-    // Now let's put some lost avatar out there
-    userAvatarManager.setLostSelectedGalleryImage_testing(imagePath);
-
-    // And create a second widget, ...
-    controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: emptyUserParams.call());
-    await tester.superPump(
-        EditUserDataWidget(key: const Key('widget2'), controller: controller));
-    // Which we expect to recover the lost avatar
-    expect(controller.userParams.hasAvatar, isTrue);
-    expect(controller.userAvatar, equals(imagePath));
-  });
-
   testWidgets('user avatar deletion', (WidgetTester tester) async {
-    await userAvatarManager.updateUserAvatar(imagePath);
     final userParams = () async => UserParams((e) => e
       ..name = ''
       ..hasAvatar = true);
+    final avatar = () async => imagePath;
     final controller = EditUserDataWidgetController(
-        userAvatarManager: userAvatarManager,
-        initialUserParams: userParams.call());
+        initialAvatar: avatar.call(),
+        initialUserParams: userParams.call(),
+        userAvatarHttpHeaders: userAvatarHeaders.call(),
+        selectImageFromGallery: () async => null);
     final context =
         await tester.superPump(EditUserDataWidget(controller: controller));
 

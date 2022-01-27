@@ -113,6 +113,10 @@ void main() {
   });
 
   testWidgets('edit profile click', (WidgetTester tester) async {
+    await userParamsController
+        .setUserParams(UserParams((e) => e.name = 'Bob Kelso'));
+    await userAvatarManager.deleteUserAvatar();
+
     await tester.superPump(const ProfilePage());
 
     expect(find.byType(EditProfilePage), findsNothing);
