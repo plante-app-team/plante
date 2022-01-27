@@ -38,7 +38,7 @@ import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
@@ -180,7 +180,7 @@ class ShopProductRangePageTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-    when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
+    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
     productsExtraProperties = FakeProductsAtShopsExtraPropertiesManager();
     GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
         productsExtraProperties);

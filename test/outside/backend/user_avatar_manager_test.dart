@@ -7,6 +7,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -134,20 +135,20 @@ void main() {
   });
 
   test('select avatar', () async {
-    when(photosTaker.selectAndCropPhoto(any, any,
+    when(photosTaker.selectAndCropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
             targetSize: anyNamed('targetSize'),
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => imagePath);
 
-    verifyNever(photosTaker.selectAndCropPhoto(any, any,
+    verifyNever(photosTaker.selectAndCropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
     final result = await userAvatarManager.askUserToSelectImageFromGallery(
         _MockBuildContext(),
         iHaveTriedRetrievingLostImage: true);
-    verify(photosTaker.selectAndCropPhoto(any, any,
+    verify(photosTaker.selectAndCropPhoto(any, any, PhotoRequester.AVATAR_INIT,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
@@ -156,20 +157,20 @@ void main() {
   });
 
   test('select avatar canceled by user', () async {
-    when(photosTaker.selectAndCropPhoto(any, any,
+    when(photosTaker.selectAndCropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
             targetSize: anyNamed('targetSize'),
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => null);
 
-    verifyNever(photosTaker.selectAndCropPhoto(any, any,
+    verifyNever(photosTaker.selectAndCropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
     final result = await userAvatarManager.askUserToSelectImageFromGallery(
         _MockBuildContext(),
         iHaveTriedRetrievingLostImage: true);
-    verify(photosTaker.selectAndCropPhoto(any, any,
+    verify(photosTaker.selectAndCropPhoto(any, any, PhotoRequester.AVATAR_INIT,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
@@ -178,7 +179,7 @@ void main() {
   });
 
   test('retrieve lost selected avatar', () async {
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((_) async => Ok(imagePath));
     when(photosTaker.cropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
@@ -186,14 +187,14 @@ void main() {
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => imagePath);
 
-    verifyNever(photosTaker.retrieveLostPhoto());
+    verifyNever(photosTaker.retrieveLostPhoto(any));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
     final result =
         await userAvatarManager.retrieveLostSelectedAvatar(_MockBuildContext());
-    verify(photosTaker.retrieveLostPhoto());
+    verify(photosTaker.retrieveLostPhoto(PhotoRequester.AVATAR_INIT));
     verify(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
@@ -203,16 +204,16 @@ void main() {
   });
 
   test('retrieve lost selected avatar, no lost images', () async {
-    when(photosTaker.retrieveLostPhoto()).thenAnswer((_) async => null);
+    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
 
-    verifyNever(photosTaker.retrieveLostPhoto());
+    verifyNever(photosTaker.retrieveLostPhoto(any));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),
         minSize: anyNamed('minSize')));
     final result =
         await userAvatarManager.retrieveLostSelectedAvatar(_MockBuildContext());
-    verify(photosTaker.retrieveLostPhoto());
+    verify(photosTaker.retrieveLostPhoto(PhotoRequester.AVATAR_INIT));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
         targetSize: anyNamed('targetSize'),

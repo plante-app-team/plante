@@ -8,27 +8,41 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/size_int.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/ui/crop/image_crop_page.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
 
 class PhotosTaker {
-  Future<Uri?> takeAndCropPhoto(BuildContext context, Directory outFolder,
+  static const _PREF_PHOTO_REQUESTER = 'PhotosTaker_PHOTO_REQUESTER';
+  final SharedPreferencesHolder _prefsHolder;
+
+  PhotosTaker(this._prefsHolder);
+
+  Future<Uri?> takeAndCropPhoto(
+      BuildContext context, Directory outFolder, PhotoRequester requester,
       {bool cropCircle = false, SizeInt? targetSize, SizeInt? minSize}) async {
-    return await _pickAndCropPhoto(context, outFolder, ImageSource.camera,
+    return await _pickAndCropPhoto(
+        context, outFolder, ImageSource.camera, requester,
         cropCircle: cropCircle, targetSize: targetSize, minSize: minSize);
   }
 
-  Future<Uri?> selectAndCropPhoto(BuildContext context, Directory outFolder,
+  Future<Uri?> selectAndCropPhoto(
+      BuildContext context, Directory outFolder, PhotoRequester requester,
       {bool cropCircle = false, SizeInt? targetSize, SizeInt? minSize}) async {
-    return await _pickAndCropPhoto(context, outFolder, ImageSource.gallery,
+    return await _pickAndCropPhoto(
+        context, outFolder, ImageSource.gallery, requester,
         cropCircle: cropCircle, targetSize: targetSize, minSize: minSize);
   }
 
-  Future<Uri?> _pickAndCropPhoto(
-      BuildContext context, Directory outFolder, ImageSource source,
+  Future<Uri?> _pickAndCropPhoto(BuildContext context, Directory outFolder,
+      ImageSource source, PhotoRequester requester,
       {required bool cropCircle,
       required SizeInt? targetSize,
       required SizeInt? minSize}) async {
     Log.i('_pickAndCropPhoto start');
+    final prefs = await _prefsHolder.get();
+    await prefs.setInt(_PREF_PHOTO_REQUESTER, requester.persistentCode);
+
     final imagePicker = ImagePicker();
 
     try {
@@ -71,7 +85,8 @@ class PhotosTaker {
 
   /// See https://pub.dev/packages/image_picker#handling-mainactivity-destruction-on-android
   /// Android, man!
-  Future<Result<Uri, PlatformException>?> retrieveLostPhoto() async {
+  Future<Result<Uri, PlatformException>?> retrieveLostPhoto(
+      PhotoRequester requester) async {
     if (!Platform.isAndroid) {
       return null;
     }
@@ -81,10 +96,19 @@ class PhotosTaker {
     if (response.isEmpty) {
       return null;
     }
-    if (response.file != null) {
-      return Ok(Uri.file(response.file!.path));
-    } else {
+
+    if (response.file == null) {
       return Err(response.exception!);
     }
+
+    final prefs = await _prefsHolder.get();
+    final retrievedPhotoSaver = prefs.getInt(_PREF_PHOTO_REQUESTER);
+    if (requester.persistentCode != retrievedPhotoSaver) {
+      Log.w('Lost photo requested by ${requester.persistentCode}, '
+          'but the retrieved photo was saved by $retrievedPhotoSaver');
+      return null;
+    }
+
+    return Ok(Uri.file(response.file!.path));
   }
 }

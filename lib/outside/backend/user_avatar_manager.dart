@@ -10,7 +10,8 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 
 abstract class UserAvatarManagerObserver {
   void onUserAvatarChange();
@@ -95,7 +96,8 @@ class UserAvatarManager {
     if (iHaveTriedRetrievingLostImage == false) {
       throw Exception('bruh');
     }
-    return await _photosTaker.selectAndCropPhoto(context, await _avatarDir(),
+    return await _photosTaker.selectAndCropPhoto(
+        context, await _avatarDir(), PhotoRequester.AVATAR_INIT,
         cropCircle: true, targetSize: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
   }
 
@@ -109,7 +111,8 @@ class UserAvatarManager {
   }
 
   Future<Uri?> retrieveLostSelectedAvatar(BuildContext context) async {
-    final lostPhotoRes = await _photosTaker.retrieveLostPhoto();
+    final lostPhotoRes =
+        await _photosTaker.retrieveLostPhoto(PhotoRequester.AVATAR_INIT);
     if (lostPhotoRes == null) {
       return null;
     }

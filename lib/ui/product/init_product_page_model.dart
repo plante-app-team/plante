@@ -21,7 +21,8 @@ import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 enum InitProductPageOcrState {
@@ -168,7 +169,8 @@ class InitProductPageModel {
     _cacheDir = cacheDir;
 
     try {
-      final lostPhoto = await _photosTaker.retrieveLostPhoto();
+      final lostPhoto =
+          await _photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT);
       Log.i('InitProductPageModel initPhotoTaker, '
           'lostPhoto: $lostPhoto, '
           '_photoBeingTaken: ${_photoBeingTaken.value}');
@@ -209,7 +211,8 @@ class InitProductPageModel {
     _photoBeingTaken.value = imageType.index;
     try {
       Log.i('InitProductPageModel: takePhoto start, imageType: $imageType');
-      final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!,
+      final outPath = await _photosTaker.takeAndCropPhoto(
+          context, _cacheDir!, PhotoRequester.PRODUCT_INIT,
           minSize: _IMAGES_MIN_SIZE);
       if (outPath == null) {
         Log.i('InitProductPageModel: takePhoto, outPath == null');
