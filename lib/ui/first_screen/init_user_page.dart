@@ -167,6 +167,29 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
       _longAction(() async {
         Log.i('InitUserPage, onDoneClicked: $_userParams');
 
+        // NOTE: we intentionally update the avatar before
+        // user params, because otherwise the InitUserPage widget
+        // will be immediately closed after valid user params are set
+        // bellow.
+        // The code is far from great and should be refactored when
+        // there will be a chance.
+        if (_userAvatar?.isScheme('FILE') == true) {
+          final avatarUploadRes =
+              await _avatarManager.updateUserAvatar(_userAvatar!);
+          if (avatarUploadRes.isErr) {
+            _showError(avatarUploadRes.unwrapErr().convert());
+            return;
+          }
+          _userParams = _userParams.rebuild((e) => e.hasAvatar = true);
+        } else if (_userAvatar == null) {
+          final avatarDeleteRes = await _avatarManager.deleteUserAvatar();
+          if (avatarDeleteRes.isErr) {
+            _showError(avatarDeleteRes.unwrapErr().convert());
+            return;
+          }
+          _userParams = _userParams.rebuild((e) => e.hasAvatar = false);
+        }
+
         // Update on backend
         final paramsRes = await _backend.updateUserParams(_userParams);
         if (paramsRes.isErr) {
@@ -186,24 +209,6 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           return;
         }
         _userParams = langRes.unwrap();
-
-        // Update avatar
-        if (_userAvatar?.isScheme('FILE') == true) {
-          final avatarUploadRes =
-              await _avatarManager.updateUserAvatar(_userAvatar!);
-          if (avatarUploadRes.isErr) {
-            _showError(avatarUploadRes.unwrapErr().convert());
-            return;
-          }
-        } else if (_userAvatar == null) {
-          final avatarDeleteRes = await _avatarManager.deleteUserAvatar();
-          if (avatarDeleteRes.isErr) {
-            _showError(avatarDeleteRes.unwrapErr().convert());
-            return;
-          }
-        }
-
-        _userParams = (await _userParamsController.getUserParams())!;
       });
     };
 

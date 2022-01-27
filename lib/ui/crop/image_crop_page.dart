@@ -17,6 +17,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 
 /// NOTE: this class is not tested at all, because the flutter_image_compress
 /// package supports only mobile platforms.
@@ -55,10 +56,10 @@ class ImageCropPage extends PagePlante {
 
 class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   final _cropImageContainerKey = GlobalKey();
-  Uint8List? _originalImage;
+  late final _originalImage = UIValue<Uint8List?>(null, ref);
   SizeInt? _originalImageSize;
   CropController? _cropController;
-  bool _loading = true;
+  late final _loading = UIValue<bool>(true, ref);
 
   bool _modifyingCropArea = false;
 
@@ -73,26 +74,24 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
 
   void _initAsync() async {
     Log.i('ImageCropPage loading image start, ${widget.imagePath}');
-    _originalImage = await FlutterImageCompress.compressWithFile(
+    _cropController = CropController();
+
+    _originalImage.setValue(await FlutterImageCompress.compressWithFile(
       widget.imagePath,
       minWidth: _screenSize.width,
       minHeight: _screenSize.height,
       quality: widget.compressQuality,
-    );
+    ));
 
-    final imageData = await decodeImageFromList(_originalImage!);
+    final imageData = await decodeImageFromList(_originalImage.cachedVal!);
     _originalImageSize = SizeInt(
       width: imageData.width,
       height: imageData.height,
     );
 
-    _cropController = CropController();
-
-    setState(() {
-      if (mounted) {
-        _loading = false;
-      }
-    });
+    if (mounted) {
+      _loading.setValue(false);
+    }
 
     if (_isImageTooSmall()) {
       Log.i('ImageCropPage closing because of too small image');
@@ -128,12 +127,8 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   @override
   void didUpdateWidget(ImageCropPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _originalImage = null;
-    _originalImageSize = null;
     _cropController = null;
-    setState(() {
-      _loading = true;
-    });
+    _loading.setValue(true);
     _initAsync();
   }
 
@@ -172,40 +167,41 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
             ]),
             rightActionPadding: 0,
           ),
-          Expanded(
-              child: AnimatedSwitcher(
-            duration: DURATION_DEFAULT,
-            child: _cropWidget(),
-          ))
+          Expanded(child: _cropWidget())
         ]),
-        if (_loading && !isInTests())
-          Positioned.fill(
-              child: Container(
-            color: const Color(0x70FFFFFF),
-            child: const Center(child: CircularProgressIndicator()),
-          ))
+        if (!isInTests())
+          consumer((ref) => _loading.watch(ref)
+              ? Positioned.fill(
+                  child: Container(
+                  color: const Color(0x70FFFFFF),
+                  child: const Center(child: CircularProgressIndicator()),
+                ))
+              : const SizedBox()),
       ]),
     )));
   }
 
   Widget _cropWidget() {
-    final Widget result;
-    if (_originalImage != null) {
-      result = Crop(
-        // So that the widget will be recreated on image rotation
-        key: UniqueKey(),
-        image: _originalImage!,
-        controller: _cropController,
-        baseColor: Colors.white,
-        initialSize: 0.5,
-        onCropped: _onCropped,
-        onMoved: _onCropAreaMoved,
-        withCircleUi: widget.withCircleUi,
-      );
-    } else {
-      result = const SizedBox.shrink();
-    }
-    return Container(key: _cropImageContainerKey, child: result);
+    return consumer((ref) {
+      final Widget result;
+      final originalImage = _originalImage.watch(ref);
+      if (originalImage != null) {
+        result = Crop(
+          // So that the widget will be recreated on image rotation
+          key: UniqueKey(),
+          image: originalImage,
+          controller: _cropController,
+          baseColor: Colors.white,
+          initialSize: 0.5,
+          onCropped: _onCropped,
+          onMoved: _onCropAreaMoved,
+          withCircleUi: widget.withCircleUi,
+        );
+      } else {
+        result = const SizedBox.shrink();
+      }
+      return Container(key: _cropImageContainerKey, child: result);
+    });
   }
 
   void _onCropAreaMoved(Rect rect) {
@@ -281,9 +277,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   void _onDoneClick() async {
     Log.i('ImageCropPage crop start');
     _cropController!.crop();
-    setState(() {
-      _loading = true;
-    });
+    _loading.setValue(true);
   }
 
   void _onCropped(Uint8List image) async {
@@ -299,9 +293,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
     Log.i('ImageCropPage writing out file start, $file');
     await file.writeAsBytes(image);
     Log.i('ImageCropPage writing out file finished, $file');
-    setState(() {
-      _loading = false;
-    });
+    _loading.setValue(false);
     Navigator.of(context).pop(file.uri);
   }
 
@@ -322,17 +314,13 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   }
 
   void _rotate90() async {
-    if (_originalImage == null) {
+    final originalImage = _originalImage.cachedVal;
+    if (originalImage == null) {
       Log.w("ImageCropPage rotation couldn't start");
       return;
     }
     Uint8List? rotated;
-    final originalImage = _originalImage!;
-    setState(() {
-      _loading = true;
-      _originalImage = null;
-      _originalImageSize = null;
-    });
+    _loading.setValue(true);
     try {
       Log.i('ImageCropPage rotation start');
       rotated = await compute(_rotate90Impl, originalImage);
@@ -345,14 +333,12 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
       }
     }
     final imageData = await decodeImageFromList(rotated);
-    setState(() {
-      _originalImage = rotated;
-      _originalImageSize = SizeInt(
-        width: imageData.width,
-        height: imageData.height,
-      );
-      _loading = false;
-    });
+    _originalImage.setValue(rotated);
+    _originalImageSize = SizeInt(
+      width: imageData.width,
+      height: imageData.height,
+    );
+    _loading.setValue(false);
   }
 }
 

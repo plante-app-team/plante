@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
@@ -11,10 +12,12 @@ import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
+import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/edit_user_data_widget.dart';
 
 class EditProfilePage extends PagePlante {
@@ -32,6 +35,8 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
 
   late final UserParams? _initialUserParams;
   late final Uri? _initialUserAvatar;
+
+  late final _loading = UIValue<bool>(false, ref);
 
   _EditProfilePageState() : super('EditProfilePage');
 
@@ -59,33 +64,42 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
         child: Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-                child:
-                    Column(verticalDirection: VerticalDirection.up, children: [
-              Padding(
-                  padding: const EdgeInsets.only(
-                      left: 24, right: 24, top: 26, bottom: 26),
-                  child: SizedBox(
-                      width: double.infinity,
-                      child: ButtonFilledPlante.withText(
-                          context.strings.global_save,
-                          onPressed: _onSavePress))),
-              Expanded(
-                  child: SingleChildScrollView(
-                      child: Column(children: [
-                HeaderPlante(
-                  title: Text(context.strings.edit_profile_page_title,
-                      style: TextStyles.pageTitle),
-                  height: 84,
-                  leftAction: FabPlante(
-                      key: const Key('back_button'),
-                      svgAsset: 'assets/back_arrow.svg',
-                      onPressed: _onBackPress),
-                ),
+                child: Stack(children: [
+              Column(verticalDirection: VerticalDirection.up, children: [
                 Padding(
-                    padding: const EdgeInsets.all(24),
-                    child:
-                        EditUserDataWidget(controller: _editUserDataController))
-              ])))
+                    padding: const EdgeInsets.only(
+                        left: 24, right: 24, top: 26, bottom: 26),
+                    child: SizedBox(
+                        width: double.infinity,
+                        child: consumer((ref) => ButtonFilledPlante.withText(
+                            context.strings.global_save,
+                            onPressed: _loading.watch(ref) == false
+                                ? _onSavePress
+                                : null)))),
+                Expanded(
+                    child: SingleChildScrollView(
+                        child: Column(children: [
+                  HeaderPlante(
+                    title: Text(context.strings.edit_profile_page_title,
+                        style: TextStyles.pageTitle),
+                    height: 84,
+                    leftAction: FabPlante(
+                        key: const Key('back_button'),
+                        svgAsset: 'assets/back_arrow.svg',
+                        onPressed: _onBackPress),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: EditUserDataWidget(
+                          controller: _editUserDataController))
+                ])))
+              ]),
+              if (!isInTests())
+                consumer((ref) => AnimatedSwitcher(
+                    duration: DURATION_DEFAULT,
+                    child: _loading.watch(ref)
+                        ? const LinearProgressIndicatorPlante()
+                        : const SizedBox.shrink())),
             ]))));
   }
 
@@ -110,33 +124,44 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage> {
   }
 
   void _onSavePress() async {
-    if (_initialUserParams != _editUserDataController.userParams) {
-      final userParamsChangeRes =
-          await _backend.updateUserParams(_editUserDataController.userParams);
-      if (userParamsChangeRes.isErr) {
-        _showError(userParamsChangeRes.unwrapErr());
-        return;
-      } else {
-        await _userParamsController
-            .setUserParams(_editUserDataController.userParams);
+    _longAction(() async {
+      if (_initialUserParams != _editUserDataController.userParams) {
+        final userParamsChangeRes =
+            await _backend.updateUserParams(_editUserDataController.userParams);
+        if (userParamsChangeRes.isErr) {
+          _showError(userParamsChangeRes.unwrapErr());
+          return;
+        } else {
+          await _userParamsController
+              .setUserParams(_editUserDataController.userParams);
+        }
       }
-    }
 
-    if (_initialUserAvatar != _editUserDataController.userAvatar) {
-      final Result<None, BackendError> avatarChangeRes;
-      if (_editUserDataController.userAvatar != null) {
-        avatarChangeRes = await _avatarManager
-            .updateUserAvatar(_editUserDataController.userAvatar!);
-      } else {
-        avatarChangeRes = await _avatarManager.deleteUserAvatar();
+      if (_initialUserAvatar != _editUserDataController.userAvatar) {
+        final Result<None, BackendError> avatarChangeRes;
+        if (_editUserDataController.userAvatar != null) {
+          avatarChangeRes = await _avatarManager
+              .updateUserAvatar(_editUserDataController.userAvatar!);
+        } else {
+          avatarChangeRes = await _avatarManager.deleteUserAvatar();
+        }
+        if (avatarChangeRes.isErr) {
+          _showError(avatarChangeRes.unwrapErr());
+          return;
+        }
       }
-      if (avatarChangeRes.isErr) {
-        _showError(avatarChangeRes.unwrapErr());
-        return;
-      }
-    }
 
-    Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    });
+  }
+
+  void _longAction(dynamic Function() action) async {
+    try {
+      _loading.setValue(true);
+      await action.call();
+    } finally {
+      _loading.setValue(false);
+    }
   }
 
   void _showError(BackendError error) {
