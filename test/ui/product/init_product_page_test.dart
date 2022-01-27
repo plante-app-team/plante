@@ -38,7 +38,8 @@ import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
 
@@ -82,13 +83,14 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(analytics);
 
     photosTaker = MockPhotosTaker();
-    when(photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')))
+    when(photosTaker.takeAndCropPhoto(any, any, any,
+            minSize: anyNamed('minSize')))
         .thenAnswer(
             (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
     when(photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')))
         .thenAnswer(
             (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
@@ -226,10 +228,10 @@ void main() {
     }
 
     if (takeImageFront) {
-      verifyNever(
-          photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+      verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+          minSize: anyNamed('minSize')));
       await tester.tap(find.byKey(const Key('front_photo')));
-      verify(photosTaker.takeAndCropPhoto(any, any,
+      verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
               minSize: anyNamed('minSize')))
           .called(1);
       await tester.pumpAndSettle();
@@ -274,15 +276,15 @@ void main() {
     }
 
     if (takeImageIngredients) {
-      verifyNever(
-          photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+      verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+          minSize: anyNamed('minSize')));
       expect(ocrAttempts, equals(0));
       await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
       expect(ocrAttempts, greaterThanOrEqualTo(1));
       expect(ocrAttempts,
           lessThanOrEqualTo(InitProductPageModel.OCR_RETRIES_COUNT));
-      verify(photosTaker.takeAndCropPhoto(any, any,
+      verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
               minSize: anyNamed('minSize')))
           .called(1);
 
@@ -1064,7 +1066,7 @@ void main() {
             invoc.positionalArguments[0] as Product, 'water, lemon')));
 
     // Lost photo exists!
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT))
         .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
     verifyNever(
@@ -1106,7 +1108,7 @@ void main() {
             invoc.positionalArguments[0] as Product, 'water, lemon')));
 
     // Lost photo exists!
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT))
         .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
     verifyNever(
@@ -1161,14 +1163,14 @@ void main() {
     await tester.pumpAndSettle();
 
     verifyNever(permissionsManager.request(any));
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
 
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
-    verify(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
+        minSize: anyNamed('minSize')));
   }
 
   Future<void> takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(
@@ -1193,22 +1195,22 @@ void main() {
     await tester.pumpAndSettle();
 
     verifyNever(permissionsManager.request(any));
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
 
     // First attempt with a deny
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
 
     // Second attempt with permission successfully granted
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
-    verify(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
+        minSize: anyNamed('minSize')));
   }
 
   Future<void> takePhotoWhenNoPermissionPermanentlyTest(
@@ -1226,8 +1228,8 @@ void main() {
 
     verifyNever(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
     expect(
         find.text(context
             .strings.init_product_page_camera_permission_reasoning_settings),
@@ -1237,8 +1239,8 @@ void main() {
 
     verify(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
     expect(
         find.text(context
             .strings.init_product_page_camera_permission_reasoning_settings),
@@ -1249,8 +1251,8 @@ void main() {
 
     verifyNever(permissionsManager.request(any));
     verify(permissionsManager.openAppSettings());
-    verifyNever(
-        photosTaker.takeAndCropPhoto(any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
+        minSize: anyNamed('minSize')));
   }
 
   testWidgets('take front photo when no permission',

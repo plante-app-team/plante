@@ -19,7 +19,7 @@ import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
@@ -63,8 +63,7 @@ void main() {
     when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
 
     final photosTaker = MockPhotosTaker();
-    when(photosTaker.retrieveLostPhoto())
-        .thenAnswer((realInvocation) async => null);
+    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
     GetIt.I.registerSingleton<UserAvatarManager>(FakeUserAvatarManager());

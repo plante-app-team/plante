@@ -43,7 +43,7 @@ import 'package:plante/outside/products/suggestions/suggested_products_manager.d
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
@@ -67,7 +67,8 @@ void initDI() {
       GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<GoogleAuthorizer>(GoogleAuthorizer());
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
-  GetIt.I.registerSingleton<PhotosTaker>(PhotosTaker());
+  GetIt.I.registerSingleton<PhotosTaker>(
+      PhotosTaker(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<Backend>(Backend(GetIt.I.get<Analytics>(),
       GetIt.I.get<UserParamsController>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(

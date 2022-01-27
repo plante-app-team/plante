@@ -29,7 +29,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -89,7 +89,7 @@ void main() {
         ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
 
     final userParamsController = FakeUserParamsController();
