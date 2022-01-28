@@ -191,14 +191,15 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
             _showError(avatarUploadRes.unwrapErr().convert());
             return;
           }
-          _userParams = _userParams.rebuild((e) => e.hasAvatar = true);
+          _userParams =
+              _userParams.rebuild((e) => e.avatarId = avatarUploadRes.unwrap());
         } else if (_userAvatar == null) {
           final avatarDeleteRes = await _avatarManager.deleteUserAvatar();
           if (avatarDeleteRes.isErr) {
             _showError(avatarDeleteRes.unwrapErr().convert());
             return;
           }
-          _userParams = _userParams.rebuild((e) => e.hasAvatar = false);
+          _userParams = _userParams.rebuild((e) => e.avatarId = null);
         }
 
         // Update on backend

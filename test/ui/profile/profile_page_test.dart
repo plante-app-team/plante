@@ -23,6 +23,7 @@ import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
+  const avatarId = FakeUserAvatarManager.DEFAULT_AVATAR_ID;
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
   late FakeUserParamsController userParamsController;
   late FakeUserAvatarManager userAvatarManager;
@@ -32,7 +33,7 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
     userParamsController = FakeUserParamsController();
-    userAvatarManager = FakeUserAvatarManager();
+    userAvatarManager = FakeUserAvatarManager(userParamsController);
 
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
@@ -46,7 +47,7 @@ void main() {
     await userParamsController.setUserParams(UserParams((e) => e
       ..name = 'Bob Kelso'
       ..selfDescription = 'Hello there!'
-      ..hasAvatar = true));
+      ..avatarId = avatarId));
     await userAvatarManager.updateUserAvatar(imagePath);
 
     await tester.superPump(const ProfilePage());
@@ -59,7 +60,7 @@ void main() {
     await userParamsController.setUserParams(UserParams((e) => e
       ..name = null
       ..selfDescription = null
-      ..hasAvatar = false));
+      ..avatarId = null));
     await userAvatarManager.deleteUserAvatar();
 
     await tester.superPump(const ProfilePage());

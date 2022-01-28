@@ -23,6 +23,7 @@ import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
+  const avatarId = FakeUserAvatarManager.DEFAULT_AVATAR_ID;
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
   late FakeUserParamsController userParamsController;
   late FakeUserAvatarManager userAvatarManager;
@@ -33,7 +34,7 @@ void main() {
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
 
     userParamsController = FakeUserParamsController();
-    userAvatarManager = FakeUserAvatarManager();
+    userAvatarManager = FakeUserAvatarManager(userParamsController);
     backend = MockBackend();
 
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
@@ -47,7 +48,7 @@ void main() {
     final initialUserParams = UserParams((e) => e
       ..name = 'Bob Kelso'
       ..selfDescription = 'Hello there!'
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     final initialAvatar = imagePath;
     await userParamsController.setUserParams(initialUserParams);
     await userAvatarManager.updateUserAvatar(initialAvatar);
@@ -63,7 +64,7 @@ void main() {
     final initialUserParams = UserParams((e) => e
       ..name = null
       ..selfDescription = null
-      ..hasAvatar = false);
+      ..avatarId = null);
     const Uri? initialAvatar = null;
 
     await userParamsController.setUserParams(initialUserParams);
@@ -128,12 +129,12 @@ void main() {
 
     await tester.superTap(find.text(context.strings.global_save));
 
-    final expectedParams = initialParams.rebuild((e) => e.hasAvatar = true);
+    final expectedParams = initialParams.rebuild((e) => e.avatarId = avatarId);
     expect(expectedParams, isNot(equals(initialParams)));
     // Local user params are almost same
     expect(await userParamsController.getUserParams(), equals(expectedParams));
-    // User params are sent to the backend
-    verify(backend.updateUserParams(expectedParams));
+    // User params are NOT sent to the backend - user params were not changed
+    verifyNever(backend.updateUserParams(any));
     // User avatar IS changed
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(1));
     // The page is closed

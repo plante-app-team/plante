@@ -3,7 +3,13 @@ import 'package:plante/base/result.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 
+import 'fake_user_params_controller.dart';
+
 class FakeUserAvatarManager implements UserAvatarManager {
+  static const DEFAULT_AVATAR_ID = 'DEFAULT_AVATAR_ID';
+
+  final FakeUserParamsController userParamsController;
+
   Uri? _selectedGalleryImage;
   Uri? _lostSelectedGalleryImage;
   Uri? _userAvatar;
@@ -13,6 +19,8 @@ class FakeUserAvatarManager implements UserAvatarManager {
   var _callsCountSelectAvatar = 0;
   var _callsCountRetrieveLostAvatar = 0;
   var _callsUpdateUserAvatar = 0;
+
+  FakeUserAvatarManager(this.userParamsController);
 
   // ignore: non_constant_identifier_names
   void setSelectedGalleryImage_testing(Uri? image) =>
@@ -60,7 +68,7 @@ class FakeUserAvatarManager implements UserAvatarManager {
   Future<Map<String, String>> userAvatarAuthHeaders() async => {'auth': 'cool'};
 
   @override
-  Future<Result<None, BackendError>> updateUserAvatar(
+  Future<Result<String, BackendError>> updateUserAvatar(
       Uri avatarFilePath) async {
     _callsUpdateUserAvatar += 1;
     if (_updateUserAvatarError != null) {
@@ -68,7 +76,10 @@ class FakeUserAvatarManager implements UserAvatarManager {
     }
     _userAvatar = avatarFilePath;
     _observers.forEach((o) => o.onUserAvatarChange());
-    return Ok(None());
+    await userParamsController.setUserParams(userParamsController
+        .cachedUserParams
+        ?.rebuild((e) => e.avatarId = DEFAULT_AVATAR_ID));
+    return Ok(DEFAULT_AVATAR_ID);
   }
 
   @override

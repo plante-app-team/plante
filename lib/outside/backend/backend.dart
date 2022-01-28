@@ -111,11 +111,21 @@ class Backend {
     }
   }
 
-  Future<Result<None, BackendError>> updateUserAvatar(
+  /// Returns user avatar ID
+  Future<Result<String, BackendError>> updateUserAvatar(
       Uint8List avatarBytes) async {
-    final response =
-        await _backendPost('user_avatar_upload/', null, bodyBytes: avatarBytes);
-    return _noneOrErrorFrom(response);
+    final jsonRes = await _backendPostJson('user_avatar_upload/', null,
+        bodyBytes: avatarBytes);
+
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+    if (!json.containsKey('result')) {
+      Log.w('Invalid user_avatar_upload response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+    return Ok(json['result']!.toString());
   }
 
   Future<Result<None, BackendError>> deleteUserAvatar() async {
@@ -124,10 +134,11 @@ class Backend {
   }
 
   Uri? userAvatarUrl(UserParams user) {
-    if (user.hasAvatar != true) {
+    if (user.avatarId == null) {
       return null;
     }
-    return _createUrl('user_avatar_data/${user.backendId}', const {});
+    return _createUrl(
+        'user_avatar_data/${user.backendId}/${user.avatarId}', const {});
   }
 
   Future<Result<RequestedProductsResult, BackendError>> requestProducts(
@@ -342,23 +353,26 @@ class Backend {
       String? backendClientTokenOverride,
       String? body,
       String? contentType}) async {
-    final response = await _backendGet(path, params,
+    return _backendReqJson(path, params, 'GET',
         headers: headers,
         backendClientTokenOverride: backendClientTokenOverride,
         body: body,
         contentType: contentType);
-    if (response.isError) {
-      return Err(_errFromResp(response));
-    }
+  }
 
-    final json = jsonDecodeSafe(response.body);
-    if (json == null) {
-      return Err(_errInvalidJson(response.body));
-    }
-    if (_isError(json)) {
-      return Err(_errFromJson(json));
-    }
-    return Ok(json);
+  Future<Result<Map<String, dynamic>, BackendError>> _backendPostJson(
+      String path, Map<String, dynamic>? params,
+      {Map<String, String>? headers,
+      String? backendClientTokenOverride,
+      String? body,
+      Uint8List? bodyBytes,
+      String? contentType}) async {
+    return _backendReqJson(path, params, 'POST',
+        headers: headers,
+        backendClientTokenOverride: backendClientTokenOverride,
+        body: body,
+        bodyBytes: bodyBytes,
+        contentType: contentType);
   }
 
   Future<BackendResponse> _backendGet(String path, Map<String, dynamic>? params,
@@ -373,13 +387,31 @@ class Backend {
         contentType: contentType);
   }
 
-  Future<BackendResponse> _backendPost(
-      String path, Map<String, dynamic>? params,
-      {Map<String, String>? headers, Uint8List? bodyBytes}) async {
-    return await _backendReq(path, params, 'POST',
+  Future<Result<Map<String, dynamic>, BackendError>> _backendReqJson(
+      String path, Map<String, dynamic>? params, String method,
+      {Map<String, String>? headers,
+      String? backendClientTokenOverride,
+      String? body,
+      Uint8List? bodyBytes,
+      String? contentType}) async {
+    final response = await _backendReq(path, params, method,
         headers: headers,
-        backendClientTokenOverride: null,
-        bodyBytes: bodyBytes);
+        backendClientTokenOverride: backendClientTokenOverride,
+        body: body,
+        bodyBytes: bodyBytes,
+        contentType: contentType);
+    if (response.isError) {
+      return Err(_errFromResp(response));
+    }
+
+    final json = jsonDecodeSafe(response.body);
+    if (json == null) {
+      return Err(_errInvalidJson(response.body));
+    }
+    if (_isError(json)) {
+      return Err(_errFromJson(json));
+    }
+    return Ok(json);
   }
 
   Future<BackendResponse> _backendReq(

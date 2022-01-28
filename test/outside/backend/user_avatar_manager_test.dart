@@ -16,6 +16,7 @@ import '../../z_fakes/fake_user_params_controller.dart';
 void main() {
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
   final avatarUrl = Uri.parse('https://planteapp.com/avatar.jpg');
+  const avatarId = 'avatarID';
   late MockBackend backend;
   late FakeUserParamsController userParamsController;
   late MockPhotosTaker photosTaker;
@@ -29,11 +30,9 @@ void main() {
     userAvatarManager =
         UserAvatarManager(backend, userParamsController, photosTaker);
 
-    userParamsController.setUserParams(UserParams((e) => e
-      ..hasAvatar = false
-      ..name = 'Bob'));
+    userParamsController.setUserParams(UserParams((e) => e.name = 'Bob'));
 
-    when(backend.updateUserAvatar(any)).thenAnswer((_) async => Ok(None()));
+    when(backend.updateUserAvatar(any)).thenAnswer((_) async => Ok(avatarId));
     when(backend.deleteUserAvatar()).thenAnswer((_) async => Ok(None()));
     when(backend.userAvatarUrl(any)).thenAnswer((_) => avatarUrl);
   });
@@ -44,14 +43,14 @@ void main() {
     final avatarBytes = await File.fromUri(imagePath).readAsBytes();
 
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
+    expect(userParamsController.cachedUserParams?.avatarId, isNull);
     verifyNever(backend.updateUserAvatar(any));
 
     final result = await userAvatarManager.updateUserAvatar(imagePath);
     expect(result.isOk, isTrue);
 
     expect(observer.notificationsCount, equals(1));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
+    expect(userParamsController.cachedUserParams?.avatarId, equals(avatarId));
     final capturedBytes = verify(backend.updateUserAvatar(captureAny))
         .captured
         .first as Uint8List;
@@ -70,7 +69,7 @@ void main() {
 
     verify(backend.updateUserAvatar(any));
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
+    expect(userParamsController.cachedUserParams?.avatarId, isNull);
   });
 
   test('delete avatar', () async {
@@ -78,18 +77,18 @@ void main() {
     userAvatarManager.addObserver(observer);
 
     await userParamsController.setUserParams(UserParams((e) => e
-      ..hasAvatar = true
+      ..avatarId = avatarId
       ..name = 'Bob'));
 
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
+    expect(userParamsController.cachedUserParams?.avatarId, equals(avatarId));
     verifyNever(backend.deleteUserAvatar());
 
     final result = await userAvatarManager.deleteUserAvatar();
     expect(result.isOk, isTrue);
 
     expect(observer.notificationsCount, equals(1));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isFalse);
+    expect(userParamsController.cachedUserParams?.avatarId, isNull);
     verify(backend.deleteUserAvatar());
   });
 
@@ -101,23 +100,23 @@ void main() {
     userAvatarManager.addObserver(observer);
 
     await userParamsController.setUserParams(UserParams((e) => e
-      ..hasAvatar = true
+      ..avatarId = avatarId
       ..name = 'Bob'));
 
     final result = await userAvatarManager.deleteUserAvatar();
     expect(result.isErr, isTrue);
 
     expect(observer.notificationsCount, equals(0));
-    expect(userParamsController.cachedUserParams?.hasAvatar, isTrue);
+    expect(userParamsController.cachedUserParams?.avatarId, equals(avatarId));
   });
 
-  test('user avatar', () async {
+  test('user avatar url', () async {
     final result = await userAvatarManager.userAvatarUri();
     verify(backend.userAvatarUrl(userParamsController.cachedUserParams));
     expect(result, equals(avatarUrl));
   });
 
-  test('no user avatar', () async {
+  test('no user avatar url', () async {
     await userParamsController.setUserParams(null);
     final result = await userAvatarManager.userAvatarUri();
     expect(result, isNull);

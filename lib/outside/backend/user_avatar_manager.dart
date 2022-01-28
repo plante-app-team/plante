@@ -35,7 +35,11 @@ class UserAvatarManager {
   UserAvatarManager(
       this._backend, this._userParamsController, this._photosTaker);
 
-  Future<Result<None, BackendError>> updateUserAvatar(
+  /// Returns user avatar ID on success.
+  /// NOTE that the user avatar is also inserted into current user params by
+  /// a call to UserParamsController - you should use the returned
+  /// avatar ID only if there's no way to use UserParamsController.
+  Future<Result<String, BackendError>> updateUserAvatar(
       Uri avatarFilePath) async {
     final Uint8List avatarBytes;
     try {
@@ -48,10 +52,11 @@ class UserAvatarManager {
         'Uploading user avatar. Size: ${avatarBytes.length}, path: $avatarFilePath');
     final result = await _backend.updateUserAvatar(avatarBytes);
     if (result.isOk) {
+      final avatarId = result.unwrap();
       final existingParams = await _userParamsController.getUserParams();
-      if (existingParams != null && existingParams.hasAvatar != true) {
+      if (existingParams != null) {
         await _userParamsController.setUserParams(
-            existingParams.rebuild((params) => params.hasAvatar = true));
+            existingParams.rebuild((params) => params.avatarId = avatarId));
       }
       _observers.forEach((observer) => observer.onUserAvatarChange());
     }
@@ -63,9 +68,9 @@ class UserAvatarManager {
     final result = await _backend.deleteUserAvatar();
     if (result.isOk) {
       final existingParams = await _userParamsController.getUserParams();
-      if (existingParams != null && existingParams.hasAvatar != false) {
+      if (existingParams != null && existingParams.avatarId != null) {
         await _userParamsController.setUserParams(
-            existingParams.rebuild((params) => params.hasAvatar = false));
+            existingParams.rebuild((params) => params.avatarId = null));
       }
       _observers.forEach((observer) => observer.onUserAvatarChange());
     }

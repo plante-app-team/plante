@@ -166,13 +166,11 @@ void main() {
     await tester.superPump(EditUserDataWidget(controller: controller));
 
     expect(find.byType(UriImagePlante), findsNothing);
-    expect(controller.userParams.hasAvatar, isFalse);
 
     controller.userAvatar = imagePath;
     await tester.pumpAndSettle();
 
     expect(find.byType(UriImagePlante), findsOneWidget);
-    expect(controller.userParams.hasAvatar, isTrue);
   });
 
   testWidgets('user name in widget changes', (WidgetTester tester) async {
@@ -241,7 +239,6 @@ void main() {
     controller.registerChangeCallback(() => notificationsCount += 1);
 
     expect(notificationsCount, equals(0));
-    expect(controller.userParams.hasAvatar, isFalse);
     expect(controller.userAvatar, isNull);
 
     await tester.superTap(find.byKey(const Key('change_avatar_button')));
@@ -249,14 +246,13 @@ void main() {
     // Callback is notified
     expect(notificationsCount, equals(1));
     // Avatar is set
-    expect(controller.userParams.hasAvatar, isTrue);
     expect(controller.userAvatar, equals(imagePath));
   });
 
   testWidgets('user avatar deletion', (WidgetTester tester) async {
     final userParams = () async => UserParams((e) => e
       ..name = ''
-      ..hasAvatar = true);
+      ..avatarId = 'avatarID');
     final avatar = () async => imagePath;
     final controller = EditUserDataWidgetController(
         initialAvatar: avatar.call(),
@@ -270,7 +266,7 @@ void main() {
     controller.registerChangeCallback(() => notificationsCount += 1);
 
     expect(notificationsCount, equals(0));
-    expect(controller.userParams.hasAvatar, isTrue);
+    expect(controller.userParams.avatarId, equals('avatarID'));
     expect(controller.userAvatar, imagePath);
     expect(find.text(context.strings.edit_user_data_widget_avatar_delete),
         findsOneWidget);
@@ -283,9 +279,11 @@ void main() {
 
     // Callback is notified
     expect(notificationsCount, equals(1));
-    // Avatar is deleted
-    expect(controller.userParams.hasAvatar, isFalse);
+    // Avatar is deleted ...
     expect(controller.userAvatar, isNull);
+    // ... BUT avatar ID is not touched - it's up for the backend
+    // to change the avatar ID.
+    expect(controller.userParams.avatarId, equals('avatarID'));
     // UI has changed
     expect(find.text(context.strings.edit_user_data_widget_avatar_delete),
         findsNothing);

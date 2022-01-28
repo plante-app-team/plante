@@ -67,11 +67,7 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
-    params = params.rebuild((v) => v.hasAvatar = false);
-    await controller.setUserParams(params);
-    expect(params, equals(await controller.getUserParams()));
-
-    params = params.rebuild((v) => v.hasAvatar = true);
+    params = params.rebuild((v) => v.avatarId = 'avatarID');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
@@ -82,7 +78,7 @@ void main() {
       ..backendClientToken = '321'
       ..userGroup = 123
       ..langsPrioritized.addAll(['en', 'ru'])
-      ..hasAvatar = true);
+      ..avatarId = 'avatarID');
     expect(params, equals(expectedParams));
   });
 

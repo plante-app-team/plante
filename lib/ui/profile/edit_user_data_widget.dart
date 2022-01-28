@@ -41,8 +41,6 @@ class EditUserDataWidgetController {
   set userAvatar(Uri? newValue) {
     if (newValue != _userAvatar) {
       _userAvatar = newValue;
-      _userParams =
-          _userParams?.rebuild((e) => e.hasAvatar = _userAvatar != null);
       _notifyCallbacks();
     }
   }
