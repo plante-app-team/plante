@@ -214,7 +214,7 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage>
       }
 
       if (widget.initialUserAvatar != _editUserDataController.userAvatar) {
-        final Result<None, BackendError> avatarChangeRes;
+        final Result<dynamic, BackendError> avatarChangeRes;
         if (_editUserDataController.userAvatar != null) {
           avatarChangeRes = await _avatarManager
               .updateUserAvatar(_editUserDataController.userAvatar!);

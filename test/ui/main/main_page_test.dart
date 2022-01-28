@@ -66,7 +66,8 @@ void main() {
     when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
-    GetIt.I.registerSingleton<UserAvatarManager>(FakeUserAvatarManager());
+    GetIt.I.registerSingleton<UserAvatarManager>(
+        FakeUserAvatarManager(userParamsController));
   });
 
   Widget currentPage() {

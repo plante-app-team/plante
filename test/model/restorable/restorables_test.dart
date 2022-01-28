@@ -208,7 +208,7 @@ void main() {
     await tester.superPump(widget);
 
     final params = UserParams((e) => e
-      ..hasAvatar = true
+      ..avatarId = 'avatarID'
       ..name = 'Bob'
       ..selfDescription = 'Doctor'
       ..backendId = '1234'

@@ -17,11 +17,7 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
   @override
   Iterable<Object?> serialize(Serializers serializers, UserParams object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      'has_avatar',
-      serializers.serialize(object.hasAvatar,
-          specifiedType: const FullType(bool)),
-    ];
+    final result = <Object?>[];
     Object? value;
     value = object.backendId;
     if (value != null) {
@@ -48,6 +44,13 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
     if (value != null) {
       result
         ..add('self_description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.avatarId;
+    if (value != null) {
+      result
+        ..add('avatar_id')
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
@@ -95,9 +98,9 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.selfDescription = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
-        case 'has_avatar':
-          result.hasAvatar = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+        case 'avatar_id':
+          result.avatarId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'rights_group':
           result.userGroup = serializers.deserialize(value,
@@ -126,7 +129,7 @@ class _$UserParams extends UserParams {
   @override
   final String? selfDescription;
   @override
-  final bool hasAvatar;
+  final String? avatarId;
   @override
   final int? userGroup;
   @override
@@ -140,12 +143,10 @@ class _$UserParams extends UserParams {
       this.backendClientToken,
       this.name,
       this.selfDescription,
-      required this.hasAvatar,
+      this.avatarId,
       this.userGroup,
       this.langsPrioritized})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(hasAvatar, 'UserParams', 'hasAvatar');
-  }
+      : super._();
 
   @override
   UserParams rebuild(void Function(UserParamsBuilder) updates) =>
@@ -162,7 +163,7 @@ class _$UserParams extends UserParams {
         backendClientToken == other.backendClientToken &&
         name == other.name &&
         selfDescription == other.selfDescription &&
-        hasAvatar == other.hasAvatar &&
+        avatarId == other.avatarId &&
         userGroup == other.userGroup &&
         langsPrioritized == other.langsPrioritized;
   }
@@ -178,7 +179,7 @@ class _$UserParams extends UserParams {
                             backendClientToken.hashCode),
                         name.hashCode),
                     selfDescription.hashCode),
-                hasAvatar.hashCode),
+                avatarId.hashCode),
             userGroup.hashCode),
         langsPrioritized.hashCode));
   }
@@ -190,7 +191,7 @@ class _$UserParams extends UserParams {
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
           ..add('selfDescription', selfDescription)
-          ..add('hasAvatar', hasAvatar)
+          ..add('avatarId', avatarId)
           ..add('userGroup', userGroup)
           ..add('langsPrioritized', langsPrioritized))
         .toString();
@@ -218,9 +219,9 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   set selfDescription(String? selfDescription) =>
       _$this._selfDescription = selfDescription;
 
-  bool? _hasAvatar;
-  bool? get hasAvatar => _$this._hasAvatar;
-  set hasAvatar(bool? hasAvatar) => _$this._hasAvatar = hasAvatar;
+  String? _avatarId;
+  String? get avatarId => _$this._avatarId;
+  set avatarId(String? avatarId) => _$this._avatarId = avatarId;
 
   int? _userGroup;
   int? get userGroup => _$this._userGroup;
@@ -232,9 +233,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   set langsPrioritized(ListBuilder<String>? langsPrioritized) =>
       _$this._langsPrioritized = langsPrioritized;
 
-  UserParamsBuilder() {
-    UserParams._setDefaults(this);
-  }
+  UserParamsBuilder();
 
   UserParamsBuilder get _$this {
     final $v = _$v;
@@ -243,7 +242,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _backendClientToken = $v.backendClientToken;
       _name = $v.name;
       _selfDescription = $v.selfDescription;
-      _hasAvatar = $v.hasAvatar;
+      _avatarId = $v.avatarId;
       _userGroup = $v.userGroup;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
@@ -272,8 +271,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               backendClientToken: backendClientToken,
               name: name,
               selfDescription: selfDescription,
-              hasAvatar: BuiltValueNullFieldError.checkNotNull(
-                  hasAvatar, 'UserParams', 'hasAvatar'),
+              avatarId: avatarId,
               userGroup: userGroup,
               langsPrioritized: _langsPrioritized?.build());
     } catch (_) {

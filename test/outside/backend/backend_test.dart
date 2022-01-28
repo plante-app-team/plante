@@ -511,7 +511,7 @@ void main() {
             "name": "Bob Kelso",
             "self_description": "Hello there",
             "user_id": "123",
-            "has_avatar": true
+            "avatar_id": "avatarID"
            },
           "nominatim_enabled": false
         }
@@ -526,7 +526,7 @@ void main() {
     expect(obtainedParams.name, equals('Bob Kelso'));
     expect(obtainedParams.selfDescription, equals('Hello there'));
     expect(obtainedParams.backendId, equals('123'));
-    expect(obtainedParams.hasAvatar, isTrue);
+    expect(obtainedParams.avatarId, equals('avatarID'));
   });
 
   test('mobile app config obtaining invalid JSON response', () async {
@@ -1094,18 +1094,32 @@ void main() {
   test('update user avatar', () async {
     final httpClient = FakeHttpClient();
     final backend = Backend(analytics, await _initUserParams(), httpClient);
-    httpClient
-        .setResponse('.*user_avatar_upload.*', ''' { "result": "ok" } ''');
+    httpClient.setResponse(
+        '.*user_avatar_upload.*', ''' { "result": "avatar_id_here" } ''');
 
     final result =
         await backend.updateUserAvatar(Uint8List.fromList([123, 321]));
 
     expect(result.isOk, isTrue);
+    expect(result.unwrap(), equals('avatar_id_here'));
 
     final requests = httpClient.getRequestsMatching('.*user_avatar_upload.*');
     expect(requests.length, equals(1));
     final request = requests.first;
     expect(request.method, equals('POST'));
+  });
+
+  test('update user avatar - invalid response', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+    httpClient.setResponse(
+        '.*user_avatar_upload.*', ''' { "rezzult": "avatar_id_here" } ''');
+
+    final result =
+        await backend.updateUserAvatar(Uint8List.fromList([123, 321]));
+
+    expect(result.isErr, isTrue);
+    expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
   test('delete user avatar', () async {
@@ -1123,10 +1137,10 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
 
     final result = backend.userAvatarUrl(UserParams((e) => e
-      ..backendId = '123321'
-      ..hasAvatar = true));
+      ..backendId = 'userID'
+      ..avatarId = 'avatarID'));
 
-    expect(result.toString(), contains('user_avatar_data/123321'));
+    expect(result.toString(), contains('user_avatar_data/userID/avatarID'));
   });
 
   test('no user avatar', () async {
@@ -1134,8 +1148,8 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
 
     final result = backend.userAvatarUrl(UserParams((e) => e
-      ..backendId = '123321'
-      ..hasAvatar = false));
+      ..backendId = 'userID'
+      ..avatarId = null));
 
     expect(result, isNull);
   });

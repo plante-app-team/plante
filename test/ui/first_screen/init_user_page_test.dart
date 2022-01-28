@@ -28,6 +28,7 @@ import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
+  const avatarId = FakeUserAvatarManager.DEFAULT_AVATAR_ID;
   late FakeUserParamsController userParamsController;
   late FakeUserLangsManager userLangsManager;
   late MockBackend backend;
@@ -45,7 +46,7 @@ void main() {
     GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
-    userAvatarManager = FakeUserAvatarManager();
+    userAvatarManager = FakeUserAvatarManager(userParamsController);
     GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
@@ -82,7 +83,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
       ..langsPrioritized.addAll([LangCode.en, LangCode.be].map((e) => e.name))
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     expect(await userParamsController.getUserParams(), equals(expectedParams));
     expect(await userAvatarManager.userAvatarUri(), imagePath);
     expect(
@@ -119,7 +120,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
       ..langsPrioritized.addAll([LangCode.en].map((e) => e.name))
-      ..hasAvatar = false);
+      ..avatarId = null);
     expect(await userParamsController.getUserParams(), equals(expectedParams));
   });
 
@@ -150,7 +151,7 @@ void main() {
         equals(UserParams((v) => v
           ..name = 'Bob'
           ..langsPrioritized.addAll([LangCode.en].map((e) => e.name))
-          ..hasAvatar = false)));
+          ..avatarId = null)));
   });
 
   testWidgets('user avatar not set if avatar selection not started by user',
@@ -177,7 +178,7 @@ void main() {
         equals(UserParams((v) => v
           ..name = 'Bob'
           ..langsPrioritized.addAll([LangCode.en].map((e) => e.name))
-          ..hasAvatar = false)));
+          ..avatarId = null)));
 
     // The user was not asked to choose an image from the gallery
     expect(userAvatarManager.askUserToSelectImageFromGallery_callsCount(),
@@ -187,7 +188,7 @@ void main() {
   testWidgets('uses initial user name and avatar', (WidgetTester tester) async {
     final initialParams = UserParams((v) => v
       ..name = 'Nora'
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     await userParamsController.setUserParams(initialParams);
 
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
@@ -202,7 +203,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..name = 'Nora'
       ..langsPrioritized.add(LangCode.en.name)
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     expect(await userParamsController.getUserParams(), equals(expectedParams));
 
     expect(userAvatarManager.askUserToSelectImageFromGallery_callsCount(),
@@ -213,7 +214,7 @@ void main() {
   testWidgets('can delete preset user avatar', (WidgetTester tester) async {
     final initialParams = UserParams((v) => v
       ..name = 'Nora'
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     await userParamsController.setUserParams(initialParams);
 
     final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
@@ -230,7 +231,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..name = 'Nora'
       ..langsPrioritized.add(LangCode.en.name)
-      ..hasAvatar = false);
+      ..avatarId = null);
     expect(await userParamsController.getUserParams(), equals(expectedParams));
     expect(await userAvatarManager.userAvatarUri(), isNull);
   });
@@ -319,7 +320,7 @@ void main() {
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
       ..langsPrioritized.addAll([LangCode.en.name])
-      ..hasAvatar = true);
+      ..avatarId = avatarId);
     expect(await userParamsController.getUserParams(), equals(expectedParams));
   });
 }
