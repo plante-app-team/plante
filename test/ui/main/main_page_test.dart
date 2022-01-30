@@ -38,6 +38,7 @@ void main() {
   late MapPageModesTestCommons mapTestsCommons;
   late FakeProductsObtainer productsObtainer;
   late FakeShopsManager shopsManager;
+  late MockViewedProductsStorage viewedProductsStorage;
 
   setUp(() async {
     mapTestsCommons = MapPageModesTestCommons();
@@ -51,8 +52,8 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
-    GetIt.I.registerSingleton<ViewedProductsStorage>(
-        ViewedProductsStorage(loadPersistentProducts: false));
+    viewedProductsStorage = MockViewedProductsStorage();
+    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
 
     GetIt.I.registerSingleton<InputProductsLangStorage>(
@@ -242,5 +243,22 @@ void main() {
     // We expect the shops creation mode to be canceled by pages switching
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsNothing);
+  });
+
+  testWidgets('viewed products are not requested implicitly',
+      (WidgetTester tester) async {
+    await tester.superPump(const MainPage());
+
+    // No interactions when MainPage is created
+    verifyZeroInteractions(viewedProductsStorage);
+
+    expect(currentPage().key, isNot(equals(const Key('main_profile_page'))));
+    await tester.superTap(find.byKey(const Key('bottom_bar_profile')));
+    expect(currentPage().key, equals(const Key('main_profile_page')));
+
+    // Still no interactions even when the Profile page is opened
+    // This might change in the future though, if the history products
+    // list there would have the first position.
+    verifyZeroInteractions(viewedProductsStorage);
   });
 }

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
@@ -18,17 +19,18 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/scan/viewed_products_history_page.dart';
+import 'package:plante/ui/profile/components/products_history_widget.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
-import '../../z_fakes/fake_user_params_controller.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_user_langs_manager.dart';
+import '../../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late MockProductsObtainer productsObtainer;
   late ViewedProductsStorage viewedProductsStorage;
+  late FakeUserParamsController userParamsController;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -47,7 +49,7 @@ void main() {
         ViewedProductsStorage(loadPersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
-    final userParamsController = FakeUserParamsController();
+    userParamsController = FakeUserParamsController();
     final user = UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
@@ -60,23 +62,35 @@ void main() {
     unawaited(viewedProductsStorage.addProduct(_makeProduct('1')));
     unawaited(viewedProductsStorage.addProduct(_makeProduct('2')));
 
-    await tester.superPump(const ViewedProductsHistoryPage());
+    await tester.superPump(ProductsHistoryWidget(
+        viewedProductsStorage, productsObtainer, userParamsController));
 
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsOneWidget);
   });
 
   testWidgets('viewed product added', (WidgetTester tester) async {
+    final context = await tester.superPump(ProductsHistoryWidget(
+        viewedProductsStorage, productsObtainer, userParamsController));
+
+    expect(find.text(context.strings.products_history_widget_no_history_hint),
+        findsOneWidget);
+    expect(find.text('Product 1'), findsNothing);
+    expect(find.text('Product 2'), findsNothing);
+
     unawaited(viewedProductsStorage.addProduct(_makeProduct('1')));
+    await tester.pumpAndSettle();
 
-    await tester.superPump(const ViewedProductsHistoryPage());
-
+    expect(find.text(context.strings.products_history_widget_no_history_hint),
+        findsNothing);
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);
 
     unawaited(viewedProductsStorage.addProduct(_makeProduct('2')));
     await tester.pumpAndSettle();
 
+    expect(find.text(context.strings.products_history_widget_no_history_hint),
+        findsNothing);
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsOneWidget);
   });
@@ -89,7 +103,8 @@ void main() {
     unawaited(viewedProductsStorage.addProduct(p2));
     unawaited(viewedProductsStorage.addProduct(p1));
 
-    await tester.superPump(const ViewedProductsHistoryPage());
+    await tester.superPump(ProductsHistoryWidget(
+        viewedProductsStorage, productsObtainer, userParamsController));
 
     var product1Pos = tester.getTopLeft(find.text('Product 1'));
     var product2Pos = tester.getTopLeft(find.text('Product 2'));
@@ -110,7 +125,8 @@ void main() {
     final p1 = _makeProduct('1');
     unawaited(viewedProductsStorage.addProduct(p1));
 
-    await tester.superPump(const ViewedProductsHistoryPage());
+    await tester.superPump(ProductsHistoryWidget(
+        viewedProductsStorage, productsObtainer, userParamsController));
 
     // Opened product is obtained from the manager
     // and display product page is shown

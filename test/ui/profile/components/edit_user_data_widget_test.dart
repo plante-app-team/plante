@@ -8,9 +8,9 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
-import 'package:plante/ui/profile/edit_user_data_widget.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 
-import '../../widget_tester_extension.dart';
+import '../../../widget_tester_extension.dart';
 
 void main() {
   final userAvatarHeaders = () async {

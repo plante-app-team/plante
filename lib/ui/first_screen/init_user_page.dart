@@ -21,7 +21,7 @@ import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
-import 'package:plante/ui/profile/edit_user_data_widget.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 
 typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);

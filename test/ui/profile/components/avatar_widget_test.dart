@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
-import 'package:plante/ui/profile/avatar_widget.dart';
+import 'package:plante/ui/profile/components/avatar_widget.dart';
 
-import '../../widget_tester_extension.dart';
+import '../../../widget_tester_extension.dart';
 
 void main() {
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);

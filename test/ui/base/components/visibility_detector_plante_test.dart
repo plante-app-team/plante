@@ -166,6 +166,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(visible, isFalse);
   });
+
+  testWidgets(
+      'visibility detector with invisible child never reports visibility',
+      (WidgetTester tester) async {
+    bool? visible;
+    final visibilityDetector = VisibilityDetectorPlante(
+      keyStr: 'key',
+      onVisibilityChanged: (visibleIn, _) {
+        visible = visibleIn;
+      },
+      child: const SizedBox(), // <--------- Invisible child
+    );
+
+    await tester.superPump(visibilityDetector);
+    expect(visible, isNull);
+  });
 }
 
 class _VisibilityDetectorTestHelper extends StatefulWidget {

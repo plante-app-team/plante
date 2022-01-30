@@ -21,7 +21,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
-import 'package:plante/ui/profile/edit_user_data_widget.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 
 class EditProfilePage extends PagePlante {
   final UserParams initialUserParams;

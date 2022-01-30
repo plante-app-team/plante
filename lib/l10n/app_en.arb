@@ -264,12 +264,24 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
     "mod_reason_tested_on_animals": "Animal tested product",
+    "products_history_widget_no_history_hint": "Here you will see products you've viewed or scanned",
+    "@products_history_widget_no_history_hint": {
+        "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"
+    },
     "product_report_dialog_report_sent": "Report sent",
     "product_report_dialog_send": "Send",
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
     "profile_page_edit_profile": "Edit profile",
     "@profile_page_edit_profile": {
         "description": "A button in User Profile which initiates user profile editing (changes of name, avatar, ...)"
+    },
+    "profile_page_products_history": "History",
+    "@profile_page_products_history": {
+        "description": "A button in User Profile which switches the list of displayed products to user's history - list of products the user has scanned and viewed"
+    },
+    "profile_page_products_my_products": "My products",
+    "@profile_page_products_my_products": {
+        "description": "A button in User Profile which switches the list of displayed products to user's products - list of products the user has added to stores and to the app by filling products' data"
     },
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
@@ -343,6 +355,5 @@
     "veg_status_displayed_vegan_status_unknown": "Unknown vegan status",
     "veg_status_selection_panel_dunno": "Not sure",
     "veg_status_selection_panel_negative": "No",
-    "veg_status_selection_panel_positive": "Yes",
-    "viewed_products_history_page_title": "Recently viewed"
+    "veg_status_selection_panel_positive": "Yes"
 }
