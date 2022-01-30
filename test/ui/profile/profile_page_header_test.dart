@@ -1,46 +1,28 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
-import 'package:plante/base/settings.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/profile/edit_profile_page.dart';
 import 'package:plante/ui/profile/profile_page.dart';
 import 'package:plante/ui/settings/settings_page.dart';
 
-import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
+import 'profile_page_test_commons.dart';
 
 void main() {
-  const avatarId = FakeUserAvatarManager.DEFAULT_AVATAR_ID;
-  final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
+  late ProfilePageTestCommons commons;
+  const avatarId = ProfilePageTestCommons.avatarId;
+  final imagePath = ProfilePageTestCommons.imagePath;
   late FakeUserParamsController userParamsController;
   late FakeUserAvatarManager userAvatarManager;
 
   setUp(() async {
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-
-    userParamsController = FakeUserParamsController();
-    userAvatarManager = FakeUserAvatarManager(userParamsController);
-
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
-    GetIt.I.registerSingleton<Settings>(Settings());
-    GetIt.I
-        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I.registerSingleton<Backend>(MockBackend());
+    commons = await ProfilePageTestCommons.create();
+    userParamsController = commons.userParamsController;
+    userAvatarManager = commons.userAvatarManager;
   });
 
   testWidgets('filled profile', (WidgetTester tester) async {
@@ -50,7 +32,7 @@ void main() {
       ..avatarId = avatarId));
     await userAvatarManager.updateUserAvatar(imagePath);
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
     expect(find.text('Bob Kelso'), findsOneWidget);
     expect(find.text('Hello there!'), findsOneWidget);
     expect(find.byType(UriImagePlante), findsOneWidget);
@@ -63,7 +45,7 @@ void main() {
       ..avatarId = null));
     await userAvatarManager.deleteUserAvatar();
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
     expect(find.byType(UriImagePlante), findsNothing);
     // We mostly test that the widget does not crash
   });
@@ -72,7 +54,7 @@ void main() {
     await userParamsController.setUserParams(null);
     await userAvatarManager.deleteUserAvatar();
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
     expect(find.byType(UriImagePlante), findsNothing);
     // We mostly test that the widget does not crash
   });
@@ -83,7 +65,7 @@ void main() {
       ..name = null
       ..selfDescription = null));
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
 
     expect(find.text('Bob Kelso'), findsNothing);
     await userParamsController.setUserParams(userParamsController
@@ -105,7 +87,7 @@ void main() {
       (WidgetTester tester) async {
     await userAvatarManager.deleteUserAvatar();
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
 
     expect(find.byType(UriImagePlante), findsNothing);
     await userAvatarManager.updateUserAvatar(imagePath);
@@ -118,7 +100,7 @@ void main() {
         .setUserParams(UserParams((e) => e.name = 'Bob Kelso'));
     await userAvatarManager.deleteUserAvatar();
 
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
 
     expect(find.byType(EditProfilePage), findsNothing);
     await tester.superTap(find.byKey(const Key('edit_profile_button')));
@@ -128,7 +110,7 @@ void main() {
   testWidgets('settings click', (WidgetTester tester) async {
     await userParamsController
         .setUserParams(UserParams((e) => e.name = 'Bob Kelso'));
-    await tester.superPump(const ProfilePage());
+    await tester.superPump(ProfilePage());
 
     expect(find.byType(SettingsPage), findsNothing);
     await tester.superTap(find.byKey(const Key('settings_button')));

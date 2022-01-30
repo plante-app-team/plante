@@ -13,7 +13,7 @@ import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
-import 'package:plante/ui/profile/avatar_widget.dart';
+import 'package:plante/ui/profile/components/avatar_widget.dart';
 
 class EditUserDataWidgetController {
   UserParams? _userParams;

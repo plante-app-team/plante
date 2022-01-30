@@ -9,7 +9,13 @@ typedef OnVisibilityChanged = Function(bool visible, bool firstNotification);
 /// Observes VisibilityDetector, app's background-foreground state and
 /// supports tests.
 /// Also notifies about gone visibility when is disposed.
+/// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/// !!! IMPORTANT WARNINGS BELOW !!!
+/// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ///
+/// !!!!!!!!!!!!!!!!!
+/// !!! WARNING 1 !!!
+/// !!!!!!!!!!!!!!!!!
 /// PLEASE NOTE that unfortunately the events emitted by this widget (and by
 /// [VisibilityDetector]) are PROBABILISTIC, and DO NOT GUARANTY that the
 /// wrapped widget is actually hidden or shown.
@@ -24,6 +30,14 @@ typedef OnVisibilityChanged = Function(bool visible, bool firstNotification);
 /// problem and left the things as they are.
 ///
 /// https://trello.com/c/pQ4q3ets/
+///
+/// !!!!!!!!!!!!!!!!!
+/// !!! WARNING 2 !!!
+/// !!!!!!!!!!!!!!!!!
+/// If the given [child] does not have any visibility by design (for example,
+/// it's `SizedBox.shrink()`), then the detector will not report
+/// visibility == true, ever.
+///
 class VisibilityDetectorPlante extends StatefulWidget {
   final String keyStr;
   final Widget child;

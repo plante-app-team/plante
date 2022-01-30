@@ -13,13 +13,16 @@ import 'package:plante/model/product.dart';
 class ViewedProductsStorage {
   static const STORED_PRODUCTS_MAX = 20;
   static const _DEFAULT_FILE_NAME = 'viewed_products_storage.json';
+  final bool loadPersistentProducts;
+  final bool storePersistentProducts;
   final String storageFileName;
   final _cache = <Product>[];
 
   final _updatesStream = StreamController<void>.broadcast();
 
   ViewedProductsStorage(
-      {bool loadPersistentProducts = true,
+      {this.loadPersistentProducts = true,
+      this.storePersistentProducts = true,
       this.storageFileName = _DEFAULT_FILE_NAME}) {
     if (loadPersistentProducts) {
       _loadPersistentProducts();
@@ -81,6 +84,9 @@ class ViewedProductsStorage {
   }
 
   Future<void> _storeProductsPersistently() async {
+    if (!storePersistentProducts) {
+      return;
+    }
     final file = await _getStorageFile();
     await file.writeAsString(jsonEncode(_cache), flush: true);
   }

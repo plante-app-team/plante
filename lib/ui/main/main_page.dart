@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
@@ -14,7 +13,6 @@ import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/profile/profile_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
-import 'package:plante/ui/scan/viewed_products_history_page.dart';
 
 class MainPage extends PagePlante {
   static const PAGE_NAME = 'MainPage';
@@ -30,9 +28,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
       MapPage(key: const Key('main_map_page'), controller: _mapPageController);
   final _barcodePage =
       BarcodeScanPage(key: const Key('main_barcode_scan_page'));
-  final _historyPage =
-      const ViewedProductsHistoryPage(key: Key('main_history_page'));
-  final _profilePage = const ProfilePage(key: Key('main_profile_page'));
+  final _profilePage = ProfilePage(key: const Key('main_profile_page'));
 
   final _plusButtonKey = GlobalKey();
 
@@ -40,7 +36,6 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   late final Map<Widget, Key> _pagesButtonsKeys;
   late final UIValue<List<Widget>> _pages;
   late final _selectedPage = RestorableInt(0);
-  late final UIValue<bool> _enableProfile;
   final PageController pagerController = PageController();
 
   _MainPageState() : super(MainPage.PAGE_NAME);
@@ -51,35 +46,21 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   @override
   void initState() {
     super.initState();
-    _enableProfile = UIValue(false, ref);
     _pagesIcons = {
       _mapPage: 'assets/bottom_bar_map.svg',
       _barcodePage: 'assets/bottom_bar_barcode.svg',
-      _historyPage: 'assets/bottom_bar_history.svg',
       _profilePage: 'assets/bottom_bar_profile.svg',
     };
     _pagesButtonsKeys = {
       _mapPage: const Key('bottom_bar_map'),
       _barcodePage: const Key('bottom_bar_barcode'),
-      _historyPage: const Key('bottom_bar_history'),
       _profilePage: const Key('bottom_bar_profile'),
     };
     _pages = UIValue([
       _mapPage,
       _barcodePage,
-      _historyPage,
+      _profilePage,
     ], ref);
-
-    () async {
-      _enableProfile.setValue(await enableNewestFeatures());
-      if (await enableNewestFeatures()) {
-        _pages.setValue([
-          _mapPage,
-          _barcodePage,
-          _profilePage,
-        ]);
-      }
-    }.call();
   }
 
   @override
@@ -116,7 +97,6 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
 
   Widget _bottomBar() {
     return consumer((ref) {
-      final enableProfile = _enableProfile.watch(ref);
       final pages = _pages.watch(ref);
       final children = [
         ...pages.map((page) {
@@ -131,20 +111,19 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
                       ? ColorsPlante.primary
                       : ColorsPlante.grey));
         }).toList(),
-        if (enableProfile)
-          Container(
-              key: const Key('bottom_bar_plus_fab'),
-              child: FabPlante(
-                key: _plusButtonKey,
-                svgAsset: 'assets/bottom_bar_plus.svg',
-                shadow: const BoxShadow(
-                  color: Color(0x261E2030),
-                  spreadRadius: 0,
-                  blurRadius: 16,
-                  offset: Offset(0, 4),
-                ),
-                onPressed: _onPlusClick,
-              )),
+        Container(
+            key: const Key('bottom_bar_plus_fab'),
+            child: FabPlante(
+              key: _plusButtonKey,
+              svgAsset: 'assets/bottom_bar_plus.svg',
+              shadow: const BoxShadow(
+                color: Color(0x261E2030),
+                spreadRadius: 0,
+                blurRadius: 16,
+                offset: Offset(0, 4),
+              ),
+              onPressed: _onPlusClick,
+            )),
       ];
       return BottomBarPlante(children: children);
     });
