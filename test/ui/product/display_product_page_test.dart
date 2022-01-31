@@ -23,7 +23,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
-import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -52,7 +52,7 @@ const _DEFAULT_LANG = LangCode.en;
 
 void main() {
   late MockProductsManager productsManager;
-  late MockBackend backend;
+  late MockUserReportsMaker userReportsMaker;
   late MockUserLocationManager userLocationManager;
   late MockShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
@@ -72,9 +72,10 @@ void main() {
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
     GetIt.I.registerSingleton<ProductsManager>(productsManager);
 
-    backend = MockBackend();
-    when(backend.sendReport(any, any)).thenAnswer((_) async => Ok(None()));
-    GetIt.I.registerSingleton<Backend>(backend);
+    userReportsMaker = MockUserReportsMaker();
+    when(userReportsMaker.reportProduct(any, any))
+        .thenAnswer((_) async => Ok(None()));
+    GetIt.I.registerSingleton<UserReportsMaker>(userReportsMaker);
 
     GetIt.I.registerSingleton<LatestCameraPosStorage>(
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
@@ -283,7 +284,7 @@ void main() {
         .tap(find.text(context.strings.display_product_page_report_btn));
     await tester.pumpAndSettle();
 
-    verifyNever(backend.sendReport('123', 'Bad, bad product!'));
+    verifyNever(userReportsMaker.reportProduct(any, any));
 
     await tester.enterText(
         find.byKey(const Key('report_text')), 'Bad, bad product!');
@@ -291,7 +292,8 @@ void main() {
     await tester.tap(find.text(context.strings.product_report_dialog_send));
     await tester.pumpAndSettle();
 
-    verify(backend.sendReport('123', 'Bad, bad product!')).called(1);
+    verify(userReportsMaker.reportProduct('123', 'Bad, bad product!'))
+        .called(1);
   });
 
   testWidgets('viewed product is stored persistently',

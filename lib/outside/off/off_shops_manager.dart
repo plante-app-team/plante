@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
@@ -41,7 +41,7 @@ class OffShopsManager {
   final OffShopsListObtainer _shopsObtainer;
 
   late final Map<String,
-          CachedOperation<OffShopsListWrapper, OffShopsManagerError>>
+          CachedLazyOp<OffShopsListWrapper, OffShopsManagerError>>
       _offShopsMap = {};
 
   OffShopsManager(this._veganBarcodesObtainer, this._shopsObtainer);
@@ -76,7 +76,7 @@ class OffShopsManager {
   Future<Result<OffShopsListWrapper, OffShopsManagerError>> _offShopsFor(
       String countryCode) async {
     var shops = _offShopsMap[countryCode];
-    shops ??= CachedOperation(() => _fetchOffShopsImpl(countryCode));
+    shops ??= CachedLazyOp(() => _fetchOffShopsImpl(countryCode));
     _offShopsMap[countryCode] = shops;
     return shops.result;
   }

@@ -35,7 +35,7 @@ enum MapPageModelError {
   OTHER,
 }
 
-class MapPageModel implements ShopsManagerListener {
+class MapPageModel with ShopsManagerListener {
   static const DEFAULT_USER_POS = LatLng(37.49777, -122.22195);
   static final delayBetweenSuggestionsAbsorption =
       isInTests() ? const Duration(seconds: 1) : const Duration(seconds: 5);

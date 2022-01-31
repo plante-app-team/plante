@@ -13,7 +13,7 @@ import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
-class ConfirmedProductsModel implements ShopsManagerListener {
+class ConfirmedProductsModel with ShopsManagerListener {
   final ShopsManager _shopsManager;
   final Shop _shop;
   final VoidCallback _updateCallback;

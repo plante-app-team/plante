@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 
+/// Cached Lazy Operation.
 /// Wrapper for an operation, which:
 /// - Has delayed execution: a [_fn] is passed to the constructor and
 ///   is called only when the [result] getter is invoked.
@@ -18,16 +19,18 @@ import 'package:plante/base/result.dart';
 /// This class is good for network operations which you expect to return same
 /// result on success (so it can be reused) and want to retry on failures,
 /// but not eagerly.
-class CachedOperation<T, E> {
+class CachedLazyOp<T, E> {
   final ResCallback<Future<Result<T, E>>> _fn;
   Result<T, E>? _result;
   Completer<Result<T, E>>? _completer;
 
-  CachedOperation(this._fn);
+  CachedLazyOp(this._fn);
 
-  static CachedOperation<T, None> alwaysOk<T>(ResCallback<Future<T>> fn) {
-    return CachedOperation(() async => Ok(await fn.call()));
+  static CachedLazyOp<T, None> alwaysOk<T>(ResCallback<Future<T>> fn) {
+    return CachedLazyOp(() async => Ok(await fn.call()));
   }
+
+  bool get done => _result != null;
 
   Future<Result<T, E>> get result {
     if (_result != null) {

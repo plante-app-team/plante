@@ -24,6 +24,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -71,6 +72,7 @@ void main() {
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     backend = MockBackend();
     GetIt.I.registerSingleton<Backend>(backend);
+    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     routesObserver = MockRouteObserver();
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
     permissionsManager = MockPermissionsManager();

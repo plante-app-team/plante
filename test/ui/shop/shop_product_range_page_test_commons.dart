@@ -25,6 +25,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -177,6 +178,7 @@ class ShopProductRangePageTestCommons {
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
     GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     suggestedProductsManager = FakeSuggestedProductsManager();
     GetIt.I
         .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);

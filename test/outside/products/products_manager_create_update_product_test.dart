@@ -23,12 +23,15 @@ void main() {
   late MockOffApi offApi;
   late MockBackend backend;
   late ProductsManager productsManager;
+  late _FakeObserver observer;
 
   setUp(() async {
     commons = await ProductsManagerTestCommons.create();
     offApi = commons.offApi;
     backend = commons.backend;
     productsManager = commons.productsManager;
+    observer = _FakeObserver();
+    productsManager.addObserver(observer);
   });
 
   void setUpOffProducts(List<off.Product> products) {
@@ -96,6 +99,9 @@ void main() {
     expect(capturedImage2.imageUri, equals(Uri.file('/tmp/img2.jpg')));
     expect(capturedImage2.barcode, equals('123'));
     expect(capturedImage2.lang, equals(off.OpenFoodFactsLanguage.RUSSIAN));
+
+    // Observers notified
+    expect(observer.editedProducts, equals([product.barcode]));
   });
 
   test('update product without images', () async {
@@ -135,6 +141,9 @@ void main() {
         .called(1);
 
     verifyNever(offApi.addProductImage(any, captureAny));
+
+    // Observers notified
+    expect(observer.editedProducts, equals([product.barcode]));
   });
 
   test('update product with front image only', () async {
@@ -184,6 +193,9 @@ void main() {
 
     // Only 1 image
     expect(allImages.length, equals(1));
+
+    // Observers notified
+    expect(observer.editedProducts, equals([product.barcode]));
   });
 
   test('update product with ingredients image only', () async {
@@ -233,6 +245,9 @@ void main() {
 
     // Only 1 image
     expect(allImages.length, equals(1));
+
+    // Observers notified
+    expect(observer.editedProducts, equals([product.barcode]));
   });
 
   test('update product OFF throws network error at save call', () async {
@@ -253,6 +268,9 @@ void main() {
 
     final result = await productsManager.createUpdateProduct(product);
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('update product OFF throws network error at image save call', () async {
@@ -273,6 +291,9 @@ void main() {
 
     final result = await productsManager.createUpdateProduct(product);
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('update product network error in backend', () async {
@@ -296,6 +317,9 @@ void main() {
 
     final result = await productsManager.createUpdateProduct(product);
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('create product which does not exist in OFF yet', () async {
@@ -384,6 +408,9 @@ void main() {
     verify(offApi.getProductList(any));
 
     expect(saveResult.isErr, isTrue);
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('unchanged product is not sent to OFF or backend on re-save', () async {
@@ -404,6 +431,9 @@ void main() {
     // Ensure the product was not sent anywhere because it's not changed
     verifyNever(offApi.saveProduct(any, captureAny));
     verifyNever(backend.createUpdateProduct(any));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('product considered unchanged when prioritized langs are different',
@@ -432,6 +462,9 @@ void main() {
     // are changed
     verifyNever(offApi.saveProduct(any, captureAny));
     verifyNever(backend.createUpdateProduct(any));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test('product considered unchanged when OFF tags field are reordered',
@@ -456,6 +489,9 @@ void main() {
     // Ensure the product was not sent anywhere because it's actually same
     verifyNever(offApi.saveProduct(any, captureAny));
     verifyNever(backend.createUpdateProduct(any));
+
+    // Observers NOT notified
+    expect(observer.editedProducts, isEmpty);
   });
 
   test(
@@ -521,4 +557,13 @@ void main() {
         veganStatus: VegStatus.negative,
         changedLangs: anyNamed('changedLangs')));
   });
+}
+
+class _FakeObserver implements ProductsManagerObserver {
+  final editedProducts = <String>[];
+
+  @override
+  void onProductEdited(Product product) {
+    editedProducts.add(product.barcode);
+  }
 }

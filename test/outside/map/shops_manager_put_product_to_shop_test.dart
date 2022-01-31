@@ -216,4 +216,17 @@ void main() {
           targetProduct.barcode: {targetShop.osmUID}
         }));
   });
+
+  test('when product put to shop listeners are notified', () async {
+    final listener = MockShopsManagerListener();
+    shopsManager.addListener(listener);
+
+    verifyZeroInteractions(listener);
+    final putRes = await shopsManager.putProductToShops(
+        rangeProducts[2], [fullShops.values.first], ProductAtShopSource.MANUAL);
+    expect(putRes.isOk, isTrue);
+    verify(listener.onLocalShopsChange());
+    verify(listener
+        .onProductPutToShops(rangeProducts[2], [fullShops.values.first]));
+  });
 }

@@ -19,6 +19,10 @@ import 'package:plante/outside/products/products_converter.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/taken_products_images_storage.dart';
 
+abstract class ProductsManagerObserver {
+  void onProductEdited(Product product);
+}
+
 class ProductWithOCRIngredients {
   Product product;
   String? ingredients;
@@ -46,6 +50,8 @@ class ProductsManager {
   final Backend _backend;
   final TakenProductsImagesStorage _takenProductsImagesTable;
   final ProductsConverterAndCacher _productsConverter;
+
+  final _observers = <ProductsManagerObserver>[];
 
   ProductsManager(this._off, this._backend, this._takenProductsImagesTable,
       Analytics analytics)
@@ -270,7 +276,9 @@ class ProductsManager {
       Log.w("Product was saved but couldn't be obtained back");
       return Err(ProductsManagerError.OTHER);
     } else {
-      return Ok(result.unwrap()!);
+      final product = result.unwrap()!;
+      _observers.forEach((o) => o.onProductEdited(product));
+      return Ok(product);
     }
   }
 
@@ -390,6 +398,14 @@ class ProductsManager {
 
   off.User _offUser() =>
       const off.User(userId: OffUser.USERNAME, password: OffUser.PASSWORD);
+
+  void addObserver(ProductsManagerObserver observer) {
+    _observers.add(observer);
+  }
+
+  void removeObserver(ProductsManagerObserver observer) {
+    _observers.remove(observer);
+  }
 }
 
 Result<T1, ProductsManagerError> _convertBackendError<T1, T2>(

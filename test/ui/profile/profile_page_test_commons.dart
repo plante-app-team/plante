@@ -9,6 +9,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -49,6 +50,7 @@ class ProfilePageTestCommons {
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     productsObtainer = FakeProductsObtainer();
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     viewedProductsStorage = ViewedProductsStorage(
