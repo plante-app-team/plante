@@ -210,6 +210,8 @@ class FakeShopsManager implements ShopsManager {
         ..osmUID = osmUid
         ..productsCount = 0)));
 
+    _listeners.forEach((listener) => listener.onShopCreated(newShop));
+
     var notify = false;
     for (final areaShops in _shopsAreas.entries) {
       if (areaShops.key.contains(coord)) {
@@ -293,6 +295,8 @@ class FakeShopsManager implements ShopsManager {
       _shopsRanges[shop.osmUID] = range;
     }
     _notifyListeners();
+    _listeners
+        .forEach((listener) => listener.onProductPutToShops(product, shops));
     return Ok(None());
   }
 

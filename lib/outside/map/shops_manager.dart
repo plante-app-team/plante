@@ -75,9 +75,23 @@ class ShopsManager {
     _listeners.remove(listener);
   }
 
-  void _notifyListeners() {
+  void _notifyListenersAboutChange() {
     _listeners.forEach((listener) {
       listener.onLocalShopsChange();
+    });
+  }
+
+  void _notifyListenersProductAddedToShops(Product product, List<Shop> shops) {
+    _notifyListenersAboutChange();
+    _listeners.forEach((listener) {
+      listener.onProductPutToShops(product, shops);
+    });
+  }
+
+  void _notifyListenersShopCreated(Shop shop) {
+    _notifyListenersAboutChange();
+    _listeners.forEach((listener) {
+      listener.onShopCreated(shop);
     });
   }
 
@@ -169,7 +183,7 @@ class ShopsManager {
     final result = ids
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
-    _notifyListeners();
+    _notifyListenersAboutChange();
     return Ok({for (var shop in result) shop.osmUID: shop});
   }
 
@@ -216,7 +230,7 @@ class ShopsManager {
       loadedShops.addAll(inflatedShops);
 
       await slowCache.addShops(inflatedShops.values);
-      _notifyListeners();
+      _notifyListenersAboutChange();
       // NOTE: we don't put the shop into [_loadedAreas] because the
       // [_loadedAreas] field is an entire area of already loaded shops -
       // if a shop was not loaded before [inflateOsmShops], it is not expected
@@ -243,7 +257,7 @@ class ShopsManager {
       await slowCache.addBarcodes(
           {shop.osmUID: range.products.map((e) => e.barcode).toList()});
     }
-    _notifyListeners();
+    _notifyListenersAboutChange();
     return result;
   }
 
@@ -281,7 +295,7 @@ class ShopsManager {
               'was no cache for the shop. Shop: $shop');
         }
       }
-      _notifyListeners();
+      _notifyListenersProductAddedToShops(product, shops);
       unawaited(_sendShopsToOFF(product, shops));
     } else {
       _analytics.sendEvent(
@@ -340,7 +354,7 @@ class ShopsManager {
           unawaited(_osmCacher.addShopToCache(territory.id, shop.osmShop));
         }
       }
-      _notifyListeners();
+      _notifyListenersShopCreated(shop);
     } else {
       _analytics.sendEvent('create_shop_failure',
           {'name': name, 'lat': coord.lat, 'lon': coord.lon});
@@ -373,7 +387,7 @@ class ShopsManager {
         }
         _rangesCache[shop.osmUID] = cachedRange.rebuildWithProduct(
             product, DateTime.now().secondsSinceEpoch);
-        _notifyListeners();
+        _notifyListenersAboutChange();
       } else if (result.unwrap().productDeleted) {
         await slowCache.removeBarcode(shop.osmUID, product.barcode);
         _rangesCache[shop.osmUID] =
@@ -382,7 +396,7 @@ class ShopsManager {
           await slowCache.addShop(cachedShop.rebuildWith(
               productsCount: cachedShop.productsCount - 1));
         }
-        _notifyListeners();
+        _notifyListenersAboutChange();
       }
     }
     return result;
@@ -393,7 +407,7 @@ class ShopsManager {
     await (await _slowCache).clear();
     _loadedAreas.clear();
     _rangesCache.clear();
-    _notifyListeners();
+    _notifyListenersAboutChange();
   }
 }
 

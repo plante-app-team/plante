@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:plante/base/base.dart';
 import 'package:plante/base/device_info.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/contributions/user_contribution.dart';
+import 'package:plante/contributions/user_contribution_type.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
@@ -139,6 +141,35 @@ class Backend {
     }
     return _createUrl(
         'user_avatar_data/${user.backendId}/${user.avatarId}', const {});
+  }
+
+  Future<Result<List<UserContribution>, BackendError>> requestUserContributions(
+      int limit, Iterable<UserContributionType> types) async {
+    final jsonRes = await _backendGetJson('user_contributions_data/', {
+      'limit': limit.toString(),
+      'contributionsTypes': types.map((e) => e.persistentCode.toString()),
+    });
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+    if (!json.containsKey('result')) {
+      Log.w('Invalid user_contributions_data response: $json');
+      return Err(BackendError.invalidDecodedJson(json));
+    }
+
+    final result = <UserContribution>[];
+    final contributionsJson = json['result'] as List<dynamic>;
+    for (final contributionJson in contributionsJson) {
+      final contribution =
+          UserContribution.fromJson(contributionJson as Map<String, dynamic>);
+      if (contribution == null) {
+        Log.w('Contribution could not pe parsed: $contributionJson');
+        continue;
+      }
+      result.add(contribution);
+    }
+    return Ok(result);
   }
 
   Future<Result<RequestedProductsResult, BackendError>> requestProducts(

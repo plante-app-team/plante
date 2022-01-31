@@ -1,5 +1,5 @@
 import 'package:plante/base/base.dart';
-import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
@@ -15,7 +15,7 @@ class DistinctAddressTypeObtainer {
   final ResCallback<Future<Coord?>> _requestPosition;
   final int _maxToleratedDistanceKms;
 
-  CachedOperation<OsmAddress?, None>? _ongoingOp;
+  CachedLazyOp<OsmAddress?, None>? _ongoingOp;
 
   DistinctAddressTypeObtainer(
       this._name,
@@ -25,7 +25,7 @@ class DistinctAddressTypeObtainer {
       this._maxToleratedDistanceKms);
 
   Future<OsmAddress?> obtainAddress() async {
-    _ongoingOp ??= CachedOperation.alwaysOk(_obtainAddressImpl);
+    _ongoingOp ??= CachedLazyOp.alwaysOk(_obtainAddressImpl);
     final result = await _ongoingOp!.result;
     _ongoingOp = null;
     return result.unwrap();

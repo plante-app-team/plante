@@ -18,6 +18,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/profile/components/products_history_widget.dart';
 
@@ -36,6 +37,7 @@ void main() {
     await GetIt.I.reset();
     GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
 

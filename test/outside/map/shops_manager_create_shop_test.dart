@@ -170,5 +170,6 @@ void main() {
         type: ShopType.supermarket);
     expect(newShopRes.isOk, isTrue);
     verify(listener.onLocalShopsChange());
+    verify(listener.onShopCreated(newShopRes.unwrap()));
   });
 }
