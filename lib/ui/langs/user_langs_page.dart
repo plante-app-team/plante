@@ -65,7 +65,7 @@ class _UserLangsPageState extends PageStatePlante<UserLangsPage> {
           HeaderPlante(
               title: Text(context.strings.settings_page_langs_i_know,
                   style: TextStyles.headline1),
-              leftAction: FabPlante.backBtnPopOnClick()),
+              leftAction: const FabPlante.backBtnPopOnClick()),
           Expanded(child: langsList),
           Padding(
               padding: const EdgeInsets.only(

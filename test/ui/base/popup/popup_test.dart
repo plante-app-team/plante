@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/popup/popup_plante.dart';
 
-import '../../widget_tester_extension.dart';
+import '../../../widget_tester_extension.dart';
 
 // ignore_for_file: must_be_immutable
 

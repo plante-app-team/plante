@@ -33,7 +33,7 @@ import 'package:plante/outside/products/products_manager_error.dart';
 import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
@@ -103,8 +103,7 @@ void main() {
 
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    when(photosTaker.retrieveLostPhoto())
-        .thenAnswer((realInvocation) async => null);
+    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
 
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
 

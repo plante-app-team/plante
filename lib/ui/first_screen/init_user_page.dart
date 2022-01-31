@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/general_error.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
@@ -10,8 +11,8 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
-import 'package:plante/ui/base/components/input_field_plante.dart';
 import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -20,13 +21,12 @@ import 'package:plante/ui/base/stepper/stepper_page.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/user_langs_widget.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 
 typedef UserParamsSpecifiedCallback = Future<bool> Function(
     UserParams userParams);
 
 class InitUserPage extends PagePlante {
-  static const MIN_NAME_LENGTH = 3;
-
   const InitUserPage({Key? key}) : super(key: key);
 
   @override
@@ -36,54 +36,66 @@ class InitUserPage extends PagePlante {
 class _InitUserPageState extends PageStatePlante<InitUserPage> {
   bool _loading = false;
 
-  UserParams _userParams = UserParams();
+  late final EditUserDataWidgetController _editUserDataController;
+
   final _userParamsController = GetIt.I.get<UserParamsController>();
   final _userLangsManager = GetIt.I.get<UserLangsManager>();
   final _backend = GetIt.I.get<Backend>();
+  final _avatarManager = GetIt.I.get<UserAvatarManager>();
   UserLangs? _userLangs;
 
   final _stepperController = CustomizableStepperController();
-  final _nameController = TextEditingController();
 
   var _firstPageHasData = false;
+
+  UserParams get _userParams => _editUserDataController.userParams;
+  set _userParams(UserParams params) =>
+      _editUserDataController.userParams = params;
+
+  Uri? get _userAvatar => _editUserDataController.userAvatar;
 
   _InitUserPageState() : super('InitUserPage');
 
   @override
   void initState() {
     super.initState();
+    final initialUserParams =
+        () async => await _userParamsController.getUserParams() ?? UserParams();
+    final initialUserAvatar = () async => await _avatarManager.userAvatarUri();
+    _editUserDataController = EditUserDataWidgetController(
+        initialUserParams: initialUserParams.call(),
+        initialAvatar: initialUserAvatar.call(),
+        userAvatarHttpHeaders: _avatarManager.userAvatarAuthHeaders(),
+        selectImageFromGallery: _selectImageFromGallery)
+      ..registerChangeCallback(_validateFirstPageInputs);
     _initAsync();
+  }
+
+  Future<Uri?> _selectImageFromGallery() async {
+    return _avatarManager.askUserToSelectImageFromGallery(context,
+        iHaveTriedRetrievingLostImage: true);
   }
 
   void _initAsync() {
     _longAction(() async {
-      _userParams = await _userParamsController.getUserParams() ?? UserParams();
-
-      _nameController.text = _userParams.name ?? '';
-      _nameController.addListener(() {
-        if (_validateFirstPageInputs()) {
-          _userParams =
-              _userParams.rebuild((v) => v.name = _nameController.text);
-        }
-      });
-
+      final lostAvatar =
+          await _avatarManager.retrieveLostSelectedAvatar(context);
+      if (lostAvatar != null) {
+        _editUserDataController.userAvatar = lostAvatar;
+      }
       _validateFirstPageInputs();
       _initUserLangs();
     });
   }
 
   bool _validateFirstPageInputs() {
-    final firstPageHasData = _calcFirstPageHasData();
+    final firstPageHasData = _editUserDataController.isDataValid();
     if (firstPageHasData != _firstPageHasData) {
       setState(() {
         _firstPageHasData = firstPageHasData;
       });
     }
     return firstPageHasData;
-  }
-
-  bool _calcFirstPageHasData() {
-    return InitUserPage.MIN_NAME_LENGTH <= _nameController.text.trim().length;
   }
 
   void _initUserLangs() async {
@@ -117,28 +129,12 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   }
 
   StepperPage _page1() {
-    final content = Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
-        child: Column(children: [
-          Expanded(
-            child: Stack(children: [
-              Center(
-                  child: SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                          padding: const EdgeInsets.only(bottom: 132),
-                          child: Text(context.strings.init_user_page_title,
-                              style: TextStyles.headline1)))),
-              Center(
-                  child: InputFieldPlante(
-                key: const Key('name'),
-                textCapitalization: TextCapitalization.sentences,
-                label: context.strings.init_user_page_name_field_title,
-                controller: _nameController,
-              ))
-            ]),
-          ),
-        ]));
+    final content = SingleChildScrollView(
+        child: Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24),
+            child: Column(children: [
+              EditUserDataWidget(controller: _editUserDataController),
+            ])));
 
     final onNextPressed = () {
       FocusScope.of(context).unfocus();
@@ -182,15 +178,34 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
       _longAction(() async {
         Log.i('InitUserPage, onDoneClicked: $_userParams');
 
+        // NOTE: we intentionally update the avatar before
+        // user params, because otherwise the InitUserPage widget
+        // will be immediately closed after valid user params are set
+        // bellow.
+        // The code is far from great and should be refactored when
+        // there will be a chance.
+        if (_userAvatar?.isScheme('FILE') == true) {
+          final avatarUploadRes =
+              await _avatarManager.updateUserAvatar(_userAvatar!);
+          if (avatarUploadRes.isErr) {
+            _showError(avatarUploadRes.unwrapErr().convert());
+            return;
+          }
+          _userParams =
+              _userParams.rebuild((e) => e.avatarId = avatarUploadRes.unwrap());
+        } else if (_userAvatar == null) {
+          final avatarDeleteRes = await _avatarManager.deleteUserAvatar();
+          if (avatarDeleteRes.isErr) {
+            _showError(avatarDeleteRes.unwrapErr().convert());
+            return;
+          }
+          _userParams = _userParams.rebuild((e) => e.avatarId = null);
+        }
+
         // Update on backend
         final paramsRes = await _backend.updateUserParams(_userParams);
         if (paramsRes.isErr) {
-          if (paramsRes.unwrapErr().errorKind ==
-              BackendErrorKind.NETWORK_ERROR) {
-            showSnackBar(context.strings.global_network_error, context);
-          } else {
-            showSnackBar(context.strings.global_something_went_wrong, context);
-          }
+          _showError(paramsRes.unwrapErr().convert());
           return;
         }
 
@@ -202,11 +217,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         final langRes = await _userLangsManager
             .setManualUserLangs(_userLangs!.langs.toList());
         if (langRes.isErr) {
-          if (langRes.unwrapErr() == UserLangsManagerError.NETWORK) {
-            showSnackBar(context.strings.global_network_error, context);
-          } else {
-            showSnackBar(context.strings.global_something_went_wrong, context);
-          }
+          _showError(langRes.unwrapErr().convert());
           return;
         }
         _userParams = langRes.unwrap();
@@ -228,6 +239,14 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
     return StepperPage(content, bottomControls);
   }
 
+  void _showError(GeneralError error) {
+    if (error == GeneralError.NETWORK) {
+      showSnackBar(context.strings.global_network_error, context);
+    } else {
+      showSnackBar(context.strings.global_something_went_wrong, context);
+    }
+  }
+
   void _longAction(Future<void> Function() action) async {
     try {
       setState(() {
@@ -240,6 +259,28 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
           _loading = false;
         });
       }
+    }
+  }
+}
+
+extension on BackendError {
+  GeneralError convert() {
+    switch (errorKind) {
+      case BackendErrorKind.NETWORK_ERROR:
+        return GeneralError.NETWORK;
+      default:
+        return GeneralError.OTHER;
+    }
+  }
+}
+
+extension on UserLangsManagerError {
+  GeneralError convert() {
+    switch (this) {
+      case UserLangsManagerError.NETWORK:
+        return GeneralError.NETWORK;
+      default:
+        return GeneralError.OTHER;
     }
   }
 }

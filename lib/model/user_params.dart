@@ -12,6 +12,10 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String? get backendClientToken;
   @BuiltValueField(wireName: 'name')
   String? get name;
+  @BuiltValueField(wireName: 'self_description')
+  String? get selfDescription;
+  @BuiltValueField(wireName: 'avatar_id')
+  String? get avatarId;
   @BuiltValueField(wireName: 'rights_group')
   int? get userGroup;
 
@@ -22,7 +26,7 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String requireBackendID() => backendId!;
   String requireBackendClientToken() => backendClientToken!;
 
-  static UserParams? fromJson(Map<String, dynamic> json) {
+  static UserParams? fromJson(Map<dynamic, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(UserParams.serializer, json);
   }

@@ -6,6 +6,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';

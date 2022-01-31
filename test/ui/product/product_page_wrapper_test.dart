@@ -19,7 +19,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -55,7 +55,7 @@ void main() {
 
     final photosTaker = MockPhotosTaker();
     GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
 
     GetIt.I.registerSingleton<InputProductsLangStorage>(

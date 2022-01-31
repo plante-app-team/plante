@@ -37,7 +37,7 @@ class _SettingsCachePageState extends PageStatePlante<SettingsCachePage> {
           HeaderPlante(
               title: Text(context.strings.settings_cache_page_title,
                   style: TextStyles.headline1),
-              leftAction: FabPlante.backBtnPopOnClick()),
+              leftAction: const FabPlante.backBtnPopOnClick()),
           Container(
               padding: const EdgeInsets.only(left: 24, right: 24),
               child: Column(children: [

@@ -24,9 +24,9 @@ import 'package:plante/ui/base/components/info_button_plante.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/popup/popup_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
-import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/product/_veg_status_warning.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
@@ -116,8 +116,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                 child: Stack(children: [
           Column(children: [
             HeaderPlante(
-              leftAction: FabPlante.backBtnPopOnClick(
-                  key: const Key('back_button'), heroTag: 'left_action'),
+              leftAction: const FabPlante.backBtnPopOnClick(
+                  key: Key('back_button'), heroTag: 'left_action'),
               // Sized box is only for the key
               rightAction: SizedBox(
                   key: const Key('options_button'),

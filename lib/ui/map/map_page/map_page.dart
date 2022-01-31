@@ -27,6 +27,7 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/animated_map_widget.dart';
 import 'package:plante/ui/map/components/fab_my_location.dart';
@@ -35,6 +36,7 @@ import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 import 'package:plante/ui/map/map_page/map_page_progress_bar.dart';
@@ -50,43 +52,46 @@ enum MapPageRequestedMode {
   SELECT_SHOPS,
 }
 
+class MapPageController {
+  VoidCallback? _startStoreCreation;
+  VoidCallback? _switchToDefaultMode;
+
+  /// Note: the map will switch to the default mode after store creation
+  /// is finished (or canceled).
+  void startShopCreation() {
+    _startStoreCreation?.call();
+  }
+
+  void switchToDefaultMode() {
+    _switchToDefaultMode?.call();
+  }
+}
+
 class MapPage extends PagePlante {
   final Product? product;
   final List<Shop> initialSelectedShops;
   final MapPageRequestedMode requestedMode;
-  final _testingStorage = MapPageTestingStorage();
+  final MapPageController? controller;
+  final testingStorage = MapPageTestingStorage();
 
   MapPage(
       {Key? key,
       this.product,
       this.initialSelectedShops = const [],
       this.requestedMode = MapPageRequestedMode.DEFAULT,
+      this.controller,
       GoogleMapController? mapControllerForTesting,
       bool createMapWidgetForTesting = false})
       : super(key: key) {
     if (mapControllerForTesting != null && !isInTests()) {
       throw Exception('MapPage: not in tests (init)');
     }
-    _testingStorage.mapControllerForTesting = mapControllerForTesting;
-    _testingStorage.createMapWidgetForTesting = createMapWidgetForTesting;
+    testingStorage.mapControllerForTesting = mapControllerForTesting;
+    testingStorage.createMapWidgetForTesting = createMapWidgetForTesting;
   }
 
   @override
   _MapPageState createState() => _MapPageState();
-
-  void finishForTesting<T>(T res) => _testingStorage.finishForTesting(res);
-  void onMapIdleForTesting() => _testingStorage.onMapIdleForTesting();
-  void onMapMoveForTesting(Coord coord, double zoom) =>
-      _testingStorage.onMapMoveForTesting(coord, zoom);
-  void onMarkerClickForTesting(Iterable<Shop> markerShops) =>
-      _testingStorage.onMarkerClickForTesting(markerShops);
-  void onMapClickForTesting(Coord coords) =>
-      _testingStorage.onMapClickForTesting(coords);
-  MapPageMode getModeForTesting() => _testingStorage.getModeForTesting();
-  Set<Shop> getDisplayedShopsForTesting() =>
-      _testingStorage.getDisplayedShopsForTesting();
-  void onSearchResultsForTesting(MapSearchPageResult searchResult) =>
-      _testingStorage.onSearchResultsForTesting(searchResult);
 }
 
 class _MapPageState extends PageStatePlante<MapPage>
@@ -123,22 +128,22 @@ class _MapPageState extends PageStatePlante<MapPage>
     _latestSearchResult = UIValue(null, ref);
     _loadNewShops = UIValue(true, ref);
 
-    widget._testingStorage.finishCallback = (result) {
+    widget.testingStorage.finishCallback = (result) {
       _model.finishWith(context, result);
     };
-    widget._testingStorage.onMapMoveCallback = (posZoomPair) {
+    widget.testingStorage.onMapMoveCallback = (posZoomPair) {
       _onCameraMove(CameraPosition(
           target: posZoomPair.first.toLatLng(), zoom: posZoomPair.second));
     };
-    widget._testingStorage.onMapIdleCallback = _onCameraIdle;
-    widget._testingStorage.onMarkerClickCallback = _onMarkerClick;
-    widget._testingStorage.onMapClickCallback = (Coord coord) {
+    widget.testingStorage.onMapIdleCallback = _onCameraIdle;
+    widget.testingStorage.onMarkerClickCallback = _onMarkerClick;
+    widget.testingStorage.onMapClickCallback = (Coord coord) {
       _onMapTap(LatLng(coord.lat, coord.lon));
     };
-    widget._testingStorage.modeCallback = () {
+    widget.testingStorage.modeCallback = () {
       return _mode.cachedVal;
     };
-    widget._testingStorage.onSearchResultCallback = _onSearchResult;
+    widget.testingStorage.onSearchResultCallback = _onSearchResult;
 
     final updateMapCallback = () {
       if (mounted) {
@@ -194,6 +199,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       oldMode.deinit();
       _mode.setValue(newMode);
       newMode.init(oldMode);
+      updateMapCallback.call();
     };
     _mode = UIValue(
         MapPageModeDefault(MapPageModeParams(
@@ -214,14 +220,25 @@ class _MapPageState extends PageStatePlante<MapPage>
             shouldLoadNewShops: _loadNewShops)),
         ref);
 
+    widget.controller?._switchToDefaultMode = () {
+      if (_mode.cachedVal is! MapPageModeDefault) {
+        switchModeCallback.call(MapPageModeDefault(_mode.cachedVal.params));
+      }
+    };
+    widget.controller?._startStoreCreation = () {
+      final nextMode = () => MapPageModeDefault(_mode.cachedVal.params);
+      switchModeCallback
+          .call(MapPageModeCreateShop(_mode.cachedVal.params, nextMode));
+    };
+
     _asyncInit();
     _instances.add(this);
     _instances.forEach((instance) {
       instance.onInstancesChange();
     });
 
-    if (widget._testingStorage.mapControllerForTesting != null) {
-      _mapController.complete(widget._testingStorage.mapControllerForTesting);
+    if (widget.testingStorage.mapControllerForTesting != null) {
+      _mapController.complete(widget.testingStorage.mapControllerForTesting);
     }
   }
 
@@ -324,7 +341,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       initialPos = _model.defaultUserPos();
     }
 
-    final searchBar = Consumer(builder: (context, ref, _) {
+    final searchBar = consumer((ref) {
       final loadNewShops = _loadNewShops.watch(ref);
       final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
       if (!loadNewShops || !viewPortShopsLoaded) {
@@ -345,7 +362,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                       }))));
     });
 
-    final loadShopsButton = Consumer(builder: (context, ref, _) {
+    final loadShopsButton = consumer((ref) {
       final loadNewShops = _loadNewShops.watch(ref);
       final loading = _model.loading.watch(ref);
       final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
@@ -362,7 +379,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     });
 
     final createMapWidget =
-        !isInTests() || widget._testingStorage.createMapWidgetForTesting;
+        !isInTests() || widget.testingStorage.createMapWidgetForTesting;
     final content = Stack(children: [
       if (createMapWidget)
         Consumer(
@@ -446,7 +463,7 @@ class _MapPageState extends PageStatePlante<MapPage>
               ),
             ])),
       ),
-      Consumer(builder: (context, ref, _) => _mode.watch(ref).buildOverlay()),
+      consumer((ref) => _mode.watch(ref).buildOverlay()),
     ]);
 
     return WillPopScope(
@@ -470,7 +487,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Widget _fabs() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final modeFabs = _mode.watch(ref).buildFABs() +
           [
             FabMyLocation(
@@ -513,7 +530,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   Widget _progressBar() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final loading = _model.loading.watch(ref);
       final loadingSuggestions = _model.loadingSuggestions.watch(ref);
       if (loading) {
@@ -541,8 +558,8 @@ class _MapPageState extends PageStatePlante<MapPage>
 
   void _onShopsUpdated(Iterable<Shop> shops) {
     _displayedShops = shops;
-    widget._testingStorage.displayedShops.clear();
-    widget._testingStorage.displayedShops.addAll(shops);
+    widget.testingStorage.displayedShops.clear();
+    widget.testingStorage.displayedShops.addAll(shops);
     _mode.cachedVal.onDisplayedShopsChange(shops);
 
     _clusterManager.setItems(shops

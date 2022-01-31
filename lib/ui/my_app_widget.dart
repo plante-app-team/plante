@@ -12,6 +12,7 @@ import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 import 'package:plante/ui/main/main_page.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 
 class MyAppWidget extends StatefulWidget {
   final UserParams? _initialUserParams;
@@ -78,7 +79,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
     if (_userParams == null) {
       return false;
     }
-    if ((_userParams?.name ?? '').length < InitUserPage.MIN_NAME_LENGTH ||
+    if ((_userParams?.name ?? '').length < EditUserDataWidget.MIN_NAME_LENGTH ||
         _userParams!.langsPrioritized == null ||
         _userParams!.langsPrioritized!.isEmpty) {
       return false;

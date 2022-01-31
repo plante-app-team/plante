@@ -24,8 +24,9 @@ class AddPhotoButtonPlante extends StatelessWidget {
         onTap: existingPhoto == null ? onAddTap : onCancelTap,
         child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Stack(children: [
+            child: Stack(alignment: Alignment.center, children: [
               SvgPicture.asset('assets/add_photo.svg'),
+              SvgPicture.asset('assets/add_photo_background.svg'),
               if (existingPhoto != null)
                 Positioned.fill(
                     child: Stack(children: [

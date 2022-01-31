@@ -7,6 +7,7 @@ import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -111,8 +112,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.superTap(find.byKey(const Key('shop_type_dropdown')));
-    await tester.tapDropDownItem(context.strings.shop_type_supermarket);
-    await tester.pumpAndSettle();
+    await tester.superTapDropDownItem(context.strings.shop_type_supermarket);
 
     shopsManager.verity_createShop_called(times: 0);
 

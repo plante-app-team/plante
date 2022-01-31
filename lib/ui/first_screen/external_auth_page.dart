@@ -19,7 +19,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/first_screen/init_user_page.dart';
+import 'package:plante/ui/profile/components/edit_user_data_widget.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -209,7 +209,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
 
     // Take external name
     var userParams = loginResult.unwrap();
-    if ((userParams.name ?? '').length < InitUserPage.MIN_NAME_LENGTH) {
+    if ((userParams.name ?? '').length < EditUserDataWidget.MIN_NAME_LENGTH) {
       userParams = userParams.rebuild((e) => e.name = userName);
     }
     return userParams;

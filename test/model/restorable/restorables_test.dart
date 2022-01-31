@@ -5,18 +5,21 @@ import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/model/product_lang_slice_restorable.dart';
-import 'package:plante/model/product_restorable.dart';
+import 'package:plante/model/restorable/product_lang_slice_restorable.dart';
+import 'package:plante/model/restorable/product_restorable.dart';
+import 'package:plante/model/restorable/shop_restorable.dart';
+import 'package:plante/model/restorable/shops_list_restorable.dart';
+import 'package:plante/model/restorable/uri_restorable.dart';
+import 'package:plante/model/restorable/user_params_restorable.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/shop_restorable.dart';
-import 'package:plante/model/shops_list_restorable.dart';
+import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 
-import '../widget_tester_extension.dart';
+import '../../widget_tester_extension.dart';
 
 // ignore: must_be_immutable
 class _TestWidget extends StatefulWidget {
@@ -194,6 +197,64 @@ void main() {
     restorable.value = shops;
 
     final restored = ShopsListRestorable(const []);
+    widget.register(restored, 'restored');
+    restored.value = restored.fromPrimitives(restorable.toPrimitives());
+
+    expect(restored.value, equals(restorable.value));
+  });
+
+  testWidgets('UserParamsRestorable', (WidgetTester tester) async {
+    final widget = _TestWidget();
+    await tester.superPump(widget);
+
+    final params = UserParams((e) => e
+      ..avatarId = 'avatarID'
+      ..name = 'Bob'
+      ..selfDescription = 'Doctor'
+      ..backendId = '1234'
+      ..backendClientToken = '12345'
+      ..langsPrioritized.addAll(['en', 'ru'])
+      ..userGroup = 1);
+
+    final restorable = UserParamsRestorable(UserParams());
+    widget.register(restorable, 'restorable');
+    restorable.value = params;
+
+    final restored = UserParamsRestorable(UserParams());
+    widget.register(restored, 'restored');
+    restored.value = restored.fromPrimitives(restorable.toPrimitives());
+
+    expect(restored.value, equals(restorable.value));
+  });
+
+  testWidgets('UriRestorable non-null', (WidgetTester tester) async {
+    final widget = _TestWidget();
+    await tester.superPump(widget);
+
+    final uri = Uri.parse('https://planteapp.com');
+
+    final restorable = UriRestorable(null);
+    widget.register(restorable, 'restorable');
+    restorable.value = uri;
+
+    final restored = UriRestorable(null);
+    widget.register(restored, 'restored');
+    restored.value = restored.fromPrimitives(restorable.toPrimitives());
+
+    expect(restored.value, equals(restorable.value));
+  });
+
+  testWidgets('UriRestorable null', (WidgetTester tester) async {
+    final widget = _TestWidget();
+    await tester.superPump(widget);
+
+    final initialValue = Uri.parse('https://planteapp.com');
+
+    final restorable = UriRestorable(initialValue);
+    widget.register(restorable, 'restorable');
+    restorable.value = null;
+
+    final restored = UriRestorable(initialValue);
     widget.register(restored, 'restored');
     restored.value = restored.fromPrimitives(restorable.toPrimitives());
 

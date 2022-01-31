@@ -5,6 +5,9 @@ import 'package:plante/ui/base/text_styles.dart';
 class CheckButtonPlante extends StatelessWidget {
   final bool checked;
   final String text;
+  final double height;
+  final Color colorChecked;
+  final Color colorUnchecked;
   final dynamic Function(bool value) onChanged;
   final bool? showBorder;
 
@@ -12,8 +15,11 @@ class CheckButtonPlante extends StatelessWidget {
       {Key? key,
       required this.checked,
       required this.text,
-      required this.onChanged,
-      this.showBorder})
+      this.showBorder,
+      this.height = 43,
+      this.colorChecked = ColorsPlante.primary,
+      this.colorUnchecked = ColorsPlante.lightGrey,
+      required this.onChanged})
       : super(key: key);
 
   @override
@@ -22,7 +28,7 @@ class CheckButtonPlante extends StatelessWidget {
         ? const BorderSide(width: 1, color: Colors.grey)
         : const BorderSide(style: BorderStyle.none);
     return SizedBox(
-        height: 43,
+        height: height,
         child: OutlinedButton(
             style: ButtonStyle(
                 side: MaterialStateProperty.all<BorderSide>(border),
@@ -30,7 +36,7 @@ class CheckButtonPlante extends StatelessWidget {
                     ? ColorsPlante.splashColor
                     : ColorsPlante.primaryDisabled),
                 backgroundColor: MaterialStateProperty.all(
-                    checked ? ColorsPlante.primary : ColorsPlante.lightGrey),
+                    checked ? colorChecked : colorUnchecked),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)))),

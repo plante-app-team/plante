@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 
 import '../../widget_tester_extension.dart';
@@ -134,7 +135,7 @@ class _HelperWidgetState extends ConsumerState<_HelperWidget> {
     buildsCount += 1;
     return Column(children: [
       Text(observedValue.watch(ref).toString()),
-      Consumer(builder: (context, ref, _) {
+      consumer((ref) {
         consumerBuildsCount += 1;
         return Text(observedByConsumerValue.watch(ref).toString());
       }),

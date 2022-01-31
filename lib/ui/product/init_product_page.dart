@@ -32,7 +32,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 
 // ignore: always_use_package_imports
 import 'init_product_page_model.dart';

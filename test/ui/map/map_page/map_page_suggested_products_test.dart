@@ -14,6 +14,7 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_default.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';

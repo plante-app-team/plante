@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/base/size_int.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
@@ -11,16 +12,17 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/model/product_lang_slice_restorable.dart';
-import 'package:plante/model/product_restorable.dart';
+import 'package:plante/model/restorable/product_lang_slice_restorable.dart';
+import 'package:plante/model/restorable/product_restorable.dart';
+import 'package:plante/model/restorable/shops_list_restorable.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/shops_list_restorable.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photo_requester.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 enum InitProductPageOcrState {
@@ -37,6 +39,10 @@ enum InitProductPageModelError {
 
 class InitProductPageModel {
   static const OCR_RETRIES_COUNT = 3;
+  static const _IMAGES_MIN_SIZE = SizeInt(
+    width: 640,
+    height: 160,
+  );
   static const _NO_PHOTO = -1;
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
@@ -163,7 +169,8 @@ class InitProductPageModel {
     _cacheDir = cacheDir;
 
     try {
-      final lostPhoto = await _photosTaker.retrieveLostPhoto();
+      final lostPhoto =
+          await _photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT);
       Log.i('InitProductPageModel initPhotoTaker, '
           'lostPhoto: $lostPhoto, '
           '_photoBeingTaken: ${_photoBeingTaken.value}');
@@ -181,7 +188,8 @@ class InitProductPageModel {
 
       Log.i('InitProductPageModel obtained photo, cropping');
       final outPath = await _photosTaker.cropPhoto(
-          lostPhoto.unwrap().path, context, cacheDir);
+          lostPhoto.unwrap().path, context, cacheDir,
+          minSize: _IMAGES_MIN_SIZE);
       if (outPath == null) {
         Log.i('InitProductPageModel cropping finished without photo');
         return;
@@ -203,7 +211,9 @@ class InitProductPageModel {
     _photoBeingTaken.value = imageType.index;
     try {
       Log.i('InitProductPageModel: takePhoto start, imageType: $imageType');
-      final outPath = await _photosTaker.takeAndCropPhoto(context, _cacheDir!);
+      final outPath = await _photosTaker.takeAndCropPhoto(
+          context, _cacheDir!, PhotoRequester.PRODUCT_INIT,
+          minSize: _IMAGES_MIN_SIZE);
       if (outPath == null) {
         Log.i('InitProductPageModel: takePhoto, outPath == null');
         // Cancelled

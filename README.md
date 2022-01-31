@@ -53,7 +53,7 @@ This means that while the `flutter test` command will work out of the box, to bu
 
 #### Obtain existing secrets
 
-If you're willing to help the project, you can get in touch with us on our Discord server: https://discord.com/invite/2QCgRbba
+If you're willing to help the project, you can get in touch with us on our Discord server: https://discord.gg/kXgXrTVpGY
 
 We will gladly provide you any needed information and will help you with any problems 🙂
 
@@ -85,7 +85,7 @@ To contribute on iOS you will need a (generated) tmp.xconfig.
 
 ## 👩🏾‍💻 Development
 
-- `flutter format` is used to enforce app's coding style - you should run `$ flutter format lib` from project's root directory before each commit.
+- `flutter format` is used to enforce app's coding style - you should run `$ flutter format .` from project's root directory before each commit.
 
 - The [built_value package](https://pub.dev/packages/built_value) is used for value types. You should read its documentation if you want to edit any `implements Built` class, or if you want to create a new one. We run next command when we update/create such a class: `$ flutter pub run build_runner build --delete-conflicting-outputs`.
 

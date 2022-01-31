@@ -40,6 +40,20 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add(serializers.serialize(value,
             specifiedType: const FullType(String)));
     }
+    value = object.selfDescription;
+    if (value != null) {
+      result
+        ..add('self_description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.avatarId;
+    if (value != null) {
+      result
+        ..add('avatar_id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.userGroup;
     if (value != null) {
       result
@@ -80,6 +94,14 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'self_description':
+          result.selfDescription = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'avatar_id':
+          result.avatarId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'rights_group':
           result.userGroup = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
@@ -105,6 +127,10 @@ class _$UserParams extends UserParams {
   @override
   final String? name;
   @override
+  final String? selfDescription;
+  @override
+  final String? avatarId;
+  @override
   final int? userGroup;
   @override
   final BuiltList<String>? langsPrioritized;
@@ -116,6 +142,8 @@ class _$UserParams extends UserParams {
       {this.backendId,
       this.backendClientToken,
       this.name,
+      this.selfDescription,
+      this.avatarId,
       this.userGroup,
       this.langsPrioritized})
       : super._();
@@ -134,6 +162,8 @@ class _$UserParams extends UserParams {
         backendId == other.backendId &&
         backendClientToken == other.backendClientToken &&
         name == other.name &&
+        selfDescription == other.selfDescription &&
+        avatarId == other.avatarId &&
         userGroup == other.userGroup &&
         langsPrioritized == other.langsPrioritized;
   }
@@ -142,8 +172,14 @@ class _$UserParams extends UserParams {
   int get hashCode {
     return $jf($jc(
         $jc(
-            $jc($jc($jc(0, backendId.hashCode), backendClientToken.hashCode),
-                name.hashCode),
+            $jc(
+                $jc(
+                    $jc(
+                        $jc($jc(0, backendId.hashCode),
+                            backendClientToken.hashCode),
+                        name.hashCode),
+                    selfDescription.hashCode),
+                avatarId.hashCode),
             userGroup.hashCode),
         langsPrioritized.hashCode));
   }
@@ -154,6 +190,8 @@ class _$UserParams extends UserParams {
           ..add('backendId', backendId)
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
+          ..add('selfDescription', selfDescription)
+          ..add('avatarId', avatarId)
           ..add('userGroup', userGroup)
           ..add('langsPrioritized', langsPrioritized))
         .toString();
@@ -176,6 +214,15 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
+  String? _selfDescription;
+  String? get selfDescription => _$this._selfDescription;
+  set selfDescription(String? selfDescription) =>
+      _$this._selfDescription = selfDescription;
+
+  String? _avatarId;
+  String? get avatarId => _$this._avatarId;
+  set avatarId(String? avatarId) => _$this._avatarId = avatarId;
+
   int? _userGroup;
   int? get userGroup => _$this._userGroup;
   set userGroup(int? userGroup) => _$this._userGroup = userGroup;
@@ -194,6 +241,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _backendId = $v.backendId;
       _backendClientToken = $v.backendClientToken;
       _name = $v.name;
+      _selfDescription = $v.selfDescription;
+      _avatarId = $v.avatarId;
       _userGroup = $v.userGroup;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
@@ -221,6 +270,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               backendId: backendId,
               backendClientToken: backendClientToken,
               name: name,
+              selfDescription: selfDescription,
+              avatarId: avatarId,
               userGroup: userGroup,
               langsPrioritized: _langsPrioritized?.build());
     } catch (_) {

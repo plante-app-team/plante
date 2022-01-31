@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/model/shop.dart';
@@ -79,7 +78,7 @@ abstract class MapPageModeShopsCardBase extends MapPageMode {
 
   @protected
   Widget shopsCardsWidget() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final displayedShops = _displayedShops.watch(ref);
       final Widget actualWidget;
       if (displayedShops.isEmpty) {

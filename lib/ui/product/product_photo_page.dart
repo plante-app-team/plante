@@ -45,8 +45,8 @@ class _ProductPhotoPageState extends PageStatePlante<ProductPhotoPage> {
               children: [
                 TableRow(
                   children: <Widget>[
-                    Padding(
-                        padding: const EdgeInsets.only(left: 12),
+                    const Padding(
+                        padding: EdgeInsets.only(left: 12),
                         child: SizedBox(
                           height: HeaderPlante.DEFAULT_HEIGHT,
                           child: Center(child: FabPlante.backBtnPopOnClick()),

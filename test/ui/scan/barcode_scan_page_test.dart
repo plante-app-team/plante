@@ -29,7 +29,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/ui/photos_taker.dart';
+import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -54,6 +54,7 @@ void main() {
   late MockRouteObserver<ModalRoute> routesObserver;
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
+  late ViewedProductsStorage viewedProductsStorage;
   late FakeAnalytics analytics;
 
   setUp(() async {
@@ -74,8 +75,6 @@ void main() {
     GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
     permissionsManager = MockPermissionsManager();
     GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
-    GetIt.I
-        .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
     shopsManager = MockShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     final userLocationManager = FakeUserLocationManager();
@@ -86,8 +85,11 @@ void main() {
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([_DEFAULT_LANG]));
+    viewedProductsStorage =
+        ViewedProductsStorage(loadPersistentProducts: false);
+    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
-    when(photosTaker.retrieveLostPhoto())
+    when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
 
     final userParamsController = FakeUserParamsController();
@@ -126,6 +128,7 @@ void main() {
     expect(find.text('Product name'), findsNothing);
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
+    expect(viewedProductsStorage.getProducts(), isEmpty);
 
     widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
@@ -135,6 +138,7 @@ void main() {
         findsNothing);
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isTrue);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
+    expect(viewedProductsStorage.getProducts(), isNot(isEmpty));
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
@@ -164,6 +168,7 @@ void main() {
         findsNothing);
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
+    expect(viewedProductsStorage.getProducts(), isEmpty);
 
     widget.newScanDataForTesting(_barcode('4606038069239'));
     await tester.pumpAndSettle();
@@ -173,6 +178,7 @@ void main() {
         findsOneWidget);
     expect(analytics.wasEventSent('scanned_product_in_user_lang'), isFalse);
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isTrue);
+    expect(viewedProductsStorage.getProducts(), isNot(isEmpty));
 
     expect(find.byType(DisplayProductPage), findsNothing);
     await tester.tap(find.text('Product name'));
@@ -231,6 +237,7 @@ void main() {
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
+    expect(viewedProductsStorage.getProducts(), isEmpty);
 
     expect(find.byType(InitProductPage), findsNothing);
     await tester.tap(find.text(context.strings.barcode_scan_page_add_product));
@@ -359,11 +366,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsNothing);
+    expect(viewedProductsStorage.getProducts(), isEmpty);
 
     await tester.tap(find.text(context.strings.global_send));
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
+    expect(viewedProductsStorage.getProducts(), isNot(isEmpty));
   });
 
   testWidgets('manual barcode search, but barcode is invalid',
@@ -398,6 +407,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsNothing);
+    expect(viewedProductsStorage.getProducts(), isEmpty);
     expect(find.text(context.strings.barcode_scan_page_invalid_barcode),
         findsWidgets);
   });

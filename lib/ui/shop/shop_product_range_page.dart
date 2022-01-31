@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -166,7 +165,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Consumer(builder: (context, ref, _) {
+      floatingActionButton: consumer((ref) {
         final showBackToTop = _showBackToTop.watch(ref);
         final Widget result;
         if (!showBackToTop) {
@@ -291,7 +290,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               textDirection: TextDirection.rtl,
               children: [
-                FabPlante.closeBtnPopOnClick(key: const Key('close_button')),
+                const FabPlante.closeBtnPopOnClick(key: Key('close_button')),
                 Expanded(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,7 +356,7 @@ class _ShopProductRangePageState extends PageStatePlante<ShopProductRangePage> {
   }
 
   Widget _offSuggestedProductsTitle() {
-    return Consumer(builder: (context, ref, _) {
+    return consumer((ref) {
       final countryName = _countryName.watch(ref);
       if (countryName == null) {
         return const Padding(

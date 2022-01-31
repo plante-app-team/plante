@@ -58,6 +58,31 @@
     "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's veg-status manually before buying it, just in case",
     "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
     "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
+    "edit_profile_page_title": "Edit profile",
+    "@edit_profile_page_title": {
+        "description": "Title of the \"Edit profile\" page."
+    },
+    "edit_profile_page_cancel_editing_q": "Cancel profile editing?",
+    "@edit_profile_page_cancel_editing_q": {
+        "description": "Question the user is asked when they started editing their profile but then clicked a Cancel button."
+    },
+    "edit_user_data_widget_about_me_label": "About me (optional)",
+    "@edit_user_data_widget_about_me_label": {
+        "description": "Title of the \"About me\" input text field, which the user can use to write a short self-description."
+    },
+    "edit_user_data_widget_avatar_delete": "Delete user avatar",
+    "edit_user_data_widget_avatar_description": "User avatar (optional)",
+    "@edit_user_data_widget_avatar_description": {
+        "description": "A hint for the button which let's the user to choose an avatar image"
+    },
+    "edit_user_data_widget_name_hint": "John",
+    "@edit_user_data_widget_name_hint": {
+        "description": "A hint for the user name input text field"
+    },
+    "edit_user_data_widget_name_label": "Name",
+    "@edit_user_data_widget_name_label": {
+        "description": "Title of the user name input text field"
+    },
     "expandable_plante_collapse": "Collapse",
     "expandable_plante_expand": "Expand",
     "external_auth_page_continue_with": "Continue with",
@@ -85,6 +110,10 @@
     "global_yes": "Yes",
     "help_with_veg_status_page_title": "Help with vegan status",
     "image_crop_page_title": "Let's crop it!",
+    "image_crop_page_error_small_image": "The image is too small",
+    "@image_crop_page_error_small_image": {
+        "description": "Error message shown when the user selects an image from device's gallery, but the selected image is too small."
+    },
     "init_product_page_adding_non_vegan_product": "Non-vegan products cannot be added to a store",
     "init_product_page_brand_optional": "Brand (optional)",
     "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
@@ -106,10 +135,7 @@
     "init_product_page_where_sold_optional": "Where is it sold? (optional)",
     "init_user_page_done_button_title": "Done",
     "init_user_page_langs_explanation": "Select the languages you know — some products are sold in many countries and thus may have packagings in different languages",
-    "init_user_page_name_field_hint": "Jon",
-    "init_user_page_name_field_title": "Name",
     "init_user_page_next_button_title": "Next",
-    "init_user_page_title": "What is your name?",
     "lang_ar": "Arabic",
     "lang_be": "Belarusian",
     "lang_bg": "Bulgarian",
@@ -149,8 +175,15 @@
     "lang_uk": "Ukrainian",
     "lang_vi": "Vietnamese",
     "lang_zh": "Chinese",
-    "main_page_bottom_btn_feed": "News",
-    "main_page_bottom_btn_map": "Products map",
+    "main_page_add_product": "Add a product",
+    "@main_page_add_product": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new product (opens the barcodes scanning screen)."
+    },
+    "main_page_add_product_hint": "Please scan product's barcode",
+    "main_page_add_shop": "Add a store",
+    "@main_page_add_shop": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new store (opens the map and asks the user where the store is located)."
+    },
     "map_page_cancel_putting_product_q": "Cancel putting the product to the map?",
     "map_page_cancel_shop_creation_q": "Cancel new store creation?",
     "map_page_click_on_shop_where_product_sold": "Click the store marker, where the product is being sold",
@@ -232,9 +265,25 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
     "mod_reason_tested_on_animals": "Animal tested product",
+    "products_history_widget_no_history_hint": "Here you will see products you've viewed or scanned",
+    "@products_history_widget_no_history_hint": {
+        "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"
+    },
     "product_report_dialog_report_sent": "Report sent",
     "product_report_dialog_send": "Send",
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
+    "profile_page_edit_profile": "Edit profile",
+    "@profile_page_edit_profile": {
+        "description": "A button in User Profile which initiates user profile editing (changes of name, avatar, ...)"
+    },
+    "profile_page_products_history": "History",
+    "@profile_page_products_history": {
+        "description": "A button in User Profile which switches the list of displayed products to user's history - list of products the user has scanned and viewed"
+    },
+    "profile_page_products_my_products": "My products",
+    "@profile_page_products_my_products": {
+        "description": "A button in User Profile which switches the list of displayed products to user's products - list of products the user has added to stores and to the app by filling products' data"
+    },
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
     "settings_page_crash_on_errors": "Crash on errors",
@@ -307,6 +356,5 @@
     "veg_status_displayed_vegan_status_unknown": "Unknown vegan status",
     "veg_status_selection_panel_dunno": "Not sure",
     "veg_status_selection_panel_negative": "No",
-    "veg_status_selection_panel_positive": "Yes",
-    "viewed_products_history_page_title": "Recently viewed"
+    "veg_status_selection_panel_positive": "Yes"
 }

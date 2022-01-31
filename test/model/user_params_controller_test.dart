@@ -47,6 +47,10 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.selfDescription = 'Nice man');
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     params = params.rebuild((v) => v.backendId = '123');
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
@@ -63,12 +67,18 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.avatarId = 'avatarID');
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
+      ..selfDescription = 'Nice man'
       ..backendId = '123'
       ..backendClientToken = '321'
       ..userGroup = 123
-      ..langsPrioritized.addAll(['en', 'ru']));
+      ..langsPrioritized.addAll(['en', 'ru'])
+      ..avatarId = 'avatarID');
     expect(params, equals(expectedParams));
   });
 

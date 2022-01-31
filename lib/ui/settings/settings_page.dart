@@ -73,7 +73,10 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-        child: const Center(child: CircularProgressIndicator()),
+        child: Center(
+            child: !isInTests()
+                ? const CircularProgressIndicator()
+                : const SizedBox()),
       );
     }
     return Scaffold(
@@ -84,7 +87,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
           HeaderPlante(
               title: Text(context.strings.settings_page_title,
                   style: TextStyles.headline1),
-              leftAction: FabPlante.backBtnPopOnClick()),
+              leftAction: const FabPlante.backBtnPopOnClick()),
           Container(
               padding: const EdgeInsets.only(left: 24, right: 24),
               child: Column(children: [

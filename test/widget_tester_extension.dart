@@ -44,9 +44,9 @@ extension WidgetTesterExtension on WidgetTester {
   /// because widgets in those pairs are almost identical.
   /// This function is a avoiding this problem by finding only the first needed
   /// widget and clicking it, ignoring all the rest.
-  Future<void> tapDropDownItem(String text) async {
+  Future<void> superTapDropDownItem(String text) async {
     var foundFirst = false;
-    await tap(find.byWidgetPredicate((widget) {
+    await superTap(find.byWidgetPredicate((widget) {
       if (foundFirst) {
         return false;
       }

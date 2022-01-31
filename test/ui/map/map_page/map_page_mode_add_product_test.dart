@@ -10,6 +10,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_create_shop.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold_base.dart';
+import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
