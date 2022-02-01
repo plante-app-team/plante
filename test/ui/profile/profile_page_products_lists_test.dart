@@ -109,13 +109,15 @@ void main() {
     expect(productsRequestsCount, equals(1));
   });
 
-  testWidgets('analytics event is sent when history opened',
+  testWidgets('analytics event is sent when lists are switched',
       (WidgetTester tester) async {
     final page = ProfilePage();
     final context = await tester.superPump(page);
 
     expect(analytics.allEvents(), isEmpty);
     expect(analytics.wasEventSent('profile_products_switch_history'), isFalse);
+    expect(
+        analytics.wasEventSent('profile_products_switch_my_products'), isFalse);
 
     await tester
         .superTap(find.text(context.strings.profile_page_products_history));
@@ -126,5 +128,18 @@ void main() {
     expect(analytics.allEvents().length, equals(1),
         reason: analytics.allEvents().toString());
     expect(analytics.wasEventSent('profile_products_switch_history'), isTrue);
+    expect(
+        analytics.wasEventSent('profile_products_switch_my_products'), isFalse);
+
+    await tester
+        .superTap(find.text(context.strings.profile_page_products_my_products));
+    expect(page.displayedProductsList(),
+        equals(ProfilePageProductsList.MY_PRODUCTS));
+
+    expect(analytics.allEvents(), isNot(isEmpty));
+    expect(analytics.allEvents().length, equals(2),
+        reason: analytics.allEvents().toString());
+    expect(
+        analytics.wasEventSent('profile_products_switch_my_products'), isTrue);
   });
 }

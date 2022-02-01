@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -17,6 +18,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/components/avatar_widget.dart';
+import 'package:plante/ui/profile/components/contributed_by_user_products_widget.dart';
 import 'package:plante/ui/profile/components/products_history_widget.dart';
 import 'package:plante/ui/profile/components/profile_check_button_wrapper.dart';
 import 'package:plante/ui/profile/edit_profile_page.dart';
@@ -49,6 +51,7 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
   final _avatarManager = GetIt.I.get<UserAvatarManager>();
   final _viewedProductsStorage = GetIt.I.get<ViewedProductsStorage>();
   final _productsObtainer = GetIt.I.get<ProductsObtainer>();
+  final _userContributionsManager = GetIt.I.get<UserContributionsManager>();
 
   final _productsListPagerController = PageController();
 
@@ -159,7 +162,9 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
               key: const Key('products_lists_page_view'),
               controller: _productsListPagerController,
               children: [
-                const Text('page1'),
+                ContributedByUserProductsWidget(_userContributionsManager,
+                    _productsObtainer, _userParamsController,
+                    topSpacing: 62),
                 ProductsHistoryWidget(_viewedProductsStorage, _productsObtainer,
                     _userParamsController,
                     topSpacing: 62),
