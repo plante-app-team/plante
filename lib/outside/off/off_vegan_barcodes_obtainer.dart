@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/pair.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -9,7 +9,7 @@ import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
 
 typedef ShopsAndBarcodesMap = Map<OffShop, List<String>>;
 typedef ShopBarcodesPair = Pair<OffShop, List<String>>;
-typedef _BarcodesRequest = CachedOperation<List<String>, OffShopsManagerError>;
+typedef _BarcodesRequest = CachedLazyOp<List<String>, OffShopsManagerError>;
 
 class OffVeganBarcodesObtainer {
   final OffApi _offApi;
@@ -100,7 +100,7 @@ class OffVeganBarcodesObtainer {
     // Let's get an existing request ...
     var existingRequest = _barcodesRequests[shop];
     // ... or create a new one if no request is active at the moment.
-    existingRequest ??= CachedOperation(() async => _queryBarcodesImpl(shop));
+    existingRequest ??= CachedLazyOp(() async => _queryBarcodesImpl(shop));
     // Memorize the request.
     _barcodesRequests[shop] = existingRequest;
     // Let's start the request OR reuse the result of an already

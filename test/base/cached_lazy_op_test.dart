@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
-import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/result.dart';
 import 'package:test/test.dart';
 
@@ -13,7 +13,7 @@ void main() {
     final op = () {
       executionsCount += 1;
     };
-    final cachedOp = CachedOperation(_convertOkToOp(op));
+    final cachedOp = CachedLazyOp(_convertOkToOp(op));
 
     await Future.delayed(const Duration(milliseconds: 1));
     expect(executionsCount, equals(0));
@@ -27,7 +27,7 @@ void main() {
     final op = () {
       return ++executionsCount;
     };
-    final cachedOp = CachedOperation(_convertOkToOp(op));
+    final cachedOp = CachedLazyOp(_convertOkToOp(op));
 
     // Executions count is always 1 because first execution was successful.
     await cachedOp.result;
@@ -46,7 +46,7 @@ void main() {
     final op = () {
       return ++executionsCount;
     };
-    final cachedOp = CachedOperation(_convertErrToOp(op));
+    final cachedOp = CachedLazyOp(_convertErrToOp(op));
 
     // Executions count changes each time [result] is called
     // because it always fails.
@@ -68,7 +68,7 @@ void main() {
       executionsCount += 1;
       return completer.future;
     };
-    final cachedOp = CachedOperation(op);
+    final cachedOp = CachedLazyOp(op);
 
     // Executions count is always 1 because first execution is still execution
     // (it's in Completer).
@@ -88,6 +88,15 @@ void main() {
     unawaited(cachedOp.result);
     await Future.delayed(const Duration(milliseconds: 1));
     expect(executionsCount, equals(3));
+  });
+
+  test('done property', () async {
+    final op = () {};
+    final cachedOp = CachedLazyOp(_convertOkToOp(op));
+
+    expect(cachedOp.done, isFalse);
+    await cachedOp.result;
+    expect(cachedOp.done, isTrue);
   });
 }
 

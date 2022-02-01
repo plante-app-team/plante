@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
 
 class ProductReportDialog extends StatefulWidget {
   final String barcode;
-  final Backend backend;
+  final UserReportsMaker reportsMaker;
   const ProductReportDialog(
-      {Key? key, required this.barcode, required this.backend})
+      {Key? key, required this.barcode, required this.reportsMaker})
       : super(key: key);
 
   @override
@@ -53,8 +53,8 @@ class _ProductReportDialogState extends State<ProductReportDialog> {
       _loading = true;
     });
     try {
-      final result = await widget.backend
-          .sendReport(widget.barcode, _reportTextController.text);
+      final result = await widget.reportsMaker
+          .reportProduct(widget.barcode, _reportTextController.text);
       if (result.isOk) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

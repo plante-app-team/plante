@@ -17,6 +17,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/products/products_manager.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
@@ -48,6 +49,7 @@ void main() {
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
     GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     final userLocationManager = MockUserLocationManager();
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);

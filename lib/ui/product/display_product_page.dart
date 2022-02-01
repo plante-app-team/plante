@@ -14,7 +14,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
-import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/expandable_plante.dart';
@@ -59,9 +59,10 @@ class DisplayProductPage extends PagePlante {
 class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
     implements UserLangsManagerObserver {
   Product _product;
-  final Backend _backend;
-  final UserParams _user;
-  final UserLangsManager _userLangsManager;
+  final UserParams _user =
+      GetIt.I.get<UserParamsController>().cachedUserParams!;
+  final UserLangsManager _userLangsManager = GetIt.I.get<UserLangsManager>();
+  final UserReportsMaker _userReportsMaker = GetIt.I.get<UserReportsMaker>();
   List<LangCode>? _userLangs;
   final ProductUpdatedCallback? _productUpdatedCallback;
 
@@ -71,10 +72,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   final menuButtonKey = GlobalKey();
 
   _DisplayProductPageState(this._product, this._productUpdatedCallback)
-      : _backend = GetIt.I.get<Backend>(),
-        _user = GetIt.I.get<UserParamsController>().cachedUserParams!,
-        _userLangsManager = GetIt.I.get<UserLangsManager>(),
-        super('DisplayProductPage') {
+      : super('DisplayProductPage') {
     GetIt.I.get<ViewedProductsStorage>().addProduct(_product);
     _userLangsManager.getUserLangs().then(onUserLangsChange);
     _userLangsManager.addObserver(this);
@@ -460,7 +458,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
       context: context,
       builder: (context) {
         return ProductReportDialog(
-            barcode: _product.barcode, backend: _backend);
+            barcode: _product.barcode, reportsMaker: _userReportsMaker);
       },
     );
   }

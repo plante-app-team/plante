@@ -3,6 +3,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/contributions/user_contribution.dart';
+import 'package:plante/contributions/user_contribution_type.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/lang_code.dart';
@@ -1170,6 +1173,65 @@ void main() {
     authHeaders =
         await backend.authHeaders(backendClientTokenOverride: 'nice_override');
     expect(authHeaders, equals({'Authorization': 'Bearer nice_override'}));
+  });
+
+  test('user contributions data', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+    httpClient.setResponse('.*user_contributions_data.*', ''' { "result": [
+          {
+            "time_utc": 1234567,
+            "type": 1,
+            "barcode": "123321"
+          },
+          {
+            "time_utc": 1234566,
+            "type": 2,
+            "barcode": "123321",
+            "shop_uid": "1:123321"
+          },
+          {
+            "time_utc": 1234565,
+            "type": 4,
+            "shop_uid": "1:123322"
+          }
+        ]
+      } ''');
+
+    final result = await backend.requestUserContributions(30, [
+      UserContributionType.PRODUCT_EDITED,
+      UserContributionType.PRODUCT_ADDED_TO_SHOP,
+      UserContributionType.SHOP_CREATED
+    ]);
+
+    expect(result.isOk, isTrue);
+    expect(
+        result.unwrap(),
+        equals([
+          UserContribution.create(UserContributionType.PRODUCT_EDITED,
+              dateTimeFromSecondsSinceEpoch(1234567),
+              barcode: '123321'),
+          UserContribution.create(UserContributionType.PRODUCT_ADDED_TO_SHOP,
+              dateTimeFromSecondsSinceEpoch(1234566),
+              barcode: '123321', osmUID: OsmUID.parse('1:123321')),
+          UserContribution.create(UserContributionType.SHOP_CREATED,
+              dateTimeFromSecondsSinceEpoch(1234565),
+              osmUID: OsmUID.parse('1:123322')),
+        ]));
+
+    final requests =
+        httpClient.getRequestsMatching('.*user_contributions_data.*');
+    expect(requests.length, equals(1));
+
+    final request = requests.first;
+    expect(request.url.queryParameters['limit'], equals('30'));
+    expect(
+        request.url.queryParametersAll['contributionsTypes'],
+        equals([
+          UserContributionType.PRODUCT_EDITED,
+          UserContributionType.PRODUCT_ADDED_TO_SHOP,
+          UserContributionType.SHOP_CREATED
+        ].map((e) => e.persistentCode.toString())));
   });
 }
 

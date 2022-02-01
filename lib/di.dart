@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/lang/countries_lang_codes_table.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
@@ -17,6 +18,7 @@ import 'package:plante/outside/backend/mobile_app_config_manager.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/backend/user_params_fetcher.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
@@ -71,6 +73,8 @@ void initDI() {
       PhotosTaker(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<Backend>(Backend(GetIt.I.get<Analytics>(),
       GetIt.I.get<UserParamsController>(), GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<UserReportsMaker>(
+      UserReportsMaker(GetIt.I.get<Backend>()));
   GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(
       GetIt.I.get<Backend>(),
       GetIt.I.get<UserParamsController>(),
@@ -177,5 +181,11 @@ void initDI() {
     GetIt.I.get<SharedPreferencesHolder>(),
     GetIt.I.get<CountriesLangCodesTable>(),
     GetIt.I.get<CachingUserAddressPiecesObtainer>(),
+  ));
+  GetIt.I.registerSingleton(UserContributionsManager(
+    GetIt.I.get<Backend>(),
+    GetIt.I.get<ProductsManager>(),
+    GetIt.I.get<ShopsManager>(),
+    GetIt.I.get<UserReportsMaker>(),
   ));
 }

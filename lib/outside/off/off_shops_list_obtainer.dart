@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/cached_operation.dart';
+import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/file_system_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
@@ -25,7 +25,7 @@ class OffShopsListObtainer {
   final OffApi _offApi;
   final _cache = <String, List<OffShop>>{};
   final _coolCache =
-      <String, CachedOperation<List<OffShop>, OffShopsListObtainerError>>{};
+      <String, CachedLazyOp<List<OffShop>, OffShopsListObtainerError>>{};
 
   OffShopsListObtainer(
     this._offApi, {
@@ -38,7 +38,7 @@ class OffShopsListObtainer {
       String countryIso) async {
     if (_coolCache[countryIso] == null) {
       _coolCache[countryIso] =
-          CachedOperation(() => _getShopsForCountryImpl(countryIso));
+          CachedLazyOp(() => _getShopsForCountryImpl(countryIso));
     }
     return _coolCache[countryIso]!.result;
   }

@@ -11,6 +11,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -60,6 +61,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
   UserLangsManager,
   UserLangsManagerObserver,
   UserParamsController,
+  UserReportsMaker,
   ViewedProductsStorage,
 ])
 void unusedFunctionForCommonMocks() {}
