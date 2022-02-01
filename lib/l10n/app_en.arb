@@ -14,6 +14,10 @@
     "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
     "barcode_scan_page_scan_product": "Start scanning",
     "barcode_scan_page_searching_product": "Searching product ",
+    "contributed_by_user_products_widget_no_products_hint": "Here you will see products you've added to the map or to the app",
+    "@contributed_by_user_products_widget_no_products_hint": {
+        "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
+    },
     "country_be": "Belgium",
     "country_de": "Germany",
     "country_dk": "Denmark",

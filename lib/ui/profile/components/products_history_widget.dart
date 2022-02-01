@@ -10,6 +10,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
+import 'package:plante/ui/base/components/invisible_widget.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
@@ -82,7 +83,7 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
         child: Stack(children: [
           consumer((ref) {
             if (!_shownAtLeastOnce.watch(ref)) {
-              return const _NoWidget();
+              return const InvisibleWidget();
             }
             final products = _products.watch(ref);
             if (products.isEmpty) {
@@ -154,18 +155,5 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
   void _openProductPage(Product productUpdated) {
     ProductPageWrapper.show(context, productUpdated,
         productUpdatedCallback: viewedProductsStorage.addProduct);
-  }
-}
-
-// ProductsHistoryWidget uses [VisibilityDetectorPlante], which
-// hates `const SizedBox()` because it's always invisible as of itself.
-// So we replace SizedBox here with a Container which is sort of visible -
-// it will be drawn, but, at the same time, it's transparent.
-class _NoWidget extends StatelessWidget {
-  const _NoWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(width: 1, height: 11, color: Colors.transparent);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
@@ -30,6 +31,7 @@ import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
+import '../../z_fakes/fake_user_contributions_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 import '../map/map_page/map_page_modes_test_commons.dart';
@@ -39,6 +41,7 @@ void main() {
   late FakeProductsObtainer productsObtainer;
   late FakeShopsManager shopsManager;
   late MockViewedProductsStorage viewedProductsStorage;
+  late FakeUserContributionsManager userContributionsManager;
 
   setUp(() async {
     mapTestsCommons = MapPageModesTestCommons();
@@ -69,6 +72,9 @@ void main() {
 
     GetIt.I.registerSingleton<UserAvatarManager>(
         FakeUserAvatarManager(userParamsController));
+    userContributionsManager = FakeUserContributionsManager();
+    GetIt.I
+        .registerSingleton<UserContributionsManager>(userContributionsManager);
   });
 
   Widget currentPage() {
@@ -260,5 +266,23 @@ void main() {
     // This might change in the future though, if the history products
     // list there would have the first position.
     verifyZeroInteractions(viewedProductsStorage);
+  });
+
+  testWidgets('users products are not requested implicitly',
+      (WidgetTester tester) async {
+    await tester.superPump(const MainPage());
+
+    // No interactions when MainPage is created
+    expect(userContributionsManager.getContributionsCallsCount_testing(),
+        equals(0));
+
+    expect(currentPage().key, isNot(equals(const Key('main_profile_page'))));
+    await tester.superTap(find.byKey(const Key('bottom_bar_profile')));
+    expect(currentPage().key, equals(const Key('main_profile_page')));
+
+    // Now there's an interaction!
+    // No interactions when MainPage is created
+    expect(userContributionsManager.getContributionsCallsCount_testing(),
+        equals(1));
   });
 }

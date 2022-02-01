@@ -1,3 +1,4 @@
+import 'package:plante/base/base.dart';
 import 'package:plante/base/cached_lazy_op.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contribution.dart';
@@ -13,11 +14,7 @@ import 'package:plante/outside/products/products_manager.dart';
 
 // NOTE: this class is lazy - it doesn't request contributions unless
 // is asked to. Because of this the class does not support observers.
-class UserContributionsManager
-    with
-        ProductsManagerObserver,
-        ShopsManagerListener,
-        UserReportsMakerObserver {
+class UserContributionsManager {
   static const SUPPORTED_CONTRIBUTIONS = {
     UserContributionType.UNKNOWN,
     UserContributionType.PRODUCT_EDITED,
@@ -39,9 +36,15 @@ class UserContributionsManager
   UserContributionsManager(this._backend, this._productsManager,
       this._shopsManager, this._userReportsMaker) {
     _backendContributionsRequest = CachedLazyOp(_requestContributions);
-    _productsManager.addObserver(this);
-    _shopsManager.addListener(this);
-    _userReportsMaker.addObserver(this);
+    final observer = _EverythingObserver(
+      onProductEditedFn: _onProductEdited,
+      onProductPutToShopsFn: _onProductPutToShops,
+      onShopCreatedFn: _onShopCreated,
+      onUserReportMadeFn: _onUserReportMade,
+    );
+    _productsManager.addObserver(observer);
+    _shopsManager.addListener(observer);
+    _userReportsMaker.addObserver(observer);
   }
 
   Future<Result<List<UserContribution>, BackendError>>
@@ -64,8 +67,7 @@ class UserContributionsManager
     return Ok(_contributions);
   }
 
-  @override
-  void onProductEdited(Product product) {
+  void _onProductEdited(Product product) {
     if (!_backendContributionsRequest.done) {
       return;
     }
@@ -74,8 +76,7 @@ class UserContributionsManager
         barcode: product.barcode));
   }
 
-  @override
-  void onUserReportMade(String barcode) {
+  void _onUserReportMade(String barcode) {
     if (!_backendContributionsRequest.done) {
       return;
     }
@@ -84,8 +85,7 @@ class UserContributionsManager
         barcode: barcode));
   }
 
-  @override
-  void onShopCreated(Shop shop) {
+  void _onShopCreated(Shop shop) {
     if (!_backendContributionsRequest.done) {
       return;
     }
@@ -94,8 +94,7 @@ class UserContributionsManager
         osmUID: shop.osmUID));
   }
 
-  @override
-  void onProductPutToShops(Product product, List<Shop> shops) {
+  void _onProductPutToShops(Product product, List<Shop> shops) {
     if (!_backendContributionsRequest.done) {
       return;
     }
@@ -104,5 +103,42 @@ class UserContributionsManager
           UserContributionType.PRODUCT_ADDED_TO_SHOP, DateTime.now(),
           barcode: product.barcode, osmUID: shop.osmUID));
     }
+  }
+}
+
+class _EverythingObserver
+    with
+        ProductsManagerObserver,
+        ShopsManagerListener,
+        UserReportsMakerObserver {
+  ArgCallback<Product> onProductEditedFn;
+  ArgCallback<String> onUserReportMadeFn;
+  ArgCallback<Shop> onShopCreatedFn;
+  void Function(Product product, List<Shop> shops) onProductPutToShopsFn;
+
+  _EverythingObserver(
+      {required this.onProductEditedFn,
+      required this.onUserReportMadeFn,
+      required this.onShopCreatedFn,
+      required this.onProductPutToShopsFn});
+
+  @override
+  void onProductEdited(Product product) {
+    onProductEditedFn.call(product);
+  }
+
+  @override
+  void onUserReportMade(String barcode) {
+    onUserReportMadeFn.call(barcode);
+  }
+
+  @override
+  void onShopCreated(Shop shop) {
+    onShopCreatedFn.call(shop);
+  }
+
+  @override
+  void onProductPutToShops(Product product, List<Shop> shops) {
+    onProductPutToShopsFn.call(product, shops);
   }
 }

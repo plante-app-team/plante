@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/settings.dart';
+import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -16,6 +17,7 @@ import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
+import '../../z_fakes/fake_user_contributions_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 class ProfilePageTestCommons {
@@ -27,6 +29,7 @@ class ProfilePageTestCommons {
   late FakeUserAvatarManager userAvatarManager;
   late FakeProductsObtainer productsObtainer;
   late ViewedProductsStorage viewedProductsStorage;
+  late FakeUserContributionsManager userContributionsManager;
 
   ProfilePageTestCommons._();
 
@@ -42,6 +45,7 @@ class ProfilePageTestCommons {
     analytics = FakeAnalytics();
     userParamsController = FakeUserParamsController();
     userAvatarManager = FakeUserAvatarManager(userParamsController);
+    userContributionsManager = FakeUserContributionsManager();
 
     GetIt.I.registerSingleton<Analytics>(analytics);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
@@ -56,5 +60,7 @@ class ProfilePageTestCommons {
     viewedProductsStorage = ViewedProductsStorage(
         loadPersistentProducts: false, storePersistentProducts: false);
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
+    GetIt.I
+        .registerSingleton<UserContributionsManager>(userContributionsManager);
   }
 }
