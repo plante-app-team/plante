@@ -7,7 +7,7 @@ class CheckboxPlante extends StatelessWidget {
   /// See [Checkbox.onChanged]
   final ValueChanged<bool?>? onChanged;
 
-  const CheckboxPlante({Key? key, required this.value, required this.onChanged})
+  const CheckboxPlante({Key? key, required this.value, this.onChanged})
       : super(key: key);
 
   @override

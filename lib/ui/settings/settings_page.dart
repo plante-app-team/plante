@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:plante/base/base.dart';
@@ -14,13 +15,15 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
+import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
+import 'package:plante/ui/settings/settings_buttons.dart';
 import 'package:plante/ui/settings/settings_cache_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,7 +33,7 @@ class SettingsPage extends PagePlante {
 }
 
 class _SettingsPageState extends PageStatePlante<SettingsPage> {
-  bool _loading = true;
+  late final _loading = UIValue<bool>(true, ref);
   bool _developer = false;
   bool _enableNewestFeatures = false;
 
@@ -53,172 +56,124 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
     _user = userNullable!;
     _packageInfo = await getPackageInfo();
     if (kReleaseMode && (_user.userGroup == null || _user.userGroup == 1)) {
-      setState(() {
-        _loading = false;
-      });
+      _loading.setValue(false);
       return;
     }
 
     _developer = true;
     _enableNewestFeatures = await _settings.enableNewestFeatures();
-    setState(() {
-      _loading = false;
-    });
+    _loading.setValue(false);
   }
 
   @override
   Widget buildPage(BuildContext context) {
-    if (_loading) {
+    if (_loading.watch(ref)) {
       return Container(
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-        child: Center(
-            child: !isInTests()
-                ? const CircularProgressIndicator()
-                : const SizedBox()),
+        child: const Center(child: CircularProgressIndicatorPlante()),
       );
     }
+    final content =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 24),
+      Padding(
+          padding: const EdgeInsets.only(left: 24, right: 24),
+          child: Stack(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(context.strings.settings_page_your_id,
+                  style: TextStyles.headline3),
+              const SizedBox(height: 8),
+              Text(_user.backendId ?? '???', style: TextStyles.hint),
+            ]),
+            Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                    onPressed: () {
+                      Clipboard.setData(
+                          ClipboardData(text: _user.backendId ?? ''));
+                      showSnackBar(
+                          context.strings.global_copied_to_clipboard, context);
+                    },
+                    icon: SvgPicture.asset('assets/copy.svg'))),
+          ])),
+      const SizedBox(height: 16),
+      SettingsGeneralButton(
+          text: context.strings.settings_page_langs_i_know,
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const UserLangsPage()));
+          }),
+      SettingsGeneralButton(
+          text: context.strings.settings_page_send_logs,
+          onTap: Log.startLogsSending),
+      SettingsGeneralButton(
+          text: context.strings.settings_page_open_cache_settings,
+          onTap: _openCachePage),
+      SettingsGeneralButton(
+          text: context.strings.external_auth_page_privacy_policy,
+          onTap: () {
+            launch(privacyPolicyUrl(_sysLangCodeHolder));
+          }),
+      if (_developer)
+        SettingsGeneralButton(
+            text: 'Clear user data and exit (dev option)',
+            onTap: () async {
+              final paramsController = GetIt.I.get<UserParamsController>();
+              final params = await paramsController.getUserParams();
+              final newParams = params!.rebuild((e) => e.name = '😁');
+              await paramsController.setUserParams(newParams);
+
+              final backend = GetIt.I.get<Backend>();
+              await backend.updateUserParams(newParams);
+
+              exit(0);
+            }),
+      if (_developer)
+        SettingsCheckButton(
+            text: 'Newest features (dev option)',
+            value: _enableNewestFeatures,
+            onChanged: (value) {
+              setState(() {
+                _enableNewestFeatures = value;
+                _settings.setEnableNewestFeatures(_enableNewestFeatures);
+              });
+            })
+    ]);
+
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-            child: SingleChildScrollView(
-                child: Column(children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           HeaderPlante(
-              title: Text(context.strings.settings_page_title,
-                  style: TextStyles.headline1),
-              leftAction: const FabPlante.backBtnPopOnClick()),
-          Container(
-              padding: const EdgeInsets.only(left: 24, right: 24),
-              child: Column(children: [
-                Row(children: [
-                  InkWell(
+            title: Text(context.strings.settings_page_title,
+                style: TextStyles.pageTitle),
+            leftAction: const FabPlante.backBtnPopOnClick(),
+          ),
+          Expanded(child: SingleChildScrollView(child: content)),
+          Center(
+              child: Padding(
+                  padding: const EdgeInsets.only(bottom: 26),
+                  child: InkWell(
                       onTap: () {
                         Clipboard.setData(
-                            ClipboardData(text: _user.backendId ?? ''));
+                            ClipboardData(text: _packageInfo.asString()));
                         showSnackBar(context.strings.global_copied_to_clipboard,
                             context);
                       },
-                      child: Text(
-                          context.strings.settings_page_your_id +
-                              (_user.backendId ?? ''),
-                          style: TextStyles.normal)),
-                ]),
-                const SizedBox(height: 24),
-                SizedBox(
-                    width: double.infinity,
-                    child: Text(context.strings.settings_page_general,
-                        style: TextStyles.headline3)),
-                const SizedBox(height: 12),
-                SizedBox(
-                    width: double.infinity,
-                    child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_langs_i_know,
-                        onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const UserLangsPage()));
-                    })),
-                const SizedBox(height: 12),
-                SizedBox(
-                    width: double.infinity,
-                    child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_send_logs,
-                        onPressed: Log.startLogsSending)),
-                const SizedBox(height: 12),
-                SizedBox(
-                    width: double.infinity,
-                    child: ButtonFilledPlante.withText(
-                        context.strings.settings_page_open_cache_settings,
-                        onPressed: _openCachePage)),
-                if (_developer) const SizedBox(height: 24),
-                if (_developer)
-                  SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                          context.strings.settings_page_developer_options,
-                          style: TextStyles.headline3)),
-                if (_developer) const SizedBox(height: 12),
-                if (_developer)
-                  SizedBox(
-                      width: double.infinity,
-                      child: ButtonFilledPlante.withText(
-                          context.strings.settings_page_erase_user_data,
-                          onPressed: () async {
-                        final paramsController =
-                            GetIt.I.get<UserParamsController>();
-                        final params = await paramsController.getUserParams();
-                        final newParams = params!.rebuild((e) => e.name = '😁');
-                        await paramsController.setUserParams(newParams);
-
-                        final backend = GetIt.I.get<Backend>();
-                        await backend.updateUserParams(newParams);
-
-                        exit(0);
-                      })),
-                if (_developer)
-                  _CheckboxSettings(
-                      text: 'Newest features',
-                      value: _enableNewestFeatures,
-                      onChanged: (value) {
-                        setState(() {
-                          _enableNewestFeatures = value;
-                          _settings
-                              .setEnableNewestFeatures(_enableNewestFeatures);
-                        });
-                      }),
-                const SizedBox(height: 10),
-                Center(
-                    child: InkWell(
-                        onTap: () {
-                          launch(privacyPolicyUrl(_sysLangCodeHolder));
-                        },
-                        child: Text(
-                            context.strings.external_auth_page_privacy_policy,
-                            style: TextStyles.normal.copyWith(
-                                color: Colors.blue,
-                                decoration: TextDecoration.underline)))),
-                const SizedBox(height: 10),
-                Center(
-                    child: InkWell(
-                        onTap: () {
-                          Clipboard.setData(
-                              ClipboardData(text: _packageInfo.asString()));
-                          showSnackBar(
-                              context.strings.global_copied_to_clipboard,
-                              context);
-                        },
-                        child: Text(_packageInfo.asString(),
-                            style: TextStyles.hint))),
-              ]))
-        ]))));
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(_packageInfo.asString(),
+                              style: TextStyles.hint))))),
+        ])));
   }
 
   void _openCachePage() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const SettingsCachePage()));
-  }
-}
-
-class _CheckboxSettings extends StatelessWidget {
-  final String text;
-  final bool value;
-  final dynamic Function(bool value) onChanged;
-
-  const _CheckboxSettings(
-      {required this.text, required this.value, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-      value: value,
-      onChanged: (value) {
-        onChanged.call(value ?? false);
-      },
-      title: Text(text, style: TextStyles.normal),
-      contentPadding: EdgeInsets.zero,
-    );
   }
 }
 
