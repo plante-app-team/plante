@@ -131,6 +131,7 @@ flutter:
     - assets/cancel_circle_light.svg
     - assets/cancel_circle.svg
     - assets/cancel.svg
+    - assets/copy.svg
     - assets/directions.svg
     - assets/empty.svg
     - assets/expand_down.svg
