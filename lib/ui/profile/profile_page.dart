@@ -102,8 +102,6 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
             child: Column(children: [
           HeaderPlante(
               title: const SizedBox(),
-              spacingTop: 0,
-              spacingBottom: 0,
               height: 64,
               rightActionPadding: 12,
               rightAction: IconButton(
