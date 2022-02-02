@@ -434,7 +434,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 44),
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
             child: Column(children: [
               AnimatedMapWidget(child: searchBar),
               Consumer(
