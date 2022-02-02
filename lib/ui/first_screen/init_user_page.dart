@@ -113,18 +113,18 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
         backgroundColor: Colors.white,
         body: SafeArea(
             child: Stack(children: [
-          AnimatedSwitcher(
-              duration: DURATION_DEFAULT,
-              child: _loading
-                  ? const LinearProgressIndicatorPlante()
-                  : const SizedBox.shrink()),
           CustomizableStepper(
             pages: [
               _page1(),
               _page2(),
             ],
             controller: _stepperController,
-          )
+          ),
+          AnimatedSwitcher(
+              duration: DURATION_DEFAULT,
+              child: _loading
+                  ? const LinearProgressIndicatorPlante()
+                  : const SizedBox.shrink()),
         ])));
   }
 
