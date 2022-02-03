@@ -98,6 +98,9 @@ class ProductsManager {
         offProducts: offProducts, langsPrioritized: langsPrioritized);
   }
 
+  /// NOTE: the function will try to do its best to keep the
+  /// order of requested products, but the order is not guaranteed,
+  /// because it's hard to map requested and returned barcodes.
   Future<Result<List<Product>, ProductsManagerError>> _getProducts(
       {List<String>? barcodesRaw,
       List<off.Product>? offProducts,
@@ -113,6 +116,7 @@ class ProductsManager {
         return Err(ProductsManagerError.OTHER);
       }
     }
+    final requestedBarcodes = barcodesRaw;
 
     if (offProducts == null) {
       final offProductsRes =
@@ -157,7 +161,29 @@ class ProductsManager {
       result.add(_productsConverter.convertAndCache(
           offProduct, backendProduct, langsPrioritized));
     }
-    return Ok(result);
+
+    // Let's order the result accordingly to the order of requested barcodes
+    final resultMap = {for (final product in result) product.barcode: product};
+    final resultOrdered = <Product>[];
+    for (final barcode in requestedBarcodes) {
+      final product = resultMap[barcode];
+      if (product != null) {
+        resultOrdered.add(product);
+      }
+    }
+    // Requested barcodes are raw and sometimes OFF returns a product with
+    // a slightly different barcode (e.g. if we request barcode '123', OFF might
+    // return a product with barcode '00000123`).
+    // [resultOrdered] was built by a map of barcode-product pairs, and thus
+    // it can miss some of the products because of how OFF works.
+    // So let's include the missing products.
+    for (final product in result) {
+      if (!resultOrdered.contains(product)) {
+        resultOrdered.add(product);
+      }
+    }
+
+    return Ok(resultOrdered);
   }
 
   Future<Result<List<off.Product>, ProductsManagerError>> _requestOffProducts(

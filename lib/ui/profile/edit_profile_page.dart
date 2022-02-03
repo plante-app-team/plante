@@ -158,7 +158,6 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage>
                   HeaderPlante(
                     title: Text(context.strings.edit_profile_page_title,
                         style: TextStyles.pageTitle),
-                    height: 84,
                     leftAction: FabPlante(
                         key: const Key('back_button'),
                         svgAsset: 'assets/back_arrow.svg',

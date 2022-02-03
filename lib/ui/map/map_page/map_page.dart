@@ -430,12 +430,11 @@ class _MapPageState extends PageStatePlante<MapPage>
             Consumer(
                 builder: (context, ref, _) => AnimatedListSimplePlante(
                     children: _mode.watch(ref).buildBottomActions())),
-            _progressBar(),
           ])),
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
-            padding: const EdgeInsets.only(top: 44),
+            padding: const EdgeInsets.only(top: 24),
             child: Column(children: [
               Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24),
@@ -464,6 +463,7 @@ class _MapPageState extends PageStatePlante<MapPage>
             ])),
       ),
       consumer((ref) => _mode.watch(ref).buildOverlay()),
+      Align(alignment: Alignment.bottomCenter, child: _progressBar()),
     ]);
 
     return WillPopScope(

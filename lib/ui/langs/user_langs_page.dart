@@ -59,13 +59,20 @@ class _UserLangsPageState extends PageStatePlante<UserLangsPage> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: Stack(children: [
         Column(mainAxisSize: MainAxisSize.min, children: [
           HeaderPlante(
               title: Text(context.strings.settings_page_langs_i_know,
-                  style: TextStyles.headline1),
+                  style: TextStyles.pageTitle),
               leftAction: const FabPlante.backBtnPopOnClick()),
+          const SizedBox(height: 24),
+          Padding(
+              padding: const EdgeInsets.only(left: 24, right: 24),
+              child: Text(context.strings.init_user_page_langs_explanation,
+                  style: TextStyles.normal)),
+          const SizedBox(height: 17),
           Expanded(child: langsList),
           Padding(
               padding: const EdgeInsets.only(

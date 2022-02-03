@@ -88,6 +88,79 @@ void main() {
     expect(find.text('Product 2'), findsOneWidget);
   });
 
+  testWidgets('products order', (WidgetTester tester) async {
+    final products = [
+      _makeProduct('1'),
+      _makeProduct('2'),
+    ];
+    userContributionsManager.setContributionsSimple_testing([
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(111),
+          barcode: products[0].barcode),
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(222),
+          barcode: products[1].barcode),
+    ]);
+    await tester.superPump(ContributedByUserProductsWidget(
+        userContributionsManager, productsObtainer, userParamsController,
+        key: const Key('widget 1')));
+
+    // More recent product is above of the older (Y coord is smaller).
+    var center1 = tester.getCenter(find.text('Product 1'));
+    var center2 = tester.getCenter(find.text('Product 2'));
+    expect(center2.dy, lessThan(center1.dy));
+
+    // Switch times of the contributions
+    userContributionsManager.setContributionsSimple_testing([
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(222),
+          barcode: products[0].barcode),
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(111),
+          barcode: products[1].barcode),
+    ]);
+    await tester.superPump(ContributedByUserProductsWidget(
+        userContributionsManager, productsObtainer, userParamsController,
+        key: const Key('widget 2')));
+
+    // More recent product is above of the older (Y coord is smaller).
+    center1 = tester.getCenter(find.text('Product 1'));
+    center2 = tester.getCenter(find.text('Product 2'));
+    expect(center1.dy, lessThan(center2.dy));
+  });
+
+  testWidgets('duplicate products are removed (the older ones)',
+      (WidgetTester tester) async {
+    final products = [
+      _makeProduct('1'),
+      _makeProduct('2'),
+    ];
+    userContributionsManager.setContributionsSimple_testing([
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(111),
+          barcode: products[0].barcode),
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(222),
+          barcode: products[1].barcode),
+      // First product again, but it's more recent
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(333),
+          barcode: products[0].barcode),
+    ]);
+    await tester.superPump(ContributedByUserProductsWidget(
+        userContributionsManager, productsObtainer, userParamsController));
+
+    // Ensure only one of each products is present
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsOneWidget);
+
+    // The recent Product 1 is expected to be present. We check it's recent
+    // by checking it's above of the Product 2.
+    final center1 = tester.getCenter(find.text('Product 1'));
+    final center2 = tester.getCenter(find.text('Product 2'));
+    expect(center1.dy, lessThan(center2.dy));
+  });
+
   testWidgets('types of user contributions displayed',
       (WidgetTester tester) async {
     // A contribution for each of the contribution types
@@ -100,6 +173,7 @@ void main() {
     const expectedDisplayedContributionTypes = [
       UserContributionType.PRODUCT_ADDED_TO_SHOP,
       UserContributionType.PRODUCT_EDITED,
+      UserContributionType.LEGACY_PRODUCT_EDITED,
     ];
     final unexpectedDisplayedContributionTypes = UserContributionType.values
         .where((e) => !expectedDisplayedContributionTypes.contains(e));

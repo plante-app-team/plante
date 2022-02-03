@@ -21,6 +21,7 @@ class UserContributionsManager {
     UserContributionType.PRODUCT_ADDED_TO_SHOP,
     UserContributionType.PRODUCT_REPORTED,
     UserContributionType.SHOP_CREATED,
+    UserContributionType.LEGACY_PRODUCT_EDITED,
   };
   static const _REQUESTED_CONTRIBUTIONS_LIMIT = 50;
 
