@@ -4,6 +4,7 @@ enum UserContributionType {
   PRODUCT_ADDED_TO_SHOP,
   PRODUCT_REPORTED,
   SHOP_CREATED,
+  LEGACY_PRODUCT_EDITED,
 }
 
 UserContributionType userContributionTypeFromCode(int code) {
@@ -25,6 +26,8 @@ extension UserContributionTypeExt on UserContributionType {
         return 3;
       case UserContributionType.SHOP_CREATED:
         return 4;
+      case UserContributionType.LEGACY_PRODUCT_EDITED:
+        return 5;
     }
   }
 }
