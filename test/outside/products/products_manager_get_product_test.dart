@@ -282,4 +282,65 @@ void main() {
           ModeratorChoiceReason.SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN,
         }));
   });
+
+  test('barcode from off is used', () async {
+    const badBarcode = '0000000000123';
+    const goodBarcode = '123';
+    setUpOffProducts([
+      off.Product.fromJson({'code': goodBarcode, 'product_name_ru': 'name'})
+    ]);
+
+    final productRes =
+        await productsManager.getProduct(badBarcode, [LangCode.ru]);
+    final product = productRes.unwrap();
+
+    // Verify received product
+    expect(product!.barcode, equals(goodBarcode));
+    // Verify good barcode is asked from the backed
+    verify(backend.requestProducts([goodBarcode], any)).called(1);
+  });
+
+  test('returned products are ordered in the same way as requested barcodes',
+      () async {
+    setUpBackendProducts(Ok(const []));
+
+    // Set OFF products in the first order
+    setUpOffProducts([
+      off.Product.fromJson({'code': '1', 'product_name_ru': 'name1'}),
+      off.Product.fromJson({'code': '2', 'product_name_ru': 'name2'}),
+    ]);
+    // Ensure OFF API gives them in that order
+    var offResult = await offApi
+        .getProductList(off.ProductListQueryConfiguration(['1', '2']));
+    expect(offResult.products?[0].barcode, equals('1'));
+    expect(offResult.products?[1].barcode, equals('2'));
+
+    // Request products and ensure they're return in the requested order
+    var productsRes =
+        await productsManager.getProducts(['1', '2'], [LangCode.ru]);
+    expect(productsRes.unwrap()[0].barcode, equals('1'));
+    expect(productsRes.unwrap()[1].barcode, equals('2'));
+    productsRes = await productsManager.getProducts(['2', '1'], [LangCode.ru]);
+    expect(productsRes.unwrap()[0].barcode, equals('2'));
+    expect(productsRes.unwrap()[1].barcode, equals('1'));
+
+    // Set OFF products in the second order
+    setUpOffProducts([
+      off.Product.fromJson({'code': '2', 'product_name_ru': 'name2'}),
+      off.Product.fromJson({'code': '1', 'product_name_ru': 'name1'}),
+    ]);
+    // Ensure OFF API gives them in that order
+    offResult = await offApi
+        .getProductList(off.ProductListQueryConfiguration(['1', '2']));
+    expect(offResult.products?[0].barcode, equals('2'));
+    expect(offResult.products?[1].barcode, equals('1'));
+
+    // Request products and ensure they're return in the requested order
+    productsRes = await productsManager.getProducts(['1', '2'], [LangCode.ru]);
+    expect(productsRes.unwrap()[0].barcode, equals('1'));
+    expect(productsRes.unwrap()[1].barcode, equals('2'));
+    productsRes = await productsManager.getProducts(['2', '1'], [LangCode.ru]);
+    expect(productsRes.unwrap()[0].barcode, equals('2'));
+    expect(productsRes.unwrap()[1].barcode, equals('1'));
+  });
 }
