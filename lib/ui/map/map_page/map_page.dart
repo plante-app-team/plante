@@ -347,19 +347,17 @@ class _MapPageState extends PageStatePlante<MapPage>
       if (!loadNewShops || !viewPortShopsLoaded) {
         return const SizedBox();
       }
-      return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Hero(
-              tag: 'search_bar',
-              child: Consumer(
-                  builder: (context, ref, _) => MapSearchBar(
-                      queryOverride: _latestSearchResult.watch(ref)?.query,
-                      enabled: false,
-                      onDisabledTap: _onSearchBarTap,
-                      onCleared: () {
-                        _latestSearchResult.setValue(null);
-                        _mode.cachedVal.deselectShops();
-                      }))));
+      return Hero(
+          tag: 'search_bar',
+          child: Consumer(
+              builder: (context, ref, _) => MapSearchBar(
+                  queryOverride: _latestSearchResult.watch(ref)?.query,
+                  enabled: false,
+                  onDisabledTap: _onSearchBarTap,
+                  onCleared: () {
+                    _latestSearchResult.setValue(null);
+                    _mode.cachedVal.deselectShops();
+                  })));
     });
 
     final loadShopsButton = consumer((ref) {
