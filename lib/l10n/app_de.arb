@@ -62,6 +62,10 @@
     "display_product_page_veg_status_positive_warning": "Der Hersteller kann die Inhaltsstoffe des Produkts jederzeit ändern - bitte überprüfen Sie den Vegan-Status des Produkts manuell, bevor Sie es kaufen, nur um sicher zu gehen",
     "display_product_page_veg_status_possible_explanation": "Der Inhaltsstoff kann einenen positiven oder negativen Vegan-Status haben, je nachdem, wie er hergestellt wurde.\nZum Beispiel können \"Enzyme\" sowohl vegan als auch nicht-vegan sein",
     "display_product_page_veg_status_unknown_explanation": "Bei der Bestimmung des Vegan-Status wurden keine Informationen über den Inhaltsstoff gefunden",
+    "edit_user_data_widget_name_hint": "Max",
+    "@edit_user_data_widget_name_hint": {
+        "description": "A hint for the user name input text field"
+    },
     "expandable_plante_collapse": "Einklappen",
     "expandable_plante_expand": "Ausklappen",
     "external_auth_page_continue_with": "Weiter mit",
@@ -110,10 +114,7 @@
     "init_product_page_where_sold_optional": "Wo wird das Produkt verkauft? (optional)",
     "init_user_page_done_button_title": "Fertig",
     "init_user_page_langs_explanation": "Wählen Sie die Sprachen aus, die Sie kennen - einige Produkte werden in vielen Ländern verkauft und haben daher möglicherweise Verpackungen in verschiedenen Sprachen",
-    "init_user_page_name_field_hint": "Max",
-    "init_user_page_name_field_title": "Name",
     "init_user_page_next_button_title": "Weiter",
-    "init_user_page_title": "Wie heißen Sie?",
     "lang_ar": "Arabisch",
     "lang_be": "Weißrussisch",
     "lang_bg": "Bulgarisch",
@@ -153,8 +154,6 @@
     "lang_uk": "Ukrainisch",
     "lang_vi": "Vietnamesisch",
     "lang_zh": "Chinesisch",
-    "main_page_bottom_btn_feed": "Neuigkeiten",
-    "main_page_bottom_btn_map": "Produktkarte",
     "map_page_cancel_putting_product_q": "Produkt zur Karte hinzufügen abbrechen?",
     "map_page_cancel_shop_creation_q": "Geschäft-Erstellung abbrechen?",
     "map_page_click_on_shop_where_product_sold": "klicken sie auf das Geschäft, in dem das Produkt verkauft wird",
@@ -245,7 +244,6 @@
     "settings_cache_page_clear_map_cache_and_exit": "Karten-Cache löschen und beenden",
     "settings_cache_page_title": "App-Cache",
     "settings_page_crash_on_errors": "Abstürze und Fehler",
-    "settings_page_developer_options": "Entwickleroptionen",
     "settings_page_erase_user_data": "Nutzer-Daten löschen und schließen",
     "settings_page_general": "Allgemein",
     "settings_page_langs_i_know": "Meine Sprachen",
@@ -310,6 +308,5 @@
     "veg_status_displayed_vegan_status_unknown": "Unbekannter Vegan-Status",
     "veg_status_selection_panel_dunno": "Nicht sicher",
     "veg_status_selection_panel_negative": "Nein",
-    "veg_status_selection_panel_positive": "ja",
-    "viewed_products_history_page_title": "Kürzlich angesehen"
+    "veg_status_selection_panel_positive": "ja"
 }
