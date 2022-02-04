@@ -43,6 +43,8 @@ class InitProductPageModel {
     width: 640,
     height: 160,
   );
+  static const _IMAGES_PREFERRED_SIZE = 2000;
+  static const _IMAGES_COMPRESS_QUALITY = 90;
   static const _NO_PHOTO = -1;
   final dynamic Function() _onProductUpdate;
   final dynamic Function() _forceReloadAllProductData;
@@ -188,8 +190,13 @@ class InitProductPageModel {
 
       Log.i('InitProductPageModel obtained photo, cropping');
       final outPath = await _photosTaker.cropPhoto(
-          lostPhoto.unwrap().path, context, cacheDir,
-          minSize: _IMAGES_MIN_SIZE);
+        lostPhoto.unwrap().path,
+        context,
+        cacheDir,
+        minSize: _IMAGES_MIN_SIZE,
+        downsizeTo: _IMAGES_PREFERRED_SIZE,
+        compressQualityJpg: _IMAGES_COMPRESS_QUALITY,
+      );
       if (outPath == null) {
         Log.i('InitProductPageModel cropping finished without photo');
         return;
@@ -212,8 +219,14 @@ class InitProductPageModel {
     try {
       Log.i('InitProductPageModel: takePhoto start, imageType: $imageType');
       final outPath = await _photosTaker.takeAndCropPhoto(
-          context, _cacheDir!, PhotoRequester.PRODUCT_INIT,
-          minSize: _IMAGES_MIN_SIZE);
+        context,
+        _cacheDir!,
+        PhotoRequester.PRODUCT_INIT,
+        minSize: _IMAGES_MIN_SIZE,
+        downsizeTo: _IMAGES_PREFERRED_SIZE,
+        compressQualityJpg: _IMAGES_COMPRESS_QUALITY,
+      );
+
       if (outPath == null) {
         Log.i('InitProductPageModel: takePhoto, outPath == null');
         // Cancelled

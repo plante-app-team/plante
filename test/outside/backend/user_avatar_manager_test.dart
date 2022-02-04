@@ -136,20 +136,20 @@ void main() {
   test('select avatar', () async {
     when(photosTaker.selectAndCropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
-            targetSize: anyNamed('targetSize'),
+            downsizeTo: anyNamed('downsizeTo'),
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => imagePath);
 
     verifyNever(photosTaker.selectAndCropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
     final result = await userAvatarManager.askUserToSelectImageFromGallery(
         _MockBuildContext(),
         iHaveTriedRetrievingLostImage: true);
     verify(photosTaker.selectAndCropPhoto(any, any, PhotoRequester.AVATAR_INIT,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
 
     expect(result, equals(imagePath));
@@ -158,20 +158,20 @@ void main() {
   test('select avatar canceled by user', () async {
     when(photosTaker.selectAndCropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
-            targetSize: anyNamed('targetSize'),
+            downsizeTo: anyNamed('downsizeTo'),
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => null);
 
     verifyNever(photosTaker.selectAndCropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
     final result = await userAvatarManager.askUserToSelectImageFromGallery(
         _MockBuildContext(),
         iHaveTriedRetrievingLostImage: true);
     verify(photosTaker.selectAndCropPhoto(any, any, PhotoRequester.AVATAR_INIT,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
 
     expect(result, isNull);
@@ -182,21 +182,21 @@ void main() {
         .thenAnswer((_) async => Ok(imagePath));
     when(photosTaker.cropPhoto(any, any, any,
             cropCircle: anyNamed('cropCircle'),
-            targetSize: anyNamed('targetSize'),
+            downsizeTo: anyNamed('downsizeTo'),
             minSize: anyNamed('minSize')))
         .thenAnswer((_) async => imagePath);
 
     verifyNever(photosTaker.retrieveLostPhoto(any));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
     final result =
         await userAvatarManager.retrieveLostSelectedAvatar(_MockBuildContext());
     verify(photosTaker.retrieveLostPhoto(PhotoRequester.AVATAR_INIT));
     verify(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
 
     expect(result, equals(imagePath));
@@ -208,14 +208,14 @@ void main() {
     verifyNever(photosTaker.retrieveLostPhoto(any));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
     final result =
         await userAvatarManager.retrieveLostSelectedAvatar(_MockBuildContext());
     verify(photosTaker.retrieveLostPhoto(PhotoRequester.AVATAR_INIT));
     verifyNever(photosTaker.cropPhoto(any, any, any,
         cropCircle: anyNamed('cropCircle'),
-        targetSize: anyNamed('targetSize'),
+        downsizeTo: anyNamed('downsizeTo'),
         minSize: anyNamed('minSize')));
 
     expect(result, isNull);

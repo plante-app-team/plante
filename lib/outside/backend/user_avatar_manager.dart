@@ -19,10 +19,7 @@ abstract class UserAvatarManagerObserver {
 
 class UserAvatarManager {
   static const _AVATAR_DIR = 'avatar_selection_dir';
-  static const _AVATAR_SIZE = SizeInt(
-    width: 460,
-    height: 460,
-  );
+  static const _AVATAR_SIZE = 460;
   static const _AVATAR_SIZE_MIN = SizeInt(
     width: 256,
     height: 256,
@@ -103,7 +100,7 @@ class UserAvatarManager {
     }
     return await _photosTaker.selectAndCropPhoto(
         context, await _avatarDir(), PhotoRequester.AVATAR_INIT,
-        cropCircle: true, targetSize: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
+        cropCircle: true, downsizeTo: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
   }
 
   Future<Directory> _avatarDir() async {
@@ -129,7 +126,7 @@ class UserAvatarManager {
     final lostPhoto = lostPhotoRes.unwrap();
     return await _photosTaker.cropPhoto(
         lostPhoto.path, context, await _avatarDir(),
-        cropCircle: true, targetSize: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
+        cropCircle: true, downsizeTo: _AVATAR_SIZE, minSize: _AVATAR_SIZE_MIN);
   }
 
   void addObserver(UserAvatarManagerObserver observer) {
