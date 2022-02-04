@@ -126,6 +126,16 @@ class MapPageModeCreateShop extends MapPageMode {
   }
 
   @override
+  Future<bool> onWillPop() async {
+    final superAllowedPop = await super.onWillPop();
+    if (!superAllowedPop) {
+      return superAllowedPop;
+    }
+    _onCancelClick();
+    return false;
+  }
+
+  @override
   List<Widget> buildBottomActions() {
     // TODO(https://trello.com/c/rb2w42J5/): remove the function after
     // the ticket from the Trello URL will be fixed.
