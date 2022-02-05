@@ -117,6 +117,9 @@ class ProductsManager {
       }
     }
     final requestedBarcodes = barcodesRaw;
+    if (requestedBarcodes.isEmpty) {
+      return Ok(const []);
+    }
 
     if (offProducts == null) {
       final offProductsRes =

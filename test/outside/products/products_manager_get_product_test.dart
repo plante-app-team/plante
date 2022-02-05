@@ -343,4 +343,12 @@ void main() {
     expect(productsRes.unwrap()[0].barcode, equals('2'));
     expect(productsRes.unwrap()[1].barcode, equals('1'));
   });
+
+  test('OFF and backend are not touched when empty barcodes list is received',
+      () async {
+    final result = await productsManager.getProducts(const [], [LangCode.en]);
+    expect(result.unwrap(), isEmpty);
+    verifyZeroInteractions(offApi);
+    verifyZeroInteractions(backend);
+  });
 }
