@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:mockito/mockito.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
-import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product_lang_slice.dart';
@@ -16,19 +15,13 @@ import 'products_manager_tests_commons.dart';
 void main() {
   late ProductsManagerTestCommons commons;
   late MockOffApi offApi;
-  late MockBackend backend;
   late ProductsManager productsManager;
 
   setUp(() async {
     commons = await ProductsManagerTestCommons.create();
     offApi = commons.offApi;
-    backend = commons.backend;
     productsManager = commons.productsManager;
   });
-
-  void setUpOffProducts(List<off.Product> products) {
-    commons.setUpOffProducts(products);
-  }
 
   test('ingredients extraction successful', () async {
     final product = ProductLangSlice((v) => v
@@ -94,22 +87,5 @@ void main() {
     final result = await productsManager.updateProductAndExtractIngredients(
         product, LangCode.ru);
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
-  });
-
-  test('barcode from off is used', () async {
-    const badBarcode = '0000000000123';
-    const goodBarcode = '123';
-    setUpOffProducts([
-      off.Product.fromJson({'code': goodBarcode, 'product_name_ru': 'name'})
-    ]);
-
-    final productRes =
-        await productsManager.getProduct(badBarcode, [LangCode.ru]);
-    final product = productRes.unwrap();
-
-    // Verify received product
-    expect(product!.barcode, equals(goodBarcode));
-    // Verify good barcode is asked from the backed
-    verify(backend.requestProducts([goodBarcode], any)).called(1);
   });
 }

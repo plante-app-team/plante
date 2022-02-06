@@ -112,15 +112,19 @@ class _ContributedByUserProductsWidgetState
     const contributionsTypes = {
       UserContributionType.PRODUCT_EDITED,
       UserContributionType.PRODUCT_ADDED_TO_SHOP,
+      UserContributionType.LEGACY_PRODUCT_EDITED,
     };
     final contributions = contributionsRes
         .unwrap()
-        .where((e) => contributionsTypes.contains(e.type));
+        .where((e) => contributionsTypes.contains(e.type))
+        .toList()
+      ..sort((lhs, rhs) => rhs.timeSecsUtc - lhs.timeSecsUtc);
     final barcodes = contributions
         .map((e) => e.barcode)
         .where((e) => e != null)
         .cast<String>()
-        .toList();
+        .toList()
+      ..removeDuplicates();
 
     final productsRes = await productsObtainer.getProducts(barcodes);
     if (productsRes.isOk) {
@@ -138,7 +142,7 @@ class _ContributedByUserProductsWidgetState
   List<Widget> _listChildren(List<Product> products) {
     final result = <Widget>[];
     result.add(SizedBox(height: widget.topSpacing));
-    result.addAll(products.reversed.map((e) => Padding(
+    result.addAll(products.map((e) => Padding(
         key: Key('product_${e.barcode}'),
         padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
         child: ProductCard(
@@ -152,5 +156,12 @@ class _ContributedByUserProductsWidgetState
 
   void _onProductTap(Product product) async {
     ProductPageWrapper.show(context, product);
+  }
+}
+
+extension<T> on List<T> {
+  void removeDuplicates() {
+    final set = <T>{};
+    retainWhere(set.add);
   }
 }

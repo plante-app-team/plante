@@ -7,11 +7,11 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
 import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/off/off_cacher.dart';
-import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/settings/settings_buttons.dart';
 
 class SettingsCachePage extends PagePlante {
   const SettingsCachePage({Key? key}) : super(key: key);
@@ -36,18 +36,14 @@ class _SettingsCachePageState extends PageStatePlante<SettingsCachePage> {
                 child: Column(children: [
           HeaderPlante(
               title: Text(context.strings.settings_cache_page_title,
-                  style: TextStyles.headline1),
+                  style: TextStyles.pageTitle),
               leftAction: const FabPlante.backBtnPopOnClick()),
-          Container(
-              padding: const EdgeInsets.only(left: 24, right: 24),
-              child: Column(children: [
-                SizedBox(
-                    width: double.infinity,
-                    child: ButtonFilledPlante.withText(
-                        context.strings
-                            .settings_cache_page_clear_map_cache_and_exit,
-                        onPressed: _clearMapCacheAndRestart)),
-              ]))
+          Column(children: [
+            SettingsGeneralButton(
+                onTap: _clearMapCacheAndRestart,
+                text: context
+                    .strings.settings_cache_page_clear_map_cache_and_exit),
+          ]),
         ]))));
   }
 

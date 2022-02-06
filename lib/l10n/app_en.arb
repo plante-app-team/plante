@@ -192,9 +192,9 @@
     "map_page_cancel_shop_creation_q": "Cancel new store creation?",
     "map_page_click_on_shop_where_product_sold": "Click the store marker, where the product is being sold",
     "map_page_click_where_new_shop_located": "Click where the new store is located",
-    "map_page_filter_empty_shops": "Show stores without products",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
+    "map_page_filter_empty_shops2": "Only empty stores",
+    "@map_page_filter_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
     },
     "map_page_filter_shops_with_radius_suggested_products": "Show stores with products seen similar stores of the city",
     "@map_page_filter_shops_with_radius_suggested_products": {
@@ -204,10 +204,10 @@
     "@map_page_filter_shops_with_off_suggested_products": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
     },
-    "map_page_filter_all_shops": "All shops",
-    "map_page_filter_not_empty_shops": "Show stores with products",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
+    "map_page_filter_all_shops": "All stores",
+    "map_page_filter_not_empty_shops2": "Only stores with products",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
     "map_page_is_new_product_sold_q": "Is the product being sold here?",
     "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
@@ -291,7 +291,6 @@
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
     "settings_page_crash_on_errors": "Crash on errors",
-    "settings_page_developer_options": "Developer options",
     "settings_page_erase_user_data": "Clear user data and exit",
     "settings_page_general": "General",
     "settings_page_langs_i_know": "My languages",
