@@ -347,19 +347,17 @@ class _MapPageState extends PageStatePlante<MapPage>
       if (!loadNewShops || !viewPortShopsLoaded) {
         return const SizedBox();
       }
-      return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Hero(
-              tag: 'search_bar',
-              child: Consumer(
-                  builder: (context, ref, _) => MapSearchBar(
-                      queryOverride: _latestSearchResult.watch(ref)?.query,
-                      enabled: false,
-                      onDisabledTap: _onSearchBarTap,
-                      onCleared: () {
-                        _latestSearchResult.setValue(null);
-                        _mode.cachedVal.deselectShops();
-                      }))));
+      return Hero(
+          tag: 'search_bar',
+          child: Consumer(
+              builder: (context, ref, _) => MapSearchBar(
+                  queryOverride: _latestSearchResult.watch(ref)?.query,
+                  enabled: false,
+                  onDisabledTap: _onSearchBarTap,
+                  onCleared: () {
+                    _latestSearchResult.setValue(null);
+                    _mode.cachedVal.deselectShops();
+                  })));
     });
 
     final loadShopsButton = consumer((ref) {
@@ -434,20 +432,32 @@ class _MapPageState extends PageStatePlante<MapPage>
       Align(
         alignment: Alignment.topCenter,
         child: Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
+            padding: const EdgeInsets.only(top: 24),
             child: Column(children: [
-              AnimatedMapWidget(child: searchBar),
-              Consumer(
-                  builder: (context, ref, _) =>
-                      AnimatedMapWidget(child: _mode.watch(ref).buildHeader())),
-              MapHintsList(controller: _hintsController),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: AnimatedMapWidget(child: searchBar),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: Consumer(
+                    builder: (context, ref, _) => AnimatedMapWidget(
+                        child: _mode.watch(ref).buildHeader())),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: MapHintsList(controller: _hintsController),
+              ),
               Consumer(
                   builder: (context, ref, _) => AnimatedMapWidget(
                       child: _mode.watch(ref).buildTopActions())),
-              IgnorePointer(
-                  child: MapPageTimedHints(
-                      loading: _model.loading,
-                      loadingSuggestions: _model.loadingSuggestions)),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: IgnorePointer(
+                    child: MapPageTimedHints(
+                        loading: _model.loading,
+                        loadingSuggestions: _model.loadingSuggestions)),
+              ),
             ])),
       ),
       consumer((ref) => _mode.watch(ref).buildOverlay()),

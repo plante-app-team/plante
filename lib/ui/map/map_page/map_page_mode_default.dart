@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
@@ -9,14 +8,11 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
-import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
-import 'package:plante/ui/base/popup/popup_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
-import 'package:plante/ui/map/components/map_shops_filter_checkbox.dart';
+import 'package:plante/ui/map/components/map_filter_check_button.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_add_product.dart';
@@ -26,26 +22,23 @@ import 'package:plante/ui/map/map_page/map_page_mode_zoomed_out.dart';
 
 class MapPageModeDefault extends MapPageModeShopsCardBase {
   static const MIN_ZOOM = 6.0;
+  static const _PREF_SHOW_ALL_SHOPS = 'MapPageModeDefault_SHOW_ALL_SHOPS';
   static const _PREF_SHOW_NOT_EMPTY_SHOPS =
       'MapPageModeDefault_SHOW_NOT_EMPTY_SHOPS';
   static const _PREF_SHOW_EMPTY_SHOPS = 'MapPageModeDefault_SHOW_EMPTY_SHOPS';
-  static const _PREF_SHOW_SUGGESTIONS = 'MapPageModeDefault_SHOW_SUGGESTIONS_';
 
-  final _filtersButtonKey = GlobalKey();
-
+  late final UIValue<bool> _showAllShops;
   late final UIValue<bool> _showNotEmptyShops;
-  final _showSuggestionsAtShop = <SuggestionType, UIValue<bool>>{};
   late final UIValue<bool> _showEmptyShops;
+  late final Map<String, MapFilter> _filterOptions;
 
   ArgCallback<bool>? _onLoadingChange;
 
   MapPageModeDefault(MapPageModeParams params)
       : super(params, nameForAnalytics: 'default') {
+    _showAllShops = createUIValue(false);
     _showNotEmptyShops = createUIValue(true);
     _showEmptyShops = createUIValue(false);
-    for (final type in SuggestionType.values) {
-      _showSuggestionsAtShop[type] = createUIValue(true);
-    }
   }
 
   @override
@@ -72,21 +65,35 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   void _initAsync() async {
     final prefs = await model.prefs.get();
+    final showAllShops =
+        prefs.getBool(_PREF_SHOW_ALL_SHOPS) ?? _showAllShops.cachedVal;
     final showNotEmptyShops = prefs.getBool(_PREF_SHOW_NOT_EMPTY_SHOPS) ??
         _showNotEmptyShops.cachedVal;
     final showEmptyShops =
         prefs.getBool(_PREF_SHOW_EMPTY_SHOPS) ?? _showEmptyShops.cachedVal;
+    _showAllShops.setValue(showAllShops);
     _showNotEmptyShops.setValue(
       showNotEmptyShops,
     );
     _showEmptyShops.setValue(showEmptyShops);
 
-    for (final type in SuggestionType.values) {
-      final prefVal = prefs.getBool(type.prefName);
-      if (prefVal != null) {
-        _showSuggestionsAtShop[type]?.setValue(prefVal);
-      }
-    }
+    _filterOptions = {
+      _PREF_SHOW_ALL_SHOPS: MapFilter(
+          target: _showAllShops,
+          pref: _PREF_SHOW_ALL_SHOPS,
+          eventShown: 'all_shops_shown',
+          eventHidden: 'all_shops_hidden'),
+      _PREF_SHOW_NOT_EMPTY_SHOPS: MapFilter(
+          target: _showNotEmptyShops,
+          pref: _PREF_SHOW_NOT_EMPTY_SHOPS,
+          eventShown: 'shops_with_products_shown',
+          eventHidden: 'shops_with_products_hidden'),
+      _PREF_SHOW_EMPTY_SHOPS: MapFilter(
+          target: _showEmptyShops,
+          pref: _PREF_SHOW_EMPTY_SHOPS,
+          eventShown: 'empty_shops_shown',
+          eventHidden: 'empty_shops_hidden'),
+    };
 
     _onLoadingChange = (_) {
       _updateBottomHint();
@@ -110,26 +117,28 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         return true;
       }
 
-      final enabledByNotEmptyShopsFilter =
-          _showNotEmptyShops.cachedVal && 0 < shop.productsCount;
-      final enabledByEmptyShopsFilter =
-          _showEmptyShops.cachedVal && shop.productsCount <= 0;
+      if (_showAllShops.cachedVal) {
+        return true;
+      }
 
-      final suggestedBarcodes = model.barcodesSuggestions;
-      bool enabledBySuggestions = false;
-      for (final type in SuggestionType.values) {
-        final enabled = _showSuggestionsAtShop[type]?.cachedVal ?? false;
-        final exists =
-            suggestedBarcodes.suggestionsCountFor(shop.osmUID, type) > 0;
-        enabledBySuggestions = enabled && exists;
-        if (enabledBySuggestions) {
-          break;
+      var hasProducts = 0 < shop.productsCount;
+      if (!hasProducts) {
+        final suggestedBarcodes = model.barcodesSuggestions;
+        for (final type in SuggestionType.values) {
+          hasProducts =
+              0 < suggestedBarcodes.suggestionsCountFor(shop.osmUID, type);
+          if (hasProducts) {
+            break;
+          }
         }
       }
 
-      return enabledByNotEmptyShopsFilter ||
-          enabledBySuggestions ||
-          enabledByEmptyShopsFilter;
+      if (hasProducts && _showNotEmptyShops.cachedVal) {
+        return true;
+      } else if (!hasProducts && _showEmptyShops.cachedVal) {
+        return true;
+      }
+      return false;
     };
     return shops.where(shouldShow);
   }
@@ -137,124 +146,70 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   @override
   Widget buildTopActions() {
     return consumer((ref) {
-      final shopsForViewPortLoaded = super.shopsForViewPortLoaded.watch(ref);
-      if (!shopsForViewPortLoaded) {
-        return super.buildTopActions();
+      if (model.loading.watch(ref)) {
+        return const SizedBox();
       }
-      return Align(
-          alignment: Alignment.centerRight,
-          child: ButtonFilledSmallPlante.lightGreen(
-            key: _filtersButtonKey,
-            elevation: 5,
-            onPressed: () {
-              _onFiltersClick(context);
-            },
-            paddings: EdgeInsets.zero,
-            height: 32,
-            width: 32,
-            icon: SvgPicture.asset('assets/map_filters.svg',
-                key: const Key('filter_shops_icon')),
-          ));
+      return SizedBox(
+          height: MapFilterCheckButton.TOTAL_HEIGHT,
+          child: ListView(
+              key: const Key('filter_listview'),
+              scrollDirection: Axis.horizontal,
+              children: [
+                const SizedBox(width: 16),
+                MapFilterCheckButton(
+                    key: const Key('button_filter_all_shops'),
+                    checked: _showAllShops.watch(ref),
+                    text: context.strings.map_page_filter_all_shops,
+                    onChanged: _setShowAllShops),
+                const SizedBox(width: 8),
+                MapFilterCheckButton(
+                    key: const Key('button_filter_not_empty_shops'),
+                    checked: _showNotEmptyShops.watch(ref),
+                    text: context.strings.map_page_filter_not_empty_shops2,
+                    onChanged: _setShowNotEmptyShops),
+                const SizedBox(width: 8),
+                MapFilterCheckButton(
+                    key: const Key('filter_empty_shops'),
+                    checked: _showEmptyShops.watch(ref),
+                    text: context.strings.map_page_filter_empty_shops2,
+                    onChanged: _setShowEmptyShops),
+                const SizedBox(width: 16),
+              ]));
     });
   }
 
-  void _onFiltersClick(BuildContext context) async {
-    await showCustomPopUp(
-      target: _filtersButtonKey,
-      context: context,
-      child: consumer((ref) {
-        return Column(children: [
-          MapShopsFilterCheckbox(
-            key: const Key('checkbox_filter_not_empty_shops'),
-            text: context.strings.map_page_filter_not_empty_shops,
-            markerColor: ColorsPlante.primary,
-            value: _showNotEmptyShops.watch(ref),
-            onChanged: _setShowNotEmptyShops,
-          ),
-          MapShopsFilterCheckbox(
-            key: const Key('filter_shops_with_rad_suggested_products'),
-            text: context
-                .strings.map_page_filter_shops_with_radius_suggested_products,
-            markerColor: ColorsPlante.suggestedProductsMarker,
-            value: _showSuggestionsAtShop[SuggestionType.RADIUS]!.watch(ref),
-            onChanged: _setShowRadSuggestedShops,
-          ),
-          MapShopsFilterCheckbox(
-            key: const Key('filter_shops_with_off_suggested_products'),
-            text: context
-                .strings.map_page_filter_shops_with_off_suggested_products,
-            markerColor: ColorsPlante.suggestedProductsMarker,
-            value: _showSuggestionsAtShop[SuggestionType.OFF]!.watch(ref),
-            onChanged: _setShowOffSuggestedShops,
-          ),
-          MapShopsFilterCheckbox(
-            key: const Key('filter_empty_shops'),
-            text: context.strings.map_page_filter_empty_shops,
-            markerColor: ColorsPlante.grey,
-            value: _showEmptyShops.watch(ref),
-            onChanged: _setShowEmptyShops,
-          ),
-        ]);
-      }),
-    );
-  }
-
   void _setShowNotEmptyShops(bool value) {
-    _setFilterValue(
-      value,
-      pref: _PREF_SHOW_NOT_EMPTY_SHOPS,
-      target: _showNotEmptyShops,
-      eventShown: 'shops_with_products_shown',
-      eventHidden: 'shops_with_products_hidden',
-    );
+    _onFilterClick(_PREF_SHOW_NOT_EMPTY_SHOPS);
   }
 
-  void _setFilterValue(bool value,
-      {required UIValue<bool> target,
-      required String pref,
-      required String eventShown,
-      required String eventHidden}) async {
-    target.setValue(value);
-    updateMap();
-    if (target.cachedVal) {
-      analytics.sendEvent(eventShown);
-    } else {
-      analytics.sendEvent(eventHidden);
+  void _onFilterClick(String pref) async {
+    if (_filterOptions[pref]?.target.cachedVal == true) {
+      // Only switching from false to true is supported
+      return;
     }
-    onDisplayedShopsChange(displayedShops);
 
     final prefs = await model.prefs.get();
-    await prefs.setBool(pref, value);
+    for (final filter in _filterOptions.values) {
+      if (filter.pref == pref) {
+        filter.target.setValue(true);
+        await prefs.setBool(filter.pref, true);
+      } else {
+        filter.target.setValue(false);
+        await prefs.setBool(filter.pref, false);
+      }
+    }
+
+    analytics.sendEvent(_filterOptions[pref]!.eventShown);
+    updateMap();
+    onDisplayedShopsChange(displayedShops);
   }
 
-  void _setShowRadSuggestedShops(bool value) {
-    _setFilterValue(
-      value,
-      pref: SuggestionType.RADIUS.prefName,
-      target: _showSuggestionsAtShop[SuggestionType.RADIUS]!,
-      eventShown: 'shops_with_rad_suggestions_shown',
-      eventHidden: 'shops_with_rad_suggestions_hidden',
-    );
-  }
-
-  void _setShowOffSuggestedShops(bool value) {
-    _setFilterValue(
-      value,
-      pref: SuggestionType.OFF.prefName,
-      target: _showSuggestionsAtShop[SuggestionType.OFF]!,
-      eventShown: 'shops_with_off_suggestions_shown',
-      eventHidden: 'shops_with_off_suggestions_hidden',
-    );
+  void _setShowAllShops(bool value) {
+    _onFilterClick(_PREF_SHOW_ALL_SHOPS);
   }
 
   void _setShowEmptyShops(bool value) {
-    _setFilterValue(
-      value,
-      pref: _PREF_SHOW_EMPTY_SHOPS,
-      target: _showEmptyShops,
-      eventShown: 'empty_shops_shown',
-      eventHidden: 'empty_shops_hidden',
-    );
+    _onFilterClick(_PREF_SHOW_EMPTY_SHOPS);
   }
 
   @override
@@ -301,10 +256,6 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       style: TextStyles.normal,
       children: [
         TextSpan(text: context.strings.map_page_no_shops_hint2),
-        WidgetSpan(
-            child: Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: SvgPicture.asset('assets/map_filters.svg'))),
       ],
     )));
   }
@@ -320,17 +271,15 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   }
 }
 
-extension on SuggestionType {
-  String get prefName =>
-      MapPageModeDefault._PREF_SHOW_SUGGESTIONS + prefPostfix;
+class MapFilter {
+  final UIValue<bool> target;
+  final String pref;
+  final String eventShown;
+  final String eventHidden;
 
-  String get prefPostfix {
-    // Must be persistent
-    switch (this) {
-      case SuggestionType.OFF:
-        return 'OFF';
-      case SuggestionType.RADIUS:
-        return 'RADIUS';
-    }
-  }
+  MapFilter(
+      {required this.target,
+      required this.pref,
+      required this.eventShown,
+      required this.eventHidden});
 }

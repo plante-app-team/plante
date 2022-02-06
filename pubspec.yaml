@@ -143,7 +143,6 @@ flutter:
     - assets/list_drag_n_drop.svg
     - assets/location.svg
     - assets/map_check_mark.svg
-    - assets/map_filters.svg
     - assets/map_marker_accented.svg
     - assets/map_marker_empty.svg
     - assets/map_marker_filled.svg

@@ -192,21 +192,22 @@
     "map_page_cancel_shop_creation_q": "Cancel new store creation?",
     "map_page_click_on_shop_where_product_sold": "Click the store marker, where the product is being sold",
     "map_page_click_where_new_shop_located": "Click where the new store is located",
-    "map_page_filter_empty_shops": "Empty stores",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
+    "map_page_filter_empty_shops2": "Only empty stores",
+    "@map_page_filter_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
     },
-    "map_page_filter_shops_with_radius_suggested_products": "Products seen similar stores of the city",
+    "map_page_filter_shops_with_radius_suggested_products": "Show stores with products seen similar stores of the city",
     "@map_page_filter_shops_with_radius_suggested_products": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
     },
-    "map_page_filter_shops_with_off_suggested_products": "Products seen similar stores of the country",
+    "map_page_filter_shops_with_off_suggested_products": "Show stores with products seen similar stores of the country",
     "@map_page_filter_shops_with_off_suggested_products": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
     },
-    "map_page_filter_not_empty_shops": "Stores with products",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
+    "map_page_filter_all_shops": "All stores",
+    "map_page_filter_not_empty_shops2": "Only stores with products",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
     "map_page_is_new_product_sold_q": "Is the product being sold here?",
     "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
@@ -216,7 +217,7 @@
     "map_page_location_permission_go_to_settings": "Turn On in Settings",
     "map_page_location_permission_reasoning_settings": "Plante works best with Location Services turned on. You'll get information about stores based on your location",
     "map_page_location_permission_title": "Location Services",
-    "map_page_no_shops_hint2": "No stores with products nearby. You can tune stores filters by clicking",
+    "map_page_no_shops_hint2": "There are no stores in the area yet. Try moving the map, add a new store or try the map filters.",
     "@map_page_no_shops_hint2": {
         "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
     },

@@ -71,6 +71,12 @@ extension WidgetTesterExtension on WidgetTester {
     await pumpAndSettle();
   }
 
+  Future<void> superDragUntilVisible(
+      Finder finder, Finder view, Offset moveStep) async {
+    await dragUntilVisible(finder, view, moveStep);
+    await pumpAndSettle();
+  }
+
   /// Same as [enterText], but also calls [pumpAndSettle].
   Future<void> superEnterText(Finder finder, String text) async {
     await enterText(finder, text);
