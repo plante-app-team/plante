@@ -27,11 +27,18 @@ class ImageCropPage extends PagePlante {
   final Directory outFolder;
   final bool withCircleUi;
 
-  /// In pixels.
-  /// Note that the final image might be larger than the target size,
+  /// Size in pixels.
+  ///
+  /// If both width and height of the final image are greater than [downsizeTo],
+  /// then the smaller side of the image is downsized to the field's value,
+  /// and the other size is scaled to keep the ration.
+  ///
+  /// For example, if the image is 4000*2000, and [downsizeTo] is 1080,
+  /// then the image will be downsized to 2160*1080.
+  ///
   /// for more info:
   /// https://pub.dev/packages/flutter_image_compress#minwidth-and-minheight
-  final SizeInt? targetSize;
+  final int? downsizeTo;
 
   /// In pixels, smallest accepted image.
   /// The page will try to disallow cropping size
@@ -45,10 +52,11 @@ class ImageCropPage extends PagePlante {
       required this.imagePath,
       required this.outFolder,
       this.withCircleUi = false,
-      this.targetSize,
+      this.downsizeTo,
       this.minSize,
-      this.compressQuality = _COMPRESSION_DEFAULT})
-      : super(key: key);
+      int? compressQuality})
+      : compressQuality = compressQuality ?? _COMPRESSION_DEFAULT,
+        super(key: key);
 
   @override
   _ImageCropPageState createState() => _ImageCropPageState();
@@ -298,9 +306,15 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   }
 
   Future<Uint8List> _compressIfNeeded(Uint8List image) async {
-    if (widget.targetSize != null ||
+    if (widget.downsizeTo != null ||
         widget.compressQuality != ImageCropPage._COMPRESSION_DEFAULT) {
-      final targetSize = widget.targetSize ?? _screenSize;
+      final SizeInt targetSize;
+      final desiredSize = widget.downsizeTo;
+      if (desiredSize != null) {
+        targetSize = SizeInt(width: desiredSize, height: desiredSize);
+      } else {
+        targetSize = _screenSize;
+      }
       Log.i(
           'ImageCropPage compressing and downsizing, target: $targetSize, ${widget.compressQuality}');
       image = await FlutterImageCompress.compressWithList(

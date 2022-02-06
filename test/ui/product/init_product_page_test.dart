@@ -84,10 +84,15 @@ void main() {
 
     photosTaker = MockPhotosTaker();
     when(photosTaker.takeAndCropPhoto(any, any, any,
-            minSize: anyNamed('minSize')))
+            minSize: anyNamed('minSize'),
+            downsizeTo: anyNamed('downsizeTo'),
+            compressQualityJpg: anyNamed('compressQualityJpg')))
         .thenAnswer(
             (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
-    when(photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')))
+    when(photosTaker.cropPhoto(any, any, any,
+            minSize: anyNamed('minSize'),
+            downsizeTo: anyNamed('downsizeTo'),
+            compressQualityJpg: anyNamed('compressQualityJpg')))
         .thenAnswer(
             (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
     when(photosTaker.retrieveLostPhoto(any))
@@ -229,10 +234,14 @@ void main() {
 
     if (takeImageFront) {
       verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-          minSize: anyNamed('minSize')));
+          minSize: anyNamed('minSize'),
+          downsizeTo: anyNamed('downsizeTo'),
+          compressQualityJpg: anyNamed('compressQualityJpg')));
       await tester.tap(find.byKey(const Key('front_photo')));
       verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
-              minSize: anyNamed('minSize')))
+              minSize: anyNamed('minSize'),
+              downsizeTo: anyNamed('downsizeTo'),
+              compressQualityJpg: anyNamed('compressQualityJpg')))
           .called(1);
       await tester.pumpAndSettle();
     }
@@ -277,7 +286,9 @@ void main() {
 
     if (takeImageIngredients) {
       verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-          minSize: anyNamed('minSize')));
+          minSize: anyNamed('minSize'),
+          downsizeTo: anyNamed('downsizeTo'),
+          compressQualityJpg: anyNamed('compressQualityJpg')));
       expect(ocrAttempts, equals(0));
       await tester.tap(find.byKey(const Key('ingredients_photo')));
       await tester.pumpAndSettle();
@@ -285,7 +296,9 @@ void main() {
       expect(ocrAttempts,
           lessThanOrEqualTo(InitProductPageModel.OCR_RETRIES_COUNT));
       verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
-              minSize: anyNamed('minSize')))
+              minSize: anyNamed('minSize'),
+              downsizeTo: anyNamed('downsizeTo'),
+              compressQualityJpg: anyNamed('compressQualityJpg')))
           .called(1);
 
       var performedManualOcrAttempts = 0;
@@ -1069,8 +1082,10 @@ void main() {
     when(photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT))
         .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
-    verifyNever(
-        photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.cropPhoto(any, any, any,
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
 
     final widget = InitProductPage(
         ProductLangSlice((v) => v
@@ -1080,7 +1095,10 @@ void main() {
     await tester.superPump(widget);
 
     // Lost photo cropping expected to be started
-    verify(photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')));
+    verify(photosTaker.cropPhoto(any, any, any,
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
 
     // Now let's fill the product and ensure it's filled enough to be saved
     // The front photo is not taken by us as we expect it to be restored.
@@ -1111,8 +1129,10 @@ void main() {
     when(photosTaker.retrieveLostPhoto(PhotoRequester.PRODUCT_INIT))
         .thenAnswer((_) async => Ok(Uri.parse('./test/assets/img.jpg')));
 
-    verifyNever(
-        photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')));
+    verifyNever(photosTaker.cropPhoto(any, any, any,
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
     verifyNever(productsManager.updateProductAndExtractIngredients(any, any));
 
     final widget = InitProductPage(
@@ -1123,7 +1143,10 @@ void main() {
     await tester.superPump(widget);
 
     // Lost photo cropping expected to be started
-    verify(photosTaker.cropPhoto(any, any, any, minSize: anyNamed('minSize')));
+    verify(photosTaker.cropPhoto(any, any, any,
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
     // Because the lost photo is an ingredients photo -
     // OCR is expected to be performed.
     verify(productsManager.updateProductAndExtractIngredients(any, any));
@@ -1164,13 +1187,17 @@ void main() {
 
     verifyNever(permissionsManager.request(any));
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
 
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
     verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
   }
 
   Future<void> takePhotoWhenNoPermissionThenPermissionDeniedAgainTest(
@@ -1196,21 +1223,27 @@ void main() {
 
     verifyNever(permissionsManager.request(any));
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
 
     // First attempt with a deny
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
 
     // Second attempt with permission successfully granted
     await takePhotoAction.call();
 
     verify(permissionsManager.request(PermissionKind.CAMERA));
     verify(photosTaker.takeAndCropPhoto(any, any, PhotoRequester.PRODUCT_INIT,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
   }
 
   Future<void> takePhotoWhenNoPermissionPermanentlyTest(
@@ -1229,7 +1262,9 @@ void main() {
     verifyNever(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
     expect(
         find.text(context
             .strings.init_product_page_camera_permission_reasoning_settings),
@@ -1240,7 +1275,9 @@ void main() {
     verify(permissionsManager.request(any));
     verifyNever(permissionsManager.openAppSettings());
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
     expect(
         find.text(context
             .strings.init_product_page_camera_permission_reasoning_settings),
@@ -1252,7 +1289,9 @@ void main() {
     verifyNever(permissionsManager.request(any));
     verify(permissionsManager.openAppSettings());
     verifyNever(photosTaker.takeAndCropPhoto(any, any, any,
-        minSize: anyNamed('minSize')));
+        minSize: anyNamed('minSize'),
+        downsizeTo: anyNamed('downsizeTo'),
+        compressQualityJpg: anyNamed('compressQualityJpg')));
   }
 
   testWidgets('take front photo when no permission',
