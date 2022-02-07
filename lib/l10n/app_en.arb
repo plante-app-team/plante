@@ -51,6 +51,9 @@
     "display_product_page_report_btn": "Report incorrect information",
     "display_product_page_table_column1": "Product",
     "display_product_page_table_column3": "Vegan",
+    "@display_product_page_table_column3": {
+        "description": "A column title in a product's ingredients analysis table. The column can have 'Yes', 'No' and 'Ambiguous' values for each of the ingredients (\"Vegan? Yes. Vegan? No. Vegan? Ambiguous!\")."
+    },
     "display_product_page_table_negative": "No",
     "display_product_page_table_positive": "Yes",
     "display_product_page_table_possible": "Ambiguous",
@@ -213,8 +216,8 @@
     "map_page_is_product_sold_q": "Is «<PRODUCT>» being sold here?",
     "map_page_is_shop_location_correct": "Is the displayed store location correct?",
     "map_page_load_shops_of_this_area": "Load stores of this area",
-    "map_page_location_permission_cancel_go_to_settings": "Keep Location Services Off",
-    "map_page_location_permission_go_to_settings": "Turn On in Settings",
+    "map_page_location_permission_cancel_go_to_settings": "Keep Location Services off",
+    "map_page_location_permission_go_to_settings": "Turn on in Settings",
     "map_page_location_permission_reasoning_settings": "Plante works best with Location Services turned on. You'll get information about stores based on your location",
     "map_page_location_permission_title": "Location Services",
     "map_page_no_shops_hint2": "There are no stores in the area yet. Try moving the map, add a new store or try the map filters.",
