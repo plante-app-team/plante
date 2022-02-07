@@ -43,6 +43,10 @@ void main() {
       ModeratorChoiceReason.POSSIBLY_CANE_SUGAR_IN_INGREDIENTS: 22,
       ModeratorChoiceReason.CERTIFIED_VEGAN: 23,
       ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM: 24,
+      ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS: 25,
+      ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS: 26,
     };
 
     _ensureAllReasonsHandled(idsMap.keys);
@@ -95,6 +99,15 @@ void main() {
       ModeratorChoiceReason.CERTIFIED_VEGAN: {VegStatus.positive},
       ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM: {
         VegStatus.possible
+      },
+      ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS: {
+        VegStatus.negative
+      },
+      ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS: {
+        VegStatus.possible,
+        VegStatus.unknown,
       },
     };
 

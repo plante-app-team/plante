@@ -1,7 +1,7 @@
 {
     "barcode_scan_page_add_info_in_your_langs": "Add information",
     "barcode_scan_page_add_product": "Add the product",
-    "barcode_scan_page_camera_permission_cancel_settings": "Keep Camera Permission Off",
+    "barcode_scan_page_camera_permission_cancel_settings": "Keep Camera Permission off",
     "barcode_scan_page_camera_permission_go_to_settings": "Turn on in settings",
     "barcode_scan_page_camera_permission_reasoning": "To start the barcodes scanner the app needs the camera permission",
     "barcode_scan_page_camera_permission_reasoning_settings": "In order to be able to scan a barcode, the app needs access to the camera. You can grant access in the app settings",
@@ -258,6 +258,8 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "The product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured), but it also has a Vegan label on its packaging.",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Manufacturer confirmed non-vegan ingredients absence",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Manufacturer confirmed non-vegan ingredients presence",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Product has ambiguous ingredients which very often are non-vegan. The product's manufacturer did not respond to our request or refused to provide needed clarifications.",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Product has ambiguous ingredients. The product's manufacturer did not respond to our request or refused to provide needed clarifications.",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Product's manufacturing process utilizes non-vegan practices. But the product is considered ambiguous by Plante because all ingredients are vegan, and its mainstream appeal to help the vegan movement grow.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Product contains sugar, which could be obtained from sugarcane and processed through Bone Black/Bone Char.",
     "mod_reason_some_ingredient_has_unknown_origin": "Some of the ingredients have unknown origin",
