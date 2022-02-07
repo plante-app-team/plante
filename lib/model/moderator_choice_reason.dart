@@ -19,14 +19,16 @@ enum ModeratorChoiceReason {
   HONEY_IN_INGREDIENTS,
   MANUFACTURER_CONFIRMED_NON_VEGAN_INGREDIENTS_PRESENCE,
   TESTED_ON_ANIMALS,
+  MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS,
 
-  // Why possible
+  // Why ambiguous
   SOME_INGREDIENT_IS_POSSIBLY_NON_VEGAN,
   SOME_INGREDIENT_IS_IN_FACT_A_CATEGORY,
   SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS,
   CANE_SUGAR_IN_INGREDIENTS,
   POSSIBLY_CANE_SUGAR_IN_INGREDIENTS,
   NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM,
+  MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS,
 
   // Why unknown
   SOME_INGREDIENT_HAS_UNKNOWN_ORIGIN,
@@ -76,6 +78,12 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return 23;
       case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
         return 24;
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS:
+        return 25;
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS:
+        return 26;
     }
   }
 
@@ -120,6 +128,12 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
         return {VegStatus.positive};
       case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
         return {VegStatus.possible};
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS:
+        return {VegStatus.negative};
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS:
+        return {VegStatus.possible, VegStatus.unknown};
     }
   }
 
@@ -171,6 +185,14 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
       case ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM:
         return context
             .strings.mod_reason_non_vegan_practices_but_helps_veganism;
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_VERY_SUSPICIOUS_INGREDIENTS:
+        return context.strings
+            .mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients;
+      case ModeratorChoiceReason
+          .MANUFACTURER_DID_NOT_HELP_WITH_AMBIGUOUS_INGREDIENTS:
+        return context.strings
+            .mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients;
     }
   }
 
