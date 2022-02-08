@@ -1,9 +1,6 @@
 import 'dart:convert';
 
 import 'package:mockito/mockito.dart';
-import 'package:openfoodfacts/model/Product.dart' as off;
-import 'package:openfoodfacts/model/SearchResult.dart' as off;
-import 'package:openfoodfacts/model/parameter/Page.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/result.dart';

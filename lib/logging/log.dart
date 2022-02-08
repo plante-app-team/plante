@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:fimber/fimber.dart';
 import 'package:fimber_io/fimber_io.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';

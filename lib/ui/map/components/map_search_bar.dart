@@ -158,7 +158,15 @@ class _MapSearchBarState extends State<MapSearchBar> {
           key: const Key('map_search_bar_cancel'),
           onTap: () {
             _textController.clear();
-            widget.onCleared?.call();
+            // We listen to our [_textController] and notify observers about
+            // query changes. But a [TextControllers] notifies its observers
+            // only in the beginning of the next frame.
+            // We want to keep the order of the 2 events (query changed,
+            // search box cleared), so we delay the second even until the first
+            // one is definitely delivered - to the next frame.
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              widget.onCleared?.call();
+            });
           },
           svg: 'assets/cancel_circle.svg',
         ));

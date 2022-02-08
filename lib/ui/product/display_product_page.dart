@@ -1,5 +1,4 @@
 import 'package:expandable/expandable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -275,6 +274,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
         return context
             .strings.display_product_page_veg_status_unknown_explanation;
     }
+    return null;
   }
 
   Widget _ingredientsAnalysisWidget() {

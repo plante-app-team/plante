@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';

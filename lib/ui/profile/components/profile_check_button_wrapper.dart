@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:plante/ui/base/components/check_button_plante.dart';
 
 /// Wrapper for a nice looking shadow

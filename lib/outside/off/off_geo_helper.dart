@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/utils/ProductListQueryConfiguration.dart' as off;
 import 'package:plante/base/coord_utils.dart';

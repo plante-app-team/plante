@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:plante/model/coords_bounds.dart';
 

@@ -185,6 +185,7 @@ class MapPageModel with ShopsManagerListener {
     if (result != null) {
       return _pointToCameraPos(result);
     }
+    return null;
   }
 
   UIValueBase<bool> get viewPortShopsLoaded => _viewPortShopsFetched;
