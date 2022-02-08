@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 
 /// Some Widgets use [VisibilityDetectorPlante], which

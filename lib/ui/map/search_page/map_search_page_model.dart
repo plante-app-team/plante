@@ -89,6 +89,7 @@ class MapSearchPageModel {
     _lastQuery = _querySource.call();
     _queryChanges.listen((updatedQuery) {
       if (_lastQuery != updatedQuery) {
+        _lastQuery = updatedQuery;
         _loading = false;
       }
     });

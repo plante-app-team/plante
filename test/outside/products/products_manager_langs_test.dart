@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:mockito/mockito.dart';
-import 'package:openfoodfacts/model/Product.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/result.dart';
 import 'package:plante/model/ingredient.dart';

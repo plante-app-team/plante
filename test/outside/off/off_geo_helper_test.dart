@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:openfoodfacts/model/SearchResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:plante/base/coord_utils.dart';

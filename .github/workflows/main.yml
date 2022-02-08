@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  flutter_version: "2.5.2"
+  flutter_version: "2.10.0"
 
 jobs:
   run_checks:

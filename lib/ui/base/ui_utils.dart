@@ -96,7 +96,7 @@ Future<bool?> showSystemDialog<bool>(
 Future<bool?> _showIosDialog<bool>(BuildContext context, String? title,
     String content, String doWhat, VoidCallback onDo,
     {String? cancelWhat}) async {
-  await showDialog<bool>(
+  return await showDialog<bool>(
     context: context,
     builder: (_) => CupertinoAlertDialog(
       title: Text(title ?? ''),

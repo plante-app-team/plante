@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mockito/mockito.dart';
 import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
-import 'package:openfoodfacts/model/Product.dart' as off;
-import 'package:openfoodfacts/model/SearchResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
