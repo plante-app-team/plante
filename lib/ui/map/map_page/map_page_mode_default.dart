@@ -8,7 +8,6 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
-import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/map_filter_check_button.dart';
@@ -224,13 +223,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
       return;
     }
 
-    setBottomHint(RichText(
-        text: TextSpan(
-      style: TextStyles.normal,
-      children: [
-        TextSpan(text: context.strings.map_page_no_shops_hint2),
-      ],
-    )));
+    setBottomHintSimple(context.strings.map_page_no_shops_hint3);
   }
 
   @override

@@ -152,20 +152,20 @@ void main() {
     final widget = MapPage(mapControllerForTesting: mapController);
     final context = await commons.initIdleMapPage(widget, tester);
 
-    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint3),
         findsNothing);
 
     // No shops!
     await commons.clearFetchedShops(widget, tester, context);
 
     // 'No shops' hint is expected
-    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint3),
         findsOneWidget);
 
     // Fetch shops!
     await commons.fillFetchedShops(widget, tester);
 
-    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint3),
         findsNothing);
   });
 
@@ -182,14 +182,14 @@ void main() {
         .superTap(find.text(context.strings.map_page_load_shops_of_this_area));
 
     // No hints yet!
-    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint3),
         findsNothing);
 
     // Shops loaded, and there are no shops!
     completer.complete([]);
     await tester.pumpAndSettle();
 
-    expect(find.richTextContaining(context.strings.map_page_no_shops_hint2),
+    expect(find.richTextContaining(context.strings.map_page_no_shops_hint3),
         findsOneWidget);
   });
 

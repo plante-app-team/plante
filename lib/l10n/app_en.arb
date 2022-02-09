@@ -220,9 +220,9 @@
     "map_page_location_permission_go_to_settings": "Turn on in Settings",
     "map_page_location_permission_reasoning_settings": "Plante works best with Location Services turned on. You'll get information about stores based on your location",
     "map_page_location_permission_title": "Location Services",
-    "map_page_no_shops_hint2": "There are no stores in the area yet. Try moving the map, add a new store or try the map filters.",
-    "@map_page_no_shops_hint2": {
-        "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
+    "map_page_no_shops_hint3": "There are no stores in the area yet. You can try to move the map or change the filters above.",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
     },
     "map_page_no_shops_hint_in_select_shops_mode": "We don't know of any stores nearby. But you can add a new one by clicking the round button with a plus on the right!",
     "map_page_open_street_map_licence": "Data from Open Street Map",
