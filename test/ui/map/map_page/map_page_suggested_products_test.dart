@@ -17,6 +17,7 @@ import 'package:plante/ui/map/map_page/map_page_model.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 import 'map_page_modes_test_commons.dart';
 
@@ -48,6 +49,8 @@ void main() {
       // Map 1
       var widget = await commons.createIdleMapPage(tester,
           key: Key('${mapKeyPrefix}map1'));
+      await tester
+          .superTap(find.byKey(const Key('button_filter_not_empty_shops')));
 
       // Shop[0] is not displayed because it has 0 products
       var displayedShops = widget.getDisplayedShopsForTesting();
@@ -60,6 +63,8 @@ void main() {
       // Map 2
       widget = await commons.createIdleMapPage(tester,
           key: Key('${mapKeyPrefix}map2'));
+      await tester
+          .superTap(find.byKey(const Key('button_filter_not_empty_shops')));
 
       // Shop[0] is now displayed because it has several suggestions
       displayedShops = widget.getDisplayedShopsForTesting();
@@ -119,6 +124,8 @@ void main() {
 
     // No markers at first
     final page = await commons.createIdleMapPage(tester);
+    await tester
+        .superTap(find.byKey(const Key('button_filter_not_empty_shops')));
     expect(page.getDisplayedShopsForTesting(), isEmpty);
 
     // Still no markers even after we push a suggestion - suggestions
