@@ -72,12 +72,12 @@ abstract class BackgroundWorker<BS> {
     // Let's inform the caller about how to communicate with us...
     dataFromFront.initFrontPort.send(port.sendPort);
     // ...and listen to its messages.
-    port.listen((dynamic message) {
+    port.listen((dynamic message) async {
       final incomingMsg = message as _CrossIsolatesMessage;
       var exceptionCaught = false;
       dynamic response;
       try {
-        response = fn.call(incomingMsg.payload, backgroundState, log);
+        response = await fn.call(incomingMsg.payload, backgroundState, log);
       } catch (e) {
         exceptionCaught = true;
         log(LogLevel.WARNING, '$name: backgroundWorkFn threw',

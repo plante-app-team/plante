@@ -20,7 +20,8 @@ import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/map/shops_large_local_cache_wrapper.dart';
+import 'package:plante/outside/map/shops_large_local_cache.dart';
+import 'package:plante/outside/map/shops_large_local_cache_isolated.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -43,24 +44,26 @@ class ShopsManager {
 
   static const MAX_SHOPS_LOADS_ATTEMPTS = 2;
   // If new cache fields are added please update the [clearCache] method.
-  final _slowCacheCompleter = Completer<ShopsLargeLocalCacheWrapper>();
-  Future<ShopsLargeLocalCacheWrapper> get _slowCache =>
-      _slowCacheCompleter.future;
+  final _slowCacheCompleter = Completer<ShopsLargeLocalCache>();
+  Future<ShopsLargeLocalCache> get _slowCache => _slowCacheCompleter.future;
   final _rangesCache = <OsmUID, ShopProductRange>{};
   final _loadedAreas = <CoordsBounds, List<OsmUID>>{};
 
   int get loadedAreasCount => _loadedAreas.length;
 
+  /// [largeCache] param is used in the Web Admin project.
   ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
-      this._analytics, this._osmCacher, this._offGeoHelper)
+      this._analytics, this._osmCacher, this._offGeoHelper,
+      {ShopsLargeLocalCache? largeCache})
       : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
     _fetchShopsHelper =
         ShopsManagerFetchShopsHelper(_backendWorker, _osmCacher);
-    _initAsync();
+    _initAsync(largeCache);
   }
 
-  void _initAsync() async {
-    _slowCacheCompleter.complete(await ShopsLargeLocalCacheWrapper.create());
+  void _initAsync(ShopsLargeLocalCache? largeCache) async {
+    _slowCacheCompleter
+        .complete(largeCache ?? await ShopsLargeLocalCacheIsolated.create());
   }
 
   Future<void> dispose() async {
