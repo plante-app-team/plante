@@ -5,6 +5,6 @@
   Created by Johan Vandingenen on 26/06/2021.
   
 */
-NSCameraUsageDescription = "With camera access you can scan barcodes to search for products and take pictures to add new products";
-NSLocationWhenInUseUsageDescription = "While using your location we can find nearby shops!";
-NSPhotoLibraryUsageDescription="This app needs access to your library to upload pictures of products";
+NSCameraUsageDescription = "Pomocou prístupu k fotoaparátu môžete skenovať čiarové kódy a vyhľadávať produkty, fotografovať a pridávať nové produkty";
+NSLocationWhenInUseUsageDescription = "Pomocou vašej polohy môžeme nájsť obchody v okolí";
+NSPhotoLibraryUsageDescription="Táto aplikácia potrebuje prístup do vašej knižnice na nahrávanie obrázkov produktov";
