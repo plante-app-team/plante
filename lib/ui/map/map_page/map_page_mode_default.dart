@@ -24,20 +24,17 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   static const _PREF_SHOW_ALL_SHOPS = 'MapPageModeDefault_SHOW_ALL_SHOPS';
   static const _PREF_SHOW_NOT_EMPTY_SHOPS =
       'MapPageModeDefault_SHOW_NOT_EMPTY_SHOPS';
-  static const _PREF_SHOW_EMPTY_SHOPS = 'MapPageModeDefault_SHOW_EMPTY_SHOPS';
 
   late final UIValue<bool> _showAllShops;
   late final UIValue<bool> _showNotEmptyShops;
-  late final UIValue<bool> _showEmptyShops;
   late final Map<String, MapFilter> _filterOptions;
 
   ArgCallback<bool>? _onLoadingChange;
 
   MapPageModeDefault(MapPageModeParams params)
       : super(params, nameForAnalytics: 'default') {
-    _showAllShops = createUIValue(false);
-    _showNotEmptyShops = createUIValue(true);
-    _showEmptyShops = createUIValue(false);
+    _showAllShops = createUIValue(true);
+    _showNotEmptyShops = createUIValue(false);
   }
 
   @override
@@ -68,13 +65,10 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         prefs.getBool(_PREF_SHOW_ALL_SHOPS) ?? _showAllShops.cachedVal;
     final showNotEmptyShops = prefs.getBool(_PREF_SHOW_NOT_EMPTY_SHOPS) ??
         _showNotEmptyShops.cachedVal;
-    final showEmptyShops =
-        prefs.getBool(_PREF_SHOW_EMPTY_SHOPS) ?? _showEmptyShops.cachedVal;
     _showAllShops.setValue(showAllShops);
     _showNotEmptyShops.setValue(
       showNotEmptyShops,
     );
-    _showEmptyShops.setValue(showEmptyShops);
 
     _filterOptions = {
       _PREF_SHOW_ALL_SHOPS: MapFilter(
@@ -87,11 +81,6 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
           pref: _PREF_SHOW_NOT_EMPTY_SHOPS,
           eventShown: 'shops_with_products_shown',
           eventHidden: 'shops_with_products_hidden'),
-      _PREF_SHOW_EMPTY_SHOPS: MapFilter(
-          target: _showEmptyShops,
-          pref: _PREF_SHOW_EMPTY_SHOPS,
-          eventShown: 'empty_shops_shown',
-          eventHidden: 'empty_shops_hidden'),
     };
 
     _onLoadingChange = (_) {
@@ -132,12 +121,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         }
       }
 
-      if (hasProducts && _showNotEmptyShops.cachedVal) {
-        return true;
-      } else if (!hasProducts && _showEmptyShops.cachedVal) {
-        return true;
-      }
-      return false;
+      return hasProducts && _showNotEmptyShops.cachedVal;
     };
     return shops.where(shouldShow);
   }
@@ -154,7 +138,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
               key: const Key('filter_listview'),
               scrollDirection: Axis.horizontal,
               children: [
-                const SizedBox(width: 16),
+                const SizedBox(width: 24),
                 MapFilterCheckButton(
                     key: const Key('button_filter_all_shops'),
                     checked: _showAllShops.watch(ref),
@@ -166,13 +150,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
                     checked: _showNotEmptyShops.watch(ref),
                     text: context.strings.map_page_filter_not_empty_shops2,
                     onChanged: _setShowNotEmptyShops),
-                const SizedBox(width: 8),
-                MapFilterCheckButton(
-                    key: const Key('filter_empty_shops'),
-                    checked: _showEmptyShops.watch(ref),
-                    text: context.strings.map_page_filter_empty_shops2,
-                    onChanged: _setShowEmptyShops),
-                const SizedBox(width: 16),
+                const SizedBox(width: 24),
               ]));
     });
   }
@@ -205,10 +183,6 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
 
   void _setShowAllShops(bool value) {
     _onFilterClick(_PREF_SHOW_ALL_SHOPS);
-  }
-
-  void _setShowEmptyShops(bool value) {
-    _onFilterClick(_PREF_SHOW_EMPTY_SHOPS);
   }
 
   @override

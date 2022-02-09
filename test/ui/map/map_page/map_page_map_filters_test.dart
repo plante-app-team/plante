@@ -39,38 +39,24 @@ void main() {
     return find.byKey(Key(keyStr)).evaluate().first.widget as T;
   }
 
-  testWidgets('User selects to display all shops', (WidgetTester tester) async {
+  testWidgets('User selects to display not empty shops',
+      (WidgetTester tester) async {
     final widget = MapPage(mapControllerForTesting: mapController);
     await commons.initIdleMapPage(widget, tester);
 
     var displayedShops = widget.getDisplayedShopsForTesting();
-    expect(displayedShops.length, lessThan(shops.length));
-
-    await tester.superTap(find.byKey(const Key('button_filter_all_shops')));
-
-    displayedShops = widget.getDisplayedShopsForTesting();
     expect(displayedShops.length, equals(shops.length));
     expect(displayedShops, containsAll(shops));
-  });
 
-  testWidgets('empty shops filter', (WidgetTester tester) async {
-    final widget = MapPage(mapControllerForTesting: mapController);
-    await commons.initIdleMapPage(widget, tester);
-
-    var displayedShops = widget.getDisplayedShopsForTesting();
-    emptyShops.forEach((shop) => expect(displayedShops, isNot(contains(shop))));
-    notEmptyShops.forEach((shop) => expect(displayedShops, contains(shop)));
-
-    await tester.tapMapFilter('filter_empty_shops');
+    await tester
+        .superTap(find.byKey(const Key('button_filter_not_empty_shops')));
 
     displayedShops = widget.getDisplayedShopsForTesting();
-    emptyShops.forEach((shop) => expect(displayedShops, contains(shop)));
-    notEmptyShops
-        .forEach((shop) => expect(displayedShops, isNot(contains(shop))));
+    expect(displayedShops.length, lessThan(shops.length));
   });
 
   testWidgets(
-      'shops with suggested products only are displayed as shops with products',
+      'shops with suggested products only - are displayed as shops with products',
       (WidgetTester tester) async {
     suggestedProductsManager.clearAllSuggestions();
     // Now empty shops have some suggested products
@@ -80,14 +66,8 @@ void main() {
     final widget = await commons.createIdleMapPage(tester);
 
     // Shops with suggestions but with 0 products are displayed
-    var displayedShops = widget.getDisplayedShopsForTesting();
+    final displayedShops = widget.getDisplayedShopsForTesting();
     emptyShops.forEach((shop) => expect(displayedShops, contains(shop)));
-
-    await tester.tapMapFilter('filter_empty_shops');
-
-    // Shops with suggestions but with 0 products are no longer displayed
-    displayedShops = widget.getDisplayedShopsForTesting();
-    emptyShops.forEach((shop) => expect(displayedShops, isNot(contains(shop))));
   });
 
   Future<void> filterEventsTest(
@@ -107,7 +87,7 @@ void main() {
       // Let's disable it!
       final String anotherFilter;
       if (key == 'button_filter_all_shops') {
-        anotherFilter = 'filter_empty_shops';
+        anotherFilter = 'button_filter_not_empty_shops';
       } else {
         anotherFilter = 'button_filter_all_shops';
       }
@@ -126,7 +106,7 @@ void main() {
     await filterEventsTest(
       tester,
       key: 'button_filter_all_shops',
-      enabledByDefault: false,
+      enabledByDefault: true,
       eventShown: 'all_shops_shown',
     );
   });
@@ -135,17 +115,8 @@ void main() {
     await filterEventsTest(
       tester,
       key: 'button_filter_not_empty_shops',
-      enabledByDefault: true,
-      eventShown: 'shops_with_products_shown',
-    );
-  });
-
-  testWidgets('empty shops filter analytics', (WidgetTester tester) async {
-    await filterEventsTest(
-      tester,
-      key: 'filter_empty_shops',
       enabledByDefault: false,
-      eventShown: 'empty_shops_shown',
+      eventShown: 'shops_with_products_shown',
     );
   });
 
@@ -157,20 +128,20 @@ void main() {
 
     var checkboxNotEmptyShops =
         firstWidgetWith<MapFilterCheckButton>('button_filter_not_empty_shops');
-    var checkboxEmptyShops =
-        firstWidgetWith<MapFilterCheckButton>('filter_empty_shops');
-    expect(checkboxNotEmptyShops.checked, isTrue);
-    expect(checkboxEmptyShops.checked, isFalse);
+    var checkboxAllShops =
+        firstWidgetWith<MapFilterCheckButton>('button_filter_all_shops');
+    expect(checkboxNotEmptyShops.checked, isFalse);
+    expect(checkboxAllShops.checked, isTrue);
 
-    await tester.tapMapFilter('filter_empty_shops');
+    await tester.tapMapFilter('button_filter_not_empty_shops');
 
     // Verify the values are changed
     checkboxNotEmptyShops =
         firstWidgetWith<MapFilterCheckButton>('button_filter_not_empty_shops');
-    checkboxEmptyShops =
-        firstWidgetWith<MapFilterCheckButton>('filter_empty_shops');
-    expect(checkboxNotEmptyShops.checked, isFalse);
-    expect(checkboxEmptyShops.checked, isTrue);
+    checkboxAllShops =
+        firstWidgetWith<MapFilterCheckButton>('button_filter_all_shops');
+    expect(checkboxNotEmptyShops.checked, isTrue);
+    expect(checkboxAllShops.checked, isFalse);
 
     // Create a new page
     widget = MapPage(
@@ -180,10 +151,10 @@ void main() {
     // Verify the values are still the same
     checkboxNotEmptyShops =
         firstWidgetWith<MapFilterCheckButton>('button_filter_not_empty_shops');
-    checkboxEmptyShops =
-        firstWidgetWith<MapFilterCheckButton>('filter_empty_shops');
-    expect(checkboxNotEmptyShops.checked, isFalse);
-    expect(checkboxEmptyShops.checked, isTrue);
+    checkboxAllShops =
+        firstWidgetWith<MapFilterCheckButton>('button_filter_all_shops');
+    expect(checkboxNotEmptyShops.checked, isTrue);
+    expect(checkboxAllShops.checked, isFalse);
   });
 }
 

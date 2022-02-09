@@ -36,17 +36,17 @@ void main() {
     directionsManager = commons.directionsManager;
   });
 
-  testWidgets('empty shops are not displayed by default',
+  testWidgets('empty shops are displayed by default',
       (WidgetTester tester) async {
     expect(shops[0].productsCount, equals(0));
 
     final widget = await commons.createIdleMapPage(tester);
 
     final displayedShops = widget.getDisplayedShopsForTesting();
-    expect(displayedShops.length, equals(shops.length - 1));
-    expect(displayedShops, contains(shops[1]));
-    expect(displayedShops, contains(shops[2]));
-    expect(displayedShops, contains(shops[3]));
+    expect(displayedShops.length, equals(shops.length));
+    for (final shop in shops) {
+      expect(displayedShops, contains(shop));
+    }
   });
 
   testWidgets('shop click', (WidgetTester tester) async {
