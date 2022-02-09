@@ -2,14 +2,14 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/map/shops_large_local_cache_wrapper.dart';
+import 'package:plante/outside/map/shops_large_local_cache_isolated.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late ShopsLargeLocalCacheWrapper cacheWrapper;
+  late ShopsLargeLocalCacheIsolated cacheWrapper;
 
   setUp(() async {
-    cacheWrapper = await ShopsLargeLocalCacheWrapper.create();
+    cacheWrapper = await ShopsLargeLocalCacheIsolated.create();
   });
 
   test('add and get barcodes', () async {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:plante/logging/log.dart';
 
@@ -8,16 +9,18 @@ class HttpClient extends BaseClient {
   late final Client _realClient;
 
   HttpClient() {
-    final context = SecurityContext.defaultContext;
-    try {
-      final bytes = utf8.encode(_ISRG_X1);
-      context.setTrustedCertificatesBytes(bytes);
-      Log.i('Successfully added the legacy Let\'s Encrypt certificate');
-    } on TlsException catch (e) {
-      Log.i(
-          'Could not add the legacy Let\'s Encrypt certificate. '
-          'It probably already is present on the device.',
-          ex: e);
+    if (!kIsWeb && Platform.isAndroid) {
+      final context = SecurityContext.defaultContext;
+      try {
+        final bytes = utf8.encode(_ISRG_X1);
+        context.setTrustedCertificatesBytes(bytes);
+        Log.i('Successfully added the legacy Let\'s Encrypt certificate');
+      } on TlsException catch (e) {
+        Log.i(
+            'Could not add the legacy Let\'s Encrypt certificate. '
+            'It probably already is present on the device.',
+            ex: e);
+      }
     }
     _realClient = Client();
   }
