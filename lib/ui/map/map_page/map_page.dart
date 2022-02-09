@@ -452,7 +452,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                   builder: (context, ref, _) => AnimatedMapWidget(
                       child: _mode.watch(ref).buildTopActions())),
               Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24),
+                padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
                 child: IgnorePointer(
                     child: MapPageTimedHints(
                         loading: _model.loading,
