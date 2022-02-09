@@ -129,7 +129,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   @override
   Widget buildTopActions() {
     return consumer((ref) {
-      if (model.loading.watch(ref)) {
+      if (model.loading.watch(ref) || !model.viewPortShopsLoaded.watch(ref)) {
         return const SizedBox();
       }
       return SizedBox(
