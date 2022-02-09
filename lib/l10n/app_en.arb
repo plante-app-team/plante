@@ -35,6 +35,9 @@
     "country_se": "Sweden",
     "create_shop_page_how_new_shop_is_called": "What is the name of the store?",
     "create_shop_page_how_new_shop_is_called_hint": "Spar",
+    "@create_shop_page_how_new_shop_is_called_hint": {
+        "description": "An example of a store name. Can be the name of any well-known store in the country which speaks the target language."
+    },
     "create_shop_page_how_new_shop_is_called_label": "Store's name",
     "create_shop_page_what_type_new_shop_has": "Select store's type",
     "display_product_page_add_info_in_your_langs": "Add information",
@@ -62,9 +65,9 @@
     "display_product_page_veg_status_explanations_ok": "Alright!",
     "display_product_page_veg_status_negative_explanation": "The ingredient is not vegan.",
     "display_product_page_veg_status_positive_explanation": "The ingredient is vegan.",
-    "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's veg-status manually before buying it, just in case",
-    "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative veg-status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
-    "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its veg-status was determined",
+    "display_product_page_veg_status_positive_warning": "Manufacturer can change product's ingredients at any time - please verify product's vegan status manually before buying it, just in case",
+    "display_product_page_veg_status_possible_explanation": "The ingredient can have positive or negative vegan status depending on how it was manufactured.\nFor example, \"Ferment\" can be both vegan and non-vegan",
+    "display_product_page_veg_status_unknown_explanation": "No information was found about the ingredient when its vegan status was determined",
     "edit_profile_page_title": "Edit profile",
     "@edit_profile_page_title": {
         "description": "Title of the \"Edit profile\" page."
@@ -91,7 +94,13 @@
         "description": "Title of the user name input text field"
     },
     "expandable_plante_collapse": "Collapse",
+    "@expandable_plante_collapse": {
+        "description": "The Collapse button of an expandable UI element. When clicked, the UI element will collapse, hiding its content."
+    },
     "expandable_plante_expand": "Expand",
+    "@expandable_plante_expand": {
+        "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
+    },
     "external_auth_page_continue_with": "Continue with",
     "external_auth_page_continue_with_apple": "Continue with Apple",
     "external_auth_page_google_email_not_verified": "Error: Google email is not verified",
@@ -241,7 +250,7 @@
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_suggested_products_hint1": "Figuring out all possibly sold products nearby",
+    "map_page_loading_suggested_products_hint_v2": "Searching for products nearby",
     "map_search_bar_button_title": "Search",
     "map_search_bar_hint": "Search stores and streets",
     "map_search_page_search_hint": "Enter some text and tap Search",
@@ -295,12 +304,14 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
-    "settings_page_crash_on_errors": "Crash on errors",
     "settings_page_erase_user_data": "Clear user data and exit",
     "settings_page_general": "General",
     "settings_page_langs_i_know": "My languages",
     "settings_page_open_cache_settings": "Manage app cache",
     "settings_page_send_logs": "Send logs",
+    "@settings_page_send_logs": {
+        "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
     "settings_page_title": "Settings",
     "settings_page_your_id": "Your ID: ",
     "shop_address_widget_possible_address": "Approximate address: ",
@@ -333,26 +344,89 @@
         "description": "A hint within product's description, letting the user know this product is displayed only because it was seen in some other store with the same name. The hint shouldn't be too verbose. There probably will be many hints visible to the user - each suggested product will have such a hint."
     },
     "shop_type_bakery": "Bakery",
+    "@shop_type_bakery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
+    },
     "shop_type_beverages": "Beverages",
+    "@shop_type_beverages": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
+    },
     "shop_type_cheese": "Cheese",
+    "@shop_type_cheese": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
+    },
     "shop_type_chocolate": "Chocolate",
+    "@shop_type_chocolate": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
+    },
     "shop_type_coffee": "Coffee",
+    "@shop_type_coffee": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
+    },
     "shop_type_confectionery": "Confectionery",
+    "@shop_type_confectionery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=confectionery"
+    },
     "shop_type_convenience": "Convenience",
+    "@shop_type_convenience": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
+    },
     "shop_type_dairy": "Dairy",
+    "@shop_type_dairy": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
+    },
     "shop_type_deli": "Deli",
+    "@shop_type_deli": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=deli"
+    },
     "shop_type_farm": "Farm",
+    "@shop_type_farm": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
+    },
     "shop_type_frozen_food": "Frozen food",
+    "@shop_type_frozen_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
+    },
     "shop_type_general": "General",
+    "@shop_type_general": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=general"
+    },
     "shop_type_greengrocer": "Greengrocer",
+    "@shop_type_greengrocer": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=greengrocer"
+    },
     "shop_type_grocery": "Grocery",
+    "@shop_type_grocery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
+    },
     "shop_type_health_food": "Health food",
+    "@shop_type_health_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
+    },
     "shop_type_ice_cream": "Ice cream",
+    "@shop_type_ice_cream": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
+    },
     "shop_type_organic": "Organic",
+    "@shop_type_organic": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
+    },
     "shop_type_pasta": "Pasta",
+    "@shop_type_pasta": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
+    },
     "shop_type_pastry": "Pastry",
+    "@shop_type_pastry": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
+    },
     "shop_type_spices": "Spices",
+    "@shop_type_spices": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=spices"
+    },
     "shop_type_supermarket": "Supermarket",
+    "@shop_type_supermarket": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
     "user_langs_widget_system_lang": "(System language)",
     "veg_status_displayed_not_vegan": "Not vegan",
     "veg_status_displayed_veg_status_source_community": "Info from community",

@@ -38,7 +38,7 @@ class MapPageTimedHints extends StatelessWidget {
       } else if (loadingSuggestions) {
         return TimedHints(inProgress: true, hints: [
           const Pair('', Duration(seconds: 5)),
-          Pair(context.strings.map_page_loading_suggested_products_hint1,
+          Pair(context.strings.map_page_loading_suggested_products_hint_v2,
               const Duration(days: 1)),
         ]);
       } else {
