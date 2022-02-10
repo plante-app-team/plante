@@ -1,0 +1,10 @@
+/* 
+  infoplist.strings
+  Runner
+
+  Created by Johan Vandingenen on 26/06/2021.
+  
+*/
+NSCameraUsageDescription = "Pomocou prístupu k fotoaparátu môžete skenovať čiarové kódy a vyhľadávať produkty, fotografovať a pridávať nové produkty";
+NSLocationWhenInUseUsageDescription = "Pomocou vašej polohy môžeme nájsť obchody v okolí";
+NSPhotoLibraryUsageDescription="Táto aplikácia potrebuje prístup do vašej knižnice na nahrávanie obrázkov produktov";
