@@ -55,9 +55,11 @@ class _SettingsButtonBase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        width: double.infinity,
-        height: 54,
+    return ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: 54,
+          minWidth: double.infinity,
+        ),
         child: InkWell(
             onTap: onTap,
             child: Padding(

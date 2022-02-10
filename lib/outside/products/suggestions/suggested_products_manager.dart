@@ -1,4 +1,5 @@
 import 'package:plante/base/result.dart';
+import 'package:plante/base/settings.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/extra_properties/product_at_shop_extra_property_type.dart';
@@ -24,9 +25,10 @@ class SuggestedProductsManager {
   final RadiusProductsSuggestionsManager _radiusSuggestionsManager;
   final OffShopsManager _offShopsManager;
   final ProductsAtShopsExtraPropertiesManager _productsExtraProperties;
+  final Settings _settings;
 
   SuggestedProductsManager(ShopsManager shopsManager, this._offShopsManager,
-      this._productsExtraProperties,
+      this._productsExtraProperties, this._settings,
       {RadiusProductsSuggestionsManager? radiusManager})
       : _radiusSuggestionsManager =
             radiusManager ?? RadiusProductsSuggestionsManager(shopsManager);
@@ -60,6 +62,10 @@ class SuggestedProductsManager {
   /// NOTE: function stops data retrieval on first error
   SuggestionsStream _getSuggestedBarcodesByRadius(
       Iterable<Shop> shops, Coord center) async* {
+    if (await _settings.enableRadiusProductsSuggestions() == false) {
+      return;
+    }
+
     final barcodesMap = await _radiusSuggestionsManager
         .getSuggestedBarcodesByRadius(center, shops);
     for (final entry in barcodesMap.entries) {
@@ -75,6 +81,10 @@ class SuggestedProductsManager {
   /// NOTE: function stops data retrieval on first error
   SuggestionsStream _getSuggestedBarcodesByOFF(
       Iterable<Shop> shops, String countryCode) async* {
+    if (await _settings.enableOFFProductsSuggestions() == false) {
+      return;
+    }
+
     // There can be many shops with same name,
     // let's build a map which will let us to work with that.
     final namesUidsMap = <String, List<OsmUID>>{};

@@ -18,6 +18,7 @@ import 'package:plante/outside/products/suggestions/suggestion_type.dart';
 import 'package:test/test.dart';
 
 import '../../../z_fakes/fake_off_shops_manager.dart';
+import '../../../z_fakes/fake_settings.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 
 // ignore_for_file: cancel_subscriptions
@@ -27,6 +28,7 @@ void main() {
   late FakeOffShopsManager offShopsManager;
   late ProductsAtShopsExtraPropertiesManager productsExtraProperties;
   late _FakeRadiusProductsSuggestionsManager radiusSuggestionsManager;
+  late FakeSettings settings;
 
   late SuggestedProductsManager suggestedProductsManager;
 
@@ -36,8 +38,9 @@ void main() {
     productsExtraProperties =
         ProductsAtShopsExtraPropertiesManager(MapExtraPropertiesCacher());
     radiusSuggestionsManager = _FakeRadiusProductsSuggestionsManager();
+    settings = FakeSettings();
     suggestedProductsManager = SuggestedProductsManager(
-        shopsManager, offShopsManager, productsExtraProperties,
+        shopsManager, offShopsManager, productsExtraProperties, settings,
         radiusManager: radiusSuggestionsManager);
   });
 
@@ -109,6 +112,13 @@ void main() {
           shops[1].osmUID: allSuggestions[offShops[1]]!,
         })),
         isTrue);
+
+    // But not if the settings disable the suggestions
+    await settings.setEnableOFFProductsSuggestions(false);
+    suggestionsRes = await suggestedProductsManager
+        .getSuggestedBarcodesByOFFMap(shops, center, 'ru');
+    suggestions = suggestionsRes.unwrap();
+    expect(suggestions.asMap(), isEmpty);
   });
 
   test('getSuggestedBarcodes - by radius', () async {
@@ -133,14 +143,20 @@ void main() {
     radiusSuggestionsManager.setSuggestionsFor(shops[0], ['123', '345']);
     radiusSuggestionsManager.setSuggestionsFor(shops[1], ['567', '789']);
 
-    final result = await suggestedProductsManager
-        .getSuggestedBarcodesByRadiusMap(shops, center, 'ru');
+    var result = await suggestedProductsManager.getSuggestedBarcodesByRadiusMap(
+        shops, center, 'ru');
     expect(
         result.unwrap().equals(SuggestedBarcodesMap({
               OsmUID.parse('1:1'): ['123', '345'],
               OsmUID.parse('1:2'): ['567', '789'],
             })),
         isTrue);
+
+    // But not if the settings disable the suggestions
+    await settings.setEnableRadiusProductsSuggestions(false);
+    result = await suggestedProductsManager.getSuggestedBarcodesByRadiusMap(
+        shops, center, 'ru');
+    expect(result.unwrap().asMap(), isEmpty);
   });
 
   Future<void> badSuggestionsAreNotSuggestedTest(

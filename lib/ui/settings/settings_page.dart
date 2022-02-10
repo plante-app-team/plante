@@ -24,6 +24,7 @@ import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:plante/ui/settings/settings_buttons.dart';
 import 'package:plante/ui/settings/settings_cache_page.dart';
+import 'package:plante/ui/settings/settings_stores_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends PagePlante {
@@ -103,6 +104,14 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
           onTap: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const UserLangsPage()));
+          }),
+      SettingsGeneralButton(
+          text: context.strings.settings_page_stores_settings_button,
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const SettingsStoresPage()));
           }),
       SettingsGeneralButton(
           text: context.strings.settings_page_send_logs,
