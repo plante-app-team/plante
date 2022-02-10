@@ -168,6 +168,7 @@ void initDI() {
     GetIt.I.get<ShopsManager>(),
     GetIt.I.get<OffShopsManager>(),
     GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
+    GetIt.I.get<Settings>(),
   ));
   GetIt.I.registerSingleton<RoadsManager>(
       RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));

@@ -314,6 +314,22 @@
     },
     "settings_page_title": "Settings",
     "settings_page_your_id": "Your ID: ",
+    "settings_page_stores_settings_button": "Stores settings",
+    "@settings_page_stores_settings_button": {
+        "description": "A button which opens settings for stores"
+    },
+    "settings_page_stores_settings_title": "Stores settings",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
+    },
+    "settings_page_show_products_radius_suggestions": "Show products seen in other stores with the same name nearby",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_off_suggestions": "Show products seen in other stores with the same name in the same country",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
     "shop_address_widget_possible_address": "Approximate address: ",
     "shop_card_add_product": "Add product",
     "shop_card_directions": "Directions",
