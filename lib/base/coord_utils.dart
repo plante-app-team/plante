@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
@@ -33,15 +32,6 @@ double metersBetween(Coord coord1, Coord coord2) {
 
 double _deg2rad(double deg) {
   return deg * (pi / 180);
-}
-
-String distanceMetersToStr(double meters, BuildContext context) {
-  if (meters < 1000) {
-    return '${meters.round()} ${context.strings.global_meters}';
-  } else {
-    final distanceKms = meters / 1000;
-    return '${distanceKms.toStringAsFixed(1)} ${context.strings.global_kilometers}';
-  }
 }
 
 CoordsBounds outliningRectFor(Iterable<Coord> coords) {

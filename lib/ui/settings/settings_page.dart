@@ -20,6 +20,7 @@ import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/langs/user_langs_page.dart';
 import 'package:plante/ui/settings/settings_buttons.dart';
@@ -34,6 +35,7 @@ class SettingsPage extends PagePlante {
 
 class _SettingsPageState extends PageStatePlante<SettingsPage> {
   late final _loading = UIValue<bool>(true, ref);
+  late final _distanceInMiles = UIValue<bool?>(null, ref);
   bool _developer = false;
   bool _enableNewestFeatures = false;
 
@@ -47,10 +49,17 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    initStateImpl();
+    _initAsync();
   }
 
-  void initStateImpl() async {
+  void _initAsync() async {
+    _distanceInMiles.setValue(await _settings.distanceInMiles());
+    _distanceInMiles.callOnChanges((val) {
+      if (val != null) {
+        _settings.setDistanceInMiles(val);
+      }
+    });
+
     final userNullable =
         await GetIt.I.get<UserParamsController>().getUserParams();
     _user = userNullable!;
@@ -124,6 +133,10 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
           onTap: () {
             launch(privacyPolicyUrl(_sysLangCodeHolder));
           }),
+      consumer((ref) => SettingsCheckButton(
+          onChanged: _distanceInMiles.setValue,
+          text: context.strings.settings_page_distance_in_miles,
+          value: _distanceInMiles.watch(ref) ?? false)),
       if (_developer)
         SettingsGeneralButton(
             text: 'Clear user data and exit (dev option)',

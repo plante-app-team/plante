@@ -16,6 +16,7 @@ import 'package:plante/outside/products/products_obtainer.dart';
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
+import '../../z_fakes/fake_settings.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_contributions_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -50,7 +51,7 @@ class ProfilePageTestCommons {
     GetIt.I.registerSingleton<Analytics>(analytics);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
-    GetIt.I.registerSingleton<Settings>(Settings());
+    GetIt.I.registerSingleton<Settings>(FakeSettings());
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     GetIt.I.registerSingleton<Backend>(MockBackend());

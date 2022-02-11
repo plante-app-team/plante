@@ -24,6 +24,7 @@ import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
@@ -49,7 +50,8 @@ import 'package:plante/ui/photos/photos_taker.dart';
 
 void initDI() {
   GetIt.I.registerSingleton<SharedPreferencesHolder>(SharedPreferencesHolder());
-  GetIt.I.registerSingleton<Settings>(Settings());
+  GetIt.I.registerSingleton<Settings>(
+      Settings(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<Analytics>(Analytics());
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
@@ -188,5 +190,9 @@ void initDI() {
     GetIt.I.get<ProductsManager>(),
     GetIt.I.get<ShopsManager>(),
     GetIt.I.get<UserReportsMaker>(),
+  ));
+  GetIt.I.registerSingleton(DisplayedDistanceUnitsManager(
+    GetIt.I.get<CachingUserAddressPiecesObtainer>(),
+    GetIt.I.get<Settings>(),
   ));
 }
