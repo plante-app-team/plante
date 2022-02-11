@@ -16,6 +16,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -34,6 +35,7 @@ import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
+import '../../../z_fakes/fake_settings.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
@@ -91,6 +93,10 @@ class MapPageModesTestCommons {
         userAddressObtainer);
     GetIt.I.registerSingleton<SharedPreferencesHolder>(
         FakeSharedPreferences().asHolder());
+    final displayedDistanceManager =
+        DisplayedDistanceUnitsManager(userAddressObtainer, FakeSettings());
+    GetIt.I.registerSingleton<DisplayedDistanceUnitsManager>(
+        displayedDistanceManager);
 
     await fillFetchedShops();
 

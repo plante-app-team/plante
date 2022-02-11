@@ -10,9 +10,11 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
+import 'package:plante/model/country_code.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
@@ -24,6 +26,8 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/user_address/user_address_piece.dart';
+import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_model.dart';
@@ -34,6 +38,8 @@ import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
+import '../../../z_fakes/fake_settings.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_user_location_manager.dart';
 
@@ -45,6 +51,9 @@ void main() {
   late MockOsmSearcher osmSearcher;
   late FakeUserLocationManager userLocationManager;
   late FakeAnalytics analytics;
+  late FakeCachingUserAddressPiecesObtainer userAddressObtainer;
+  late DisplayedDistanceUnitsManager displayedDistanceManager;
+  late FakeSettings settings;
 
   final userPos = Coord(lat: 15, lon: 15);
   final distanceToEntities = kmToGrad(3);
@@ -134,6 +143,12 @@ void main() {
     GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     analytics = FakeAnalytics();
     GetIt.I.registerSingleton<Analytics>(analytics);
+    userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    settings = FakeSettings();
+    displayedDistanceManager =
+        DisplayedDistanceUnitsManager(userAddressObtainer, settings);
+    GetIt.I.registerSingleton<DisplayedDistanceUnitsManager>(
+        displayedDistanceManager);
 
     await cameraPosStorage.set(cameraPos);
     userLocationManager.setCurrentPosition(userPos);
@@ -148,6 +163,9 @@ void main() {
           ..city = 'London'
           ..road = 'Broadway')));
 
+    userAddressObtainer.setResultFor(UserAddressType.USER_LOCATION,
+        UserAddressPiece.COUNTRY_CODE, CountryCode.BELGIUM);
+
     setUpFoundEntities(
         localShops: [],
         foundInOsmShops: [],
@@ -157,9 +175,10 @@ void main() {
 
   Future<BuildContext> pumpAndWaitPreloadFinish(WidgetTester tester,
       {NavigatorObserver? navigatorObserver,
-      MapSearchPageResult? initialState}) async {
+      MapSearchPageResult? initialState,
+      Key? key}) async {
     final context = await tester.superPump(
-        MapSearchPage(initialState: initialState),
+        MapSearchPage(initialState: initialState, key: key),
         navigatorObserver: navigatorObserver);
     await tester.pumpAndSettle();
     return context;
@@ -539,12 +558,43 @@ void main() {
 
     // NOTE: grad to kms math is complex so we simply hardcode the expected
     // number of kilometers.
-
     expect(find.text('2.8 ${context.strings.global_kilometers}'), findsNothing);
     await tester
         .superTap(find.text(context.strings.map_search_bar_button_title));
     expect(find.text('2.8 ${context.strings.global_kilometers}'),
         findsNWidgets(allShops.length));
+  });
+
+  testWidgets('distance from user is shown in miles when settings say so',
+      (WidgetTester tester) async {
+    setUpFoundEntities(
+        localShops: localShops,
+        foundInOsmShops: foundInOsmShops,
+        localRoads: [],
+        foundInOsmRoads: []);
+
+    // Kilometers first
+    var context =
+        await pumpAndWaitPreloadFinish(tester, key: const Key('page1'));
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+    expect(
+        find.textContaining(context.strings.global_kilometers), findsWidgets);
+    expect(find.textContaining(context.strings.global_miles), findsNothing);
+
+    // Now miles
+    await settings.setDistanceInMiles(true);
+
+    context = await pumpAndWaitPreloadFinish(tester, key: const Key('page2'));
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+    expect(
+        find.textContaining(context.strings.global_kilometers), findsNothing);
+    expect(find.textContaining(context.strings.global_miles), findsWidgets);
   });
 
   testWidgets('behaviour when osm and local shops intersect',
@@ -780,11 +830,11 @@ void main() {
     for (final distance in expectedDistances) {
       Offset? prevCenter;
       if (prevDistance != null) {
-        prevCenter = tester
-            .getCenter(find.text(distanceMetersToStr(prevDistance, context)));
+        prevCenter = tester.getCenter(find
+            .text(displayedDistanceManager.metersToStr(prevDistance, context)));
       }
-      final center =
-          tester.getCenter(find.text(distanceMetersToStr(distance, context)));
+      final center = tester.getCenter(
+          find.text(displayedDistanceManager.metersToStr(distance, context)));
       expect(center.dy, greaterThan(prevCenter?.dy ?? -1));
       prevDistance = distance;
     }
@@ -830,11 +880,11 @@ void main() {
     for (final distance in expectedDistances) {
       Offset? prevCenter;
       if (prevDistance != null) {
-        prevCenter = tester
-            .getCenter(find.text(distanceMetersToStr(prevDistance, context)));
+        prevCenter = tester.getCenter(find
+            .text(displayedDistanceManager.metersToStr(prevDistance, context)));
       }
-      final center =
-          tester.getCenter(find.text(distanceMetersToStr(distance, context)));
+      final center = tester.getCenter(
+          find.text(displayedDistanceManager.metersToStr(distance, context)));
       expect(center.dy, greaterThan(prevCenter?.dy ?? -1));
       prevDistance = distance;
     }
@@ -884,10 +934,12 @@ void main() {
     final notExpectedDistances = [distances[1]];
 
     for (final distance in expectedDistances) {
-      expect(find.text(distanceMetersToStr(distance, context)), findsOneWidget);
+      expect(find.text(displayedDistanceManager.metersToStr(distance, context)),
+          findsOneWidget);
     }
     for (final distance in notExpectedDistances) {
-      expect(find.text(distanceMetersToStr(distance, context)), findsNothing);
+      expect(find.text(displayedDistanceManager.metersToStr(distance, context)),
+          findsNothing);
     }
   });
 
@@ -950,7 +1002,8 @@ void main() {
     final expectedDistances = [distances[0], distances[1], distances[2]];
 
     for (final distance in expectedDistances) {
-      expect(find.text(distanceMetersToStr(distance, context)), findsOneWidget);
+      expect(find.text(displayedDistanceManager.metersToStr(distance, context)),
+          findsOneWidget);
     }
   });
 

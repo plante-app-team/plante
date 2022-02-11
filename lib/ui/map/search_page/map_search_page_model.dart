@@ -128,7 +128,7 @@ class MapSearchPageModel {
       return Ok(await _centerAddressCompleter.future);
     }
     final cameraAddressRes = await _addressObtainer.addressOfCoords(center);
-    if (cameraAddressRes.isOk) {
+    if (cameraAddressRes.isOk && !_centerAddressCompleter.isCompleted) {
       _centerAddressCompleter.complete(cameraAddressRes.unwrap());
     }
     return cameraAddressRes;

@@ -114,6 +114,8 @@
     "global_done_thanks": "Done! Thank you!",
     "global_give_permission": "Give permission",
     "global_kilometers": "km",
+    "global_miles": "mi",
+    "global_feet": "ft",
     "global_meters": "meters",
     "global_network_error": "Network error - please check your internet connection",
     "global_no": "No",
@@ -207,14 +209,6 @@
     "map_page_filter_empty_shops2": "Only empty stores",
     "@map_page_filter_empty_shops2": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
-    "map_page_filter_shops_with_radius_suggested_products": "Show stores with products seen similar stores of the city",
-    "@map_page_filter_shops_with_radius_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
-    },
-    "map_page_filter_shops_with_off_suggested_products": "Show stores with products seen similar stores of the country",
-    "@map_page_filter_shops_with_off_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
     },
     "map_page_filter_all_shops": "All stores",
     "map_page_filter_not_empty_shops2": "Only stores with products",
@@ -330,9 +324,16 @@
     "@settings_page_show_products_off_suggestions": {
         "description": "A checkmark in the app settings"
     },
+    "settings_page_distance_in_miles": "Display distance in miles",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
     "shop_address_widget_possible_address": "Approximate address: ",
     "shop_card_add_product": "Add product",
     "shop_card_directions": "Directions",
+    "@shop_card_directions": {
+        "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
+    },
     "shop_card_no_products_listed": "Nothing listed",
     "shop_card_open_shop_products": "Product list",
     "shop_card_products_listed": "Products listed",

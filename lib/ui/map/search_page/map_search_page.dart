@@ -7,10 +7,10 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/location/user_location_manager.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
+import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
@@ -43,7 +43,7 @@ class MapSearchPage extends PagePlante {
 class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   static const _ANIMATION_END_AWAIT_DURATION = Duration(milliseconds: 500);
 
-  final _analytics = GetIt.I.get<Analytics>();
+  final _distanceManager = GetIt.I.get<DisplayedDistanceUnitsManager>();
   final _searchBarFocusNode = FocusNode();
   final _querySource = MapSearchBarQueryView();
   late final ScrollController _scrollController;
@@ -249,10 +249,12 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
         onVisibilityChanged: (visible, _) =>
             _onShopVisibilityChange(shop, visible),
         child: MapSearchResultEntry(
-            title: shop.name,
-            subtitle:
-                AddressWidget.forShop(shop, _model.requestAddressOf(shop)),
-            distanceMeters: metersBetween(_model.center, shop.coord)));
+          title: shop.name,
+          subtitle: AddressWidget.forShop(shop, _model.requestAddressOf(shop)),
+          distanceMeters: metersBetween(_model.center, shop.coord),
+          distanceMetersToStr: (meters) =>
+              _distanceManager.metersToStr(meters, context),
+        ));
   }
 
   void _onShopVisibilityChange(Shop shop, bool visible) {
@@ -267,8 +269,11 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
 
   Widget _roadToWidget(OsmRoad road) {
     return MapSearchResultEntry(
-        title: road.name,
-        distanceMeters: metersBetween(_model.center, road.coord));
+      title: road.name,
+      distanceMeters: metersBetween(_model.center, road.coord),
+      distanceMetersToStr: (meters) =>
+          _distanceManager.metersToStr(meters, context),
+    );
   }
 
   void _finishWithShop(Shop shop) {
@@ -301,7 +306,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
   }
 
   void _onSearchTap(String query) async {
-    _analytics.sendEvent('map_search_start');
+    analytics.sendEvent('map_search_start');
     FocusScope.of(context).unfocus();
     _model.search(query, (result) {
       if (mounted) {

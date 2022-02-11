@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:plante/base/coord_utils.dart';
+import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class MapSearchResultEntry extends StatelessWidget {
   final String title;
   final Widget? subtitle;
   final double distanceMeters;
-  const MapSearchResultEntry(
-      {Key? key,
-      required this.title,
-      this.subtitle,
-      required this.distanceMeters})
-      : super(key: key);
+  final ArgResCallback<double, String> distanceMetersToStr;
+  const MapSearchResultEntry({
+    Key? key,
+    required this.title,
+    this.subtitle,
+    required this.distanceMeters,
+    required this.distanceMetersToStr,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
       textDirection: TextDirection.rtl,
       children: [
-        Text(distanceMetersToStr(distanceMeters, context),
+        Text(distanceMetersToStr(distanceMeters),
             style: TextStyles.searchResultDistance),
         Expanded(
             child:
