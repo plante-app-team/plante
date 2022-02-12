@@ -1102,6 +1102,48 @@ void main() {
     expect(pageResult.chosenShops!.toSet(),
         equals((localShops + foundInOsmShops).toSet()));
   });
+
+  testWidgets('found shops are shown when streets are not loaded yet',
+      (WidgetTester tester) async {
+    // Shops will be found immediately
+    setUpFoundEntities(localShops: localShops);
+
+    // But streets will be found later
+    final roadsCompleter =
+        Completer<Result<List<OsmRoad>, RoadsManagerError>>();
+    when(roadsManager.fetchRoadsWithinAndNearby(any))
+        .thenAnswer((_) async => roadsCompleter.future);
+
+    final context = await pumpAndWaitPreloadFinish(tester);
+    await tester.superEnterText(
+        find.byKey(const Key('map_search_bar_text_field')), 'name');
+    await tester
+        .superTap(find.text(context.strings.map_search_bar_button_title));
+
+    // Shops are expected to be found
+    verifySearchResults(
+      tester,
+      context,
+      expectedShops: localShops,
+      expectedRoads: const [],
+      expectNotFoundMsgIfEntitiesEmpty: false,
+    );
+    // Roads are not found yet
+    expect(find.text(localRoads.first.name), findsNothing);
+
+    // Finish roads loading
+    roadsCompleter.complete(Ok(localRoads));
+    await tester.pumpAndSettle();
+
+    // Now both shops and roads are expected to be found
+    verifySearchResults(
+      tester,
+      context,
+      expectedShops: localShops,
+      expectedRoads: localRoads,
+    );
+    expect(find.text(localRoads.first.name), findsOneWidget);
+  });
 }
 
 extension _ShopsListExt on Iterable<Shop> {
