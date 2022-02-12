@@ -20,9 +20,9 @@ import 'package:plante/ui/map/map_page/map_page_mode_zoomed_out.dart';
 
 class MapPageModeDefault extends MapPageModeShopsCardBase {
   static const MIN_ZOOM = 6.0;
-  static const _PREF_SHOW_ALL_SHOPS = 'MapPageModeDefault_SHOW_ALL_SHOPS';
+  static const _PREF_SHOW_ALL_SHOPS = 'MapPageModeDefault_SHOW_ALL_SHOPS2';
   static const _PREF_SHOW_NOT_EMPTY_SHOPS =
-      'MapPageModeDefault_SHOW_NOT_EMPTY_SHOPS';
+      'MapPageModeDefault_SHOW_NOT_EMPTY_SHOPS2';
 
   late final UIValue<bool> _showAllShops;
   late final UIValue<bool> _showNotEmptyShops;
