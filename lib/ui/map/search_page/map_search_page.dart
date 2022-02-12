@@ -217,7 +217,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                     child: titleButton,
                   )))
         ])));
-    if (_model.loading || entities == null) {
+    if (_model.loading && entities == null) {
       if (!isInTests()) {
         results.add(Wrap(children: [
           Padding(
@@ -226,7 +226,7 @@ class _MapSearchPageState extends PageStatePlante<MapSearchPage> {
                   width: 24, height: 24, child: CircularProgressIndicator()))
         ]));
       }
-    } else if (entities.isEmpty) {
+    } else if (entities == null || entities.isEmpty) {
       results.add(Padding(
           padding: entityPadding,
           child: Text(notFoundMsg, style: TextStyles.hint)));
