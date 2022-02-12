@@ -34,7 +34,7 @@
     "country_ru": "Rosja",
     "country_se": "Szwecja",
     "create_shop_page_how_new_shop_is_called": "Jak nazywa się sklep?",
-    "create_shop_page_how_new_shop_is_called_hint": "Lidl",
+    "create_shop_page_how_new_shop_is_called_hint": "Biedronka",
     "create_shop_page_how_new_shop_is_called_label": "Nazwa sklepu",
     "create_shop_page_what_type_new_shop_has": "Wybierz rodzaj sklepu",
     "display_product_page_add_info_in_your_langs": "Dodaj informacje",
@@ -51,6 +51,9 @@
     "display_product_page_report_btn": "Zgłoś niepoprawne informacje",
     "display_product_page_table_column1": "Produkt",
     "display_product_page_table_column3": "Wegański",
+    "@display_product_page_table_column3": {
+        "description": "A column title in a product's ingredients analysis table. The column can have 'Yes', 'No' and 'Ambiguous' values for each of the ingredients (\"Vegan? Yes. Vegan? No. Vegan? Ambiguous!\")."
+    },
     "display_product_page_table_negative": "Nie",
     "display_product_page_table_positive": "Tak",
     "display_product_page_table_possible": "Niejednoznaczny",
@@ -88,7 +91,13 @@
         "description": "Title of the user name input text field"
     },
     "expandable_plante_collapse": "Zwiń",
+    "@expandable_plante_collapse": {
+        "description": "The Collapse button of an expandable UI element. When clicked, the UI element will collapse, hiding its content."
+    },
     "expandable_plante_expand": "Rozwiń",
+    "@expandable_plante_expand": {
+        "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
+    },
     "external_auth_page_continue_with": "Kontynuuj",
     "external_auth_page_continue_with_apple": "Kontynuuj z Apple",
     "external_auth_page_google_email_not_verified": "Błąd: email Google nie został zweryfikowany",
@@ -192,21 +201,14 @@
     "map_page_cancel_shop_creation_q": "Anulować dodawanie nowego sklepu?",
     "map_page_click_on_shop_where_product_sold": "Wybierz pinezkę sklepu, w którym dostępny jest produkt",
     "map_page_click_where_new_shop_located": "Kliknij miejsce, w którym zlokalizowany jest sklep",
-    "map_page_filter_empty_shops": "Puste sklepy",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
+    "map_page_filter_all_shops": "Wszystkie sklepy",
+    "map_page_filter_empty_shops2": "Tylko puste sklepy",
+    "@map_page_filter_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
     },
-    "map_page_filter_not_empty_shops": "Sklepy z produktami",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
-    },
-    "map_page_filter_shops_with_off_suggested_products": "Produkt widziany w podobnych sklepach w kraju",
-    "@map_page_filter_shops_with_off_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
-    },
-    "map_page_filter_shops_with_radius_suggested_products": "Produkt widziany w podobnych sklepach w tym mieście",
-    "@map_page_filter_shops_with_radius_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
+    "map_page_filter_not_empty_shops2": "Tylko sklepy z produktami",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
     "map_page_is_new_product_sold_q": "Czy ten produkt jest tutaj dostępny?",
     "map_page_is_product_sold_q": "Czy <PRODUCT> jest tutaj dostępny?",
@@ -224,15 +226,15 @@
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_suggested_products_hint1": "Znajdywanie wszystkich potencjalnie sprzedanych produktów w pobliżu",
+    "map_page_loading_suggested_products_hint_v2": "Szukanie produktów w okolicy",
     "map_page_location_permission_cancel_go_to_settings": "Pozostaw usługi lokalizacyjne wyłączone",
     "map_page_location_permission_go_to_settings": "Włącz w ustawieniach",
     "map_page_location_permission_reasoning_settings": "Plante działa najlepiej z włączonymi usługami lokalizacyjnymi. Dzięki nim, otrzymasz informacje o sklepach w pobliżu Ciebie",
     "map_page_location_permission_title": "Usługi lokalizacyjne",
     "map_page_no_shops_hint_in_select_shops_mode": "Nie znamy żadnych sklepów w pobliżu. Możesz dodać pierwszy, klikając okrągły przycisk z plusem po prawej stronie!",
-    "map_page_no_shops_hint2": "Brak sklepów z produktami w pobliżu. Możesz regulawać filtry sklepów klikając na nie",
-    "@map_page_no_shops_hint2": {
-        "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
+    "map_page_no_shops_hint3": "W tej okolicy nie ma jeszcze dostępnych sklepów. Możesz spróbować przesunąć mapę lub zmienić filtry mapy powyżej.",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
     },
     "map_page_open_street_map_licence": "Dane z Open Street Map",
     "map_page_shop_added_to_map": "Sklep został dodany do mapy",
@@ -257,6 +259,8 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Produkt ma niejednoznaczne składniki (niejednoznaczne składniki mogą być wegańskie lub niewegańskie w zależności od sposobu ich produkcji), ale produkt ma na opakowaniu znak Vegan.",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Producent potwierdził brak składników niewegańskich",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Producent potwierdził obecność składników niewegańskich",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Produkt posiada niejednoznaczne składniki. Producent produktu nie odpowiedział na naszą prośbę lub odmówił udzielenia niezbędnych wyjaśnień.",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Produkt posiada niejednoznaczne składniki, które bardzo często nie są wegańskie. Producent produktu nie odpowiedział na naszą prośbę lub odmówił udzielenia niezbędnych wyjaśnień.",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Proces produkcyjny produktu wykorzystuje praktyki niewegańskie. Produkt jest uważany przez Plante za niejednoznaczny, ponieważ wszystkie składniki są wegańskie, a produkt pomaga rozwojowi ruchu wegańskiego. ",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Produkt zawiera cukier, który mógł być pozyskany z trzciny cukrowej i wybielony węglem kostnym.",
     "mod_reason_some_ingredient_has_unknown_origin": "Niektóre składniki są nieznanego pochodzenia",
@@ -289,17 +293,38 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Wyczyść pamięć podręczną mapy i wyjdź",
     "settings_cache_page_title": "Pamięć podręczna aplikacji",
-    "settings_page_crash_on_errors": "Błędy crash on",
     "settings_page_erase_user_data": "Wyczyść dane użytkownika i wyjdź",
     "settings_page_general": "Główne",
     "settings_page_langs_i_know": "Moje języki",
     "settings_page_open_cache_settings": "Zarządzaj pamięcią podręczną aplikacji",
     "settings_page_send_logs": "Wyślij logi",
+    "@settings_page_send_logs": {
+        "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
+    "settings_page_show_products_off_suggestions": "Pokaż produkty z taką samą nazwą, widziane w tym samym kraju",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_radius_suggestions": "Pokaż produkty z taką samą nazwą, widziane w pobliskich sklepach",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_stores_settings_button": "Ustawienia sklepów",
+    "@settings_page_stores_settings_button": {
+        "description": "A button which opens settings for stores"
+    },
+    "settings_page_stores_settings_title": "Ustawienia sklepów",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
+    },
     "settings_page_title": "Ustawienia",
     "settings_page_your_id": "Twoje ID: ",
     "shop_address_widget_possible_address": "Przybliżony adres: ",
     "shop_card_add_product": "Dodaj produkt",
     "shop_card_directions": "Wskazówki dojazdu",
+    "@shop_card_directions": {
+        "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
+    },
     "shop_card_no_products_listed": "Brak dostępnych produktów",
     "shop_card_open_shop_products": "Lista produktów",
     "shop_card_products_listed": "Dostępne produkty",
@@ -327,26 +352,89 @@
     "shop_product_range_page_you_sure_negative_vote": "Jesteś pewny, że ten produkt nie jest dostępny w tym sklepie?",
     "shop_product_range_page_you_sure_positive_vote": "Jesteś pewny, że widziałeś ten produkt w sklepie?",
     "shop_type_bakery": "Piekarnia",
+    "@shop_type_bakery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
+    },
     "shop_type_beverages": "Napoje",
+    "@shop_type_beverages": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
+    },
     "shop_type_cheese": "Ser",
+    "@shop_type_cheese": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
+    },
     "shop_type_chocolate": "Czekolada",
+    "@shop_type_chocolate": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
+    },
     "shop_type_coffee": "Kawa",
+    "@shop_type_coffee": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
+    },
     "shop_type_confectionery": "Cukiernia",
+    "@shop_type_confectionery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=confectionery"
+    },
     "shop_type_convenience": "Sklep osiedlowy",
+    "@shop_type_convenience": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
+    },
     "shop_type_dairy": "Nabiał",
+    "@shop_type_dairy": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
+    },
     "shop_type_deli": "Delikatesy",
+    "@shop_type_deli": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=deli"
+    },
     "shop_type_farm": "Gospodarstwo",
+    "@shop_type_farm": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
+    },
     "shop_type_frozen_food": "Mrożonki",
+    "@shop_type_frozen_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
+    },
     "shop_type_general": "Ogólne",
+    "@shop_type_general": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=general"
+    },
     "shop_type_greengrocer": "Warzywniak",
+    "@shop_type_greengrocer": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=greengrocer"
+    },
     "shop_type_grocery": "Sklep spożywczy",
+    "@shop_type_grocery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
+    },
     "shop_type_health_food": "Zdrowa żywność",
+    "@shop_type_health_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
+    },
     "shop_type_ice_cream": "Lody",
+    "@shop_type_ice_cream": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
+    },
     "shop_type_organic": "Organiczne",
+    "@shop_type_organic": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
+    },
     "shop_type_pasta": "Makaron",
+    "@shop_type_pasta": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
+    },
     "shop_type_pastry": "Ciasto",
+    "@shop_type_pastry": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
+    },
     "shop_type_spices": "Przyprawy",
+    "@shop_type_spices": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=spices"
+    },
     "shop_type_supermarket": "Supermarket",
+    "@shop_type_supermarket": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
     "user_langs_widget_system_lang": "(Język systemu)",
     "veg_status_displayed_not_vegan": "Niewegański",
     "veg_status_displayed_veg_status_source_community": "Informacja od społeczności",
