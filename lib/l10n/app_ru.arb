@@ -51,6 +51,9 @@
     "display_product_page_report_btn": "Сообщить о неверных данных",
     "display_product_page_table_column1": "Продукт",
     "display_product_page_table_column3": "Веганский",
+    "@display_product_page_table_column3": {
+        "description": "A column title in a product's ingredients analysis table. The column can have 'Yes', 'No' and 'Ambiguous' values for each of the ingredients (\"Vegan? Yes. Vegan? No. Vegan? Ambiguous!\")."
+    },
     "display_product_page_table_negative": "Нет",
     "display_product_page_table_positive": "Да",
     "display_product_page_table_possible": "Неоднозначно",
@@ -88,7 +91,13 @@
         "description": "Title of the user name input text field"
     },
     "expandable_plante_collapse": "Свернуть",
+    "@expandable_plante_collapse": {
+        "description": "The Collapse button of an expandable UI element. When clicked, the UI element will collapse, hiding its content."
+    },
     "expandable_plante_expand": "Развернуть",
+    "@expandable_plante_expand": {
+        "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
+    },
     "external_auth_page_continue_with": "Продолжить с",
     "external_auth_page_continue_with_apple": "Войти с Apple",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",
@@ -100,9 +109,11 @@
     "global_copied_to_clipboard": "Скопировано в буфер обмена",
     "global_done": "Готово",
     "global_done_thanks": "Готово! Спасибо!",
+    "global_feet": "фут.",
     "global_give_permission": "Дать разрешение",
     "global_kilometers": "км",
     "global_meters": "м",
+    "global_miles": "мил.",
     "global_network_error": "Сетевая ошибка - пожалуйста, проверьте подключение к интернету",
     "global_no": "Нет",
     "global_oops_no": "Ой, нет",
@@ -191,22 +202,11 @@
     "map_page_cancel_putting_product_q": "Отменить добавление продукта на карту?",
     "map_page_cancel_shop_creation_q": "Отменить добавление магазина?",
     "map_page_click_on_shop_where_product_sold": "Кликните на маркер магазина, в котором находится продукт",
-    "map_page_click_where_new_shop_located": "Кликните на место, где расположен не учтённый магазин",
-    "map_page_filter_empty_shops": "Пустые магазины",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
-    },
-    "map_page_filter_not_empty_shops": "Магазины с продуктами",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
-    },
-    "map_page_filter_shops_with_off_suggested_products": "Продукты из похожих магазинов страны",
-    "@map_page_filter_shops_with_off_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
-    },
-    "map_page_filter_shops_with_radius_suggested_products": "Продукты из похожих магазинов города",
-    "@map_page_filter_shops_with_radius_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
+    "map_page_click_where_new_shop_located": "Кликните на место, где расположен неучтённый магазин",
+    "map_page_filter_all_shops": "Все магазины",
+    "map_page_filter_not_empty_shops2": "Только магазины с продуктами",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
     "map_page_is_new_product_sold_q": "Тут продают продукт?",
     "map_page_is_product_sold_q": "Тут продают «<PRODUCT>»?",
@@ -224,15 +224,15 @@
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_suggested_products_hint1": "Ищем продукты, возможно продаваемые поблизости",
+    "map_page_loading_suggested_products_hint_v2": "Ищем продукты поблизости",
     "map_page_location_permission_cancel_go_to_settings": "Оставить Службы геолокации выключенными",
     "map_page_location_permission_go_to_settings": "Включить в настройках",
     "map_page_location_permission_reasoning_settings": "Plante работает лучше с включёнными службами геолокации. Вы сможете получать информацию о магазинах рядом.",
     "map_page_location_permission_title": "Службы геолокации",
     "map_page_no_shops_hint_in_select_shops_mode": "Рядом нет известных магазинов. Но вы можете отметить новый, кликнув на круглую кнопку с плюсиком справа!",
-    "map_page_no_shops_hint2": "Нет магазинов с продуктами рядом. Чтобы настроить фильтрацию магазинов, кликните на",
-    "@map_page_no_shops_hint2": {
-        "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
+    "map_page_no_shops_hint3": "Здесь пока нет магазинов. Вы можете попробовать переместить карту или изменить фильтры выше.",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
     },
     "map_page_open_street_map_licence": "Данные от Open Street Map",
     "map_page_shop_added_to_map": "Магазин добавлен на карту",
@@ -257,6 +257,8 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "В составе имеются неоднозначные ингредиенты (могут быть как веганскими, так и невеганскими, в зависимости от конкретного способа производства), но на упаковке продукта есть Веганская пометка.",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Производитель подтвердил отсутствие невеганских ингредиентов",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Производитель подтвердил присутствие невеганских ингредиентов",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Продукт содержит неоднозначные ингредиенты. Производитель продукта не ответил на наш запрос или отказался предоставить информацию.",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Продукт содержит неоднозначные ингредиенты, которые чаще всего не являются веганскими. Производитель продукта не ответил на наш запрос или отказался предоставить информацию.",
     "mod_reason_non_vegan_practices_but_helps_veganism": "При производтсве продукта применяются невеганские методы. Но продукт помечен как неоднозначный командой Plante, потому что все ингредиенты веганские, и продукт помогает росту веганского сообщества.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "В составе есть сахар, который может быть тростниковым и поэтому мог фильтроваться через костяной уголь.",
     "mod_reason_some_ingredient_has_unknown_origin": "Какие-то из ингредиентов в составе имеют неизвестное нам происхождение",
@@ -289,17 +291,42 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Очистить кеш карты и выйти",
     "settings_cache_page_title": "Кеш приложения",
-    "settings_page_crash_on_errors": "Креш при ошибках",
+    "settings_page_distance_in_miles": "Показывать расстояние в милях",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
     "settings_page_erase_user_data": "Очистить данные и выйти",
     "settings_page_general": "Общее",
     "settings_page_langs_i_know": "Языки, которые я знаю",
-    "settings_page_open_cache_settings": "Управление кешом приложения",
+    "settings_page_open_cache_settings": "Управление кешем приложения",
     "settings_page_send_logs": "Отправить логи",
+    "@settings_page_send_logs": {
+        "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
+    "settings_page_show_products_off_suggestions": "Показать продукты, которые видели в других магазинах с таким же названием в вашей стране",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_radius_suggestions": "Показать продукты, которые видели в других магазинах с таким же названием поблизости",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_stores_settings_button": "Настройки магазинов",
+    "@settings_page_stores_settings_button": {
+        "description": "A button which opens settings for stores"
+    },
+    "settings_page_stores_settings_title": "Настройки магазинов",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
+    },
     "settings_page_title": "Настройки",
     "settings_page_your_id": "Ваш ID: ",
     "shop_address_widget_possible_address": "Примерный адрес: ",
     "shop_card_add_product": "Добавить продукт",
     "shop_card_directions": "Маршрут",
+    "@shop_card_directions": {
+        "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
+    },
     "shop_card_no_products_listed": "Нет продуктов",
     "shop_card_open_shop_products": "Открыть список продуктов",
     "shop_card_products_listed": "Есть продукты",
@@ -327,26 +354,89 @@
     "shop_product_range_page_you_sure_negative_vote": "Вы уверены, что продукта в магазине нет?",
     "shop_product_range_page_you_sure_positive_vote": "Вы уверены, что видели продукт в магазине?",
     "shop_type_bakery": "Пекарня",
+    "@shop_type_bakery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
+    },
     "shop_type_beverages": "Напитки",
+    "@shop_type_beverages": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
+    },
     "shop_type_cheese": "Сыр",
+    "@shop_type_cheese": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
+    },
     "shop_type_chocolate": "Шоколад",
+    "@shop_type_chocolate": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
+    },
     "shop_type_coffee": "Кофе",
+    "@shop_type_coffee": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
+    },
     "shop_type_confectionery": "Кондитерские изделия",
+    "@shop_type_confectionery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=confectionery"
+    },
     "shop_type_convenience": "Небольшой магазин",
+    "@shop_type_convenience": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
+    },
     "shop_type_dairy": "Молочный магазин",
+    "@shop_type_dairy": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
+    },
     "shop_type_deli": "Гастроном",
+    "@shop_type_deli": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=deli"
+    },
     "shop_type_farm": "Фермерские продукты",
+    "@shop_type_farm": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
+    },
     "shop_type_frozen_food": "Замороженные продукты",
+    "@shop_type_frozen_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
+    },
     "shop_type_general": "Универмаг",
+    "@shop_type_general": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=general"
+    },
     "shop_type_greengrocer": "Овощной магазин",
+    "@shop_type_greengrocer": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=greengrocer"
+    },
     "shop_type_grocery": "Продукты",
+    "@shop_type_grocery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
+    },
     "shop_type_health_food": "Здоровая еда",
+    "@shop_type_health_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
+    },
     "shop_type_ice_cream": "Мороженное",
+    "@shop_type_ice_cream": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
+    },
     "shop_type_organic": "Органическая еда",
+    "@shop_type_organic": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
+    },
     "shop_type_pasta": "Макаронные изделия",
+    "@shop_type_pasta": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
+    },
     "shop_type_pastry": "Кондитерские изделия",
+    "@shop_type_pastry": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
+    },
     "shop_type_spices": "Специи",
+    "@shop_type_spices": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=spices"
+    },
     "shop_type_supermarket": "Супермаркет",
+    "@shop_type_supermarket": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
     "user_langs_widget_system_lang": "(Системный язык)",
     "veg_status_displayed_not_vegan": "Не веганский",
     "veg_status_displayed_veg_status_source_community": "Информация от сообщества",

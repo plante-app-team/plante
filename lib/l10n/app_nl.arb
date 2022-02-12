@@ -51,6 +51,9 @@
     "display_product_page_report_btn": "Rapporteer foutieve informatie",
     "display_product_page_table_column1": "Product",
     "display_product_page_table_column3": "Veganistisch",
+    "@display_product_page_table_column3": {
+        "description": "A column title in a product's ingredients analysis table. The column can have 'Yes', 'No' and 'Ambiguous' values for each of the ingredients (\"Vegan? Yes. Vegan? No. Vegan? Ambiguous!\")."
+    },
     "display_product_page_table_negative": "Nee",
     "display_product_page_table_positive": "Ja",
     "display_product_page_table_possible": "Twijfelachtig",
@@ -88,7 +91,13 @@
         "description": "Title of the user name input text field"
     },
     "expandable_plante_collapse": "Inklappen",
+    "@expandable_plante_collapse": {
+        "description": "The Collapse button of an expandable UI element. When clicked, the UI element will collapse, hiding its content."
+    },
     "expandable_plante_expand": "Uitklappen",
+    "@expandable_plante_expand": {
+        "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
+    },
     "external_auth_page_continue_with": "Ga verder met",
     "external_auth_page_continue_with_apple": "Ga verder met Apple",
     "external_auth_page_google_email_not_verified": "Fout: Google email is niet bevestigd",
@@ -100,9 +109,11 @@
     "global_copied_to_clipboard": "gekopieerd",
     "global_done": "Klaar",
     "global_done_thanks": "Klaar! Bedankt!",
+    "global_feet": "ft",
     "global_give_permission": "Geef toestemming",
     "global_kilometers": "km",
     "global_meters": "meters",
+    "global_miles": "mi",
     "global_network_error": "Netwerk error - controleer je internetverbinding",
     "global_no": "Nee",
     "global_oops_no": "Oops, nee",
@@ -192,21 +203,14 @@
     "map_page_cancel_shop_creation_q": "Wilt u het aanmaken van de winkel annuleren?",
     "map_page_click_on_shop_where_product_sold": "Klik op de winkel indicator waar het product wordt verkocht",
     "map_page_click_where_new_shop_located": "Klik waar de nieuwe winkel is gevestigd",
-    "map_page_filter_empty_shops": "Winkels zonder producten",
-    "@map_page_filter_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores without known products"
+    "map_page_filter_all_shops": "Alle winkels",
+    "map_page_filter_empty_shops2": "Alleen winkels zonder producten",
+    "@map_page_filter_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
     },
-    "map_page_filter_not_empty_shops": "Winkels met producten",
-    "@map_page_filter_not_empty_shops": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with products added by Plante users"
-    },
-    "map_page_filter_shops_with_off_suggested_products": "Producten gezien in gelijkaardige winkels in dit land",
-    "@map_page_filter_shops_with_off_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's country"
-    },
-    "map_page_filter_shops_with_radius_suggested_products": "Producten gezien in gelijkaardige winkels in de buurt ",
-    "@map_page_filter_shops_with_radius_suggested_products": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see stores with where products are guessed by similar stores in user's city"
+    "map_page_filter_not_empty_shops2": "Alleen winkels met producten",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
     "map_page_is_new_product_sold_q": "Wordt het product hier verkocht?",
     "map_page_is_product_sold_q": "Wordt <PRODUCT> hier verkocht?",
@@ -224,15 +228,15 @@
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
-    "map_page_loading_suggested_products_hint1": "Zoeken naar producten",
+    "map_page_loading_suggested_products_hint_v2": "Producten in de buurt zoeken",
     "map_page_location_permission_cancel_go_to_settings": "Hou locatie diensten uit",
     "map_page_location_permission_go_to_settings": "Schakel in in instellingen",
     "map_page_location_permission_reasoning_settings": "Plante werkt het best met locatie diensten ingesteld. Op deze manier krijgt u informatie van winkels gebaseerd op uw locatie",
     "map_page_location_permission_title": "Locatie diensten",
     "map_page_no_shops_hint_in_select_shops_mode": "We kunnen geen winkels vinden in de buurt! U kan een winkel toevoegen door op de \"plus-knop\" rechts te klikken.",
-    "map_page_no_shops_hint2": "Geen winkels met producten in de buurt. Je kan de filters aanpassen door te klikken op",
-    "@map_page_no_shops_hint2": {
-        "description": "A bottom hint on the Map Page, shown when there are no visible stores. The Filters button icon is always appended to the end of the text."
+    "map_page_no_shops_hint3": "Er zijn nog geen winkels in de buurt. Je kan de map verplaatsen of de filters bovenaan wijzigen",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
     },
     "map_page_open_street_map_licence": "Informatie van Open Street Map",
     "map_page_shop_added_to_map": "De winkel is toegevoegd aan de kaart",
@@ -257,6 +261,8 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Het product heeft een Vegan label maar heeft twijfelachtige ingrediënten (deze kunnen veganistisch of niet veganistisch zijn afhankelijk van de manier waarop ze geproduceerd worden)",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Fabrikant bevestigd dat alle ingrediënten veganistisch zijn",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Fabrikant bevestigd dat er niet veganistische ingrediënten aanwezig zijn",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Het product heeft twijfelachtige ingrediënten. De producent van het product heeft niet geantwoord op onze vraag of weigerde om onze vraag op te helderen.",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Het product heeft twijfelachtige ingrediënten die vaak niet veganistisch zijn. De producent van het product heeft niet geantwoord op onze vraag of weigerde om onze vraag op te helderen.",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Het productieproces heeft niet veganistische handelingen. Het product wordt als twijfelachtig beschouwd door Plante omdat alle ingrediënten veganistisch zijn en het product de veganistische beweging helpt groeien.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Het product bevat suiker, deze kan verkregen zijn uit rietsuiker en verwerkt worden met beenderkool",
     "mod_reason_some_ingredient_has_unknown_origin": "Sommige van de ingrediënten bevatten een onbekende oorsprong",
@@ -289,17 +295,42 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Leeg map cache en log uit",
     "settings_cache_page_title": "App cache",
-    "settings_page_crash_on_errors": "Crash bij fouten",
+    "settings_page_distance_in_miles": "Toon afstand in mijl",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
     "settings_page_erase_user_data": "Leeg gebruikersdate en verlaat",
     "settings_page_general": "Algemeen",
     "settings_page_langs_i_know": "Mijn talen",
     "settings_page_open_cache_settings": "Beheer app cache",
     "settings_page_send_logs": "Verstuur logs",
+    "@settings_page_send_logs": {
+        "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
+    "settings_page_show_products_off_suggestions": "Toon producten in winkels met dezelfde naam in hetzelfde land",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_radius_suggestions": "Toon producten gezien in winkels met dezelfde naam in de buurt",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_stores_settings_button": "Winkel instellingen",
+    "@settings_page_stores_settings_button": {
+        "description": "A button which opens settings for stores"
+    },
+    "settings_page_stores_settings_title": "Winkel instellingen",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
+    },
     "settings_page_title": "Instellingen",
     "settings_page_your_id": "Uw ID:",
     "shop_address_widget_possible_address": "Adres bij benadering:",
     "shop_card_add_product": "Product toevoegen",
     "shop_card_directions": "Richtingen",
+    "@shop_card_directions": {
+        "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
+    },
     "shop_card_no_products_listed": "Geen producten aanwezig",
     "shop_card_open_shop_products": "Productenlijst",
     "shop_card_products_listed": "Producten aanwezig",
@@ -327,26 +358,89 @@
     "shop_product_range_page_you_sure_negative_vote": "Ben je zeker dat het product niet in deze winkel verkocht wordt?",
     "shop_product_range_page_you_sure_positive_vote": "Ben je zeker dat je dit product gezien hebt in deze winkel?",
     "shop_type_bakery": "Bakkerij",
+    "@shop_type_bakery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
+    },
     "shop_type_beverages": "Drank",
+    "@shop_type_beverages": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
+    },
     "shop_type_cheese": "Kaas",
+    "@shop_type_cheese": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
+    },
     "shop_type_chocolate": "Chocolade",
+    "@shop_type_chocolate": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
+    },
     "shop_type_coffee": "Koffie",
+    "@shop_type_coffee": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
+    },
     "shop_type_confectionery": "Banketbakkerij",
+    "@shop_type_confectionery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=confectionery"
+    },
     "shop_type_convenience": "Buurtwinkel",
+    "@shop_type_convenience": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
+    },
     "shop_type_dairy": "Zuivel",
+    "@shop_type_dairy": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
+    },
     "shop_type_deli": "Deli",
+    "@shop_type_deli": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=deli"
+    },
     "shop_type_farm": "Boerderij",
+    "@shop_type_farm": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
+    },
     "shop_type_frozen_food": "Diepvries producten",
+    "@shop_type_frozen_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
+    },
     "shop_type_general": "Algemeen",
+    "@shop_type_general": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=general"
+    },
     "shop_type_greengrocer": "Groenteboer",
+    "@shop_type_greengrocer": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=greengrocer"
+    },
     "shop_type_grocery": "Boodschappen",
+    "@shop_type_grocery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
+    },
     "shop_type_health_food": "Gezonde voeding",
+    "@shop_type_health_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
+    },
     "shop_type_ice_cream": "Ijs",
+    "@shop_type_ice_cream": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
+    },
     "shop_type_organic": "Biologisch",
+    "@shop_type_organic": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
+    },
     "shop_type_pasta": "Pasta",
+    "@shop_type_pasta": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
+    },
     "shop_type_pastry": "Gebak",
+    "@shop_type_pastry": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
+    },
     "shop_type_spices": "Kruiden",
+    "@shop_type_spices": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=spices"
+    },
     "shop_type_supermarket": "Supermarkt",
+    "@shop_type_supermarket": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
     "user_langs_widget_system_lang": "(Systeem taal)",
     "veg_status_displayed_not_vegan": "Niet veganistisch",
     "veg_status_displayed_veg_status_source_community": "Informatie vanuit de community",
