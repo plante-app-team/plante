@@ -1,6 +1,6 @@
 {
     "barcode_scan_page_add_info_in_your_langs": "Προσθήκη πληροφοριών",
-    "barcode_scan_page_add_product": "Προσθέστε το προϊόν",
+    "barcode_scan_page_add_product": "Προσθήκη προϊόντος",
     "barcode_scan_page_camera_permission_cancel_settings": "Κρατήστε την άδεια χρήσης της κάμερας απενεργοποιημένη",
     "barcode_scan_page_camera_permission_go_to_settings": "Άνοιγμα μέσω των ρυθμίσεων",
     "barcode_scan_page_camera_permission_reasoning": "Για τη χρήση του barcode scanner η εφαρμογή χρειάζεται άδεια χρήσης κάμερας.",
@@ -12,7 +12,7 @@
     "barcode_scan_page_point_camera_at_barcode": "Σκοπεύστε την κάμερά σας στο barcode του προϊόντος",
     "barcode_scan_page_product_not_found": "Δε βρέθηκε προϊόν",
     "barcode_scan_page_product_not_found_descr": "Δεν έχουμε αρκετά δεδομένα για το προϊόν <PRODUCT> ακόμη, αλλά μπορείτε να βοηθήσετε την κοινότητα προσθέτοντάς τα",
-    "barcode_scan_page_scan_product": "Ξεκινήστε να σκανάρετε",
+    "barcode_scan_page_scan_product": "Έναρξη σάρωσης",
     "barcode_scan_page_searching_product": "Αναζήτηση προϊόντος ",
     "contributed_by_user_products_widget_no_products_hint": "Εδώ θα δείτε προϊόντα που έχετε προσθέσει στον χάρτη ή στην εφαρμογή",
     "@contributed_by_user_products_widget_no_products_hint": {
@@ -38,7 +38,7 @@
     "create_shop_page_how_new_shop_is_called_label": "Όνομα καταστήματος",
     "create_shop_page_what_type_new_shop_has": "Επιλέξτε τύπο καταστήματος",
     "display_product_page_add_info_in_your_langs": "Προσθήκη πληροφοριών",
-    "display_product_page_adding_non_vegan_product": "Μη-χορτοφαγικά συστατικά δεν επιτρέπεται να μπουν στο χάρτη",
+    "display_product_page_adding_non_vegan_product": "Μη-vegan συστατικά δεν επιτρέπεται να μπουν στο χάρτη",
     "display_product_page_brand": "Μάρκα: ",
     "display_product_page_click_to_help_with_veg_statuses": "Μπορώ να βοηθήσω!",
     "display_product_page_ingredients": "Συστατικά:",
@@ -56,14 +56,14 @@
     },
     "display_product_page_table_negative": "Οχι",
     "display_product_page_table_positive": "Ναι",
-    "display_product_page_table_possible": "Ασαφές",
+    "display_product_page_table_possible": "Διφορούμενο",
     "display_product_page_table_unknown": "Άγνωστο",
     "display_product_page_veg_mark_on_map": "Προσθὲστε τοποθεσία",
     "display_product_page_veg_status_explanations_ok": "Ωραία!",
-    "display_product_page_veg_status_negative_explanation": "Το συστατικό δεν είναι χορτοφαγικό.",
-    "display_product_page_veg_status_positive_explanation": "Το συστατικό είναι χορτοφαγικό.",
-    "display_product_page_veg_status_positive_warning": "Ο κατασκευαστής μπορεί να αλλάξει οποτεδήποτε τα συστατικά - παρακαλώ επιβεβαιώστε χειροκίνητα πως είναι χορτοφαγικό, πριν την αγορά, καλού-κακού",
-    "display_product_page_veg_status_possible_explanation": "Το πιστοποιητικό μπορεί να είναι χορτοφαγικό ή όχι, ανάλογα με τον τρόπο κατασκευής.\nΠ.χ. \"προϊόν ζύμωσης\" μπορεί να σημαίνει χορτοφαγικό ή και όχι",
+    "display_product_page_veg_status_negative_explanation": "Το συστατικό δεν είναι .",
+    "display_product_page_veg_status_positive_explanation": "Το συστατικό είναι vegan.",
+    "display_product_page_veg_status_positive_warning": "Ο κατασκευαστής μπορεί να αλλάξει οποτεδήποτε τα συστατικά - παρακαλώ επιβεβαιώστε χειροκίνητα πως είναι vegan, πριν την αγορά, καλού-κακού",
+    "display_product_page_veg_status_possible_explanation": "Το πιστοποιητικό μπορεί να είναι vegan ή όχι, ανάλογα με τον τρόπο κατασκευής.\nΠ.χ. \"προϊόν ζύμωσης\" μπορεί να σημαίνει vegan ή και όχι",
     "display_product_page_veg_status_unknown_explanation": "Δεν υπήρχαν πληροφορίες για το συστατικό αυτό, όταν προστέθηκε",
     "edit_profile_page_cancel_editing_q": "Ακύρωση επεξεργασίας προφίλ;",
     "@edit_profile_page_cancel_editing_q": {
@@ -99,7 +99,7 @@
         "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
     },
     "external_auth_page_continue_with": "Συνέχεια με",
-    "external_auth_page_continue_with_apple": "Συνέχεια με Apple",
+    "external_auth_page_continue_with_apple": "Συνέχεια με λογ/μό Apple",
     "external_auth_page_google_email_not_verified": "Σφάλμα: Το Google email δεν είναι επιβεβαιωμένο",
     "external_auth_page_privacy_policy": "Πολιτική απορρήτου",
     "global_add": "Προσθήκη",
@@ -107,11 +107,13 @@
     "global_barcode": "Barcode",
     "global_cancel": "Ακύρωση",
     "global_copied_to_clipboard": "Αντιγράφηκε στο clipboard",
-    "global_done": "Έγινε",
+    "global_done": "ΟΚ",
     "global_done_thanks": "Έγινε! Σας ευχαριστούμε!",
+    "global_feet": "ft",
     "global_give_permission": "Δώστε άδεια",
     "global_kilometers": "χμ.",
-    "global_meters": "Μέτρα",
+    "global_meters": "μέτρα",
+    "global_miles": "mi",
     "global_network_error": "Σφάλμα δικτύου - παρακαλώ ελέγξτε τη σύνδεσή σας στο διαδίκτυο",
     "global_no": "Όχι",
     "global_oops_no": "Ουπς, όχι",
@@ -127,7 +129,7 @@
         "description": "Error message shown when the user selects an image from device's gallery, but the selected image is too small."
     },
     "image_crop_page_title": "Ας κάνουμε περικοπή!",
-    "init_product_page_adding_non_vegan_product": "Μη-χορτοφαγικά προϊόντα δεν είναι δυνατόν να προστεθούν στο χάρτη",
+    "init_product_page_adding_non_vegan_product": "Μη-vegan προϊόντα δεν είναι δυνατόν να προστεθούν στο χάρτη",
     "init_product_page_brand_optional": "Μάρκα (προαιρετικά)",
     "init_product_page_camera_permission_reasoning_settings": "Για να τραβήξετε φωτογραφίες, παρακαλούμε δώστε στην εφαρμογή δικαιώματα χρήσης κάμερας, μέσω των ρυθμίσεων της εφαρμογής",
     "init_product_page_cancel_adding_product_q": "Ακύρωση δημιουργίας προϊόντος;",
@@ -139,14 +141,14 @@
     "init_product_page_ocr_error_descr": "Ήταν αδύνατη η αυτόματη αναγνώριση συστατικών. Μπορείτε να ξαναεκκινήσετε τη διαδικασία ή να παραλείψετε αυτό το βήμα - η φωτογραφία των συστατικών αρκεί",
     "init_product_page_ocr_in_progress": "Αναγνώριση συστατικών...",
     "init_product_page_open_map": "Προσθήκη στο κατάστημα",
-    "init_product_page_please_select_lang": "Παρακαλώ διαλέξτε γλώσσες συσκευασίας",
+    "init_product_page_please_select_lang": "Παρακαλώ επιλέξτε τη γλώσσα της συσκευασίας",
     "init_product_page_product_name": "Όνομα",
-    "init_product_page_take_front_photo": "Φωτογραφία μπροστινής πλευράς συσκευασίας",
+    "init_product_page_take_front_photo": "Φωτογραφία της μπροστινής πλευράς της συσκευασίας",
     "init_product_page_take_ingredients_photo": "Φωτογραφία συστατικών",
     "init_product_page_title": "Νέο προϊόν",
     "init_product_page_verify_ingredients_ocr": "Παρακαλώ διορθώστε χειροκίνητα οποιοδήποτε σφάλμα προήλθε από την αυτόματη αναγνώριση συστατικών",
     "init_product_page_where_sold_optional": "Που πωλείται; (Προαιρετικά)",
-    "init_user_page_done_button_title": "Τέλος",
+    "init_user_page_done_button_title": "ΟΚ",
     "init_user_page_langs_explanation": "Επιλέξτε τις γλώσσες που γνωρίζετε - κάποια προϊόντα πωλούνται σε πολλές χώρες και ενδέχεται να έχουν συσκευασία με διαφορετικές γλώσσες",
     "init_user_page_next_button_title": "Επόμενο",
     "lang_ar": "Αραβικά",
@@ -247,30 +249,30 @@
     "map_search_page_shops_title": "Βρέθηκαν καταστήματα",
     "map_search_page_streets_not_found": "Δε βρέθηκαν δρόμοι",
     "map_search_page_streets_title": "Βρέθηκαν δρόμοι",
-    "mod_reason_all_ingredients_are_vegan": "Το προϊόν δεν περιέχει μη-χορτοφαγικά συστατικά",
-    "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Ορισμένα συστατικά είναι ιστορικά διφορούμενα, αλλά στη σύγχρονη βιομηχανία τροφίμων είναι σχεδόν πάντα χορτοφαγικά",
-    "mod_reason_cane_sugar_in_ingredients": "Το προϊόν περιέχει ζάχαρη από ζαχαροκάλαμο, που ενδέχεται να έχει επεξεργαστεί με απανθρακωμένα κόκκαλα.",
-    "mod_reason_certified_vegan": "Το προϊόν είναι επιβεβαιωμένα χορτοφαγικό",
+    "mod_reason_all_ingredients_are_vegan": "Το προϊόν δεν περιέχει μη-vegan συστατικά",
+    "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "Ορισμένα συστατικά είναι ιστορικά διφορούμενα, αλλά στη σύγχρονη βιομηχανία τροφίμων είναι σχεδόν πάντα vegan",
+    "mod_reason_cane_sugar_in_ingredients": "Το προϊόν περιέχει ζάχαρη από ζαχαροκάλαμο, που ενδέχεται να έχει υποστεί επεξεργασία μέσω απανθρακωμένων κοκκάλων.",
+    "mod_reason_certified_vegan": "Το προϊόν είναι επιβεβαιωμένα vegan",
     "@mod_reason_certified_vegan": {
         "description": "Product was certified as vegan buy a trustworthy certification organization."
     },
     "mod_reason_honey_in_ingredients": "Το προϊόν περιέχει μέλι",
-    "mod_reason_info_found_in_external_source": "Βρέθηκε πληροφορία σε εξωτερική πηγή",
-    "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Το προϊόν περιέχει ασαφή συστατικά (μπορεί να είναι χορτοφαγικό ή όχι, ανάλογα με τον τρόπο κατασκευής), αλλά έχει ταμπέλα Vegan στη συσκευασία. ",
-    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Ο κατασκευαστής επιβεβαίωσε την απουσία μη-χορτοφαγικών συστατικών",
-    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Ο κατασκευαστής επιβεβαίωσε την παρουσία μη-χορτοφαγικών συστατικών",
+    "mod_reason_info_found_in_external_source": "Βρέθηκαν πληροφορίες σε εξωτερική πηγή",
+    "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Το προϊόν περιέχει διφορούμενα συστατικά (μπορεί να είναι vegan ή όχι, ανάλογα με τον τρόπο κατασκευής), αλλά έχει ταμπέλα Vegan στη συσκευασία.",
+    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Ο κατασκευαστής επιβεβαίωσε την απουσία μη-vegan συστατικών",
+    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Ο κατασκευαστής επιβεβαίωσε την παρουσία μη-vegan συστατικών",
     "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Το προϊόν έχει διφορούμενα συστατικά. Ο κατασκευαστής δεν απάντησε στο αίτημά μας ή αρνήθηκε να παράσχει τις απαραίτητες διευκρινίσεις.",
-    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Το προϊόν έχει διφορούμενα συστατικά τα οποία πολύ συχνά είναι μη-χορτοφαγικά. Ο κατασκευαστής δεν απάντησε στο αίτημά μας ή αρνήθηκε να παράσχει τις απαραίτητες διευκρινίσεις.",
-    "mod_reason_non_vegan_practices_but_helps_veganism": "Η διαδικασία κατασκευής του προϊόντος χρησιμοποιεί μη χορτοφαγικές πρακτικές. Το προϊόν θεωρείται διφορούμενο από το Plante επειδή όλα τα συστατικά είναι χορτοφαγικά και η κύρια έκκλησή του να βοηθήσει το κίνημα των χορτοφάγων να αναπτυχθεί.",
-    "mod_reason_possibly_cane_sugar_in_ingredients": "Το προϊόν περιέχει ζάχαρη, που ενδέχεται να προέρχεται από ζαχαροκάλαμο και να έχει επεξεργαστεί με απανθρακωμένα κόκκαλα.",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Το προϊόν έχει διφορούμενα συστατικά τα οποία πολύ συχνά είναι μη-vegan. Ο κατασκευαστής δεν απάντησε στο αίτημά μας ή αρνήθηκε να παράσχει τις απαραίτητες διευκρινίσεις.",
+    "mod_reason_non_vegan_practices_but_helps_veganism": "Η διαδικασία κατασκευής του προϊόντος χρησιμοποιεί μη-vegan πρακτικές. Το προϊόν θεωρείται διφορούμενο από το Plante παρόλο που όλα τα συστατικά είναι vegan, αφού η κύρια έκκλησή του είναι να βοηθήσει το κίνημα των χορτοφάγων να αναπτυχθεί.",
+    "mod_reason_possibly_cane_sugar_in_ingredients": "Το προϊόν περιέχει ζάχαρη, που ενδέχεται να προέρχεται από ζαχαροκάλαμο και να έχει υποστεί επεξεργασία μέσω απανθρακωμένων κοκκάλων.",
     "mod_reason_some_ingredient_has_unknown_origin": "Κάποια από τα συστατικά είναι αγνώστου προέλευσης",
     "mod_reason_some_ingredient_is_in_fact_a_category2": "Τα συστατικά που επισημαίνονται ως \"Γεύσεις\", \"Φυσικές Βαφές\", \"Πρόσθετα\" (ή με παρόμοιο διφορούμενο τρόπο) προέρχονται είτε από φυτικές, ζωικές ή ορυκτές πηγές. Συνεπώς, τα προϊόντα με τέτοια συστατικά είναι (μερικές φορές σκόπιμα) διφορούμενα ως προς την καταλληλότητά τους για χορτοφάγους.",
     "@mod_reason_some_ingredient_is_in_fact_a_category2": {
         "description": "Explanation of why is certain product's vegan status is set to \"ambiguous\""
     },
-    "mod_reason_some_ingredient_is_non_vegan": "Το προϊόν έχει μη-χορτοφαγικά συστατικά",
-    "mod_reason_some_ingredient_is_possibly_non_vegan": "Το προϊόν περιέχει ασαφή συστατικά (μπορεί να είναι χορτοφαγικό ή όχι, ανάλογα με τον τρόπο κατασκευής)",
-    "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Κάποια από τα προϊόντα περιέχουν μη-χορτοφαγικά συστατικά και κάποια όχι - παρακαλώ διαβάστε προσεκτικά τα συστατικά!",
+    "mod_reason_some_ingredient_is_non_vegan": "Το προϊόν έχει μη-vegan συστατικά",
+    "mod_reason_some_ingredient_is_possibly_non_vegan": "Το προϊόν περιέχει διφορούμενα συστατικά (μπορεί να είναι vegan ή όχι, ανάλογα με τον τρόπο κατασκευής)",
+    "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Κάποια από τα προϊόντα περιέχουν μη-vegan συστατικά και κάποια όχι - παρακαλώ διαβάστε προσεκτικά τα συστατικά!",
     "mod_reason_tested_on_animals": "Προϊόν που δοκιμάστηκε σε ζώα",
     "product_report_dialog_report_sent": "Η αναφορά εστάλη",
     "product_report_dialog_send": "Αποστολή",
@@ -293,6 +295,10 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Καθαρισμός μνήμης cache και έξοδος",
     "settings_cache_page_title": "Μνήμη cache",
+    "settings_page_distance_in_miles": "Εμφάνιση απόστασης σε μίλια",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
     "settings_page_erase_user_data": "Καθαρισμός δεδομένων χρήστη και έξοδος",
     "settings_page_general": "Γενικές ρυθμίσεις",
     "settings_page_langs_i_know": "Οι γλώσσες μου",
@@ -325,9 +331,9 @@
     "@shop_card_directions": {
         "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
     },
-    "shop_card_no_products_listed": "Τίποτα στη λίστα",
+    "shop_card_no_products_listed": "Δε βρέθηκαν προϊόντα",
     "shop_card_open_shop_products": "Λίστα προϊόντων",
-    "shop_card_products_listed": "Προϊόντα στη λίστα",
+    "shop_card_products_listed": "Βρέθηκαν προϊόντα",
     "shop_product_range_page_add_product": "Προσθήκη προϊόντος",
     "shop_product_range_page_confirmed_products_country": "Προϊόντα που βρέθηκαν σε αυτό το κατάστημα από άλλους χρήστες του Plante",
     "@shop_product_range_page_confirmed_products_country": {
@@ -348,26 +354,26 @@
         "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's country, which are named in the same way as the displayed store. For example, if an \"Aldi\" shop has some chocolate bar, then all other \"Aldi\" shops will have this products section with same chocolate bar."
     },
     "shop_product_range_page_suggested_products_country_unknown": "Τα προϊόντα βρέθηκαν σε άλλα καταστήματα <SHOP> σε αυτή τη χώρα",
-    "shop_product_range_page_this_shop_has_no_product": "Δεν έχουν προστεθεί προϊόντα σε αυτό το κατάστημα ακόμη.",
-    "shop_product_range_page_you_sure_negative_vote": "Είστε σίγουρος/η/ο πως το προϊόν δεν πωλείται σε αυτό το κατάστημα;",
-    "shop_product_range_page_you_sure_positive_vote": "Είστε σίγουρος/η/ο πως είδατε το προϊόν σε αυτό το κατάστημα;",
+    "shop_product_range_page_this_shop_has_no_product": "Δεν έχουν προστεθεί προϊόντα σε αυτό το κατάστημα ακόμη",
+    "shop_product_range_page_you_sure_negative_vote": "Είναι σίγουρο πως το προϊόν δεν πωλείται σε αυτό το κατάστημα;",
+    "shop_product_range_page_you_sure_positive_vote": "Είναι σίγουρο πως είδατε το προϊόν σε αυτό το κατάστημα;",
     "shop_type_bakery": "Αρτοποιείο",
     "@shop_type_bakery": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
     },
-    "shop_type_beverages": "Ροφήματα",
+    "shop_type_beverages": "Καφετέρια",
     "@shop_type_beverages": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
     },
-    "shop_type_cheese": "Τυρί/Κασέρι",
+    "shop_type_cheese": "Τυροκομείο",
     "@shop_type_cheese": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
     },
-    "shop_type_chocolate": "Σοκολάτα",
+    "shop_type_chocolate": "Σοκολατάδικο",
     "@shop_type_chocolate": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
     },
-    "shop_type_coffee": "Καφές",
+    "shop_type_coffee": "Καφεκοπτείο",
     "@shop_type_coffee": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
     },
@@ -379,7 +385,7 @@
     "@shop_type_convenience": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
     },
-    "shop_type_dairy": "Γαλακτοκομικά",
+    "shop_type_dairy": "Γαλακτοπωλείο",
     "@shop_type_dairy": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
     },
@@ -391,7 +397,7 @@
     "@shop_type_farm": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
     },
-    "shop_type_frozen_food": "Κατεψυγμένο φαγητό",
+    "shop_type_frozen_food": "Κατεψυγμένες τροφές",
     "@shop_type_frozen_food": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
     },
@@ -407,7 +413,7 @@
     "@shop_type_grocery": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
     },
-    "shop_type_health_food": "Υγιεινή τροφή",
+    "shop_type_health_food": "Υγιεινές τροφές",
     "@shop_type_health_food": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
     },
@@ -415,15 +421,15 @@
     "@shop_type_ice_cream": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
     },
-    "shop_type_organic": "Οργανικά",
+    "shop_type_organic": "Βιολογικές τροφές",
     "@shop_type_organic": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
     },
-    "shop_type_pasta": "Ζυμαρικά",
+    "shop_type_pasta": "Μακαρονάδικο",
     "@shop_type_pasta": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
     },
-    "shop_type_pastry": "Γλυκίσματα",
+    "shop_type_pastry": "Ζαχαροπλαστείο",
     "@shop_type_pastry": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
     },

@@ -109,9 +109,11 @@
     "global_copied_to_clipboard": "Skopiowano do schowka",
     "global_done": "Gotowe",
     "global_done_thanks": "Gotowe! Dziękujemy!",
+    "global_feet": "ft",
     "global_give_permission": "Nadaj uprawnienia",
     "global_kilometers": "km",
     "global_meters": "m",
+    "global_miles": "mi",
     "global_network_error": "Błąd sieci – sprawdź swoje połączenie",
     "global_no": "Nie",
     "global_oops_no": "Ups, nie",
@@ -293,6 +295,10 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Wyczyść pamięć podręczną mapy i wyjdź",
     "settings_cache_page_title": "Pamięć podręczna aplikacji",
+    "settings_page_distance_in_miles": "Pokaż dystans w milach",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
     "settings_page_erase_user_data": "Wyczyść dane użytkownika i wyjdź",
     "settings_page_general": "Główne",
     "settings_page_langs_i_know": "Moje języki",

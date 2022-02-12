@@ -424,7 +424,13 @@
     "@map_page_filter_not_empty_shops2": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
     },
+    "map_page_no_shops_hint3": "Det er ingen butikker i området ennå. Du kan prøve å flytte kartet, eller endre filtrene ovenfor.",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
+    },
     "map_page_loading_suggested_products_hint_v2": "Søker etter produkter i nærheten",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Produktet har tvetydige ingredienser som ofte er ikke-veganske. Produsenten svarte ikke på forespørselen vår eller nektet å gi nødvendige avklaringer.",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Produktet har tvetydige ingredienser. Produsenten svarte ikke på forespørselen vår eller nektet å gi nødvendige avklaringer.",
     "settings_page_stores_settings_button": "Butikk instillinger",
     "@settings_page_stores_settings_button": {
         "description": "A button which opens settings for stores"
@@ -432,5 +438,9 @@
     "settings_page_stores_settings_title": "Butikk instillinger",
     "@settings_page_stores_settings_title": {
         "description": "Title of settings for stores"
+    },
+    "settings_page_show_products_radius_suggestions": "Vis produkter sett i andre butikker med samme navn i nærheten",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
     }
 }
