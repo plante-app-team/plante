@@ -455,5 +455,9 @@
     "veg_status_displayed_vegan_status_unknown": "Unknown vegan status",
     "veg_status_selection_panel_dunno": "Not sure",
     "veg_status_selection_panel_negative": "No",
-    "veg_status_selection_panel_positive": "Yes"
+    "veg_status_selection_panel_positive": "Yes",
+
+    "ios_NSCameraUsageDescription": "With camera access you can scan barcodes to search for products and take pictures to add new products",
+    "ios_NSLocationWhenInUseUsageDescription" : "While using your location we can find nearby shops!",
+    "ios_NSPhotoLibraryUsageDescription" : "This app needs access to your library to upload pictures of products"
 }
