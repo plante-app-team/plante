@@ -102,7 +102,9 @@ class MapPageModesTestCommons {
 
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
-    when(userLocationManager.currentPosition()).thenAnswer((_) async => null);
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
+        .thenAnswer((_) async => null);
     when(mapController.getVisibleRegion()).thenAnswer((_) async => LatLngBounds(
         southwest: LatLng(shopsBounds.south, shopsBounds.west),
         northeast: LatLng(shopsBounds.north, shopsBounds.east)));

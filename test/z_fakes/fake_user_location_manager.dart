@@ -41,7 +41,7 @@ class FakeUserLocationManager implements UserLocationManager {
   }
 
   @override
-  Future<Coord?> currentPosition() async {
+  Future<Coord?> currentPosition({required bool explicitUserRequest}) async {
     return _currentPosition;
   }
 

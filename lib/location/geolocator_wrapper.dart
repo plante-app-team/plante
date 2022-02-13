@@ -7,6 +7,8 @@ class GeolocatorWrapper {
       (await Geolocator.getLastKnownPosition())?.toCoord();
   Future<Coord?> getCurrentPosition() async =>
       (await Geolocator.getCurrentPosition()).toCoord();
+  Future<bool> isLocationServiceEnabled() async =>
+      Geolocator.isLocationServiceEnabled();
 }
 
 extension MyPositionExt on Position {

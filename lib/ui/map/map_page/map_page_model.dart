@@ -180,8 +180,10 @@ class MapPageModel with ShopsManagerListener {
     return CameraPosition(target: point.toLatLng(), zoom: 15);
   }
 
-  Future<CameraPosition?> currentUserPos() async {
-    final result = await _userLocationManager.currentPosition();
+  Future<CameraPosition?> currentUserPos(
+      {required bool explicitUserRequest}) async {
+    final result = await _userLocationManager.currentPosition(
+        explicitUserRequest: explicitUserRequest);
     if (result != null) {
       return _pointToCameraPos(result);
     }

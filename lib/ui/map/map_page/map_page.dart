@@ -489,7 +489,9 @@ class _MapPageState extends PageStatePlante<MapPage>
       final modeFabs = _mode.watch(ref).buildFABs() +
           [
             FabMyLocation(
-                key: const Key('my_location_fab'), onPressed: _showUser)
+                key: const Key('my_location_fab'),
+                userCoord: _obtainCurrentUserPos,
+                onTapResult: _moveCameraTo)
           ];
       final fabs = modeFabs
           .map((e) => Padding(
@@ -501,15 +503,11 @@ class _MapPageState extends PageStatePlante<MapPage>
     });
   }
 
-  Future<void> _showUser() async {
+  Future<CameraPosition?> _obtainCurrentUserPos() async {
     if (!await _ensurePermissions()) {
-      return;
+      return null;
     }
-    final position = await _model.currentUserPos();
-    if (position == null) {
-      return;
-    }
-    await _moveCameraTo(position);
+    return await _model.currentUserPos(explicitUserRequest: true);
   }
 
   Future<bool> _ensurePermissions() async {
