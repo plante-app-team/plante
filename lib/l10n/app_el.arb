@@ -58,7 +58,7 @@
     "display_product_page_table_positive": "Ναι",
     "display_product_page_table_possible": "Διφορούμενο",
     "display_product_page_table_unknown": "Άγνωστο",
-    "display_product_page_veg_mark_on_map": "Προσθὲστε τοποθεσία",
+    "display_product_page_veg_mark_on_map": "Προσθέστε τοποθεσία",
     "display_product_page_veg_status_explanations_ok": "Ωραία!",
     "display_product_page_veg_status_negative_explanation": "Το συστατικό δεν είναι .",
     "display_product_page_veg_status_positive_explanation": "Το συστατικό είναι vegan.",
@@ -190,7 +190,7 @@
     "lang_uk": "Ουκρανικά",
     "lang_vi": "Βιετναμέζικα",
     "lang_zh": "Κινέζικα",
-    "main_page_add_product": "Προσθήκη προἰόντος",
+    "main_page_add_product": "Προσθήκη προϊόντος",
     "@main_page_add_product": {
         "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new product (opens the barcodes scanning screen)."
     },
