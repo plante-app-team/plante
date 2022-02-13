@@ -11,6 +11,8 @@ class DisplayedDistanceUnitsManager {
     CountryCode.UNITED_KINGDOM,
     CountryCode.GREAT_BRITAIN,
     CountryCode.USA,
+    CountryCode.MYANMAR,
+    CountryCode.LIBERIA,
   };
 
   final CachingUserAddressPiecesObtainer _userAddressObtainer;
