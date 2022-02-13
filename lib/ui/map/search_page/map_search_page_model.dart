@@ -135,7 +135,8 @@ class MapSearchPageModel {
   }
 
   void _updateLastKnownUserPos() async {
-    _lastKnownUserPos = await _userLocationManager.currentPosition();
+    _lastKnownUserPos =
+        await _userLocationManager.currentPosition(explicitUserRequest: false);
     _lastKnownUserPos ??= await _userLocationManager.lastKnownPosition();
   }
 

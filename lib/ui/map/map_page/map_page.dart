@@ -507,7 +507,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     if (!await _ensurePermissions()) {
       return null;
     }
-    return await _model.currentUserPos();
+    return await _model.currentUserPos(explicitUserRequest: true);
   }
 
   Future<bool> _ensurePermissions() async {

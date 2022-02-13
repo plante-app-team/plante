@@ -24,6 +24,8 @@ void main() {
 
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
+    when(geolocatorWrapper.isLocationServiceEnabled())
+        .thenAnswer((_) async => true);
   });
 
   void init() async {
@@ -259,7 +261,8 @@ void main() {
         .thenAnswer((_) async => newPos);
 
     // Expecting the new position to be returned
-    final result = await locationManager.currentPosition();
+    final result =
+        await locationManager.currentPosition(explicitUserRequest: false);
     expect(result, equals(newPos));
 
     // Expecting the new position to be stored in prefs
@@ -284,7 +287,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Expecting null to be returned even though there's the initial position
-    final result = await locationManager.currentPosition();
+    final result =
+        await locationManager.currentPosition(explicitUserRequest: false);
     expect(result, isNull);
 
     // Expecting the initial position to still be stored in prefs
@@ -309,7 +313,8 @@ void main() {
         .thenAnswer((_) async => throw const PermissionDeniedException(''));
 
     // Expecting null to be returned even though there's the initial position
-    final result = await locationManager.currentPosition();
+    final result =
+        await locationManager.currentPosition(explicitUserRequest: false);
     expect(result, isNull);
 
     // Expecting the initial position to still be stored in prefs
@@ -336,5 +341,35 @@ void main() {
       receivedPosition = position;
     });
     expect(receivedPosition, equals(currentPos));
+  });
+
+  test('currentPosition when location services are disabled', () async {
+    final currentPos = Coord(lon: 10, lat: 20);
+    when(geolocatorWrapper.getLastKnownPosition())
+        .thenAnswer((_) async => currentPos);
+    when(geolocatorWrapper.getCurrentPosition())
+        .thenAnswer((_) async => currentPos);
+    // Disabled!
+    when(geolocatorWrapper.isLocationServiceEnabled())
+        .thenAnswer((_) async => false);
+
+    init();
+
+    // Not explicitly asked by the user
+    var result =
+        await locationManager.currentPosition(explicitUserRequest: false);
+    // The system was not queried for the current position because
+    // [explicitUserRequest] is false!
+    verifyNever(geolocatorWrapper.getCurrentPosition());
+    // No result, because the system was not queried
+    expect(result, isNull);
+
+    // Explicitly asked by the user
+    result = await locationManager.currentPosition(explicitUserRequest: true);
+    // The system was now queried for the current position because
+    // [explicitUserRequest] is true!
+    verify(geolocatorWrapper.getCurrentPosition());
+    // Now result is here
+    expect(result, equals(currentPos));
   });
 }

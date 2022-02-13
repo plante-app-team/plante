@@ -52,8 +52,8 @@ class UserLocationManager {
   }
 
   Future<void> _initLastKnownPosition() async {
-    // Both calls attempt to fill the '_lastKnownPosition' field
-    var pos = await currentPosition();
+    // Both calls attempt to fill the '_lastKnownPosition' field.
+    var pos = await currentPosition(explicitUserRequest: false);
     if (pos != null) {
       return;
     }
@@ -123,8 +123,16 @@ class UserLocationManager {
     return position;
   }
 
-  /// Works only if the permission is acquired
-  Future<Coord?> currentPosition() async {
+  /// Works only if the permission is acquired.
+  /// If [explicitUserRequest] is true, some Android devices might show a system
+  /// popup asking the user to enable Location Services (if they're disabled).
+  Future<Coord?> currentPosition({required bool explicitUserRequest}) async {
+    final locationServicesEnabled =
+        await _geolocatorWrapper.isLocationServiceEnabled();
+    if (!locationServicesEnabled && !explicitUserRequest) {
+      return null;
+    }
+
     final permissionStatus = await _permissionStatus();
     if (permissionStatus != PermissionState.granted) {
       return null;

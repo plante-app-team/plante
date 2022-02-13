@@ -54,10 +54,12 @@ void main() {
     widget.onMapIdleForTesting();
     await tester.pumpAndSettle();
 
-    verifyNever(userLocationManager.currentPosition());
+    verifyNever(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
     await tester.tap(find.byKey(const Key('my_location_fab')));
     await tester.pumpAndSettle();
-    verify(userLocationManager.currentPosition());
+    verify(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
 
     verifyNever(permissionsManager.request(any));
   });
@@ -81,7 +83,8 @@ void main() {
     await tester.tap(find.byKey(const Key('my_location_fab')));
     await tester.pumpAndSettle();
     verify(permissionsManager.request(PermissionKind.LOCATION));
-    verifyNever(userLocationManager.currentPosition());
+    verifyNever(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
 
     // Second request will be granted
     when(permissionsManager.request(PermissionKind.LOCATION))
@@ -95,7 +98,8 @@ void main() {
     await tester.tap(find.byKey(const Key('my_location_fab')));
     await tester.pumpAndSettle();
     verify(permissionsManager.request(PermissionKind.LOCATION));
-    verify(userLocationManager.currentPosition());
+    verify(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
   });
 
   testWidgets('my location when permanently no permission',
@@ -118,7 +122,8 @@ void main() {
     await tester.tap(find.byKey(const Key('my_location_fab')));
     await tester.pumpAndSettle();
     verify(permissionsManager.request(PermissionKind.LOCATION));
-    verifyNever(userLocationManager.currentPosition());
+    verifyNever(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
 
     // Verify the user is asked to go to the settings
     expect(
@@ -143,7 +148,8 @@ void main() {
     await tester.tap(find.byKey(const Key('my_location_fab')));
     await tester.pumpAndSettle();
     verify(permissionsManager.request(PermissionKind.LOCATION));
-    verify(userLocationManager.currentPosition());
+    verify(userLocationManager.currentPosition(
+        explicitUserRequest: anyNamed('explicitUserRequest')));
   });
 
   testWidgets('start camera pos when it is available',
@@ -156,7 +162,8 @@ void main() {
         .thenReturn(notInitialPos);
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => notInitialPos);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
@@ -187,7 +194,8 @@ void main() {
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(initialPos);
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => notInitialPos);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
@@ -217,7 +225,8 @@ void main() {
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => notInitialPos);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
@@ -251,7 +260,8 @@ void main() {
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => notInitialPos);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
@@ -293,7 +303,8 @@ void main() {
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition())
         .thenAnswer((_) async => initialPosCompleter.future);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       final callback = invc.positionalArguments[0] as ArgCallback<Coord>;
@@ -335,7 +346,8 @@ void main() {
     when(latestCameraPosStorage.get()).thenAnswer((_) async => null);
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
-    when(userLocationManager.currentPosition())
+    when(userLocationManager.currentPosition(
+            explicitUserRequest: anyNamed('explicitUserRequest')))
         .thenAnswer((_) async => notInitialPos);
     when(userLocationManager.callWhenLastPositionKnown(any)).thenAnswer((invc) {
       initialPosCallback = invc.positionalArguments[0] as ArgCallback<Coord>;
