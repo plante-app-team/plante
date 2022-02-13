@@ -16,4 +16,6 @@ class CountryCode {
   static const String UNITED_KINGDOM = 'uk';
   static const String RUSSIA = 'ru';
   static const String USA = 'us';
+  static const String MYANMAR = 'mm';
+  static const String LIBERIA = 'lr';
 }

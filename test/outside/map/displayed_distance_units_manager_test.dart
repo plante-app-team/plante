@@ -57,6 +57,8 @@ void main() {
       'uk',
       'ru',
       'us',
+      'mm',
+      'lr',
     };
     for (final milesCountry in DisplayedDistanceUnitsManager.MILES_COUNTRIES) {
       expect(countries, contains(milesCountry));
