@@ -21,7 +21,6 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
@@ -30,6 +29,7 @@ import 'package:plante/outside/map/user_address/caching_user_address_pieces_obta
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
@@ -89,8 +89,7 @@ void main() {
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
 
-    viewedProductsStorage =
-        ViewedProductsStorage(loadPersistentProducts: false);
+    viewedProductsStorage = ViewedProductsStorage();
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
     userLocationManager = MockUserLocationManager();

@@ -16,10 +16,10 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/profile/components/products_history_widget.dart';
 
 import '../../../common_mocks.mocks.dart';
@@ -47,8 +47,7 @@ void main() {
     productsObtainer = MockProductsObtainer();
     GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
 
-    viewedProductsStorage =
-        ViewedProductsStorage(loadPersistentProducts: false);
+    viewedProductsStorage = ViewedProductsStorage();
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
     userParamsController = FakeUserParamsController();

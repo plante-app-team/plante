@@ -8,7 +8,6 @@ import 'package:plante/location/geolocator_wrapper.dart';
 import 'package:plante/location/ip_location_provider.dart';
 import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
@@ -24,9 +23,11 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
@@ -35,6 +36,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
   AppleAuthorizer,
   Backend,
   BackendObserver,
+  ContributedByUserProductsStorage,
   DirectionsManager,
   GeolocatorWrapper,
   GoogleAuthorizer,

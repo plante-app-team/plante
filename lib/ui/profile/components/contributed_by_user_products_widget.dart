@@ -9,6 +9,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
@@ -21,10 +22,11 @@ import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class ContributedByUserProductsWidget extends ConsumerStatefulWidget {
   final double topSpacing;
+  final ContributedByUserProductsStorage storage;
   final UserContributionsManager contributionsManager;
   final ProductsObtainer productsObtainer;
   final UserParamsController userParamsController;
-  const ContributedByUserProductsWidget(this.contributionsManager,
+  const ContributedByUserProductsWidget(this.contributionsManager, this.storage,
       this.productsObtainer, this.userParamsController,
       {Key? key, this.topSpacing = 0})
       : super(key: key);
@@ -42,6 +44,7 @@ class _ContributedByUserProductsWidgetState
   late final ProductsObtainer productsObtainer = widget.productsObtainer;
   late final UserParams user = widget.userParamsController.cachedUserParams!;
 
+  var _initialLoadDone = false;
   late final _products =
       UIValue<Result<List<Product>, GeneralError>?>(null, ref);
 
@@ -104,6 +107,14 @@ class _ContributedByUserProductsWidgetState
   }
 
   void _loadProducts() async {
+    if (!_initialLoadDone) {
+      // Reversed, because the storage considers the collection tail as
+      // the newest products, but ContributedByUserProductsWidgets considers
+      // the collection head as the newest ones.
+      _products.setValue(Ok(widget.storage.getProducts().reversed.toList()));
+      _initialLoadDone = true;
+    }
+
     final contributionsRes = await contributionsManager.getContributions();
     if (contributionsRes.isErr) {
       _products.setValue(Err(contributionsRes.unwrapErr().toGeneral()));
@@ -128,7 +139,12 @@ class _ContributedByUserProductsWidgetState
 
     final productsRes = await productsObtainer.getProducts(barcodes);
     if (productsRes.isOk) {
-      _products.setValue(Ok(productsRes.unwrap()));
+      final products = productsRes.unwrap();
+      _products.setValue(Ok(products));
+      // Reversed, because the storage considers the collection tail as
+      // the newest products, but ContributedByUserProductsWidgets considers
+      // the collection head as the newest ones.
+      await widget.storage.setProducts(products.reversed);
     } else {
       _products.setValue(Err(productsRes.unwrapErr().toGeneral()));
     }

@@ -11,11 +11,12 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -41,6 +42,7 @@ void main() {
   late FakeProductsObtainer productsObtainer;
   late FakeShopsManager shopsManager;
   late MockViewedProductsStorage viewedProductsStorage;
+  late MockContributedByUserProductsStorage contributedByUserProductsStorage;
   late FakeUserContributionsManager userContributionsManager;
 
   setUp(() async {
@@ -57,6 +59,12 @@ void main() {
         FakeUserLangsManager([LangCode.en]));
     viewedProductsStorage = MockViewedProductsStorage();
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
+
+    contributedByUserProductsStorage = MockContributedByUserProductsStorage();
+    GetIt.I.registerSingleton<ContributedByUserProductsStorage>(
+        contributedByUserProductsStorage);
+    when(contributedByUserProductsStorage.getProducts()).thenReturn(const []);
+
     GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
 
     GetIt.I.registerSingleton<InputProductsLangStorage>(
@@ -273,6 +281,7 @@ void main() {
     await tester.superPump(const MainPage());
 
     // No interactions when MainPage is created
+    verifyZeroInteractions(contributedByUserProductsStorage);
     expect(userContributionsManager.getContributionsCallsCount_testing(),
         equals(0));
 
@@ -282,6 +291,7 @@ void main() {
 
     // Now there's an interaction!
     // No interactions when MainPage is created
+    verify(contributedByUserProductsStorage.getProducts());
     expect(userContributionsManager.getContributionsCallsCount_testing(),
         equals(1));
   });

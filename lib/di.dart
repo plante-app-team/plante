@@ -12,7 +12,6 @@ import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
@@ -40,10 +39,12 @@ import 'package:plante/outside/off/off_shops_list_obtainer.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/taken_products_images_storage.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
@@ -157,6 +158,8 @@ void initDI() {
       GetIt.I.get<UserParamsController>(),
       GetIt.I.get<MobileAppConfigManager>()));
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
+  GetIt.I.registerSingleton<ContributedByUserProductsStorage>(
+      ContributedByUserProductsStorage());
   GetIt.I.registerSingleton<OsmCacher>(OsmCacher());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
     GetIt.I.get<OpenStreetMap>(),

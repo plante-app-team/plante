@@ -17,7 +17,6 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_product_range.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -31,6 +30,7 @@ import 'package:plante/outside/map/user_address/caching_user_address_pieces_obta
 import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
@@ -116,8 +116,7 @@ void main() {
     final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
     GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
         userAddressObtainer);
-    GetIt.I.registerSingleton<ViewedProductsStorage>(
-        ViewedProductsStorage(loadPersistentProducts: false));
+    GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
   });
 
   testWidgets('card for range: card for empty shop',
