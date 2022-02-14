@@ -10,16 +10,16 @@ import 'package:plante/outside/map/extra_properties/products_at_shops_extra_prop
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/off/off_shop.dart';
-import 'package:plante/outside/products/suggestions/_radius_products_suggestions_manager.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/suggestions/_radius_products_suggestions_manager.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map_full.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:test/test.dart';
 
-import '../../../z_fakes/fake_off_shops_manager.dart';
-import '../../../z_fakes/fake_settings.dart';
-import '../../../z_fakes/fake_shops_manager.dart';
+import '../../z_fakes/fake_off_shops_manager.dart';
+import '../../z_fakes/fake_settings.dart';
+import '../../z_fakes/fake_shops_manager.dart';
 
 // ignore_for_file: cancel_subscriptions
 

@@ -5,11 +5,11 @@ import 'package:openfoodfacts/model/OcrIngredientsResult.dart' as off;
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.mocks.dart';
+import '../common_mocks.mocks.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {

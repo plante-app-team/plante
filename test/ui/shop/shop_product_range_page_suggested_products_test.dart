@@ -15,7 +15,7 @@ import 'package:plante/outside/map/extra_properties/product_at_shop_extra_proper
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/user_address/user_address_piece.dart';
 import 'package:plante/outside/map/user_address/user_address_type.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/base/components/product_card.dart';
 import 'package:plante/ui/shop/_suggested_products_model.dart';
 import 'package:plante/ui/shop/shop_product_range_page.dart';

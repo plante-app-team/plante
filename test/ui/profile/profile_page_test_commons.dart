@@ -11,7 +11,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';

@@ -1,5 +1,5 @@
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 
 /// Should be used when a class can return errors, but the only errors
 /// it can have are ones from the general list.

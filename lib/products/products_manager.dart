@@ -15,9 +15,9 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
-import 'package:plante/outside/products/products_converter.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
-import 'package:plante/outside/products/taken_products_images_storage.dart';
+import 'package:plante/products/products_converter.dart';
+import 'package:plante/products/products_manager_error.dart';
+import 'package:plante/products/taken_products_images_storage.dart';
 
 abstract class ProductsManagerObserver {
   void onProductEdited(Product product);

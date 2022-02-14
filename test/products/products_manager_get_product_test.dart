@@ -14,12 +14,12 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../off/off_json_product_images_utils.dart';
+import '../common_mocks.mocks.dart';
+import '../outside/off/off_json_product_images_utils.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {

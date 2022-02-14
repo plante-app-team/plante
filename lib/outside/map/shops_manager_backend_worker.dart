@@ -16,7 +16,7 @@ import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 
 class ShopsManagerBackendWorker {
   final Backend _backend;

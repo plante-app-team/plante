@@ -9,7 +9,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import 'products_manager_tests_commons.dart';

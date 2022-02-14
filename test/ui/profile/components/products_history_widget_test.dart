@@ -19,7 +19,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/profile/components/products_history_widget.dart';
 
 import '../../../common_mocks.mocks.dart';

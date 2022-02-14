@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/map/components/map_filter_check_button.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';

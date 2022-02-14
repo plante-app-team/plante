@@ -9,7 +9,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/product_card.dart';

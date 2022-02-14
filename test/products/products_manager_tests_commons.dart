@@ -7,11 +7,11 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/taken_products_images_storage.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/taken_products_images_storage.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../z_fakes/fake_analytics.dart';
+import '../common_mocks.mocks.dart';
+import '../z_fakes/fake_analytics.dart';
 
 class ProductsManagerTestCommons {
   late MockOffApi offApi;

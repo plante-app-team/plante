@@ -14,7 +14,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';

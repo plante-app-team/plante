@@ -17,7 +17,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/box_with_circle_cutout.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/animated_cross_fade_plante.dart';
