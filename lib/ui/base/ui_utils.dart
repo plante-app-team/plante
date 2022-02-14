@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -128,6 +129,19 @@ String millisSinceEpochToStr(int millis, BuildContext context) {
 
 String dateToStr(DateTime date, BuildContext context) {
   return intl.DateFormat.yMMMMd(context.langCode).format(date);
+}
+
+Future<void> nextFrame() async {
+  final completer = Completer<void>();
+  WidgetsBinding.instance!.addPostFrameCallback((_) {
+    completer.complete();
+  });
+  return completer.future;
+}
+
+void runOnNextFrame(VoidCallback callback) async {
+  await nextFrame();
+  callback.call();
 }
 
 void _noOp() {}

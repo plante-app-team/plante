@@ -8,6 +8,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 
 class MapSearchBarQueryView {
   String? _latestQuery;
@@ -156,7 +157,7 @@ class _MapSearchBarState extends State<MapSearchBar> {
         height: _SIZE,
         child: _TextFieldIcon(
           key: const Key('map_search_bar_cancel'),
-          onTap: () {
+          onTap: () async {
             _textController.clear();
             // We listen to our [_textController] and notify observers about
             // query changes. But a [TextControllers] notifies its observers
@@ -164,9 +165,8 @@ class _MapSearchBarState extends State<MapSearchBar> {
             // We want to keep the order of the 2 events (query changed,
             // search box cleared), so we delay the second even until the first
             // one is definitely delivered - to the next frame.
-            WidgetsBinding.instance!.addPostFrameCallback((_) {
-              widget.onCleared?.call();
-            });
+            await nextFrame();
+            widget.onCleared?.call();
           },
           svg: 'assets/cancel_circle.svg',
         ));

@@ -55,12 +55,15 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      viewedProductsSubscription = viewedProductsStorage.updates().listen((_) {
-        _products.setValue(viewedProductsStorage.getProducts().toList());
-      });
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    await nextFrame();
+    viewedProductsSubscription = viewedProductsStorage.updates().listen((_) {
       _products.setValue(viewedProductsStorage.getProducts().toList());
     });
+    _products.setValue(viewedProductsStorage.getProducts().toList());
   }
 
   @override
