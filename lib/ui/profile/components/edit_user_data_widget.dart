@@ -120,9 +120,7 @@ class _EditUserDataWidgetState extends ConsumerState<EditUserDataWidget> {
     _controller.registerChangeCallback(_onControllerDataChanged);
     // UIValue cannot be changed from [initState], so we'll call it
     // during next frame.
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _onControllerDataChanged();
-    });
+    runOnNextFrame(_onControllerDataChanged);
   }
 
   void _onControllerDataChanged() {

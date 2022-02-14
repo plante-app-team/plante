@@ -9,7 +9,7 @@ import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/model/viewed_products_storage.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/profile/profile_page.dart';
 
 import '../../common_mocks.mocks.dart';

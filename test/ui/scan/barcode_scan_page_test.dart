@@ -20,7 +20,6 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
@@ -30,6 +29,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -87,8 +87,7 @@ void main() {
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([_DEFAULT_LANG]));
-    viewedProductsStorage =
-        ViewedProductsStorage(loadPersistentProducts: false);
+    viewedProductsStorage = ViewedProductsStorage();
     GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
 
     when(photosTaker.retrieveLostPhoto(any))

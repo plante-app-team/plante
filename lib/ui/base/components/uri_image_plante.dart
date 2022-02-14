@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class UriImagePlante extends StatelessWidget {
@@ -17,14 +18,16 @@ class UriImagePlante extends StatelessWidget {
     if (uri.isScheme('FILE')) {
       result = Image.file(File.fromUri(uri), fit: BoxFit.cover);
     } else {
-      result = Image.network(uri.toString(),
-          headers: httpHeaders,
-          fit: BoxFit.cover, loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) {
-          return child;
-        }
-        return const Center(child: CircularProgressIndicator());
-      });
+      result = Image(
+          image:
+              CachedNetworkImageProvider(uri.toString(), headers: httpHeaders),
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            }
+            return const Center(child: CircularProgressIndicator());
+          });
     }
     imageProviderCallback?.call(result.image);
     return result;

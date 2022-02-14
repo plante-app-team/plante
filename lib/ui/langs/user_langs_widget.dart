@@ -5,6 +5,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/langs/lang_list_item.dart';
 
 /// Widget with a list of languages selected by user, which allows the user
@@ -93,8 +94,9 @@ class _UserLangsWidgetState extends State<UserLangsWidget>
         animationState: animState,
         animationTickerProvider: this,
         selectedChangeCallback: selectedChangeCallback,
-        onRemoveAnimationEnd: () {
-          _setStateALittleLater(() {
+        onRemoveAnimationEnd: () async {
+          await nextFrame();
+          setState(() {
             _langsBeingDeselected.remove(lang);
             final updatedCodes = _userLangs.langs.toList();
             updatedCodes.remove(lang);
@@ -145,23 +147,15 @@ class _UserLangsWidgetState extends State<UserLangsWidget>
             });
             widget.callback.call(_userLangs);
           },
-          onRemoveAnimationEnd: () {
-            _setStateALittleLater(() {
+          onRemoveAnimationEnd: () async {
+            await nextFrame();
+            setState(() {
               _langsBeingSelected.remove(lang);
             });
           });
       notSelectedLangsWidgets.add(child);
     }
     return notSelectedLangsWidgets;
-  }
-
-  /// Helper function to avoid calling of `setState` during `build`.
-  void _setStateALittleLater(VoidCallback callback) {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      setState(() {
-        callback.call();
-      });
-    });
   }
 
   void _onSelectedLangReorder(int oldIndex, int newIndex) {

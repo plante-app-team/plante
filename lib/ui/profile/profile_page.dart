@@ -8,9 +8,10 @@ import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -50,6 +51,8 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
   final _userParamsController = GetIt.I.get<UserParamsController>();
   final _avatarManager = GetIt.I.get<UserAvatarManager>();
   final _viewedProductsStorage = GetIt.I.get<ViewedProductsStorage>();
+  final _contributedProductsStorage =
+      GetIt.I.get<ContributedByUserProductsStorage>();
   final _productsObtainer = GetIt.I.get<ProductsObtainer>();
   final _userContributionsManager = GetIt.I.get<UserContributionsManager>();
 
@@ -160,8 +163,11 @@ class _ProfilePageState extends PageStatePlante<ProfilePage>
               key: const Key('products_lists_page_view'),
               controller: _productsListPagerController,
               children: [
-                ContributedByUserProductsWidget(_userContributionsManager,
-                    _productsObtainer, _userParamsController,
+                ContributedByUserProductsWidget(
+                    _userContributionsManager,
+                    _contributedProductsStorage,
+                    _productsObtainer,
+                    _userParamsController,
                     topSpacing: 62),
                 ProductsHistoryWidget(_viewedProductsStorage, _productsObtainer,
                     _userParamsController,

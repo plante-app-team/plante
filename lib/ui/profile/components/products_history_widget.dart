@@ -7,8 +7,8 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/invisible_widget.dart';
 import 'package:plante/ui/base/components/product_card.dart';
@@ -55,12 +55,15 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      viewedProductsSubscription = viewedProductsStorage.updates().listen((_) {
-        _products.setValue(viewedProductsStorage.getProducts().toList());
-      });
+    _initAsync();
+  }
+
+  void _initAsync() async {
+    await nextFrame();
+    viewedProductsSubscription = viewedProductsStorage.updates().listen((_) {
       _products.setValue(viewedProductsStorage.getProducts().toList());
     });
+    _products.setValue(viewedProductsStorage.getProducts().toList());
   }
 
   @override
@@ -93,7 +96,8 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
                       child: Text(
                           context
                               .strings.products_history_widget_no_history_hint,
-                          style: TextStyles.hint)));
+                          style: TextStyles.hint,
+                          textAlign: TextAlign.center)));
             }
             return ListView(children: _listChildren(products));
           }),

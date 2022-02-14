@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,11 +20,12 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
+import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/components/contributed_by_user_products_widget.dart';
 
@@ -38,6 +41,7 @@ void main() {
   late FakeProductsObtainer productsObtainer;
   late FakeUserParamsController userParamsController;
   late FakeUserContributionsManager userContributionsManager;
+  late ContributedByUserProductsStorage storage;
 
   setUp(() async {
     await GetIt.I.reset();
@@ -48,8 +52,7 @@ void main() {
         FakeUserLangsManager([LangCode.en]));
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I.registerSingleton<ViewedProductsStorage>(
-        ViewedProductsStorage(loadPersistentProducts: false));
+    GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
 
     productsObtainer = FakeProductsObtainer();
     productsObtainer.unknownProductsGeneratorSimple = _makeProduct;
@@ -64,6 +67,7 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
 
     userContributionsManager = FakeUserContributionsManager();
+    storage = ContributedByUserProductsStorage();
   });
 
   testWidgets('contributed by user products shown',
@@ -82,7 +86,10 @@ void main() {
     ]);
 
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController));
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
 
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsOneWidget);
@@ -102,7 +109,10 @@ void main() {
           barcode: products[1].barcode),
     ]);
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController,
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController,
         key: const Key('widget 1')));
 
     // More recent product is above of the older (Y coord is smaller).
@@ -120,7 +130,10 @@ void main() {
           barcode: products[1].barcode),
     ]);
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController,
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController,
         key: const Key('widget 2')));
 
     // More recent product is above of the older (Y coord is smaller).
@@ -148,7 +161,10 @@ void main() {
           barcode: products[0].barcode),
     ]);
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController));
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
 
     // Ensure only one of each products is present
     expect(find.text('Product 1'), findsOneWidget);
@@ -179,7 +195,10 @@ void main() {
         .where((e) => !expectedDisplayedContributionTypes.contains(e));
 
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController));
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
 
     for (final expected in expectedDisplayedContributionTypes) {
       expect(find.text('Product ${expected.index}'), findsOneWidget);
@@ -204,8 +223,8 @@ void main() {
     final wrapperStack = StatefulStackForTesting(
       children: [
         Container(color: Colors.white),
-        ContributedByUserProductsWidget(
-            userContributionsManager, productsObtainer, userParamsController),
+        ContributedByUserProductsWidget(userContributionsManager, storage,
+            productsObtainer, userParamsController),
       ],
     );
     await tester.superPump(wrapperStack);
@@ -263,7 +282,10 @@ void main() {
     ]);
 
     await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController));
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
 
     expect(find.byKey(const Key('display_product_page')), findsNothing);
 
@@ -278,7 +300,10 @@ void main() {
     userContributionsManager.setContributionsSimple_testing(const []);
 
     var context = await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController,
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController,
         key: const Key('key1')));
 
     expect(
@@ -297,7 +322,10 @@ void main() {
     ]);
 
     context = await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController,
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController,
         key: const Key('key2')));
 
     expect(
@@ -310,10 +338,13 @@ void main() {
       (WidgetTester tester) async {
     // Error!
     userContributionsManager
-        .setContributions_testing(Err(BackendError.other()));
+        .setContributionsResult_testing(Err(BackendError.other()));
 
     final context = await tester.superPump(ContributedByUserProductsWidget(
-        userContributionsManager, productsObtainer, userParamsController));
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
 
     expect(
         find.text(context.strings.global_something_went_wrong), findsOneWidget);
@@ -337,6 +368,72 @@ void main() {
     expect(
         find.text(context.strings.global_something_went_wrong), findsNothing);
     expect(find.text('Product 1'), findsOneWidget);
+  });
+
+  testWidgets(
+      'products from persistent storage are used before they are loaded from network',
+      (WidgetTester tester) async {
+    final p1 = _makeProduct('1');
+    final p2 = _makeProduct('2');
+    final p3 = _makeProduct('3');
+
+    await storage.setProducts([p1, p3]);
+
+    final completer = Completer<Result<List<UserContribution>, BackendError>>();
+    userContributionsManager.setContributions_testing(completer.future);
+
+    await tester.superPump(ContributedByUserProductsWidget(
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
+    // Products from persistent storage are loaded first
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+    expect(find.text('Product 3'), findsOneWidget);
+
+    completer.complete(Ok([
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(111),
+          barcode: p2.barcode),
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(222),
+          barcode: p3.barcode),
+    ]));
+    await tester.pumpAndSettle();
+
+    // Products from the backend are shown as soon as they're loaded
+    expect(find.text('Product 1'), findsNothing);
+    expect(find.text('Product 2'), findsOneWidget);
+    expect(find.text('Product 3'), findsOneWidget);
+  });
+
+  testWidgets(
+      'products are stored persistently when they are loaded from network',
+      (WidgetTester tester) async {
+    // The backend has some contributions
+    final p1 = _makeProduct('1');
+    final p2 = _makeProduct('2');
+    userContributionsManager.setContributionsSimple_testing([
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(111),
+          barcode: p1.barcode),
+      UserContribution.create(UserContributionType.PRODUCT_EDITED,
+          dateTimeFromSecondsSinceEpoch(222),
+          barcode: p2.barcode),
+    ]);
+
+    // But no products are stored persistently yet
+    expect(storage.getProducts(), isEmpty);
+
+    await tester.superPump(ContributedByUserProductsWidget(
+        userContributionsManager,
+        storage,
+        productsObtainer,
+        userParamsController));
+
+    // The backend contributions are now stored persistently
+    expect(storage.getProducts(), equals([p1, p2]));
   });
 }
 

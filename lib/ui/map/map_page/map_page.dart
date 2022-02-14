@@ -253,7 +253,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       // Meanwhile, [MapPageMode.init] can (and does) cause different
       // UIValues to be changed. To avoid exceptions, we delay [init] call
       // until the next frame.
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      runOnNextFrame(() {
         if (!_modeInited) {
           _mode.cachedVal.init(null);
           _modeInited = true;
@@ -323,14 +323,13 @@ class _MapPageState extends PageStatePlante<MapPage>
     super.dispose();
   }
 
-  void onInstancesChange() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() {
-          // Update!
-        });
-      }
-    });
+  void onInstancesChange() async {
+    await nextFrame();
+    if (mounted) {
+      setState(() {
+        // Update!
+      });
+    }
   }
 
   @override
