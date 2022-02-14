@@ -93,7 +93,8 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
                       child: Text(
                           context
                               .strings.products_history_widget_no_history_hint,
-                          style: TextStyles.hint)));
+                          style: TextStyles.hint,
+                          textAlign: TextAlign.center)));
             }
             return ListView(children: _listChildren(products));
           }),

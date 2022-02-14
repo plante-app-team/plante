@@ -77,7 +77,8 @@ class _ContributedByUserProductsWidgetState
                       child: Text(
                           context.strings
                               .contributed_by_user_products_widget_no_products_hint,
-                          style: TextStyles.hint)));
+                          style: TextStyles.hint,
+                          textAlign: TextAlign.center)));
             }
           } else {
             final String errorText;
@@ -92,7 +93,9 @@ class _ContributedByUserProductsWidgetState
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(errorText, style: TextStyles.normal),
+                          Text(errorText,
+                              style: TextStyles.normal,
+                              textAlign: TextAlign.center),
                           const SizedBox(height: 8),
                           ButtonFilledPlante.withText(
                               context.strings.global_try_again,
