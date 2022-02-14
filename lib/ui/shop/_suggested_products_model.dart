@@ -13,10 +13,10 @@ import 'package:plante/outside/map/extra_properties/product_at_shop_extra_proper
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class SuggestedProductsModel {

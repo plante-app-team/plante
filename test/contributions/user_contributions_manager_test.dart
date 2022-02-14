@@ -13,7 +13,7 @@ import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';

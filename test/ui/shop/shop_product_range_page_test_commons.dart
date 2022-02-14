@@ -35,10 +35,10 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/map/user_address/user_address_piece.dart';
 import 'package:plante/outside/map/user_address/user_address_type.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';

@@ -4,8 +4,8 @@ import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_manager_error.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/products_manager_error.dart';
 
 enum ProductsObtainerError {
   NETWORK,

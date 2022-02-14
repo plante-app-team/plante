@@ -4,10 +4,10 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/products/suggestions/_radius_products_suggestions_manager.dart';
+import 'package:plante/products/suggestions/_radius_products_suggestions_manager.dart';
 import 'package:test/test.dart';
 
-import '../../../z_fakes/fake_shops_manager.dart';
+import '../../z_fakes/fake_shops_manager.dart';
 
 void main() {
   final shopsWithProducts = <Shop>[];

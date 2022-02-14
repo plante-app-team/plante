@@ -1,5 +1,5 @@
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map.dart';
 import 'package:test/test.dart';
 
 void main() {

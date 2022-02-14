@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:plante/base/base.dart';
-import 'package:plante/outside/products/taken_products_images_storage.dart';
+import 'package:plante/products/taken_products_images_storage.dart';
 import 'package:test/test.dart';
 
 void main() {

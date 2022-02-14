@@ -10,7 +10,7 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/products/products_manager.dart';
 
 // NOTE: this class is lazy - it doesn't request contributions unless
 // is asked to. Because of this the class does not support observers.

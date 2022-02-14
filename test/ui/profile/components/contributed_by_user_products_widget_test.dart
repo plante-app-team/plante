@@ -22,7 +22,7 @@ import 'package:plante/model/viewed_products_storage.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/profile/components/contributed_by_user_products_widget.dart';
 

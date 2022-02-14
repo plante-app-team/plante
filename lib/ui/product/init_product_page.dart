@@ -15,7 +15,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/products/products_manager.dart';
+import 'package:plante/products/products_manager.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';

@@ -19,7 +19,7 @@ import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';

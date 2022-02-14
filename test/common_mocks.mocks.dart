@@ -77,15 +77,13 @@ import 'package:plante/outside/map/shops_manager_types.dart' as _i70;
 import 'package:plante/outside/off/off_api.dart' as _i45;
 import 'package:plante/outside/off/off_shop.dart' as _i47;
 import 'package:plante/outside/off/off_shops_manager.dart' as _i48;
-import 'package:plante/outside/products/products_manager.dart' as _i63;
-import 'package:plante/outside/products/products_manager_error.dart' as _i65;
-import 'package:plante/outside/products/products_obtainer.dart' as _i67;
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart'
+import 'package:plante/products/products_manager.dart' as _i63;
+import 'package:plante/products/products_manager_error.dart' as _i65;
+import 'package:plante/products/products_obtainer.dart' as _i67;
+import 'package:plante/products/suggestions/suggested_products_manager.dart'
     as _i73;
-import 'package:plante/outside/products/suggestions/suggestion_type.dart'
-    as _i75;
-import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart'
-    as _i74;
+import 'package:plante/products/suggestions/suggestion_type.dart' as _i75;
+import 'package:plante/products/suggestions/suggestions_for_shop.dart' as _i74;
 import 'package:plante/ui/map/latest_camera_pos_storage.dart' as _i42;
 import 'package:plante/ui/photos/photo_requester.dart' as _i60;
 import 'package:plante/ui/photos/photos_taker.dart' as _i57;

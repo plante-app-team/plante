@@ -6,7 +6,7 @@ import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 
 class FakeProductsObtainer implements ProductsObtainer {
   final _knownProducts = <String, Product>{};

@@ -26,7 +26,7 @@ import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_geo_helper.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
+import 'package:plante/products/products_obtainer.dart';
 
 /// NOTE: this class is a total mess among with both
 /// [ShopsManagerFetchShopsHelper] and [ShopsManagerBackendWorker].

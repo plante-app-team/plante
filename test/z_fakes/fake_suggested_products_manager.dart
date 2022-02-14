@@ -2,11 +2,11 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map.dart';
-import 'package:plante/outside/products/suggestions/suggested_barcodes_map_full.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
-import 'package:plante/outside/products/suggestions/suggestion_type.dart';
-import 'package:plante/outside/products/suggestions/suggestions_for_shop.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map.dart';
+import 'package:plante/products/suggestions/suggested_barcodes_map_full.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/suggestions/suggestions_for_shop.dart';
 
 class FakeSuggestedProductsManager implements SuggestedProductsManager {
   var _suggestions = SuggestedBarcodesMapFull({});

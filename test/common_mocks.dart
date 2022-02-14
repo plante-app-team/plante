@@ -24,9 +24,9 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_shops_manager.dart';
-import 'package:plante/outside/products/products_manager.dart';
-import 'package:plante/outside/products/products_obtainer.dart';
-import 'package:plante/outside/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
