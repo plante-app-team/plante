@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/log.dart';
@@ -12,7 +13,6 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
@@ -29,6 +29,7 @@ import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/components/delayed_loading_notifier.dart';
 import 'package:plante/ui/map/components/delayed_lossy_arg_callback.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 
 enum MapPageModelError {
   NETWORK_ERROR,
@@ -51,6 +52,7 @@ class MapPageModel with ShopsManagerListener {
   final DirectionsManager _directionsManager;
   final SuggestedProductsManager _suggestedProductsManager;
   final CachingUserAddressPiecesObtainer _userAddressPiecesObtainer;
+  final ShopsCreationManager _shopsCreationManager;
   final UIValueBase<bool> _shouldLoadNewShops;
 
   var _disposed = false;
@@ -81,6 +83,7 @@ class MapPageModel with ShopsManagerListener {
       this._directionsManager,
       this._suggestedProductsManager,
       this._userAddressPiecesObtainer,
+      this._shopsCreationManager,
       this._shouldLoadNewShops,
       ArgCallback<Map<OsmUID, Shop>> updateShopsCallback,
       this._errorCallback,
@@ -304,15 +307,9 @@ class MapPageModel with ShopsManagerListener {
     });
   }
 
-  Future<Result<Shop, ShopsManagerError>> createShop(
-      String name, ShopType type, Coord coord) async {
-    return await _networkOperation(() async {
-      return await _shopsManager.createShop(
-        name: name,
-        coord: coord,
-        type: type,
-      );
-    });
+  Future<Result<Shop?, GeneralError>> startShopCreation(
+      Coord coord, BuildContext context) {
+    return _shopsCreationManager.startShopCreation(coord, context);
   }
 
   UiListAddressesObtainer<Shop> createListAddressesObtainer() {

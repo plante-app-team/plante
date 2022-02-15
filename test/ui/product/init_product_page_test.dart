@@ -37,6 +37,7 @@ import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -152,6 +153,8 @@ void main() {
         userAddressObtainer);
     GetIt.I.registerSingleton<SharedPreferencesHolder>(
         FakeSharedPreferences().asHolder());
+    GetIt.I.registerSingleton<ShopsCreationManager>(
+        ShopsCreationManager(shopsManager));
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {

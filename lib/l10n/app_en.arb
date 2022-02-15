@@ -277,6 +277,18 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product has ambiguous ingredients (ambiguous ingredients can be vegan or non-vegan depending on how they were manufactured)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Some of product series have non-vegan ingredients and some don't — please read ingredients list carefully!",
     "mod_reason_tested_on_animals": "Animal tested product",
+    "pick_existing_shop_page_title": "There are some stores nearby - maybe the new shop is already among them?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "The store is not in the list?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_create_shop_button": "Create a new store",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
     "products_history_widget_no_history_hint": "Here you will see products you've viewed or scanned",
     "@products_history_widget_no_history_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"

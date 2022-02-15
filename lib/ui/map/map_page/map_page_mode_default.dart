@@ -45,15 +45,18 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
           Log.e('Requested mode ADD_PRODUCT but the product is null');
         }
         switchModeTo(MapPageModeAddProduct(params));
-        break;
+        return;
       case MapPageRequestedMode.SELECT_SHOPS:
         switchModeTo(MapPageModeSelectShopsWhereProductSold(params));
-        break;
+        return;
       case MapPageRequestedMode.DEFAULT:
         if (widget.product != null) {
           Log.e('Requested mode DEFAULT but "productToAdd" != null');
         }
         _initAsync();
+        if (previousMode != null && previousMode.selectedShops().isNotEmpty) {
+          onMarkerClick(previousMode.selectedShops());
+        }
         break;
     }
   }

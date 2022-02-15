@@ -16,11 +16,11 @@ import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/ui/map/create_shop_page.dart';
+import 'package:plante/ui/map/shop_creation/create_shop_page.dart';
 
-import '../../common_mocks.mocks.dart';
-import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
+import '../../../common_mocks.mocks.dart';
+import '../../../widget_tester_extension.dart';
+import '../../../z_fakes/fake_analytics.dart';
 
 void main() {
   late MockShopsManager shopsManager;

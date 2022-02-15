@@ -12,6 +12,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -28,6 +29,7 @@ void main() {
   late MockAddressObtainer addressObtainer;
   late FakeCachingUserAddressPiecesObtainer userAddressObtainer;
   late FakeSuggestedProductsManager suggestedProductsManager;
+  late ShopsCreationManager shopsCreationManager;
   late MapPageModel model;
 
   Map<OsmUID, Shop>? latestLoadedShops;
@@ -60,6 +62,7 @@ void main() {
     userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
 
     suggestedProductsManager = FakeSuggestedProductsManager();
+    shopsCreationManager = ShopsCreationManager(fakeShopsManager);
   });
 
   Future<void> createModel(WidgetTester tester) async {
@@ -80,6 +83,7 @@ void main() {
         directionsManager,
         suggestedProductsManager,
         userAddressObtainer,
+        shopsCreationManager,
         UIValue<bool>(false, state.ref), (shops) {
       latestLoadedShops = shops;
     }, (error) {
