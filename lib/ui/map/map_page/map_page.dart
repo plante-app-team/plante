@@ -101,32 +101,33 @@ class _MapPageState extends PageStatePlante<MapPage>
   late final MapPageModel _model;
   var _modeInited = false;
   late final UIValue<MapPageMode> _mode;
-  late final UIValue<bool> _locationPermissionObtained;
+  late final _locationPermissionObtained = UIValue(false, ref);
 
-  final _mapController = Completer<GoogleMapController>();
-  late final UIValue<Set<Marker>> _displayedShopsMarkers;
+  var _mapController = Completer<GoogleMapController>();
+  late final _displayedShopsMarkers = UIValue(<Marker>{}, ref);
   Iterable<Shop> _displayedShops = const [];
   late final ClusterManager _clusterManager;
 
   final _hintsController = MapHintsListController();
-  late final UIValue<RichText?> _bottomHint;
+  late final UIValue<RichText?> _bottomHint = UIValue(null, ref);
 
-  late final UIValue<MapSearchPageResult?> _latestSearchResult;
+  late final UIValue<MapSearchPageResult?> _latestSearchResult =
+      UIValue(null, ref);
 
-  late final UIValue<bool> _loadNewShops;
+  late final _loadNewShops = UIValue(true, ref);
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
-        super('MapPage');
+        super(
+          'MapPage',
+          // Widget's death often breaks Google Maps.
+          // We don't want that.
+          keepAlive: true,
+        );
 
   @override
   void initState() {
     super.initState();
-    _locationPermissionObtained = UIValue(false, ref);
-    _displayedShopsMarkers = UIValue({}, ref);
-    _bottomHint = UIValue(null, ref);
-    _latestSearchResult = UIValue(null, ref);
-    _loadNewShops = UIValue(true, ref);
 
     widget.testingStorage.finishCallback = (result) {
       _model.finishWith(context, result);
