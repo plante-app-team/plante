@@ -11,9 +11,11 @@ abstract class PagePlante extends ConsumerStatefulWidget {
   const PagePlante({Key? key}) : super(key: key);
 }
 
-abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T> {
+abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T>
+    with AutomaticKeepAliveClientMixin<T> {
   late final Analytics _analytics;
   final String _pageName;
+  final bool _keepAlive;
   late final UIValuesFactory _uiValuesFactory;
 
   @protected
@@ -22,7 +24,10 @@ abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T> {
   @protected
   UIValuesFactory get uiValuesFactory => _uiValuesFactory;
 
-  PageStatePlante(this._pageName) : _analytics = GetIt.I.get<Analytics>() {
+  /// For [keepAlive] see [AutomaticKeepAliveClientMixin]
+  PageStatePlante(this._pageName, {bool keepAlive = false})
+      : _analytics = GetIt.I.get<Analytics>(),
+        _keepAlive = keepAlive {
     _uiValuesFactory = UIValuesFactory(() => ref);
   }
 
@@ -31,6 +36,7 @@ abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T> {
   @nonVirtual
   @override
   Widget build(BuildContext context) {
+    super.build(context); // for AutomaticKeepAliveClientMixin
     return VisibilityDetectorPlante(
       keyStr: '${_pageName}_base_visibility_detector',
       onVisibilityChanged: _onVisibilityChanged,
@@ -45,6 +51,9 @@ abstract class PageStatePlante<T extends PagePlante> extends ConsumerState<T> {
       _analytics.onPageHidden(_pageName);
     }
   }
+
+  @override
+  bool get wantKeepAlive => _keepAlive;
 }
 
 class UIValuesFactory {
