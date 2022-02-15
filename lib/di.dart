@@ -47,6 +47,7 @@ import 'package:plante/products/taken_products_images_storage.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/safe_font_environment_detector.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
 void initDI() {
@@ -197,5 +198,8 @@ void initDI() {
   GetIt.I.registerSingleton(DisplayedDistanceUnitsManager(
     GetIt.I.get<CachingUserAddressPiecesObtainer>(),
     GetIt.I.get<Settings>(),
+  ));
+  GetIt.I.registerSingleton(ShopsCreationManager(
+    GetIt.I.get<ShopsManager>(),
   ));
 }

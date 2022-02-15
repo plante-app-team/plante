@@ -9,9 +9,7 @@ import 'package:plante/outside/map/osm/osm_element_type.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
-import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
-import 'package:plante/ui/map/create_shop_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 
 class MapPageModeCreateShop extends MapPageMode {
@@ -71,16 +69,10 @@ class MapPageModeCreateShop extends MapPageMode {
       return;
     }
 
-    final dialogResult = await Navigator.push<Shop>(
-      context,
-      MaterialPageRoute(builder: (context) => CreateShopPage(shopCoord: coord)),
-    );
-
-    if (dialogResult != null) {
-      _selectedShops.add(dialogResult);
+    final shopCreationResult = await model.startShopCreation(coord, context);
+    if (shopCreationResult.isOk && shopCreationResult.unwrap() != null) {
+      _selectedShops.add(shopCreationResult.unwrap()!);
       switchModeTo(nextModeMaker.call());
-      showSnackBar(context.strings.map_page_shop_added_to_map, context,
-          SnackBarStyle.MAP_ACTION_DONE);
       return;
     }
     _shopBeingCreated = null;

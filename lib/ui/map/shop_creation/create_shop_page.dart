@@ -54,7 +54,7 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             textDirection: TextDirection.rtl,
             children: [
-              const FabPlante.closeBtnPopOnClick(),
+              const FabPlante.closeBtnPopOnClick(key: Key('cancel')),
               Expanded(
                   child: Column(
                       textDirection: TextDirection.ltr,
@@ -134,6 +134,8 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
       coord: widget.shopCoord,
     );
     if (result.isOk) {
+      showSnackBar(context.strings.map_page_shop_added_to_map, context,
+          SnackBarStyle.MAP_ACTION_DONE);
       Navigator.of(context).pop(result.unwrap());
     } else {
       if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {

@@ -30,6 +30,7 @@ import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
@@ -51,6 +52,7 @@ class MapPageModesTestCommons {
   late MockAddressObtainer addressObtainer;
   late MockDirectionsManager directionsManager;
   late FakeSuggestedProductsManager suggestedProductsManager;
+  late ShopsCreationManager shopsCreationManager;
 
   final readyAddress = OsmAddress((e) => e.road = 'Broadway');
 
@@ -97,6 +99,8 @@ class MapPageModesTestCommons {
         DisplayedDistanceUnitsManager(userAddressObtainer, FakeSettings());
     GetIt.I.registerSingleton<DisplayedDistanceUnitsManager>(
         displayedDistanceManager);
+    shopsCreationManager = ShopsCreationManager(shopsManager);
+    GetIt.I.registerSingleton<ShopsCreationManager>(shopsCreationManager);
 
     await fillFetchedShops();
 

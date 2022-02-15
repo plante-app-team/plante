@@ -45,6 +45,7 @@ import 'package:plante/ui/map/map_page/map_page_timed_hints.dart';
 import 'package:plante/ui/map/map_page/markers_builder.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
 import 'package:plante/ui/map/search_page/map_search_page_result.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 
 enum MapPageRequestedMode {
   DEFAULT,
@@ -167,6 +168,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       GetIt.I.get<DirectionsManager>(),
       GetIt.I.get<SuggestedProductsManager>(),
       GetIt.I.get<CachingUserAddressPiecesObtainer>(),
+      GetIt.I.get<ShopsCreationManager>(),
       _loadNewShops.unmodifiable(),
       updateShopsCallback,
       _onError,

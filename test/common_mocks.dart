@@ -29,6 +29,7 @@ import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
 @GenerateMocks([
@@ -56,6 +57,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
   ProductsObtainer,
   RoadsManager,
   RouteObserver,
+  ShopsCreationManager,
   ShopsManager,
   ShopsManagerListener,
   SuggestedProductsManager,
