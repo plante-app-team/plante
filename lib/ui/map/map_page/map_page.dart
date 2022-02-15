@@ -103,7 +103,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   late final UIValue<MapPageMode> _mode;
   late final _locationPermissionObtained = UIValue(false, ref);
 
-  var _mapController = Completer<GoogleMapController>();
+  final _mapController = Completer<GoogleMapController>();
   late final _displayedShopsMarkers = UIValue(<Marker>{}, ref);
   Iterable<Shop> _displayedShops = const [];
   late final ClusterManager _clusterManager;
