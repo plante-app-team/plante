@@ -30,6 +30,7 @@ class ShopType extends EnumClass {
   static const ShopType general = _$general;
   static const ShopType supermarket = _$supermarket;
   static const ShopType grocery = _$grocery;
+  static const ShopType wholesale = _$wholesale;
 
   static List<ShopType> valuesOrderedForUI = [
     ShopType.supermarket,
@@ -103,6 +104,8 @@ class ShopType extends EnumClass {
         return 'supermarket';
       case grocery:
         return 'grocery';
+      case wholesale:
+        return 'wholesale';
       default:
         throw Exception('Unknown shop type: $this');
     }
@@ -152,6 +155,8 @@ class ShopType extends EnumClass {
         return context.strings.shop_type_supermarket;
       case grocery:
         return context.strings.shop_type_grocery;
+      case wholesale:
+        return context.strings.shop_type_wholesale;
       default:
         throw Exception('Unknown shop type: $this');
     }

@@ -456,6 +456,10 @@
     "@shop_type_supermarket": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
     },
+    "shop_type_wholesale": "Wholesale",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
+    },
     "user_langs_widget_system_lang": "(System language)",
     "veg_status_displayed_not_vegan": "Not vegan",
     "veg_status_displayed_veg_status_source_community": "Info from community",
