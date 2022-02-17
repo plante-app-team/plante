@@ -120,6 +120,7 @@ class ShopsManagerBackendWorker {
       }
       shops[osmShop.osmUID] = shop;
     }
+    shops.removeWhere((key, value) => value.deleted);
     return shops;
   }
 

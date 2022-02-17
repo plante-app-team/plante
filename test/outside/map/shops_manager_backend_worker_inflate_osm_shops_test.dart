@@ -42,4 +42,21 @@ void main() {
         .inflateOsmShops(commons.someOsmShops.values.toList());
     expect(shopsRes.unwrapErr(), ShopsManagerError.OTHER);
   });
+
+  test('inflateOsmShops ignores shops marked as deleted', () async {
+    final someBackendShops = commons.someBackendShops.values.toList();
+    expect(someBackendShops.length, greaterThan(1));
+    someBackendShops[0] = someBackendShops[0].rebuild((e) => e.deleted = true);
+
+    when(backend.requestShopsByOsmUIDs(any))
+        .thenAnswer((_) async => Ok(someBackendShops));
+
+    final shopsRes = await shopsManagerBackendWorker
+        .inflateOsmShops(commons.someOsmShops.values.toList());
+
+    expect(shopsRes.unwrap(), isNot(equals(commons.someShops)));
+    final expectedShops = {...commons.someShops};
+    expectedShops.remove(someBackendShops[0].osmUID);
+    expect(shopsRes.unwrap(), equals(expectedShops));
+  });
 }

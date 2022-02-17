@@ -21,6 +21,8 @@ abstract class Shop implements Built<Shop, ShopBuilder> {
   OsmShop get osmShop;
   BackendShop? get backendShop;
 
+  bool get deleted => backendShop?.deleted ?? false;
+
   OsmUID get osmUID => osmShop.osmUID;
   String get name => osmShop.name;
   String? get typeStr => osmShop.type;

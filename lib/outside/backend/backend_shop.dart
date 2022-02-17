@@ -10,6 +10,11 @@ abstract class BackendShop implements Built<BackendShop, BackendShopBuilder> {
   OsmUID get osmUID;
   @BuiltValueField(wireName: 'products_count')
   int get productsCount;
+  @BuiltValueField(wireName: 'deleted')
+  bool get deleted;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _setDefaults(BackendShopBuilder b) => b.deleted = false;
 
   static BackendShop? fromJson(Map<String, dynamic> json) {
     return BuildValueHelper.jsonSerializers
