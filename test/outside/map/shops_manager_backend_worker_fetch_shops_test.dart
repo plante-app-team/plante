@@ -217,4 +217,33 @@ void main() {
         osmBounds: bounds, planteBounds: bounds);
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.OTHER));
   });
+
+  test('fetchShops ignores shops marked as deleted', () async {
+    final deletedShop = someBackendShops.values.first.osmUID;
+    someBackendShops[deletedShop] =
+        someBackendShops[deletedShop]!.rebuild((e) => e.deleted = true);
+    setUpShopsResponses(
+      osmShops: someOsmShops.values,
+      backendShops: someBackendShops.values,
+    );
+
+    final expectedShops = someOsmShops.map((key, value) => MapEntry(
+        key,
+        Shop((e) => e
+          ..osmShop.replace(value)
+          ..backendShop.replace(someBackendShops[key]!))));
+    expectedShops.removeWhere((key, value) => value.osmUID == deletedShop);
+    expect(expectedShops.length, equals(someOsmShops.length - 1));
+
+    final bounds = CoordsBounds(
+      southwest: Coord(lat: 0, lon: 0),
+      northeast: Coord(lat: 99999, lon: 99999),
+    );
+    final expectedFetchResult =
+        FetchedShops(expectedShops, const {}, bounds, someOsmShops, bounds);
+
+    final shopsRes = await shopsManagerBackendWorker.fetchShops(osm,
+        osmBounds: bounds, planteBounds: bounds);
+    expect(shopsRes.unwrap(), equals(expectedFetchResult));
+  });
 }

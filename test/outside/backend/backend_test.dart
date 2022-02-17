@@ -817,6 +817,11 @@ void main() {
               "1:8771781029" : {
                 "osm_uid" : "1:8771781029",
                 "products_count" : 2
+              },
+              "1:8771781030" : {
+                "osm_uid" : "1:8771781030",
+                "products_count" : 0,
+                "deleted" : true
               }
             },
             "barcodes" : {
@@ -832,15 +837,21 @@ void main() {
     expect(responseRes.isOk, isTrue);
 
     final response = responseRes.unwrap();
-    expect(response.shops.length, equals(2));
+    expect(response.shops.length, equals(3));
 
     final shop1 = response.shops['1:8711880917']!;
     final shop2 = response.shops['1:8771781029']!;
+    final shop3 = response.shops['1:8771781030']!;
     expect(shop1.productsCount, equals(1));
     expect(shop2.productsCount, equals(2));
+    expect(shop3.productsCount, equals(0));
+    expect(shop1.deleted, isFalse);
+    expect(shop2.deleted, isFalse);
+    expect(shop3.deleted, isTrue);
 
     expect(response.barcodes['1:8711880917'], equals(['123', '345']));
     expect(response.barcodes['1:8771781029'], equals(['678', '890']));
+    expect(response.barcodes['1:8771781030'], isNull);
   });
 
   test('requesting shops by bounds empty response', () async {

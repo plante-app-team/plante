@@ -24,6 +24,9 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
       'products_count',
       serializers.serialize(object.productsCount,
           specifiedType: const FullType(int)),
+      'deleted',
+      serializers.serialize(object.deleted,
+          specifiedType: const FullType(bool)),
     ];
 
     return result;
@@ -48,6 +51,10 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
           result.productsCount = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
           break;
+        case 'deleted':
+          result.deleted = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool;
+          break;
       }
     }
 
@@ -60,15 +67,21 @@ class _$BackendShop extends BackendShop {
   final OsmUID osmUID;
   @override
   final int productsCount;
+  @override
+  final bool deleted;
 
   factory _$BackendShop([void Function(BackendShopBuilder)? updates]) =>
       (new BackendShopBuilder()..update(updates)).build();
 
-  _$BackendShop._({required this.osmUID, required this.productsCount})
+  _$BackendShop._(
+      {required this.osmUID,
+      required this.productsCount,
+      required this.deleted})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(osmUID, 'BackendShop', 'osmUID');
     BuiltValueNullFieldError.checkNotNull(
         productsCount, 'BackendShop', 'productsCount');
+    BuiltValueNullFieldError.checkNotNull(deleted, 'BackendShop', 'deleted');
   }
 
   @override
@@ -83,19 +96,22 @@ class _$BackendShop extends BackendShop {
     if (identical(other, this)) return true;
     return other is BackendShop &&
         osmUID == other.osmUID &&
-        productsCount == other.productsCount;
+        productsCount == other.productsCount &&
+        deleted == other.deleted;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, osmUID.hashCode), productsCount.hashCode));
+    return $jf($jc($jc($jc(0, osmUID.hashCode), productsCount.hashCode),
+        deleted.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('BackendShop')
           ..add('osmUID', osmUID)
-          ..add('productsCount', productsCount))
+          ..add('productsCount', productsCount)
+          ..add('deleted', deleted))
         .toString();
   }
 }
@@ -112,13 +128,20 @@ class BackendShopBuilder implements Builder<BackendShop, BackendShopBuilder> {
   set productsCount(int? productsCount) =>
       _$this._productsCount = productsCount;
 
-  BackendShopBuilder();
+  bool? _deleted;
+  bool? get deleted => _$this._deleted;
+  set deleted(bool? deleted) => _$this._deleted = deleted;
+
+  BackendShopBuilder() {
+    BackendShop._setDefaults(this);
+  }
 
   BackendShopBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _osmUID = $v.osmUID;
       _productsCount = $v.productsCount;
+      _deleted = $v.deleted;
       _$v = null;
     }
     return this;
@@ -142,7 +165,9 @@ class BackendShopBuilder implements Builder<BackendShop, BackendShopBuilder> {
             osmUID: BuiltValueNullFieldError.checkNotNull(
                 osmUID, 'BackendShop', 'osmUID'),
             productsCount: BuiltValueNullFieldError.checkNotNull(
-                productsCount, 'BackendShop', 'productsCount'));
+                productsCount, 'BackendShop', 'productsCount'),
+            deleted: BuiltValueNullFieldError.checkNotNull(
+                deleted, 'BackendShop', 'deleted'));
     replace(_$result);
     return _$result;
   }
