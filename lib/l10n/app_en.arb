@@ -320,10 +320,6 @@
     },
     "settings_page_title": "Settings",
     "settings_page_your_id": "Your ID: ",
-    "settings_page_stores_settings_button": "Stores settings",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
-    },
     "settings_page_stores_settings_title": "Stores settings",
     "@settings_page_stores_settings_title": {
         "description": "Title of settings for stores"
@@ -339,6 +335,14 @@
     "settings_page_distance_in_miles": "Display distance in miles",
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "settings_page_help_and_feedback_title": "Help and feedback",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Contact or follow us:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
     },
     "shop_address_widget_possible_address": "Approximate address: ",
     "shop_card_add_product": "Add product",

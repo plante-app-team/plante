@@ -132,6 +132,12 @@ flutter:
     - assets/cancel_circle_light.svg
     - assets/cancel_circle.svg
     - assets/cancel.svg
+    - assets/contact_discord.png
+    - assets/contact_email.png
+    - assets/contact_facebook.png
+    - assets/contact_instagram.png
+    - assets/contact_telegram.png
+    - assets/contact_vk.png
     - assets/copy.svg
     - assets/directions.svg
     - assets/empty.svg
