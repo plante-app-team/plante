@@ -79,6 +79,7 @@ class _SettingsHelpAndFeedbackPageState
             ])),
         const SizedBox(height: 18),
       ]),
+      const SizedBox(height: 6),
       _Padding24(Stack(children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(context.strings.settings_page_your_id,
@@ -96,6 +97,7 @@ class _SettingsHelpAndFeedbackPageState
                 },
                 icon: SvgPicture.asset('assets/copy.svg'))),
       ])),
+      const SizedBox(height: 16),
       SettingsGeneralButton(
           text: context.strings.settings_page_send_logs,
           onTap: Log.startLogsSending),
@@ -187,12 +189,14 @@ class _ContactButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-        padding: EdgeInsets.zero,
-        onPressed: () {
-          launch(url);
-        },
-        icon: SizedBox(width: 38, height: 38, child: Image.asset(png)));
+    return Padding(
+        padding: const EdgeInsets.only(right: 6),
+        child: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              launch(url);
+            },
+            icon: SizedBox(width: 38, height: 38, child: Image.asset(png))));
   }
 }
 
