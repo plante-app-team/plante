@@ -60,6 +60,7 @@ class MapPageModel with ShopsManagerListener {
   late final UIValue<bool> _viewPortShopsFetched;
   CoordsBounds? _latestViewPort;
   CoordsBounds? _latestFetchedViewPort;
+  var _fetchingViewPort = false;
   late final UIValue<bool> _firstTerritoryLoadDone;
 
   Map<OsmUID, Shop> _shopsCache = {};
@@ -220,7 +221,12 @@ class MapPageModel with ShopsManagerListener {
 
   Future<void> _loadShopsImpl(CoordsBounds viewPort) async {
     final result = await _networkOperation(() async {
-      return await _shopsManager.fetchShops(viewPort);
+      try {
+        _fetchingViewPort = true;
+        return await _shopsManager.fetchShops(viewPort);
+      } finally {
+        _fetchingViewPort = false;
+      }
     });
     if (result.isOk) {
       _shopsCache = result.unwrap();
@@ -318,8 +324,10 @@ class MapPageModel with ShopsManagerListener {
 
   @override
   void onLocalShopsChange() {
-    /// Invalidating cache!
-    if (_latestFetchedViewPort != null) {
+    // Let's invalidate cache if a viewport was loaded before, and if
+    // a viewport is not being loaded right now - if it's being loaded right
+    // now, [_latestFetchedViewPort] has an outdated value.
+    if (_latestFetchedViewPort != null && !_fetchingViewPort) {
       // We expect the call to not go to network because
       // we use already fetched view port
       _loadShopsImpl(_latestFetchedViewPort!);
