@@ -178,6 +178,47 @@ void main() {
     expect(fakeShopsManager.calls_fetchShop().first, equals(initialViewPort));
   });
 
+  testWidgets(
+      'shops from the loaded viewport are not being reloaded while a new viewport is being loaded',
+      (WidgetTester tester) async {
+    // When a new viewport is being loaded it also modifies cache of ShopsManager,
+    // thus causing MapPageModel to get notified about local shops cache change.
+    // Such notifications _should not_ cause MapPageModel to reload the last loaded
+    // viewport, because it's outdated at this point - a new one is being loaded
+
+    await createModel(tester);
+
+    final preloadedBounds = CoordsBounds(
+        southwest: Coord(lat: 14, lon: 14), northeast: Coord(lat: 16, lon: 16));
+    fakeShopsManager.addPreloadedArea(preloadedBounds, shops.values);
+
+    // Initial load
+    fakeShopsManager.verify_fetchShops_called(times: 0);
+    final initialViewPort = CoordsBounds(
+        southwest: Coord(lat: 14.999, lon: 14.999),
+        northeast: Coord(lat: 15.001, lon: 15.001));
+    await model.onCameraIdle(initialViewPort);
+    await model.loadShops();
+    fakeShopsManager.verify_fetchShops_called();
+
+    // Viewport moved
+    final secondViewPort = CoordsBounds(
+        southwest: Coord(lat: 4.999, lon: 4.999),
+        northeast: Coord(lat: 5.001, lon: 5.001));
+    await model.onCameraIdle(secondViewPort);
+
+    fakeShopsManager.clear_verifiedCalls();
+    // NOTE: we don't add [secondViewPort] as a preloaded area to
+    // fakeShopsManager - we expect it to be loaded by the [loadShops] call
+    // and to modify cache of [fakeShopsManager].
+    await model.loadShops();
+    // Verify shops were fetched only once by the loadShops call
+    fakeShopsManager.verify_fetchShops_called(times: 1);
+    expect(fakeShopsManager.calls_fetchShop().first,
+        isNot(equals(initialViewPort)));
+    expect(fakeShopsManager.calls_fetchShop().first, equals(secondViewPort));
+  });
+
   testWidgets('loading == true until first onCameraIdle is handled',
       (WidgetTester tester) async {
     await createModel(tester);
