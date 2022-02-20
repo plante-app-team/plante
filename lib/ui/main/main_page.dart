@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
@@ -15,8 +16,9 @@ import 'package:plante/ui/profile/profile_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
 class MainPage extends PagePlante {
+  final GoogleMapController? mapControllerForTesting;
   static const PAGE_NAME = 'MainPage';
-  const MainPage({Key? key}) : super(key: key);
+  const MainPage({Key? key, this.mapControllerForTesting}) : super(key: key);
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -24,8 +26,10 @@ class MainPage extends PagePlante {
 
 class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   final _mapPageController = MapPageController();
-  late final _mapPage =
-      MapPage(key: const Key('main_map_page'), controller: _mapPageController);
+  late final _mapPage = MapPage(
+      key: const Key('main_map_page'),
+      controller: _mapPageController,
+      mapControllerForTesting: widget.mapControllerForTesting);
   final _barcodePage =
       BarcodeScanPage(key: const Key('main_barcode_scan_page'));
   final _profilePage = ProfilePage(key: const Key('main_profile_page'));
@@ -130,6 +134,8 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   }
 
   void _onPlusClick() async {
+    final shopsLoaded = _mapPageController.isViewportLoaded();
+
     final selected = await showMenuPlante(
         target: _plusButtonKey,
         context: context,
@@ -137,17 +143,18 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
         offsetFromTarget: 21,
         values: [
           context.strings.main_page_add_product,
-          context.strings.main_page_add_shop
+          if (shopsLoaded) context.strings.main_page_add_shop
         ],
         children: [
           Align(
               alignment: Alignment.centerRight,
               child: Text(context.strings.main_page_add_product,
                   style: TextStyles.headline2)),
-          Align(
-              alignment: Alignment.centerRight,
-              child: Text(context.strings.main_page_add_shop,
-                  style: TextStyles.headline2))
+          if (shopsLoaded)
+            Align(
+                alignment: Alignment.centerRight,
+                child: Text(context.strings.main_page_add_shop,
+                    style: TextStyles.headline2))
         ]);
     if (selected == context.strings.main_page_add_product) {
       _onAddProductClick();
