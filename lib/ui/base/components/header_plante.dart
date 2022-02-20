@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 class HeaderPlante extends StatelessWidget {
@@ -59,8 +58,8 @@ class HeaderPlante extends StatelessWidget {
         ));
   }
 
-  Widget _titleDefault(BuildContext context) => Text(
-        context.strings.global_app_name,
+  Widget _titleDefault(BuildContext context) => const Text(
+        'plante',
         style: TextStyles.branding,
       );
 }

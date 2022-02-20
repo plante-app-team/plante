@@ -31,6 +31,7 @@ import 'package:plante/ui/product/_veg_status_warning.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/moderator_comment_dialog.dart';
+import 'package:plante/ui/product/product_barcode_dialog.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 import 'package:plante/ui/product/product_photo_page.dart';
 import 'package:plante/ui/product/product_report_dialog.dart';
@@ -463,6 +464,15 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
     );
   }
 
+  void _onBarcodeClick() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ProductBarcodeDialog(product: _product);
+      },
+    );
+  }
+
   void _showVegStatusesExplanation() {
     showDialog<void>(
       context: context,
@@ -508,15 +518,22 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
   void _showProductMenu() async {
     final selected =
         await showMenuPlante(target: menuButtonKey, context: context, values: [
-      1
+      1,
+      2
     ], children: [
+      MenuItemPlante(
+        title: context.strings.display_product_page_barcode_btn,
+        description: context.strings.display_product_page_barcode_btn_descr,
+      ),
       MenuItemPlante(
         title: context.strings.display_product_page_report_btn,
         description: context.strings.product_report_dialog_title,
-      )
+      ),
     ]);
 
     if (selected == 1) {
+      _onBarcodeClick();
+    } else if (selected == 2) {
       _onReportClick();
     }
   }

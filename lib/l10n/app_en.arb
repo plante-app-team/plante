@@ -42,6 +42,14 @@
     "create_shop_page_what_type_new_shop_has": "Select store's type",
     "display_product_page_add_info_in_your_langs": "Add information",
     "display_product_page_adding_non_vegan_product": "Non-vegan products cannot be put on the map",
+    "display_product_page_barcode_btn": "Barcode",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "See and copy product's barcode",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
     "display_product_page_brand": "Brand: ",
     "display_product_page_click_to_help_with_veg_statuses": "I can help!",
     "display_product_page_ingredients": "Ingredients:",
@@ -105,8 +113,6 @@
     "external_auth_page_continue_with_apple": "Continue with Apple",
     "external_auth_page_google_email_not_verified": "Error: Google email is not verified",
     "external_auth_page_privacy_policy": "Privacy policy",
-    "global_add": "Add",
-    "global_app_name": "plante",
     "global_barcode": "Barcode",
     "global_cancel": "Cancel",
     "global_copied_to_clipboard": "Copied to clipboard",
@@ -120,12 +126,19 @@
     "global_network_error": "Network error - please check your internet connection",
     "global_no": "No",
     "global_oops_no": "Oops, no",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_open_app_settings": "Open app settings",
     "global_save": "Save",
     "global_send": "Send",
     "global_something_went_wrong": "Oops, something went wrong",
     "global_try_again": "Try again",
     "global_yes": "Yes",
+    "global_copy": "Copy",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
     "help_with_veg_status_page_title": "Help with vegan status",
     "image_crop_page_title": "Let's crop it!",
     "image_crop_page_error_small_image": "The image is too small",
@@ -294,7 +307,6 @@
         "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"
     },
     "product_report_dialog_report_sent": "Report sent",
-    "product_report_dialog_send": "Send",
     "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
     "profile_page_edit_profile": "Edit profile",
     "@profile_page_edit_profile": {

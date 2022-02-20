@@ -42,8 +42,7 @@ class _ProductReportDialogState extends State<ProductReportDialog> {
             maxLines: 5,
             controller: _reportTextController),
       ]),
-      actions: ButtonFilledPlante.withText(
-          context.strings.product_report_dialog_send,
+      actions: ButtonFilledPlante.withText(context.strings.global_send,
           onPressed: _reportSendAllowed && !_loading ? onSendClick : null),
     );
   }
