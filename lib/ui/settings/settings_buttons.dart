@@ -36,11 +36,13 @@ class SettingsCheckButton extends StatelessWidget {
           onChanged.call(!value);
         },
         child: Row(textDirection: TextDirection.rtl, children: [
-          CheckboxPlante(
-              value: value,
-              onChanged: (value) {
-                onChanged.call(value ?? false);
-              }),
+          SizedBox(
+              height: 16,
+              child: CheckboxPlante(
+                  value: value,
+                  onChanged: (value) {
+                    onChanged.call(value ?? false);
+                  })),
           Expanded(child: Text(text, style: _settingsCheckButton)),
         ]));
   }
@@ -63,7 +65,8 @@ class _SettingsButtonBase extends StatelessWidget {
         child: InkWell(
             onTap: onTap,
             child: Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24),
+                padding: const EdgeInsets.only(
+                    left: 24, right: 24, top: 16, bottom: 16),
                 child: child)));
   }
 }
