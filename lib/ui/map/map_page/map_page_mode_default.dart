@@ -135,7 +135,7 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         return const SizedBox();
       }
       return SizedBox(
-          height: MapFilterCheckButton.TOTAL_HEIGHT,
+          height: MapFilterCheckButton.HEIGHT,
           child: ListView(
               key: const Key('filter_listview'),
               scrollDirection: Axis.horizontal,
