@@ -33,6 +33,7 @@ import 'package:plante/outside/map/user_address/caching_user_address_pieces_obta
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -66,6 +67,7 @@ void main() {
   late FakeAnalytics analytics;
   late MockAddressObtainer addressObtainer;
   late FakeInputProductsLangStorage inputProductsLangStorage;
+  late ViewedProductsStorage viewedProductsStorage;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -155,6 +157,9 @@ void main() {
         FakeSharedPreferences().asHolder());
     GetIt.I.registerSingleton<ShopsCreationManager>(
         ShopsCreationManager(shopsManager));
+
+    viewedProductsStorage = ViewedProductsStorage();
+    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {
@@ -414,9 +419,12 @@ void main() {
       expect(analytics.wasEventSent('product_save_failure'), isFalse);
       expect(analytics.wasEventSent('product_save_shops_failure'), isFalse);
       expect(inputProductsLangStorage.selectedCode, equals(selectLang));
+      expect(
+          viewedProductsStorage.getProducts(), equals([expectedProductResult]));
     } else {
       expect(analytics.wasEventSent('product_save_success'), isFalse);
       expect(inputProductsLangStorage.selectedCode, equals(_DEFAULT_TEST_LANG));
+      expect(viewedProductsStorage.getProducts(), isEmpty);
     }
 
     return done;

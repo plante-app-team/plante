@@ -16,6 +16,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/components/add_photo_button_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
@@ -131,7 +132,8 @@ class _InitProductPageState extends PageStatePlante<InitProductPage>
         GetIt.I.get<PhotosTaker>(),
         analytics,
         GetIt.I.get<InputProductsLangStorage>(),
-        GetIt.I.get<UserLangsManager>());
+        GetIt.I.get<UserLangsManager>(),
+        GetIt.I.get<ViewedProductsStorage>());
     _ensureCacheDirExistence();
   }
 

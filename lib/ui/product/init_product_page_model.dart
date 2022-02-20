@@ -21,6 +21,7 @@ import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
+import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -62,6 +63,7 @@ class InitProductPageModel {
   final Analytics _analytics;
   final InputProductsLangStorage _inputProductsLangStorage;
   final UserLangsManager _userLangsManager;
+  final ViewedProductsStorage _viewedProductsStorage;
 
   Product get _initialProductFull => _initialProductRestorableFull.value;
   ProductLangSlice get _initialProductSlice =>
@@ -142,7 +144,8 @@ class InitProductPageModel {
       this._photosTaker,
       this._analytics,
       this._inputProductsLangStorage,
-      this._userLangsManager)
+      this._userLangsManager,
+      this._viewedProductsStorage)
       : _initialProductRestorableFull = ProductRestorable(initialProduct),
         _productSliceRestorable = ProductLangSliceRestorable(
             _inputProductsLangStorage.selectedCode != null
@@ -343,6 +346,7 @@ class InitProductPageModel {
       }
 
       _inputProductsLangStorage.selectedCode = langCode;
+      await _viewedProductsStorage.addProduct(savedProduct);
       _analytics
           .sendEvent('product_save_success', {'barcode': productSlice.barcode});
       Log.i('InitProductPageModel: saveProduct: success');
