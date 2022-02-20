@@ -290,11 +290,32 @@ void main() {
     await tester.enterText(
         find.byKey(const Key('report_text')), 'Bad, bad product!');
     await tester.pumpAndSettle();
-    await tester.tap(find.text(context.strings.product_report_dialog_send));
+    await tester.tap(find.text(context.strings.global_send));
     await tester.pumpAndSettle();
 
     verify(userReportsMaker.reportProduct('123', 'Bad, bad product!'))
         .called(1);
+  });
+
+  testWidgets('copy barcode', (WidgetTester tester) async {
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..veganStatus = VegStatus.negative
+      ..veganStatusSource = VegStatusSource.moderator
+      ..ingredientsText = 'Water, salt, sugar').buildSingleLangProduct();
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    await tester.superTap(find.byKey(const Key('options_button')));
+    await tester
+        .superTap(find.text(context.strings.display_product_page_barcode_btn));
+
+    await tester.superTap(find.text(context.strings.global_copy));
+
+    // NOTE: we don't test the actual content of the clipboard - the
+    // clipboard package doesn't really like tests.
   });
 
   testWidgets('viewed product is stored persistently',
