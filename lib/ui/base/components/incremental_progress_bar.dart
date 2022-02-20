@@ -121,6 +121,8 @@ class _IncrementalProgressBarState extends State<IncrementalProgressBar>
     if (_progressIndex == 0) {
       prevProgress = 0.0;
       _progressAnimationController
+          .removeStatusListener(_nextProgressAnimationStarter);
+      _progressAnimationController
           .addStatusListener(_nextProgressAnimationStarter);
     } else {
       prevProgress = _progressAnimation.value;
