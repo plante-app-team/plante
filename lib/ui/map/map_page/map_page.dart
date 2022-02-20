@@ -56,6 +56,7 @@ enum MapPageRequestedMode {
 class MapPageController {
   VoidCallback? _startStoreCreation;
   VoidCallback? _switchToDefaultMode;
+  ResCallback<bool>? _isViewportLoaded;
 
   /// Note: the map will switch to the default mode after store creation
   /// is finished (or canceled).
@@ -65,6 +66,10 @@ class MapPageController {
 
   void switchToDefaultMode() {
     _switchToDefaultMode?.call();
+  }
+
+  bool isViewportLoaded() {
+    return _isViewportLoaded?.call() ?? false;
   }
 }
 
@@ -233,6 +238,8 @@ class _MapPageState extends PageStatePlante<MapPage>
       switchModeCallback
           .call(MapPageModeCreateShop(_mode.cachedVal.params, nextMode));
     };
+    widget.controller?._isViewportLoaded =
+        () => _model.viewPortShopsLoaded.cachedVal;
 
     _asyncInit();
     _instances.add(this);

@@ -86,6 +86,12 @@ void main() {
         .registerSingleton<UserContributionsManager>(userContributionsManager);
   });
 
+  Future<void> forceMapIdleState(WidgetTester tester) async {
+    final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
+    mapPage.onMapIdleForTesting();
+    await tester.pumpAndSettle();
+  }
+
   Widget currentPage() {
     final stack = find
         .byKey(const Key('main_pages_stack'))
@@ -154,7 +160,9 @@ void main() {
   });
 
   testWidgets('plus button: add a store', (WidgetTester tester) async {
-    final context = await tester.superPump(const MainPage());
+    final context = await tester.superPump(
+        MainPage(mapControllerForTesting: mapTestsCommons.mapController));
+    await forceMapIdleState(tester);
 
     // Force switch from the map page
     await tester.superTap(find.byKey(const Key('bottom_bar_barcode')));
@@ -209,7 +217,9 @@ void main() {
     GetIt.I.unregister<ShopsCreationManager>();
     GetIt.I.registerSingleton<ShopsCreationManager>(mockShopsCreationManager);
 
-    final context = await tester.superPump(const MainPage());
+    final context = await tester.superPump(
+        MainPage(mapControllerForTesting: mapTestsCommons.mapController));
+    await forceMapIdleState(tester);
 
     // Add FAB
     await tester.superTap(find.byKey(const Key('bottom_bar_plus_fab')));
@@ -236,7 +246,9 @@ void main() {
 
   testWidgets('plus button: click Add a Store twice in a row',
       (WidgetTester tester) async {
-    final context = await tester.superPump(const MainPage());
+    final context = await tester.superPump(
+        MainPage(mapControllerForTesting: mapTestsCommons.mapController));
+    await forceMapIdleState(tester);
 
     // Force switch from the map page
     await tester.superTap(find.byKey(const Key('bottom_bar_barcode')));
@@ -263,7 +275,9 @@ void main() {
 
   testWidgets('plus button: add a store is canceled when pages are switched',
       (WidgetTester tester) async {
-    final context = await tester.superPump(const MainPage());
+    final context = await tester.superPump(
+        MainPage(mapControllerForTesting: mapTestsCommons.mapController));
+    await forceMapIdleState(tester);
 
     // Force switch from the map page
     await tester.superTap(find.byKey(const Key('bottom_bar_barcode')));
@@ -291,6 +305,27 @@ void main() {
     // We expect the shops creation mode to be canceled by pages switching
     expect(find.text(context.strings.map_page_click_where_new_shop_located),
         findsNothing);
+  });
+
+  testWidgets(
+      'plus button: add a store item is not available until shops are loaded',
+      (WidgetTester tester) async {
+    final context = await tester.superPump(
+        MainPage(mapControllerForTesting: mapTestsCommons.mapController));
+
+    // No Add Store button
+    await tester.superTap(find.byKey(const Key('bottom_bar_plus_fab')));
+    expect(find.text(context.strings.main_page_add_shop), findsNothing);
+
+    // Idle state means the shops are loaded
+    await forceMapIdleState(tester);
+
+    // Close the popup
+    await tester.superTap(find.byKey(const Key('bottom_bar_map')));
+
+    // Not there is an Add Store button
+    await tester.superTap(find.byKey(const Key('bottom_bar_plus_fab')));
+    expect(find.text(context.strings.main_page_add_shop), findsWidgets);
   });
 
   testWidgets('viewed products are not requested implicitly',
