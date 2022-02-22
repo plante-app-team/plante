@@ -199,6 +199,7 @@ extension ModeratorChoiceReasonExt on ModeratorChoiceReason {
   bool get printWarningOnProduct {
     return [
       ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM,
+      ModeratorChoiceReason.SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS,
     ].contains(this);
   }
 }

@@ -124,6 +124,8 @@ void main() {
     };
     expectations[ModeratorChoiceReason.NON_VEGAN_PRACTICES_BUT_HELPS_VEGANISM] =
         true;
+    expectations[ModeratorChoiceReason
+        .SOME_OF_PRODUCT_SERIES_HAVE_NON_VEGAN_INGREDIENTS] = true;
 
     _ensureAllReasonsHandled(expectations.keys);
 
