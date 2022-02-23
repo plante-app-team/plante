@@ -1,13 +1,14 @@
 {
-    "global_app_name": "Plante",
     "global_something_went_wrong": "Oops, noe gikk galt",
     "global_network_error": "Nettverksfeil - sjekk Internett-tilkoblingen din",
     "global_copied_to_clipboard": "Kopier til utklippstavle",
-    "global_add": "Legg til",
     "global_done": "Ferdig",
     "global_cancel": "Avbryt",
     "global_no": "Nei",
     "global_oops_no": "Oops, nei",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_yes": "Ja",
     "global_give_permission": "Gi tillatelse",
     "global_open_app_settings": "Åpne app instillinger",
@@ -155,7 +156,6 @@
     "display_product_page_off_licence": "Data fra Open Food Facts",
     "display_product_page_adding_non_vegan_product": "Ikke-veganske produkter kan ikke bli lagt til på kartet",
     "product_report_dialog_title": "Vennligst gi oss beskjed om du tror produktinformasjonen bør redigeres eller utvides",
-    "product_report_dialog_send": "Send",
     "product_report_dialog_report_sent": "Rapport sendt",
     "veg_status_selection_panel_positive": "Ja",
     "veg_status_selection_panel_negative": "Nei",
@@ -431,10 +431,6 @@
     "map_page_loading_suggested_products_hint_v2": "Søker etter produkter i nærheten",
     "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Produktet har tvetydige ingredienser som ofte er ikke-veganske. Produsenten svarte ikke på forespørselen vår eller nektet å gi nødvendige avklaringer.",
     "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Produktet har tvetydige ingredienser. Produsenten svarte ikke på forespørselen vår eller nektet å gi nødvendige avklaringer.",
-    "settings_page_stores_settings_button": "Butikk instillinger",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
-    },
     "settings_page_stores_settings_title": "Butikk instillinger",
     "@settings_page_stores_settings_title": {
         "description": "Title of settings for stores"
@@ -442,5 +438,23 @@
     "settings_page_show_products_radius_suggestions": "Vis produkter sett i andre butikker med samme navn i nærheten",
     "@settings_page_show_products_radius_suggestions": {
         "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_off_suggestions": "Vis produkter sett i andre butikker med samme navn i samme land",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "global_miles": "mi",
+    "@global_miles": {
+        "description": "==metric system users == \nMiles should NOT be translated to kilometers. It's for people using the app in a different language, but still wanting to use their non-metric system",
+        "type": "text"
+    },
+    "global_feet": "ft",
+    "@global_feet": {
+        "description": "==metric system users == \nFeet should NOT be translated to meters. It's for people using the app in a different language, but still wanting to use their non-metric system",
+        "type": "text"
+    },
+    "settings_page_distance_in_miles": "Vis avstand i miles",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
     }
 }

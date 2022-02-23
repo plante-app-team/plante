@@ -106,8 +106,6 @@
     "external_auth_page_continue_with_apple": "Weiter mit Apple",
     "external_auth_page_google_email_not_verified": "Fehler: Google E-mail wurde nicht verifiziert",
     "external_auth_page_privacy_policy": "Datenschutzerklärung",
-    "global_add": "Hinzufügen",
-    "global_app_name": "plante",
     "global_barcode": "Strichcode",
     "global_cancel": "Abbrechen",
     "global_copied_to_clipboard": "In Zwischenablage gespeichert",
@@ -119,6 +117,9 @@
     "global_network_error": "Netzwerkfehler - bitte überprüfen Sie Ihre Internetverbindung",
     "global_no": "Nein",
     "global_oops_no": "Ups, nein",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_open_app_settings": "App-Einstellungen öffnen",
     "global_save": "Speichern",
     "global_send": "Senden",
@@ -265,7 +266,6 @@
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Einige Produktserien enthalten nicht-vegane Inhaltsstoffe, andere nicht - bitte lesen Sie die Inhaltsstoffe sorgfältig!",
     "mod_reason_tested_on_animals": "An Tieren getestetes Produkt",
     "product_report_dialog_report_sent": "Bericht gesendet",
-    "product_report_dialog_send": "Senden",
     "product_report_dialog_title": "Bitte teilen Sie uns mit, wenn Sie der Meinung sind, dass die Produktinformationen bearbeitet oder erweitert werden müssen",
     "products_history_widget_no_history_hint": "Hier können Sie Produkte sehen, die Sie angesehen oder gescannt haben",
     "@products_history_widget_no_history_hint": {

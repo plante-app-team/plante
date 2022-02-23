@@ -39,6 +39,14 @@
     "create_shop_page_what_type_new_shop_has": "Укажите тип магазина",
     "display_product_page_add_info_in_your_langs": "Добавить информацию",
     "display_product_page_adding_non_vegan_product": "Невеганские продукты нельзя добавлять в магазины",
+    "display_product_page_barcode_btn": "Штрихкод",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Посмотреть и скопировать штрихкод",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
     "display_product_page_brand": "Бренд: ",
     "display_product_page_click_to_help_with_veg_statuses": "Хочу помочь!",
     "display_product_page_ingredients": "Состав:",
@@ -102,11 +110,13 @@
     "external_auth_page_continue_with_apple": "Войти с Apple",
     "external_auth_page_google_email_not_verified": "Ошибка: Google-почта не подтверждена",
     "external_auth_page_privacy_policy": "Политика конфиденциальности",
-    "global_add": "Добавить",
-    "global_app_name": "plante",
     "global_barcode": "Штрихкод",
     "global_cancel": "Отмена",
     "global_copied_to_clipboard": "Скопировано в буфер обмена",
+    "global_copy": "Копировать",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
     "global_done": "Готово",
     "global_done_thanks": "Готово! Спасибо!",
     "global_feet": "фут.",
@@ -117,6 +127,9 @@
     "global_network_error": "Сетевая ошибка - пожалуйста, проверьте подключение к интернету",
     "global_no": "Нет",
     "global_oops_no": "Ой, нет",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_open_app_settings": "Открыть настройки",
     "global_save": "Сохранить",
     "global_send": "Отправить",
@@ -151,6 +164,9 @@
     "init_user_page_done_button_title": "Готово",
     "init_user_page_langs_explanation": "Выберите языки, которые вы знаете — некоторые продукты продаются во многих странах, и поэтому их упаковки могут быть на разных языках",
     "init_user_page_next_button_title": "Далее",
+    "ios_NSCameraUsageDescription": "С помощью камеры вы сможете сканировать штрихкоды и делать фотографии новых продуктов",
+    "ios_NSLocationWhenInUseUsageDescription": "Используя ваше местоположение, мы сможем найти магазины поблизости!",
+    "ios_NSPhotoLibraryUsageDescription": "Приложению требуется доступ к вашей библиотеке, чтобы загружать фото продуктов",
     "lang_ar": "Арабский",
     "lang_be": "Белорусский",
     "lang_bg": "Болгарский",
@@ -270,8 +286,19 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "В составе имеются неоднозначные ингредиенты (могут быть как веганскими, так и невеганскими, в зависимости от конкретного способа производства)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "В некоторых партиях продуктов возможно присутствие невеганских ингредиентов — внимательно читайте состав!",
     "mod_reason_tested_on_animals": "Продукт тестируется на животных",
+    "pick_existing_shop_page_create_shop_button": "Создать новый магазин",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Магазина нет в списке?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_title": "Поблизости есть несколько магазинов - может, нужный магазин уже есть среди них?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
     "product_report_dialog_report_sent": "Жалоба отправлена",
-    "product_report_dialog_send": "Отправить",
     "product_report_dialog_title": "Напишите нам, если вам кажется, что информация требует редактирования или дополнения",
     "products_history_widget_no_history_hint": "Здесь будут просмотренные и отсканированные вами продукты",
     "@products_history_widget_no_history_hint": {
@@ -297,6 +324,14 @@
     },
     "settings_page_erase_user_data": "Очистить данные и выйти",
     "settings_page_general": "Общее",
+    "settings_page_help_and_feedback_contacts_title": "Связь с нами:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "settings_page_help_and_feedback_title": "Помощь и обратная связь",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
     "settings_page_langs_i_know": "Языки, которые я знаю",
     "settings_page_open_cache_settings": "Управление кешем приложения",
     "settings_page_send_logs": "Отправить логи",
@@ -310,10 +345,6 @@
     "settings_page_show_products_radius_suggestions": "Показать продукты, которые видели в других магазинах с таким же названием поблизости",
     "@settings_page_show_products_radius_suggestions": {
         "description": "A checkmark in the app settings"
-    },
-    "settings_page_stores_settings_button": "Настройки магазинов",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
     },
     "settings_page_stores_settings_title": "Настройки магазинов",
     "@settings_page_stores_settings_title": {
@@ -331,7 +362,7 @@
     "shop_card_open_shop_products": "Открыть список продуктов",
     "shop_card_products_listed": "Есть продукты",
     "shop_product_range_page_add_product": "Добавить продукт",
-    "shop_product_range_page_confirmed_products_country": "Продукты, замеченные в этом магазине другими пользователями Plante",
+    "shop_product_range_page_confirmed_products_country": "Продукты, замеченные в этом магазине пользователями Plante",
     "@shop_product_range_page_confirmed_products_country": {
         "description": "A title of sections of products in a screen of a store. The products in the section were put into this store by other users of Plante."
     },
@@ -436,6 +467,10 @@
     "shop_type_supermarket": "Супермаркет",
     "@shop_type_supermarket": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
+    "shop_type_wholesale": "Оптовый магазин",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
     },
     "user_langs_widget_system_lang": "(Системный язык)",
     "veg_status_displayed_not_vegan": "Не веганский",

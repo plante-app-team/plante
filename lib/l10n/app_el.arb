@@ -3,7 +3,7 @@
     "barcode_scan_page_add_product": "Προσθήκη προϊόντος",
     "barcode_scan_page_camera_permission_cancel_settings": "Κρατήστε την άδεια χρήσης της κάμερας απενεργοποιημένη",
     "barcode_scan_page_camera_permission_go_to_settings": "Άνοιγμα μέσω των ρυθμίσεων",
-    "barcode_scan_page_camera_permission_reasoning": "Για τη χρήση του barcode scanner η εφαρμογή χρειάζεται άδεια χρήσης κάμερας.",
+    "barcode_scan_page_camera_permission_reasoning": "Για τη χρήση του barcode scanner η εφαρμογή χρειάζεται άδεια χρήσης κάμερας",
     "barcode_scan_page_camera_permission_reasoning_settings": "Για τη χρήση του barcode scanner η εφαρμογή χρειάζεται άδεια χρήσης κάμερας. Μπορείτε να δώσετε άδεια μέσω των ρυθμίσεων της εφαρμογής",
     "barcode_scan_page_camera_permission_title": "Το Plante χρειάζεται πρόσβαση στην κάμερα",
     "barcode_scan_page_invalid_barcode": "Μη έγκυρο barcode",
@@ -39,6 +39,14 @@
     "create_shop_page_what_type_new_shop_has": "Επιλέξτε τύπο καταστήματος",
     "display_product_page_add_info_in_your_langs": "Προσθήκη πληροφοριών",
     "display_product_page_adding_non_vegan_product": "Μη-vegan συστατικά δεν επιτρέπεται να μπουν στο χάρτη",
+    "display_product_page_barcode_btn": "Barcode",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Προβολή και αντιγραφή barcode",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
     "display_product_page_brand": "Μάρκα: ",
     "display_product_page_click_to_help_with_veg_statuses": "Μπορώ να βοηθήσω!",
     "display_product_page_ingredients": "Συστατικά:",
@@ -102,11 +110,13 @@
     "external_auth_page_continue_with_apple": "Συνέχεια με λογ/μό Apple",
     "external_auth_page_google_email_not_verified": "Σφάλμα: Το Google email δεν είναι επιβεβαιωμένο",
     "external_auth_page_privacy_policy": "Πολιτική απορρήτου",
-    "global_add": "Προσθήκη",
-    "global_app_name": "Plante",
     "global_barcode": "Barcode",
     "global_cancel": "Ακύρωση",
     "global_copied_to_clipboard": "Αντιγράφηκε στο clipboard",
+    "global_copy": "Αντιγραφή",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
     "global_done": "ΟΚ",
     "global_done_thanks": "Έγινε! Σας ευχαριστούμε!",
     "global_feet": "ft",
@@ -117,6 +127,9 @@
     "global_network_error": "Σφάλμα δικτύου - παρακαλώ ελέγξτε τη σύνδεσή σας στο διαδίκτυο",
     "global_no": "Όχι",
     "global_oops_no": "Ουπς, όχι",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_open_app_settings": "Άνοιγμα ρυθμίσεων εφαρμογής",
     "global_save": "Αποθήκευση",
     "global_send": "Αποστολή",
@@ -151,6 +164,9 @@
     "init_user_page_done_button_title": "ΟΚ",
     "init_user_page_langs_explanation": "Επιλέξτε τις γλώσσες που γνωρίζετε - κάποια προϊόντα πωλούνται σε πολλές χώρες και ενδέχεται να έχουν συσκευασία με διαφορετικές γλώσσες",
     "init_user_page_next_button_title": "Επόμενο",
+    "ios_NSCameraUsageDescription": "Δίνοντας πρόσβαση στην κάμερα μπορείτε να σκανάρετε barcodes ώστε να βρείτε προϊόντα, και να τραβήξετε φωτογραφίες νέων προϊόντων",
+    "ios_NSLocationWhenInUseUsageDescription": "Χρησιμοποιώντας την τοποθεσία σας μπορούμε να βρούμε κοντινά καταστήματα!",
+    "ios_NSPhotoLibraryUsageDescription": "Η εφαρμογή χρειάζεται πρόσβαση στη βιβλιοθήκη σας για τη μεταφόρτωση φωτογραφιών προϊόντων",
     "lang_ar": "Αραβικά",
     "lang_be": "Λευκορωσικά",
     "lang_bg": "Βουλγαρικά",
@@ -233,7 +249,7 @@
     "map_page_location_permission_go_to_settings": "Ενεργοποίηση μέσω των ρυθμίσεων",
     "map_page_location_permission_reasoning_settings": "Το Plante λειτουργεί καλύτερα με τις Υπηρεσίες Τοποθεσίας ενεργοποιημένες. Θα λαμβάνετε ενημερώσεις για καταστήματα στην περιοχή σας",
     "map_page_location_permission_title": "Υπηρεσίες Τοποθεσίας",
-    "map_page_no_shops_hint_in_select_shops_mode": "Δε γνωριζουμε κανένα κοντινό κατάστημα. Μπορείτε να προσθέσετε ένα καινούργιο κάνοντας κλικ στο κυκλικό κουμπί με τον σταυρό στα δεξιά",
+    "map_page_no_shops_hint_in_select_shops_mode": "Δε γνωριζουμε κανένα κοντινό κατάστημα. Μπορείτε να προσθέσετε ένα καινούργιο κάνοντας κλικ στο κυκλικό κουμπί με τον σταυρό στα δεξιά!",
     "map_page_no_shops_hint3": "Δεν υπάρχουν ακόμα καταστήματα σε αυτή την περιοχή. Μετακινήστε τον χάρτη ή αλλάξτε κάποιο από τα παραπάνω φίλτρα.",
     "@map_page_no_shops_hint3": {
         "description": "A bottom hint on the Map Page, shown when there are no visible stores."
@@ -274,8 +290,19 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Το προϊόν περιέχει διφορούμενα συστατικά (μπορεί να είναι vegan ή όχι, ανάλογα με τον τρόπο κατασκευής)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Κάποια από τα προϊόντα περιέχουν μη-vegan συστατικά και κάποια όχι - παρακαλώ διαβάστε προσεκτικά τα συστατικά!",
     "mod_reason_tested_on_animals": "Προϊόν που δοκιμάστηκε σε ζώα",
+    "pick_existing_shop_page_create_shop_button": "Προσθήκη νέου καταστήματος",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Το κατάστημα δεν είναι στη λίστα;",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_title": "Υπάρχουν ήδη κάποια κοντινά καταστήματα – μήπως ψάχνετε ένα από αυτά;",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
     "product_report_dialog_report_sent": "Η αναφορά εστάλη",
-    "product_report_dialog_send": "Αποστολή",
     "product_report_dialog_title": "Παρακαλούμε ενημερώστε μας αν πιστεύετε πως οι πληροφορίες του προϊόντος πρέπει να επεξεργαστούν",
     "products_history_widget_no_history_hint": "Εδώ θα βρείτε προἱόντα που έχετε δει ή σκανάρει",
     "@products_history_widget_no_history_hint": {
@@ -301,6 +328,14 @@
     },
     "settings_page_erase_user_data": "Καθαρισμός δεδομένων χρήστη και έξοδος",
     "settings_page_general": "Γενικές ρυθμίσεις",
+    "settings_page_help_and_feedback_contacts_title": "Επικοινωνήστε μαζί μας ή ακολουθήστε μας:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "settings_page_help_and_feedback_title": "Βοήθεια και επικοινωνία",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
     "settings_page_langs_i_know": "Οι γλώσσες μου",
     "settings_page_open_cache_settings": "Διαχείριση μνήμης cache",
     "settings_page_send_logs": "Αποστολή logs",
@@ -314,10 +349,6 @@
     "settings_page_show_products_radius_suggestions": "Προϊόντα που βρέθηκαν σε άλλα ομώνυμα κοντινά καταστήματα",
     "@settings_page_show_products_radius_suggestions": {
         "description": "A checkmark in the app settings"
-    },
-    "settings_page_stores_settings_button": "Ρυθμίσεις καταστημάτων",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
     },
     "settings_page_stores_settings_title": "Ρυθμίσεις καταστημάτων",
     "@settings_page_stores_settings_title": {
@@ -440,6 +471,10 @@
     "shop_type_supermarket": "Σουπερμάρκετ",
     "@shop_type_supermarket": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
+    "shop_type_wholesale": "Χονδρική",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
     },
     "user_langs_widget_system_lang": "(Γλώσσα συστήματος)",
     "veg_status_displayed_not_vegan": "Δεν είναι vegan",
