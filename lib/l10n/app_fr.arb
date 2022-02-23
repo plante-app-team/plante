@@ -1,13 +1,14 @@
 {
-    "global_app_name": "plante",
     "global_something_went_wrong": "Oups, quelque chose s'est mal passé",
     "global_network_error": "Erreur de réseau - vérifiez votre connexion Internet",
     "global_copied_to_clipboard": "Copié dans le presse-papier",
-    "global_add": "Ajouter",
     "global_done": "Fini",
     "global_cancel": "Annuler",
     "global_no": "Non",
     "global_oops_no": "Oups, non",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_yes": "Oui",
     "global_give_permission": "Donner la permission",
     "global_open_app_settings": "Ouvrir les paramètres de l'application",
@@ -155,7 +156,6 @@
     "display_product_page_off_licence": "Données provenant d'Open Food Facts",
     "display_product_page_adding_non_vegan_product": "Les produits non vegan ne peuvent pas être ajoutés sur la carte",
     "product_report_dialog_title": "Laissez-nous savoir si vous pensez que les informations du produit nécessitent d'être modifiées ou approfondies",
-    "product_report_dialog_send": "Envoyer",
     "product_report_dialog_report_sent": "Signalement envoyé",
     "veg_status_selection_panel_positive": "Oui",
     "veg_status_selection_panel_negative": "Non",
@@ -431,10 +431,6 @@
     "map_page_loading_suggested_products_hint_v2": "Recherche de produits aux alentours",
     "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Le produit contient des ingrédients ambigus qui sont très souvent non vegan. Le fabricant du produit n'a pas répondu à notre demande ou a refusé de nous fournir les clarifications nécessaires.",
     "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Le produit contient des ingrédients ambigus. Le fabricant du produit n'a pas répondu à notre demande ou a refusé de nous fournir les clarifications nécessaires.",
-    "settings_page_stores_settings_button": "Paramètres des magasins",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
-    },
     "settings_page_stores_settings_title": "Paramètres des magasins",
     "@settings_page_stores_settings_title": {
         "description": "Title of settings for stores"
@@ -446,5 +442,50 @@
     "settings_page_show_products_off_suggestions": "Montrer les produits vus dans d'autres magasins avec le même nom dans le même pays",
     "@settings_page_show_products_off_suggestions": {
         "description": "A checkmark in the app settings"
-    }
+    },
+    "global_miles": "mi",
+    "global_feet": "ft",
+    "settings_page_distance_in_miles": "Afficher les distance en milles",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "display_product_page_barcode_btn": "Code-barres",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Voir et copier le code-barres du produit",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "global_copy": "Copier",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
+    "pick_existing_shop_page_title": "Il y a des magasins alentours - peut-être que le nouveau magasin est déjà parmi eux ?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Le magasin n'est pas dans la liste ?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_create_shop_button": "Créer un nouveau magasin",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "settings_page_help_and_feedback_title": "Aide et commentaires",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Contactez-nous ou suivez-nous :",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "shop_type_wholesale": "Commerce de gros",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
+    },
+    "ios_NSCameraUsageDescription": "Donner l'accès à la caméra vous permet de scanner des codes-barres pour chercher des produits et de prendre des photos pour ajouter de nouveaux produits",
+    "ios_NSLocationWhenInUseUsageDescription": "Vous pouvez trouver des magasins proches en activant la géolocalisation !",
+    "ios_NSPhotoLibraryUsageDescription": "Cette application a besoin de l'accès à votre galerie pour charger des photos de produits"
 }

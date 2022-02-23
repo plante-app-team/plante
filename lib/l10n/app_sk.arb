@@ -1,13 +1,14 @@
 {
-    "global_app_name": "plante",
     "global_something_went_wrong": "Oops, niečo sa pokazilo",
     "global_network_error": "Problem s pripojením - prosím skontrolujte svoje internetové pripojenie",
     "global_copied_to_clipboard": "Skopírovať do schránky",
-    "global_add": "Pridať",
     "global_done": "Hotovo",
     "global_cancel": "Zrušiť",
     "global_no": "Nie",
     "global_oops_no": "Oops, nie",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_yes": "Áno",
     "global_give_permission": "Dať povolenie",
     "global_open_app_settings": "Otvoriť nastavenia aplikácie",
@@ -163,7 +164,6 @@
     "display_product_page_off_licence": "Údaje z Open Food Facts",
     "display_product_page_adding_non_vegan_product": "Nevegánske výrobky nemôžu byť umiestnené na mape",
     "product_report_dialog_title": "Ak si myslíte, že informácie o produkte je potrebné upraviť alebo rozšíriť, dajte nám prosím vedieť.",
-    "product_report_dialog_send": "Odoslať",
     "product_report_dialog_report_sent": "Správa odoslaná",
     "veg_status_selection_panel_positive": "Áno",
     "veg_status_selection_panel_negative": "Nie",
@@ -439,10 +439,6 @@
     "map_page_loading_suggested_products_hint_v2": "Vyhľadávanie produktov v okolí",
     "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Výrobok má nejednoznačné zložky, ktoré veľmi často nie sú vegánske. Výrobca výrobku na našu žiadosť nereagoval alebo odmietol poskytnúť potrebné vysvetlenia.",
     "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Výrobok má nejednoznačné zložky. Výrobca výrobku na našu žiadosť nereagoval alebo odmietol poskytnúť potrebné vysvetlenia.",
-    "settings_page_stores_settings_button": "ukladá nastavenia",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
-    },
     "settings_page_stores_settings_title": "ukladá nastavenia",
     "@settings_page_stores_settings_title": {
         "description": "Title of settings for stores"
@@ -454,5 +450,50 @@
     "settings_page_show_products_off_suggestions": "Zobraziť produkty videné v iných obchodoch s rovnakým názvom v rovnakej krajine.",
     "@settings_page_show_products_off_suggestions": {
         "description": "A checkmark in the app settings"
-    }
+    },
+    "global_miles": "mi",
+    "global_feet": "ft",
+    "settings_page_distance_in_miles": "Zobraziť vzdialenosť v míľach",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "display_product_page_barcode_btn": "Čiarový kód",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Pozrite si a skopírujte čiarový kód produktu",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "global_copy": "kopírovať",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
+    "pick_existing_shop_page_title": "V blízkosti sú nejaké obchody - možno je medzi nimi už aj nový obchod?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Obchod nie je v zozname?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_create_shop_button": "Vytvorte nový obchod",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "settings_page_help_and_feedback_title": "Pomoc a spätná väzba",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Kontaktujte nás alebo nás sledujte:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "shop_type_wholesale": "Veľkoobchod",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
+    },
+    "ios_NSCameraUsageDescription": "Vďaka prístupu k fotoaparátu môžete skenovať čiarové kódy a vyhľadávať produkty a fotografovať a pridávať nové produkty",
+    "ios_NSLocationWhenInUseUsageDescription": "Pri používaní vašej polohy môžeme nájsť obchody v okolí!",
+    "ios_NSPhotoLibraryUsageDescription": "Táto aplikácia potrebuje prístup do vašej knižnice, aby mohla nahrávať obrázky produktov"
 }

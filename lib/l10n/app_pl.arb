@@ -39,6 +39,14 @@
     "create_shop_page_what_type_new_shop_has": "Wybierz rodzaj sklepu",
     "display_product_page_add_info_in_your_langs": "Dodaj informacje",
     "display_product_page_adding_non_vegan_product": "Niewegańskie produkty nie mogą być dodane do mapy",
+    "display_product_page_barcode_btn": "Kod kreskowy",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Zobacz i skopiuj kod kreskowy produktu",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
     "display_product_page_brand": "Marka: ",
     "display_product_page_click_to_help_with_veg_statuses": "Mogę z tym pomóc!",
     "display_product_page_ingredients": "Składniki:",
@@ -102,11 +110,13 @@
     "external_auth_page_continue_with_apple": "Kontynuuj z Apple",
     "external_auth_page_google_email_not_verified": "Błąd: email Google nie został zweryfikowany",
     "external_auth_page_privacy_policy": "Polityka prywatności",
-    "global_add": "Dodaj",
-    "global_app_name": "plante",
     "global_barcode": "Kod kreskowy",
     "global_cancel": "Anuluj",
     "global_copied_to_clipboard": "Skopiowano do schowka",
+    "global_copy": "Skopiuj",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
     "global_done": "Gotowe",
     "global_done_thanks": "Gotowe! Dziękujemy!",
     "global_feet": "ft",
@@ -117,6 +127,9 @@
     "global_network_error": "Błąd sieci – sprawdź swoje połączenie",
     "global_no": "Nie",
     "global_oops_no": "Ups, nie",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
     "global_open_app_settings": "Otwórz ustawienia aplikacji",
     "global_save": "Zapisz",
     "global_send": "Wyślij",
@@ -151,6 +164,9 @@
     "init_user_page_done_button_title": "Gotowe",
     "init_user_page_langs_explanation": "Wybierz języki, które znasz – niektóre produkty są sprzedawane w wielu krajach i mogą mieć opakowania w różnych językach",
     "init_user_page_next_button_title": "Dalej",
+    "ios_NSCameraUsageDescription": "Dzięki dostępu do aparatu, możesz skanować kody kreskowe, aby wyszukiwać produkty i robić zdjęcia, aby dodać nowe produkty",
+    "ios_NSLocationWhenInUseUsageDescription": "Używając twojej lokalizacji możemy znaleźć sklepy w twojej okolicy!",
+    "ios_NSPhotoLibraryUsageDescription": "Aplikacja potrzebuje dostępu do twojej pamięci, aby przekazywać zdjęcia produktów",
     "lang_ar": "arabski",
     "lang_be": "białoruski",
     "lang_bg": "bułgarki",
@@ -274,8 +290,19 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Produkt zawiera niejednoznaczne składniki (niejednoznaczne składniki mogą być wegańskie lub niewegańskie w zależności od sposobu ich produkcji)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Niektóre produkty tej serii mają niewegańskie składniki, a niektóre nie – przeczytaj dokładnie skład!",
     "mod_reason_tested_on_animals": "Produkt testowany na zwierzętach",
+    "pick_existing_shop_page_create_shop_button": "Dodaj nowy sklep",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Sklep nie jest na liście?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_title": "W pobliży jest kilka sklepów – może nowy sklep jest jednym z nich?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
     "product_report_dialog_report_sent": "Raport wysłany",
-    "product_report_dialog_send": "Wyślij",
     "product_report_dialog_title": "Daj nam znać, jeśli myślisz, że informacje o produkcie powinny być edytowane lub rozbudowane",
     "products_history_widget_no_history_hint": "Tutaj zobaczysz produkty, które oglądałeś i skanowałeś",
     "@products_history_widget_no_history_hint": {
@@ -301,6 +328,14 @@
     },
     "settings_page_erase_user_data": "Wyczyść dane użytkownika i wyjdź",
     "settings_page_general": "Główne",
+    "settings_page_help_and_feedback_contacts_title": "Skonktaktuj się z nami lub obserwuj nas:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "settings_page_help_and_feedback_title": "Pomoc i opinie",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
     "settings_page_langs_i_know": "Moje języki",
     "settings_page_open_cache_settings": "Zarządzaj pamięcią podręczną aplikacji",
     "settings_page_send_logs": "Wyślij logi",
@@ -314,10 +349,6 @@
     "settings_page_show_products_radius_suggestions": "Pokaż produkty z taką samą nazwą, widziane w pobliskich sklepach",
     "@settings_page_show_products_radius_suggestions": {
         "description": "A checkmark in the app settings"
-    },
-    "settings_page_stores_settings_button": "Ustawienia sklepów",
-    "@settings_page_stores_settings_button": {
-        "description": "A button which opens settings for stores"
     },
     "settings_page_stores_settings_title": "Ustawienia sklepów",
     "@settings_page_stores_settings_title": {
@@ -440,6 +471,10 @@
     "shop_type_supermarket": "Supermarket",
     "@shop_type_supermarket": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
+    "shop_type_wholesale": "Sprzedaż hurtowa",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
     },
     "user_langs_widget_system_lang": "(Język systemu)",
     "veg_status_displayed_not_vegan": "Niewegański",
