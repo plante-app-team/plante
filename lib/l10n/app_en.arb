@@ -13,7 +13,6 @@
     "barcode_scan_page_product_not_found": "Product not found",
     "barcode_scan_page_product_not_found_descr": "We don't have enough data about product <PRODUCT> yet, but you can help the community by adding it",
     "barcode_scan_page_scan_product": "Start scanning",
-    "barcode_scan_page_searching_product": "Searching product ",
     "contributed_by_user_products_widget_no_products_hint": "Here you will see products you've added to the map or to the app",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +30,6 @@
     "country_no": "Norway",
     "country_pl": "Poland",
     "country_pt": "Portugal",
-    "country_ru": "Russia",
     "country_se": "Sweden",
     "create_shop_page_how_new_shop_is_called": "What is the name of the store?",
     "create_shop_page_how_new_shop_is_called_hint": "Spar",
@@ -118,7 +116,6 @@
     "global_copied_to_clipboard": "Copied to clipboard",
     "global_done": "Done",
     "global_done_thanks": "Done! Thank you!",
-    "global_give_permission": "Give permission",
     "global_kilometers": "km",
     "global_miles": "mi",
     "global_feet": "ft",
@@ -149,8 +146,6 @@
     "init_product_page_brand_optional": "Brand (optional)",
     "init_product_page_camera_permission_reasoning_settings": "To take pictures of a product please give the camera permission to the app in the app settings",
     "init_product_page_cancel_adding_product_q": "Cancel product creation?",
-    "init_product_page_categories_hint": "Pie, bakery product",
-    "init_product_page_categories_optional": "Categories (optional)",
     "init_product_page_delete_photo_q": "Delete photo?",
     "init_product_page_is_it_vegan": "Is product vegan?",
     "init_product_page_lang_title": "Product packaging language",
@@ -219,10 +214,6 @@
     "map_page_cancel_shop_creation_q": "Cancel new store creation?",
     "map_page_click_on_shop_where_product_sold": "Click the store marker, where the product is being sold",
     "map_page_click_where_new_shop_located": "Click where the new store is located",
-    "map_page_filter_empty_shops2": "Only empty stores",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_all_shops": "All stores",
     "map_page_filter_not_empty_shops2": "Only stores with products",
     "@map_page_filter_not_empty_shops2": {
@@ -322,8 +313,6 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Clear map cache and exit",
     "settings_cache_page_title": "App cache",
-    "settings_page_erase_user_data": "Clear user data and exit",
-    "settings_page_general": "General",
     "settings_page_langs_i_know": "My languages",
     "settings_page_open_cache_settings": "Manage app cache",
     "settings_page_send_logs": "Send logs",
