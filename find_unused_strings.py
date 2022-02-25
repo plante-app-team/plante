@@ -18,6 +18,7 @@ def main(argv):
   parser.add_argument('--strings-file', default='lib/l10n/app_en.arb')
   parser.add_argument('--project-root', default='.')
   parser.add_argument('--ignored-prefixes', nargs='*', default=['ios_NS'])
+  parser.add_argument('--fail-if-found', action='store_true')
   options = parser.parse_args()
 
   strings_used_in_code = extract_strings_from_dir_recursive(options.project_root)
@@ -32,7 +33,9 @@ def main(argv):
   if difference:
     print('Unused strings:')
     for string in difference:
-      print(string)
+      print('  {}'.format(string))
+    if options.fail_if_found:
+      sys.exit('ERROR: Found unused Flutter strings')
 
 def extract_strings_from_str(string: str):
   result = set()
