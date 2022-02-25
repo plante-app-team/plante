@@ -15,6 +15,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Ensure no unused strings
+        run: python find_unused_strings.py --fail-if-found
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
         with:
