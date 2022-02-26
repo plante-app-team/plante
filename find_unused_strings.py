@@ -17,7 +17,7 @@ def main(argv):
     description='Find unused strings')
   parser.add_argument('--strings-file', default='lib/l10n/app_en.arb')
   parser.add_argument('--project-root', default='.')
-  parser.add_argument('--ignored-prefixes', nargs='*', default=['ios_NS'])
+  parser.add_argument('--ignored-prefixes', nargs='*', default=['ios_NS', 'app_markets'])
   parser.add_argument('--fail-if-found', action='store_true')
   options = parser.parse_args()
 
