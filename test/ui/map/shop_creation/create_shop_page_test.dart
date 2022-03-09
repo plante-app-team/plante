@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -114,5 +116,45 @@ void main() {
         name: anyNamed('name'),
         coord: anyNamed('coord'),
         type: anyNamed('type')));
+  });
+
+  testWidgets(
+      'only 1 shop is created when the done button is clicked many times with slow network',
+      (WidgetTester tester) async {
+    final context = await tester.superPump(CreateShopPage(shopCoord: coord));
+
+    await tester.superEnterText(
+        find.byKey(const Key('new_shop_name_input')), 'Sparta');
+    await tester.superTap(find.byKey(const Key('shop_type_dropdown')));
+    await tester.superTapDropDownItem(ShopType.deli.localize(context));
+
+    final completer = Completer<Shop>();
+    when(shopsManager.createShop(
+            name: anyNamed('name'),
+            coord: anyNamed('coord'),
+            type: anyNamed('type')))
+        .thenAnswer((invc) async {
+      return Ok(await completer.future);
+    });
+
+    await tester.superTap(find.text(context.strings.global_done));
+    await tester.superTap(find.text(context.strings.global_done));
+    await tester.superTap(find.text(context.strings.global_done));
+
+    completer.complete(Shop((e) => e
+      ..osmShop.replace(OsmShop((e) => e
+        ..osmUID = OsmUID.parse('1:${randInt(100, 500)}')
+        ..longitude = 123
+        ..latitude = 321
+        ..name = 'Sparta'))
+      ..backendShop.replace(BackendShop((e) => e
+        ..osmUID = OsmUID.parse('1:${randInt(100, 500)}')
+        ..productsCount = 0))));
+
+    verify(shopsManager.createShop(
+            name: anyNamed('name'),
+            coord: anyNamed('coord'),
+            type: anyNamed('type')))
+        .called(1);
   });
 }
