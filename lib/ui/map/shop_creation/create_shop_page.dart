@@ -11,9 +11,12 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/input_field_plante.dart';
+import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
+import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 
 class CreateShopPage extends PagePlante {
   final Coord shopCoord;
@@ -26,7 +29,8 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
   final ShopsManager _shopsManager;
   final AddressObtainer _addressObtainer;
   final _textController = TextEditingController();
-  ShopType? _shopType;
+  late final _shopType = UIValue<ShopType?>(null, ref);
+  late final _loading = UIValue(false, ref);
 
   _CreateShopPageState()
       : _shopsManager = GetIt.I.get<ShopsManager>(),
@@ -94,20 +98,17 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
           padding: const EdgeInsets.only(left: 26, right: 26),
           child: SizedBox(
               width: double.infinity,
-              child: DropdownPlante<ShopType>(
-                key: const Key('shop_type_dropdown'),
-                value: _shopType,
-                values: ShopType.valuesOrderedForUI,
-                onChanged: (newValue) {
-                  setState(() {
-                    _shopType = newValue;
-                  });
-                },
-                dropdownItemBuilder: (shopType) => DropdownMenuItem<ShopType>(
-                  value: shopType,
-                  child: Text(shopType.localize(context)),
-                ),
-              ))),
+              child: consumer((ref) => DropdownPlante<ShopType>(
+                    key: const Key('shop_type_dropdown'),
+                    value: _shopType.watch(ref),
+                    values: ShopType.valuesOrderedForUI,
+                    onChanged: _shopType.setValue,
+                    dropdownItemBuilder: (shopType) =>
+                        DropdownMenuItem<ShopType>(
+                      value: shopType,
+                      child: Text(shopType.localize(context)),
+                    ),
+                  )))),
       Expanded(
           child: Align(
               alignment: Alignment.bottomCenter,
@@ -116,33 +117,51 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 24, right: 24, bottom: 24),
-                      child: ButtonFilledPlante.withText(
-                          context.strings.global_done,
-                          onPressed: _isInputOk() ? _onAddPressed : null)))))
+                      child: consumer((ref) {
+                        final shopType = _shopType.watch(ref);
+                        final loading = _loading.watch(ref);
+                        return ButtonFilledPlante.withText(
+                            context.strings.global_done,
+                            onPressed: !loading && _isInputOk(shopType)
+                                ? _onAddPressed
+                                : null);
+                      }))))),
     ]);
-    return Scaffold(body: SafeArea(child: content));
+    return Scaffold(
+        body: SafeArea(
+            child: Stack(children: [
+      content,
+      consumer((ref) => _loading.watch(ref)
+          ? const LinearProgressIndicatorPlante()
+          : const SizedBox()),
+    ])));
   }
 
-  bool _isInputOk() {
-    return _textController.text.trim().length >= 3 && _shopType != null;
+  bool _isInputOk(ShopType? shopType) {
+    return _textController.text.trim().length >= 3 && shopType != null;
   }
 
   void _onAddPressed() async {
-    final result = await _shopsManager.createShop(
-      name: _textController.text.trim(),
-      type: _shopType!,
-      coord: widget.shopCoord,
-    );
-    if (result.isOk) {
-      showSnackBar(context.strings.map_page_shop_added_to_map, context,
-          SnackBarStyle.MAP_ACTION_DONE);
-      Navigator.of(context).pop(result.unwrap());
-    } else {
-      if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
-        showSnackBar(context.strings.global_network_error, context);
+    try {
+      _loading.setValue(true);
+      final result = await _shopsManager.createShop(
+        name: _textController.text.trim(),
+        type: _shopType.cachedVal!,
+        coord: widget.shopCoord,
+      );
+      if (result.isOk) {
+        showSnackBar(context.strings.map_page_shop_added_to_map, context,
+            SnackBarStyle.MAP_ACTION_DONE);
+        Navigator.of(context).pop(result.unwrap());
       } else {
-        showSnackBar(context.strings.global_something_went_wrong, context);
+        if (result.unwrapErr() == ShopsManagerError.NETWORK_ERROR) {
+          showSnackBar(context.strings.global_network_error, context);
+        } else {
+          showSnackBar(context.strings.global_something_went_wrong, context);
+        }
       }
+    } finally {
+      _loading.setValue(false);
     }
   }
 }
