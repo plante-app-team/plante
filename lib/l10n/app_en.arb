@@ -518,5 +518,9 @@
     "app_markets_screenshot_new_product_page": "Improve the app together with us",
     "@app_markets_screenshot_new_product_page": {
         "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_keywords": "Vegan, food, stores, shops, groceries",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
     }
 }
