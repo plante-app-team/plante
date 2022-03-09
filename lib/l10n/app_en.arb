@@ -478,7 +478,49 @@
     "veg_status_selection_panel_negative": "No",
     "veg_status_selection_panel_positive": "Yes",
 
-    "ios_NSCameraUsageDescription": "With camera access you can scan barcodes to search for products and take pictures to add new products",
-    "ios_NSLocationWhenInUseUsageDescription" : "While using your location we can find nearby shops!",
-    "ios_NSPhotoLibraryUsageDescription" : "This app needs access to your library to upload pictures of products"
+    "ios_NSCameraUsageDescription": "With camera access you can scan products' barcodes to see detailed information and take pictures to add new products",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
+    "ios_NSLocationWhenInUseUsageDescription": "With access to your device's location location we can find nearby stores!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
+    "ios_NSPhotoLibraryUsageDescription": "This app needs access to your library to upload pictures of products",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
+
+    "app_markets_app_name": "Plante - vegan groceries map",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Find vegan groceries near you!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_long_description": "With Plante you can find vegan food products in your town and worldwide. You can not only find nearby grocery stores but also see which vegan products are sold there. \n\nPlante is a community-based app. Join us by adding your favorite products to the map and help others discover something delicious!\n\nWant an easy way to check if a product is vegan? Scan its barcode and Plante will tell you! \n\nSee things that could be improved? Missing something? We are a small team working on enthusiasm, get in touch with us on Facebook (https://www.facebook.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_screenshot_map_page": "Find and put products to the map",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Scan products’ barcodes to see if they are vegan",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "See detailed info about products",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Improve the app together with us",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_keywords": "Vegan, food, stores, shops, groceries",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    }
 }
