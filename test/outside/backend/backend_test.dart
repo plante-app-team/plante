@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/contributions/user_contribution.dart';
@@ -18,6 +20,8 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/news/news_data_response.dart';
+import 'package:plante/outside/backend/news/news_piece.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -1243,6 +1247,173 @@ void main() {
           UserContributionType.PRODUCT_ADDED_TO_SHOP,
           UserContributionType.SHOP_CREATED
         ].map((e) => e.persistentCode.toString())));
+  });
+
+  test('news_data', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    httpClient.setResponse('.*news_data.*page=0.*', '''
+         {
+           "last_page": false,
+           "results": [
+             {
+               "id": 1,
+               "lat": 1.1,
+               "lon": 1.2,
+               "creator_user_id": "user1",
+               "creation_time": 123456,
+               "type": 1,
+               "data": {
+                 "barcode": "654321",
+                 "shop_uid": "1:123321"
+               }
+             },
+             {
+               "id": 2,
+               "lat": 1.3,
+               "lon": 1.4,
+               "creator_user_id": "user2",
+               "creation_time": 123455,
+               "type": 1,
+               "data": {
+                 "barcode": "654322",
+                 "shop_uid": "1:123322"
+               }
+             }
+           ]
+         }
+         ''');
+    httpClient.setResponse('.*news_data.*page=1.*', '''
+         {
+           "last_page": true,
+           "results": [
+             {
+               "id": 3,
+               "lat": 1.5,
+               "lon": 1.6,
+               "creator_user_id": "user3",
+               "creation_time": 123454,
+               "type": 1,
+               "data": {
+                 "barcode": "654323",
+                 "shop_uid": "1:123323"
+               }
+             }
+           ]
+         }
+         ''');
+    httpClient.setResponse('.*news_data.*page=2.*', '''
+         {
+           "last_page": true,
+           "results": []
+         }
+         ''');
+
+    var result = await backend.requestNews(
+        CoordsBounds(
+            southwest: Coord(lat: 1, lon: 1), northeast: Coord(lat: 2, lon: 2)),
+        page: 0);
+    expect(
+        result.unwrap(),
+        equals(NewsDataResponse((e) => e
+          ..lastPage = false
+          ..results.addAll([
+            NewsPiece((e) => e
+              ..serverId = 1
+              ..lat = 1.1
+              ..lon = 1.2
+              ..creatorUserId = 'user1'
+              ..creationTimeSecs = 123456
+              ..typeCode = 1
+              ..data = MapBuilder({
+                'barcode': JsonObject('654321'),
+                'shop_uid': JsonObject('1:123321')
+              })),
+            NewsPiece((e) => e
+              ..serverId = 2
+              ..lat = 1.3
+              ..lon = 1.4
+              ..creatorUserId = 'user2'
+              ..creationTimeSecs = 123455
+              ..typeCode = 1
+              ..data = MapBuilder({
+                'barcode': JsonObject('654322'),
+                'shop_uid': JsonObject('1:123322')
+              })),
+          ]))));
+
+    result = await backend.requestNews(
+        CoordsBounds(
+            southwest: Coord(lat: 1, lon: 1), northeast: Coord(lat: 2, lon: 2)),
+        page: 1);
+    expect(
+        result.unwrap(),
+        equals(NewsDataResponse((e) => e
+          ..lastPage = true
+          ..results.addAll([
+            NewsPiece((e) => e
+              ..serverId = 3
+              ..lat = 1.5
+              ..lon = 1.6
+              ..creatorUserId = 'user3'
+              ..creationTimeSecs = 123454
+              ..typeCode = 1
+              ..data = MapBuilder({
+                'barcode': JsonObject('654323'),
+                'shop_uid': JsonObject('1:123323')
+              })),
+          ]))));
+
+    result = await backend.requestNews(
+        CoordsBounds(
+            southwest: Coord(lat: 1, lon: 1), northeast: Coord(lat: 2, lon: 2)),
+        page: 2);
+    expect(result.unwrap(), equals(NewsDataResponse((e) => e.lastPage = true)));
+  });
+
+  test('news_data invalid json', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    httpClient.setResponse('.*news_data.*', '''
+         {
+           "last_page": true,
+           "results": [[[[[[[[[[
+             {
+               "id": 3,
+               "lat": 1.5,
+               "lon": 1.6,
+               "creator_user_id": "user3",
+               "creation_time": 123454,
+               "type": 1,
+               "data": {
+                 "barcode": "654323",
+                 "shop_uid": "1:123323"
+               }
+             }
+           ]
+         }
+         ''');
+
+    final result = await backend.requestNews(
+        CoordsBounds(
+            southwest: Coord(lat: 1, lon: 1), northeast: Coord(lat: 2, lon: 2)),
+        page: 0);
+    expect(result.unwrapErr().errorKind, BackendErrorKind.INVALID_JSON);
+  });
+
+  test('news_data network error', () async {
+    final httpClient = FakeHttpClient();
+    final backend = Backend(analytics, await _initUserParams(), httpClient);
+
+    httpClient.setResponseException('.*news_data.*', const SocketException(''));
+    final result = await backend.requestNews(
+        CoordsBounds(
+            southwest: Coord(lat: 1, lon: 1), northeast: Coord(lat: 2, lon: 2)),
+        page: 0);
+    expect(
+        result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
 }
 

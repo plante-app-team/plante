@@ -1,4 +1,5 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
 import 'package:plante/contributions/user_contribution.dart';
@@ -16,6 +17,9 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/news/news_data_response.dart';
+import 'package:plante/outside/backend/news/news_piece.dart';
+import 'package:plante/outside/backend/news/news_piece_product_at_shop.dart';
 import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
@@ -48,13 +52,20 @@ part 'build_value_helper.g.dart';
   UserLangs,
   ShopsInBoundsResponse,
   UserContribution,
+  NewsPiece,
+  NewsPiece,
+  NewsPieceProductAtShop,
+  NewsDataResponse,
 ])
 final Serializers _serializers = _$_serializers;
 final _jsonSerializers = (_serializers.toBuilder()
       ..add(OsmUIDBuildValueSerializer())
       ..addPlugin(StandardJsonPlugin())
       ..addBuilderFactory(const FullType(BuiltList, [FullType(Ingredient)]),
-          () => ListBuilder<Ingredient>()))
+          () => ListBuilder<Ingredient>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap, [FullType(String), FullType(JsonObject)]),
+          () => MapBuilder<String, JsonObject>()))
     .build();
 
 class BuildValueHelper {

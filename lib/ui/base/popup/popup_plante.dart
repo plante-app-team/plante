@@ -3,15 +3,16 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/ui/base/popup/pseudo_popup_menu_item.dart';
 
 enum PlantePopupPosition {
-  BELOW_TARGET,
-  ABOVE_TARGET,
+  BOTTOM_LEFT,
+  TOP_LEFT,
+  TOP_RIGHT,
 }
 
 Future<T?> showMenuPlante<T>(
     {required GlobalKey target,
     required BuildContext context,
     required List<T> values,
-    PlantePopupPosition position = PlantePopupPosition.BELOW_TARGET,
+    PlantePopupPosition position = PlantePopupPosition.BOTTOM_LEFT,
     double offsetFromTarget = 0,
     required List<Widget> children}) async {
   assert(values.length == children.length);
@@ -45,7 +46,7 @@ Future<void> showCustomPopUp(
   return await _showPopupPlante(
     target: target,
     context: context,
-    position: PlantePopupPosition.BELOW_TARGET,
+    position: PlantePopupPosition.BOTTOM_LEFT,
     offsetFromTarget: offsetFromTarget,
     items: [
       PseudoPopupMenuItem(child: child),
@@ -69,21 +70,27 @@ Future<T?> _showPopupPlante<T>({
 
   final RelativeRect rectPosition;
   switch (position) {
-    case PlantePopupPosition.BELOW_TARGET:
+    case PlantePopupPosition.BOTTOM_LEFT:
       rectPosition = RelativeRect.fromLTRB(
           targetPosition.dx - targetBox.size.width,
           targetPosition.dy + targetBox.size.height + offsetFromTarget,
           targetPosition.dx,
           targetPosition.dy + targetBox.size.height + offsetFromTarget);
       break;
-    case PlantePopupPosition.ABOVE_TARGET:
-      const systemPopupVerticalPaddings = 17; // Approximate
-      final height = systemPopupVerticalPaddings +
-          items.map((e) => e.height).reduce((lhs, rhs) => lhs + rhs);
+    case PlantePopupPosition.TOP_LEFT:
+      final height = _calculateItemsHeight(items);
       rectPosition = RelativeRect.fromLTRB(
           targetPosition.dx - targetBox.size.width,
           targetPosition.dy - height - offsetFromTarget,
           targetPosition.dx,
+          targetPosition.dy - height - offsetFromTarget);
+      break;
+    case PlantePopupPosition.TOP_RIGHT:
+      final height = _calculateItemsHeight(items);
+      rectPosition = RelativeRect.fromLTRB(
+          targetPosition.dx,
+          targetPosition.dy - height - offsetFromTarget,
+          targetPosition.dx + targetBox.size.width,
           targetPosition.dy - height - offsetFromTarget);
       break;
   }
@@ -94,4 +101,11 @@ Future<T?> _showPopupPlante<T>({
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     items: items,
   );
+}
+
+double _calculateItemsHeight(List<PopupMenuEntry<dynamic>> items) {
+  const systemPopupVerticalPaddings = 17; // Approximate
+  final height = systemPopupVerticalPaddings +
+      items.map((e) => e.height).reduce((lhs, rhs) => lhs + rhs);
+  return height;
 }

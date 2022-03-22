@@ -7,6 +7,8 @@ import 'package:plante/model/coords_bounds.dart';
 /// Very similar to the LatLng class from Google libs,
 /// **BUT** tails are being cut to certain precision - [lat] and [lon] will
 /// have up to [precision] digits after the dot.
+/// **AND** if the cut tail is 9 in period (999..), the value is rounded to the
+/// next integer (e.g. 1.999 => 2.000).
 ///
 /// Also, this class has some additional methods.
 @immutable
@@ -26,7 +28,18 @@ class Coord {
     final scaledBack = rounded / factor;
     // scaledBack=1.23400
     // 1.23456=>1.23400
-    return scaledBack;
+
+    final minWithGivenPrecision = (1 / factor) * scaledBack.sign;
+    // =0.001
+    final scaledBackPlusMin = scaledBack + minWithGivenPrecision;
+    // 1.23400=>1.23500
+    if (scaledBackPlusMin.toInt() != scaledBack.toInt()) {
+      // if scaledBack=1.999, scaledBackPlusMin would be 2.000
+      return scaledBackPlusMin;
+    } else {
+      // if scaledBack=1.998, scaledBackPlusMin would be 1.999
+      return scaledBack;
+    }
   }
 
   /// Creates a geographical location specified in degrees [lat] and

@@ -129,6 +129,7 @@ flutter:
     - assets/bottom_bar_map.svg
     - assets/bottom_bar_plus.svg
     - assets/bottom_bar_profile.svg
+    - assets/bottom_bar_news_feed.svg
     - assets/cancel_circle_light.svg
     - assets/cancel_circle.svg
     - assets/cancel.svg
