@@ -24,6 +24,7 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
+import 'package:plante/outside/backend/news/news_data_response.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
@@ -364,6 +365,29 @@ class Backend {
     return Ok(BackendShop((e) => e
       ..osmUID = OsmUID.parse(json['osm_uid'] as String)
       ..productsCount = 0));
+  }
+
+  Future<Result<NewsDataResponse, BackendError>> requestNews(
+      CoordsBounds bounds,
+      {required int page}) async {
+    final jsonRes = await _backendGetJson('/news_data/', {
+      'north': '${bounds.north}',
+      'south': '${bounds.south}',
+      'west': '${bounds.west}',
+      'east': '${bounds.east}',
+      'page': '$page'
+    });
+    if (jsonRes.isErr) {
+      return Err(jsonRes.unwrapErr());
+    }
+    final json = jsonRes.unwrap();
+
+    try {
+      return Ok(NewsDataResponse.fromJson(json)!);
+    } catch (e) {
+      Log.w('Invalid news_data response: $json', ex: e);
+      return Err(BackendError.invalidDecodedJson(json));
+    }
   }
 
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {

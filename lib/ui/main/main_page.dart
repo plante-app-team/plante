@@ -12,6 +12,7 @@ import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
+import 'package:plante/ui/news/news_feed_page.dart';
 import 'package:plante/ui/profile/profile_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 
@@ -32,6 +33,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
       mapControllerForTesting: widget.mapControllerForTesting);
   final _barcodePage =
       BarcodeScanPage(key: const Key('main_barcode_scan_page'));
+  final _newsFeedPage = const NewsFeedPage(key: Key('main_news_feed_page'));
   final _profilePage = ProfilePage(key: const Key('main_profile_page'));
 
   final _plusButtonKey = GlobalKey();
@@ -53,16 +55,19 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
     _pagesIcons = {
       _mapPage: 'assets/bottom_bar_map.svg',
       _barcodePage: 'assets/bottom_bar_barcode.svg',
+      _newsFeedPage: 'assets/bottom_bar_news_feed.svg',
       _profilePage: 'assets/bottom_bar_profile.svg',
     };
     _pagesButtonsKeys = {
       _mapPage: const Key('bottom_bar_map'),
       _barcodePage: const Key('bottom_bar_barcode'),
+      _newsFeedPage: const Key('bottom_bar_news_feed'),
       _profilePage: const Key('bottom_bar_profile'),
     };
     _pages = UIValue([
       _mapPage,
       _barcodePage,
+      _newsFeedPage,
       _profilePage,
     ], ref);
   }
@@ -102,19 +107,23 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   Widget _bottomBar() {
     return consumer((ref) {
       final pages = _pages.watch(ref);
+      final middle = (pages.length / 2).round();
+      final pages1 = pages.sublist(0, middle);
+      final pages2 = pages.sublist(middle, pages.length);
+      final pageToButtons = (Widget page) {
+        final index = pages.indexOf(page);
+        return IconButton(
+            key: _pagesButtonsKeys[page],
+            onPressed: () {
+              _switchPageTo(pageIndex: index);
+            },
+            icon: SvgPicture.asset(_pagesIcons[page]!,
+                color: index == _selectedPage.value
+                    ? ColorsPlante.primary
+                    : ColorsPlante.grey));
+      };
       final children = [
-        ...pages.map((page) {
-          final index = pages.indexOf(page);
-          return IconButton(
-              key: _pagesButtonsKeys[page],
-              onPressed: () {
-                _switchPageTo(pageIndex: index);
-              },
-              icon: SvgPicture.asset(_pagesIcons[page]!,
-                  color: index == _selectedPage.value
-                      ? ColorsPlante.primary
-                      : ColorsPlante.grey));
-        }).toList(),
+        ...pages1.map(pageToButtons).toList(),
         Container(
             key: const Key('bottom_bar_plus_fab'),
             child: FabPlante(
@@ -128,6 +137,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
               ),
               onPressed: _onPlusClick,
             )),
+        ...pages2.map(pageToButtons).toList(),
       ];
       return BottomBarPlante(children: children);
     });
@@ -139,7 +149,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
     final selected = await showMenuPlante(
         target: _plusButtonKey,
         context: context,
-        position: PlantePopupPosition.ABOVE_TARGET,
+        position: PlantePopupPosition.TOP_RIGHT,
         offsetFromTarget: 21,
         values: [
           context.strings.main_page_add_product,
@@ -147,12 +157,12 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
         ],
         children: [
           Align(
-              alignment: Alignment.centerRight,
+              alignment: Alignment.center,
               child: Text(context.strings.main_page_add_product,
                   style: TextStyles.headline2)),
           if (shopsLoaded)
             Align(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 child: Text(context.strings.main_page_add_shop,
                     style: TextStyles.headline2))
         ]);

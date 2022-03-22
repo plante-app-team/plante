@@ -64,4 +64,22 @@ void main() {
     expect(square.south, closeTo(40, 0.00001));
     expect(square.west, closeTo(165, 0.00001));
   });
+
+  test('coord 9s-tail transformation', () async {
+    final coord1 = Coord(lat: 1.998, lon: 1.998, precision: 3);
+    final coord2 = Coord(lat: 1.9998, lon: 1.9998, precision: 3);
+    final coord3 = Coord(lat: 2, lon: 2, precision: 3);
+    expect(coord1, isNot(equals(coord2)));
+    expect(coord1, isNot(equals(coord3)));
+    expect(coord2, equals(coord3));
+  });
+
+  test('negative coord 9s-tail transformation', () async {
+    final coord1 = Coord(lat: -1.998, lon: -1.998, precision: 3);
+    final coord2 = Coord(lat: -1.9998, lon: -1.9998, precision: 3);
+    final coord3 = Coord(lat: -2, lon: -2, precision: 3);
+    expect(coord1, isNot(equals(coord2)));
+    expect(coord1, isNot(equals(coord3)));
+    expect(coord2, equals(coord3));
+  });
 }
