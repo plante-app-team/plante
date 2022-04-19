@@ -136,7 +136,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                 );
               },
               child: Padding(
-                  padding: EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: _ProductAtShopNewsPieceWidget(product, shop,
                       _uiAddressesObtainer.requestAddressOf(shop))));
           break;
