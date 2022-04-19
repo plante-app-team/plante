@@ -27,6 +27,8 @@ class NewsFeedManager {
       return Err(backendNewsRes.unwrapErr().toGeneral());
     }
     final backendNews = backendNewsRes.unwrap();
-    return Ok(backendNews.results.toList());
+    final results = backendNews.results.toList();
+    results.sort((a, b) => b.creationTimeSecs - a.creationTimeSecs);
+    return Ok(results);
   }
 }

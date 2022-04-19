@@ -20,6 +20,7 @@ import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/info_button_plante.dart';
+import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/components/veg_status_displayed.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
@@ -150,11 +151,13 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                 child: Column(children: [
                   const SizedBox(height: 12),
                   ProductHeaderWidget(
-                      key: const Key('product_header'),
-                      product: _product,
-                      imageType: ProductImageType.FRONT,
-                      onTap: _showProductPhoto,
-                      onLongPress: _copyProductName),
+                    key: const Key('product_header'),
+                    product: _product,
+                    imageType: ProductImageType.FRONT,
+                    onTap: _showProductPhoto,
+                    onLongPress: _copyProductName,
+                    overlay: const _OffLicenceWidget(),
+                  ),
                 ])),
             const SizedBox(height: 19),
             Padding(
@@ -234,10 +237,12 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                                 style: TextStyles.normal)),
                       if (_product.ingredientsText == null)
                         ProductHeaderWidget(
-                            key: const Key('product_ingredients_photo'),
-                            product: _product,
-                            imageType: ProductImageType.INGREDIENTS,
-                            onTap: _showProductIngredientsPhoto),
+                          key: const Key('product_ingredients_photo'),
+                          product: _product,
+                          imageType: ProductImageType.INGREDIENTS,
+                          onTap: _showProductIngredientsPhoto,
+                          overlay: const _OffLicenceWidget(),
+                        ),
                       const SizedBox(height: 24),
                     ]))),
             if (_haveIngredientsAnalysis()) _ingredientsAnalysisWidget(),
@@ -552,5 +557,20 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage>
                 product: _product),
           ));
     }
+  }
+}
+
+class _OffLicenceWidget extends StatelessWidget {
+  const _OffLicenceWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+        child: Align(
+            alignment: Alignment.topRight,
+            child: LicenceLabel(
+              label: context.strings.display_product_page_off_licence,
+              darkBox: true,
+            )));
   }
 }

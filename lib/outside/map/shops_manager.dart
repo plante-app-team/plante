@@ -16,28 +16,28 @@ import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_large_local_cache.dart';
 import 'package:plante/outside/map/shops_large_local_cache_isolated.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
-import 'package:plante/outside/map/shops_manager_fetch_shops_helper.dart';
+import 'package:plante/outside/map/shops_manager_shops_territories_fetcher.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/off/off_geo_helper.dart';
 import 'package:plante/products/products_obtainer.dart';
 
 /// NOTE: this class is a total mess among with both
-/// [ShopsManagerFetchShopsHelper] and [ShopsManagerBackendWorker].
+/// [ShopsManagerShopsTerritoriesFetcher] and [ShopsManagerBackendWorker].
 /// They need a refactoring.
 class ShopsManager {
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD = 30;
   static const DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT = 90;
   final Analytics _analytics;
-  final OsmCacher _osmCacher;
+  final OsmTerritoryCacher _osmTerritoriesCacher;
   final OffGeoHelper _offGeoHelper;
-  late final ShopsManagerFetchShopsHelper _fetchShopsHelper;
+  late final ShopsManagerShopsTerritoriesFetcher _territoriesFetcher;
   final _listeners = <ShopsManagerListener>[];
   final OpenStreetMap _osm;
   late final ShopsManagerBackendWorker _backendWorker;
@@ -53,11 +53,11 @@ class ShopsManager {
 
   /// [largeCache] param is used in the Web Admin project.
   ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
-      this._analytics, this._osmCacher, this._offGeoHelper,
+      this._analytics, this._osmTerritoriesCacher, this._offGeoHelper,
       {ShopsLargeLocalCache? largeCache})
       : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
-    _fetchShopsHelper =
-        ShopsManagerFetchShopsHelper(_backendWorker, _osmCacher);
+    _territoriesFetcher = ShopsManagerShopsTerritoriesFetcher(
+        _backendWorker, _osmTerritoriesCacher);
     _initAsync(largeCache);
   }
 
@@ -116,7 +116,7 @@ class ShopsManager {
     if (await _loadShopsFromCache(bounds) != null) {
       return true;
     }
-    for (final territory in await _osmCacher.getCachedShops()) {
+    for (final territory in await _osmTerritoriesCacher.getCachedShops()) {
       if (territory.bounds.containsBounds(bounds)) {
         return true;
       }
@@ -157,7 +157,7 @@ class ShopsManager {
       return Ok(existingCache);
     }
 
-    final shopsFetchResult = await _fetchShopsHelper.fetchShops(overpass,
+    final shopsFetchResult = await _territoriesFetcher.fetchShops(overpass,
         viewPort: bounds,
         osmBoundsSizesToRequest: [100, 91],
         planteBoundsSizeToRequest: 90);
@@ -191,7 +191,7 @@ class ShopsManager {
   }
 
   void _ensureAllShopsArePresentInOsmCache(Iterable<Shop> shops) async {
-    for (final territory in await _osmCacher.getCachedShops()) {
+    for (final territory in await _osmTerritoriesCacher.getCachedShops()) {
       final territoryShopsUids =
           territory.entities.map((e) => e.osmUID).toSet();
       final shopsToInsert = <OsmUID, OsmShop>{};
@@ -199,7 +199,8 @@ class ShopsManager {
         if (territory.bounds.containsShop(shop) &&
             !territoryShopsUids.contains(shop.osmUID)) {
           shopsToInsert[shop.osmUID] = shop.osmShop;
-          unawaited(_osmCacher.addShopToCache(territory.id, shop.osmShop));
+          unawaited(
+              _osmTerritoriesCacher.addShopToCache(territory.id, shop.osmShop));
         }
       }
     }
@@ -352,9 +353,10 @@ class ShopsManager {
           _loadedAreas[loadedArea]!.add(shop.osmUID);
         }
       }
-      for (final territory in await _osmCacher.getCachedShops()) {
+      for (final territory in await _osmTerritoriesCacher.getCachedShops()) {
         if (territory.bounds.containsShop(shop)) {
-          unawaited(_osmCacher.addShopToCache(territory.id, shop.osmShop));
+          unawaited(
+              _osmTerritoriesCacher.addShopToCache(territory.id, shop.osmShop));
         }
       }
       _notifyListenersShopCreated(shop);
@@ -406,16 +408,57 @@ class ShopsManager {
   }
 
   Future<void> clearCache() async {
-    await _fetchShopsHelper.clearCache();
+    await _territoriesFetcher.clearCache();
     await (await _slowCache).clear();
     _loadedAreas.clear();
     _rangesCache.clear();
     _notifyListenersAboutChange();
   }
+
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShopsByUIDs(
+      Iterable<OsmUID> uids) async {
+    final cache = await _slowCache;
+    final shopsFromCache = await cache.getShops(uids);
+
+    final obtainedUIDs = shopsFromCache.keys.toSet();
+    final notYetObtainedUIDs = uids.where((uid) => !obtainedUIDs.contains(uid));
+    if (notYetObtainedUIDs.isEmpty) {
+      return Ok(shopsFromCache);
+    }
+
+    return _osm.withOverpass((overpass) async {
+      final osmShopsRes =
+          await overpass.fetchShops(osmUIDs: notYetObtainedUIDs);
+      if (osmShopsRes.isErr) {
+        return Err(osmShopsRes.unwrapErr().convert());
+      }
+      final shopsRes = await inflateOsmShops(osmShopsRes.unwrap());
+      if (shopsRes.isErr) {
+        return Err(shopsRes.unwrapErr());
+      }
+      final shopsFromNetwork = shopsRes.unwrap();
+      await cache.addShops(shopsFromNetwork.values);
+      return Ok({
+        ...shopsFromCache,
+        ...shopsFromNetwork,
+      });
+    });
+  }
 }
 
-extension _BoundsExt on CoordsBounds {
+extension on CoordsBounds {
   bool containsShop(Shop shop) {
     return contains(Coord(lat: shop.latitude, lon: shop.longitude));
+  }
+}
+
+extension on OpenStreetMapError {
+  ShopsManagerError convert() {
+    switch (this) {
+      case OpenStreetMapError.NETWORK:
+        return ShopsManagerError.NETWORK_ERROR;
+      case OpenStreetMapError.OTHER:
+        return ShopsManagerError.OTHER;
+    }
   }
 }

@@ -207,6 +207,12 @@ class TextStyles {
       color: ColorsPlante.grey,
       fontWeight: FontWeight.bold);
 
+  static const TextStyle newsTitle = TextStyle(
+      fontFamily: 'OpenSans',
+      fontWeight: FontWeight.bold,
+      fontSize: 18,
+      color: ColorsPlante.mainTextBlack);
+
   static String get montserrat {
     if (_useSafeFont()) {
       return 'OpenSans';

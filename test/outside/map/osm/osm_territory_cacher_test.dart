@@ -1,14 +1,14 @@
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:test/test.dart';
 
 void main() {
-  late OsmCacher osmCacher;
+  late OsmTerritoryCacher osmCacher;
 
   final shops = [
     OsmShop((e) => e
@@ -56,7 +56,7 @@ void main() {
   ];
 
   setUp(() async {
-    osmCacher = OsmCacher();
+    osmCacher = OsmTerritoryCacher();
   });
 
   test('cached shops: store, delete, reload', () async {
@@ -96,7 +96,7 @@ void main() {
 
     // Create a second cacher with same DB,
     // verify it has same territories
-    final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
+    final osmCacher2 = OsmTerritoryCacher.withDb(await osmCacher.dbForTesting);
     expect(await osmCacher2.getCachedShops(), equals([territory2]));
   });
 
@@ -119,7 +119,7 @@ void main() {
 
     // Create a second cacher with same DB,
     // verify it has same territories
-    final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
+    final osmCacher2 = OsmTerritoryCacher.withDb(await osmCacher.dbForTesting);
     expect(await osmCacher2.getCachedShops(), equals([territory]));
   });
 
@@ -160,7 +160,7 @@ void main() {
 
     // Create a second cacher with same DB,
     // verify it has same territories
-    final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
+    final osmCacher2 = OsmTerritoryCacher.withDb(await osmCacher.dbForTesting);
     expect(await osmCacher2.getCachedRoads(), equals([territory2]));
   });
 
@@ -183,7 +183,7 @@ void main() {
 
     // Create a second cacher with same DB,
     // verify it has same territories
-    final osmCacher2 = OsmCacher.withDb(await osmCacher.dbForTesting);
+    final osmCacher2 = OsmTerritoryCacher.withDb(await osmCacher.dbForTesting);
     expect(await osmCacher2.getCachedRoads(), equals([territory]));
   });
 }

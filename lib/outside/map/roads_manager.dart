@@ -5,9 +5,9 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_cached_territory.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 
 enum RoadsManagerError {
   NETWORK,
@@ -24,7 +24,7 @@ class RoadsManager {
   static final requestedRadios = kmToGrad(REQUESTED_RADIUS_KM);
 
   final OpenStreetMap _osm;
-  final OsmCacher _cacher;
+  final OsmTerritoryCacher _cacher;
 
   RoadsManager(this._osm, this._cacher);
 

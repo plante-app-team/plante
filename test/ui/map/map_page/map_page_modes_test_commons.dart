@@ -176,7 +176,7 @@ class MapPageModesTestCommons {
           ..osmUID = OsmUID.parse('1:3')
           ..productsCount = 3))),
     ]);
-    shopsManager.addPreloadedArea(shopsBounds, shops);
+    shopsManager.addPreloadedArea_testing(shopsBounds, shops);
 
     widget?.onMapIdleForTesting();
     await tester?.pumpAndSettle();

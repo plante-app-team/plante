@@ -4,19 +4,19 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm/osm_cached_territory.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_overpass.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_backend_worker.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
 
-// Extracted from ShopsManager logic of shops fetching
-class ShopsManagerFetchShopsHelper {
+// Extracted from ShopsManager logic of shops' territories fetching
+class ShopsManagerShopsTerritoriesFetcher {
   final ShopsManagerBackendWorker _shopsManagerBackendWorker;
-  final OsmCacher _osmCacher;
+  final OsmTerritoryCacher _osmCacher;
 
-  ShopsManagerFetchShopsHelper(
+  ShopsManagerShopsTerritoriesFetcher(
       this._shopsManagerBackendWorker, this._osmCacher);
 
   /// [osmBoundsSizesToRequest] - list of bounds sizes which will be requested

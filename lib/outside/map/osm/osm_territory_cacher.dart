@@ -48,7 +48,7 @@ enum OsmCacherError {
   TERRITORY_NOT_FOUND,
 }
 
-class OsmCacher extends DatabaseBase {
+class OsmTerritoryCacher extends DatabaseBase {
   final _dbCompleter = Completer<Database>();
   Future<Database> get _db => _dbCompleter.future;
 
@@ -62,11 +62,11 @@ class OsmCacher extends DatabaseBase {
     return _db;
   }
 
-  OsmCacher() {
+  OsmTerritoryCacher() {
     _initAsync();
   }
 
-  OsmCacher.withDb(Database db) {
+  OsmTerritoryCacher.withDb(Database db) {
     _initAsync(db);
   }
 

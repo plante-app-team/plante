@@ -239,7 +239,7 @@ void main() {
           ..productsCount = i))));
     }
     await shopsManager.clearCache();
-    shopsManager.addPreloadedArea(commons.shopsBounds, manyShops);
+    shopsManager.addPreloadedArea_testing(commons.shopsBounds, manyShops);
 
     final widget = MapPage(
         mapControllerForTesting: mapController,

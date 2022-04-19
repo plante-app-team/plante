@@ -1,12 +1,12 @@
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm/osm_cached_territory.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-class FakeOsmCacher implements OsmCacher {
+class FakeOsmCacher implements OsmTerritoryCacher {
   var _lastId = 0;
   final _cachedShops = <OsmCachedTerritory<OsmShop>>[];
   final _cachedRoads = <OsmCachedTerritory<OsmRoad>>[];
