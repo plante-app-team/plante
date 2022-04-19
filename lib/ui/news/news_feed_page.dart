@@ -135,8 +135,10 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                   allEntitiesOrdered: allLoadedShops,
                 );
               },
-              child: _ProductAtShopNewsPieceWidget(
-                  product, shop, _uiAddressesObtainer.requestAddressOf(shop)));
+              child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _ProductAtShopNewsPieceWidget(product, shop,
+                      _uiAddressesObtainer.requestAddressOf(shop))));
           break;
       }
       widgets.add(widget);
