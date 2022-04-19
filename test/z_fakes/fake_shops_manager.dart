@@ -24,6 +24,7 @@ class FakeShopsManager implements ShopsManager {
   final _shopsAreas = <CoordsBounds, List<Shop>>{};
   final _shopsRanges = <OsmUID, Result<ShopProductRange, ShopsManagerError>>{};
   final _barcodesCache = <Shop, List<String>>{};
+  final _shopsMap = <OsmUID, Shop>{};
 
   ArgResCallback<CoordsBounds, Future<Iterable<Shop>>> _shopsLoader =
       (_) async => const [];
@@ -34,9 +35,14 @@ class FakeShopsManager implements ShopsManager {
   var _fetchRangesCalls = 0;
   final _productPresenceVoteCalls = <Pair<Shop, Product>, List<bool>>{};
 
-  void addPreloadedArea(CoordsBounds bounds, Iterable<Shop> shops) {
+  void addPreloadedArea_testing(CoordsBounds bounds, Iterable<Shop> shops) {
     _shopsAreas[bounds] = shops.toList();
+    cacheShops_testing(shops);
     _notifyListeners();
+  }
+
+  void cacheShops_testing(Iterable<Shop> shops) {
+    _shopsMap.addAll({for (final shop in shops) shop.osmUID: shop});
   }
 
   void updatePreloadedArea(CoordsBounds bounds, Iterable<Shop> shops) {
@@ -45,6 +51,7 @@ class FakeShopsManager implements ShopsManager {
           'Nothing to update - area $bounds is not loaded: $_shopsAreas');
     }
     _shopsAreas[bounds] = shops.toList();
+    cacheShops_testing(shops);
     _notifyListeners();
   }
 
@@ -60,11 +67,15 @@ class FakeShopsManager implements ShopsManager {
   void setShopRange(
       OsmUID uid, Result<ShopProductRange, ShopsManagerError> range) {
     _shopsRanges[uid] = range;
+    if (range.isOk) {
+      cacheShops_testing([range.unwrap().shop]);
+    }
     _notifyListeners();
   }
 
   void setBarcodesCacheFor(Shop shop, List<String> barcodes) {
     _barcodesCache[shop] = barcodes;
+    cacheShops_testing([shop]);
   }
 
   void clear_verifiedCalls() {
@@ -190,6 +201,7 @@ class FakeShopsManager implements ShopsManager {
   @override
   Future<void> clearCache() async {
     _shopsAreas.clear();
+    _shopsMap.clear();
   }
 
   @override
@@ -238,6 +250,7 @@ class FakeShopsManager implements ShopsManager {
       }
     }
     _shopsAreas[bounds] = (await _shopsLoader.call(bounds)).toList();
+    cacheShops_testing(_shopsAreas[bounds]!);
     _notifyListeners();
     final result = {for (final shop in _shopsAreas[bounds]!) shop.osmUID: shop};
     return Ok(result);
@@ -307,6 +320,19 @@ class FakeShopsManager implements ShopsManager {
     _fetchRangesCalls += 1;
     final emptyRange = ShopProductRange((e) => e.shop.replace(shop));
     return _shopsRanges[shop.osmUID] ?? Ok(emptyRange);
+  }
+
+  @override
+  Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShopsByUIDs(
+      Iterable<OsmUID> uids) async {
+    final result = <OsmUID, Shop>{};
+    for (final uid in uids) {
+      final shop = _shopsMap[uid];
+      if (shop != null) {
+        result[uid] = shop;
+      }
+    }
+    return Ok(result);
   }
 }
 

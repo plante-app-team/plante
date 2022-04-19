@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
-import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/text_styles.dart';
 
 // ignore: always_use_package_imports
@@ -12,13 +11,21 @@ class ProductHeaderWidget extends StatelessWidget {
   final ProductImageType imageType;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
-  const ProductHeaderWidget(
-      {Key? key,
-      required this.product,
-      required this.imageType,
-      required this.onTap,
-      this.onLongPress})
-      : super(key: key);
+  final double height;
+  final Widget overlay;
+  final Widget? titleOverride;
+  final Widget? subtitleOverride;
+  const ProductHeaderWidget({
+    Key? key,
+    required this.product,
+    required this.imageType,
+    required this.onTap,
+    this.height = 161,
+    this.onLongPress,
+    required this.overlay,
+    this.titleOverride,
+    this.subtitleOverride,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +33,7 @@ class ProductHeaderWidget extends StatelessWidget {
       borderRadius: BorderRadius.circular(8),
       child: Stack(children: [
         SizedBox(
-            height: 161,
+            height: height,
             width: double.infinity,
             child: ProductImagesHelper.productImageWidget(product, imageType)),
         Positioned.fill(
@@ -41,25 +48,22 @@ class ProductHeaderWidget extends StatelessWidget {
         )),
         Positioned.fill(
             child: Align(
-                alignment: Alignment.topRight,
-                child: LicenceLabel(
-                  label: context.strings.display_product_page_off_licence,
-                  darkBox: true,
-                ))),
-        Positioned.fill(
-            child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
                     padding: const EdgeInsets.only(left: 12, bottom: 18),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      if (imageType == ProductImageType.FRONT)
+                      if (titleOverride != null)
+                        subtitleOverride!
+                      else if (imageType == ProductImageType.FRONT)
                         SizedBox(
                             width: double.infinity,
                             child: Text(product.name!,
                                 style: TextStyles.headline1White,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1)),
-                      if (imageType == ProductImageType.FRONT &&
+                      if (subtitleOverride != null)
+                        subtitleOverride!
+                      else if (imageType == ProductImageType.FRONT &&
                           product.brands != null &&
                           product.brands!.isNotEmpty)
                         Row(children: [
@@ -75,7 +79,8 @@ class ProductHeaderWidget extends StatelessWidget {
                 child: InkWell(
                   onTap: onTap,
                   onLongPress: onLongPress,
-                )))
+                ))),
+        overlay,
       ]),
     );
   }

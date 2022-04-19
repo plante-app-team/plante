@@ -14,6 +14,7 @@ import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
+import 'package:plante/outside/backend/news/news_feed_manager.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/backend/user_params_auto_wiper.dart';
 import 'package:plante/outside/backend/user_params_fetcher.dart';
@@ -27,8 +28,8 @@ import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
@@ -161,13 +162,13 @@ void initDI() {
   GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
   GetIt.I.registerSingleton<ContributedByUserProductsStorage>(
       ContributedByUserProductsStorage());
-  GetIt.I.registerSingleton<OsmCacher>(OsmCacher());
+  GetIt.I.registerSingleton<OsmTerritoryCacher>(OsmTerritoryCacher());
   GetIt.I.registerSingleton<ShopsManager>(ShopsManager(
     GetIt.I.get<OpenStreetMap>(),
     GetIt.I.get<Backend>(),
     GetIt.I.get<ProductsObtainer>(),
     GetIt.I.get<Analytics>(),
-    GetIt.I.get<OsmCacher>(),
+    GetIt.I.get<OsmTerritoryCacher>(),
     GetIt.I.get<OffGeoHelper>(),
   ));
   GetIt.I.registerSingleton<SuggestedProductsManager>(SuggestedProductsManager(
@@ -176,8 +177,8 @@ void initDI() {
     GetIt.I.get<ProductsAtShopsExtraPropertiesManager>(),
     GetIt.I.get<Settings>(),
   ));
-  GetIt.I.registerSingleton<RoadsManager>(
-      RoadsManager(GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmCacher>()));
+  GetIt.I.registerSingleton<RoadsManager>(RoadsManager(
+      GetIt.I.get<OpenStreetMap>(), GetIt.I.get<OsmTerritoryCacher>()));
   GetIt.I.registerSingleton<OsmSearcher>(
       OsmSearcher(GetIt.I.get<OpenStreetMap>()));
   GetIt.I.registerSingleton<DirectionsManager>(DirectionsManager());
@@ -201,5 +202,9 @@ void initDI() {
   ));
   GetIt.I.registerSingleton(ShopsCreationManager(
     GetIt.I.get<ShopsManager>(),
+  ));
+  GetIt.I.registerSingleton(NewsFeedManager(
+    GetIt.I.get<Backend>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
   ));
 }

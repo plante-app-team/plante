@@ -5,7 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/map/extra_properties/map_extra_properties_cacher.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/off/off_cacher.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -21,7 +21,7 @@ class SettingsCachePage extends PagePlante {
 }
 
 class _SettingsCachePageState extends PageStatePlante<SettingsCachePage> {
-  final _osmCacher = GetIt.I.get<OsmCacher>();
+  final _osmCacher = GetIt.I.get<OsmTerritoryCacher>();
   final _offCacher = GetIt.I.get<OffCacher>();
   final _mapExtraProperties = GetIt.I.get<MapExtraPropertiesCacher>();
 

@@ -94,7 +94,7 @@ void main() {
   testWidgets('successful shops load', (WidgetTester tester) async {
     await createModel(tester);
 
-    fakeShopsManager.addPreloadedArea(
+    fakeShopsManager.addPreloadedArea_testing(
         CoordsBounds(
             southwest: Coord(lat: 14, lon: 14),
             northeast: Coord(lat: 16, lon: 16)),
@@ -120,7 +120,7 @@ void main() {
       (WidgetTester tester) async {
     await createModel(tester);
 
-    fakeShopsManager.addPreloadedArea(
+    fakeShopsManager.addPreloadedArea_testing(
         CoordsBounds(
             southwest: Coord(lat: 14, lon: 14),
             northeast: Coord(lat: 16, lon: 16)),
@@ -138,7 +138,7 @@ void main() {
     await fakeShopsManager.clearCache();
     fakeShopsManager.clear_verifiedCalls();
     fakeShopsManager.verify_fetchShops_called(times: 0);
-    fakeShopsManager.addPreloadedArea(
+    fakeShopsManager.addPreloadedArea_testing(
         CoordsBounds(
             southwest: Coord(lat: 14, lon: 14),
             northeast: Coord(lat: 16, lon: 16)),
@@ -154,7 +154,7 @@ void main() {
 
     final preloadedBounds = CoordsBounds(
         southwest: Coord(lat: 14, lon: 14), northeast: Coord(lat: 16, lon: 16));
-    fakeShopsManager.addPreloadedArea(preloadedBounds, shops.values);
+    fakeShopsManager.addPreloadedArea_testing(preloadedBounds, shops.values);
 
     // Initial load
     fakeShopsManager.verify_fetchShops_called(times: 0);
@@ -190,7 +190,7 @@ void main() {
 
     final preloadedBounds = CoordsBounds(
         southwest: Coord(lat: 14, lon: 14), northeast: Coord(lat: 16, lon: 16));
-    fakeShopsManager.addPreloadedArea(preloadedBounds, shops.values);
+    fakeShopsManager.addPreloadedArea_testing(preloadedBounds, shops.values);
 
     // Initial load
     fakeShopsManager.verify_fetchShops_called(times: 0);

@@ -12,6 +12,7 @@ import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/map/shops_large_local_cache.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -179,18 +180,21 @@ class ShopsManagerTestCommons {
     });
   }
 
-  Future<ShopsManager> createShopsManager({bool first = false}) async {
+  Future<ShopsManager> createShopsManager(
+      {bool first = false, ShopsLargeLocalCache? largeCache}) async {
     if (!first) {
       await shopsManager.dispose();
     }
     return ShopsManager(
-        OpenStreetMap.forTesting(
-            overpass: osm, configManager: FakeMobileAppConfigManager()),
-        backend,
-        productsObtainer,
-        analytics,
-        osmCacher,
-        offGeoHelper);
+      OpenStreetMap.forTesting(
+          overpass: osm, configManager: FakeMobileAppConfigManager()),
+      backend,
+      productsObtainer,
+      analytics,
+      osmCacher,
+      offGeoHelper,
+      largeCache: largeCache,
+    );
   }
 
   ShopsInBoundsResponse createShopsInBoundsResponse({

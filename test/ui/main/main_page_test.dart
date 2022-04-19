@@ -12,6 +12,7 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/news/news_feed_manager.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_manager.dart';
@@ -30,6 +31,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_news_feed_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
@@ -84,6 +86,7 @@ void main() {
     userContributionsManager = FakeUserContributionsManager();
     GetIt.I
         .registerSingleton<UserContributionsManager>(userContributionsManager);
+    GetIt.I.registerSingleton<NewsFeedManager>(FakeNewsFeedManager());
   });
 
   Future<void> forceMapIdleState(WidgetTester tester) async {

@@ -3,8 +3,8 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
-import 'package:plante/outside/map/osm/osm_cacher.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
+import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:test/test.dart';
 
@@ -14,7 +14,7 @@ import '../../z_fakes/fake_osm_cacher.dart';
 
 void main() {
   late MockOsmOverpass osm;
-  late OsmCacher cacher;
+  late OsmTerritoryCacher cacher;
   late RoadsManager roadsManager;
 
   final northeast = Coord(lat: 15.001, lon: 15.001);
