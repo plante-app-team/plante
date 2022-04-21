@@ -40,16 +40,42 @@ class NewsFeedPageModel {
   Shop? getShopWith(OsmUID uid) => _loadedShops[uid];
   Iterable<Shop> getAllLoadedShops() => _loadedShops.values;
 
-  void maybeLoadNextNews() async {
-    if (_allNewsLoaded) {
+  Future<void> reloadNews() async {
+    await _maybeLoadNextNews(clearOldNews: true);
+  }
+
+  Future<void> maybeLoadNextNews() async {
+    await _maybeLoadNextNews();
+  }
+
+  Future<void> _maybeLoadNextNews({bool clearOldNews = false}) async {
+    if (loading.cachedVal) {
       return;
     }
+    if (_allNewsLoaded && !clearOldNews) {
+      return;
+    }
+
     _loading.setValue(true);
     _lastError.setValue(null);
     try {
+      if (clearOldNews) {
+        _allNewsLoaded = false;
+        _lastLoadedNewsPage = -1;
+      }
       final result = await _loadNewsImpl();
       if (result.isOk) {
+        if (clearOldNews) {
+          _newsPieces.setValue(const []);
+        }
         _lastLoadedNewsPage += 1;
+        final newNews = result.unwrap();
+        if (newNews.isEmpty) {
+          _allNewsLoaded = true;
+        }
+        final allNews = _newsPieces.cachedVal.toList();
+        allNews.addAll(newNews);
+        _newsPieces.setValue(allNews);
       } else {
         _lastError.setValue(result.unwrapErr());
       }
@@ -58,7 +84,8 @@ class NewsFeedPageModel {
     }
   }
 
-  Future<Result<None, GeneralError>> _loadNewsImpl() async {
+  // Returns loaded news
+  Future<Result<List<NewsPiece>, GeneralError>> _loadNewsImpl() async {
     // Get news
     final newsRes =
         await _newsFeedManager.obtainNews(page: _lastLoadedNewsPage + 1);
@@ -67,8 +94,7 @@ class NewsFeedPageModel {
     }
     final newNews = newsRes.unwrap();
     if (newNews.isEmpty) {
-      _allNewsLoaded = true;
-      return Ok(None());
+      return Ok(const []);
     }
 
     // Extract barcodes and shops UIDs
@@ -99,10 +125,6 @@ class NewsFeedPageModel {
     }
     _loadedShops.addAll(shopsRes.unwrap());
 
-    // Finish
-    final allNews = _newsPieces.cachedVal.toList();
-    allNews.addAll(newNews);
-    _newsPieces.setValue(allNews);
-    return Ok(None());
+    return Ok(newNews);
   }
 }

@@ -6,9 +6,10 @@ import 'package:plante/outside/backend/news/news_piece.dart';
 class FakeNewsFeedManager implements NewsFeedManager {
   final _news = <NewsPiece>[];
   final _errorsForPages = <int, GeneralError>{};
+  final _obtainedPages = <int>[];
   final int pageSizeTesting;
 
-  FakeNewsFeedManager({this.pageSizeTesting = 5});
+  FakeNewsFeedManager({this.pageSizeTesting = 10});
 
   // ignore: non_constant_identifier_names
   void setErrorForPage_testing(int page, GeneralError? error) {
@@ -29,9 +30,14 @@ class FakeNewsFeedManager implements NewsFeedManager {
     _news.clear();
   }
 
+  // ignore: non_constant_identifier_names
+  List<int> obtainedPages_testing() => List.unmodifiable(_obtainedPages);
+
   @override
   Future<Result<List<NewsPiece>, GeneralError>> obtainNews(
       {required int page}) async {
+    _obtainedPages.add(page);
+
     final error = _errorsForPages[page];
     if (error != null) {
       return Err(error);
