@@ -91,7 +91,7 @@ void main() {
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
   });
 
-  Future<void> scrollDown(WidgetTester tester) async {
+  Future<void> scroll(WidgetTester tester, double yDiff) async {
     // NOTE: we pause products retrieval before the scroll down
     // and resume it after.
     // This is needed because we expected new batches of products to be
@@ -101,11 +101,19 @@ void main() {
     productsObtainer.pauseProductsRetrieval();
     for (var i = 0; i < 50; ++i) {
       await tester.drag(
-          find.byKey(const Key('news_pieces_list')), const Offset(0, -3000));
+          find.byKey(const Key('news_pieces_list')), Offset(0, yDiff));
       await tester.pump();
     }
     productsObtainer.resumeProductsRetrieval();
     await tester.pumpAndSettle();
+  }
+
+  Future<void> scrollDown(WidgetTester tester) async {
+    await scroll(tester, -3000);
+  }
+
+  Future<void> scrollUp(WidgetTester tester) async {
+    await scroll(tester, 3000);
   }
 
   Product createProduct(String name) {
@@ -276,8 +284,10 @@ void main() {
     // And an error is also present
     expect(
         find.text(context.strings.global_something_went_wrong), findsOneWidget);
-    // And the first product of the second page is not present
+    // And the first+last products of the second page are not present
     expect(find.text('Product ${newsFeedManager.pageSizeTesting + 1}'),
+        findsNothing);
+    expect(find.text('Product ${newsFeedManager.pageSizeTesting * 2}'),
         findsNothing);
 
     // Remove the error, retry
@@ -287,10 +297,11 @@ void main() {
     // No error
     expect(
         find.text(context.strings.global_something_went_wrong), findsNothing);
-    // Both the last and the first product from pages 0 and 1 are present
+    // Both last products from pages 0 and 1 are present
     expect(find.text('Product ${newsFeedManager.pageSizeTesting}'),
         findsOneWidget);
-    expect(find.text('Product ${newsFeedManager.pageSizeTesting + 1}'),
+    await scrollDown(tester);
+    expect(find.text('Product ${newsFeedManager.pageSizeTesting * 2}'),
         findsOneWidget);
   });
 
@@ -349,5 +360,48 @@ void main() {
     expect(find.text(product2.name!), findsOneWidget);
     expect(
         find.text(context.strings.global_something_went_wrong), findsNothing);
+  });
+
+  testWidgets('pull to refresh behaviour', (WidgetTester tester) async {
+    // Prepare 2 pages of products' news
+    for (var index = 1; index <= newsFeedManager.pageSizeTesting * 2; ++index) {
+      addProductToShop(createProduct('Product $index'),
+          createShop('Shop $index', OsmAddress((e) => e.road = 'Lenina')));
+    }
+
+    await tester.superPump(const NewsFeedPage());
+
+    // Both first of page 0 and last product of page 1 are present
+    expect(find.text('Product 1'), findsOneWidget);
+    await scrollDown(tester);
+    await scrollDown(tester);
+    expect(find.text('Product ${newsFeedManager.pageSizeTesting * 2}'),
+        findsOneWidget);
+
+    // Prepare absolutely new news
+    newsFeedManager.deleteAllNews_testing();
+    addProductToShop(createProduct('New product 1'),
+        createShop('New shop 1', OsmAddress((e) => e.road = 'Lenina')));
+    addProductToShop(createProduct('New product 2'),
+        createShop('New shop 2', OsmAddress((e) => e.road = 'Lenina')));
+
+    // Pull to refresh
+    await scrollUp(tester);
+    await scrollUp(tester);
+
+    // New news are visible
+    expect(find.text('New product 1'), findsOneWidget);
+    expect(find.text('New product 2'), findsOneWidget);
+
+    // Old news are not present, even from the second page
+    expect(find.text('Product 1'), findsNothing);
+    expect(find.text('Product ${newsFeedManager.pageSizeTesting * 2}'),
+        findsNothing);
+
+    // They were not present on the top, they are not present on the bottom
+    await scrollDown(tester);
+    expect(find.text('Product 1'), findsNothing);
+    expect(find.text('Product ${newsFeedManager.pageSizeTesting * 2}'),
+        findsNothing);
   });
 }

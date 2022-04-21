@@ -436,6 +436,7 @@ class _MapPageState extends PageStatePlante<MapPage>
                     MapBottomHint(_bottomHint.watch(ref))),
             Consumer(
                 builder: (context, ref, _) => AnimatedListSimplePlante(
+                    shrinkWrap: true,
                     children: _mode.watch(ref).buildBottomActions())),
           ])),
       Align(
@@ -508,7 +509,7 @@ class _MapPageState extends PageStatePlante<MapPage>
               padding: const EdgeInsets.only(right: 24, bottom: 24),
               child: e))
           .toList();
-      return AnimatedListSimplePlante(children: fabs);
+      return AnimatedListSimplePlante(shrinkWrap: true, children: fabs);
     });
   }
 

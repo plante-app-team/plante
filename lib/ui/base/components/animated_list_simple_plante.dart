@@ -6,8 +6,14 @@ import 'package:flutter/material.dart';
 class AnimatedListSimplePlante extends StatefulWidget {
   final List<Widget> children;
   final EdgeInsets padding;
+  final bool shrinkWrap;
+  final ScrollPhysics? physics;
   const AnimatedListSimplePlante(
-      {Key? key, required this.children, this.padding = EdgeInsets.zero})
+      {Key? key,
+      required this.children,
+      this.physics,
+      this.shrinkWrap = false,
+      this.padding = EdgeInsets.zero})
       : super(key: key);
 
   @override
@@ -36,7 +42,7 @@ class _AnimatedListSimplePlanteState extends State<AnimatedListSimplePlante> {
           }
         },
         remove: (pos, count) {
-          for (var index = pos; index < pos + count; ++index) {
+          for (var index = pos + count - 1; pos <= index; --index) {
             listState.removeItem(
                 index,
                 (context, animation) =>
@@ -72,7 +78,8 @@ class _AnimatedListSimplePlanteState extends State<AnimatedListSimplePlante> {
             behavior: _ScrollBehavior(),
             child: AnimatedList(
                 key: _listKey,
-                shrinkWrap: true,
+                physics: widget.physics,
+                shrinkWrap: widget.shrinkWrap,
                 initialItemCount: widget.children.length,
                 itemBuilder: (context, index, animation) {
                   return _wrapChild(widget.children[index], animation);

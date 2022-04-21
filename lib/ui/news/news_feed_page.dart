@@ -14,6 +14,7 @@ import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/address_widget.dart';
+import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
@@ -21,6 +22,7 @@ import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/news/news_feed_page_model.dart';
 import 'package:plante/ui/product/product_header_widget.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -44,6 +46,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
       UiListAddressesObtainer<Shop>(GetIt.I.get<AddressObtainer>());
 
   final _visibleShops = <Shop>{};
+  late final _loadingByPullToRefresh = UIValue(false, ref);
 
   _NewsFeedPageState() : super('PageStatePlante');
 
@@ -55,7 +58,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
 
   void _initAsync() async {
     await nextFrame();
-    _model.maybeLoadNextNews();
+    await _model.maybeLoadNextNews();
   }
 
   @override
@@ -67,20 +70,28 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
           consumer((ref) {
             final newsWidgets =
                 _newsPiecesWidgets(_model.newsPieces.watch(ref));
-            return ListView(
-              key: const Key('news_pieces_list'),
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 21),
-                  child: Text(context.strings.news_feed_page_new_events_title,
-                      style: TextStyles.newsTitle),
-                ),
-                ...newsWidgets,
-                if (_model.newsPieces.watch(ref).isNotEmpty)
-                  _loadingOrErrorOrNothing(),
-              ],
-            );
+            return RefreshIndicator(
+                onRefresh: () async {
+                  _loadingByPullToRefresh.setValue(true);
+                  await _model.reloadNews();
+                  _loadingByPullToRefresh.setValue(false);
+                },
+                child: AnimatedListSimplePlante(
+                  key: const Key('news_pieces_list'),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 21),
+                      child: Text(
+                          context.strings.news_feed_page_new_events_title,
+                          style: TextStyles.newsTitle),
+                    ),
+                    ...newsWidgets,
+                    if (_model.newsPieces.watch(ref).isNotEmpty)
+                      _loadingOrErrorOrNothing(),
+                  ],
+                ));
           }),
           if (_model.newsPieces.watch(ref).isEmpty) _loadingOrErrorOrNothing(),
         ])));
@@ -89,6 +100,9 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
   Widget _loadingOrErrorOrNothing() {
     return consumer((ref) {
       if (_model.loading.watch(ref)) {
+        if (_loadingByPullToRefresh.watch(ref)) {
+          return const SizedBox();
+        }
         return const _LoadingWidget();
       }
       final error = _model.lastError.watch(ref);
