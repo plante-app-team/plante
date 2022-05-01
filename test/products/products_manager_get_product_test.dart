@@ -143,8 +143,10 @@ void main() {
     when(offApi.getProductList(any)).thenAnswer((invc) async {
       final configuration =
           invc.positionalArguments[0] as off.ProductListQueryConfiguration;
-      final page =
-          configuration.additionalParameters.whereType<off.Page>().first.page;
+      final page = configuration.additionalParameters
+          .whereType<off.PageNumber>()
+          .first
+          .page;
       if (page < 1) {
         throw ArgumentError('OFF pagination count starts from 1');
       }

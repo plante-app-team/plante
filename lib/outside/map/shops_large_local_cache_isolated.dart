@@ -1,5 +1,6 @@
 import 'package:plante/base/background/background_log_msg.dart';
 import 'package:plante/base/background/background_worker.dart';
+import 'package:plante/base/pair.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -32,6 +33,14 @@ class ShopsLargeLocalCacheIsolated
     final stream =
         communicate(_TaskPayload(_TaskType.GET_BARCODES_IN_BOUNDS, bounds));
     return await stream.first as Map<OsmUID, List<String>>;
+  }
+
+  @override
+  Future<Map<String, List<OsmUID>>> getShopsContainingBarcodes(
+      CoordsBounds bounds, Set<String> barcodes) async {
+    final stream = communicate(_TaskPayload(
+        _TaskType.GET_SHOPS_CONTAINING_BARCODES, Pair(bounds, barcodes)));
+    return await stream.first as Map<String, List<OsmUID>>;
   }
 
   @override
@@ -82,6 +91,10 @@ class ShopsLargeLocalCacheIsolated
       case _TaskType.GET_BARCODES_IN_BOUNDS:
         return await state.impl
             .getBarcodesWithin(payloadTyped.data as CoordsBounds);
+      case _TaskType.GET_SHOPS_CONTAINING_BARCODES:
+        final data = payloadTyped.data as Pair<CoordsBounds, Set<String>>;
+        return await state.impl
+            .getShopsContainingBarcodes(data.first, data.second);
       case _TaskType.GET_SHOPS:
         return await state.impl.getShops(payloadTyped.data as Iterable<OsmUID>);
       case _TaskType.ADD_BARCODES:
@@ -106,6 +119,7 @@ class _BackgroundIsolateState {
 enum _TaskType {
   GET_BARCODES,
   GET_BARCODES_IN_BOUNDS,
+  GET_SHOPS_CONTAINING_BARCODES,
   GET_SHOPS,
   ADD_BARCODES,
   REMOVE_BARCODES,

@@ -444,6 +444,12 @@ class ShopsManager {
       });
     });
   }
+
+  Future<Map<String, List<OsmUID>>> getShopsContainingBarcodes(
+      CoordsBounds bounds, Set<String> barcodes) async {
+    final cache = await _slowCache;
+    return await cache.getShopsContainingBarcodes(bounds, barcodes);
+  }
 }
 
 extension on CoordsBounds {

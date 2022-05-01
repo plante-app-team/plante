@@ -334,6 +334,23 @@ class FakeShopsManager implements ShopsManager {
     }
     return Ok(result);
   }
+
+  @override
+  Future<Map<String, List<OsmUID>>> getShopsContainingBarcodes(
+      CoordsBounds bounds, Set<String> barcodes) async {
+    final result = <String, List<OsmUID>>{};
+    for (final barcode in barcodes) {
+      for (final shopBarcodesPair in _barcodesCache.entries) {
+        final shop = shopBarcodesPair.key;
+        final barcodesOfShop = shopBarcodesPair.value;
+        if (barcodesOfShop.contains(barcode)) {
+          result[barcode] ??= [];
+          result[barcode]!.add(shop.osmUID);
+        }
+      }
+    }
+    return result;
+  }
 }
 
 class PutProductToShopsParams {

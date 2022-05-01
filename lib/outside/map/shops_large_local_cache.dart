@@ -15,6 +15,9 @@ abstract class ShopsLargeLocalCache {
 
   Future<Map<OsmUID, List<String>>> getBarcodesWithin(CoordsBounds bounds);
 
+  Future<Map<String, List<OsmUID>>> getShopsContainingBarcodes(
+      CoordsBounds bounds, Set<String> barcodes);
+
   Future<void> removeBarcodes(Map<OsmUID, List<String>> barcodes);
 
   Future<void> removeBarcode(OsmUID uid, String barcode) async {

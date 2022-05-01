@@ -7,7 +7,7 @@ import 'package:plante/outside/backend/news/news_piece.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 class NewsFeedManager {
-  static const _REQUESTED_AREA_SIZE_KMS = 35.0;
+  static const REQUESTED_AREA_SIZE_KMS = 35.0;
   final Backend _backend;
   final LatestCameraPosStorage _cameraPosStorage;
 
@@ -21,7 +21,7 @@ class NewsFeedManager {
       return Ok(const []);
     }
     final backendNewsRes = await _backend.requestNews(
-        pos.makeSquare(kmToGrad(_REQUESTED_AREA_SIZE_KMS)),
+        pos.makeSquare(kmToGrad(REQUESTED_AREA_SIZE_KMS)),
         page: page);
     if (backendNewsRes.isErr) {
       return Err(backendNewsRes.unwrapErr().toGeneral());

@@ -32,8 +32,8 @@ class MapPageModeZoomedOut extends MapPageMode {
   double minZoom() => MIN_ZOOM;
 
   @override
-  void onCameraMove(Coord coord, double zoom) {
-    if (zoom >= super.minZoom()) {
+  void onCameraMove(Coord coord) {
+    if (zoom.cachedVal >= super.minZoom()) {
       switchModeTo(MapPageModeDefault(params));
     }
   }

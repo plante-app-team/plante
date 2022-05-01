@@ -12,6 +12,8 @@ import 'package:plante/ui/map/components/map_hints_list.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_model.dart';
 
+typedef ShowOnMapCallback = void Function(Iterable<Coord>, double?);
+
 class MapPageModeParams {
   final MapPageModel model;
   final MapHintsListController hintsListController;
@@ -20,13 +22,15 @@ class MapPageModeParams {
   final ResCallback<Iterable<Shop>> displayedShopsSource;
   final VoidCallback updateMapCallback;
   final ArgCallback<RichText?> bottomHintCallback;
-  final ArgCallback<Coord> moveMapCallback;
+  final ShowOnMapCallback showOnMapCallback;
   final ArgCallback<MapPageMode> modeSwitchCallback;
   final UIValuesFactory uiValuesFactory;
   final UIValueBase<bool> isLoading;
   final UIValueBase<bool> isLoadingSuggestions;
   final UIValueBase<bool> areShopsForViewPortLoaded;
+  final UIValueBase<double> zoom;
   final UIValue<bool> shouldLoadNewShops;
+  final UIValue<bool> shouldShowSearchBar;
   final Analytics analytics;
   MapPageModeParams(
       {required this.model,
@@ -36,13 +40,15 @@ class MapPageModeParams {
       required this.displayedShopsSource,
       required this.updateMapCallback,
       required this.bottomHintCallback,
-      required this.moveMapCallback,
+      required this.showOnMapCallback,
       required this.modeSwitchCallback,
       required this.uiValuesFactory,
       required this.isLoading,
       required this.isLoadingSuggestions,
       required this.areShopsForViewPortLoaded,
+      required this.zoom,
       required this.shouldLoadNewShops,
+      required this.shouldShowSearchBar,
       required this.analytics});
 }
 
@@ -66,11 +72,14 @@ abstract class MapPageMode {
   UIValueBase<bool> get loadingSuggestions => params.isLoadingSuggestions;
   UIValueBase<bool> get shopsForViewPortLoaded =>
       params.areShopsForViewPortLoaded;
+  UIValueBase<double> get zoom => params.zoom;
   UIValue<bool> get shouldLoadNewShops => params.shouldLoadNewShops;
+  UIValue<bool> get shouldShowSearchBar => params.shouldShowSearchBar;
 
   @mustCallSuper
   void init(MapPageMode? previousMode) {
     shouldLoadNewShops.setValue(true);
+    shouldShowSearchBar.setValue(true);
   }
 
   @mustCallSuper
@@ -94,7 +103,7 @@ abstract class MapPageMode {
   void onShopsUpdated(Map<OsmUID, Shop> shops) {}
   void onMapClick(Coord coord) {}
   void onDisplayedShopsChange(Iterable<Shop> shops) {}
-  void onCameraMove(Coord coord, double zoom) {}
+  void onCameraMove(Coord coord) {}
   void onCameraIdle() {}
 
   /// True if allowed to pop, false if Pop is handled by the mode
@@ -105,7 +114,10 @@ abstract class MapPageMode {
       params.uiValuesFactory.create(initialValue);
 
   @protected
-  void moveMapTo(Coord coord) => params.moveMapCallback.call(coord);
+  void moveMapTo(Coord coord, {double? zoom}) => showOnMap([coord], zoom: zoom);
+  @protected
+  void showOnMap(Iterable<Coord> coords, {double? zoom}) =>
+      params.showOnMapCallback.call(coords, zoom);
   @protected
   void updateMap() => params.updateMapCallback.call();
   @protected
