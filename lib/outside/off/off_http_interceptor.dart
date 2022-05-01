@@ -24,15 +24,28 @@ class OffHttpInterceptor implements off.HttpInterceptor {
   @override
   Future<http.Request>? interceptPost(Uri uri) async {
     return await _backend.customRequest(
-        'off_proxy_form_post${uri.path}', (uri) => http.Request('POST', uri),
-        queryParams: uri.queryParametersAll, headers: null);
+        'off_proxy_form_post${uri.pathWithoutSlash}',
+        (uri) => http.Request('POST', uri),
+        queryParams: uri.queryParametersAll,
+        headers: null);
   }
 
   @override
   Future<http.MultipartRequest>? interceptMultipart(
       String method, Uri uri) async {
-    return await _backend.customRequest('off_proxy_multipart${uri.path}',
+    return await _backend.customRequest(
+        'off_proxy_multipart${uri.pathWithoutSlash}',
         (uri) => http.MultipartRequest(method, uri),
-        queryParams: uri.queryParametersAll, headers: null);
+        queryParams: uri.queryParametersAll,
+        headers: null);
+  }
+}
+
+extension on Uri {
+  String get pathWithoutSlash {
+    if (!path.endsWith('/')) {
+      return path;
+    }
+    return path.substring(0, path.length - 1);
   }
 }
