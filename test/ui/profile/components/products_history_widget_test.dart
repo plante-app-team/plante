@@ -18,13 +18,17 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
+import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/profile/components/products_history_widget.dart';
 
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_shared_preferences.dart';
+import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_user_langs_manager.dart';
 import '../../../z_fakes/fake_user_params_controller.dart';
 
@@ -57,6 +61,9 @@ void main() {
       ..name = 'Bob');
     await userParamsController.setUserParams(user);
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+    GetIt.I.registerSingleton<ShopsManager>(FakeShopsManager());
   });
 
   testWidgets('viewed products shown', (WidgetTester tester) async {

@@ -11,19 +11,24 @@ import 'package:plante/lang/input_products_lang_storage.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shared_preferences_holder.dart';
+import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
+import 'package:plante/outside/map/osm/osm_shop.dart';
+import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/products/products_manager.dart';
@@ -40,10 +45,12 @@ import 'package:plante/ui/product/init_product_page.dart';
 import '../../common_finders_extension.dart';
 import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_address_obtainer.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
+import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -54,11 +61,21 @@ void main() {
   late MockProductsManager productsManager;
   late MockUserReportsMaker userReportsMaker;
   late MockUserLocationManager userLocationManager;
-  late MockShopsManager shopsManager;
+  late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
   late FakeAnalytics analytics;
-  late MockAddressObtainer addressObtainer;
+  late FakeAddressObtainer addressObtainer;
+
+  final aShop = Shop((e) => e
+    ..osmShop.replace(OsmShop((e) => e
+      ..osmUID = OsmUID.parse('1:1')
+      ..longitude = 11
+      ..latitude = 11
+      ..name = 'Spar'))
+    ..backendShop.replace(BackendShop((e) => e
+      ..osmUID = OsmUID.parse('1:1')
+      ..productsCount = 2)));
 
   setUp(() async {
     await GetIt.I.reset();
@@ -77,8 +94,10 @@ void main() {
         .thenAnswer((_) async => Ok(None()));
     GetIt.I.registerSingleton<UserReportsMaker>(userReportsMaker);
 
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+    final latestCameraPosStorage =
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
+    await latestCameraPosStorage.set(Coord(lat: 10, lon: 20));
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
     GetIt.I.registerSingleton<InputProductsLangStorage>(
         FakeInputProductsLangStorage.fromCode(LangCode.en));
 
@@ -98,7 +117,7 @@ void main() {
     when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
     GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
 
-    shopsManager = MockShopsManager();
+    shopsManager = FakeShopsManager();
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
 
     final photosTaker = MockPhotosTaker();
@@ -107,7 +126,7 @@ void main() {
 
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
 
-    addressObtainer = MockAddressObtainer();
+    addressObtainer = FakeAddressObtainer();
     GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
     GetIt.I.registerSingleton<UserLangsManager>(
@@ -920,5 +939,62 @@ void main() {
     expect(_DEFAULT_LANG, isNot(equals(LangCode.nl)));
     await knownLanguagesTest(tester,
         productLang: LangCode.nl, expectedFullyFilled: false);
+  });
+
+  testWidgets('can show shops on map', (WidgetTester tester) async {
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator).buildSingleLangProduct();
+
+    // Sold in aShop
+    shopsManager.setBarcodesCacheFor(aShop, ['123']);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(context.strings.display_product_page_show_where_sold),
+        findsOneWidget);
+    expect(find.text(context.strings.display_product_page_not_sold_nearby),
+        findsNothing);
+
+    expect(find.byType(MapPage), findsNothing);
+    await tester.superTap(
+        find.text(context.strings.display_product_page_show_where_sold));
+    expect(find.byType(MapPage), findsOneWidget);
+
+    final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
+    expect(
+        mapPage.requestedMode, equals(MapPageRequestedMode.DEMONSTRATE_SHOPS));
+    expect(mapPage.initialSelectedShops, equals([aShop]));
+  });
+
+  testWidgets('cannot show shops on map when no shops have the product',
+      (WidgetTester tester) async {
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator).buildSingleLangProduct();
+
+    // NOT sold in aShop
+    // shopsManager.setBarcodesCacheFor(aShop, ['123']);
+
+    final context = await tester.superPump(DisplayProductPage(product));
+
+    expect(find.text(context.strings.display_product_page_show_where_sold),
+        findsNothing);
+    expect(find.text(context.strings.display_product_page_not_sold_nearby),
+        findsOneWidget);
+
+    await tester.superTap(
+        find.text(context.strings.display_product_page_not_sold_nearby));
+    expect(find.byType(MapPage), findsNothing);
   });
 }

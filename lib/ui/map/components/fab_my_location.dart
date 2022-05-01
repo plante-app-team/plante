@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 
 class FabMyLocation extends ConsumerStatefulWidget {
-  final ArgCallback<CameraPosition>? onTapResult;
-  final ResCallback<Future<CameraPosition?>> userCoord;
+  final ArgCallback<Coord>? onTapResult;
+  final ResCallback<Future<Coord?>> userCoord;
   const FabMyLocation(
       {Key? key, required this.onTapResult, required this.userCoord})
       : super(key: key);

@@ -20,6 +20,7 @@ import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -29,6 +30,7 @@ import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
@@ -63,6 +65,8 @@ void main() {
         FakeInputProductsLangStorage.fromCode(LangCode.en));
     GetIt.I.registerSingleton<UserLangsManager>(
         FakeUserLangsManager([LangCode.en]));
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
   });
 
   testWidgets('init page is shown when product is not filled',

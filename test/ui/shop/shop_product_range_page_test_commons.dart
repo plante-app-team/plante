@@ -39,6 +39,7 @@ import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/suggestions/suggestion_type.dart';
 import 'package:plante/products/viewed_products_storage.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';
@@ -47,6 +48,7 @@ import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_products_at_shops_extra_properties_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
@@ -191,6 +193,8 @@ class ShopProductRangePageTestCommons {
         UserAddressPiece.COUNTRY_CODE, countryCode);
     GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
         userAddressObtainer);
+    GetIt.I.registerSingleton<LatestCameraPosStorage>(
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
 
     final params = UserParams((v) => v.name = 'Bob');
     await userParamsController.setUserParams(params);

@@ -51,6 +51,7 @@ enum MapPageRequestedMode {
   DEFAULT,
   ADD_PRODUCT,
   SELECT_SHOPS,
+  DEMONSTRATE_SHOPS,
 }
 
 class MapPageController {
@@ -121,6 +122,8 @@ class _MapPageState extends PageStatePlante<MapPage>
       UIValue(null, ref);
 
   late final _loadNewShops = UIValue(true, ref);
+  late final _shouldShowSearchBar = UIValue(true, ref);
+  late final _zoom = UIValue<double>(0, ref);
 
   _MapPageState()
       : _permissionsManager = GetIt.I.get<PermissionsManager>(),
@@ -194,38 +197,37 @@ class _MapPageState extends PageStatePlante<MapPage>
         markerBuilder: _markersBuilder, levels: clusteringLevels);
 
     final updateBottomHintCallback = _bottomHint.setValue;
-    final moveMapCallback = (Coord coord) async {
-      final mapController = await _mapController.future;
-      await mapController.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(
-              target: LatLng(coord.lat, coord.lon),
-              zoom: await mapController.getZoomLevel())));
+    final showOnMapCallback = (Iterable<Coord> coords, [double? zoom]) async {
+      await _moveCameraToShowCoords(coords, zoom: zoom);
     };
     final switchModeCallback = (MapPageMode newMode) {
-      analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
       final oldMode = _mode.cachedVal;
       oldMode.deinit();
+      analytics.sendEvent('map_page_mode_switch_${newMode.nameForAnalytics}');
       _mode.setValue(newMode);
       newMode.init(oldMode);
       updateMapCallback.call();
     };
     _mode = UIValue(
         MapPageModeDefault(MapPageModeParams(
-            analytics: analytics,
-            model: _model,
-            hintsListController: _hintsController,
-            widgetSource: () => widget,
-            contextSource: () => context,
-            displayedShopsSource: () => _displayedShops,
-            updateMapCallback: updateMapCallback,
-            bottomHintCallback: updateBottomHintCallback,
-            moveMapCallback: moveMapCallback,
-            modeSwitchCallback: switchModeCallback,
-            uiValuesFactory: uiValuesFactory,
-            isLoading: _model.loading,
-            isLoadingSuggestions: _model.loadingSuggestions,
-            areShopsForViewPortLoaded: _model.viewPortShopsLoaded,
-            shouldLoadNewShops: _loadNewShops)),
+          analytics: analytics,
+          model: _model,
+          hintsListController: _hintsController,
+          widgetSource: () => widget,
+          contextSource: () => context,
+          displayedShopsSource: () => _displayedShops,
+          updateMapCallback: updateMapCallback,
+          bottomHintCallback: updateBottomHintCallback,
+          showOnMapCallback: showOnMapCallback,
+          modeSwitchCallback: switchModeCallback,
+          uiValuesFactory: uiValuesFactory,
+          isLoading: _model.loading,
+          isLoadingSuggestions: _model.loadingSuggestions,
+          areShopsForViewPortLoaded: _model.viewPortShopsLoaded,
+          zoom: _zoom,
+          shouldLoadNewShops: _loadNewShops,
+          shouldShowSearchBar: _shouldShowSearchBar,
+        )),
         ref);
 
     widget.controller?._switchToDefaultMode = () {
@@ -351,9 +353,10 @@ class _MapPageState extends PageStatePlante<MapPage>
     }
 
     final searchBar = consumer((ref) {
+      final shouldShow = _shouldShowSearchBar.watch(ref);
       final loadNewShops = _loadNewShops.watch(ref);
       final viewPortShopsLoaded = _model.viewPortShopsLoaded.watch(ref);
-      if (!loadNewShops || !viewPortShopsLoaded) {
+      if (!shouldShow || !loadNewShops || !viewPortShopsLoaded) {
         return const SizedBox();
       }
       return Hero(
@@ -501,7 +504,8 @@ class _MapPageState extends PageStatePlante<MapPage>
             FabMyLocation(
                 key: const Key('my_location_fab'),
                 userCoord: _obtainCurrentUserPos,
-                onTapResult: _moveCameraTo)
+                onTapResult: (coord) =>
+                    _moveCameraToShowCoords([coord], zoom: 17))
           ];
       final fabs = modeFabs
           .map((e) => Padding(
@@ -513,7 +517,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     });
   }
 
-  Future<CameraPosition?> _obtainCurrentUserPos() async {
+  Future<Coord?> _obtainCurrentUserPos() async {
     if (!await _ensurePermissions()) {
       return null;
     }
@@ -551,8 +555,9 @@ class _MapPageState extends PageStatePlante<MapPage>
   }
 
   void _onCameraMove(CameraPosition position) {
+    _zoom.setValue(position.zoom);
     _clusterManager.onCameraMove(position);
-    _mode.cachedVal.onCameraMove(position.target.toCoord(), position.zoom);
+    _mode.cachedVal.onCameraMove(position.target.toCoord());
   }
 
   void _onCameraIdle() async {
@@ -617,34 +622,40 @@ class _MapPageState extends PageStatePlante<MapPage>
     final road = result.chosenRoad;
     if (shops != null && shops.isNotEmpty) {
       _mode.cachedVal.deselectShops();
-      if (shops.length == 1) {
-        await _moveCameraTo(
-            CameraPosition(target: shops.first.coord.toLatLng(), zoom: 17));
-      } else {
-        final coords = shops.map((e) => e.coord);
-        await _moveCameraToShowManyCoords(coords);
-      }
+      await _moveCameraToShowCoords(shops.map((e) => e.coord));
       _onMarkerClick(shops);
     } else if (road != null) {
       _mode.cachedVal.deselectShops();
-      await _moveCameraTo(
-          CameraPosition(target: road.coord.toLatLng(), zoom: 17));
+      await _moveCameraToShowCoords([road.coord], zoom: 17);
     }
   }
 
-  Future<void> _moveCameraToShowManyCoords(Iterable<Coord> coords) async {
+  /// Returns visible region after camera move
+  Future<LatLngBounds> _moveCameraToShowCoords(
+    Iterable<Coord> coords, {
+
+    /// if not specified, the function will determine a good zoom by itself
+    double? zoom,
+  }) async {
+    final mapController = await _mapController.future;
+
+    if (coords.length == 1) {
+      await _moveCameraTo(CameraPosition(
+          target: coords.first.toLatLng(), zoom: zoom ?? _zoom.cachedVal));
+      return await mapController.getVisibleRegion();
+    }
+
     final coordsBounds = outliningRectFor(coords);
     final screenSize = MediaQuery.of(context).size;
     // -2 is so that the markers won't be hidden behind the search
     // bar or the shops cards (the map will be zoomed out a little more
     // than necessary).
-    var zoomLevel = boundsZoomLevel(coordsBounds, screenSize) - 2;
+    var zoomLevel = zoom ?? boundsZoomLevel(coordsBounds, screenSize) - 2;
     if (zoomLevel < MapPageMode.DEFAULT_MIN_ZOOM) {
       zoomLevel = MapPageMode.DEFAULT_MIN_ZOOM;
     } else if (MapPageMode.DEFAULT_MAX_ZOOM < zoomLevel) {
       zoomLevel = MapPageMode.DEFAULT_MAX_ZOOM;
     }
-    final mapController = await _mapController.future;
 
     // At first let's just zoom out to see if that will be enough in
     // order for any of coords to be visible.
@@ -670,6 +681,8 @@ class _MapPageState extends PageStatePlante<MapPage>
       await mapController.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: coords.first.toLatLng(), zoom: zoomLevel)));
     }
+
+    return await mapController.getVisibleRegion();
   }
 
   Future<bool> _onWillPop() async {

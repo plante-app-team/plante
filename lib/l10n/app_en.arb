@@ -56,8 +56,16 @@
     "display_product_page_moderator_comment_dialog_source": "Source:",
     "display_product_page_moderator_comment_dialog_title": "Moderator's comment",
     "display_product_page_no_info_in_your_langs": "No information about the product in your language",
+    "display_product_page_not_sold_nearby": "Not sold nearby",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Data from Open Food Facts",
     "display_product_page_report_btn": "Report incorrect information",
+    "display_product_page_show_where_sold": "Show where sold",
+    "@display_product_page_show_where_sold": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
     "display_product_page_table_column1": "Product",
     "display_product_page_table_column3": "Vegan",
     "@display_product_page_table_column3": {

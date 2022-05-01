@@ -14,6 +14,7 @@ import 'package:plante/ui/map/components/map_filter_check_button.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_mode.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_add_product.dart';
+import 'package:plante/ui/map/map_page/map_page_mode_demonstrate_shops.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_select_shops_where_product_sold.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_shops_card_base.dart';
 import 'package:plante/ui/map/map_page/map_page_mode_zoomed_out.dart';
@@ -48,6 +49,9 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
         return;
       case MapPageRequestedMode.SELECT_SHOPS:
         switchModeTo(MapPageModeSelectShopsWhereProductSold(params));
+        return;
+      case MapPageRequestedMode.DEMONSTRATE_SHOPS:
+        switchModeTo(MapPageModeDemonstrateShops(params));
         return;
       case MapPageRequestedMode.DEFAULT:
         if (widget.product != null) {
@@ -233,8 +237,8 @@ class MapPageModeDefault extends MapPageModeShopsCardBase {
   double minZoom() => MIN_ZOOM;
 
   @override
-  void onCameraMove(Coord coord, double zoom) {
-    if (zoom < super.minZoom()) {
+  void onCameraMove(Coord coord) {
+    if (zoom.cachedVal < super.minZoom()) {
       switchModeTo(MapPageModeZoomedOut(params));
     }
   }
