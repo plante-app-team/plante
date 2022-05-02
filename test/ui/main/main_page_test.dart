@@ -47,6 +47,7 @@ void main() {
   late MockViewedProductsStorage viewedProductsStorage;
   late MockContributedByUserProductsStorage contributedByUserProductsStorage;
   late FakeUserContributionsManager userContributionsManager;
+  late FakeNewsFeedManager newsFeedManager;
 
   setUp(() async {
     mapTestsCommons = MapPageModesTestCommons();
@@ -86,7 +87,8 @@ void main() {
     userContributionsManager = FakeUserContributionsManager();
     GetIt.I
         .registerSingleton<UserContributionsManager>(userContributionsManager);
-    GetIt.I.registerSingleton<NewsFeedManager>(FakeNewsFeedManager());
+    newsFeedManager = FakeNewsFeedManager();
+    GetIt.I.registerSingleton<NewsFeedManager>(newsFeedManager);
   });
 
   Future<void> forceMapIdleState(WidgetTester tester) async {
@@ -362,9 +364,23 @@ void main() {
     expect(currentPage().key, equals(const Key('main_profile_page')));
 
     // Now there's an interaction!
-    // No interactions when MainPage is created
     verify(contributedByUserProductsStorage.getProducts());
     expect(userContributionsManager.getContributionsCallsCount_testing(),
         equals(1));
+  });
+
+  testWidgets('news fed is not requested implicitly',
+      (WidgetTester tester) async {
+    await tester.superPump(const MainPage());
+
+    // No interactions when MainPage is created
+    expect(newsFeedManager.obtainedPages_testing(), isEmpty);
+
+    expect(currentPage().key, isNot(equals(const Key('main_news_feed_page'))));
+    await tester.superTap(find.byKey(const Key('bottom_bar_news_feed')));
+    expect(currentPage().key, equals(const Key('main_news_feed_page')));
+
+    // Now there's an interaction!
+    expect(newsFeedManager.obtainedPages_testing(), isNotEmpty);
   });
 }
