@@ -47,59 +47,56 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
 
   final _visibleShops = <Shop>{};
   late final _loadingByPullToRefresh = UIValue(false, ref);
+  late final _initialLoadStarted = UIValue(false, ref);
 
   _NewsFeedPageState() : super('PageStatePlante');
 
   @override
-  void initState() {
-    super.initState();
-    _initAsync();
-  }
-
-  void _initAsync() async {
-    await nextFrame();
-    await _model.maybeLoadNextNews();
-  }
-
-  @override
   Widget buildPage(BuildContext context) {
+    final content = Stack(children: [
+      consumer((ref) {
+        final newsWidgets = _newsPiecesWidgets(_model.newsPieces.watch(ref));
+        return RefreshIndicator(
+            onRefresh: () async {
+              _loadingByPullToRefresh.setValue(true);
+              await _model.reloadNews();
+              _loadingByPullToRefresh.setValue(false);
+            },
+            child: AnimatedListSimplePlante(
+              key: const Key('news_pieces_list'),
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 21),
+                  child: Text(context.strings.news_feed_page_new_events_title,
+                      style: TextStyles.newsTitle),
+                ),
+                ...newsWidgets,
+                if (_model.newsPieces.watch(ref).isNotEmpty)
+                  _loadingOrErrorOrNothing(),
+              ],
+            ));
+      }),
+      if (_model.newsPieces.watch(ref).isEmpty) _loadingOrErrorOrNothing(),
+    ]);
     return Scaffold(
         backgroundColor: ColorsPlante.lightGrey,
         body: SafeArea(
-            child: Stack(children: [
-          consumer((ref) {
-            final newsWidgets =
-                _newsPiecesWidgets(_model.newsPieces.watch(ref));
-            return RefreshIndicator(
-                onRefresh: () async {
-                  _loadingByPullToRefresh.setValue(true);
-                  await _model.reloadNews();
-                  _loadingByPullToRefresh.setValue(false);
+            child: VisibilityDetectorPlante(
+                keyStr: 'UserProductsWidget_visibilityDetector',
+                onVisibilityChanged: (visible, _) async {
+                  if (visible && !_initialLoadStarted.cachedVal) {
+                    _initialLoadStarted.setValue(true);
+                    await _model.maybeLoadNextNews();
+                  }
                 },
-                child: AnimatedListSimplePlante(
-                  key: const Key('news_pieces_list'),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 21),
-                      child: Text(
-                          context.strings.news_feed_page_new_events_title,
-                          style: TextStyles.newsTitle),
-                    ),
-                    ...newsWidgets,
-                    if (_model.newsPieces.watch(ref).isNotEmpty)
-                      _loadingOrErrorOrNothing(),
-                  ],
-                ));
-          }),
-          if (_model.newsPieces.watch(ref).isEmpty) _loadingOrErrorOrNothing(),
-        ])));
+                child: content)));
   }
 
   Widget _loadingOrErrorOrNothing() {
     return consumer((ref) {
-      if (_model.loading.watch(ref)) {
+      if (!_initialLoadStarted.watch(ref) || _model.loading.watch(ref)) {
         if (_loadingByPullToRefresh.watch(ref)) {
           return const SizedBox();
         }
