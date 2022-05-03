@@ -3,12 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
@@ -21,8 +19,8 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/ui/map/shop_creation/create_shop_page.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../test_di_registry.dart';
 import '../../../widget_tester_extension.dart';
-import '../../../z_fakes/fake_analytics.dart';
 
 void main() {
   late MockShopsManager shopsManager;
@@ -32,14 +30,13 @@ void main() {
   final coord = Coord(lat: 3.4, lon: 1.2);
 
   setUp(() async {
-    await GetIt.I.reset();
-
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-
     shopsManager = MockShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     addressObtainer = MockAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
+
+    await TestDiRegistry.register((r) {
+      r.register<ShopsManager>(shopsManager);
+      r.register<AddressObtainer>(addressObtainer);
+    });
 
     when(shopsManager.createShop(
             name: anyNamed('name'),

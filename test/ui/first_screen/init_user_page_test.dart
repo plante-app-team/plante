@@ -2,14 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
@@ -21,8 +18,8 @@ import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -35,19 +32,18 @@ void main() {
   late FakeUserAvatarManager userAvatarManager;
 
   setUp(() async {
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-    GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());
-
     userParamsController = FakeUserParamsController();
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     userLangsManager = FakeUserLangsManager([LangCode.en],
         fakeUserParamsController: userParamsController, auto: true);
-    GetIt.I.registerSingleton<UserLangsManager>(userLangsManager);
     backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
     userAvatarManager = FakeUserAvatarManager(userParamsController);
-    GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
+
+    await TestDiRegistry.register((r) {
+      r.register<UserParamsController>(userParamsController);
+      r.register<UserLangsManager>(userLangsManager);
+      r.register<Backend>(backend);
+      r.register<UserAvatarManager>(userAvatarManager);
+    });
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
   });

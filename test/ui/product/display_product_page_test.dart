@@ -2,22 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/input_products_lang_storage.dart';
-import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
-import 'package:plante/model/coord.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -25,34 +18,22 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
-import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
-import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
-import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_finders_extension.dart';
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_address_obtainer.dart';
 import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
-import '../../z_fakes/fake_input_products_lang_storage.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
-import '../../z_fakes/fake_suggested_products_manager.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
@@ -60,12 +41,10 @@ const _DEFAULT_LANG = LangCode.en;
 void main() {
   late MockProductsManager productsManager;
   late MockUserReportsMaker userReportsMaker;
-  late MockUserLocationManager userLocationManager;
   late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
   late FakeAnalytics analytics;
-  late FakeAddressObtainer addressObtainer;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -78,73 +57,34 @@ void main() {
       ..productsCount = 2)));
 
   setUp(() async {
-    await GetIt.I.reset();
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-
     productsManager = MockProductsManager();
+    userReportsMaker = MockUserReportsMaker();
+    viewedProductsStorage = ViewedProductsStorage();
+    shopsManager = FakeShopsManager();
+    userParamsController = FakeUserParamsController();
+
+    await TestDiRegistry.register((registry) {
+      registry.register<Analytics>(analytics);
+      registry.register<ProductsManager>(productsManager);
+      registry.register<UserReportsMaker>(userReportsMaker);
+      registry.register<ViewedProductsStorage>(viewedProductsStorage);
+      registry.register<ShopsManager>(shopsManager);
+      registry.register<UserParamsController>(userParamsController);
+    });
+
     when(productsManager.createUpdateProduct(any)).thenAnswer(
         (invoc) async => Ok(invoc.positionalArguments[0] as Product));
     when(productsManager.updateProductAndExtractIngredients(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
 
-    userReportsMaker = MockUserReportsMaker();
     when(userReportsMaker.reportProduct(any, any))
         .thenAnswer((_) async => Ok(None()));
-    GetIt.I.registerSingleton<UserReportsMaker>(userReportsMaker);
 
-    final latestCameraPosStorage =
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
-    await latestCameraPosStorage.set(Coord(lat: 10, lon: 20));
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
-    GetIt.I.registerSingleton<InputProductsLangStorage>(
-        FakeInputProductsLangStorage.fromCode(LangCode.en));
-
-    userParamsController = FakeUserParamsController();
-    final user = UserParams((v) => v
+    await userParamsController.setUserParams(UserParams((v) => v
       ..backendClientToken = '123'
       ..backendId = '321'
-      ..name = 'Bob');
-    await userParamsController.setUserParams(user);
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-
-    viewedProductsStorage = ViewedProductsStorage();
-    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
-
-    userLocationManager = MockUserLocationManager();
-    when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
-    when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
-
-    shopsManager = FakeShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
-
-    final photosTaker = MockPhotosTaker();
-    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
-
-    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
-
-    addressObtainer = FakeAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
-
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
-
-    final directionsManager = MockDirectionsManager();
-    when(directionsManager.areDirectionsAvailable())
-        .thenAnswer((_) async => false);
-    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
-    GetIt.I.registerSingleton<SuggestedProductsManager>(
-        FakeSuggestedProductsManager());
-    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
-    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
-        userAddressObtainer);
-    GetIt.I.registerSingleton<SharedPreferencesHolder>(
-        FakeSharedPreferences().asHolder());
-    GetIt.I.registerSingleton<ShopsCreationManager>(
-        ShopsCreationManager(shopsManager));
+      ..name = 'Bob'));
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable
@@ -956,14 +896,14 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(context.strings.display_product_page_show_where_sold),
+    expect(find.text(context.strings.display_product_page_show_where_sold_v2),
         findsOneWidget);
     expect(find.text(context.strings.display_product_page_not_sold_nearby),
         findsNothing);
 
     expect(find.byType(MapPage), findsNothing);
     await tester.superTap(
-        find.text(context.strings.display_product_page_show_where_sold));
+        find.text(context.strings.display_product_page_show_where_sold_v2));
     expect(find.byType(MapPage), findsOneWidget);
 
     final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
@@ -988,7 +928,7 @@ void main() {
 
     final context = await tester.superPump(DisplayProductPage(product));
 
-    expect(find.text(context.strings.display_product_page_show_where_sold),
+    expect(find.text(context.strings.display_product_page_show_where_sold_v2),
         findsNothing);
     expect(find.text(context.strings.display_product_page_not_sold_nearby),
         findsOneWidget);

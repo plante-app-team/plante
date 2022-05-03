@@ -2,55 +2,38 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:plante/base/general_error.dart';
-import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/input_products_lang_storage.dart';
-import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
-import 'package:plante/model/user_params.dart';
-import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/news/news_feed_manager.dart';
 import 'package:plante/outside/backend/news/news_piece.dart';
 import 'package:plante/outside/backend/news/news_piece_type.dart';
-import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_element_type.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
-import 'package:plante/products/viewed_products_storage.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
-import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 
 import '../../common_finders_extension.dart';
-import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_address_obtainer.dart';
-import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_news_feed_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
-import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   var lastNewsPieceId = 0;
@@ -63,36 +46,17 @@ void main() {
   late FakeAddressObtainer addressObtainer;
 
   setUp(() async {
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-
     productsObtainer = FakeProductsObtainer();
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     shopsManager = FakeShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     newsFeedManager = FakeNewsFeedManager();
-    GetIt.I.registerSingleton<NewsFeedManager>(newsFeedManager);
     addressObtainer = FakeAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
 
-    GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
-    GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-    GetIt.I.registerSingleton<PhotosTaker>(MockPhotosTaker());
-    GetIt.I.registerSingleton<InputProductsLangStorage>(
-        FakeInputProductsLangStorage.fromCode(LangCode.en));
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
-    GetIt.I
-        .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
-    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
-    final userParamsController = FakeUserParamsController();
-    await userParamsController.setUserParams(UserParams((v) => v
-      ..backendClientToken = '123'
-      ..backendId = '321'
-      ..name = 'Bob'));
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+    await TestDiRegistry.register((r) {
+      r.register<ProductsObtainer>(productsObtainer);
+      r.register<ShopsManager>(shopsManager);
+      r.register<NewsFeedManager>(newsFeedManager);
+      r.register<AddressObtainer>(addressObtainer);
+    });
   });
 
   Future<void> scroll(WidgetTester tester, double yDiff) async {

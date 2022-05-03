@@ -1306,6 +1306,23 @@ class MockShopsManager extends _i1.Mock implements _i73.ShopsManager {
       (super.noSuchMethod(Invocation.method(#clearCache, []),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future<void>.value()) as _i9.Future<void>);
+  @override
+  _i9.Future<_i2.Result<Map<_i28.OsmUID, _i12.Shop>, _i74.ShopsManagerError>>
+      fetchShopsByUIDs(Iterable<_i28.OsmUID>? uids) =>
+          (super.noSuchMethod(Invocation.method(#fetchShopsByUIDs, [uids]),
+              returnValue:
+                  Future<_i2.Result<Map<_i28.OsmUID, _i12.Shop>, _i74.ShopsManagerError>>.value(
+                      _FakeResult_0<Map<_i28.OsmUID, _i12.Shop>,
+                          _i74.ShopsManagerError>())) as _i9
+              .Future<_i2.Result<Map<_i28.OsmUID, _i12.Shop>, _i74.ShopsManagerError>>);
+  @override
+  _i9.Future<Map<String, List<_i28.OsmUID>>> getShopsContainingBarcodes(
+          _i31.CoordsBounds? bounds, Set<String>? barcodes) =>
+      (super.noSuchMethod(
+          Invocation.method(#getShopsContainingBarcodes, [bounds, barcodes]),
+          returnValue: Future<Map<String, List<_i28.OsmUID>>>.value(
+              <String, List<_i28.OsmUID>>{})) as _i9
+          .Future<Map<String, List<_i28.OsmUID>>>);
 }
 
 /// A class which mocks [ShopsManagerListener].

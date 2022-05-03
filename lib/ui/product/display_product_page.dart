@@ -221,8 +221,8 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                       text =
                           context.strings.display_product_page_not_sold_nearby;
                     } else {
-                      text =
-                          context.strings.display_product_page_show_where_sold;
+                      text = context
+                          .strings.display_product_page_show_where_sold_v2;
                     }
                   } else {
                     text = '';

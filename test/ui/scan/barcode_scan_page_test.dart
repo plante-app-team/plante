@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/base/settings.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/input_products_lang_storage.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/location/user_location_manager.dart';
 import 'package:plante/logging/analytics.dart';
@@ -16,21 +12,17 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/user_params.dart';
-import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
-import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
@@ -38,15 +30,12 @@ import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
-import '../../z_fakes/fake_settings.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_location_manager.dart';
-import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
 
@@ -61,50 +50,33 @@ void main() {
   late FakeAnalytics analytics;
 
   setUp(() async {
-    await GetIt.I.reset();
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-
-    GetIt.I
-        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I.registerSingleton<Settings>(FakeSettings());
     productsManager = MockProductsManager();
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
     productsObtainer = FakeProductsObtainer();
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
-    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     routesObserver = MockRouteObserver();
-    GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(routesObserver);
     permissionsManager = MockPermissionsManager();
-    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     shopsManager = MockShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     final userLocationManager = FakeUserLocationManager();
-    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     final photosTaker = MockPhotosTaker();
-    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    GetIt.I.registerSingleton<InputProductsLangStorage>(
-        FakeInputProductsLangStorage.fromCode(LangCode.en));
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([_DEFAULT_LANG]));
     viewedProductsStorage = ViewedProductsStorage();
-    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+
+    await TestDiRegistry.register((r) {
+      r.register<Analytics>(analytics);
+      r.register<ProductsManager>(productsManager);
+      r.register<ProductsObtainer>(productsObtainer);
+      r.register<Backend>(backend);
+      r.register<RouteObserver<ModalRoute>>(routesObserver);
+      r.register<PermissionsManager>(permissionsManager);
+      r.register<ShopsManager>(shopsManager);
+      r.register<UserLocationManager>(userLocationManager);
+      r.register<PhotosTaker>(photosTaker);
+      r.register<UserLangsManager>(FakeUserLangsManager([_DEFAULT_LANG]));
+      r.register<ViewedProductsStorage>(viewedProductsStorage);
+    });
 
     when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
-
-    final userParamsController = FakeUserParamsController();
-    final user = UserParams((v) => v
-      ..backendClientToken = '123'
-      ..backendId = '321'
-      ..name = 'Bob');
-    await userParamsController.setUserParams(user);
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-
     when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
@@ -113,6 +85,10 @@ void main() {
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
     when(shopsManager.putProductToShops(any, any, any))
         .thenAnswer((_) async => Ok(None()));
+    when(shopsManager.getShopsContainingBarcodes(any, any))
+        .thenAnswer((_) async => const {});
+    when(shopsManager.fetchShopsByUIDs(any))
+        .thenAnswer((_) async => Ok(const {}));
   });
 
   testWidgets('product found', (WidgetTester tester) async {
