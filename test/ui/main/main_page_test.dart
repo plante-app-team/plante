@@ -5,44 +5,29 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/input_products_lang_storage.dart';
-import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/coord.dart';
-import 'package:plante/model/lang_code.dart';
-import 'package:plante/model/user_params.dart';
-import 'package:plante/model/user_params_controller.dart';
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/news/news_feed_manager.dart';
-import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/products/contributed_by_user_products_storage.dart';
-import 'package:plante/products/products_manager.dart';
-import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/main/main_page.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/shop_creation/create_shop_page.dart';
 import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
-import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_news_feed_manager.dart';
-import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shops_manager.dart';
-import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_contributions_manager.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
-import '../../z_fakes/fake_user_params_controller.dart';
 import '../map/map_page/map_page_modes_test_commons.dart';
 
 void main() {
   late MapPageModesTestCommons mapTestsCommons;
-  late FakeProductsObtainer productsObtainer;
   late FakeShopsManager shopsManager;
   late MockViewedProductsStorage viewedProductsStorage;
   late MockContributedByUserProductsStorage contributedByUserProductsStorage;
@@ -50,45 +35,24 @@ void main() {
   late FakeNewsFeedManager newsFeedManager;
 
   setUp(() async {
-    mapTestsCommons = MapPageModesTestCommons();
-    await mapTestsCommons.setUp();
-    shopsManager = mapTestsCommons.shopsManager;
-
-    productsObtainer = FakeProductsObtainer();
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
-    final userParamsController = FakeUserParamsController();
-    await userParamsController.setUserParams(UserParams());
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
     viewedProductsStorage = MockViewedProductsStorage();
-    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
-
     contributedByUserProductsStorage = MockContributedByUserProductsStorage();
-    GetIt.I.registerSingleton<ContributedByUserProductsStorage>(
-        contributedByUserProductsStorage);
-    when(contributedByUserProductsStorage.getProducts()).thenReturn(const []);
-
-    GetIt.I.registerSingleton<ProductsManager>(MockProductsManager());
-
-    GetIt.I.registerSingleton<InputProductsLangStorage>(
-        FakeInputProductsLangStorage.fromCode(LangCode.en));
-
-    final backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
-    when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
-
-    final photosTaker = MockPhotosTaker();
-    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-
-    GetIt.I.registerSingleton<UserAvatarManager>(
-        FakeUserAvatarManager(userParamsController));
     userContributionsManager = FakeUserContributionsManager();
-    GetIt.I
-        .registerSingleton<UserContributionsManager>(userContributionsManager);
     newsFeedManager = FakeNewsFeedManager();
-    GetIt.I.registerSingleton<NewsFeedManager>(newsFeedManager);
+
+    await TestDiRegistry.register((r) async {
+      mapTestsCommons = MapPageModesTestCommons();
+      await mapTestsCommons.setUpImpl(r);
+      shopsManager = mapTestsCommons.shopsManager;
+
+      r.register<ViewedProductsStorage>(viewedProductsStorage);
+      r.register<ContributedByUserProductsStorage>(
+          contributedByUserProductsStorage);
+      r.register<UserContributionsManager>(userContributionsManager);
+      r.register<NewsFeedManager>(newsFeedManager);
+    });
+
+    when(contributedByUserProductsStorage.getProducts()).thenReturn(const []);
   });
 
   Future<void> forceMapIdleState(WidgetTester tester) async {

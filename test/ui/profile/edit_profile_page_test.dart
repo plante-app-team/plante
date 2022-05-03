@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -17,8 +15,8 @@ import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/profile/edit_profile_page.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
-import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
@@ -30,16 +28,15 @@ void main() {
   late MockBackend backend;
 
   setUp(() async {
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-
     userParamsController = FakeUserParamsController();
     userAvatarManager = FakeUserAvatarManager(userParamsController);
     backend = MockBackend();
 
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    GetIt.I.registerSingleton<UserAvatarManager>(userAvatarManager);
-    GetIt.I.registerSingleton<Backend>(backend);
+    await TestDiRegistry.register((r) {
+      r.register<UserParamsController>(userParamsController);
+      r.register<UserAvatarManager>(userAvatarManager);
+      r.register<Backend>(backend);
+    });
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
   });

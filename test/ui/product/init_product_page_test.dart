@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
@@ -15,44 +14,34 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
-import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
-import 'package:plante/outside/map/directions_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
-import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
-import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/components/dropdown_plante.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
-import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/init_product_page_model.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
-import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
-import '../../z_fakes/fake_suggested_products_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
-import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_TEST_LANG = LangCode.en;
 const _NOT_DEFAULT_TEST_LANG = LangCode.ru;
@@ -80,11 +69,30 @@ void main() {
       ..productsCount = 2)));
 
   setUp(() async {
-    await GetIt.I.reset();
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-
     photosTaker = MockPhotosTaker();
+    productsManager = MockProductsManager();
+    shopsManager = MockShopsManager();
+    userLocationManager = MockUserLocationManager();
+    permissionsManager = MockPermissionsManager();
+    addressObtainer = MockAddressObtainer();
+    inputProductsLangStorage =
+        FakeInputProductsLangStorage.fromCode(_DEFAULT_TEST_LANG);
+    viewedProductsStorage = ViewedProductsStorage();
+
+    await TestDiRegistry.register((r) {
+      r.register<Analytics>(analytics);
+      r.register<PhotosTaker>(photosTaker);
+      r.register<ProductsManager>(productsManager);
+      r.register<ShopsManager>(shopsManager);
+      r.register<UserLocationManager>(userLocationManager);
+      r.register<PermissionsManager>(permissionsManager);
+      r.register<AddressObtainer>(addressObtainer);
+      r.register<InputProductsLangStorage>(inputProductsLangStorage);
+      r.register<UserLangsManager>(FakeUserLangsManager(_USER_LANGS));
+      r.register<ViewedProductsStorage>(viewedProductsStorage);
+    });
+
     when(photosTaker.takeAndCropPhoto(any, any, any,
             minSize: anyNamed('minSize'),
             downsizeTo: anyNamed('downsizeTo'),
@@ -99,67 +107,25 @@ void main() {
             (_) async => Uri.file(File('./test/assets/img.jpg').absolute.path));
     when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
-    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
 
-    productsManager = MockProductsManager();
     when(productsManager.createUpdateProduct(any)).thenAnswer((invoc) async {
       return Ok(invoc.positionalArguments[0] as Product);
     });
     when(productsManager.updateProductAndExtractIngredients(any, any))
         .thenAnswer((_) async => Err(ProductsManagerError.OTHER));
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
 
-    shopsManager = MockShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     when(shopsManager.putProductToShops(any, any, any))
         .thenAnswer((_) async => Ok(None()));
 
-    GetIt.I.registerSingleton<UserParamsController>(FakeUserParamsController());
-
-    userLocationManager = MockUserLocationManager();
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);
     when(userLocationManager.lastKnownPosition()).thenAnswer((_) async => null);
-    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
 
-    permissionsManager = MockPermissionsManager();
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.openAppSettings()).thenAnswer((_) async => true);
-    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
 
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
-
-    addressObtainer = MockAddressObtainer();
     when(addressObtainer.addressOfShop(any))
         .thenAnswer((_) async => Ok(OsmShortAddress.empty));
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
-
-    inputProductsLangStorage =
-        FakeInputProductsLangStorage.fromCode(_DEFAULT_TEST_LANG);
-    GetIt.I
-        .registerSingleton<InputProductsLangStorage>(inputProductsLangStorage);
-
-    GetIt.I
-        .registerSingleton<UserLangsManager>(FakeUserLangsManager(_USER_LANGS));
-
-    final directionsManager = MockDirectionsManager();
-    when(directionsManager.areDirectionsAvailable())
-        .thenAnswer((_) async => false);
-    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
-
-    GetIt.I.registerSingleton<SuggestedProductsManager>(
-        FakeSuggestedProductsManager());
-    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
-    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
-        userAddressObtainer);
-    GetIt.I.registerSingleton<SharedPreferencesHolder>(
-        FakeSharedPreferences().asHolder());
-    GetIt.I.registerSingleton<ShopsCreationManager>(
-        ShopsCreationManager(shopsManager));
-
-    viewedProductsStorage = ViewedProductsStorage();
-    GetIt.I.registerSingleton<ViewedProductsStorage>(viewedProductsStorage);
   });
 
   Future<void> scrollToBottom(WidgetTester tester) async {

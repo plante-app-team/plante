@@ -2,18 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:built_collection/built_collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/lang/input_products_lang_storage.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
-import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/country_code.dart';
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
@@ -22,9 +15,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/extra_properties/products_at_shops_extra_properties_manager.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -38,20 +29,14 @@ import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/suggestions/suggestion_type.dart';
-import 'package:plante/products/viewed_products_storage.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
-import 'package:plante/ui/photos/photos_taker.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../z_fakes/fake_analytics.dart';
+import '../../test_di_registry.dart';
 import '../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
-import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_products_at_shops_extra_properties_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_suggested_products_manager.dart';
-import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 class ShopProductRangePageTestCommons {
@@ -154,50 +139,31 @@ class ShopProductRangePageTestCommons {
         ..ingredientsText = 'Water, salt, sugar').productForTests(),
     ];
 
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
     shopsManager = FakeShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     userParamsController = FakeUserParamsController();
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
     productsManager = MockProductsManager();
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
     productsObtainer = FakeProductsObtainer();
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
     permissionsManager = MockPermissionsManager();
-    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
-    GetIt.I
-        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I
-        .registerSingleton<ViewedProductsStorage>(MockViewedProductsStorage());
-    GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
     addressObtainer = MockAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
-    final photosTaker = MockPhotosTaker();
-    GetIt.I.registerSingleton<PhotosTaker>(photosTaker);
-    GetIt.I.registerSingleton<InputProductsLangStorage>(
-        FakeInputProductsLangStorage.fromCode(LangCode.en));
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
-    GetIt.I.registerSingleton<Backend>(MockBackend());
-    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     suggestedProductsManager = FakeSuggestedProductsManager();
-    GetIt.I
-        .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-    when(photosTaker.retrieveLostPhoto(any)).thenAnswer((_) async => null);
     productsExtraProperties = FakeProductsAtShopsExtraPropertiesManager();
-    GetIt.I.registerSingleton<ProductsAtShopsExtraPropertiesManager>(
-        productsExtraProperties);
     userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    await TestDiRegistry.register((r) {
+      r.register<ShopsManager>(shopsManager);
+      r.register<UserParamsController>(userParamsController);
+      r.register<ProductsManager>(productsManager);
+      r.register<ProductsObtainer>(productsObtainer);
+      r.register<PermissionsManager>(permissionsManager);
+      r.register<AddressObtainer>(addressObtainer);
+      r.register<SuggestedProductsManager>(suggestedProductsManager);
+      r.register<ProductsAtShopsExtraPropertiesManager>(
+          productsExtraProperties);
+      r.register<CachingUserAddressPiecesObtainer>(userAddressObtainer);
+    });
+
     userAddressObtainer.setResultFor(UserAddressType.CAMERA_LOCATION,
         UserAddressPiece.COUNTRY_CODE, countryCode);
-    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
-        userAddressObtainer);
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
-
-    final params = UserParams((v) => v.name = 'Bob');
-    await userParamsController.setUserParams(params);
+    await userParamsController.setUserParams(UserParams((v) => v.name = 'Bob'));
 
     shopsManager.setShopRange(aShop.osmUID, Ok(range));
     productsObtainer.addKnownProducts(confirmedProducts);

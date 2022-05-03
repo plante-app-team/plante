@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -16,6 +14,7 @@ import 'package:plante/outside/identity/google_user.dart';
 import 'package:plante/ui/first_screen/external_auth_page.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -28,19 +27,19 @@ void main() {
   late FakeUserParamsController userParamsController;
 
   setUp(() async {
-    await GetIt.I.reset();
     googleAuthorizer = MockGoogleAuthorizer();
-    GetIt.I.registerSingleton<GoogleAuthorizer>(googleAuthorizer);
     appleAuthorizer = MockAppleAuthorizer();
-    GetIt.I.registerSingleton<AppleAuthorizer>(appleAuthorizer);
     backend = MockBackend();
-    GetIt.I.registerSingleton<Backend>(backend);
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-    GetIt.I
-        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
     userParamsController = FakeUserParamsController();
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
+
+    await TestDiRegistry.register((r) {
+      r.register<GoogleAuthorizer>(googleAuthorizer);
+      r.register<AppleAuthorizer>(appleAuthorizer);
+      r.register<Backend>(backend);
+      r.register<Analytics>(analytics);
+      r.register<UserParamsController>(userParamsController);
+    });
 
     when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
   });

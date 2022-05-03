@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
@@ -11,21 +10,14 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
-import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/directions_manager.dart';
-import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
-import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
-import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
-import 'package:plante/outside/map/user_address/user_address_piece.dart';
-import 'package:plante/outside/map/user_address/user_address_type.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
@@ -33,10 +25,9 @@ import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../test_di_registry.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
-import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
-import '../../../z_fakes/fake_settings.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
@@ -62,45 +53,28 @@ class MapPageModesTestCommons {
     northeast: Coord(lat: 11, lon: 11),
   );
 
-  Future<void> setUp() async {
-    await GetIt.I.reset();
+  Future<void> setUpImpl(TestDiRegistrar registrar) async {
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-
     permissionsManager = MockPermissionsManager();
-    GetIt.I.registerSingleton<PermissionsManager>(permissionsManager);
     shopsManager = FakeShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     userLocationManager = MockUserLocationManager();
-    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     mapController = MockGoogleMapController();
     prefs = FakeSharedPreferences();
     latestCameraPosStorage = MockLatestCameraPosStorage();
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(latestCameraPosStorage);
     addressObtainer = MockAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
-    final roadsManager = MockRoadsManager();
-    GetIt.I.registerSingleton<RoadsManager>(roadsManager);
-    final osmSearcher = MockOsmSearcher();
-    GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
     directionsManager = MockDirectionsManager();
-    GetIt.I.registerSingleton<DirectionsManager>(directionsManager);
     suggestedProductsManager = FakeSuggestedProductsManager();
-    GetIt.I
-        .registerSingleton<SuggestedProductsManager>(suggestedProductsManager);
-    final userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
-    userAddressObtainer.setResultFor(
-        UserAddressType.CAMERA_LOCATION, UserAddressPiece.COUNTRY_CODE, 'be');
-    GetIt.I.registerSingleton<CachingUserAddressPiecesObtainer>(
-        userAddressObtainer);
-    GetIt.I.registerSingleton<SharedPreferencesHolder>(
-        FakeSharedPreferences().asHolder());
-    final displayedDistanceManager =
-        DisplayedDistanceUnitsManager(userAddressObtainer, FakeSettings());
-    GetIt.I.registerSingleton<DisplayedDistanceUnitsManager>(
-        displayedDistanceManager);
     shopsCreationManager = ShopsCreationManager(shopsManager);
-    GetIt.I.registerSingleton<ShopsCreationManager>(shopsCreationManager);
+
+    registrar.register<Analytics>(analytics);
+    registrar.register<PermissionsManager>(permissionsManager);
+    registrar.register<ShopsManager>(shopsManager);
+    registrar.register<UserLocationManager>(userLocationManager);
+    registrar.register<LatestCameraPosStorage>(latestCameraPosStorage);
+    registrar.register<AddressObtainer>(addressObtainer);
+    registrar.register<DirectionsManager>(directionsManager);
+    registrar.register<SuggestedProductsManager>(suggestedProductsManager);
+    registrar.register<ShopsCreationManager>(shopsCreationManager);
 
     await fillFetchedShops();
 
@@ -130,11 +104,12 @@ class MapPageModesTestCommons {
     when(addressObtainer.shortAddressOfCoords(any))
         .thenAnswer((_) async => Ok(readyAddress.toShort()));
 
-    when(roadsManager.fetchRoadsWithinAndNearby(any))
-        .thenAnswer((_) async => Ok(const []));
-
     when(directionsManager.areDirectionsAvailable())
         .thenAnswer((_) async => false);
+  }
+
+  Future<void> setUp() async {
+    await TestDiRegistry.register(setUpImpl);
   }
 
   Future<void> fillFetchedShops([MapPage? widget, WidgetTester? tester]) async {

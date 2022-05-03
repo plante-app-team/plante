@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
@@ -15,6 +14,7 @@ import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
 
@@ -23,14 +23,16 @@ void main() {
   late FakeAnalytics analytics;
 
   setUp(() async {
-    await GetIt.I.reset();
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
-
     productsManager = MockProductsManager();
+
+    await TestDiRegistry.register((r) {
+      r.register<Analytics>(analytics);
+      r.register<ProductsManager>(productsManager);
+    });
+
     when(productsManager.createUpdateProduct(any)).thenAnswer(
         (invoc) async => Ok(invoc.positionalArguments[0] as Product));
-    GetIt.I.registerSingleton<ProductsManager>(productsManager);
   });
 
   testWidgets('good scenario', (WidgetTester tester) async {

@@ -5,6 +5,14 @@ class FakeUserParamsController implements UserParamsController {
   final _observers = <UserParamsControllerObserver>[];
   UserParams? _userParams;
 
+  // ignore: non_constant_identifier_names
+  void setUserParams_testing(UserParams? userParams) {
+    _userParams = userParams;
+    _observers.forEach((l) {
+      l.onUserParamsUpdate(userParams);
+    });
+  }
+
   @override
   void addObserver(UserParamsControllerObserver observer) =>
       _observers.add(observer);
@@ -20,10 +28,7 @@ class FakeUserParamsController implements UserParamsController {
 
   @override
   Future<void> setUserParams(UserParams? userParams) async {
-    _userParams = userParams;
-    _observers.forEach((l) {
-      l.onUserParamsUpdate(userParams);
-    });
+    setUserParams_testing(userParams);
   }
 
   @override

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
@@ -36,6 +35,7 @@ import 'package:plante/ui/map/search_page/map_search_result.dart';
 
 import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
+import '../../../test_di_registry.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
@@ -126,29 +126,29 @@ void main() {
   }
 
   setUp(() async {
-    await GetIt.I.reset();
-
     shopsManager = MockShopsManager();
-    GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     roadsManager = MockRoadsManager();
-    GetIt.I.registerSingleton<RoadsManager>(roadsManager);
     cameraPosStorage =
         LatestCameraPosStorage(FakeSharedPreferences().asHolder());
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(cameraPosStorage);
     addressObtainer = MockAddressObtainer();
-    GetIt.I.registerSingleton<AddressObtainer>(addressObtainer);
     osmSearcher = MockOsmSearcher();
-    GetIt.I.registerSingleton<OsmSearcher>(osmSearcher);
     userLocationManager = FakeUserLocationManager();
-    GetIt.I.registerSingleton<UserLocationManager>(userLocationManager);
     analytics = FakeAnalytics();
-    GetIt.I.registerSingleton<Analytics>(analytics);
     userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
     settings = FakeSettings();
     displayedDistanceManager =
         DisplayedDistanceUnitsManager(userAddressObtainer, settings);
-    GetIt.I.registerSingleton<DisplayedDistanceUnitsManager>(
-        displayedDistanceManager);
+
+    await TestDiRegistry.register((r) {
+      r.register<ShopsManager>(shopsManager);
+      r.register<RoadsManager>(roadsManager);
+      r.register<LatestCameraPosStorage>(cameraPosStorage);
+      r.register<AddressObtainer>(addressObtainer);
+      r.register<OsmSearcher>(osmSearcher);
+      r.register<UserLocationManager>(userLocationManager);
+      r.register<Analytics>(analytics);
+      r.register<DisplayedDistanceUnitsManager>(displayedDistanceManager);
+    });
 
     await cameraPosStorage.set(cameraPos);
     userLocationManager.setCurrentPosition(userPos);
