@@ -62,8 +62,8 @@
     },
     "display_product_page_off_licence": "Data from Open Food Facts",
     "display_product_page_report_btn": "Report incorrect information",
-    "display_product_page_show_where_sold": "Show where sold",
-    "@display_product_page_show_where_sold": {
+    "display_product_page_show_where_sold_v2": "Where to find",
+    "@display_product_page_show_where_sold_v2": {
         "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
     },
     "display_product_page_table_column1": "Product",
