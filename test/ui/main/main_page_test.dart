@@ -6,7 +6,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contributions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/coord.dart';
-import 'package:plante/outside/backend/news/news_feed_manager.dart';
+import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/main/main_page.dart';

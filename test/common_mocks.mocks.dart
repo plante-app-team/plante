@@ -49,7 +49,6 @@ import 'package:plante/outside/backend/backend_response.dart' as _i3;
 import 'package:plante/outside/backend/backend_shop.dart' as _i29;
 import 'package:plante/outside/backend/mobile_app_config.dart' as _i26;
 import 'package:plante/outside/backend/mobile_app_config_manager.dart' as _i47;
-import 'package:plante/outside/backend/news/news_data_response.dart' as _i34;
 import 'package:plante/outside/backend/product_at_shop_source.dart' as _i33;
 import 'package:plante/outside/backend/product_presence_vote_result.dart'
     as _i32;
@@ -75,6 +74,7 @@ import 'package:plante/outside/map/osm/osm_uid.dart' as _i28;
 import 'package:plante/outside/map/roads_manager.dart' as _i70;
 import 'package:plante/outside/map/shops_manager.dart' as _i73;
 import 'package:plante/outside/map/shops_manager_types.dart' as _i74;
+import 'package:plante/outside/news/news_data_response.dart' as _i34;
 import 'package:plante/outside/off/off_api.dart' as _i48;
 import 'package:plante/outside/off/off_shop.dart' as _i50;
 import 'package:plante/outside/off/off_shops_manager.dart' as _i51;

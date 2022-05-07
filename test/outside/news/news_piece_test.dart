@@ -2,10 +2,10 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/result.dart';
-import 'package:plante/outside/backend/news/news_piece.dart';
-import 'package:plante/outside/backend/news/news_piece_product_at_shop.dart';
-import 'package:plante/outside/backend/news/news_piece_type.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/news/news_piece.dart';
+import 'package:plante/outside/news/news_piece_product_at_shop.dart';
+import 'package:plante/outside/news/news_piece_type.dart';
 
 void main() {
   setUp(() async {});

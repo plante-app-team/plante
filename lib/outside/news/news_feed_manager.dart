@@ -3,7 +3,7 @@ import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/news/news_piece.dart';
+import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 class NewsFeedManager {

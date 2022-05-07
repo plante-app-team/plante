@@ -5,13 +5,13 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
-import 'package:plante/outside/backend/news/news_data_response.dart';
-import 'package:plante/outside/backend/news/news_feed_manager.dart';
-import 'package:plante/outside/backend/news/news_piece.dart';
+import 'package:plante/outside/news/news_data_response.dart';
+import 'package:plante/outside/news/news_feed_manager.dart';
+import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
-import '../../../common_mocks.mocks.dart';
-import '../../../z_fakes/fake_shared_preferences.dart';
+import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late MockBackend backend;
