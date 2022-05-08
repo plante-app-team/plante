@@ -5,8 +5,8 @@ import 'package:built_value/serializer.dart';
 import 'package:plante/base/build_value_helper.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/logging/log.dart';
-import 'package:plante/outside/backend/news/news_piece_product_at_shop.dart';
-import 'package:plante/outside/backend/news/news_piece_type.dart';
+import 'package:plante/outside/news/news_piece_product_at_shop.dart';
+import 'package:plante/outside/news/news_piece_type.dart';
 
 part 'news_piece.g.dart';
 

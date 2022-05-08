@@ -24,13 +24,13 @@ import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_response.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
-import 'package:plante/outside/backend/news/news_data_response.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/product_presence_vote_result.dart';
 import 'package:plante/outside/backend/requested_products_result.dart';
 import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/http_client.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/news/news_data_response.dart';
 
 const BACKEND_ADDRESS = 'planteapp.com';
 const _LOCAL_BACKEND_ADDRESS = 'localhost:8080';

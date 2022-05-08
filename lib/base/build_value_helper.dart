@@ -17,15 +17,15 @@ import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
-import 'package:plante/outside/backend/news/news_data_response.dart';
-import 'package:plante/outside/backend/news/news_piece.dart';
-import 'package:plante/outside/backend/news/news_piece_product_at_shop.dart';
 import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_short_address.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/news/news_data_response.dart';
+import 'package:plante/outside/news/news_piece.dart';
+import 'package:plante/outside/news/news_piece_product_at_shop.dart';
 import 'package:plante/outside/off/off_shop.dart';
 
 part 'build_value_helper.g.dart';

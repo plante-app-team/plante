@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plante/outside/backend/news/news_piece_type.dart';
+import 'package:plante/outside/news/news_piece_type.dart';
 
 void main() {
   setUp(() async {});

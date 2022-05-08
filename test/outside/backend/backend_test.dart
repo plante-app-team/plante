@@ -20,11 +20,11 @@ import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
-import 'package:plante/outside/backend/news/news_data_response.dart';
-import 'package:plante/outside/backend/news/news_piece.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
+import 'package:plante/outside/news/news_data_response.dart';
+import 'package:plante/outside/news/news_piece.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
