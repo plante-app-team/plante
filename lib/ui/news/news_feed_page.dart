@@ -28,7 +28,13 @@ import 'package:plante/ui/product/product_header_widget.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class NewsFeedPage extends PagePlante {
-  const NewsFeedPage({Key? key}) : super(key: key);
+  static const _DEFAULT_NEWS_LIFETIME_SECS = 60 * 6; // 5 minutes
+
+  final int newsLifetimeSecs;
+
+  const NewsFeedPage(
+      {Key? key, this.newsLifetimeSecs = _DEFAULT_NEWS_LIFETIME_SECS})
+      : super(key: key);
 
   @override
   _NewsFeedPageState createState() => _NewsFeedPageState();
@@ -47,9 +53,27 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
 
   final _visibleShops = <Shop>{};
   late final _loadingByPullToRefresh = UIValue(false, ref);
-  late final _initialLoadStarted = UIValue(false, ref);
+
+  late final _firstLoadStarted = UIValue(false, ref);
 
   _NewsFeedPageState() : super('PageStatePlante');
+
+  @override
+  void initState() {
+    super.initState();
+    _model.setNewsLifetimeSecs(widget.newsLifetimeSecs);
+    _model.loading.callOnChanges((loading) {
+      if (loading) {
+        _firstLoadStarted.setValue(true);
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(NewsFeedPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _model.setNewsLifetimeSecs(widget.newsLifetimeSecs);
+  }
 
   @override
   Widget buildPage(BuildContext context) {
@@ -74,11 +98,11 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                 ),
                 ...newsWidgets,
                 if (_model.newsPieces.watch(ref).isNotEmpty)
-                  _loadingOrErrorOrNothing(),
+                  _loadingOrErrorOrNothing(fillSpace: false),
               ],
             ));
       }),
-      if (_model.newsPieces.watch(ref).isEmpty) _loadingOrErrorOrNothing(),
+      _loadingOrErrorOrNothing(fillSpace: true)
     ]);
     return Scaffold(
         backgroundColor: ColorsPlante.lightGrey,
@@ -86,26 +110,33 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
             child: VisibilityDetectorPlante(
                 keyStr: 'UserProductsWidget_visibilityDetector',
                 onVisibilityChanged: (visible, _) async {
-                  if (visible && !_initialLoadStarted.cachedVal) {
-                    _initialLoadStarted.setValue(true);
-                    await _model.maybeLoadNextNews();
+                  if (visible) {
+                    _model.onPageBecameVisible();
                   }
                 },
                 child: content)));
   }
 
-  Widget _loadingOrErrorOrNothing() {
+  Widget _loadingOrErrorOrNothing({required bool fillSpace}) {
+    final makeStack = (Widget child) {
+      return Stack(children: [
+        Container(color: Colors.white.withOpacity(0.5)),
+        child,
+      ]);
+    };
     return consumer((ref) {
-      if (!_initialLoadStarted.watch(ref) || _model.loading.watch(ref)) {
+      if (_model.loading.watch(ref)) {
         if (_loadingByPullToRefresh.watch(ref)) {
           return const SizedBox();
         }
-        return const _LoadingWidget();
+        const result = _LoadingWidget();
+        return fillSpace ? makeStack(result) : result;
       }
       final error = _model.lastError.watch(ref);
       if (error != null) {
-        return _ErrorWidget(
-            error: error, onRetryClick: _model.maybeLoadNextNews);
+        final result =
+            _ErrorWidget(error: error, onRetryClick: _model.maybeLoadNextNews);
+        return fillSpace ? makeStack(result) : result;
       }
       return const SizedBox();
     });

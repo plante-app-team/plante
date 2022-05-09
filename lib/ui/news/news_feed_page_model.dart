@@ -20,6 +20,7 @@ class NewsFeedPageModel {
   final UIValuesFactory _uiValuesFactory;
 
   late final _loading = _uiValuesFactory.create(false);
+  late final _reloading = _uiValuesFactory.create(false);
   late final _lastError = _uiValuesFactory.create<GeneralError?>(null);
   late final _newsPieces = _uiValuesFactory.create<List<NewsPiece>>(const []);
 
@@ -29,7 +30,11 @@ class NewsFeedPageModel {
   var _lastLoadedNewsPage = -1;
   var _allNewsLoaded = false;
 
+  var _newsLifetimeSecs = -1;
+  var _lastFirstPageRequestTime = DateTime.fromMicrosecondsSinceEpoch(0);
+
   UIValueBase<bool> get loading => _loading;
+  UIValueBase<bool> get reloading => _reloading;
   UIValueBase<GeneralError?> get lastError => _lastError;
   UIValueBase<List<NewsPiece>> get newsPieces => _newsPieces;
 
@@ -39,6 +44,19 @@ class NewsFeedPageModel {
   Product? getProductWith(String barcode) => _loadedProducts[barcode];
   Shop? getShopWith(OsmUID uid) => _loadedShops[uid];
   Iterable<Shop> getAllLoadedShops() => _loadedShops.values;
+
+  void setNewsLifetimeSecs(int newsLifetimeSecs) {
+    _newsLifetimeSecs = newsLifetimeSecs;
+  }
+
+  void onPageBecameVisible() {
+    final now = DateTime.now();
+    final secsSinceLastRequest =
+        now.difference(_lastFirstPageRequestTime).inSeconds;
+    if (_newsLifetimeSecs < secsSinceLastRequest) {
+      reloadNews();
+    }
+  }
 
   Future<void> reloadNews() async {
     await _maybeLoadNextNews(clearOldNews: true);
@@ -56,12 +74,15 @@ class NewsFeedPageModel {
       return;
     }
 
-    _loading.setValue(true);
-    _lastError.setValue(null);
     try {
+      _loading.setValue(true);
+      _lastError.setValue(null);
       if (clearOldNews) {
         _allNewsLoaded = false;
         _lastLoadedNewsPage = -1;
+      }
+      if (_lastLoadedNewsPage == -1) {
+        _reloading.setValue(true);
       }
       final result = await _loadNewsImpl();
       if (result.isOk) {
@@ -76,11 +97,16 @@ class NewsFeedPageModel {
         final allNews = _newsPieces.cachedVal.toList();
         allNews.addAll(newNews);
         _newsPieces.setValue(allNews);
+
+        if (_lastLoadedNewsPage == 0) {
+          _lastFirstPageRequestTime = DateTime.now();
+        }
       } else {
         _lastError.setValue(result.unwrapErr());
       }
     } finally {
       _loading.setValue(false);
+      _reloading.setValue(false);
     }
   }
 
