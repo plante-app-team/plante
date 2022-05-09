@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:plante/base/base.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contribution.dart';
@@ -27,11 +25,11 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
-import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/profile/components/contributed_by_user_products_widget.dart';
 
 import '../../../common_mocks.mocks.dart';
+import '../../../stateful_stack_for_testing.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_products_obtainer.dart';
@@ -228,6 +226,7 @@ void main() {
     ]);
 
     final wrapperStack = StatefulStackForTesting(
+      tester: tester,
       children: [
         Container(color: Colors.white),
         ContributedByUserProductsWidget(userContributionsManager, storage,
@@ -241,8 +240,7 @@ void main() {
         equals(0));
 
     // Switch to the contributions widget
-    wrapperStack.switchStackToIndex(1);
-    await tester.pumpAndSettle();
+    await wrapperStack.switchStackToIndex(1);
 
     // Now the contributions are requested
     expect(userContributionsManager.getContributionsCallsCount_testing(),
@@ -261,16 +259,14 @@ void main() {
     ]);
 
     // Switch from the contributions widget
-    wrapperStack.switchStackToIndex(0);
-    await tester.pumpAndSettle();
+    await wrapperStack.switchStackToIndex(0);
 
     // The widget is in the background - we don't expect new requests
     expect(userContributionsManager.getContributionsCallsCount_testing(),
         equals(1));
 
     // Switch to the contributions widget
-    wrapperStack.switchStackToIndex(1);
-    await tester.pumpAndSettle();
+    await wrapperStack.switchStackToIndex(1);
 
     // The widget went foreground - we expect another request to contributions
     expect(userContributionsManager.getContributionsCallsCount_testing(),
@@ -453,42 +449,4 @@ Product _makeProduct(String barcode) {
     ..ingredientsText = 'beans'
     ..veganStatus = VegStatus.positive
     ..veganStatusSource = VegStatusSource.community).productForTests();
-}
-
-class StatefulStackForTesting extends ConsumerStatefulWidget {
-  final List<Widget> children;
-  final _storage = StatefulStackForTestingStorage();
-  StatefulStackForTesting({Key? key, required this.children}) : super(key: key);
-
-  @override
-  _StatefulStackForTestingState createState() =>
-      _StatefulStackForTestingState();
-
-  void switchStackToIndex(int index) {
-    _storage.switchToIndexFn!.call(index);
-  }
-}
-
-class StatefulStackForTestingStorage {
-  ArgCallback<int>? switchToIndexFn;
-}
-
-class _StatefulStackForTestingState
-    extends ConsumerState<StatefulStackForTesting> {
-  late final _index = UIValue<int?>(null, ref);
-
-  @override
-  void initState() {
-    super.initState();
-    widget._storage.switchToIndexFn = _index.setValue;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final index = _index.watch(ref);
-    if (index == null) {
-      return const SizedBox();
-    }
-    return IndexedStack(index: index, children: widget.children);
-  }
 }
