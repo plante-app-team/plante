@@ -8,21 +8,16 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/outside/news/news_data_response.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 import '../../common_mocks.mocks.dart';
-import '../../z_fakes/fake_shared_preferences.dart';
 
 void main() {
   late MockBackend backend;
-  late LatestCameraPosStorage cameraPosStorage;
   late NewsFeedManager newsFeedManager;
 
   setUp(() async {
     backend = MockBackend();
-    cameraPosStorage =
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
-    newsFeedManager = NewsFeedManager(backend, cameraPosStorage);
+    newsFeedManager = NewsFeedManager(backend);
   });
 
   test('get news', () async {
@@ -37,7 +32,6 @@ void main() {
         'barcode': JsonObject('654321'),
         'shop_uid': JsonObject('1:123321')
       }));
-    await cameraPosStorage.set(Coord(lat: 1, lon: 2));
     when(backend.requestNews(any, page: anyNamed('page')))
         .thenAnswer((_) async => Ok(NewsDataResponse((e) => e
           ..lastPage = true
@@ -45,7 +39,8 @@ void main() {
 
     verifyNever(backend.requestNews(any));
 
-    final result = await newsFeedManager.obtainNews(page: 1);
+    final result = await newsFeedManager.obtainNews(
+        page: 1, center: Coord(lat: 1, lon: 2));
     final requestedBounds =
         verify(backend.requestNews(captureAny, page: anyNamed('page')))
             .captured

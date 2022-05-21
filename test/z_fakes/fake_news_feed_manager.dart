@@ -1,5 +1,6 @@
 import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
 
@@ -35,7 +36,7 @@ class FakeNewsFeedManager implements NewsFeedManager {
 
   @override
   Future<Result<List<NewsPiece>, GeneralError>> obtainNews(
-      {required int page}) async {
+      {required int page, required Coord center}) async {
     _obtainedPages.add(page);
 
     final error = _errorsForPages[page];

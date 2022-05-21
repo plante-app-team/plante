@@ -23,17 +23,22 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/news/news_feed_page_model.dart';
 import 'package:plante/ui/product/product_header_widget.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
 
 class NewsFeedPage extends PagePlante {
   static const _DEFAULT_NEWS_LIFETIME_SECS = 60 * 6; // 5 minutes
+  static const _DEFAULT_RELOAD_NEWS_AFTER_KMS = 7;
 
   final int newsLifetimeSecs;
+  final int reloadNewsAfterKms;
 
   const NewsFeedPage(
-      {Key? key, this.newsLifetimeSecs = _DEFAULT_NEWS_LIFETIME_SECS})
+      {Key? key,
+      this.newsLifetimeSecs = _DEFAULT_NEWS_LIFETIME_SECS,
+      this.reloadNewsAfterKms = _DEFAULT_RELOAD_NEWS_AFTER_KMS})
       : super(key: key);
 
   @override
@@ -45,6 +50,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
     GetIt.I.get<NewsFeedManager>(),
     GetIt.I.get<ProductsObtainer>(),
     GetIt.I.get<ShopsManager>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
     uiValuesFactory,
   );
 
@@ -53,7 +59,6 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
 
   final _visibleShops = <Shop>{};
   late final _loadingByPullToRefresh = UIValue(false, ref);
-
   late final _firstLoadStarted = UIValue(false, ref);
 
   _NewsFeedPageState() : super('PageStatePlante');
@@ -62,6 +67,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
   void initState() {
     super.initState();
     _model.setNewsLifetimeSecs(widget.newsLifetimeSecs);
+    _model.setNewsReloadAfterKms(widget.reloadNewsAfterKms);
     _model.loading.callOnChanges((loading) {
       if (loading) {
         _firstLoadStarted.setValue(true);
@@ -73,6 +79,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
   void didUpdateWidget(NewsFeedPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     _model.setNewsLifetimeSecs(widget.newsLifetimeSecs);
+    _model.setNewsReloadAfterKms(widget.reloadNewsAfterKms);
   }
 
   @override
@@ -97,8 +104,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                       style: TextStyles.newsTitle),
                 ),
                 ...newsWidgets,
-                if (_model.newsPieces.watch(ref).isNotEmpty)
-                  _loadingOrErrorOrNothing(fillSpace: false),
+                _loadingOrErrorOrNothing(fillSpace: false),
               ],
             ));
       }),
@@ -129,14 +135,21 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
         if (_loadingByPullToRefresh.watch(ref)) {
           return const SizedBox();
         }
-        const result = _LoadingWidget();
-        return fillSpace ? makeStack(result) : result;
+        if (fillSpace && _model.reloading.watch(ref)) {
+          return makeStack(const _LoadingWidget());
+        } else if (!fillSpace && !_model.reloading.watch(ref)) {
+          return const _LoadingWidget();
+        }
       }
       final error = _model.lastError.watch(ref);
       if (error != null) {
-        final result =
+        final errorWidget = () =>
             _ErrorWidget(error: error, onRetryClick: _model.maybeLoadNextNews);
-        return fillSpace ? makeStack(result) : result;
+        if (fillSpace && _model.newsPieces.watch(ref).isEmpty) {
+          return makeStack(errorWidget());
+        } else if (!fillSpace && !_model.newsPieces.watch(ref).isEmpty) {
+          return errorWidget();
+        }
       }
       return const SizedBox();
     });
@@ -166,7 +179,8 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
               onVisibilityChanged: (visible, _) {
                 if (visible) {
                   _visibleShops.add(shop);
-                  if (_model.newsPieces.cachedVal.last == newsPiece) {
+                  final newsPieces = _model.newsPieces.cachedVal;
+                  if (newsPieces.isNotEmpty && newsPieces.last == newsPiece) {
                     _model.maybeLoadNextNews();
                   }
                 } else {

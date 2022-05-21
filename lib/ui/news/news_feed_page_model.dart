@@ -1,5 +1,8 @@
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/log.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -11,11 +14,13 @@ import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/ui_value.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 class NewsFeedPageModel {
   final NewsFeedManager _newsFeedManager;
   final ProductsObtainer _productsObtainer;
   final ShopsManager _shopsManager;
+  final LatestCameraPosStorage _cameraPosStorage;
 
   final UIValuesFactory _uiValuesFactory;
 
@@ -30,8 +35,11 @@ class NewsFeedPageModel {
   var _lastLoadedNewsPage = -1;
   var _allNewsLoaded = false;
 
-  var _newsLifetimeSecs = -1;
   var _lastFirstPageRequestTime = DateTime.fromMicrosecondsSinceEpoch(0);
+  Coord? _lastNewsCenter;
+
+  var _newsLifetimeSecs = -1;
+  var _newsReloadAfterKms = -1;
 
   UIValueBase<bool> get loading => _loading;
   UIValueBase<bool> get reloading => _reloading;
@@ -39,7 +47,7 @@ class NewsFeedPageModel {
   UIValueBase<List<NewsPiece>> get newsPieces => _newsPieces;
 
   NewsFeedPageModel(this._newsFeedManager, this._productsObtainer,
-      this._shopsManager, this._uiValuesFactory);
+      this._shopsManager, this._cameraPosStorage, this._uiValuesFactory);
 
   Product? getProductWith(String barcode) => _loadedProducts[barcode];
   Shop? getShopWith(OsmUID uid) => _loadedShops[uid];
@@ -49,12 +57,31 @@ class NewsFeedPageModel {
     _newsLifetimeSecs = newsLifetimeSecs;
   }
 
-  void onPageBecameVisible() {
+  void setNewsReloadAfterKms(int newsReloadAfterKms) {
+    _newsReloadAfterKms = newsReloadAfterKms;
+  }
+
+  void onPageBecameVisible() async {
     final now = DateTime.now();
     final secsSinceLastRequest =
         now.difference(_lastFirstPageRequestTime).inSeconds;
     if (_newsLifetimeSecs < secsSinceLastRequest) {
-      reloadNews();
+      await reloadNews();
+      return;
+    }
+
+    final cameraPos = await _cameraPosStorage.get();
+    if (cameraPos != null) {
+      final kmsCameraMoved = metersBetween(_lastNewsCenter!, cameraPos) / 1000;
+      if (_lastNewsCenter != null && _newsReloadAfterKms < kmsCameraMoved) {
+        _lastNewsCenter = cameraPos;
+        await reloadNews();
+        return;
+      }
+    } else {
+      Log.w('NewsFeedPageModel: no camera position for some reason');
+      _lastError.setValue(GeneralError.OTHER);
+      return;
     }
   }
 
@@ -74,6 +101,13 @@ class NewsFeedPageModel {
       return;
     }
 
+    _lastNewsCenter ??= await _cameraPosStorage.get();
+    if (_lastNewsCenter == null) {
+      Log.w('NewsFeedPageModel: no camera position for some reason');
+      _lastError.setValue(GeneralError.OTHER);
+      return;
+    }
+
     try {
       _loading.setValue(true);
       _lastError.setValue(null);
@@ -84,7 +118,8 @@ class NewsFeedPageModel {
       if (_lastLoadedNewsPage == -1) {
         _reloading.setValue(true);
       }
-      final result = await _loadNewsImpl();
+      final result = await _loadNewsImpl(
+          center: _lastNewsCenter!, page: _lastLoadedNewsPage + 1);
       if (result.isOk) {
         if (clearOldNews) {
           _newsPieces.setValue(const []);
@@ -111,10 +146,11 @@ class NewsFeedPageModel {
   }
 
   // Returns loaded news
-  Future<Result<List<NewsPiece>, GeneralError>> _loadNewsImpl() async {
+  Future<Result<List<NewsPiece>, GeneralError>> _loadNewsImpl(
+      {required Coord center, required int page}) async {
     // Get news
     final newsRes =
-        await _newsFeedManager.obtainNews(page: _lastLoadedNewsPage + 1);
+        await _newsFeedManager.obtainNews(center: center, page: page);
     if (newsRes.isErr) {
       return Err(newsRes.unwrapErr());
     }
