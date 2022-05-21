@@ -4,6 +4,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
@@ -26,6 +27,7 @@ import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 
@@ -36,9 +38,11 @@ import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_address_obtainer.dart';
 import '../../z_fakes/fake_news_feed_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 
 void main() {
+  final initialPos = Coord(lat: 1, lon: 2);
   var lastNewsPieceId = 0;
   var lastShopCoord = 1.0;
   var lastShopID = 0;
@@ -47,19 +51,25 @@ void main() {
   late FakeProductsObtainer productsObtainer;
   late FakeShopsManager shopsManager;
   late FakeAddressObtainer addressObtainer;
+  late LatestCameraPosStorage latestCameraPosStorage;
 
   setUp(() async {
     productsObtainer = FakeProductsObtainer();
     shopsManager = FakeShopsManager();
     newsFeedManager = FakeNewsFeedManager();
     addressObtainer = FakeAddressObtainer();
+    latestCameraPosStorage =
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
 
     await TestDiRegistry.register((r) {
       r.register<ProductsObtainer>(productsObtainer);
       r.register<ShopsManager>(shopsManager);
       r.register<NewsFeedManager>(newsFeedManager);
       r.register<AddressObtainer>(addressObtainer);
+      r.register<LatestCameraPosStorage>(latestCameraPosStorage);
     });
+
+    await latestCameraPosStorage.set(initialPos);
   });
 
   Future<void> scroll(WidgetTester tester, double yDiff) async {
@@ -406,9 +416,76 @@ void main() {
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);
 
+    // Wait just a little bit - still no changes
+    sleep(const Duration(milliseconds: newsLifetimeSecs * 1000 ~/ 2));
+    await tester.pumpAndSettle();
+    await stack.switchStackToIndex(0);
+    await stack.switchStackToIndex(1);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+
     // Wait [newsLifetimeSecs] - still no
     // changes (because the page is visible)
     sleep(const Duration(seconds: newsLifetimeSecs * 2));
+    await tester.pumpAndSettle();
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+
+    // Hide and show the page - now there's a change
+    await stack.switchStackToIndex(0);
+    await stack.switchStackToIndex(1);
+    expect(find.text('Product 1'), findsNothing);
+    expect(find.text('Product 2'), findsOneWidget);
+  });
+
+  testWidgets(
+      'news feed is reloaded when the page is reopened after map camera moved far enough',
+      (WidgetTester tester) async {
+    final shop = createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina'));
+    addProductToShop(createProduct('Product 1'), shop);
+
+    const reloadNewsAfterKms = 1;
+
+    final stack = StatefulStackForTesting(tester: tester, children: const [
+      SizedBox(),
+      NewsFeedPage(reloadNewsAfterKms: reloadNewsAfterKms),
+    ]);
+    await tester.superPump(stack);
+
+    // Original news displayed
+    await stack.switchStackToIndex(1);
+    expect(find.text('Product 1'), findsOneWidget);
+
+    // News completely changed, ...
+    newsFeedManager.deleteAllNews_testing();
+    addProductToShop(createProduct('Product 2'), shop);
+    // But original news are still displayed
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+
+    // Hide and show the page - no changes
+    await stack.switchStackToIndex(0);
+    await stack.switchStackToIndex(1);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+
+    // Move camera but not far enough - still no changes
+    await latestCameraPosStorage.set(Coord(
+      lat: initialPos.lat + kmToGrad(reloadNewsAfterKms / 5),
+      lon: initialPos.lon + kmToGrad(reloadNewsAfterKms / 5),
+    ));
+    await tester.pumpAndSettle();
+    await stack.switchStackToIndex(0);
+    await stack.switchStackToIndex(1);
+    expect(find.text('Product 1'), findsOneWidget);
+    expect(find.text('Product 2'), findsNothing);
+
+    // Move camera to more than [reloadNewsAfterKms] - still no
+    // changes (because the page is visible)
+    await latestCameraPosStorage.set(Coord(
+      lat: initialPos.lat + kmToGrad(reloadNewsAfterKms * 5),
+      lon: initialPos.lon + kmToGrad(reloadNewsAfterKms * 5),
+    ));
     await tester.pumpAndSettle();
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);

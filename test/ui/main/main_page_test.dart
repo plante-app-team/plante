@@ -44,6 +44,8 @@ void main() {
       mapTestsCommons = MapPageModesTestCommons();
       await mapTestsCommons.setUpImpl(r);
       shopsManager = mapTestsCommons.shopsManager;
+      when(mapTestsCommons.latestCameraPosStorage.get())
+          .thenAnswer((_) async => Coord(lat: 1, lon: 2));
 
       r.register<ViewedProductsStorage>(viewedProductsStorage);
       r.register<ContributedByUserProductsStorage>(
@@ -333,7 +335,7 @@ void main() {
         equals(1));
   });
 
-  testWidgets('news fed is not requested implicitly',
+  testWidgets('news feed is not requested implicitly',
       (WidgetTester tester) async {
     await tester.superPump(const MainPage());
 

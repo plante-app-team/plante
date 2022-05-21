@@ -205,6 +205,5 @@ void initDI() {
   ));
   GetIt.I.registerSingleton(NewsFeedManager(
     GetIt.I.get<Backend>(),
-    GetIt.I.get<LatestCameraPosStorage>(),
   ));
 }
