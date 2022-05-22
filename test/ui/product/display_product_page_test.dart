@@ -898,8 +898,6 @@ void main() {
 
     expect(find.text(context.strings.display_product_page_show_where_sold_v2),
         findsOneWidget);
-    expect(find.text(context.strings.display_product_page_not_sold_nearby),
-        findsNothing);
 
     expect(find.byType(MapPage), findsNothing);
     await tester.superTap(
@@ -930,11 +928,5 @@ void main() {
 
     expect(find.text(context.strings.display_product_page_show_where_sold_v2),
         findsNothing);
-    expect(find.text(context.strings.display_product_page_not_sold_nearby),
-        findsOneWidget);
-
-    await tester.superTap(
-        find.text(context.strings.display_product_page_not_sold_nearby));
-    expect(find.byType(MapPage), findsNothing);
   });
 }

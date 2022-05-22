@@ -17,6 +17,7 @@ import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/components/appearing_circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/expandable_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
@@ -212,38 +213,36 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
                   )),
             const SizedBox(height: 16),
             Column(children: [
-              Row(children: [
-                consumer((ref) {
-                  final shopsWhereSold = _shopsWhereSold.watch(ref);
-                  final String text;
-                  if (shopsWhereSold != null) {
-                    if (shopsWhereSold.isEmpty) {
-                      text =
-                          context.strings.display_product_page_not_sold_nearby;
-                    } else {
-                      text = context
-                          .strings.display_product_page_show_where_sold_v2;
-                    }
-                  } else {
-                    text = '';
-                  }
-                  final showOnMap = () => _showOnMap(shopsWhereSold!);
-                  return _BigMapButton(
-                    key: const Key('show_on_map'),
-                    text: text,
-                    color: const Color(0xFF84A18E),
-                    onTap: shopsWhereSold != null && shopsWhereSold.isNotEmpty
-                        ? showOnMap
-                        : null,
-                  );
-                }),
-                _BigMapButton(
-                  key: const Key('mark_on_map'),
-                  text: context.strings.display_product_page_veg_mark_on_map,
-                  color: ColorsPlante.primary,
-                  onTap: _markOnMap,
-                ),
-              ]),
+              consumer((ref) {
+                final shopsWhereSold = _shopsWhereSold.watch(ref);
+                final Widget content;
+                if (shopsWhereSold != null) {
+                  content = Row(children: [
+                    if (shopsWhereSold.isNotEmpty)
+                      _BigMapButton(
+                        key: const Key('show_on_map'),
+                        text: context
+                            .strings.display_product_page_show_where_sold_v2,
+                        color: const Color(0xFF84A18E),
+                        onTap: () => _showOnMap(shopsWhereSold),
+                      ),
+                    _BigMapButton(
+                      key: const Key('mark_on_map'),
+                      text:
+                          context.strings.display_product_page_veg_mark_on_map,
+                      color: ColorsPlante.primary,
+                      onTap: _markOnMap,
+                    ),
+                  ]);
+                } else {
+                  content = const AppearingCircularProgressIndicatorPlante(
+                      durationBeforeAppearing: Duration(seconds: 2));
+                }
+                return SizedBox(
+                    height: 96,
+                    child: AnimatedSwitcher(
+                        duration: DURATION_DEFAULT, child: content));
+              }),
               const SizedBox(height: 16),
             ]),
             InkWell(
@@ -605,8 +604,6 @@ class _BigMapButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         child: Container(
-            width: double.infinity,
-            height: 96,
             color: color,
             child: Material(
                 color: Colors.transparent,
