@@ -1,4 +1,36 @@
 {
+    "app_markets_app_long_description": "С Plante вы сможете находить веганские продукты в вашем городе и за его пределами. Вы сможете увидеть на карте как ближайшие магазины, так и продукты, которые там продаются.\n\nИнформация в Plante заполняется сообществом. Присоединяйтесь, добавляйте ваши любимые продукты на карту, и этим вы поможете другим найти что-нибудь вкусненькое!\n\nХочется быстро проверить, по вегану ли продукт? Отсканируйте штрихкод, и Plante покажет доступную информацию!\n\nЗаметили что-то, что можно улучшить? В приложении чего-то не хватает? Мы маленькая команда, работающая на энтузиазме - будем рады любой обратной связи и информации о проблемах (https://vk.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_app_name": "Plante - карта веган продуктов",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Веган продукты рядом с тобой!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_keywords": "Веган, веганские, веганская, еда, магазины, продукты, vegan",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Сканируйте штрихкоды - узнавайте, по-вегану ли продукты",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_map_page": "Находите и отмечайте продукты на карте",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Развивайте приложение вместе с нами",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "Смотрите подробную информацию о продуктах",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
     "barcode_scan_page_add_info_in_your_langs": "Добавить информацию",
     "barcode_scan_page_add_product": "Добавить продукт",
     "barcode_scan_page_camera_permission_cancel_settings": "Не давать разрешение",
@@ -13,7 +45,6 @@
     "barcode_scan_page_product_not_found": "Продукт не найден",
     "barcode_scan_page_product_not_found_descr": "У нас пока недостаточно данных о продукте <PRODUCT>, но вы можете помочь сообществу и добавить его первым",
     "barcode_scan_page_scan_product": "Начать сканирование",
-    "barcode_scan_page_searching_product": "Ищем продукт ",
     "contributed_by_user_products_widget_no_products_hint": "Здесь будут продукты, которые вы добавите на карту или в приложение",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +62,6 @@
     "country_no": "Норвегия",
     "country_pl": "Польша",
     "country_pt": "Португалия",
-    "country_ru": "Россия",
     "country_se": "Швеция",
     "create_shop_page_how_new_shop_is_called": "Как называется магазин?",
     "create_shop_page_how_new_shop_is_called_hint": "Пятёрочка",
@@ -55,8 +85,16 @@
     "display_product_page_moderator_comment_dialog_source": "Источник:",
     "display_product_page_moderator_comment_dialog_title": "Комментарий модератора",
     "display_product_page_no_info_in_your_langs": "Нет информации о продукте на вашем языке",
+    "display_product_page_not_sold_nearby": "Не продаётся поблизости",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Данные от Open Food Facts",
     "display_product_page_report_btn": "Сообщить о неверных данных",
+    "display_product_page_show_where_sold_v2": "Где продаётся",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
     "display_product_page_table_column1": "Продукт",
     "display_product_page_table_column3": "Веганский",
     "@display_product_page_table_column3": {
@@ -120,7 +158,6 @@
     "global_done": "Готово",
     "global_done_thanks": "Готово! Спасибо!",
     "global_feet": "фут.",
-    "global_give_permission": "Дать разрешение",
     "global_kilometers": "км",
     "global_meters": "м",
     "global_miles": "мил.",
@@ -146,8 +183,6 @@
     "init_product_page_brand_optional": "Бренд (не обязательно)",
     "init_product_page_camera_permission_reasoning_settings": "Для фотографирования продукта приложению необходимо разрешение на использование камеры",
     "init_product_page_cancel_adding_product_q": "Отменить добавление продукта?",
-    "init_product_page_categories_hint": "Пирог, выпечка, выпечка с малиной",
-    "init_product_page_categories_optional": "Категории (не обязательно)",
     "init_product_page_delete_photo_q": "Удалить фото?",
     "init_product_page_is_it_vegan": "Продукт веганский?",
     "init_product_page_lang_title": "Язык упаковки продукта",
@@ -165,8 +200,17 @@
     "init_user_page_langs_explanation": "Выберите языки, которые вы знаете — некоторые продукты продаются во многих странах, и поэтому их упаковки могут быть на разных языках",
     "init_user_page_next_button_title": "Далее",
     "ios_NSCameraUsageDescription": "С помощью камеры вы сможете сканировать штрихкоды и делать фотографии новых продуктов",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
     "ios_NSLocationWhenInUseUsageDescription": "Используя ваше местоположение, мы сможем найти магазины поблизости!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
     "ios_NSPhotoLibraryUsageDescription": "Приложению требуется доступ к вашей библиотеке, чтобы загружать фото продуктов",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
     "lang_ar": "Арабский",
     "lang_be": "Белорусский",
     "lang_bg": "Болгарский",
@@ -286,6 +330,14 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "В составе имеются неоднозначные ингредиенты (могут быть как веганскими, так и невеганскими, в зависимости от конкретного способа производства)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "В некоторых партиях продуктов возможно присутствие невеганских ингредиентов — внимательно читайте состав!",
     "mod_reason_tested_on_animals": "Продукт тестируется на животных",
+    "news_feed_page_label_for_new_product_at_shop": "Новый продукт",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "Новые события поблизости",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
     "pick_existing_shop_page_create_shop_button": "Создать новый магазин",
     "@pick_existing_shop_page_create_shop_button": {
         "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
@@ -322,8 +374,6 @@
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
     },
-    "settings_page_erase_user_data": "Очистить данные и выйти",
-    "settings_page_general": "Общее",
     "settings_page_help_and_feedback_contacts_title": "Связь с нами:",
     "@settings_page_help_and_feedback_contacts_title": {
         "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."

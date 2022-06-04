@@ -1,4 +1,36 @@
 {
+    "app_markets_app_long_description": "Z Plante możesz znaleźć wegańskie produkty spożywcze w twoim mieście, a także na świecie. Z łatwością znajdziesz sklepy spożywcze, a także zobaczysz jakie wegańskie produkty są w nich sprzedawane.\n\nPlante jest aplikacją, która bazuje na społeczności. Dołącz do nas, dodając swoje ulubione produkty do mapy i pomóż innym odkryć coś pysznego!\n\nChcesz w łatwy sposób sprawdzić czy dany produkt jest wegański? Zeskanuj kod kreskowy, a Plante przeanalizuje to dla Ciebie!\n\nWidzisz coś co mogłoby zostać ulepszone? Czegoś brakuje? Jesteśmy małym zespołem, który pracuje z zapałem – skontaktuj się z nami na Facebooku (https://www.facebook.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_app_name": "Plante–mapa wegańskich zakupów",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Wegańskie produkty w pobliżu!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_keywords": "Wegańskie, jedzenie, sklepy, spożywcze",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Skanuj kody kreskowe produktów, aby sprawdzić czy są wegańskie",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_map_page": "Znajduj i dodawaj produkty do mapy",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Ulepszaj aplikację razem z nami",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "Sprawdzaj dokładne informacje o produkcie",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
     "barcode_scan_page_add_info_in_your_langs": "Dodaj informacje",
     "barcode_scan_page_add_product": "Dodaj produkt",
     "barcode_scan_page_camera_permission_cancel_settings": "Pozostaw uprawienia dostępu do aparatu wyłączone",
@@ -13,7 +45,6 @@
     "barcode_scan_page_product_not_found": "Nie znaleziono produktów",
     "barcode_scan_page_product_not_found_descr": "Nie mamy jeszcze wystarczająco danych o <PRODUCT>, ale możesz pomóc społeczności, dodając je",
     "barcode_scan_page_scan_product": "Rozpocznij skanowanie",
-    "barcode_scan_page_searching_product": "Szukanie produktu ",
     "contributed_by_user_products_widget_no_products_hint": "Tutaj zobaczysz produkty, które dodałeś",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +62,6 @@
     "country_no": "Norwegia",
     "country_pl": "Polska",
     "country_pt": "Portugalia",
-    "country_ru": "Rosja",
     "country_se": "Szwecja",
     "create_shop_page_how_new_shop_is_called": "Jak nazywa się sklep?",
     "create_shop_page_how_new_shop_is_called_hint": "Biedronka",
@@ -55,8 +85,16 @@
     "display_product_page_moderator_comment_dialog_source": "Źródło:",
     "display_product_page_moderator_comment_dialog_title": "Komentarz moderatora",
     "display_product_page_no_info_in_your_langs": "Brak informacji o produkcie w twoim języku",
+    "display_product_page_not_sold_nearby": "Produkt nie jest sprzedawany w pobliżu",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Dane z Open Food Facts",
     "display_product_page_report_btn": "Zgłoś niepoprawne informacje",
+    "display_product_page_show_where_sold_v2": "Gdzie można to znaleźć",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
     "display_product_page_table_column1": "Produkt",
     "display_product_page_table_column3": "Wegański",
     "@display_product_page_table_column3": {
@@ -120,7 +158,6 @@
     "global_done": "Gotowe",
     "global_done_thanks": "Gotowe! Dziękujemy!",
     "global_feet": "ft",
-    "global_give_permission": "Nadaj uprawnienia",
     "global_kilometers": "km",
     "global_meters": "m",
     "global_miles": "mi",
@@ -146,8 +183,6 @@
     "init_product_page_brand_optional": "Marka (opcjonalnie)",
     "init_product_page_camera_permission_reasoning_settings": "Aby zrobić zdjęcia produktu, nadaj aplikacji uprawnienia do korzystania z aparatu w ustawieniach aplikacji",
     "init_product_page_cancel_adding_product_q": "Anulować dodawanie produktu?",
-    "init_product_page_categories_hint": "Ciasto, pieczywo",
-    "init_product_page_categories_optional": "Kategorie (opcjonalnie)",
     "init_product_page_delete_photo_q": "Usunąć zdjęcie?",
     "init_product_page_is_it_vegan": "Czy ten produkt jest wegański?",
     "init_product_page_lang_title": "Język opakowania",
@@ -165,8 +200,17 @@
     "init_user_page_langs_explanation": "Wybierz języki, które znasz – niektóre produkty są sprzedawane w wielu krajach i mogą mieć opakowania w różnych językach",
     "init_user_page_next_button_title": "Dalej",
     "ios_NSCameraUsageDescription": "Dzięki dostępu do aparatu, możesz skanować kody kreskowe, aby wyszukiwać produkty i robić zdjęcia, aby dodać nowe produkty",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
     "ios_NSLocationWhenInUseUsageDescription": "Używając twojej lokalizacji możemy znaleźć sklepy w twojej okolicy!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
     "ios_NSPhotoLibraryUsageDescription": "Aplikacja potrzebuje dostępu do twojej pamięci, aby przekazywać zdjęcia produktów",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
     "lang_ar": "arabski",
     "lang_be": "białoruski",
     "lang_bg": "bułgarki",
@@ -220,10 +264,6 @@
     "map_page_click_on_shop_where_product_sold": "Wybierz pinezkę sklepu, w którym dostępny jest produkt",
     "map_page_click_where_new_shop_located": "Kliknij miejsce, w którym zlokalizowany jest sklep",
     "map_page_filter_all_shops": "Wszystkie sklepy",
-    "map_page_filter_empty_shops2": "Tylko puste sklepy",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_not_empty_shops2": "Tylko sklepy z produktami",
     "@map_page_filter_not_empty_shops2": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
@@ -290,6 +330,14 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Produkt zawiera niejednoznaczne składniki (niejednoznaczne składniki mogą być wegańskie lub niewegańskie w zależności od sposobu ich produkcji)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Niektóre produkty tej serii mają niewegańskie składniki, a niektóre nie – przeczytaj dokładnie skład!",
     "mod_reason_tested_on_animals": "Produkt testowany na zwierzętach",
+    "news_feed_page_label_for_new_product_at_shop": "Nowy produkt",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "Nowości w pobliżu",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
     "pick_existing_shop_page_create_shop_button": "Dodaj nowy sklep",
     "@pick_existing_shop_page_create_shop_button": {
         "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
@@ -326,8 +374,6 @@
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
     },
-    "settings_page_erase_user_data": "Wyczyść dane użytkownika i wyjdź",
-    "settings_page_general": "Główne",
     "settings_page_help_and_feedback_contacts_title": "Skonktaktuj się z nami lub obserwuj nas:",
     "@settings_page_help_and_feedback_contacts_title": {
         "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."

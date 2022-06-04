@@ -10,7 +10,6 @@
         "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
     },
     "global_yes": "Ja",
-    "global_give_permission": "Gi tillatelse",
     "global_open_app_settings": "Åpne app instillinger",
     "global_barcode": "Strekkode",
     "global_send": "Send",
@@ -115,7 +114,6 @@
     "barcode_scan_page_product_not_found": "Fant ikke produkt",
     "barcode_scan_page_product_not_found_descr": "Vi var ikke nok data om produktet <PRODUCT> enda, men du kan hjelpe fellesskapet ved å legge det tilbake",
     "barcode_scan_page_point_camera_at_barcode": "Sikt kameraet på produktets strekkode",
-    "barcode_scan_page_searching_product": "Søker produkt ",
     "barcode_scan_page_add_product": "Legg til produkt",
     "barcode_scan_page_camera_permission_reasoning": "For å starte strekkodeskanneren trenger appen kameratillatelse",
     "barcode_scan_page_camera_permission_reasoning_settings": "For å kunne scanne strekkoder, trenger appen tilgang til kamera. Du kan gi kamera tillatelse i app instillinger",
@@ -163,21 +161,17 @@
     "help_with_veg_status_page_title": "Hjelp med vegan status",
     "settings_page_title": "Innstillinger",
     "settings_page_your_id": "Din ID: ",
-    "settings_page_general": "Generelt",
     "settings_page_langs_i_know": "Mine språk",
     "settings_page_send_logs": "Send logg",
     "@settings_page_send_logs": {
         "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
     },
-    "settings_page_erase_user_data": "Slett brukerdata og avslutt",
     "init_product_page_title": "Nytt produkt",
     "init_product_page_lang_title": "Produktemballasjespråk",
     "init_product_page_please_select_lang": "Velg språk på emballasjen",
     "init_product_page_take_front_photo": "Bilde av emballasjen foran",
     "init_product_page_product_name": "Navn",
     "init_product_page_brand_optional": "Merke (valgfritt)",
-    "init_product_page_categories_optional": "Kategorier (valgfritt)",
-    "init_product_page_categories_hint": "Pai, bakeverk",
     "init_product_page_take_ingredients_photo": "Bilde av ingredienselisten",
     "init_product_page_is_it_vegan": "Er produktet vegansk?",
     "init_product_page_verify_ingredients_ocr": "Vennligst rett opp eventuelle feil som er blitt gjort av automatisk ingrediensgjenkjenning",
@@ -310,7 +304,6 @@
     "country_de": "Tyskland",
     "country_nl": "Nederlandsk",
     "country_fr": "Frankrike",
-    "country_ru": "Russland",
     "country_lu": "Luxembourg",
     "mod_reason_certified_vegan": "Produktet er sertifisert vegansk ",
     "@mod_reason_certified_vegan": {
@@ -415,10 +408,6 @@
     "@profile_page_products_my_products": {
         "description": "A button in User Profile which switches the list of displayed products to user's products - list of products the user has added to stores and to the app by filling products' data"
     },
-    "map_page_filter_empty_shops2": "Kun tomme butikker",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_all_shops": "Alle butikker",
     "map_page_filter_not_empty_shops2": "Kun butikker med produkter",
     "@map_page_filter_not_empty_shops2": {
@@ -456,5 +445,101 @@
     "settings_page_distance_in_miles": "Vis avstand i miles",
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "display_product_page_barcode_btn": "Strekkode",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Se og kopier produktets strekkode",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "global_copy": "Kopier",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
+    "pick_existing_shop_page_title": "Det er noen butikker i nærheten - kanskje den nye butikken er iblant dem?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Butikken er ikke på listen?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_create_shop_button": "Legg til en ny butikk",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "settings_page_help_and_feedback_title": "Hjelp og tilbakemelding",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Kontakt eller følg oss:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "shop_type_wholesale": "Grossist",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
+    },
+    "ios_NSCameraUsageDescription": "Med kameratilgang kan du skanne produktenes strekkoder for å se detaljert informasjon, og ta bilder for å legge til nye produkter",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
+    "ios_NSLocationWhenInUseUsageDescription": "Med tilgang til enhetens posisjon kan vi finne butikker i nærheten!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
+    "ios_NSPhotoLibraryUsageDescription": "Denne appen trenger tilgang til biblioteket ditt for å laste opp bilder",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
+    "display_product_page_not_sold_nearby": "Selges ikke i nærheten",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
+    "news_feed_page_new_events_title": "Nye arrangementer i nærheten",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
+    "news_feed_page_label_for_new_product_at_shop": "Nytt produkt",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "app_markets_app_name": "Plante - vegansk matvare kart",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Finn vegan matvarer nær deg!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_long_description": "Med Plante kan du finne veganske matprodukter i byen din og over hele verden. Du kan finne butikker i nærheten,  og se hvilke veganske produkter som selges der.\n\nPlante er en fellesskapsbasert app. Bli med oss ved å legge til favorittproduktene dine på kartet, og hjelp andre med å oppdage noe digg!\n\nVil du ha en enkel måte å sjekke om et produkt er vegansk? Skann strekkoden, og Plante vil fortelle deg det!\n\nSer du ting som kan forbedres? Mangler noe? Vi er et lite team som jobber med entusiasme, ta kontakt med oss på Facebook (https://www.facebook.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_screenshot_map_page": "Finn og sett produkter på kartet",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Skann produktenes strekkoder for å se om de er veganske",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "Se detaljert info om produkter",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Forbedre appen sammen med oss",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_keywords": "Vegan, mat, butikker, dagligvare, matvarer",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "display_product_page_show_where_sold_v2": "Hvor finner jeg",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
     }
 }

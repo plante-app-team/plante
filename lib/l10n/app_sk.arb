@@ -10,7 +10,6 @@
         "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
     },
     "global_yes": "Áno",
-    "global_give_permission": "Dať povolenie",
     "global_open_app_settings": "Otvoriť nastavenia aplikácie",
     "global_barcode": "Čiarový kód",
     "global_send": "Poslať",
@@ -119,7 +118,6 @@
     "barcode_scan_page_product_not_found": "Produkt nebol nájdený",
     "barcode_scan_page_product_not_found_descr": "Zatiaľ nemáme dostatok údajov o produkte <PRODUCT>, ale môžete pomôcť komunite jeho pridaním",
     "barcode_scan_page_point_camera_at_barcode": "Nasmerujte fotoaparát na čiarový kód výrobku",
-    "barcode_scan_page_searching_product": "Vyhľadávanie produktu",
     "barcode_scan_page_add_product": "Pridanie produktu",
     "barcode_scan_page_camera_permission_reasoning": "Na spustenie skenera čiarových kódov potrebuje aplikácia povolenie fotoaparátu",
     "barcode_scan_page_camera_permission_reasoning_settings": "Aby aplikácia mohla skenovať čiarový kód, potrebuje prístup k fotoaparátu. Prístup môžete udeliť v nastaveniach aplikácie",
@@ -171,21 +169,17 @@
     "help_with_veg_status_page_title": "Pomoc s vegánskym statusom",
     "settings_page_title": "Nastavenia",
     "settings_page_your_id": "Vaše ID:",
-    "settings_page_general": "Všeobecné",
     "settings_page_langs_i_know": "Môj jazyk",
     "settings_page_send_logs": "Odoslanie protokolov",
     "@settings_page_send_logs": {
         "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
     },
-    "settings_page_erase_user_data": "Vymazanie používateľských údajov a ukončenie",
     "init_product_page_title": "Nový produkt",
     "init_product_page_lang_title": "Jazyk obalu výrobku",
     "init_product_page_please_select_lang": "Prosím, vyberte jazyk balenia",
     "init_product_page_take_front_photo": "Predná fotografia obalu",
     "init_product_page_product_name": "Názov",
     "init_product_page_brand_optional": "Značka (voliteľné) ",
-    "init_product_page_categories_optional": "Kategórie (voliteľné)",
-    "init_product_page_categories_hint": "Koláč, pekárenský výrobok",
     "init_product_page_take_ingredients_photo": "Fotografia zložiek obalu",
     "init_product_page_is_it_vegan": "Je produkt vegánsky?",
     "init_product_page_verify_ingredients_ocr": "Prosím opravte ručne chyby spôsobené automatickým rozpoznávaním zložiek ",
@@ -318,7 +312,6 @@
     "country_de": "Nemecko",
     "country_nl": "Holandsko",
     "country_fr": "Francúzko",
-    "country_ru": "Rusko",
     "country_lu": "Luxembursko",
     "mod_reason_certified_vegan": "Výrobok je certifikovaný ako vegánsky",
     "@mod_reason_certified_vegan": {
@@ -423,10 +416,6 @@
     "@profile_page_products_my_products": {
         "description": "A button in User Profile which switches the list of displayed products to user's products - list of products the user has added to stores and to the app by filling products' data"
     },
-    "map_page_filter_empty_shops2": "Iba prázdne obchody",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_all_shops": "Všetky obchody ",
     "map_page_filter_not_empty_shops2": "Iba obchody s výrobkami",
     "@map_page_filter_not_empty_shops2": {
@@ -494,6 +483,15 @@
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
     },
     "ios_NSCameraUsageDescription": "Vďaka prístupu k fotoaparátu môžete skenovať čiarové kódy a vyhľadávať produkty a fotografovať a pridávať nové produkty",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
     "ios_NSLocationWhenInUseUsageDescription": "Pri používaní vašej polohy môžeme nájsť obchody v okolí!",
-    "ios_NSPhotoLibraryUsageDescription": "Táto aplikácia potrebuje prístup do vašej knižnice, aby mohla nahrávať obrázky produktov"
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
+    "ios_NSPhotoLibraryUsageDescription": "Táto aplikácia potrebuje prístup do vašej knižnice, aby mohla nahrávať obrázky produktov",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    }
 }
