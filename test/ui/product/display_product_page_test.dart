@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/analytics.dart';
+import 'package:plante/model/coord.dart';
 import 'package:plante/model/ingredient.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/moderator_choice_reason.dart';
@@ -24,8 +26,10 @@ import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/products/viewed_products_storage.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
+import 'package:plante/ui/product/display_product_page_model.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_finders_extension.dart';
@@ -33,18 +37,22 @@ import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 const _DEFAULT_LANG = LangCode.en;
 
 void main() {
+  final cameraPos = Coord(lat: 10, lon: 20);
+
   late MockProductsManager productsManager;
   late MockUserReportsMaker userReportsMaker;
   late FakeShopsManager shopsManager;
   late FakeUserParamsController userParamsController;
   late ViewedProductsStorage viewedProductsStorage;
   late FakeAnalytics analytics;
+  late LatestCameraPosStorage cameraPosStorage;
 
   final aShop = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -63,6 +71,8 @@ void main() {
     viewedProductsStorage = ViewedProductsStorage();
     shopsManager = FakeShopsManager();
     userParamsController = FakeUserParamsController();
+    cameraPosStorage =
+        LatestCameraPosStorage(FakeSharedPreferences().asHolder());
 
     await TestDiRegistry.register((registry) {
       registry.register<Analytics>(analytics);
@@ -71,6 +81,7 @@ void main() {
       registry.register<ViewedProductsStorage>(viewedProductsStorage);
       registry.register<ShopsManager>(shopsManager);
       registry.register<UserParamsController>(userParamsController);
+      registry.register<LatestCameraPosStorage>(cameraPosStorage);
     });
 
     when(productsManager.createUpdateProduct(any)).thenAnswer(
@@ -85,6 +96,8 @@ void main() {
       ..backendClientToken = '123'
       ..backendId = '321'
       ..name = 'Bob'));
+
+    await cameraPosStorage.set(cameraPos);
   });
 
   /// See DisplayProductPage.ingredientsAnalysisTable
@@ -928,5 +941,46 @@ void main() {
 
     expect(find.text(context.strings.display_product_page_show_where_sold_v2),
         findsNothing);
+  });
+
+  testWidgets('when map is not fetched around camera, the page fetches it',
+      (WidgetTester tester) async {
+    expect(
+        await shopsManager.osmShopsCacheExistFor(cameraPos.makeSquare(0.001)),
+        isFalse);
+
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator).buildSingleLangProduct();
+
+    expect(shopsManager.calls_fetchShop().length, equals(0));
+    await tester.superPump(DisplayProductPage(product));
+    expect(shopsManager.calls_fetchShop().length, equals(1));
+  });
+
+  testWidgets('when map IS fetched around camera, the page does not fetches it',
+      (WidgetTester tester) async {
+    final productsSquare = cameraPos
+        .makeSquare(kmToGrad(DisplayProductsPageModel.PRODUCT_SHOPS_SIZE_KMS));
+    await shopsManager.fetchShops(productsSquare);
+    expect(await shopsManager.osmShopsCacheExistFor(productsSquare), isTrue);
+    shopsManager.clear_verifiedCalls();
+
+    final product = ProductLangSlice((v) => v
+      ..lang = _DEFAULT_LANG
+      ..barcode = '123'
+      ..name = 'My product'
+      ..imageFront = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..imageIngredients = Uri.file(File('./test/assets/img.jpg').absolute.path)
+      ..veganStatus = VegStatus.possible
+      ..veganStatusSource = VegStatusSource.moderator).buildSingleLangProduct();
+
+    await tester.superPump(DisplayProductPage(product));
+    expect(shopsManager.calls_fetchShop().length, equals(0));
   });
 }

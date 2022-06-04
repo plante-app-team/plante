@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/coord_utils.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
@@ -54,17 +55,30 @@ class DisplayProductsPageModel implements UserLangsManagerObserver {
     await _viewedProductsStorage.addProduct(_initialProduct);
     await _userLangsManager.getUserLangs().then(onUserLangsChange);
     _userLangsManager.addObserver(this);
+    await _fetchShopsWhereSold();
+  }
 
+  Future<void> _fetchShopsWhereSold() async {
     final cameraPos = await _latestCameraPosStorage.get();
-    if (cameraPos != null) {
-      final shopsMap = await _shopsManager.getShopsContainingBarcodes(
-          cameraPos.makeSquare(PRODUCT_SHOPS_SIZE_KMS),
-          {_initialProduct.barcode});
-      final uids = shopsMap[_initialProduct.barcode] ?? const [];
-      final shopsRes = await _shopsManager.fetchShopsByUIDs(uids);
-      if (shopsRes.isOk) {
-        _shopsWhereSold.setValue(shopsRes.unwrap().values.toList());
+    if (cameraPos == null) {
+      return;
+    }
+
+    final productsSquare =
+        cameraPos.makeSquare(kmToGrad(PRODUCT_SHOPS_SIZE_KMS));
+    if (await _shopsManager.osmShopsCacheExistFor(productsSquare) == false) {
+      final fetchShopsResult = await _shopsManager.fetchShops(productsSquare);
+      if (fetchShopsResult.isErr) {
+        return;
       }
+    }
+
+    final shopsMap = await _shopsManager
+        .getShopsContainingBarcodes(productsSquare, {_initialProduct.barcode});
+    final uids = shopsMap[_initialProduct.barcode] ?? const [];
+    final shopsRes = await _shopsManager.fetchShopsByUIDs(uids);
+    if (shopsRes.isOk) {
+      _shopsWhereSold.setValue(shopsRes.unwrap().values.toList());
     }
   }
 

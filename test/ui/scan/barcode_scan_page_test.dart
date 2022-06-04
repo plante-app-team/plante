@@ -89,6 +89,7 @@ void main() {
         .thenAnswer((_) async => const {});
     when(shopsManager.fetchShopsByUIDs(any))
         .thenAnswer((_) async => Ok(const {}));
+    when(shopsManager.osmShopsCacheExistFor(any)).thenAnswer((_) async => true);
   });
 
   testWidgets('product found', (WidgetTester tester) async {
