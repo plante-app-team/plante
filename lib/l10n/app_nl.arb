@@ -1,4 +1,16 @@
 {
+    "app_markets_app_name": "Plante - Vegan producten gids",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Vind vegan boodschappen bij jou in de buurt",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_screenshot_map_page": "Vind en plaats producten op een kaart",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
     "barcode_scan_page_add_info_in_your_langs": "Voeg informatie toe",
     "barcode_scan_page_add_product": "Voeg het product toe",
     "barcode_scan_page_camera_permission_cancel_settings": "Laat toegang tot de camera uit",
@@ -13,7 +25,6 @@
     "barcode_scan_page_product_not_found": "Product niet gevonden",
     "barcode_scan_page_product_not_found_descr": "We hebben nog niet genoeg informatie over product <PRODUCT>, maar u kan helpen door deze toe te voegen",
     "barcode_scan_page_scan_product": "Start scannen",
-    "barcode_scan_page_searching_product": "Product zoeken ",
     "contributed_by_user_products_widget_no_products_hint": "Hier zie je producten die jij hebt toegevoegd in de app",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +42,6 @@
     "country_no": "Norwegen",
     "country_pl": "Polen",
     "country_pt": "Portugal",
-    "country_ru": "Rusland",
     "country_se": "Zweden",
     "create_shop_page_how_new_shop_is_called": "Wat is de naam van de winkel?",
     "create_shop_page_how_new_shop_is_called_hint": "Spar",
@@ -55,6 +65,10 @@
     "display_product_page_moderator_comment_dialog_source": "Bron:",
     "display_product_page_moderator_comment_dialog_title": "Moderator's opmerking",
     "display_product_page_no_info_in_your_langs": "Geen informatie over het product in uw taal",
+    "display_product_page_not_sold_nearby": "Niet verkocht in de buurt",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Informatie van Open Food Facts",
     "display_product_page_report_btn": "Rapporteer foutieve informatie",
     "display_product_page_table_column1": "Product",
@@ -120,7 +134,6 @@
     "global_done": "Klaar",
     "global_done_thanks": "Klaar! Bedankt!",
     "global_feet": "ft",
-    "global_give_permission": "Geef toestemming",
     "global_kilometers": "km",
     "global_meters": "meters",
     "global_miles": "mi",
@@ -146,8 +159,6 @@
     "init_product_page_brand_optional": "Merk (optioneel)",
     "init_product_page_camera_permission_reasoning_settings": "Om foto's te kunnen nemen van een product moet je de app toestemming geven om de camera te gebruiken in de app instellingen.",
     "init_product_page_cancel_adding_product_q": "Annuleer aanmaken van product?",
-    "init_product_page_categories_hint": "Taart, bakkerij",
-    "init_product_page_categories_optional": "Categorieën (optioneel)",
     "init_product_page_delete_photo_q": "Verwijder foto?",
     "init_product_page_is_it_vegan": "Is het product veganistisch?",
     "init_product_page_lang_title": "Taal verpakking product",
@@ -165,8 +176,17 @@
     "init_user_page_langs_explanation": "Selecteer de talen die u spreekt - Sommige producten worden in meerdere landen verkocht en kunnen verpakkingen hebben in meerdere talen",
     "init_user_page_next_button_title": "Volgende",
     "ios_NSCameraUsageDescription": "Met camera toegang kan je barcodes scannen om producten te zoeken of foto’s nemen om producten toe te voegen",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
     "ios_NSLocationWhenInUseUsageDescription": "Door jouw locatie te gebruiken kunnen we winkels in de buurt vinden!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
     "ios_NSPhotoLibraryUsageDescription": "De app heeft toegang nodig tot je bibliotheek om foto’s van producten op te laden",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
     "lang_ar": "Arabisch",
     "lang_be": "Wit-Russisch",
     "lang_bg": "Bulgaars",
@@ -220,10 +240,6 @@
     "map_page_click_on_shop_where_product_sold": "Klik op de winkel indicator waar het product wordt verkocht",
     "map_page_click_where_new_shop_located": "Klik waar de nieuwe winkel is gevestigd",
     "map_page_filter_all_shops": "Alle winkels",
-    "map_page_filter_empty_shops2": "Alleen winkels zonder producten",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_not_empty_shops2": "Alleen winkels met producten",
     "@map_page_filter_not_empty_shops2": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
@@ -290,6 +306,14 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Product heeft twijfelachtige ingrediënten (twijfelachtige ingrediënten kunnen veganistisch of niet-veganistisch zijn afhankelijk hoe ze geproduceerd zijn)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Sommige versies van dit product bevatten niet-veganistische ingrediënten and sommige bevatten deze niet - Controleer de ingrediënten!",
     "mod_reason_tested_on_animals": "Product is getest op dieren",
+    "news_feed_page_label_for_new_product_at_shop": "Nieuw product",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "Nieuwe evenementen in de buurt",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
     "pick_existing_shop_page_create_shop_button": "Creëer een nieuwe winkel",
     "@pick_existing_shop_page_create_shop_button": {
         "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
@@ -326,8 +350,6 @@
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
     },
-    "settings_page_erase_user_data": "Leeg gebruikersdate en verlaat",
-    "settings_page_general": "Algemeen",
     "settings_page_help_and_feedback_contacts_title": "Contacteer of volg ons:",
     "@settings_page_help_and_feedback_contacts_title": {
         "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."

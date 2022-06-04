@@ -1,0 +1,537 @@
+{
+    "app_markets_app_long_description": "",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_app_name": "",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_keywords": "",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "app_markets_screenshot_barcode_scanner_page": "",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_map_page": "",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "barcode_scan_page_add_info_in_your_langs": "Aldoni informojn",
+    "barcode_scan_page_add_product": "Aldoni la produkton",
+    "barcode_scan_page_camera_permission_cancel_settings": "Konservi Fotilan Permeson malŝaltita",
+    "barcode_scan_page_camera_permission_go_to_settings": "Ŝalti en agordoj",
+    "barcode_scan_page_camera_permission_reasoning": "Por komenci la strekokoda skanilo, la apo bezonas la fotilan permeson",
+    "barcode_scan_page_camera_permission_reasoning_settings": "Por povi skani strekkodon, la apo bezonas aliron al la fotilo. Vi povas doni aliron en la agordoj de la aplikaĵo",
+    "barcode_scan_page_camera_permission_title": "Plante bezonas aliron al la fotilo",
+    "barcode_scan_page_invalid_barcode": "Nevalida strekkodo",
+    "barcode_scan_page_is_product_sold_q": "Ĉu la produkto «<PRODUCT>» estas vendata ĉe «<SHOP>»?",
+    "barcode_scan_page_no_info_in_your_langs": "Neniu informo pri la produkto en via lingvo",
+    "barcode_scan_page_point_camera_at_barcode": "Celi la fotilon al la produkta strekkodo",
+    "barcode_scan_page_product_not_found": "Produkto ne trovita",
+    "barcode_scan_page_product_not_found_descr": "Ni ankoraŭ ne havas sufiĉe da datenoj pri produkto <PRODUCT>, sed vi povas helpi la komunumon aldonante ĝin",
+    "barcode_scan_page_scan_product": "Komenci skanadon",
+    "contributed_by_user_products_widget_no_products_hint": "Ĉi tie vi vidos produktojn, kiujn vi aldonis al la mapo aŭ al la apo",
+    "@contributed_by_user_products_widget_no_products_hint": {
+        "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
+    },
+    "country_be": "Belgio",
+    "country_de": "Germanio",
+    "country_dk": "Danio",
+    "country_es": "Hispanio",
+    "country_fr": "Francio",
+    "country_gb": "Britio",
+    "country_gr": "Grekio",
+    "country_it": "Italio",
+    "country_lu": "Luksemburgio",
+    "country_nl": "Nederlando",
+    "country_no": "Norvegio",
+    "country_pl": "Pollando",
+    "country_pt": "Portugalio",
+    "country_se": "Svedio",
+    "create_shop_page_how_new_shop_is_called": "Kio estas la nomo de la vendejo?",
+    "create_shop_page_how_new_shop_is_called_hint": "Spar",
+    "create_shop_page_how_new_shop_is_called_label": "Nomo de vendejo",
+    "create_shop_page_what_type_new_shop_has": "Elekti la tipon de vendejo",
+    "display_product_page_add_info_in_your_langs": "Aldoni informojn",
+    "display_product_page_adding_non_vegan_product": "Ne-veganaj produktoj ne povas esti metitaj sur la mapon",
+    "display_product_page_barcode_btn": "Strekokodo",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Vidi kaj kopii la strekkodon de la produkto",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_brand": "Marko: ",
+    "display_product_page_click_to_help_with_veg_statuses": "Mi povas helpi!",
+    "display_product_page_ingredients": "Ingrediencoj:",
+    "display_product_page_ingredients_analysis": "Aŭtomata analizo de ingrediencoj",
+    "display_product_page_moderator_comment_dialog_close": "Bone!",
+    "display_product_page_moderator_comment_dialog_source": "Fonto:",
+    "display_product_page_moderator_comment_dialog_title": "Komento de moderigaĵo",
+    "display_product_page_no_info_in_your_langs": "Neniu informo pri la produkto en via lingvo",
+    "display_product_page_not_sold_nearby": "",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
+    "display_product_page_off_licence": "Dateno de Open Food Facts",
+    "display_product_page_report_btn": "Raporti malĝustajn informojn",
+    "display_product_page_show_where_sold_v2": "",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
+    "display_product_page_table_column1": "Produkto",
+    "display_product_page_table_column3": "Vegana",
+    "@display_product_page_table_column3": {
+        "description": "A column title in a product's ingredients analysis table. The column can have 'Yes', 'No' and 'Ambiguous' values for each of the ingredients (\"Vegan? Yes. Vegan? No. Vegan? Ambiguous!\")."
+    },
+    "display_product_page_table_negative": "Ne",
+    "display_product_page_table_positive": "Jes",
+    "display_product_page_table_possible": "Ambigua",
+    "display_product_page_table_unknown": "Nekonata",
+    "display_product_page_veg_mark_on_map": "Helpi kun loko",
+    "display_product_page_veg_status_explanations_ok": "Bone!",
+    "display_product_page_veg_status_negative_explanation": "La ingredienco ne estas vegana.",
+    "display_product_page_veg_status_positive_explanation": "La ingredienco estas vegana.",
+    "display_product_page_veg_status_positive_warning": "",
+    "display_product_page_veg_status_possible_explanation": "",
+    "display_product_page_veg_status_unknown_explanation": "Neniu informo estis trovita pri la ingredienco kiam ĝia vegana statuso estis determinita",
+    "edit_profile_page_cancel_editing_q": "Ĉu nuligi profilredaktadon?",
+    "@edit_profile_page_cancel_editing_q": {
+        "description": "Question the user is asked when they started editing their profile but then clicked a Cancel button."
+    },
+    "edit_profile_page_title": "Redakti profilon",
+    "@edit_profile_page_title": {
+        "description": "Title of the \"Edit profile\" page."
+    },
+    "edit_user_data_widget_about_me_label": "Pri mi (laŭvola)",
+    "@edit_user_data_widget_about_me_label": {
+        "description": "Title of the \"About me\" input text field, which the user can use to write a short self-description."
+    },
+    "edit_user_data_widget_avatar_delete": "Forigi uzantan avataron",
+    "edit_user_data_widget_avatar_description": "Uzanta avataro (laŭvola)",
+    "@edit_user_data_widget_avatar_description": {
+        "description": "A hint for the button which let's the user to choose an avatar image"
+    },
+    "edit_user_data_widget_name_hint": "Adamo",
+    "@edit_user_data_widget_name_hint": {
+        "description": "A hint for the user name input text field"
+    },
+    "edit_user_data_widget_name_label": "Nomo",
+    "@edit_user_data_widget_name_label": {
+        "description": "Title of the user name input text field"
+    },
+    "expandable_plante_collapse": "Malvastigi",
+    "@expandable_plante_collapse": {
+        "description": "The Collapse button of an expandable UI element. When clicked, the UI element will collapse, hiding its content."
+    },
+    "expandable_plante_expand": "Vastigi",
+    "@expandable_plante_expand": {
+        "description": "The Expand button of an expandable UI element. When clicked, the UI element will expand, revealing its content."
+    },
+    "external_auth_page_continue_with": "Daŭrigi kun",
+    "external_auth_page_continue_with_apple": "Daŭrigi kun Apple",
+    "external_auth_page_google_email_not_verified": "Eraro: Gugla retpoŝto ne estas kontrolita",
+    "external_auth_page_privacy_policy": "Privateca politiko",
+    "global_barcode": "Strekokodo",
+    "global_cancel": "Nuligi",
+    "global_copied_to_clipboard": "Kopiita al tondujo",
+    "global_copy": "Kopii",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
+    "global_done": "Farita",
+    "global_done_thanks": "Farita! Dankon!",
+    "global_feet": "ft",
+    "global_kilometers": "km",
+    "global_meters": "metroj",
+    "global_miles": "mi",
+    "global_network_error": "Reta eraro - bonvolu kontroli vian interretan konekton",
+    "global_no": "Ne",
+    "global_oops_no": "Ho, ne",
+    "@global_oops_no": {
+        "description": "A text used on some buttons instead of a simple 'No'. The 'Oops, no' text is used in situation when we think it is likely the user initiated something by a mistake - for example, when they started to edit their Profile but then clicked the Back button without clicking Save."
+    },
+    "global_open_app_settings": "Malfermu aplikajn agordojn",
+    "global_save": "Konservi",
+    "global_send": "Sendi",
+    "global_something_went_wrong": "Ho, io misfunkciis",
+    "global_try_again": "Provi denove",
+    "global_yes": "Jes",
+    "help_with_veg_status_page_title": "Helpi kun vegana statuso",
+    "image_crop_page_error_small_image": "La bildo estas tro malgranda",
+    "@image_crop_page_error_small_image": {
+        "description": "Error message shown when the user selects an image from device's gallery, but the selected image is too small."
+    },
+    "image_crop_page_title": "Ni tranĉu ĝin!",
+    "init_product_page_adding_non_vegan_product": "Ne-veganaj produktoj ne povas esti aldonitaj al vendejo",
+    "init_product_page_brand_optional": "Marko (laŭvola)",
+    "init_product_page_camera_permission_reasoning_settings": "",
+    "init_product_page_cancel_adding_product_q": "Ĉu nuligi produktokreadon?",
+    "init_product_page_delete_photo_q": "Ĉu forigi foton?",
+    "init_product_page_is_it_vegan": "Ĉu la produkto estas vegana?",
+    "init_product_page_lang_title": "Produkta paklingvo",
+    "init_product_page_ocr_error_descr": "",
+    "init_product_page_ocr_in_progress": "Rekono de ingrediencoj...",
+    "init_product_page_open_map": "Aldoni al vendejo",
+    "init_product_page_please_select_lang": "Bonvolu elekti paklingvon",
+    "init_product_page_product_name": "Nomo",
+    "init_product_page_take_front_photo": "Paka antaŭa foto",
+    "init_product_page_take_ingredients_photo": "Paka ingredienca foto",
+    "init_product_page_title": "Nova produkto",
+    "init_product_page_verify_ingredients_ocr": "",
+    "init_product_page_where_sold_optional": "Kie ĝi estas vendita? (laŭvola)",
+    "init_user_page_done_button_title": "Farita",
+    "init_user_page_langs_explanation": "Elekti la lingvojn, kiujn vi scias — iuj produktoj estas venditaj en multaj landoj kaj tiel eble havas pakaĵojn en malsamaj lingvoj",
+    "init_user_page_next_button_title": "Sekva",
+    "ios_NSCameraUsageDescription": "",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
+    "ios_NSLocationWhenInUseUsageDescription": "Dum vi uzas vian lokon ni povas trovi proksimajn butikojn!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
+    "ios_NSPhotoLibraryUsageDescription": "",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
+    "lang_ar": "la araba",
+    "lang_be": "la belorusa",
+    "lang_bg": "la bulgara",
+    "lang_ca": "la kataluna",
+    "lang_cs": "la ĉeĥa",
+    "lang_da": "la dana",
+    "lang_de": "la germana",
+    "lang_el": "la greka",
+    "lang_en": "la angla",
+    "lang_es": "la hispana",
+    "lang_fi": "la finna",
+    "lang_fr": "la franca",
+    "lang_hi": "la hindia",
+    "lang_hr": "la kroata",
+    "lang_hu": "la hungara",
+    "lang_in": "la indonezia",
+    "lang_it": "la itala",
+    "lang_iw": "la hebrea",
+    "lang_ja": "la japana",
+    "lang_kk": "la kazaĥa",
+    "lang_ko": "la korea",
+    "lang_lt": "la litova",
+    "lang_lv": "la latva",
+    "lang_nb": "la norvega",
+    "lang_nl": "la nederlanda",
+    "lang_pl": "la pola",
+    "lang_pt": "la portugala",
+    "lang_ro": "la rumana",
+    "lang_ru": "la rusa",
+    "lang_sk": "la slovaka",
+    "lang_sl": "la slovena",
+    "lang_sr": "la serba",
+    "lang_sv": "la sveda",
+    "lang_th": "la tajlanda",
+    "lang_tl": "la tagaloga",
+    "lang_tr": "la turka",
+    "lang_uk": "la ukraina",
+    "lang_vi": "la vjetnama",
+    "lang_zh": "la ĉina",
+    "main_page_add_product": "Aldoni produkton",
+    "@main_page_add_product": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new product (opens the barcodes scanning screen)."
+    },
+    "main_page_add_product_hint": "Bonvolu skani la strekkodon de la produkto",
+    "main_page_add_shop": "Aldoni vendejon",
+    "@main_page_add_shop": {
+        "description": "The button is shown in a context menu. When clicked, app starts the workflow of adding a new store (opens the map and asks the user where the store is located)."
+    },
+    "map_page_cancel_putting_product_q": "Ĉu nuligi meti la produkton al la mapo?",
+    "map_page_cancel_shop_creation_q": "Ĉu nuligi kreadon de nova vendejo?",
+    "map_page_click_on_shop_where_product_sold": "Alklaku la butikmarkon, kie la produkto estas vendita",
+    "map_page_click_where_new_shop_located": "Alklaki kie troviĝas la nova vendejo",
+    "map_page_filter_all_shops": "Ĉiuj vendejoj",
+    "map_page_filter_not_empty_shops2": "Nur vendejoj kun produktoj",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
+    },
+    "map_page_is_new_product_sold_q": "Ĉu la produkto estas vendita ĉi tie?",
+    "map_page_is_product_sold_q": "Ĉu «<PRODUKTO>» estas vendata ĉi tie?",
+    "map_page_is_shop_location_correct": "Ĉu la montrata loko de la vendejo estas ĝusta?",
+    "map_page_load_shops_of_this_area": "Ŝarĝi vendejojn de ĉi tiu areo",
+    "map_page_loading_shops_hint1": "Ŝarĝante vendejojn en la areo",
+    "@map_page_loading_shops_hint1": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
+    "map_page_loading_shops_hint2": "Ankoraŭ ŝargas vendejojn - ŝajnas, ke estas multaj vendejoj en ĉi tiu areo",
+    "@map_page_loading_shops_hint2": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
+    "map_page_loading_shops_hint3": "Ŝarĝi vendejojn daŭras pli longe ol atendite, dankon pro via pacienco",
+    "@map_page_loading_shops_hint3": {
+        "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
+    },
+    "map_page_loading_suggested_products_hint_v2": "Serĉante produktojn proksime",
+    "map_page_location_permission_cancel_go_to_settings": "Konservi Lokaj Servoj malŝaltita",
+    "map_page_location_permission_go_to_settings": "Ŝalti en Agordoj",
+    "map_page_location_permission_reasoning_settings": "Plante funkcias plej bone kun Lokaj Servoj ŝaltitaj. Vi ricevos informojn pri vendejoj laŭ via loko",
+    "map_page_location_permission_title": "Lokaj Servoj",
+    "map_page_no_shops_hint_in_select_shops_mode": "Ni ne konas butikojn proksime. Sed vi povas aldoni novan klakante la rondan butonon kun pluso dekstre!",
+    "map_page_no_shops_hint3": "",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
+    },
+    "map_page_open_street_map_licence": "Dateno de Open Street Map",
+    "map_page_shop_added_to_map": "La vendejo estas aldonita al la mapo",
+    "map_page_show_found_shops_on_map": "Montri sur mapo",
+    "map_page_zoom_in_to_see_shops": "Bonvolu zomi por vidi butikojn",
+    "map_search_bar_button_title": "Serĉi",
+    "map_search_bar_hint": "Serĉi butikojn kaj stratojn",
+    "map_search_page_search_hint": "Enigi iom da teksto kaj frapeti Serĉi",
+    "map_search_page_shops_not_found": "Neniuj vendejoj trovitaj",
+    "map_search_page_shops_title": "Trovitaj vendejoj",
+    "map_search_page_streets_not_found": "Stratoj ne trovitaj",
+    "map_search_page_streets_title": "Trovitaj stratoj",
+    "mod_reason_all_ingredients_are_vegan": "Produkto ne havas ne-veganajn ingrediencojn",
+    "mod_reason_ambiguous_ingredients_are_almost_always_vegan_in_modern_food_industry": "",
+    "mod_reason_cane_sugar_in_ingredients": "",
+    "mod_reason_certified_vegan": "Produkto estas atestita vegana",
+    "@mod_reason_certified_vegan": {
+        "description": "Product was certified as vegan buy a trustworthy certification organization."
+    },
+    "mod_reason_honey_in_ingredients": "La produkto enhavas mielon",
+    "mod_reason_info_found_in_external_source": "Informoj troviĝis en ekstera fonto",
+    "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "",
+    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Fabrikisto konfirmis foreston de ne-veganaj ingrediencoj",
+    "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Fabrikisto konfirmis ĉeeston de ne-veganaj ingrediencoj",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "",
+    "mod_reason_non_vegan_practices_but_helps_veganism": "",
+    "mod_reason_possibly_cane_sugar_in_ingredients": "",
+    "mod_reason_some_ingredient_has_unknown_origin": "Kelkaj el la ingrediencoj havas nekonatan originon",
+    "mod_reason_some_ingredient_is_in_fact_a_category2": "",
+    "@mod_reason_some_ingredient_is_in_fact_a_category2": {
+        "description": "Explanation of why is certain product's vegan status is set to \"ambiguous\""
+    },
+    "mod_reason_some_ingredient_is_non_vegan": "Produkto havas ne-veganajn ingrediencojn",
+    "mod_reason_some_ingredient_is_possibly_non_vegan": "",
+    "mod_reason_some_of_product_series_have_non_vegan_ingredients": "",
+    "mod_reason_tested_on_animals": "Produkto provita sur bestoj",
+    "news_feed_page_label_for_new_product_at_shop": "",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
+    "pick_existing_shop_page_create_shop_button": "Krei novan vendejon",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "La vendejo ne estas en la listo?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_title": "Estas kelkaj vendejoj proksime - eble la nova butiko jam estas inter ili?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
+    "product_report_dialog_report_sent": "Raporto sendita",
+    "product_report_dialog_title": "",
+    "products_history_widget_no_history_hint": "Ĉi tie vi vidos produktojn, kiujn vi vidis aŭ skanis",
+    "@products_history_widget_no_history_hint": {
+        "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"
+    },
+    "profile_page_edit_profile": "Redakti profilon",
+    "@profile_page_edit_profile": {
+        "description": "A button in User Profile which initiates user profile editing (changes of name, avatar, ...)"
+    },
+    "profile_page_products_history": "Historio",
+    "@profile_page_products_history": {
+        "description": "A button in User Profile which switches the list of displayed products to user's history - list of products the user has scanned and viewed"
+    },
+    "profile_page_products_my_products": "Miaj produktoj",
+    "@profile_page_products_my_products": {
+        "description": "A button in User Profile which switches the list of displayed products to user's products - list of products the user has added to stores and to the app by filling products' data"
+    },
+    "settings_cache_page_clear_map_cache_and_exit": "",
+    "settings_cache_page_title": "",
+    "settings_page_distance_in_miles": "Montri distancon en mejloj",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Kontakti aŭ sekvi nin:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "settings_page_help_and_feedback_title": "Helpo kaj komentoj",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
+    "settings_page_langs_i_know": "Miaj lingvoj",
+    "settings_page_open_cache_settings": "",
+    "settings_page_send_logs": "Sendi protokolojn",
+    "@settings_page_send_logs": {
+        "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
+    "settings_page_show_products_off_suggestions": "Montri produktojn viditajn en aliaj butikoj kun la sama nomo en la sama lando",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_radius_suggestions": "Montri produktojn viditajn en aliaj butikoj kun la sama nomo proksime",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_stores_settings_title": "Agordoj de vendejoj",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
+    },
+    "settings_page_title": "Agordoj",
+    "settings_page_your_id": "Via ID: ",
+    "shop_address_widget_possible_address": "Proksimuma adreso: ",
+    "shop_card_add_product": "Aldoni produkton",
+    "shop_card_directions": "Direktoj",
+    "@shop_card_directions": {
+        "description": "A button on a Shop Card, when user clicks it, the button opens Google Maps. Google Maps show directions to the Shop. It's for users who want to get to the Shop and need some directions."
+    },
+    "shop_card_no_products_listed": "Nenio listigita",
+    "shop_card_open_shop_products": "Listo de produktoj",
+    "shop_card_products_listed": "Produktoj listigitaj",
+    "shop_product_range_page_add_product": "Aldoni produkton",
+    "shop_product_range_page_confirmed_products_country": "Produktoj viditaj en ĉi tiu vendejo de uzantoj de Plante",
+    "@shop_product_range_page_confirmed_products_country": {
+        "description": "A title of sections of products in a screen of a store. The products in the section were put into this store by other users of Plante."
+    },
+    "shop_product_range_page_have_you_seen_product_here": "Ĉu ili vendas ĝin ĉi tie?",
+    "shop_product_range_page_product_last_seen_here": "Laste vidite ĉi tie: ",
+    "shop_product_range_page_suggested_product_hint2": "Vidita en aliaj <SHOP> vendejoj",
+    "@shop_product_range_page_suggested_product_hint2": {
+        "description": "A hint within product's description, letting the user know this product is displayed only because it was seen in some other store with the same name. The hint shouldn't be too verbose. There probably will be many hints visible to the user - each suggested product will have such a hint."
+    },
+    "shop_product_range_page_suggested_products_city": "Produktoj viditaj en aliaj <SHOP> vendejoj proksime",
+    "@shop_product_range_page_suggested_products_city": {
+        "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's city, which are named in the same way as the displayed store. For example, if an \"Aldi\" store has some chocolate bar, then all other \"Aldi\" stores will have this products section with same chocolate bar."
+    },
+    "shop_product_range_page_suggested_products_country": "Produktoj viditaj en aliaj <SHOP> vendejoj en <COUNTRY>",
+    "@shop_product_range_page_suggested_products_country": {
+        "description": "A title of sections of products in a screen of a store. The products in the section are collected from other stores of user's country, which are named in the same way as the displayed store. For example, if an \"Aldi\" shop has some chocolate bar, then all other \"Aldi\" shops will have this products section with same chocolate bar."
+    },
+    "shop_product_range_page_suggested_products_country_unknown": "Produktoj viditaj en aliaj <SHOP> vendejoj en ĉi tio lando",
+    "shop_product_range_page_this_shop_has_no_product": "Ankoraŭ neniuj produktoj estas aldonitaj al ĉi tiu vendejo",
+    "shop_product_range_page_you_sure_negative_vote": "Ĉu vi certas, ke la produkto ne estas vendita en ĉi tiu vendejo?",
+    "shop_product_range_page_you_sure_positive_vote": "Ĉu vi certas, ke vi vidis la produkton en ĉi tiu vendejo?",
+    "shop_type_bakery": "Bakejo",
+    "@shop_type_bakery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=bakery"
+    },
+    "shop_type_beverages": "Trinkaĵoj",
+    "@shop_type_beverages": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=beverages"
+    },
+    "shop_type_cheese": "Fromaĝo",
+    "@shop_type_cheese": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=cheese"
+    },
+    "shop_type_chocolate": "Ĉokolado",
+    "@shop_type_chocolate": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=chocolate"
+    },
+    "shop_type_coffee": "Kafo",
+    "@shop_type_coffee": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=coffee"
+    },
+    "shop_type_confectionery": "",
+    "@shop_type_confectionery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=confectionery"
+    },
+    "shop_type_convenience": "",
+    "@shop_type_convenience": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=convenience"
+    },
+    "shop_type_dairy": "Lakto",
+    "@shop_type_dairy": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=dairy"
+    },
+    "shop_type_deli": "",
+    "@shop_type_deli": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=deli"
+    },
+    "shop_type_farm": "Bieno",
+    "@shop_type_farm": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=farm"
+    },
+    "shop_type_frozen_food": "Frostigita manĝaĵo",
+    "@shop_type_frozen_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=frozen_food"
+    },
+    "shop_type_general": "Ĝenerala",
+    "@shop_type_general": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=general"
+    },
+    "shop_type_greengrocer": "",
+    "@shop_type_greengrocer": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=greengrocer"
+    },
+    "shop_type_grocery": "Nutraĵvendejo",
+    "@shop_type_grocery": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=grocery"
+    },
+    "shop_type_health_food": "Sana manĝaĵo",
+    "@shop_type_health_food": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=health_food"
+    },
+    "shop_type_ice_cream": "Glaciaĵo",
+    "@shop_type_ice_cream": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=ice_cream"
+    },
+    "shop_type_organic": "",
+    "@shop_type_organic": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=organic"
+    },
+    "shop_type_pasta": "Pasto",
+    "@shop_type_pasta": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pasta"
+    },
+    "shop_type_pastry": "Kukaĵo",
+    "@shop_type_pastry": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=pastry"
+    },
+    "shop_type_spices": "Spicoj",
+    "@shop_type_spices": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=spices"
+    },
+    "shop_type_supermarket": "Superbazaro",
+    "@shop_type_supermarket": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
+    "shop_type_wholesale": "",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
+    },
+    "user_langs_widget_system_lang": "(Sistema lingvo)",
+    "veg_status_displayed_not_vegan": "Ne vegana",
+    "veg_status_displayed_veg_status_source_community": "Informoj de komunumo",
+    "veg_status_displayed_veg_status_source_moderator": "Kontrolita",
+    "veg_status_displayed_veg_status_source_off": "Aŭtomata analizo de ingrediencoj",
+    "veg_status_displayed_veg_status_source_unknown": "Interna eraro: fonto nekonata",
+    "veg_status_displayed_vegan": "Vegana",
+    "veg_status_displayed_vegan_status_possible": "Ambigua vegana statuso",
+    "veg_status_displayed_vegan_status_unknown": "Nekonata vegana statuso",
+    "veg_status_selection_panel_dunno": "Ne certas",
+    "veg_status_selection_panel_negative": "Ne",
+    "veg_status_selection_panel_positive": "Jes"
+}

@@ -1,4 +1,36 @@
 {
+    "app_markets_app_long_description": "Με το Plante μπορείτε να βρείτε vegan προϊόντα στην πόλη σας και σε όλο τον κόσμο. Μπορείτε να βρείτε κοντινά παντοπωλεία αλλά και να δείτε ποια vegan προϊόντα πωλούνται εκεί.\n\nΤο Plante είναι μια εφαρμογή που βασίζεται στις συνεισφορές άλλων χρηστών. Γίνετε μέρος της προσπάθειάς μας προσθέτοντας τα αγαπημένα σας προϊόντα στον χάρτη και βοηθήστε άλλους χρήστες να ανακαλύψουν κάτι νόστιμο!\n\nΨάχνετε έναν εύκολο τρόπο να ελέγξετε αν ένα προϊόν είναι vegan; Σαρώστε το barcode του και το Plante θα σας πει!\n\nΒρήκατε κάτι που θα μπορούσε να βελτιωθεί; Λείπει κάτι; Είμαστε μια μικρή αλλά ενθουσιώδης ομάδα· ελάτε σε επαφή μαζί μας στο Facebook (https://www.facebook.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_app_name": "Plante - vegan προϊόντα",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Vegan προϊόντα της πόλης σας!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_keywords": "Vegan, χορτοφαγικά, χορτοφάγοι, φαγητό, μαγαζιά, καταστήματα, ψώνια",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Σαρώστε τα barcodes των προϊόντων για να μάθετε αν είναι χορτοφαγικά",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_map_page": "Βρείτε και προσθέστε προϊόντα στο χάρτη",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Βοηθήστε μας να βελτιώσουμε την εφαρμογή",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "Δείτε αναλυτικές πληροφορίες για τα προϊόντα",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
     "barcode_scan_page_add_info_in_your_langs": "Προσθήκη πληροφοριών",
     "barcode_scan_page_add_product": "Προσθήκη προϊόντος",
     "barcode_scan_page_camera_permission_cancel_settings": "Κρατήστε την άδεια χρήσης της κάμερας απενεργοποιημένη",
@@ -13,7 +45,6 @@
     "barcode_scan_page_product_not_found": "Δε βρέθηκε προϊόν",
     "barcode_scan_page_product_not_found_descr": "Δεν έχουμε αρκετά δεδομένα για το προϊόν <PRODUCT> ακόμη, αλλά μπορείτε να βοηθήσετε την κοινότητα προσθέτοντάς τα",
     "barcode_scan_page_scan_product": "Έναρξη σάρωσης",
-    "barcode_scan_page_searching_product": "Αναζήτηση προϊόντος ",
     "contributed_by_user_products_widget_no_products_hint": "Εδώ θα δείτε προϊόντα που έχετε προσθέσει στον χάρτη ή στην εφαρμογή",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +62,6 @@
     "country_no": "Νορβηγία",
     "country_pl": "Πολωνία",
     "country_pt": "Πορτογαλία",
-    "country_ru": "Ρωσία",
     "country_se": "Σουηδία",
     "create_shop_page_how_new_shop_is_called": "Πως ονομάζεται αυτό το κατάστημα;",
     "create_shop_page_how_new_shop_is_called_hint": "Σκλαβενίτης",
@@ -55,8 +85,16 @@
     "display_product_page_moderator_comment_dialog_source": "Πηγή:",
     "display_product_page_moderator_comment_dialog_title": "Σχόλιο διαχειριστή",
     "display_product_page_no_info_in_your_langs": "Δε βρέθηκαν πληροφορίες για το προϊόν στη γλώσσα σας",
+    "display_product_page_not_sold_nearby": "Δεν πωλείται κοντά σας",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Δεδομένα από το Open Food Facts",
     "display_product_page_report_btn": "Αναφορά λάθος πληροφοριών",
+    "display_product_page_show_where_sold_v2": "Πού πωλείται;",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
     "display_product_page_table_column1": "Προϊόν",
     "display_product_page_table_column3": "Vegan",
     "@display_product_page_table_column3": {
@@ -120,7 +158,6 @@
     "global_done": "ΟΚ",
     "global_done_thanks": "Έγινε! Σας ευχαριστούμε!",
     "global_feet": "ft",
-    "global_give_permission": "Δώστε άδεια",
     "global_kilometers": "χμ.",
     "global_meters": "μέτρα",
     "global_miles": "mi",
@@ -146,8 +183,6 @@
     "init_product_page_brand_optional": "Μάρκα (προαιρετικά)",
     "init_product_page_camera_permission_reasoning_settings": "Για να τραβήξετε φωτογραφίες, παρακαλούμε δώστε στην εφαρμογή δικαιώματα χρήσης κάμερας, μέσω των ρυθμίσεων της εφαρμογής",
     "init_product_page_cancel_adding_product_q": "Ακύρωση δημιουργίας προϊόντος;",
-    "init_product_page_categories_hint": "Πίτες, αρτοποιήματα",
-    "init_product_page_categories_optional": "Κατηγορίες (προαιρετικά)",
     "init_product_page_delete_photo_q": "Διαγραφή φωτογραφίας;",
     "init_product_page_is_it_vegan": "Είναι το προϊόν vegan;",
     "init_product_page_lang_title": "Γλώσσα συσκευασίας προϊόντος",
@@ -164,9 +199,18 @@
     "init_user_page_done_button_title": "ΟΚ",
     "init_user_page_langs_explanation": "Επιλέξτε τις γλώσσες που γνωρίζετε - κάποια προϊόντα πωλούνται σε πολλές χώρες και ενδέχεται να έχουν συσκευασία με διαφορετικές γλώσσες",
     "init_user_page_next_button_title": "Επόμενο",
-    "ios_NSCameraUsageDescription": "Δίνοντας πρόσβαση στην κάμερα μπορείτε να σκανάρετε barcodes ώστε να βρείτε προϊόντα, και να τραβήξετε φωτογραφίες νέων προϊόντων",
+    "ios_NSCameraUsageDescription": "Δίνοντας πρόσβαση στην κάμερα μπορείτε να σαρώσετε barcodes ώστε να βρείτε ή να φωτογραφίσετε νέα προϊόντα",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
     "ios_NSLocationWhenInUseUsageDescription": "Χρησιμοποιώντας την τοποθεσία σας μπορούμε να βρούμε κοντινά καταστήματα!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
     "ios_NSPhotoLibraryUsageDescription": "Η εφαρμογή χρειάζεται πρόσβαση στη βιβλιοθήκη σας για τη μεταφόρτωση φωτογραφιών προϊόντων",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
     "lang_ar": "Αραβικά",
     "lang_be": "Λευκορωσικά",
     "lang_bg": "Βουλγαρικά",
@@ -220,10 +264,6 @@
     "map_page_click_on_shop_where_product_sold": "Κάντε κλικ στην πινέζα του καταστήματος που πουλάει αυτό το προϊόν",
     "map_page_click_where_new_shop_located": "Κάντε κλικ στην τοποθεσία του νέου καταστήματος",
     "map_page_filter_all_shops": "Όλα τα καταστήματα",
-    "map_page_filter_empty_shops2": "Μόνο καταστήματα χωρίς προϊόντα",
-    "@map_page_filter_empty_shops2": {
-        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will see only empty stores (no stores with products)"
-    },
     "map_page_filter_not_empty_shops2": "Μόνο καταστήματα με προϊόντα",
     "@map_page_filter_not_empty_shops2": {
         "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
@@ -290,6 +330,14 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Το προϊόν περιέχει διφορούμενα συστατικά (μπορεί να είναι vegan ή όχι, ανάλογα με τον τρόπο κατασκευής)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Κάποια από τα προϊόντα περιέχουν μη-vegan συστατικά και κάποια όχι - παρακαλώ διαβάστε προσεκτικά τα συστατικά!",
     "mod_reason_tested_on_animals": "Προϊόν που δοκιμάστηκε σε ζώα",
+    "news_feed_page_label_for_new_product_at_shop": "Νέο προϊόν",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "Νέες κοντινές συνεισφορές",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
     "pick_existing_shop_page_create_shop_button": "Προσθήκη νέου καταστήματος",
     "@pick_existing_shop_page_create_shop_button": {
         "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
@@ -326,8 +374,6 @@
     "@settings_page_distance_in_miles": {
         "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
     },
-    "settings_page_erase_user_data": "Καθαρισμός δεδομένων χρήστη και έξοδος",
-    "settings_page_general": "Γενικές ρυθμίσεις",
     "settings_page_help_and_feedback_contacts_title": "Επικοινωνήστε μαζί μας ή ακολουθήστε μας:",
     "@settings_page_help_and_feedback_contacts_title": {
         "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."

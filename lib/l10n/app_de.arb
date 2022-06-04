@@ -1,4 +1,36 @@
 {
+    "app_markets_app_long_description": "Mit Plante können Sie vegane Lebensmittel in Ihrer Stadt und weltweit finden. Sie können nicht nur Lebensmittelgeschäfte in deiner Nähe finden, sondern auch sehen, welche veganen Produkte dort verkauft werden. \n\nPlante ist eine gemeinschaftsbasierte App. Tragen Sie Ihre Lieblingsprodukte auf der Karte ein und helfen Sie anderen, etwas Leckeres zu entdecken!\n\nMöchten Sie einfach überprüfen, ob ein Produkt vegan ist? Einfach den Barcode scannen und Plante liefert die Antwort! \n\nGibt es Dinge, die verbessert werden könnten? Fehlt etwas? Wir sind ein kleines Team, das mit großer Leidenschaft an der Entwicklung arbeitet. Kontaktieren Sie uns auf Facebook (https://www.facebook.com/planteapp).",
+    "@app_markets_app_long_description": {
+        "description": "Long description of the app in Play Market and Apple Store."
+    },
+    "app_markets_app_name": "Plante - Karte veganer Lebensmittel",
+    "@app_markets_app_name": {
+        "description": "The name of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_app_short_description": "Finden Sie vegane Lebensmittel in ihrer Nähe!",
+    "@app_markets_app_short_description": {
+        "description": "Short description of the app in Play Market and Apple Store. Must be not longer than 30 characters."
+    },
+    "app_markets_keywords": "Vegan, Essen, Geschäfte, Läden, Lebensmittel",
+    "@app_markets_keywords": {
+        "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
+    },
+    "app_markets_screenshot_barcode_scanner_page": "Scannen Sie den Strichcode eine Produkts um zu sehen ob es vegan ist",
+    "@app_markets_screenshot_barcode_scanner_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows the app's barcode scanner. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_map_page": "Finde Produkte und füge sie zur Karte hinzu",
+    "@app_markets_screenshot_map_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a map of a city with some markers. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_new_product_page": "Verbessere die App mit uns zusammen",
+    "@app_markets_screenshot_new_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows creation of a new product. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
+    "app_markets_screenshot_product_page": "Detaillierte Informationen über Produkte",
+    "@app_markets_screenshot_product_page": {
+        "description": "A short text on the app's screenshot for Play Market and Apple Store. The screenshot shows a product's page. See https://play.google.com/store/apps/details?id=vegancheckteam.plante"
+    },
     "barcode_scan_page_add_info_in_your_langs": "Information hinzufügen",
     "barcode_scan_page_add_product": "Produkt hinzufügen",
     "barcode_scan_page_camera_permission_cancel_settings": "Kamerazugriff ausgeschaltet lassen",
@@ -13,7 +45,6 @@
     "barcode_scan_page_product_not_found": "Produkt nicht gefunden",
     "barcode_scan_page_product_not_found_descr": "Wir haben noch nicht genug Daten über <PRODUCT>, aber Sie können helfen, indem Sie es hinzufügen",
     "barcode_scan_page_scan_product": "Scannen starten",
-    "barcode_scan_page_searching_product": "Produkt wird gesucht ",
     "contributed_by_user_products_widget_no_products_hint": "Hier können Sie Produkte sehen, die sie der Karte oder App hinzugefügt haben",
     "@contributed_by_user_products_widget_no_products_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't added any products to the app yet"
@@ -31,7 +62,6 @@
     "country_no": "Norwegen",
     "country_pl": "Polen",
     "country_pt": "Portugal",
-    "country_ru": "Russland",
     "country_se": "Schweden",
     "create_shop_page_how_new_shop_is_called": "Wie lautet der Name des Geschäfts?",
     "create_shop_page_how_new_shop_is_called_hint": "Aldi",
@@ -43,6 +73,14 @@
     "create_shop_page_what_type_new_shop_has": "Art des Geschäfts auswählen",
     "display_product_page_add_info_in_your_langs": "Information hinzufügen",
     "display_product_page_adding_non_vegan_product": "Nicht-vegane Produkte können nicht zur Karte hinzugefügt werden",
+    "display_product_page_barcode_btn": "Strichcode",
+    "@display_product_page_barcode_btn": {
+        "description": "Title of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
+    "display_product_page_barcode_btn_descr": "Barcode des Produkts sehen und kopieren",
+    "@display_product_page_barcode_btn_descr": {
+        "description": "Description of a button located in the menu of the Product screen. When clicked, the button opens a little dialog with the product's barcode."
+    },
     "display_product_page_brand": "Marke: ",
     "display_product_page_click_to_help_with_veg_statuses": "Ich kann helfen!",
     "display_product_page_ingredients": "Inhaltstoffe:",
@@ -51,8 +89,16 @@
     "display_product_page_moderator_comment_dialog_source": "Quelle:",
     "display_product_page_moderator_comment_dialog_title": "Moderatoren-Kommentar",
     "display_product_page_no_info_in_your_langs": "Keine Informationen über das Produkt in Ihrer Sprache",
+    "display_product_page_not_sold_nearby": "Wird nicht in der Nähe verkauft",
+    "@display_product_page_not_sold_nearby": {
+        "description": "Product screen, title of the button which would open the city's map to show where the product is sold, but the product is not sold nearby."
+    },
     "display_product_page_off_licence": "Daten von Open Food Facts",
     "display_product_page_report_btn": "Inkorrekte Informationen melden",
+    "display_product_page_show_where_sold_v2": "Produkt finden",
+    "@display_product_page_show_where_sold_v2": {
+        "description": "Product screen, title of the button which opens the city's map and shows the locations of the shops which sell the product."
+    },
     "display_product_page_table_column1": "Produkt",
     "display_product_page_table_column3": "Vegan",
     "@display_product_page_table_column3": {
@@ -109,11 +155,16 @@
     "global_barcode": "Strichcode",
     "global_cancel": "Abbrechen",
     "global_copied_to_clipboard": "In Zwischenablage gespeichert",
+    "global_copy": "Kopieren",
+    "@global_copy": {
+        "description": "A text used on buttons when the user will copy something by clicking"
+    },
     "global_done": "Fertig",
     "global_done_thanks": "Erledigt! Danke!",
-    "global_give_permission": "Berechtigung erteilen",
+    "global_feet": "ft",
     "global_kilometers": "km",
     "global_meters": "meter",
+    "global_miles": "mi",
     "global_network_error": "Netzwerkfehler - bitte überprüfen Sie Ihre Internetverbindung",
     "global_no": "Nein",
     "global_oops_no": "Ups, nein",
@@ -136,8 +187,6 @@
     "init_product_page_brand_optional": "Marke (optional)",
     "init_product_page_camera_permission_reasoning_settings": "Um ein Produkt zu fotografieren, geben Sie der App in den Einstellungen Zugriff auf die Kamera",
     "init_product_page_cancel_adding_product_q": "Produkterstellung abbrechen?",
-    "init_product_page_categories_hint": "Kuchen, Backwaren",
-    "init_product_page_categories_optional": "Kategorien (optional)",
     "init_product_page_delete_photo_q": "Foto löschen?",
     "init_product_page_is_it_vegan": "Ist das Produkt vegan?",
     "init_product_page_lang_title": "Sprache der Produktverpackung",
@@ -154,6 +203,18 @@
     "init_user_page_done_button_title": "Fertig",
     "init_user_page_langs_explanation": "Wählen Sie die Sprachen aus, die Sie kennen - einige Produkte werden in vielen Ländern verkauft und haben daher möglicherweise Verpackungen in verschiedenen Sprachen",
     "init_user_page_next_button_title": "Weiter",
+    "ios_NSCameraUsageDescription": "Mit Kammerazugriff können Sie Strichcodes scannen, um nach Produkten zu suchen und Fotos machen, um neue Produkte hinzuzufügen",
+    "@ios_NSCameraUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to use the device's camera"
+    },
+    "ios_NSLocationWhenInUseUsageDescription": "Mit Hilfe Ihres Standorts können wir Geschäfte in der Nähe finden!",
+    "@ios_NSLocationWhenInUseUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access device's physical location (geolocation)"
+    },
+    "ios_NSPhotoLibraryUsageDescription": "Diese App benötigt Zugriff auf Ihre Bibliothek, um Bilder von Produkten hochzuladen",
+    "@ios_NSPhotoLibraryUsageDescription": {
+        "description": "A text shown to iOS users when the app asks a permission to access the images library of the device"
+    },
     "lang_ar": "Arabisch",
     "lang_be": "Weißrussisch",
     "lang_bg": "Bulgarisch",
@@ -206,6 +267,11 @@
     "map_page_cancel_shop_creation_q": "Geschäft-Erstellung abbrechen?",
     "map_page_click_on_shop_where_product_sold": "klicken sie auf das Geschäft, in dem das Produkt verkauft wird",
     "map_page_click_where_new_shop_located": "Klicken Sie auf den Ort, an dem sich das neue Geschäft befindet",
+    "map_page_filter_all_shops": "Alle Geschäfte",
+    "map_page_filter_not_empty_shops2": "Nur Geschäfte mit Produkten",
+    "@map_page_filter_not_empty_shops2": {
+        "description": "A text near to a checkbox on the Map Page, the checkbox controls whether the user will only see stores with products (no empty stores)"
+    },
     "map_page_is_new_product_sold_q": "Wird das produkt hier verkauft?",
     "map_page_is_product_sold_q": "Wird «<PRODUCT>» hier verkauft?",
     "map_page_is_shop_location_correct": "Ist der angezeigte Standort des Geschäfts korrekt?",
@@ -222,11 +288,16 @@
     "@map_page_loading_shops_hint3": {
         "description": "Hint shown nearby the progress bar on the map page. The hint explains what is being loaded."
     },
+    "map_page_loading_suggested_products_hint_v2": "Suche nach Produkten in der Umgebung",
     "map_page_location_permission_cancel_go_to_settings": "Standortdienste ausgeschaltet lassen",
     "map_page_location_permission_go_to_settings": "In Einstellungen anschalten",
     "map_page_location_permission_reasoning_settings": "Plante funktioniert am besten mit aktivierten Standortdiensten. Sie erhalten Informationen über Geschäfte, basierend auf Ihrem Standort",
     "map_page_location_permission_title": "Standortdienste",
     "map_page_no_shops_hint_in_select_shops_mode": "Uns sind keine Geschäfte in der Nähe bekannt. Sie können aber eine neues hinzufügen, indem Sie auf die runde Schaltfläche mit dem Plus auf der rechten Seite klicken!",
+    "map_page_no_shops_hint3": "Es gibt noch keine Geschäfte in der Gegend. Sie können versuchen, die Karte zu verschieben oder die Filter oben zu ändern.",
+    "@map_page_no_shops_hint3": {
+        "description": "A bottom hint on the Map Page, shown when there are no visible stores."
+    },
     "map_page_open_street_map_licence": "Daten von Open Street Map",
     "map_page_shop_added_to_map": "Das Geschäft wurde zur Karte hinzugefügt",
     "map_page_show_found_shops_on_map": "Auf Karte anzeigen",
@@ -254,6 +325,8 @@
     "mod_reason_ingredients_list_has_ambiguous_entries_but_product_has_vegan_label": "Das Produkt hat unklare Inhaltsstoffe (unklare Inhaltsstoffe können vegan oder nicht-vegan sein, je nachdem, wie sie hergestellt wurden), aber es wurde auch mit  einem Vegan-Label gekennzeichnet.",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_absence": "Hersteller bestätigt Abwesenheit nicht-veganer Inhaltsstoffe",
     "mod_reason_manufacturer_confirmed_non_vegan_ingredients_presence": "Hersteller bestätigt nicht-vegane Inhaltsstoffe",
+    "mod_reason_manufacturer_did_not_help_with_ambiguous_ingredients": "Das Produkt hat unklare Inhaltsstoffe. Der Hersteller des Produkts hat auf unsere Anfrage nicht reagiert oder sich geweigert, die erforderlichen Auskünfte zu erteilen.",
+    "mod_reason_manufacturer_did_not_help_with_very_suspicious_ingredients": "Das Produkt hat unklare Inhaltsstoffe, die sehr oft nicht vegan sind. Der Hersteller des Produkts hat auf unsere Anfrage nicht reagiert oder sich geweigert, die erforderlichen Auskünfte zu erteilen.",
     "mod_reason_non_vegan_practices_but_helps_veganism": "Bei der Herstellung des Produkts werden nicht-vegane Verfahren eingesetzt. Plante betrachtet das Produkt jedoch als unklar, da alle Inhaltsstoffe vegan sind und dessen allgemeine Beliebtheit der veganen Bewegung zum Wachstum verhilft.",
     "mod_reason_possibly_cane_sugar_in_ingredients": "Das Produkt enthält Zucker, welcher aus Rohrzucker gownnen und mit Hilfe von Tierkohle verarbeitet worden sein könnte.",
     "mod_reason_some_ingredient_has_unknown_origin": "Einige Inhaltsstoffe sind unbekannter Herkunft",
@@ -265,6 +338,26 @@
     "mod_reason_some_ingredient_is_possibly_non_vegan": "Das Produkt enthält unklare Inhaltsstoffe (unklare Inhaltsstoffe können vegan oder nicht-vegan sein, je nachdem, wie sie hergestellt wurden)",
     "mod_reason_some_of_product_series_have_non_vegan_ingredients": "Einige Produktserien enthalten nicht-vegane Inhaltsstoffe, andere nicht - bitte lesen Sie die Inhaltsstoffe sorgfältig!",
     "mod_reason_tested_on_animals": "An Tieren getestetes Produkt",
+    "news_feed_page_label_for_new_product_at_shop": "Neues Produkt",
+    "@news_feed_page_label_for_new_product_at_shop": {
+        "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
+    },
+    "news_feed_page_new_events_title": "Neue Veranstaltungen in der Nähe",
+    "@news_feed_page_new_events_title": {
+        "description": "Title of the News Feed Page's news list, shown above of all news"
+    },
+    "pick_existing_shop_page_create_shop_button": "Ein neues Geschäft erstellen",
+    "@pick_existing_shop_page_create_shop_button": {
+        "description": "A button which initiates a new store creation - opens a page which will asks the user for details about the new store"
+    },
+    "pick_existing_shop_page_is_new_store_not_listed_q": "Das Geschäft ist nicht in der Liste?",
+    "@pick_existing_shop_page_is_new_store_not_listed_q": {
+        "description": "Please first see description of 'pick_existing_shop_page_title'. This string asks the user again if the store the user wants to create is already in the list, but this time the intention is to let the user create a new store if they didn't find an appropriate one - right below this string there is a button 'Create new store'."
+    },
+    "pick_existing_shop_page_title": "Es gibt einige Geschäfte in der Nähe - vielleicht ist das neue Geschäft schon dabei?",
+    "@pick_existing_shop_page_title": {
+        "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
+    },
     "product_report_dialog_report_sent": "Bericht gesendet",
     "product_report_dialog_title": "Bitte teilen Sie uns mit, wenn Sie der Meinung sind, dass die Produktinformationen bearbeitet oder erweitert werden müssen",
     "products_history_widget_no_history_hint": "Hier können Sie Produkte sehen, die Sie angesehen oder gescannt haben",
@@ -285,13 +378,35 @@
     },
     "settings_cache_page_clear_map_cache_and_exit": "Karten-Cache löschen und beenden",
     "settings_cache_page_title": "App-Cache",
-    "settings_page_erase_user_data": "Nutzer-Daten löschen und schließen",
-    "settings_page_general": "Allgemein",
+    "settings_page_distance_in_miles": "Entfernung in Meilen anzeigen",
+    "@settings_page_distance_in_miles": {
+        "description": "A checkbox in app's settings. When checked, distances to Stores will be displayed in miles. When unchecked, the distances will be displayed in kilometers."
+    },
+    "settings_page_help_and_feedback_contacts_title": "Kontaktieren oder folgen Sie uns:",
+    "@settings_page_help_and_feedback_contacts_title": {
+        "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
+    },
+    "settings_page_help_and_feedback_title": "Hilfe und Feedback",
+    "@settings_page_help_and_feedback_title": {
+        "description": "Title of a settings subpage with the means for the user to get in touch with us and to do some self-assistance actions with the app (clear cache, send logs, ...)."
+    },
     "settings_page_langs_i_know": "Meine Sprachen",
     "settings_page_open_cache_settings": "App-Cache verwalten",
     "settings_page_send_logs": "Sende Protokolle",
     "@settings_page_send_logs": {
         "description": "A button in the Settings, clicking it collects app's logs and then launches system mechanics of sharing - the user can choose to share the logs with developers, do send them by email, by a chat client, etc."
+    },
+    "settings_page_show_products_off_suggestions": "Produkte anzeigen, die in anderen Geschäften mit dem gleichen Namen in demselben Land angeboten werden",
+    "@settings_page_show_products_off_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_show_products_radius_suggestions": "Produkte anzeigen, die in anderen Geschäften mit dem gleichen Namen in der Nähe gesehen wurden",
+    "@settings_page_show_products_radius_suggestions": {
+        "description": "A checkmark in the app settings"
+    },
+    "settings_page_stores_settings_title": "Geschäfts-Einstellungen",
+    "@settings_page_stores_settings_title": {
+        "description": "Title of settings for stores"
     },
     "settings_page_title": "Einstellungen",
     "settings_page_your_id": "Ihre ID: ",
@@ -410,6 +525,10 @@
     "shop_type_supermarket": "Supermarkt",
     "@shop_type_supermarket": {
         "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=supermarket"
+    },
+    "shop_type_wholesale": "Großhandel",
+    "@shop_type_wholesale": {
+        "description": "Please see https://wiki.openstreetmap.org/wiki/Tag:shop=wholesale"
     },
     "user_langs_widget_system_lang": "(Systemsprache)",
     "veg_status_displayed_not_vegan": "Nicht vegan",
