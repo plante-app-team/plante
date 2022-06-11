@@ -1,10 +1,3 @@
-<svg width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="0.5" y="0.5" width="23" height="19" stroke="#326243"/>
-<rect x="3.5" y="7.5" width="3" height="3" stroke="#326243"/>
-<rect x="1.25" y="4.25" width="21.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
-<rect x="9.25" y="7.25" width="11.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
-<rect x="9.25" y="10.25" width="11.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
-<rect x="3.25" y="13.25" width="17.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
-<rect x="3.25" y="16.25" width="17.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
-<rect x="8.25" y="2.25" width="8.5" height="0.5" fill="#192123" stroke="#326243" stroke-width="0.5"/>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 16H20V17H7V16ZM20 13H7V14H20V13ZM20 7H15V8H20V7ZM20 10H15V11H20V10ZM3 2V19.199C3 19.97 2 19.97 2 19.199V4H0V19.98C0 21.095 0.905 22 2.02 22H21.978C23.095 22 24 21.096 24 19.98V2H3ZM22 20H5V4H22V20ZM13 7H7V11H13V7Z" fill="#326243"/>
 </svg>
