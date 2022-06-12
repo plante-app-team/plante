@@ -185,7 +185,12 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
         }
       },
       child: _wasCameraWidgetEverVisible
-          ? qr.QRView(key: _qrKey, onQRViewCreated: _onQRViewCreated)
+          ? Stack(children: [
+              qr.QRView(key: _qrKey, onQRViewCreated: _onQRViewCreated),
+              InkWell(
+                  onTap: _toggleFlash,
+                  child: Container(color: Colors.transparent))
+            ])
           : const SizedBox(width: 10, height: 10),
     );
   }
