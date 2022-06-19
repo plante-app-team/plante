@@ -357,6 +357,22 @@
     "@settings_page_help_and_feedback_contacts_title": {
         "description": "A small title right above several buttons, clicking which opens Plante's social medias or initiates sending us a message (e.g. through an email)."
     },
+    "settings_button_delete_my_account": "Delete my account",
+    "@settings_button_delete_my_account": {
+        "description": "A button in app's settings which initiates user's account deletion."
+    },
+    "settings_account_deletion_dialog_title": "User account deletion",
+    "@settings_account_deletion_dialog_title": {
+        "description": "Title of the dialog where user confirms their intention to delete their account"
+    },
+    "settings_account_deletion_dialog_confirmation_request": "Please type your user name to confirm your account deletion: ",
+    "@settings_account_deletion_dialog_confirmation_request": {
+        "description": "Text in the account's deletion dialog. Right after the end of the text user's name is appended."
+    },
+    "settings_account_deletion_dialog_warning": "Beware! Account deletion cannot be undone!",
+    "@settings_account_deletion_dialog_warning": {
+        "description": "A warning in the account's deletion dialog"
+    },
     "shop_address_widget_possible_address": "Approximate address: ",
     "shop_card_add_product": "Add product",
     "shop_card_directions": "Directions",

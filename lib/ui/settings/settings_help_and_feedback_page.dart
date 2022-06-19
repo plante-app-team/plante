@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +11,9 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/identity/apple_authorizer.dart';
+import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
@@ -17,6 +22,7 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/settings/app_version_widget.dart';
+import 'package:plante/ui/settings/ask_if_user_wants_deletion_dialog.dart';
 import 'package:plante/ui/settings/settings_buttons.dart';
 import 'package:plante/ui/settings/settings_cache_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,6 +38,9 @@ class SettingsHelpAndFeedbackPage extends PagePlante {
 class _SettingsHelpAndFeedbackPageState
     extends PageStatePlante<SettingsHelpAndFeedbackPage> {
   final _langsManager = GetIt.I.get<UserLangsManager>();
+  final _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>();
+  final _appleAuthorizer = GetIt.I.get<AppleAuthorizer>();
+  final _backend = GetIt.I.get<Backend>();
 
   late final _loading = UIValue<bool>(true, ref);
   late UserParams _user;
@@ -104,6 +113,9 @@ class _SettingsHelpAndFeedbackPageState
       SettingsGeneralButton(
           text: context.strings.settings_page_open_cache_settings,
           onTap: _openCachePage),
+      SettingsGeneralButton(
+          text: context.strings.settings_button_delete_my_account,
+          onTap: _deleteMyAccount),
     ]);
 
     return Scaffold(
@@ -178,6 +190,53 @@ class _SettingsHelpAndFeedbackPageState
   void _openCachePage() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const SettingsCachePage()));
+  }
+
+  void _deleteMyAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AskIfUserWantsDeletion(user: _user);
+      },
+    );
+    if (confirmed != true) {
+      return;
+    }
+
+    try {
+      _loading.setValue(true);
+      String? appleAuthCode;
+      String? googleAuthCode;
+      if (_user.appleId != null) {
+        final appleUser = await _appleAuthorizer.auth();
+        if (appleUser == null) {
+          showSnackBar(context.strings.global_something_went_wrong, context);
+          return;
+        }
+        appleAuthCode = appleUser.authorizationCode;
+      }
+      if (_user.googleId != null) {
+        final googleUser = await _googleAuthorizer.auth();
+        if (googleUser == null) {
+          showSnackBar(context.strings.global_something_went_wrong, context);
+          return;
+        }
+        googleAuthCode = googleUser.idToken;
+      }
+
+      final result = await _backend.deleteMyUser(
+        googleIdToken: googleAuthCode,
+        appleAuthorizationCode: appleAuthCode,
+      );
+      if (result.isErr) {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+        return;
+      }
+
+      exit(0);
+    } finally {
+      _loading.setValue(false);
+    }
   }
 }
 

@@ -350,6 +350,17 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
                   _FakeResult_0<_i34.NewsDataResponse, _i19.BackendError>()))
           as _i9.Future<_i2.Result<_i34.NewsDataResponse, _i19.BackendError>>);
   @override
+  _i9.Future<_i2.Result<_i2.None, _i19.BackendError>> deleteMyUser(
+          {String? googleIdToken, String? appleAuthorizationCode}) =>
+      (super.noSuchMethod(
+          Invocation.method(#deleteMyUser, [], {
+            #googleIdToken: googleIdToken,
+            #appleAuthorizationCode: appleAuthorizationCode
+          }),
+          returnValue: Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+              _FakeResult_0<_i2.None, _i19.BackendError>())) as _i9
+          .Future<_i2.Result<_i2.None, _i19.BackendError>>);
+  @override
   _i9.Future<Map<String, String>> authHeaders(
           {String? backendClientTokenOverride}) =>
       (super.noSuchMethod(

@@ -18,6 +18,10 @@ abstract class UserParams implements Built<UserParams, UserParamsBuilder> {
   String? get avatarId;
   @BuiltValueField(wireName: 'rights_group')
   int? get userGroup;
+  @BuiltValueField(wireName: 'google_id')
+  String? get googleId;
+  @BuiltValueField(wireName: 'apple_id')
+  String? get appleId;
 
   /// Please use `UserLangsManager` instead of this field.
   @BuiltValueField(wireName: 'langs_prioritized')

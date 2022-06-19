@@ -19,6 +19,8 @@ const PREF_USER_CLIENT_TOKEN_FOR_BACKEND =
 const PREF_USER_CLIENT_USER_GROUP = 'PREF_USER_CLIENT_USER_GROUP2';
 const PREF_LANGS_PRIORITIZED = 'PREF_LANGS_PRIORITIZED';
 const PREF_AVATAR_ID = 'PREF_AVATAR_ID';
+const PREF_GOOGLE_ID = 'PREF_GOOGLE_ID';
+const PREF_APPLE_ID = 'PREF_APPLE_ID';
 // WARNING: DO NOT REUSE SAME NAME FOR DIFFERENT TYPES
 
 class UserParamsControllerObserver {
@@ -52,6 +54,8 @@ class UserParamsController {
     final userGroup = prefs.getInt(PREF_USER_CLIENT_USER_GROUP);
     final langsPrioritized = prefs.getStringList(PREF_LANGS_PRIORITIZED);
     final avatarId = prefs.getString(PREF_AVATAR_ID);
+    final googleId = prefs.getString(PREF_GOOGLE_ID);
+    final appleId = prefs.getString(PREF_APPLE_ID);
 
     if (name == null &&
         genderStr == null &&
@@ -75,7 +79,9 @@ class UserParamsController {
       ..userGroup = userGroup
       ..langsPrioritized =
           langsPrioritized != null ? ListBuilder(langsPrioritized) : null
-      ..avatarId = avatarId);
+      ..avatarId = avatarId
+      ..googleId = googleId
+      ..appleId = appleId);
   }
 
   /// Same as [UserParamsController.getUserParams] but will work only
@@ -94,6 +100,8 @@ class UserParamsController {
       await prefs.safeRemove(PREF_USER_CLIENT_USER_GROUP);
       await prefs.safeRemove(PREF_LANGS_PRIORITIZED);
       await prefs.safeRemove(PREF_AVATAR_ID);
+      await prefs.safeRemove(PREF_GOOGLE_ID);
+      await prefs.safeRemove(PREF_APPLE_ID);
       _observers.forEach((obs) {
         obs.onUserParamsUpdate(null);
       });
@@ -144,6 +152,18 @@ class UserParamsController {
       await prefs.setString(PREF_AVATAR_ID, userParams.avatarId!);
     } else {
       await prefs.safeRemove(PREF_AVATAR_ID);
+    }
+
+    if (userParams.googleId != null) {
+      await prefs.setString(PREF_GOOGLE_ID, userParams.googleId!);
+    } else {
+      await prefs.safeRemove(PREF_GOOGLE_ID);
+    }
+
+    if (userParams.appleId != null) {
+      await prefs.setString(PREF_APPLE_ID, userParams.appleId!);
+    } else {
+      await prefs.safeRemove(PREF_APPLE_ID);
     }
 
     _cachedUserParams = userParams;

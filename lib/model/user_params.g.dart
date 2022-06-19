@@ -60,6 +60,20 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
         ..add('rights_group')
         ..add(serializers.serialize(value, specifiedType: const FullType(int)));
     }
+    value = object.googleId;
+    if (value != null) {
+      result
+        ..add('google_id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.appleId;
+    if (value != null) {
+      result
+        ..add('apple_id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     value = object.langsPrioritized;
     if (value != null) {
       result
@@ -106,6 +120,14 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
           result.userGroup = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int?;
           break;
+        case 'google_id':
+          result.googleId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'apple_id':
+          result.appleId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
         case 'langs_prioritized':
           result.langsPrioritized.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
@@ -133,6 +155,10 @@ class _$UserParams extends UserParams {
   @override
   final int? userGroup;
   @override
+  final String? googleId;
+  @override
+  final String? appleId;
+  @override
   final BuiltList<String>? langsPrioritized;
 
   factory _$UserParams([void Function(UserParamsBuilder)? updates]) =>
@@ -145,6 +171,8 @@ class _$UserParams extends UserParams {
       this.selfDescription,
       this.avatarId,
       this.userGroup,
+      this.googleId,
+      this.appleId,
       this.langsPrioritized})
       : super._();
 
@@ -165,6 +193,8 @@ class _$UserParams extends UserParams {
         selfDescription == other.selfDescription &&
         avatarId == other.avatarId &&
         userGroup == other.userGroup &&
+        googleId == other.googleId &&
+        appleId == other.appleId &&
         langsPrioritized == other.langsPrioritized;
   }
 
@@ -175,12 +205,16 @@ class _$UserParams extends UserParams {
             $jc(
                 $jc(
                     $jc(
-                        $jc($jc(0, backendId.hashCode),
-                            backendClientToken.hashCode),
-                        name.hashCode),
-                    selfDescription.hashCode),
-                avatarId.hashCode),
-            userGroup.hashCode),
+                        $jc(
+                            $jc(
+                                $jc($jc(0, backendId.hashCode),
+                                    backendClientToken.hashCode),
+                                name.hashCode),
+                            selfDescription.hashCode),
+                        avatarId.hashCode),
+                    userGroup.hashCode),
+                googleId.hashCode),
+            appleId.hashCode),
         langsPrioritized.hashCode));
   }
 
@@ -193,6 +227,8 @@ class _$UserParams extends UserParams {
           ..add('selfDescription', selfDescription)
           ..add('avatarId', avatarId)
           ..add('userGroup', userGroup)
+          ..add('googleId', googleId)
+          ..add('appleId', appleId)
           ..add('langsPrioritized', langsPrioritized))
         .toString();
   }
@@ -227,6 +263,14 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   int? get userGroup => _$this._userGroup;
   set userGroup(int? userGroup) => _$this._userGroup = userGroup;
 
+  String? _googleId;
+  String? get googleId => _$this._googleId;
+  set googleId(String? googleId) => _$this._googleId = googleId;
+
+  String? _appleId;
+  String? get appleId => _$this._appleId;
+  set appleId(String? appleId) => _$this._appleId = appleId;
+
   ListBuilder<String>? _langsPrioritized;
   ListBuilder<String> get langsPrioritized =>
       _$this._langsPrioritized ??= new ListBuilder<String>();
@@ -244,6 +288,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
       _selfDescription = $v.selfDescription;
       _avatarId = $v.avatarId;
       _userGroup = $v.userGroup;
+      _googleId = $v.googleId;
+      _appleId = $v.appleId;
       _langsPrioritized = $v.langsPrioritized?.toBuilder();
       _$v = null;
     }
@@ -273,6 +319,8 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
               selfDescription: selfDescription,
               avatarId: avatarId,
               userGroup: userGroup,
+              googleId: googleId,
+              appleId: appleId,
               langsPrioritized: _langsPrioritized?.build());
     } catch (_) {
       late String _$failedField;

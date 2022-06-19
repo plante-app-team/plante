@@ -390,6 +390,19 @@ class Backend {
     }
   }
 
+  Future<Result<None, BackendError>> deleteMyUser(
+      {String? googleIdToken, String? appleAuthorizationCode}) async {
+    final queryParams = <String, dynamic>{};
+    if (googleIdToken != null) {
+      queryParams['googleIdToken'] = googleIdToken;
+    }
+    if (appleAuthorizationCode != null) {
+      queryParams['appleAuthorizationCode'] = appleAuthorizationCode;
+    }
+    final response = await _backendGet('delete_my_user/', queryParams);
+    return _noneOrErrorFrom(response);
+  }
+
   Result<None, BackendError> _noneOrErrorFrom(BackendResponse response) {
     if (response.isError) {
       return Err(_errFromResp(response));
