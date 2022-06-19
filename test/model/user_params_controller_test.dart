@@ -71,6 +71,14 @@ void main() {
     await controller.setUserParams(params);
     expect(params, equals(await controller.getUserParams()));
 
+    params = params.rebuild((v) => v.googleId = 'some google id');
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
+    params = params.rebuild((v) => v.appleId = 'some apple id');
+    await controller.setUserParams(params);
+    expect(params, equals(await controller.getUserParams()));
+
     final expectedParams = UserParams((v) => v
       ..name = 'Bob'
       ..selfDescription = 'Nice man'
@@ -78,7 +86,9 @@ void main() {
       ..backendClientToken = '321'
       ..userGroup = 123
       ..langsPrioritized.addAll(['en', 'ru'])
-      ..avatarId = 'avatarID');
+      ..avatarId = 'avatarID'
+      ..googleId = 'some google id'
+      ..appleId = 'some apple id');
     expect(params, equals(expectedParams));
   });
 
