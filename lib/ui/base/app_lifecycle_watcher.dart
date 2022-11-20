@@ -29,7 +29,7 @@ class _AppLifecycleWatcherImpl with WidgetsBindingObserver {
   final _observers = <AppLifecycleObserver>[];
 
   _AppLifecycleWatcherImpl() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   void addObserver(AppLifecycleObserver observer) {

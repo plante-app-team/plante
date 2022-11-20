@@ -318,7 +318,8 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
 
   void _onNewScanData(qr.Barcode scanData,
       {required bool byCamera, bool forceSearch = false}) async {
-    if (_model.barcode == scanData.code || !isBarcodeValid(scanData.code)) {
+    if (_model.barcode == scanData.code ||
+        !isBarcodeValid(scanData.code ?? '')) {
       if (!forceSearch) {
         return;
       }
@@ -331,7 +332,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     // Note: no await because we don't care about result
     _sendProductScan(scanData);
 
-    final searchResult = await _model.searchProduct(scanData.code);
+    final searchResult = await _model.searchProduct(scanData.code ?? '');
     switch (searchResult) {
       case BarcodeScanPageSearchResult.OK:
         // Nice
@@ -346,7 +347,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   }
 
   void _sendProductScan(qr.Barcode scanData) async {
-    await GetIt.I.get<Backend>().sendProductScan(scanData.code);
+    await GetIt.I.get<Backend>().sendProductScan(scanData.code ?? '');
   }
 
   void _toggleFlash() async {

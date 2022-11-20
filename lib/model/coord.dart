@@ -121,5 +121,5 @@ class Coord {
   }
 
   @override
-  int get hashCode => hashValues(lat, lon);
+  int get hashCode => Object.hash(lat, lon);
 }

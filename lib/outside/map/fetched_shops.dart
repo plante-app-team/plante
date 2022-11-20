@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
@@ -41,7 +39,7 @@ class FetchedShops {
   }
 
   @override
-  int get hashCode => hashValues(shopsBounds, osmShopsBounds);
+  int get hashCode => Object.hash(shopsBounds, osmShopsBounds);
 
   @override
   String toString() {

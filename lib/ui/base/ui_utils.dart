@@ -133,7 +133,7 @@ String dateToStr(DateTime date, BuildContext context) {
 
 Future<void> nextFrame() async {
   final completer = Completer<void>();
-  WidgetsBinding.instance!.addPostFrameCallback((_) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     completer.complete();
   });
   return completer.future;
