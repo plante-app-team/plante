@@ -9,7 +9,6 @@ class Analytics {
     // to be logged.
     MainPage.PAGE_NAME,
   ];
-  final _analytics = FirebaseAnalytics();
   String? _lastPage;
 
   Analytics();
@@ -20,7 +19,7 @@ class Analytics {
 
   void _sendEventImpl(String event, [Map<String, dynamic>? params]) async {
     Log.i('Analytics event: $event, $params');
-    await _analytics.logEvent(name: event, parameters: params);
+    await FirebaseAnalytics.instance.logEvent(name: event, parameters: params);
   }
 
   void onPageShown(String pageName) {
@@ -38,8 +37,8 @@ class Analytics {
     }
     Log.i('Analytics page shown: $pageName');
     _lastPage = pageName;
-    await _analytics.setCurrentScreen(screenName: pageName);
-    await _analytics.logEvent(name: 'page_shown_$pageName');
+    await FirebaseAnalytics.instance.setCurrentScreen(screenName: pageName);
+    await FirebaseAnalytics.instance.logEvent(name: 'page_shown_$pageName');
   }
 
   void onPageHidden(String? pageName) {

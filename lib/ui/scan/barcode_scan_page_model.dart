@@ -69,7 +69,7 @@ class BarcodeScanPageModel
       this._viewedProductsStorage,
       this._analytics) {
     _updateCameraPermission();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     _userLangsManager.addObserver(this);
     _userLangsManager.getUserLangs().then(onUserLangsChange);
   }
@@ -100,7 +100,7 @@ class BarcodeScanPageModel
   }
 
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _userLangsManager.removeObserver(this);
   }
 
