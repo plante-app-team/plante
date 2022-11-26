@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mobile_scanner/mobile_scanner.dart' as qr;
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contributions_manager.dart';
@@ -16,7 +17,6 @@ import 'package:plante/ui/map/shop_creation/create_shop_page.dart';
 import 'package:plante/ui/map/shop_creation/shops_creation_manager.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
@@ -88,8 +88,7 @@ void main() {
 
     // Scan the barcode
     final scanPage = currentPage() as BarcodeScanPage;
-    scanPage.newScanDataForTesting(
-        qr.Barcode('4606038069239', qr.BarcodeFormat.unknown, []));
+    scanPage.newScanDataForTesting(qr.Barcode(rawValue: '4606038069239'));
     await tester.pumpAndSettle();
 
     // Ensure the product is not found
