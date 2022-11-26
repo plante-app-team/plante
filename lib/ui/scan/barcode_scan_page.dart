@@ -55,13 +55,13 @@ class _TestingStorage {
 class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   late final BarcodeScanPageModel _model;
 
-  late final _qrController = qr.MobileScannerController();
+  qr.MobileScannerController? _qrController;
   final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
   final _manualBarcodeTextController = TextEditingController();
 
   late final _flashOn = UIValue(false, ref);
   late final _showCameraInput = UIValue(true, ref);
-  late final _wasCameraWidgetEverVisible = UIValue(false, ref);
+  late final _cameraWidgetVisible = UIValue(false, ref);
 
   _BarcodeScanPageState() : super('BarcodeScanPage');
 
@@ -98,7 +98,7 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   @override
   void dispose() {
     _model.dispose();
-    _qrController.dispose();
+    _qrController?.dispose();
     super.dispose();
   }
 
@@ -162,21 +162,22 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
             // exists but hidden than exists and shown.
             // Enabling camera while the page is hidden will confuse users,
             // so we have to avoid it.
-            if (visible) {
-              _wasCameraWidgetEverVisible.setValue(visible);
-            }
+            _cameraWidgetVisible.setValue(visible);
           });
           if (visible) {
-            _qrController.start();
+            _qrController = qr.MobileScannerController();
+            _qrController?.start();
           } else {
-            _qrController.stop();
+            _qrController?.stop();
+            _qrController?.dispose();
           }
         },
         child: consumer(
-          (ref) => _wasCameraWidgetEverVisible.watch(ref)
+          (ref) => _cameraWidgetVisible.watch(ref)
               ? Stack(children: [
                   qr.MobileScanner(
                       key: _qrKey,
+                      allowDuplicates: true,
                       controller: _qrController,
                       onDetect: (barcode, args) {
                         _onNewScanData(barcode, byCamera: true);
@@ -337,8 +338,8 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   }
 
   void _toggleFlash() async {
-    await _qrController.toggleTorch();
-    _flashOn.setValue(_qrController.torchState.value == qr.TorchState.on);
+    await _qrController?.toggleTorch();
+    _flashOn.setValue(_qrController?.torchState.value == qr.TorchState.on);
   }
 
   void _switchInputMode(bool showCameraInput) {
