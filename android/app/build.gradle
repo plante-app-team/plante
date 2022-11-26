@@ -38,7 +38,7 @@ android {
     defaultConfig {
         applicationId "vegancheckteam.plante"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         // For https://pub.dev/packages/flutter_config
