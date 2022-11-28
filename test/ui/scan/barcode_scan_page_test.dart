@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mobile_scanner/mobile_scanner.dart' as qr;
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
@@ -27,7 +28,6 @@ import 'package:plante/ui/photos/photos_taker.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/scan/barcode_scan_page.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
@@ -598,5 +598,4 @@ void main() {
   });
 }
 
-qr.Barcode _barcode(String barcode) =>
-    qr.Barcode(barcode, qr.BarcodeFormat.unknown, []);
+qr.Barcode _barcode(String barcode) => qr.Barcode(rawValue: barcode);

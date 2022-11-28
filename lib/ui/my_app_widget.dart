@@ -34,7 +34,7 @@ class _MyAppWidgetState extends State<MyAppWidget>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!
+    WidgetsBinding.instance
         .addObserver(_AppForegroundDetector(setSystemUIOverlayStyle));
   }
 

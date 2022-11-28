@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mobile_scanner/mobile_scanner.dart' as qr;
 import 'package:plante/base/barcode_utils.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/pair.dart';
@@ -11,7 +10,6 @@ import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/logging/analytics.dart';
-import 'package:plante/logging/log.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -30,8 +28,8 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
+import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/scan/barcode_scan_page_model.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart' as qr;
 
 class BarcodeScanPage extends PagePlante {
   final Shop? addProductToShop;
@@ -57,13 +55,13 @@ class _TestingStorage {
 class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   late final BarcodeScanPageModel _model;
 
-  qr.QRViewController? _qrController;
+  qr.MobileScannerController? _qrController;
   final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
   final _manualBarcodeTextController = TextEditingController();
 
-  bool _flashOn = false;
-  bool _showCameraInput = true;
-  bool _wasCameraWidgetEverVisible = false;
+  late final _flashOn = UIValue(false, ref);
+  late final _showCameraInput = UIValue(true, ref);
+  late final _cameraWidgetVisible = UIValue(false, ref);
 
   _BarcodeScanPageState() : super('BarcodeScanPage');
 
@@ -97,18 +95,6 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     });
   }
 
-  // In order to get hot reload to work we need to pause the camera if the platform
-  // is android, or resume the camera if the platform is iOS.
-  @override
-  void reassemble() {
-    super.reassemble();
-    if (Platform.isAndroid) {
-      _qrController?.pauseCamera();
-    } else if (Platform.isIOS) {
-      _qrController?.resumeCamera();
-    }
-  }
-
   @override
   void dispose() {
     _model.dispose();
@@ -125,33 +111,33 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
           Column(children: [
             HeaderPlante(
               color: ColorsPlante.lightGrey,
-              title: SwitchPlante(
-                key: const Key('input_mode_switch'),
-                leftSelected: _showCameraInput,
-                callback: _switchInputMode,
-                leftSvgAsset: 'assets/barcode_scan_mode.svg',
-                rightSvgAsset: 'assets/barcode_type_mode.svg',
-                boxShadow: BoxShadow(
-                  color: Colors.grey.withOpacity(0.25),
-                  blurRadius: 4,
-                  offset: const Offset(0, 4),
-                ),
-              ),
+              title: consumer((ref) => SwitchPlante(
+                    key: const Key('input_mode_switch'),
+                    leftSelected: _showCameraInput.watch(ref),
+                    callback: _switchInputMode,
+                    leftSvgAsset: 'assets/barcode_scan_mode.svg',
+                    rightSvgAsset: 'assets/barcode_type_mode.svg',
+                    boxShadow: BoxShadow(
+                      color: Colors.grey.withOpacity(0.25),
+                      blurRadius: 4,
+                      offset: const Offset(0, 4),
+                    ),
+                  )),
               spacingBottom: 24,
               rightActionPadding: 12,
               rightAction: IconButton(
                   onPressed: _toggleFlash,
-                  icon: SvgPicture.asset(_flashOn
+                  icon: consumer((ref) => SvgPicture.asset(_flashOn.watch(ref)
                       ? 'assets/flash_enabled.svg'
-                      : 'assets/flash_disabled.svg')),
+                      : 'assets/flash_disabled.svg'))),
             ),
-            AnimatedCrossFadePlante(
+            consumer((ref) => AnimatedCrossFadePlante(
                 firstChild:
                     _boxWithCutout(context, color: ColorsPlante.lightGrey),
                 secondChild: _manualInput(),
-                crossFadeState: _showCameraInput
+                crossFadeState: _showCameraInput.watch(ref)
                     ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond),
+                    : CrossFadeState.showSecond)),
             Expanded(
                 child: Stack(clipBehavior: Clip.none, children: [
               // Top: -2 is a part of a fix for https://github.com/flutter/flutter/issues/14288
@@ -168,31 +154,40 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
       return const SizedBox.shrink();
     }
     return VisibilityDetectorPlante(
-      keyStr: 'barcode_scan_page_qr_widget_visibility',
-      onVisibilityChanged: (visible, firstCall) {
-        setState(() {
-          // qr.QRView enables device's camera when it's created, and we
-          // don't want it to do that, because BarcodeScanPage is more often
-          // exists but hidden than exists and shown.
-          // Enabling camera while the page is hidden will confuse users,
-          // so we have to avoid it.
-          _wasCameraWidgetEverVisible |= visible;
-        });
-        if (visible) {
-          _qrController?.resumeCamera();
-        } else {
-          _qrController?.pauseCamera();
-        }
-      },
-      child: _wasCameraWidgetEverVisible
-          ? Stack(children: [
-              qr.QRView(key: _qrKey, onQRViewCreated: _onQRViewCreated),
-              InkWell(
-                  onTap: _toggleFlash,
-                  child: Container(color: Colors.transparent))
-            ])
-          : const SizedBox(width: 10, height: 10),
-    );
+        keyStr: 'barcode_scan_page_qr_widget_visibility',
+        onVisibilityChanged: (visible, firstCall) {
+          setState(() {
+            // qr.QRView enables device's camera when it's created, and we
+            // don't want it to do that, because BarcodeScanPage is more often
+            // exists but hidden than exists and shown.
+            // Enabling camera while the page is hidden will confuse users,
+            // so we have to avoid it.
+            _cameraWidgetVisible.setValue(visible);
+          });
+          if (visible) {
+            _qrController = qr.MobileScannerController();
+            _qrController?.start();
+          } else {
+            _qrController?.stop();
+            _qrController?.dispose();
+          }
+        },
+        child: consumer(
+          (ref) => _cameraWidgetVisible.watch(ref)
+              ? Stack(children: [
+                  qr.MobileScanner(
+                      key: _qrKey,
+                      allowDuplicates: true,
+                      controller: _qrController,
+                      onDetect: (barcode, args) {
+                        _onNewScanData(barcode, byCamera: true);
+                      }),
+                  InkWell(
+                      onTap: _toggleFlash,
+                      child: Container(color: Colors.transparent))
+                ])
+              : const SizedBox(width: 10, height: 10),
+        ));
   }
 
   Widget _contentWidget() {
@@ -265,7 +260,8 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
     final onPressed = () {
       _onNewScanData(
           qr.Barcode(
-              _manualBarcodeTextController.text, qr.BarcodeFormat.unknown, []),
+              rawValue: _manualBarcodeTextController.text,
+              format: qr.BarcodeFormat.unknown),
           byCamera: false,
           forceSearch: true);
       FocusScope.of(context).unfocus();
@@ -307,31 +303,23 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
                     ]))));
   }
 
-  void _onQRViewCreated(qr.QRViewController controller) {
-    setState(() {
-      _qrController = controller;
-    });
-    controller.scannedDataStream.listen((scanData) {
-      _onNewScanData(scanData, byCamera: true);
-    });
-  }
-
   void _onNewScanData(qr.Barcode scanData,
       {required bool byCamera, bool forceSearch = false}) async {
-    if (_model.barcode == scanData.code || !isBarcodeValid(scanData.code)) {
+    if (_model.barcode == scanData.rawValue ||
+        !isBarcodeValid(scanData.rawValue ?? '')) {
       if (!forceSearch) {
         return;
       }
     }
     if (byCamera) {
-      analytics.sendEvent('barcode_scan', {'barcode': scanData.code});
+      analytics.sendEvent('barcode_scan', {'barcode': scanData.rawValue});
     } else {
-      analytics.sendEvent('barcode_manual', {'barcode': scanData.code});
+      analytics.sendEvent('barcode_manual', {'barcode': scanData.rawValue});
     }
     // Note: no await because we don't care about result
     _sendProductScan(scanData);
 
-    final searchResult = await _model.searchProduct(scanData.code);
+    final searchResult = await _model.searchProduct(scanData.rawValue ?? '');
     switch (searchResult) {
       case BarcodeScanPageSearchResult.OK:
         // Nice
@@ -346,25 +334,19 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
   }
 
   void _sendProductScan(qr.Barcode scanData) async {
-    await GetIt.I.get<Backend>().sendProductScan(scanData.code);
+    await GetIt.I.get<Backend>().sendProductScan(scanData.rawValue ?? '');
   }
 
   void _toggleFlash() async {
-    try {
-      await _qrController?.toggleFlash();
-      setState(() {
-        _flashOn = !_flashOn;
-      });
-    } on qr.CameraException catch (e) {
-      Log.w('QrScanPage._toggleFlash error', ex: e);
-    }
+    await _qrController?.toggleTorch();
+    _flashOn.setValue(_qrController?.torchState.value == qr.TorchState.on);
   }
 
   void _switchInputMode(bool showCameraInput) {
     setState(() {
-      _showCameraInput = showCameraInput;
+      _showCameraInput.setValue(showCameraInput);
     });
-    _model.manualBarcodeInputShown = !_showCameraInput;
+    _model.manualBarcodeInputShown = !showCameraInput;
     FocusScope.of(context).unfocus();
   }
 }
