@@ -5,6 +5,6 @@
   Created by Johan Vandingenen on 26/06/2021.
   
 */
-NSCameraUsageDescription = "Com o acesso à câmara podes ler códigos de barras para pesquisar por produtos e tirar fotos para adicionar novos produtos";
-NSLocationWhenInUseUsageDescription = "Podemos encontrar lojas nas proximidades ao usarmos a tua localização!";
-NSPhotoLibraryUsageDescription="Esta aplicação precisa de acesso à tua biblioteca para enviar fotos de produtos";
+NSCameraUsageDescription = "With camera access you can scan barcodes to search for products and take pictures to add new products";
+NSLocationWhenInUseUsageDescription = "While using your location we can find nearby shops!";
+NSPhotoLibraryUsageDescription="This app needs access to your library to upload pictures of products";
