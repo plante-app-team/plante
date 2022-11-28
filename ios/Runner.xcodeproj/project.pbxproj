@@ -36,6 +36,8 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		401B9C74268BA7B2005F1FCB /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		40602BE6293504660078972C /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		40602BE7293504670078972C /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		40820E982687ADD9003C1E5E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4088CB8027B4498100DFB3D9 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4088CB8127B4498100DFB3D9 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				"pt-PT",
 				nb,
 				sk,
+				vi,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -351,6 +354,7 @@
 				4088CB8327B449BE00DFB3D9 /* pt-PT */,
 				4088CB8527B449CE00DFB3D9 /* nb */,
 				4088CB8727B44A6000DFB3D9 /* sk */,
+				40602BE7293504670078972C /* vi */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -377,6 +381,7 @@
 				4088CB8227B449BE00DFB3D9 /* pt-PT */,
 				4088CB8427B449CE00DFB3D9 /* nb */,
 				4088CB8627B44A6000DFB3D9 /* sk */,
+				40602BE6293504660078972C /* vi */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
