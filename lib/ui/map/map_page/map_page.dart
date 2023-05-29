@@ -113,7 +113,7 @@ class _MapPageState extends PageStatePlante<MapPage>
   final _mapController = Completer<GoogleMapController>();
   late final _displayedShopsMarkers = UIValue(<Marker>{}, ref);
   Iterable<Shop> _displayedShops = const [];
-  late final ClusterManager _clusterManager;
+  late final ClusterManager<Shop> _clusterManager;
 
   final _hintsController = MapHintsListController();
   late final UIValue<RichText?> _bottomHint = UIValue(null, ref);
@@ -633,7 +633,6 @@ class _MapPageState extends PageStatePlante<MapPage>
   /// Returns visible region after camera move
   Future<LatLngBounds> _moveCameraToShowCoords(
     Iterable<Coord> coords, {
-
     /// if not specified, the function will determine a good zoom by itself
     double? zoom,
   }) async {

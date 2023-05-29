@@ -141,46 +141,46 @@ class _SettingsHelpAndFeedbackPageState
         scheme: 'mailto',
         path: 'plante.application@gmail.com',
         queryParameters: {'subject': 'Feedback'},
-      ).toString(),
+      ),
     ));
 
     if (_userLangs.langs.contains(LangCode.en)) {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_discord.png',
-        url: 'https://discord.gg/kXgXrTVpGY',
+        url: Uri.parse('https://discord.gg/kXgXrTVpGY'),
       ));
     }
 
     if (_userLangs.langs.contains(LangCode.ru)) {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_telegram.png',
-        url: 'https://t.me/+MyYIO93--xdhOGRi',
+        url: Uri.parse('https://t.me/+MyYIO93--xdhOGRi'),
       ));
     }
 
     if (_userLangs.langs.contains(LangCode.ru)) {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_instagram.png',
-        url: 'https://instagram.com/plante.vegan.app.ru/',
+        url: Uri.parse('https://instagram.com/plante.vegan.app.ru/'),
       ));
     } else {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_instagram.png',
-        url: 'https://instagram.com/plante.vegan.app/',
+        url: Uri.parse('https://instagram.com/plante.vegan.app/'),
       ));
     }
 
     if (_userLangs.langs.contains(LangCode.en)) {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_facebook.png',
-        url: 'https://facebook.com/planteapp',
+        url: Uri.parse('https://facebook.com/planteapp'),
       ));
     }
 
     if (_userLangs.langs.contains(LangCode.ru)) {
-      buttons.add(const _ContactButton(
+      buttons.add(_ContactButton(
         png: 'assets/contact_vk.png',
-        url: 'https://vk.com/planteapp',
+        url: Uri.parse('https://vk.com/planteapp'),
       ));
     }
 
@@ -242,7 +242,7 @@ class _SettingsHelpAndFeedbackPageState
 
 class _ContactButton extends StatelessWidget {
   final String png;
-  final String url;
+  final Uri url;
   const _ContactButton({Key? key, required this.png, required this.url})
       : super(key: key);
 
@@ -253,7 +253,7 @@ class _ContactButton extends StatelessWidget {
         child: IconButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              launch(url);
+              launchUrl(url);
             },
             icon: SizedBox(width: 38, height: 38, child: Image.asset(png))));
   }

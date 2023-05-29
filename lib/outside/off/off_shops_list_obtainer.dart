@@ -79,7 +79,10 @@ class OffShopsListObtainer {
 
     jsonText ??= await file.readAsString();
 
-    final Map shops = {'json': jsonText, 'countryIso': countryIso};
+    final Map<dynamic, dynamic> shops = {
+      'json': jsonText,
+      'countryIso': countryIso,
+    };
     final result = await compute(_parseShops, shops);
     if (result != null) {
       _cache[countryIso] = result;
@@ -91,7 +94,7 @@ class OffShopsListObtainer {
     }
   }
 
-  static List<OffShop>? _parseShops(Map shops) {
+  static List<OffShop>? _parseShops(Map<dynamic, dynamic> shops) {
     final resultJson = jsonDecodeSafe(shops['json'] as String);
     if (resultJson == null) {
       return null;

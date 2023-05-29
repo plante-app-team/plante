@@ -126,12 +126,12 @@ class ShopsManagerShopsTerritoriesFetcher {
     await _osmCacher.deleteCachedTerritory(osmCachedTerritory.id);
   }
 
-  bool _isOld(OsmCachedTerritory territory) {
+  bool _isOld(OsmCachedTerritory<dynamic> territory) {
     return ShopsManager.DAYS_BEFORE_PERSISTENT_CACHE_IS_OLD <
         DateTime.now().difference(territory.whenObtained).inDays;
   }
 
-  bool _isAncient(OsmCachedTerritory territory) {
+  bool _isAncient(OsmCachedTerritory<dynamic> territory) {
     return ShopsManager.DAYS_BEFORE_PERSISTENT_CACHE_IS_ANCIENT <
         DateTime.now().difference(territory.whenObtained).inDays;
   }

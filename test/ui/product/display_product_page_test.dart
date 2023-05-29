@@ -113,7 +113,7 @@ void main() {
       throw Exception('Column $column is not expected to have SVG');
     }
 
-    final box1 = row.children![column] as SizedBox;
+    final box1 = row.children[column] as SizedBox;
     final center = box1.child! as Center;
     final box2 = center.child! as SizedBox;
     return (box2.child! as Text).data!;

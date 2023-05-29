@@ -219,11 +219,10 @@ class ProductsConverterAndCacher {
 
     final offProduct = off.Product(
         barcode: product.barcode,
-        productNameInLanguages:
-            _castToOffLangs(product.nameLangs, (e) => e! as String),
+        productNameInLanguages: _castToOffLangs(product.nameLangs, (e) => e),
         brands: _joinAndMaybeAddLangCode(product.brands, null),
         ingredientsTextInLanguages:
-            _castToOffLangs(product.ingredientsTextLangs, (e) => e! as String));
+            _castToOffLangs(product.ingredientsTextLangs, (e) => e));
 
     if (cachedProduct == null) {
       // Product is being create for the first time

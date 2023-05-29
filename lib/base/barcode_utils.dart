@@ -34,7 +34,7 @@ bool isBarcodeValid(String code) {
   a[10] = int.parse(code[10]) * 3;
   a[11] = int.parse(code[11]);
   a[12] = int.parse(code[12]) * 3;
-  final sum = a.fold(0, (p, c) => (p! as int) + c);
+  final sum = a.fold(0, (p, c) => p + c);
   final check = (10 - (sum % 10)) % 10;
   final last = int.parse(code[13]);
   return check == last;

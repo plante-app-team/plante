@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/foundation.dart';
@@ -126,9 +125,10 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   }
 
   SizeInt get _screenSize {
+    final view = View.of(context);
     return SizeInt(
-        width: window.physicalSize.width.toInt(),
-        height: window.physicalSize.height.toInt());
+        width: view.physicalSize.width.toInt(),
+        height: view.physicalSize.height.toInt());
   }
 
   @override
@@ -360,7 +360,7 @@ Uint8List? _rotate90Impl(Uint8List image) {
   if (originalImage == null) {
     return null;
   }
-  final fixedImage = img.copyRotate(originalImage, -90);
+  final fixedImage = img.copyRotate(originalImage, angle: -90);
   return Uint8List.fromList(img.encodeJpg(fixedImage));
 }
 

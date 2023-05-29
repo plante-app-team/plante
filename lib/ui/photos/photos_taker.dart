@@ -17,7 +17,7 @@ class PhotosTaker {
 
   PhotosTaker(this._prefsHolder);
 
-  /// For crop info see [new ImageCropPage]
+  /// For crop info see [ImageCropPage.new]
   Future<Uri?> takeAndCropPhoto(
       BuildContext context, Directory outFolder, PhotoRequester requester,
       {bool cropCircle = false,
@@ -32,7 +32,7 @@ class PhotosTaker {
         compressQualityJpg: compressQualityJpg);
   }
 
-  /// For crop info see [new ImageCropPage]
+  /// For crop info see [ImageCropPage.new]
   Future<Uri?> selectAndCropPhoto(
       BuildContext context, Directory outFolder, PhotoRequester requester,
       {bool cropCircle = false,
@@ -80,7 +80,7 @@ class PhotosTaker {
     }
   }
 
-  /// For crop info see [new ImageCropPage]
+  /// For crop info see [ImageCropPage.new]
   Future<Uri?> cropPhoto(
       String photoPath, BuildContext context, Directory outFolder,
       {bool cropCircle = false,

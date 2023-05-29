@@ -382,7 +382,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
               product: _product.watch(ref),
               onSourceUrlClick: (url) {
                 analytics.sendEvent('moderator_comment_source_url_click');
-                launch(url);
+                launchUrl(url);
               });
         });
   }
@@ -520,7 +520,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
   }
 
   void _copyProductName() {
-    Clipboard.setData(ClipboardData(text: _product.watch(ref).name));
+    Clipboard.setData(ClipboardData(text: _product.watch(ref).name ?? ''));
     showSnackBar(context.strings.global_copied_to_clipboard, context);
   }
 

@@ -106,7 +106,7 @@ class _SettingsPageState extends PageStatePlante<SettingsPage> {
       SettingsGeneralButton(
           text: context.strings.external_auth_page_privacy_policy,
           onTap: () {
-            launch(privacyPolicyUrl(_sysLangCodeHolder));
+            launchUrl(privacyPolicyUrl(_sysLangCodeHolder));
           }),
       consumer((ref) => SettingsCheckButton(
           onChanged: _distanceInMiles.setValue,

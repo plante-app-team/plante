@@ -107,7 +107,7 @@ class OsmOverpass {
     }
 
     final result = <OsmShop>[];
-    for (final shopJson in shopsJson['elements']) {
+    for (final shopJson in shopsJson['elements'] as Iterable<dynamic>) {
       final shopType = shopJson['tags']?['shop'] as String?;
       final shopName = shopJson['tags']?['name'] as String?;
       final id = shopJson['id']?.toString();
@@ -233,7 +233,7 @@ Result<List<OsmRoad>, _ParseRoadsErr> _parseRoads(String text) {
   }
 
   final result = <OsmRoad>[];
-  for (final roadJson in roadsJson['elements']) {
+  for (final roadJson in roadsJson['elements'] as Iterable<dynamic>) {
     final roadName = roadJson['tags']?['name'] as String?;
     if (roadName == null) {
       continue;

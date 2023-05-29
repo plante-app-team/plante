@@ -90,11 +90,11 @@ String operatingSystem() {
   return Platform.operatingSystem;
 }
 
-String privacyPolicyUrl(SysLangCodeHolder langCodeHolder) {
+Uri privacyPolicyUrl(SysLangCodeHolder langCodeHolder) {
   if (langCodeHolder.langCodeNullable == 'ru') {
-    return _PRIVACY_POLICY_URL_RU;
+    return Uri.parse(_PRIVACY_POLICY_URL_RU);
   } else {
-    return _PRIVACY_POLICY_URL_EN;
+    return Uri.parse(_PRIVACY_POLICY_URL_EN);
   }
 }
 

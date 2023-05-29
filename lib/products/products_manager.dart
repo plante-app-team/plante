@@ -19,7 +19,7 @@ import 'package:plante/products/products_converter.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/products/taken_products_images_storage.dart';
 
-abstract class ProductsManagerObserver {
+mixin ProductsManagerObserver {
   void onProductEdited(Product product);
 }
 

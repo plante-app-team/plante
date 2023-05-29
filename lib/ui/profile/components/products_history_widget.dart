@@ -38,7 +38,7 @@ class _ProductsHistoryWidgetState extends ConsumerState<ProductsHistoryWidget>
   late final ViewedProductsStorage viewedProductsStorage =
       widget.viewedProductsStorage;
   late final ProductsObtainer productsObtainer = widget.productsObtainer;
-  late final StreamSubscription viewedProductsSubscription;
+  late final StreamSubscription<void> viewedProductsSubscription;
   late final UserParams user = widget.userParamsController.cachedUserParams!;
 
   late final _loading = UIValue(false, ref);

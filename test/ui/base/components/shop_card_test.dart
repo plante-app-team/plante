@@ -101,7 +101,8 @@ void main() {
     GetIt.I.registerSingleton<ProductsObtainer>(MockProductsObtainer());
     GetIt.I
         .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('ru'));
-    GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(MockRouteObserver());
+    GetIt.I.registerSingleton<RouteObserver<ModalRoute<dynamic>>>(
+        MockRouteObserver());
 
     final permissionsManager = MockPermissionsManager();
     when(permissionsManager.status(any))

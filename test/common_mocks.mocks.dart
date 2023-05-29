@@ -109,8 +109,8 @@ class _FakeBackendResponse_1 extends _i1.Fake implements _i3.BackendResponse {}
 
 class _FakeLatLngBounds_2 extends _i1.Fake implements _i4.LatLngBounds {}
 
-class _FakeScreenCoordinate_3 extends _i1.Fake implements _i4.ScreenCoordinate {
-}
+class _FakeScreenCoordinate_3 extends _i1.Fake
+    implements _i4.ScreenCoordinate {}
 
 class _FakeLatLng_4 extends _i1.Fake implements _i4.LatLng {}
 

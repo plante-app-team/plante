@@ -2,7 +2,7 @@ import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 
-abstract class ShopsLargeLocalCache {
+mixin ShopsLargeLocalCache {
   Future<void> addBarcodes(Map<OsmUID, List<String>> barcodes);
 
   Future<void> addBarcode(OsmUID uid, String barcode) async {

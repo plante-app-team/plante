@@ -167,7 +167,8 @@ void main() {
             someOffShops.map((e) => e.name!).toSet(), CountryCode.BELGIUM)
         .asBroadcastStream();
     var calls = 0;
-    StreamSubscription? subs;
+    StreamSubscription<Result<ShopNameBarcodesPair, OffShopsManagerError>>?
+        subs;
     subs = stream.listen((event) {
       // Cancel the stream on first event
       subs!.cancel();

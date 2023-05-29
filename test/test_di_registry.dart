@@ -80,30 +80,31 @@ class TestDiRegistrar {
   void _registerDefaults() {
     _registerProvider<UserLangsManager>(
         () => FakeUserLangsManager([LangCode.en]));
-    _registerProvider<UserReportsMaker>(() => MockUserReportsMaker());
-    _registerProvider<ViewedProductsStorage>(() => MockViewedProductsStorage());
-    _registerProvider<ShopsManager>(() => FakeShopsManager());
+    _registerProvider<UserReportsMaker>(MockUserReportsMaker.new);
+    _registerProvider<ViewedProductsStorage>(MockViewedProductsStorage.new);
+    _registerProvider<ShopsManager>(FakeShopsManager.new);
     _registerProvider<SharedPreferencesHolder>(
         () => FakeSharedPreferences().asHolder());
     _registerProvider<InputProductsLangStorage>(
         () => FakeInputProductsLangStorage.fromCode(LangCode.en));
-    _registerProvider<PermissionsManager>(() => MockPermissionsManager());
-    _registerProvider<AddressObtainer>(() => FakeAddressObtainer());
+    _registerProvider<PermissionsManager>(MockPermissionsManager.new);
+    _registerProvider<AddressObtainer>(FakeAddressObtainer.new);
     _registerProvider<SuggestedProductsManager>(
-        () => FakeSuggestedProductsManager());
+        FakeSuggestedProductsManager.new);
     _registerProvider<ShopsCreationManager>(
         () => ShopsCreationManager(_get<ShopsManager>()));
-    _registerProvider<UserLocationManager>(() => FakeUserLocationManager());
-    _registerProvider<ProductsManager>(() => MockProductsManager());
-    _registerProvider<Analytics>(() => FakeAnalytics());
-    _registerProvider<OsmSearcher>(() => MockOsmSearcher());
-    _registerProvider<Settings>(() => FakeSettings());
+    _registerProvider<UserLocationManager>(FakeUserLocationManager.new);
+    _registerProvider<ProductsManager>(MockProductsManager.new);
+    _registerProvider<Analytics>(FakeAnalytics.new);
+    _registerProvider<OsmSearcher>(MockOsmSearcher.new);
+    _registerProvider<Settings>(FakeSettings.new);
     _registerProvider<DisplayedDistanceUnitsManager>(() =>
         DisplayedDistanceUnitsManager(
             _get<CachingUserAddressPiecesObtainer>(), _get<Settings>()));
-    _registerProvider<ProductsObtainer>(() => FakeProductsObtainer());
-    _registerProvider<RouteObserver<ModalRoute>>(() => MockRouteObserver());
-    _registerProvider<SysLangCodeHolder>(() => SysLangCodeHolder());
+    _registerProvider<ProductsObtainer>(FakeProductsObtainer.new);
+    _registerProvider<RouteObserver<ModalRoute<dynamic>>>(
+        MockRouteObserver.new);
+    _registerProvider<SysLangCodeHolder>(SysLangCodeHolder.new);
 
     _registerProvider<UserParamsController>(() {
       final instance = FakeUserParamsController();

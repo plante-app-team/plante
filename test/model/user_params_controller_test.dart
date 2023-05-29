@@ -8,7 +8,8 @@ import 'package:test/test.dart';
 import 'user_params_controller_test.mocks.dart';
 
 @GenerateMocks([], customMocks: [
-  MockSpec<UserParamsControllerObserver>(returnNullOnMissingStub: true)
+  MockSpec<UserParamsControllerObserver>(
+      onMissingStub: OnMissingStub.returnDefault)
 ])
 void main() {
   setUp(() async {

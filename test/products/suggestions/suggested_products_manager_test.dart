@@ -15,6 +15,7 @@ import 'package:plante/products/suggestions/suggested_barcodes_map.dart';
 import 'package:plante/products/suggestions/suggested_barcodes_map_full.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/suggestions/suggestion_type.dart';
+import 'package:plante/products/suggestions/suggestions_for_shop.dart';
 import 'package:test/test.dart';
 
 import '../../z_fakes/fake_off_shops_manager.dart';
@@ -269,7 +270,8 @@ void main() {
 
     var stream = getSuggestionsStream.call(shops).asBroadcastStream();
     var calls = 0;
-    StreamSubscription? subs;
+    StreamSubscription<
+        Result<SuggestionsForShop, SuggestedProductsManagerError>>? subs;
     subs = stream.listen((event) {
       // Cancel the stream on first event
       subs!.cancel();

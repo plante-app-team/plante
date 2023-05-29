@@ -62,8 +62,8 @@ void initDI() {
   GetIt.I.registerSingleton<CountriesLangCodesTable>(
       CountriesLangCodesTable(GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<PermissionsManager>(PermissionsManager());
-  GetIt.I.registerSingleton<RouteObserver<ModalRoute>>(
-      RouteObserver<ModalRoute>());
+  GetIt.I.registerSingleton<RouteObserver<ModalRoute<dynamic>>>(
+      RouteObserver<ModalRoute<dynamic>>());
   GetIt.I.registerSingleton<UserParamsController>(UserParamsController());
   GetIt.I.registerSingleton<HttpClient>(HttpClient());
   GetIt.I.registerSingleton<IpLocationProvider>(

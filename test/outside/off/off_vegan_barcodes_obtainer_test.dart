@@ -5,6 +5,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/model/country_code.dart';
 import 'package:plante/outside/off/off_cacher.dart';
 import 'package:plante/outside/off/off_shop.dart';
+import 'package:plante/outside/off/off_shops_manager.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_obtainer.dart';
 import 'package:plante/outside/off/off_vegan_barcodes_storage.dart';
 import 'package:test/test.dart';
@@ -213,7 +214,7 @@ void main() {
 
     var stream = obtainer.obtainVeganBarcodes(someOffShops).asBroadcastStream();
     var calls = 0;
-    StreamSubscription? subs;
+    StreamSubscription<Result<ShopBarcodesPair, OffShopsManagerError>>? subs;
     subs = stream.listen((event) {
       // Cancel the stream on first event
       subs!.cancel();
