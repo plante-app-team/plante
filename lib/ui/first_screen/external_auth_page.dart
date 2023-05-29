@@ -100,7 +100,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
                   padding: const EdgeInsets.only(bottom: 108),
                   child: InkWell(
                     onTap: () {
-                      launch(privacyPolicyUrl(_sysLangCodeHolder));
+                      launchUrl(privacyPolicyUrl(_sysLangCodeHolder));
                     },
                     child: Text(
                         context.strings.external_auth_page_privacy_policy,

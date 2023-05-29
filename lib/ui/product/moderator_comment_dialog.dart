@@ -12,7 +12,7 @@ import 'package:plante/ui/base/text_styles.dart';
 class ModeratorCommentDialog extends StatelessWidget {
   final UserParams user;
   final Product product;
-  final ArgCallback<String> onSourceUrlClick;
+  final ArgCallback<Uri> onSourceUrlClick;
   const ModeratorCommentDialog(
       {Key? key,
       required this.user,
@@ -48,7 +48,7 @@ class ModeratorCommentDialog extends StatelessWidget {
                   style: TextStyles.normal,
                   linkStyle: TextStyles.url,
                   onOpen: (link) => () {
-                        onSourceUrlClick.call(link.url);
+                        onSourceUrlClick.call(Uri.parse(link.url));
                       },
                   text: _vegStatusModeratorSourcesText()!)
             ]),

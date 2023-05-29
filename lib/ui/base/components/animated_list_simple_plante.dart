@@ -89,8 +89,8 @@ class _AnimatedListSimplePlanteState extends State<AnimatedListSimplePlante> {
 
 class _ScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails scrollableDetails) {
     return child;
   }
 }

@@ -3,9 +3,6 @@
 # observe the changes.
 
 analyzer:
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: true
   errors:
     # treat missing required parameters as a warning (not a hint)
     missing_required_param: warning
@@ -27,6 +24,9 @@ analyzer:
     - "lib/**.g.dart"
     - "test/**.mocks.dart"
     - "submodules/**"
+  language:
+    strict-casts: true
+    strict-raw-types: true
 
 linter:
   rules:
@@ -140,7 +140,6 @@ linter:
     # - prefer_constructors_over_static_methods # far too many false positives
     - prefer_contains
     # - prefer_double_quotes # opposite of prefer_single_quotes
-    - prefer_equal_for_default_values
     # - prefer_expression_function_bodies # conflicts with https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#consider-using--for-short-functions-and-methods
     - prefer_final_fields
     - prefer_final_in_for_each

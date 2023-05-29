@@ -18,7 +18,7 @@ import 'package:plante/ui/map/map_page/map_page_mode.dart';
 abstract class MapPageModeShopsCardBase extends MapPageMode {
   late final UIValue<List<Shop>> _displayedShops;
   final _actuallyVisibleShops = <Shop>{};
-  late final UiListAddressesObtainer addressesObtainer;
+  late final UiListAddressesObtainer<Shop> addressesObtainer;
 
   MapPageModeShopsCardBase(MapPageModeParams params,
       {required String nameForAnalytics})

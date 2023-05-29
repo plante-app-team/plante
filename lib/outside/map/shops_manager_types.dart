@@ -7,7 +7,7 @@ enum ShopsManagerError {
   OTHER,
 }
 
-class ShopsManagerListener {
+mixin ShopsManagerListener {
   void onLocalShopsChange() {}
   void onShopCreated(Shop shop) {}
   void onProductPutToShops(Product product, List<Shop> shops) {}

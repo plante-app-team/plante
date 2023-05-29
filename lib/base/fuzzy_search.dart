@@ -75,7 +75,7 @@ class FuzzySearch {
   }
 }
 
-class _SearchParams<T> {
+class _SearchParams {
   final List<String> values;
   final String query;
   final bool sort;

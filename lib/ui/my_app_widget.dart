@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
@@ -40,6 +41,8 @@ class _MyAppWidgetState extends State<MyAppWidget>
 
   @override
   Widget build(BuildContext context) {
+    GetIt.I.get<SysLangCodeHolder>().langCode =
+        View.of(context).platformDispatcher.locale.languageCode;
     final colorScheme =
         ColorScheme.fromSwatch(primarySwatch: ColorsPlante.primaryMaterial);
     return MaterialApp(
@@ -50,12 +53,59 @@ class _MyAppWidgetState extends State<MyAppWidget>
         supportedLocales: _supportedLocales(),
         theme: ThemeData(
           unselectedWidgetColor: ColorsPlante.grey,
-          toggleableActiveColor: ColorsPlante.primary,
           colorScheme: colorScheme.copyWith(primary: ColorsPlante.primary),
+          checkboxTheme: CheckboxThemeData(
+            fillColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return null;
+              }
+              if (states.contains(MaterialState.selected)) {
+                return ColorsPlante.primary;
+              }
+              return null;
+            }),
+          ),
+          radioTheme: RadioThemeData(
+            fillColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return null;
+              }
+              if (states.contains(MaterialState.selected)) {
+                return ColorsPlante.primary;
+              }
+              return null;
+            }),
+          ),
+          switchTheme: SwitchThemeData(
+            thumbColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return null;
+              }
+              if (states.contains(MaterialState.selected)) {
+                return ColorsPlante.primary;
+              }
+              return null;
+            }),
+            trackColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              if (states.contains(MaterialState.disabled)) {
+                return null;
+              }
+              if (states.contains(MaterialState.selected)) {
+                return ColorsPlante.primary;
+              }
+              return null;
+            }),
+          ),
         ),
         home:
             AnimatedSwitcher(duration: DURATION_DEFAULT, child: _mainWidget()),
-        navigatorObservers: [GetIt.I.get<RouteObserver<ModalRoute>>()]);
+        navigatorObservers: [
+          GetIt.I.get<RouteObserver<ModalRoute<dynamic>>>()
+        ]);
   }
 
   Iterable<Locale> _supportedLocales() {

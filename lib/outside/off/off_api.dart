@@ -150,7 +150,7 @@ class OffApi {
     if (json == null) {
       return null;
     }
-    for (final productJson in json['products']) {
+    for (final productJson in json['products'] as Iterable<dynamic>) {
       if (productJson is! Map<String, dynamic>) {
         continue;
       }

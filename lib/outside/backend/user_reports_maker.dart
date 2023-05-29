@@ -2,7 +2,7 @@ import 'package:plante/base/result.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 
-abstract class UserReportsMakerObserver {
+mixin UserReportsMakerObserver {
   void onUserReportMade(String barcode);
 }
 

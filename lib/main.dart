@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -12,7 +11,6 @@ import 'package:get_it/get_it.dart';
 import 'package:openfoodfacts/openfoodfacts.dart' as off;
 import 'package:plante/base/base.dart';
 import 'package:plante/di.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
@@ -56,8 +54,6 @@ void mainImpl() async {
       await GetIt.I.get<UserParamsController>().getUserParams();
 
   setSystemUIOverlayStyle();
-
-  GetIt.I.get<SysLangCodeHolder>().langCode = window.locales.first.languageCode;
 
   // We'll proxy all requests to OFF
   off.HttpHelper.interceptor = OffHttpInterceptor(GetIt.I.get<Backend>());

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// See class usage
-class PseudoPopupMenuItem extends PopupMenuEntry {
+class PseudoPopupMenuItem extends PopupMenuEntry<dynamic> {
   final _stateKey = GlobalKey();
   final Widget child;
 

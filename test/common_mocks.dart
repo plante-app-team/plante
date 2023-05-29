@@ -70,6 +70,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
 ])
 void unusedFunctionForCommonMocks() {}
 
-@GenerateMocks([],
-    customMocks: [MockSpec<NavigatorObserver>(returnNullOnMissingStub: true)])
+@GenerateMocks([], customMocks: [
+  MockSpec<NavigatorObserver>(onMissingStub: OnMissingStub.returnDefault)
+])
 void unusedFunctionForCommonStubbedMocks() {}

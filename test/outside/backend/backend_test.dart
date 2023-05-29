@@ -599,7 +599,7 @@ void main() {
         ''');
 
     final result = await backend.requestProductsAtShops(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -659,7 +659,7 @@ void main() {
         ''');
 
     final result = await backend.requestProductsAtShops(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrap().length, equals(0));
   });
 
@@ -684,7 +684,7 @@ void main() {
         ''');
 
     final result = await backend.requestProductsAtShops(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -698,7 +698,7 @@ void main() {
         ''');
 
     final result = await backend.requestProductsAtShops(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -709,7 +709,7 @@ void main() {
         '.*products_at_shops_data.*', const SocketException(''));
 
     final result = await backend.requestProductsAtShops(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -733,7 +733,7 @@ void main() {
         ''');
 
     final result = await backend.requestShopsByOsmUIDs(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.isOk, isTrue);
 
     final shops = result.unwrap();
@@ -763,7 +763,7 @@ void main() {
         ''');
 
     final result = await backend.requestShopsByOsmUIDs(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrap().length, equals(0));
   });
 
@@ -778,7 +778,7 @@ void main() {
         ''');
 
     final result = await backend.requestShopsByOsmUIDs(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -792,7 +792,7 @@ void main() {
         ''');
 
     final result = await backend.requestShopsByOsmUIDs(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -803,7 +803,7 @@ void main() {
         '.*/shops_data/.*', const SocketException(''));
 
     final result = await backend.requestShopsByOsmUIDs(
-        ['1:8711880917', '1:8771781029'].map((e) => OsmUID.parse(e)));
+        ['1:8711880917', '1:8771781029'].map(OsmUID.parse));
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });

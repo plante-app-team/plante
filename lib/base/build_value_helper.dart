@@ -62,10 +62,10 @@ final _jsonSerializers = (_serializers.toBuilder()
       ..add(OsmUIDBuildValueSerializer())
       ..addPlugin(StandardJsonPlugin())
       ..addBuilderFactory(const FullType(BuiltList, [FullType(Ingredient)]),
-          () => ListBuilder<Ingredient>())
+          ListBuilder<Ingredient>.new)
       ..addBuilderFactory(
           const FullType(BuiltMap, [FullType(String), FullType(JsonObject)]),
-          () => MapBuilder<String, JsonObject>()))
+          MapBuilder<String, JsonObject>.new))
     .build();
 
 class BuildValueHelper {

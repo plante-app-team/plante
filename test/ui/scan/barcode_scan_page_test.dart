@@ -43,7 +43,7 @@ void main() {
   late MockProductsManager productsManager;
   late FakeProductsObtainer productsObtainer;
   late MockBackend backend;
-  late MockRouteObserver<ModalRoute> routesObserver;
+  late MockRouteObserver<ModalRoute<dynamic>> routesObserver;
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
   late ViewedProductsStorage viewedProductsStorage;
@@ -66,7 +66,7 @@ void main() {
       r.register<ProductsManager>(productsManager);
       r.register<ProductsObtainer>(productsObtainer);
       r.register<Backend>(backend);
-      r.register<RouteObserver<ModalRoute>>(routesObserver);
+      r.register<RouteObserver<ModalRoute<dynamic>>>(routesObserver);
       r.register<PermissionsManager>(permissionsManager);
       r.register<ShopsManager>(shopsManager);
       r.register<UserLocationManager>(userLocationManager);

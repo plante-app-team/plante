@@ -65,7 +65,8 @@ class MapPageModel with ShopsManagerListener {
 
   Map<OsmUID, Shop> _shopsCache = {};
   final _barcodesSuggestions = SuggestedBarcodesMapFull({});
-  StreamSubscription? _suggestedBarcodesSubscription;
+  StreamSubscription<Result<SuggestionsForShop, SuggestedProductsManagerError>>?
+      _suggestedBarcodesSubscription;
 
   bool _directionsAvailable = false;
 
