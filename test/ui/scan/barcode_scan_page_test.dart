@@ -40,6 +40,8 @@ import '../../z_fakes/fake_user_location_manager.dart';
 const _DEFAULT_LANG = LangCode.en;
 
 void main() {
+  const validBarcode1 = '4606038069239';
+  const validBarcode2 = '1234567890128';
   late MockProductsManager productsManager;
   late FakeProductsObtainer productsObtainer;
   late MockBackend backend;
@@ -112,7 +114,7 @@ void main() {
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
     expect(viewedProductsStorage.getProducts(), isEmpty);
 
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -152,7 +154,7 @@ void main() {
     expect(analytics.wasEventSent('scanned_product_in_foreign_lang'), isFalse);
     expect(viewedProductsStorage.getProducts(), isEmpty);
 
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -197,7 +199,7 @@ void main() {
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-    widget.newScanDataForTesting(_barcode('invalid barcode!'));
+    widget.newScanDataForTesting([_barcode('invalid barcode!')]);
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsNothing);
@@ -209,12 +211,12 @@ void main() {
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
-    const barcode = '4606038069239';
+    const barcode = validBarcode1;
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
 
-    widget.newScanDataForTesting(_barcode(barcode));
+    widget.newScanDataForTesting([_barcode(barcode)]);
     await tester.pumpAndSettle();
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
@@ -227,6 +229,90 @@ void main() {
     expect(find.byType(InitProductPage), findsOneWidget);
   });
 
+  testWidgets('when multiple barcodes are scanned, the first one is used',
+      (WidgetTester tester) async {
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = _DEFAULT_LANG
+      ..barcode = barcode
+      ..name = 'Product with $barcode'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    final barcode1 = _barcode(validBarcode1);
+    final barcode2 = _barcode(validBarcode2);
+    widget.newScanDataForTesting([barcode1, barcode2]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product with ${barcode1.rawValue}'), findsOneWidget);
+    expect(find.text('Product with ${barcode2.rawValue}'), findsNothing);
+  });
+
+  testWidgets(
+      'when multiple barcodes are scanned, the invalid ones are ignored',
+      (WidgetTester tester) async {
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = _DEFAULT_LANG
+      ..barcode = barcode
+      ..name = 'Product with $barcode'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    final barcode1 = _barcode('INVALID');
+    final barcode2 = _barcode(validBarcode2);
+    widget.newScanDataForTesting([barcode1, barcode2]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product with ${barcode1.rawValue}'), findsNothing);
+    expect(find.text('Product with ${barcode2.rawValue}'), findsOneWidget);
+  });
+
+  testWidgets(
+      'when multiple barcodes are scanned, and the product of first is already displayed, second product gets displayed',
+      (WidgetTester tester) async {
+    productsObtainer
+        .unknownProductsGeneratorSimple = (barcode) => ProductLangSlice((e) => e
+      ..lang = _DEFAULT_LANG
+      ..barcode = barcode
+      ..name = 'Product with $barcode'
+      ..imageFront = Uri.file('/tmp/asd')
+      ..imageIngredients = Uri.file('/tmp/asd')
+      ..ingredientsText = 'beans'
+      ..veganStatus = VegStatus.positive
+      ..veganStatusSource = VegStatusSource.community).buildSingleLangProduct();
+
+    final widget = BarcodeScanPage();
+    await tester.superPump(widget);
+
+    final barcode1 = _barcode(validBarcode1);
+    final barcode2 = _barcode(validBarcode2);
+
+    // Scan 1
+    widget.newScanDataForTesting([barcode1, barcode2]);
+    await tester.pumpAndSettle();
+    expect(find.text('Product with ${barcode1.rawValue}'), findsOneWidget);
+    expect(find.text('Product with ${barcode2.rawValue}'), findsNothing);
+
+    // Scan 2, same barcodes in same order
+    widget.newScanDataForTesting([barcode1, barcode2]);
+    await tester.pumpAndSettle();
+    expect(find.text('Product with ${barcode1.rawValue}'), findsNothing);
+    expect(find.text('Product with ${barcode2.rawValue}'), findsOneWidget);
+  });
+
   testWidgets('scan data sent to backend', (WidgetTester tester) async {
     productsObtainer.unknownProductsGeneratorSimple =
         (barcode) => Product((e) => e.barcode = barcode);
@@ -235,7 +321,7 @@ void main() {
     await tester.superPump(widget);
 
     verifyNever(backend.sendProductScan(any));
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
     verify(backend.sendProductScan(any));
   });
@@ -408,7 +494,7 @@ void main() {
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
 
     expect(find.text('Product name'), findsOneWidget);
@@ -423,9 +509,7 @@ void main() {
     final widget = BarcodeScanPage();
     final context = await tester.superPump(widget);
 
-    const barcode = '4606038069239';
-
-    widget.newScanDataForTesting(_barcode(barcode));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
@@ -450,7 +534,7 @@ void main() {
         ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
-      ..barcode = '4606038069239'
+      ..barcode = validBarcode1
       ..name = 'Beans can'
       ..imageFront = Uri.file('/tmp/asd')
       ..imageIngredients = Uri.file('/tmp/asd')
@@ -467,7 +551,7 @@ void main() {
         .replaceAll('<SHOP>', shop.name);
 
     expect(find.text(expectedQuestion), findsNothing);
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
     expect(find.text(expectedQuestion), findsOneWidget);
 
@@ -495,7 +579,7 @@ void main() {
         ..osmUID = OsmUID.parse('1:1')
         ..productsCount = 2)));
     final product = ProductLangSlice((e) => e
-      ..barcode = '4606038069239'
+      ..barcode = validBarcode1
       ..name = 'Beans can'
       ..imageFront = Uri.file('/tmp/asd')
       ..imageIngredients = Uri.file('/tmp/asd')
@@ -512,7 +596,7 @@ void main() {
         .replaceAll('<SHOP>', shop.name);
 
     expect(find.text(expectedQuestion), findsNothing);
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
     expect(find.text(expectedQuestion), findsOneWidget);
 
@@ -543,7 +627,7 @@ void main() {
 
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsNothing);
-    widget.newScanDataForTesting(_barcode('4606038069239'));
+    widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
     expect(find.text(context.strings.barcode_scan_page_product_not_found),
         findsOneWidget);
@@ -572,11 +656,11 @@ void main() {
 
     analytics.clearEvents();
 
-    widget.newScanDataForTesting(_barcode('4606038069239'), byCamera: true);
+    widget.newScanDataForTesting([_barcode(validBarcode1)], byCamera: true);
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('barcode_scan'),
-        equals({'barcode': '4606038069239'}));
+        equals({'barcode': validBarcode1}));
     expect(analytics.wasEventSent('barcode_manual'), isFalse);
   });
 
@@ -589,11 +673,11 @@ void main() {
 
     analytics.clearEvents();
 
-    widget.newScanDataForTesting(_barcode('4606038069239'), byCamera: false);
+    widget.newScanDataForTesting([_barcode(validBarcode1)], byCamera: false);
 
     expect(analytics.allEvents().length, equals(1));
     expect(analytics.sentEventParams('barcode_manual'),
-        equals({'barcode': '4606038069239'}));
+        equals({'barcode': validBarcode1}));
     expect(analytics.wasEventSent('barcode_scan'), isFalse);
   });
 }

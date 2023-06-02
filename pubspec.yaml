@@ -57,12 +57,12 @@ dependencies:
   map_launcher: ^2.1.1
   openfoodfacts:
     path: submodules/openfoodfacts-dart
-  package_info_plus: ^3.0.2
+  package_info_plus: ^4.0.2
   palette_generator: ^0.3.0
   path_provider: ^2.0.1
   permission_handler: ^10.2.0
   photo_view: ^0.14.0
-  mobile_scanner: ^2.1.0
+  mobile_scanner: ^3.2.0
   share: ^2.0.1
   shared_preferences: ^2.0.6
   sign_in_with_apple: ^4.2.0
