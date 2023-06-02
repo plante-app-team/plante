@@ -40,16 +40,17 @@ class BarcodeScanPage extends PagePlante {
   @override
   _BarcodeScanPageState createState() => _BarcodeScanPageState();
 
-  void newScanDataForTesting(qr.Barcode barcode, {bool byCamera = true}) {
+  void newScanDataForTesting(Iterable<qr.Barcode> barcodes,
+      {bool byCamera = true}) {
     if (!isInTests()) {
       throw Exception('newScanDataForTesting not in tests');
     }
-    _testingStorage.newScanDataCallback!.call(Pair(barcode, byCamera));
+    _testingStorage.newScanDataCallback!.call(Pair(barcodes, byCamera));
   }
 }
 
 class _TestingStorage {
-  ArgCallback<Pair<qr.Barcode, bool>>? newScanDataCallback;
+  ArgCallback<Pair<Iterable<qr.Barcode>, bool>>? newScanDataCallback;
 }
 
 class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
@@ -177,10 +178,9 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
               ? Stack(children: [
                   qr.MobileScanner(
                       key: _qrKey,
-                      allowDuplicates: true,
                       controller: _qrController,
-                      onDetect: (barcode, args) {
-                        _onNewScanData(barcode, byCamera: true);
+                      onDetect: (qr.BarcodeCapture barcodes) {
+                        _onNewScanData(barcodes.barcodes, byCamera: true);
                       }),
                   InkWell(
                       onTap: _toggleFlash,
@@ -258,12 +258,11 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
 
   Widget _manualInput() {
     final onPressed = () {
-      _onNewScanData(
-          qr.Barcode(
-              rawValue: _manualBarcodeTextController.text,
-              format: qr.BarcodeFormat.unknown),
-          byCamera: false,
-          forceSearch: true);
+      _onNewScanData([
+        qr.Barcode(
+            rawValue: _manualBarcodeTextController.text,
+            format: qr.BarcodeFormat.unknown)
+      ], byCamera: false, forceSearch: true);
       FocusScope.of(context).unfocus();
     };
     final onDisabledPressed = () {
@@ -303,23 +302,27 @@ class _BarcodeScanPageState extends PageStatePlante<BarcodeScanPage> {
                     ]))));
   }
 
-  void _onNewScanData(qr.Barcode scanData,
+  void _onNewScanData(Iterable<qr.Barcode> scanData,
       {required bool byCamera, bool forceSearch = false}) async {
-    if (_model.barcode == scanData.rawValue ||
-        !isBarcodeValid(scanData.rawValue ?? '')) {
-      if (!forceSearch) {
-        return;
-      }
+    if (!forceSearch) {
+      scanData = scanData.where((barcode) =>
+          _model.barcode != barcode.rawValue &&
+          isBarcodeValid(barcode.rawValue ?? ''));
     }
+    final barcode = scanData.firstOrNull;
+    if (barcode == null) {
+      return;
+    }
+
     if (byCamera) {
-      analytics.sendEvent('barcode_scan', {'barcode': scanData.rawValue});
+      analytics.sendEvent('barcode_scan', {'barcode': barcode.rawValue});
     } else {
-      analytics.sendEvent('barcode_manual', {'barcode': scanData.rawValue});
+      analytics.sendEvent('barcode_manual', {'barcode': barcode.rawValue});
     }
     // Note: no await because we don't care about result
-    _sendProductScan(scanData);
+    _sendProductScan(barcode);
 
-    final searchResult = await _model.searchProduct(scanData.rawValue ?? '');
+    final searchResult = await _model.searchProduct(barcode.rawValue ?? '');
     switch (searchResult) {
       case BarcodeScanPageSearchResult.OK:
         // Nice

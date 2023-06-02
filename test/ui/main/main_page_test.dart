@@ -88,7 +88,7 @@ void main() {
 
     // Scan the barcode
     final scanPage = currentPage() as BarcodeScanPage;
-    scanPage.newScanDataForTesting(qr.Barcode(rawValue: '4606038069239'));
+    scanPage.newScanDataForTesting([qr.Barcode(rawValue: '4606038069239')]);
     await tester.pumpAndSettle();
 
     // Ensure the product is not found
