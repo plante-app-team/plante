@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class UriImagePlante extends StatelessWidget {
@@ -18,9 +19,15 @@ class UriImagePlante extends StatelessWidget {
     if (uri.isScheme('FILE')) {
       result = Image.file(File.fromUri(uri), fit: BoxFit.cover);
     } else {
+      final ImageProvider imageProvider;
+      if (!kIsWeb) {
+        imageProvider =
+            CachedNetworkImageProvider(uri.toString(), headers: httpHeaders);
+      } else {
+        imageProvider = NetworkImage(uri.toString(), headers: httpHeaders);
+      }
       result = Image(
-          image:
-              CachedNetworkImageProvider(uri.toString(), headers: httpHeaders),
+          image: imageProvider,
           fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) {
