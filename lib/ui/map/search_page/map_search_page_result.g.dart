@@ -74,7 +74,7 @@ class _$MapSearchPageResultSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -131,7 +131,7 @@ class _$MapSearchPageResult extends MapSearchPageResult {
 
   factory _$MapSearchPageResult(
           [void Function(MapSearchPageResultBuilder)? updates]) =>
-      (new MapSearchPageResultBuilder()..update(updates)).build();
+      (new MapSearchPageResultBuilder()..update(updates))._build();
 
   _$MapSearchPageResult._(
       {this.chosenShops,
@@ -142,9 +142,9 @@ class _$MapSearchPageResult extends MapSearchPageResult {
       this.scrollOffset})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        foundShops, 'MapSearchPageResult', 'foundShops');
+        foundShops, r'MapSearchPageResult', 'foundShops');
     BuiltValueNullFieldError.checkNotNull(
-        foundRoads, 'MapSearchPageResult', 'foundRoads');
+        foundRoads, r'MapSearchPageResult', 'foundRoads');
   }
 
   @override
@@ -170,19 +170,20 @@ class _$MapSearchPageResult extends MapSearchPageResult {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc($jc($jc(0, chosenShops.hashCode), chosenRoad.hashCode),
-                    foundShops.hashCode),
-                foundRoads.hashCode),
-            query.hashCode),
-        scrollOffset.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, chosenShops.hashCode);
+    _$hash = $jc(_$hash, chosenRoad.hashCode);
+    _$hash = $jc(_$hash, foundShops.hashCode);
+    _$hash = $jc(_$hash, foundRoads.hashCode);
+    _$hash = $jc(_$hash, query.hashCode);
+    _$hash = $jc(_$hash, scrollOffset.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('MapSearchPageResult')
+    return (newBuiltValueToStringHelper(r'MapSearchPageResult')
           ..add('chosenShops', chosenShops)
           ..add('chosenRoad', chosenRoad)
           ..add('foundShops', foundShops)
@@ -255,7 +256,9 @@ class MapSearchPageResultBuilder
   }
 
   @override
-  _$MapSearchPageResult build() {
+  MapSearchPageResult build() => _build();
+
+  _$MapSearchPageResult _build() {
     _$MapSearchPageResult _$result;
     try {
       _$result = _$v ??
@@ -279,7 +282,7 @@ class MapSearchPageResultBuilder
         foundRoads.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'MapSearchPageResult', _$failedField, e.toString());
+            r'MapSearchPageResult', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -288,4 +291,4 @@ class MapSearchPageResultBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

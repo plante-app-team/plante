@@ -7,8 +7,8 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
+import 'package:plante/outside/news/news_cluster.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
-import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/outside/news/news_piece_product_at_shop.dart';
 import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
@@ -86,7 +86,7 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
   Widget buildPage(BuildContext context) {
     final content = Stack(children: [
       consumer((ref) {
-        final newsWidgets = _newsPiecesWidgets(_model.newsPieces.watch(ref));
+        final newsWidgets = _newsPiecesWidgets(_model.news.watch(ref));
         return RefreshIndicator(
             onRefresh: () async {
               _loadingByPullToRefresh.setValue(true);
@@ -145,9 +145,9 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
       if (error != null) {
         final errorWidget = () =>
             _ErrorWidget(error: error, onRetryClick: _model.maybeLoadNextNews);
-        if (fillSpace && _model.newsPieces.watch(ref).isEmpty) {
+        if (fillSpace && _model.news.watch(ref).isEmpty) {
           return makeStack(errorWidget());
-        } else if (!fillSpace && !_model.newsPieces.watch(ref).isEmpty) {
+        } else if (!fillSpace && !_model.news.watch(ref).isEmpty) {
           return errorWidget();
         }
       }
@@ -155,19 +155,20 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
     });
   }
 
-  List<Widget> _newsPiecesWidgets(List<NewsPiece> newsPieces) {
+  List<Widget> _newsPiecesWidgets(List<NewsCluster> news) {
     // NOTE: we don't have ordered shops, so we use them
     // in an unordered state.
     final allLoadedShops = _model.getAllLoadedShops().toList();
     final widgets = <Widget>[];
-    for (final newsPiece in newsPieces) {
+    for (final cluster in news) {
       final Widget widget;
-      switch (newsPiece.type) {
+      switch (cluster.type) {
         case NewsPieceType.UNKNOWN:
           widget = const SizedBox();
           break;
         case NewsPieceType.PRODUCT_AT_SHOP:
-          final typedData = newsPiece.typedData as NewsPieceProductAtShop;
+          final typedData =
+              cluster.newsPieces.first.typedData as NewsPieceProductAtShop;
           final product = _model.getProductWith(typedData.barcode);
           final shop = _model.getShopWith(typedData.shopUID);
           if (product == null || shop == null) {
@@ -179,8 +180,8 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
               onVisibilityChanged: (visible, _) {
                 if (visible) {
                   _visibleShops.add(shop);
-                  final newsPieces = _model.newsPieces.cachedVal;
-                  if (newsPieces.isNotEmpty && newsPieces.last == newsPiece) {
+                  final news = _model.news.cachedVal;
+                  if (news.isNotEmpty && news.last == cluster) {
                     _model.maybeLoadNextNews();
                   }
                 } else {

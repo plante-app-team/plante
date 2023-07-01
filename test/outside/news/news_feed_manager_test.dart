@@ -37,7 +37,7 @@ void main() {
           ..lastPage = true
           ..results.add(newsPiece))));
 
-    verifyNever(backend.requestNews(any));
+    verifyNever(backend.requestNews(any, page: 0));
 
     final result = await newsFeedManager.obtainNews(
         page: 1, center: Coord(lat: 1, lon: 2));

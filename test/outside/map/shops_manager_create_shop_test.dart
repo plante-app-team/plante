@@ -62,7 +62,10 @@ void main() {
     clearInteractions(backend);
 
     // Create a shop
-    verifyNever(backend.createShop());
+    verifyNever(backend.createShop(
+        name: anyNamed('name'),
+        coord: anyNamed('coord'),
+        type: anyNamed('type')));
     final newShopRes = await shopsManager.createShop(
         name: 'New cool shop',
         coord: Coord(lat: 15, lon: 15),
