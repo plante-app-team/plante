@@ -7,6 +7,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/news/news_cluster.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/outside/news/news_piece_product_at_shop.dart';
@@ -27,7 +28,7 @@ class NewsFeedPageModel {
   late final _loading = _uiValuesFactory.create(false);
   late final _reloading = _uiValuesFactory.create(false);
   late final _lastError = _uiValuesFactory.create<GeneralError?>(null);
-  late final _newsPieces = _uiValuesFactory.create<List<NewsPiece>>(const []);
+  late final _news = _uiValuesFactory.create<List<NewsCluster>>(const []);
 
   late final _loadedProducts = <String, Product>{};
   late final _loadedShops = <OsmUID, Shop>{};
@@ -44,7 +45,7 @@ class NewsFeedPageModel {
   UIValueBase<bool> get loading => _loading;
   UIValueBase<bool> get reloading => _reloading;
   UIValueBase<GeneralError?> get lastError => _lastError;
-  UIValueBase<List<NewsPiece>> get newsPieces => _newsPieces;
+  UIValueBase<List<NewsCluster>> get news => _news;
 
   NewsFeedPageModel(this._newsFeedManager, this._productsObtainer,
       this._shopsManager, this._cameraPosStorage, this._uiValuesFactory);
@@ -122,16 +123,14 @@ class NewsFeedPageModel {
           center: _lastNewsCenter!, page: _lastLoadedNewsPage + 1);
       if (result.isOk) {
         if (clearOldNews) {
-          _newsPieces.setValue(const []);
+          _news.setValue(const []);
         }
         _lastLoadedNewsPage += 1;
         final newNews = result.unwrap();
         if (newNews.isEmpty) {
           _allNewsLoaded = true;
         }
-        final allNews = _newsPieces.cachedVal.toList();
-        allNews.addAll(newNews);
-        _newsPieces.setValue(allNews);
+        _news.setValue(_news.cachedVal.combineWith(newNews));
 
         if (_lastLoadedNewsPage == 0) {
           _lastFirstPageRequestTime = DateTime.now();

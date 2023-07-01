@@ -129,12 +129,13 @@ void main() {
     return shop;
   }
 
-  void addProductToShop(Product product, Shop shop) {
+  void addProductToShop(Product product, Shop shop,
+      {String creatorUserId = 'some_user'}) {
     newsFeedManager.addNewsPiece_testing(NewsPiece((e) => e
       ..serverId = ++lastNewsPieceId
       ..lat = shop.latitude
       ..lon = shop.longitude
-      ..creatorUserId = 'some_user'
+      ..creatorUserId = creatorUserId
       ..creationTimeSecs = 123454
       ..typeCode = NewsPieceType.PRODUCT_AT_SHOP.persistentCode
       ..data = MapBuilder({
@@ -495,5 +496,42 @@ void main() {
     await stack.switchStackToIndex(1);
     expect(find.text('Product 1'), findsNothing);
     expect(find.text('Product 2'), findsOneWidget);
+  });
+
+  testWidgets('news pieces from with same author and same product are merged',
+      (WidgetTester tester) async {
+    final product = createProduct('Product 1');
+    addProductToShop(
+      product,
+      createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina')),
+      creatorUserId: 'user1',
+    );
+    addProductToShop(
+      product,
+      createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive')),
+      creatorUserId: 'user1',
+    );
+
+    await tester.superPump(const NewsFeedPage());
+    expect(find.text('Product 1'), findsOneWidget);
+  });
+
+  testWidgets(
+      'news pieces from with same product but different authors are not merged',
+      (WidgetTester tester) async {
+    final product = createProduct('Product 1');
+    addProductToShop(
+      product,
+      createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina')),
+      creatorUserId: 'user1',
+    );
+    addProductToShop(
+      product,
+      createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive')),
+      creatorUserId: 'user2',
+    );
+
+    await tester.superPump(const NewsFeedPage());
+    expect(find.text('Product 1'), findsNWidgets(2));
   });
 }
