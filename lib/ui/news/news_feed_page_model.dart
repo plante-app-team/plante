@@ -7,6 +7,8 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/news/news_cluster.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
@@ -22,6 +24,7 @@ class NewsFeedPageModel {
   final ProductsObtainer _productsObtainer;
   final ShopsManager _shopsManager;
   final LatestCameraPosStorage _cameraPosStorage;
+  final ShopsWhereProductSoldObtainer _shopsWhereProductSoldObtainer;
 
   final UIValuesFactory _uiValuesFactory;
 
@@ -47,8 +50,13 @@ class NewsFeedPageModel {
   UIValueBase<GeneralError?> get lastError => _lastError;
   UIValueBase<List<NewsCluster>> get news => _news;
 
-  NewsFeedPageModel(this._newsFeedManager, this._productsObtainer,
-      this._shopsManager, this._cameraPosStorage, this._uiValuesFactory);
+  NewsFeedPageModel(
+      this._newsFeedManager,
+      this._productsObtainer,
+      this._shopsManager,
+      this._cameraPosStorage,
+      this._shopsWhereProductSoldObtainer,
+      this._uiValuesFactory);
 
   Product? getProductWith(String barcode) => _loadedProducts[barcode];
   Shop? getShopWith(OsmUID uid) => _loadedShops[uid];
@@ -187,5 +195,15 @@ class NewsFeedPageModel {
     _loadedShops.addAll(shopsRes.unwrap());
 
     return Ok(newNews);
+  }
+
+  Future<Result<List<Shop>, ShopsManagerError>> obtainShopsWhereSold(
+      Product product) async {
+    final shopsRes = await _shopsWhereProductSoldObtainer
+        .fetchShopsWhereSold(product.barcode);
+    if (shopsRes.isErr) {
+      return Err(shopsRes.unwrapErr());
+    }
+    return Ok(shopsRes.unwrap().values.toList());
   }
 }

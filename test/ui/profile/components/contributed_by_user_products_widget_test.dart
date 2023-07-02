@@ -2,25 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/contributions/user_contribution.dart';
 import 'package:plante/contributions/user_contribution_type.dart';
 import 'package:plante/l10n/strings.dart';
-import 'package:plante/lang/sys_lang_code_holder.dart';
-import 'package:plante/lang/user_langs_manager.dart';
-import 'package:plante/logging/analytics.dart';
-import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/contributed_by_user_products_storage.dart';
 import 'package:plante/products/products_obtainer.dart';
@@ -28,15 +21,13 @@ import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/profile/components/contributed_by_user_products_widget.dart';
 
-import '../../../common_mocks.mocks.dart';
 import '../../../stateful_stack_for_testing.dart';
+import '../../../test_di_registry.dart';
 import '../../../widget_tester_extension.dart';
-import '../../../z_fakes/fake_analytics.dart';
 import '../../../z_fakes/fake_products_obtainer.dart';
 import '../../../z_fakes/fake_shared_preferences.dart';
 import '../../../z_fakes/fake_shops_manager.dart';
 import '../../../z_fakes/fake_user_contributions_manager.dart';
-import '../../../z_fakes/fake_user_langs_manager.dart';
 import '../../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
@@ -46,30 +37,24 @@ void main() {
   late ContributedByUserProductsStorage storage;
 
   setUp(() async {
-    await GetIt.I.reset();
-    GetIt.I.registerSingleton<Analytics>(FakeAnalytics());
-    GetIt.I.registerSingleton<Backend>(MockBackend());
-    GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
-    GetIt.I.registerSingleton<UserLangsManager>(
-        FakeUserLangsManager([LangCode.en]));
-    GetIt.I
-        .registerSingleton<SysLangCodeHolder>(SysLangCodeHolder.inited('en'));
-    GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
+    await TestDiRegistry.register((r) async {
+      r.register<ViewedProductsStorage>(ViewedProductsStorage());
 
-    productsObtainer = FakeProductsObtainer();
-    productsObtainer.unknownProductsGeneratorSimple = _makeProduct;
-    GetIt.I.registerSingleton<ProductsObtainer>(productsObtainer);
+      productsObtainer = FakeProductsObtainer();
+      productsObtainer.unknownProductsGeneratorSimple = _makeProduct;
+      r.register<ProductsObtainer>(productsObtainer);
 
-    userParamsController = FakeUserParamsController();
-    final user = UserParams((v) => v
-      ..backendClientToken = '123'
-      ..backendId = '321'
-      ..name = 'Bob');
-    await userParamsController.setUserParams(user);
-    GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    GetIt.I.registerSingleton<LatestCameraPosStorage>(
-        LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
-    GetIt.I.registerSingleton<ShopsManager>(FakeShopsManager());
+      userParamsController = FakeUserParamsController();
+      final user = UserParams((v) => v
+        ..backendClientToken = '123'
+        ..backendId = '321'
+        ..name = 'Bob');
+      await userParamsController.setUserParams(user);
+      r.register<UserParamsController>(userParamsController);
+      r.register<LatestCameraPosStorage>(
+          LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+      r.register<ShopsManager>(FakeShopsManager());
+    });
 
     userContributionsManager = FakeUserContributionsManager();
     storage = ContributedByUserProductsStorage();

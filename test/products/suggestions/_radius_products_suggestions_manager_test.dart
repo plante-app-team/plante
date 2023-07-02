@@ -51,8 +51,10 @@ void main() {
   });
 
   test('good scenario', () async {
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[2], ['345', '678']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[0], ['123', '345']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[2], ['345', '678']);
 
     final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
@@ -72,8 +74,10 @@ void main() {
       lon: shopsCenter.lon + kmToGrad(manyKms * 2),
     ));
 
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[2], ['345', '678']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[0], ['123', '345']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[2], ['345', '678']);
 
     final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
@@ -88,8 +92,10 @@ void main() {
     shopsWithProducts[1] =
         shopsWithProducts[1].rebuildWith(name: shopsWithProducts[0].name);
 
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[0], ['123', '345']);
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[1], ['345', '890']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[0], ['123', '345']);
+    shopsManager
+        .setBarcodesCacheFor_testing(shopsWithProducts[1], ['345', '890']);
 
     final suggestions = await suggestionsManager.getSuggestedBarcodesByRadius(
         shopsCenter, shopsWithNoProducts);
@@ -109,10 +115,10 @@ void main() {
     newName = ' $newName ';
     shopsWithProducts[1] = shopsWithProducts[1].rebuildWith(name: newName);
 
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[0], [
+    shopsManager.setBarcodesCacheFor_testing(shopsWithProducts[0], [
       '123',
     ]);
-    shopsManager.setBarcodesCacheFor(shopsWithProducts[1], [
+    shopsManager.setBarcodesCacheFor_testing(shopsWithProducts[1], [
       '345',
     ]);
 

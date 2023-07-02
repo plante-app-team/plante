@@ -14,7 +14,7 @@ import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/appearing_circular_progress_indicator_plante.dart';
@@ -32,7 +32,6 @@ import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/product/_veg_status_warning.dart';
 import 'package:plante/ui/product/display_product_page_model.dart';
@@ -86,8 +85,7 @@ class _DisplayProductPageState extends PageStatePlante<DisplayProductPage> {
       GetIt.I.get<UserLangsManager>(),
       GetIt.I.get<UserReportsMaker>(),
       GetIt.I.get<ViewedProductsStorage>(),
-      GetIt.I.get<ShopsManager>(),
-      GetIt.I.get<LatestCameraPosStorage>(),
+      GetIt.I.get<ShopsWhereProductSoldObtainer>(),
       uiValuesFactory,
     );
     _initAsync();

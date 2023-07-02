@@ -35,6 +35,8 @@ class FakeShopsManager implements ShopsManager {
   var _fetchRangesCalls = 0;
   final _productPresenceVoteCalls = <Pair<Shop, Product>, List<bool>>{};
 
+  ShopsManagerError? _fetchShopsError;
+
   void addPreloadedArea_testing(CoordsBounds bounds, Iterable<Shop> shops) {
     _shopsAreas[bounds] = shops.toList();
     cacheShops_testing(shops);
@@ -73,7 +75,7 @@ class FakeShopsManager implements ShopsManager {
     _notifyListeners();
   }
 
-  void setBarcodesCacheFor(Shop shop, List<String> barcodes) {
+  void setBarcodesCacheFor_testing(Shop shop, List<String> barcodes) {
     _barcodesCache[shop] = barcodes;
     cacheShops_testing([shop]);
   }
@@ -202,6 +204,8 @@ class FakeShopsManager implements ShopsManager {
   Future<void> clearCache() async {
     _shopsAreas.clear();
     _shopsMap.clear();
+    _barcodesCache.clear();
+    _shopsRanges.clear();
   }
 
   @override
@@ -237,10 +241,19 @@ class FakeShopsManager implements ShopsManager {
     return Ok(newShop);
   }
 
+  void setFetchShopsError_testing(ShopsManagerError error) {
+    _fetchShopsError = error;
+  }
+
   @override
   Future<Result<Map<OsmUID, Shop>, ShopsManagerError>> fetchShops(
       CoordsBounds bounds) async {
     _fetchShopsCalls.add(bounds);
+
+    if (_fetchShopsError != null) {
+      return Err(_fetchShopsError!);
+    }
+
     for (final areaShops in _shopsAreas.entries) {
       if (areaShops.key.containsBounds(bounds)) {
         final shops =
@@ -296,6 +309,7 @@ class FakeShopsManager implements ShopsManager {
       Product product, List<Shop> shops, ProductAtShopSource source) async {
     _putProductToShopsCalls
         .add(PutProductToShopsParams(product, shops, source));
+
     for (final shop in shops) {
       var range = _shopsRanges[shop.osmUID];
       if (range?.isErr == true) {
@@ -306,7 +320,10 @@ class FakeShopsManager implements ShopsManager {
           .unwrap()
           .rebuildWithProduct(product, DateTime.now().secondsSinceEpoch));
       _shopsRanges[shop.osmUID] = range;
+      _barcodesCache[shop] ??= [];
+      _barcodesCache[shop]!.add(product.barcode);
     }
+
     _notifyListeners();
     _listeners
         .forEach((listener) => listener.onProductPutToShops(product, shops));

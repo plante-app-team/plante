@@ -29,6 +29,7 @@ import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/suggestions/suggested_products_manager.dart';
 import 'package:plante/products/suggestions/suggestion_type.dart';
+import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
@@ -51,6 +52,7 @@ class ShopProductRangePageTestCommons {
   late final FakeProductsObtainer productsObtainer;
   late final FakeSuggestedProductsManager suggestedProductsManager;
   late final ProductsAtShopsExtraPropertiesManager productsExtraProperties;
+  late final LatestCameraPosStorage latestCameraPosStorage;
 
   late final Shop aShop;
 
@@ -148,6 +150,7 @@ class ShopProductRangePageTestCommons {
     suggestedProductsManager = FakeSuggestedProductsManager();
     productsExtraProperties = FakeProductsAtShopsExtraPropertiesManager();
     userAddressObtainer = FakeCachingUserAddressPiecesObtainer();
+    latestCameraPosStorage = MockLatestCameraPosStorage();
     await TestDiRegistry.register((r) {
       r.register<ShopsManager>(shopsManager);
       r.register<UserParamsController>(userParamsController);

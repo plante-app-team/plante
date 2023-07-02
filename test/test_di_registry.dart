@@ -23,6 +23,7 @@ import 'package:plante/outside/map/displayed_distance_units_manager.dart';
 import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/map/user_address/user_address_piece.dart';
 import 'package:plante/outside/map/user_address/user_address_type.dart';
@@ -158,6 +159,11 @@ class TestDiRegistrar {
       final instance = MockBackend();
       when(instance.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
       return instance;
+    });
+
+    _registerProvider<ShopsWhereProductSoldObtainer>(() {
+      return ShopsWhereProductSoldObtainer(
+          _get<ShopsManager>(), _get<LatestCameraPosStorage>());
     });
   }
 

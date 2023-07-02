@@ -12,25 +12,33 @@ class ProductHeaderWidget extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
   final double height;
+  final double borderRadius;
   final Widget overlay;
   final Widget? titleOverride;
   final Widget? subtitleOverride;
+  final bool includeSubtitle;
   const ProductHeaderWidget({
     Key? key,
     required this.product,
     required this.imageType,
     required this.onTap,
     this.height = 161,
+    this.borderRadius = 8,
     this.onLongPress,
     required this.overlay,
     this.titleOverride,
     this.subtitleOverride,
+    this.includeSubtitle = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (includeSubtitle && subtitleOverride != null) {
+      throw ArgumentError(
+          'Should not provide both includeSubtitle and subtitleOverride');
+    }
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(borderRadius),
       child: Stack(children: [
         SizedBox(
             height: height,
@@ -53,7 +61,7 @@ class ProductHeaderWidget extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 12, bottom: 18),
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       if (titleOverride != null)
-                        subtitleOverride!
+                        titleOverride!
                       else if (imageType == ProductImageType.FRONT)
                         SizedBox(
                             width: double.infinity,
@@ -63,7 +71,8 @@ class ProductHeaderWidget extends StatelessWidget {
                                 maxLines: 1)),
                       if (subtitleOverride != null)
                         subtitleOverride!
-                      else if (imageType == ProductImageType.FRONT &&
+                      else if (includeSubtitle &&
+                          imageType == ProductImageType.FRONT &&
                           product.brands != null &&
                           product.brands!.isNotEmpty)
                         Row(children: [

@@ -23,13 +23,13 @@ import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
-import 'package:plante/ui/product/display_product_page_model.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 
 import '../../common_finders_extension.dart';
@@ -905,7 +905,7 @@ void main() {
       ..veganStatusSource = VegStatusSource.moderator).buildSingleLangProduct();
 
     // Sold in aShop
-    shopsManager.setBarcodesCacheFor(aShop, ['123']);
+    shopsManager.setBarcodesCacheFor_testing(aShop, ['123']);
 
     final context = await tester.superPump(DisplayProductPage(product));
 
@@ -965,8 +965,8 @@ void main() {
 
   testWidgets('when map IS fetched around camera, the page does not fetches it',
       (WidgetTester tester) async {
-    final productsSquare = cameraPos
-        .makeSquare(kmToGrad(DisplayProductsPageModel.PRODUCT_SHOPS_SIZE_KMS));
+    final productsSquare = cameraPos.makeSquare(
+        kmToGrad(ShopsWhereProductSoldObtainer.PRODUCT_SHOPS_SIZE_KMS));
     await shopsManager.fetchShops(productsSquare);
     expect(await shopsManager.osmShopsCacheExistFor(productsSquare), isTrue);
     shopsManager.clear_verifiedCalls();

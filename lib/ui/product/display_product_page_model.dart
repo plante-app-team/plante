@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/coord_utils.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product.dart';
@@ -9,18 +8,15 @@ import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
-import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/news/news_feed_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/ui_value.dart';
-import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
 import 'package:plante/ui/product/product_report_dialog.dart';
 
 class DisplayProductsPageModel implements UserLangsManagerObserver {
-  static const PRODUCT_SHOPS_SIZE_KMS = NewsFeedManager.REQUESTED_AREA_SIZE_KMS;
   final Product _initialProduct;
   late final _product = _uiValuesFactory.create(_initialProduct);
   late final _userLangs = _uiValuesFactory.create<List<LangCode>?>(null);
@@ -29,8 +25,7 @@ class DisplayProductsPageModel implements UserLangsManagerObserver {
   final UserLangsManager _userLangsManager;
   final UserReportsMaker _userReportsMaker;
   final ViewedProductsStorage _viewedProductsStorage;
-  final ShopsManager _shopsManager;
-  final LatestCameraPosStorage _latestCameraPosStorage;
+  final ShopsWhereProductSoldObtainer _shopsWhereProductSoldObtainer;
   final ArgCallback<Product>? _productUpdatedCallback;
   final UIValuesFactory _uiValuesFactory;
 
@@ -46,8 +41,7 @@ class DisplayProductsPageModel implements UserLangsManagerObserver {
       this._userLangsManager,
       this._userReportsMaker,
       this._viewedProductsStorage,
-      this._shopsManager,
-      this._latestCameraPosStorage,
+      this._shopsWhereProductSoldObtainer,
       this._uiValuesFactory)
       : _user = userParamsController.cachedUserParams!;
 
@@ -59,24 +53,8 @@ class DisplayProductsPageModel implements UserLangsManagerObserver {
   }
 
   Future<void> _fetchShopsWhereSold() async {
-    final cameraPos = await _latestCameraPosStorage.get();
-    if (cameraPos == null) {
-      return;
-    }
-
-    final productsSquare =
-        cameraPos.makeSquare(kmToGrad(PRODUCT_SHOPS_SIZE_KMS));
-    if (await _shopsManager.osmShopsCacheExistFor(productsSquare) == false) {
-      final fetchShopsResult = await _shopsManager.fetchShops(productsSquare);
-      if (fetchShopsResult.isErr) {
-        return;
-      }
-    }
-
-    final shopsMap = await _shopsManager
-        .getShopsContainingBarcodes(productsSquare, {_initialProduct.barcode});
-    final uids = shopsMap[_initialProduct.barcode] ?? const [];
-    final shopsRes = await _shopsManager.fetchShopsByUIDs(uids);
+    final shopsRes = await _shopsWhereProductSoldObtainer
+        .fetchShopsWhereSold(_initialProduct.barcode);
     if (shopsRes.isOk) {
       _shopsWhereSold.setValue(shopsRes.unwrap().values.toList());
     }
