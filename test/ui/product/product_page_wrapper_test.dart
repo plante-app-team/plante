@@ -18,6 +18,7 @@ import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/viewed_products_storage.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
@@ -67,6 +68,11 @@ void main() {
         FakeUserLangsManager([LangCode.en]));
     GetIt.I.registerSingleton<LatestCameraPosStorage>(
         LatestCameraPosStorage(FakeSharedPreferences().asHolder()));
+    GetIt.I.registerSingleton<ShopsWhereProductSoldObtainer>(
+        ShopsWhereProductSoldObtainer(
+      GetIt.I.get<ShopsManager>(),
+      GetIt.I.get<LatestCameraPosStorage>(),
+    ));
   });
 
   testWidgets('init page is shown when product is not filled',

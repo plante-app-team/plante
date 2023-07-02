@@ -23,15 +23,16 @@ import 'package:plante/outside/map/osm/osm_element_type.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 
-import '../../common_finders_extension.dart';
 import '../../stateful_stack_for_testing.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
@@ -129,11 +130,13 @@ void main() {
     return shop;
   }
 
-  void addProductToShop(Product product, Shop shop,
-      {String creatorUserId = 'some_user'}) {
+  Future<void> addProductToShop(Product product,
+      {String creatorUserId = 'some_user', Shop? shop}) async {
+    shop ??=
+        createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive'));
     newsFeedManager.addNewsPiece_testing(NewsPiece((e) => e
       ..serverId = ++lastNewsPieceId
-      ..lat = shop.latitude
+      ..lat = shop!.latitude
       ..lon = shop.longitude
       ..creatorUserId = creatorUserId
       ..creationTimeSecs = 123454
@@ -142,37 +145,37 @@ void main() {
         'barcode': JsonObject(product.barcode),
         'shop_uid': JsonObject(shop.osmUID.toString())
       })));
+
+    final barcodesMap = await shopsManager.getBarcodesCacheFor([shop.osmUID]);
+    final barcodes = barcodesMap[shop.osmUID]?.toList() ?? [];
+    barcodes.add(product.barcode);
+    shopsManager.setBarcodesCacheFor_testing(shop, barcodes);
   }
 
   testWidgets('news opened simple scenario', (WidgetTester tester) async {
-    addProductToShop(createProduct('Product 1'),
-        createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina')));
-    addProductToShop(createProduct('Product 2'),
-        createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive')));
+    await addProductToShop(createProduct('Product 1'));
+    await addProductToShop(createProduct('Product 2'));
 
     await tester.superPump(const NewsFeedPage());
     expect(find.text('Product 1'), findsOneWidget);
-    expect(find.richTextContaining('Lenina'), findsOneWidget);
     expect(find.text('Product 2'), findsOneWidget);
-    expect(find.richTextContaining('Seabreeze drive'), findsOneWidget);
   });
 
   testWidgets('news are ordered in the way returned by NewsFeedManager',
       (WidgetTester tester) async {
     final product1 = createProduct('Product 1');
     final product2 = createProduct('Product 2');
-    final shop = createShop('Shop', OsmAddress((e) => e.road = 'Lenina'));
 
-    addProductToShop(product1, shop);
-    addProductToShop(product2, shop);
+    await addProductToShop(product1);
+    await addProductToShop(product2);
     await tester.superPump(const NewsFeedPage(key: Key('page 1')));
     var center1 = tester.getCenter(find.text(product1.name!));
     var center2 = tester.getCenter(find.text(product2.name!));
     expect(center1.dy, lessThan(center2.dy));
 
     newsFeedManager.deleteAllNews_testing();
-    addProductToShop(product2, shop);
-    addProductToShop(product1, shop);
+    await addProductToShop(product2);
+    await addProductToShop(product1);
     await tester.superPump(const NewsFeedPage(key: Key('page 2')));
     center1 = tester.getCenter(find.text(product1.name!));
     center2 = tester.getCenter(find.text(product2.name!));
@@ -192,8 +195,7 @@ void main() {
       ..imageIngredients = Uri.file('/tmp/img2.jpg')).productForTests();
     productsObtainer.addKnownProduct(product);
 
-    addProductToShop(
-        product, createShop('Shop', OsmAddress((e) => e.road = 'Lenina')));
+    await addProductToShop(product);
 
     await tester.superPump(const NewsFeedPage());
 
@@ -206,8 +208,7 @@ void main() {
       (WidgetTester tester) async {
     // Prepare 3 pages of products' news
     for (var index = 1; index <= newsFeedManager.pageSizeTesting * 3; ++index) {
-      addProductToShop(createProduct('Product $index'),
-          createShop('Shop $index', OsmAddress((e) => e.road = 'Lenina')));
+      await addProductToShop(createProduct('Product $index'));
     }
 
     await tester.superPump(const NewsFeedPage());
@@ -228,8 +229,7 @@ void main() {
   testWidgets('first news page load failure, reload',
       (WidgetTester tester) async {
     final product = createProduct('Product 1');
-    final shop = createShop('Shop', OsmAddress((e) => e.road = 'Lenina'));
-    addProductToShop(product, shop);
+    await addProductToShop(product);
 
     newsFeedManager.setErrorForPage_testing(0, GeneralError.OTHER);
 
@@ -249,8 +249,7 @@ void main() {
   testWidgets('second news page load failure', (WidgetTester tester) async {
     // Prepare 2 pages of products' news
     for (var index = 1; index <= newsFeedManager.pageSizeTesting * 2; ++index) {
-      addProductToShop(createProduct('Product $index'),
-          createShop('Shop $index', OsmAddress((e) => e.road = 'Lenina')));
+      await addProductToShop(createProduct('Product $index'));
     }
 
     // Error for the second page
@@ -289,8 +288,7 @@ void main() {
 
   testWidgets('products obtaining failure', (WidgetTester tester) async {
     final product = createProduct('Product 1');
-    final shop = createShop('Shop', OsmAddress((e) => e.road = 'Lenina'));
-    addProductToShop(product, shop);
+    await addProductToShop(product);
 
     productsObtainer.clearKnownProducts();
     productsObtainer.unknownProductsGenerator =
@@ -312,9 +310,8 @@ void main() {
   testWidgets('only some products are obtained', (WidgetTester tester) async {
     final product1 = createProduct('Product 1');
     final product2 = createProduct('Product 2');
-    final shop = createShop('Shop', OsmAddress((e) => e.road = 'Lenina'));
-    addProductToShop(product1, shop);
-    addProductToShop(product2, shop);
+    await addProductToShop(product1);
+    await addProductToShop(product2);
 
     productsObtainer.clearKnownProducts();
     productsObtainer.addKnownProduct(product2);
@@ -326,29 +323,10 @@ void main() {
         find.text(context.strings.global_something_went_wrong), findsNothing);
   });
 
-  testWidgets('only some shops are obtained', (WidgetTester tester) async {
-    final product1 = createProduct('Product 1');
-    final product2 = createProduct('Product 2');
-    final shop1 = createShop('Shop1', OsmAddress((e) => e.road = 'Street 1'));
-    final shop2 = createShop('Shop2', OsmAddress((e) => e.road = 'Street 2'));
-    addProductToShop(product1, shop1);
-    addProductToShop(product2, shop2);
-
-    await shopsManager.clearCache();
-    shopsManager.cacheShops_testing([shop2]);
-
-    final context = await tester.superPump(const NewsFeedPage());
-    expect(find.text(product1.name!), findsNothing);
-    expect(find.text(product2.name!), findsOneWidget);
-    expect(
-        find.text(context.strings.global_something_went_wrong), findsNothing);
-  });
-
   testWidgets('pull to refresh behaviour', (WidgetTester tester) async {
     // Prepare 2 pages of products' news
     for (var index = 1; index <= newsFeedManager.pageSizeTesting * 2; ++index) {
-      addProductToShop(createProduct('Product $index'),
-          createShop('Shop $index', OsmAddress((e) => e.road = 'Lenina')));
+      await addProductToShop(createProduct('Product $index'));
     }
 
     await tester.superPump(const NewsFeedPage());
@@ -362,10 +340,8 @@ void main() {
 
     // Prepare absolutely new news
     newsFeedManager.deleteAllNews_testing();
-    addProductToShop(createProduct('New product 1'),
-        createShop('New shop 1', OsmAddress((e) => e.road = 'Lenina')));
-    addProductToShop(createProduct('New product 2'),
-        createShop('New shop 2', OsmAddress((e) => e.road = 'Lenina')));
+    await addProductToShop(createProduct('New product 1'));
+    await addProductToShop(createProduct('New product 2'));
 
     // Pull to refresh
     await scrollUp(tester);
@@ -389,8 +365,7 @@ void main() {
 
   testWidgets('news feed is reloaded when the page is reopened after some time',
       (WidgetTester tester) async {
-    final shop = createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina'));
-    addProductToShop(createProduct('Product 1'), shop);
+    await addProductToShop(createProduct('Product 1'));
 
     const newsLifetimeSecs = 1;
 
@@ -406,7 +381,7 @@ void main() {
 
     // News completely changed, ...
     newsFeedManager.deleteAllNews_testing();
-    addProductToShop(createProduct('Product 2'), shop);
+    await addProductToShop(createProduct('Product 2'));
     // But original news are still displayed
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);
@@ -442,8 +417,7 @@ void main() {
   testWidgets(
       'news feed is reloaded when the page is reopened after map camera moved far enough',
       (WidgetTester tester) async {
-    final shop = createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina'));
-    addProductToShop(createProduct('Product 1'), shop);
+    await addProductToShop(createProduct('Product 1'));
 
     const reloadNewsAfterKms = 1;
 
@@ -459,7 +433,7 @@ void main() {
 
     // News completely changed, ...
     newsFeedManager.deleteAllNews_testing();
-    addProductToShop(createProduct('Product 2'), shop);
+    await addProductToShop(createProduct('Product 2'));
     // But original news are still displayed
     expect(find.text('Product 1'), findsOneWidget);
     expect(find.text('Product 2'), findsNothing);
@@ -501,14 +475,12 @@ void main() {
   testWidgets('news pieces from with same author and same product are merged',
       (WidgetTester tester) async {
     final product = createProduct('Product 1');
-    addProductToShop(
+    await addProductToShop(
       product,
-      createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina')),
       creatorUserId: 'user1',
     );
-    addProductToShop(
+    await addProductToShop(
       product,
-      createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive')),
       creatorUserId: 'user1',
     );
 
@@ -520,18 +492,60 @@ void main() {
       'news pieces from with same product but different authors are not merged',
       (WidgetTester tester) async {
     final product = createProduct('Product 1');
-    addProductToShop(
+    await addProductToShop(
       product,
-      createShop('Shop 1', OsmAddress((e) => e.road = 'Lenina')),
       creatorUserId: 'user1',
     );
-    addProductToShop(
+    await addProductToShop(
       product,
-      createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive')),
       creatorUserId: 'user2',
     );
 
     await tester.superPump(const NewsFeedPage());
     expect(find.text('Product 1'), findsNWidgets(2));
+  });
+
+  testWidgets('click on product location button', (WidgetTester tester) async {
+    final product = createProduct('Product');
+    final shop1 =
+        createShop('Shop 1', OsmAddress((e) => e.road = 'Seabreeze drive'));
+    final shop2 =
+        createShop('Shop 2', OsmAddress((e) => e.road = 'Oceanbreeze drive'));
+    await addProductToShop(
+      product,
+      shop: shop1,
+    );
+    await addProductToShop(
+      product,
+      shop: shop2,
+    );
+
+    await tester.superPump(const NewsFeedPage());
+
+    expect(find.byType(MapPage), findsNothing);
+    await tester
+        .superTap(find.byKey(const Key('news_piece_product_location_button')));
+    expect(find.byType(MapPage), findsOneWidget);
+
+    final mapPage = find.byType(MapPage).evaluate().first.widget as MapPage;
+    expect(
+        mapPage.requestedMode, equals(MapPageRequestedMode.DEMONSTRATE_SHOPS));
+    expect(mapPage.initialSelectedShops, equals([shop1, shop2]));
+  });
+
+  testWidgets('click on product location button - network error',
+      (WidgetTester tester) async {
+    shopsManager.setFetchShopsError_testing(ShopsManagerError.NETWORK_ERROR);
+
+    await addProductToShop(createProduct('Product'));
+    final context = await tester.superPump(const NewsFeedPage());
+
+    expect(find.text(context.strings.global_network_error), findsNothing);
+
+    await tester
+        .superTap(find.byKey(const Key('news_piece_product_location_button')));
+
+    expect(find.text(context.strings.global_network_error), findsOneWidget);
+    expect(find.byType(MapPage), findsNothing);
   });
 }

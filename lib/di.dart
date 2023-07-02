@@ -31,6 +31,7 @@ import 'package:plante/outside/map/osm/osm_searcher.dart';
 import 'package:plante/outside/map/osm/osm_territory_cacher.dart';
 import 'package:plante/outside/map/roads_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/map/user_address/caching_user_address_pieces_obtainer.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/off/off_api.dart';
@@ -205,5 +206,9 @@ void initDI() {
   ));
   GetIt.I.registerSingleton(NewsFeedManager(
     GetIt.I.get<Backend>(),
+  ));
+  GetIt.I.registerSingleton(ShopsWhereProductSoldObtainer(
+    GetIt.I.get<ShopsManager>(),
+    GetIt.I.get<LatestCameraPosStorage>(),
   ));
 }

@@ -4,29 +4,27 @@ import 'package:plante/base/general_error.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/shops_manager.dart';
-import 'package:plante/outside/map/ui_list_addresses_obtainer.dart';
+import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/news/news_cluster.dart';
 import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece_product_at_shop.dart';
 import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/ui/base/colors_plante.dart';
-import 'package:plante/ui/base/components/address_widget.dart';
 import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';
-import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
+import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
+import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page_model.dart';
-import 'package:plante/ui/product/product_header_widget.dart';
-import 'package:plante/ui/product/product_page_wrapper.dart';
+import 'package:plante/ui/news/news_piece_product_at_shop_widget.dart';
 
 class NewsFeedPage extends PagePlante {
   static const _DEFAULT_NEWS_LIFETIME_SECS = 60 * 6; // 5 minutes
@@ -51,15 +49,12 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
     GetIt.I.get<ProductsObtainer>(),
     GetIt.I.get<ShopsManager>(),
     GetIt.I.get<LatestCameraPosStorage>(),
+    GetIt.I.get<ShopsWhereProductSoldObtainer>(),
     uiValuesFactory,
   );
 
-  late final _uiAddressesObtainer =
-      UiListAddressesObtainer<Shop>(GetIt.I.get<AddressObtainer>());
-
   final _visibleShops = <Shop>{};
   late final _loadingByPullToRefresh = UIValue(false, ref);
-  late final _firstLoadStarted = UIValue(false, ref);
 
   _NewsFeedPageState() : super('PageStatePlante');
 
@@ -68,11 +63,6 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
     super.initState();
     _model.setNewsLifetimeSecs(widget.newsLifetimeSecs);
     _model.setNewsReloadAfterKms(widget.reloadNewsAfterKms);
-    _model.loading.callOnChanges((loading) {
-      if (loading) {
-        _firstLoadStarted.setValue(true);
-      }
-    });
   }
 
   @override
@@ -156,9 +146,6 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
   }
 
   List<Widget> _newsPiecesWidgets(List<NewsCluster> news) {
-    // NOTE: we don't have ordered shops, so we use them
-    // in an unordered state.
-    final allLoadedShops = _model.getAllLoadedShops().toList();
     final widgets = <Widget>[];
     for (final cluster in news) {
       final Widget widget;
@@ -187,68 +174,41 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                 } else {
                   _visibleShops.remove(shop);
                 }
-                _uiAddressesObtainer.onDisplayedEntitiesChanged(
-                  displayedEntities: _visibleShops,
-                  allEntitiesOrdered: allLoadedShops,
-                );
               },
               child: Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: _ProductAtShopNewsPieceWidget(product, shop,
-                      _uiAddressesObtainer.requestAddressOf(shop))));
+                  child: NewsPieceProductAtShopWidget(
+                      product, () => _onProductLocationTap(product))));
           break;
       }
       widgets.add(widget);
     }
     return widgets;
   }
-}
 
-class _ProductLabelWidget extends StatelessWidget {
-  const _ProductLabelWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-        child: Align(
-            alignment: Alignment.topRight,
-            child: LicenceLabel(
-              label:
-                  context.strings.news_feed_page_label_for_new_product_at_shop,
-              darkBox: true,
-            )));
+  void _onProductLocationTap(Product product) async {
+    final shopsRes = await _model.obtainShopsWhereSold(product);
+    if (shopsRes.isErr) {
+      final error = shopsRes.unwrapErr().toGeneral();
+      if (error == GeneralError.NETWORK) {
+        showSnackBar(context.strings.global_network_error, context);
+      } else {
+        showSnackBar(context.strings.global_something_went_wrong, context);
+      }
+      return;
+    }
+    _showOnMap(shopsRes.unwrap());
   }
-}
 
-class _ProductAtShopNewsPieceWidget extends StatelessWidget {
-  final Product product;
-  final Shop shop;
-  final FutureShortAddress address;
-  const _ProductAtShopNewsPieceWidget(this.product, this.shop, this.address,
-      {Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 16),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 8, left: 12, right: 12, bottom: 12),
-        child: Column(children: [
-          ProductHeaderWidget(
-            product: product,
-            imageType: ProductImageType.FRONT,
-            height: 200,
-            overlay: const _ProductLabelWidget(),
-            subtitleOverride: AddressWidget.forShop(shop, address),
-            onTap: () {
-              ProductPageWrapper.show(context, product);
-            },
+  void _showOnMap(List<Shop> shops) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MapPage(
+            requestedMode: MapPageRequestedMode.DEMONSTRATE_SHOPS,
+            initialSelectedShops: shops,
           ),
-        ]),
-      ),
-    );
+        ));
   }
 }
 
