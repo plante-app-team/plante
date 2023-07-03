@@ -82,11 +82,14 @@ dev_dependencies:
   test: ^1.16.8
   trotter: ^2.0.0-dev.1
 
-flutter_icons:
-  android: "icon"
+flutter_launcher_icons:
+  android: true
   ios: true
   image_path: "icon/icon.png"
   image_path_ios: "icon/icon_ios.png"
+  adaptive_icon_background: "icon/icon_android_background.png"
+  adaptive_icon_foreground: "icon/icon_android_foreground.png"
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
