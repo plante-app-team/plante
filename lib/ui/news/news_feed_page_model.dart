@@ -5,6 +5,8 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -25,6 +27,8 @@ class NewsFeedPageModel {
   final ShopsManager _shopsManager;
   final LatestCameraPosStorage _cameraPosStorage;
   final ShopsWhereProductSoldObtainer _shopsWhereProductSoldObtainer;
+  final UserAvatarManager _avatarManager;
+  final Backend _backend;
 
   final UIValuesFactory _uiValuesFactory;
 
@@ -56,6 +60,8 @@ class NewsFeedPageModel {
       this._shopsManager,
       this._cameraPosStorage,
       this._shopsWhereProductSoldObtainer,
+      this._avatarManager,
+      this._backend,
       this._uiValuesFactory);
 
   Product? getProductWith(String barcode) => _loadedProducts[barcode];
@@ -205,5 +211,18 @@ class NewsFeedPageModel {
       return Err(shopsRes.unwrapErr());
     }
     return Ok(shopsRes.unwrap().values.toList());
+  }
+
+  Uri? authorAvatarUrl(NewsCluster cluster) {
+    final newsPiece = cluster.newsPieces.first;
+    if (newsPiece.creatorUserAvatarId == null) {
+      return null;
+    }
+    return _avatarManager.otherUserAvatarUri(
+        newsPiece.creatorUserId, newsPiece.creatorUserAvatarId!);
+  }
+
+  Future<Map<String, String>> authHeaders() {
+    return _backend.authHeaders();
   }
 }

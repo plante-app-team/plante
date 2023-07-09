@@ -43,7 +43,7 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -59,7 +59,7 @@ class _$UserLangsSerializer implements StructuredSerializer<UserLangs> {
           break;
         case 'auto':
           result.auto = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -77,12 +77,12 @@ class _$UserLangs extends UserLangs {
   final bool auto;
 
   factory _$UserLangs([void Function(UserLangsBuilder)? updates]) =>
-      (new UserLangsBuilder()..update(updates)).build();
+      (new UserLangsBuilder()..update(updates))._build();
 
   _$UserLangs._({required this.langs, this.sysLang, required this.auto})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(langs, 'UserLangs', 'langs');
-    BuiltValueNullFieldError.checkNotNull(auto, 'UserLangs', 'auto');
+    BuiltValueNullFieldError.checkNotNull(langs, r'UserLangs', 'langs');
+    BuiltValueNullFieldError.checkNotNull(auto, r'UserLangs', 'auto');
   }
 
   @override
@@ -103,13 +103,17 @@ class _$UserLangs extends UserLangs {
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, langs.hashCode), sysLang.hashCode), auto.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, langs.hashCode);
+    _$hash = $jc(_$hash, sysLang.hashCode);
+    _$hash = $jc(_$hash, auto.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('UserLangs')
+    return (newBuiltValueToStringHelper(r'UserLangs')
           ..add('langs', langs)
           ..add('sysLang', sysLang)
           ..add('auto', auto))
@@ -158,7 +162,9 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
   }
 
   @override
-  _$UserLangs build() {
+  UserLangs build() => _build();
+
+  _$UserLangs _build() {
     _$UserLangs _$result;
     try {
       _$result = _$v ??
@@ -166,7 +172,7 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
               langs: langs.build(),
               sysLang: sysLang,
               auto: BuiltValueNullFieldError.checkNotNull(
-                  auto, 'UserLangs', 'auto'));
+                  auto, r'UserLangs', 'auto'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -174,7 +180,7 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
         langs.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'UserLangs', _$failedField, e.toString());
+            r'UserLangs', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -183,4 +189,4 @@ class UserLangsBuilder implements Builder<UserLangs, UserLangsBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

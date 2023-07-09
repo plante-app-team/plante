@@ -40,7 +40,7 @@ class _$ShopSerializer implements StructuredSerializer<Shop> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -66,10 +66,10 @@ class _$Shop extends Shop {
   final BackendShop? backendShop;
 
   factory _$Shop([void Function(ShopBuilder)? updates]) =>
-      (new ShopBuilder()..update(updates)).build();
+      (new ShopBuilder()..update(updates))._build();
 
   _$Shop._({required this.osmShop, this.backendShop}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(osmShop, 'Shop', 'osmShop');
+    BuiltValueNullFieldError.checkNotNull(osmShop, r'Shop', 'osmShop');
   }
 
   @override
@@ -89,12 +89,16 @@ class _$Shop extends Shop {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, osmShop.hashCode), backendShop.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, osmShop.hashCode);
+    _$hash = $jc(_$hash, backendShop.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Shop')
+    return (newBuiltValueToStringHelper(r'Shop')
           ..add('osmShop', osmShop)
           ..add('backendShop', backendShop))
         .toString();
@@ -138,7 +142,9 @@ class ShopBuilder implements Builder<Shop, ShopBuilder> {
   }
 
   @override
-  _$Shop build() {
+  Shop build() => _build();
+
+  _$Shop _build() {
     _$Shop _$result;
     try {
       _$result = _$v ??
@@ -153,7 +159,7 @@ class ShopBuilder implements Builder<Shop, ShopBuilder> {
         _backendShop?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'Shop', _$failedField, e.toString());
+            r'Shop', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -162,4 +168,4 @@ class ShopBuilder implements Builder<Shop, ShopBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

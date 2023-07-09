@@ -37,6 +37,7 @@ void main() {
       ..lat = 1.5
       ..lon = 1.6
       ..creatorUserId = 'user3'
+      ..creatorUserName = 'Bob'
       ..creationTimeSecs = 123454
       ..typeCode = 1
       ..data = MapBuilder({
@@ -55,6 +56,7 @@ void main() {
       ..lat = 1.5
       ..lon = 1.6
       ..creatorUserId = 'user3'
+      ..creatorUserName = 'Bob'
       ..creationTimeSecs = 123454
       ..typeCode = 1234567
       ..data = MapBuilder({

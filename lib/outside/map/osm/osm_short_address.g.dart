@@ -53,7 +53,7 @@ class _$OsmShortAddressSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -85,7 +85,7 @@ class _$OsmShortAddress extends OsmShortAddress {
   final String? city;
 
   factory _$OsmShortAddress([void Function(OsmShortAddressBuilder)? updates]) =>
-      (new OsmShortAddressBuilder()..update(updates)).build();
+      (new OsmShortAddressBuilder()..update(updates))._build();
 
   _$OsmShortAddress._({this.houseNumber, this.road, this.city}) : super._();
 
@@ -108,13 +108,17 @@ class _$OsmShortAddress extends OsmShortAddress {
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, houseNumber.hashCode), road.hashCode), city.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, houseNumber.hashCode);
+    _$hash = $jc(_$hash, road.hashCode);
+    _$hash = $jc(_$hash, city.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('OsmShortAddress')
+    return (newBuiltValueToStringHelper(r'OsmShortAddress')
           ..add('houseNumber', houseNumber)
           ..add('road', road)
           ..add('city', city))
@@ -163,7 +167,9 @@ class OsmShortAddressBuilder
   }
 
   @override
-  _$OsmShortAddress build() {
+  OsmShortAddress build() => _build();
+
+  _$OsmShortAddress _build() {
     final _$result = _$v ??
         new _$OsmShortAddress._(
             houseNumber: houseNumber, road: road, city: city);
@@ -172,4 +178,4 @@ class OsmShortAddressBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

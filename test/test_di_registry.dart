@@ -158,6 +158,10 @@ class TestDiRegistrar {
     _registerProvider<Backend>(() {
       final instance = MockBackend();
       when(instance.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
+      when(instance.authHeaders(
+              backendClientTokenOverride:
+                  anyNamed('backendClientTokenOverride')))
+          .thenAnswer((_) async => const {});
       return instance;
     });
 

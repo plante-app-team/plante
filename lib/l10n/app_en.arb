@@ -140,6 +140,30 @@
     "@global_copy": {
         "description": "A text used on buttons when the user will copy something by clicking"
     },
+    "global_n_minutes_ago_v2": "{count, plural, =0{just now} =1{1 minute ago} other{{count} minutes ago}}",
+    "@global_n_minutes_ago_v2": {
+        "description": "A plural message for 'minutes ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
+    "global_n_hours_ago_v2": "{count, plural, =0{less than an hour ago} =1{1 hour ago} other{{count} hours ago}}",
+    "@global_n_hours_ago_v2": {
+        "description": "A plural message for 'hours ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
+    "global_n_days_ago_v2": "{count, plural, =0{today} =1{yesterday} other{{count} days ago}}",
+    "@global_n_days_ago_v2": {
+        "description": "A plural message for 'days ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
+    "global_n_weeks_ago_v2": "{count, plural, =0{this week} =1{1 week ago} other{{count} weeks ago}}",
+    "@global_n_weeks_ago_v2": {
+        "description": "A plural message for 'weeks ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
+    "global_n_months_ago_v2": "{count, plural, =0{this month} =1{1 month ago} other{{count} months ago}}",
+    "@global_n_months_ago_v2": {
+        "description": "A plural message for 'months ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
+    "global_n_years_ago_v2": "{count, plural, =0{this year} =1{1 year ago} other{{count} years ago}}",
+    "@global_n_years_ago_v2": {
+        "description": "A plural message for 'years ago'. Please see https://github.com/plante-app-team/plante_docs/blob/master/how-to-translate-app.md#plurals"
+    },
     "help_with_veg_status_page_title": "Help with vegan status",
     "image_crop_page_title": "Let's crop it!",
     "image_crop_page_error_small_image": "The image is too small",

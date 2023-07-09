@@ -4,6 +4,8 @@ import 'package:plante/base/general_error.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/news/news_cluster.dart';
@@ -50,6 +52,8 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
     GetIt.I.get<ShopsManager>(),
     GetIt.I.get<LatestCameraPosStorage>(),
     GetIt.I.get<ShopsWhereProductSoldObtainer>(),
+    GetIt.I.get<UserAvatarManager>(),
+    GetIt.I.get<Backend>(),
     uiValuesFactory,
   );
 
@@ -154,36 +158,43 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
           widget = const SizedBox();
           break;
         case NewsPieceType.PRODUCT_AT_SHOP:
-          final typedData =
-              cluster.newsPieces.first.typedData as NewsPieceProductAtShop;
-          final product = _model.getProductWith(typedData.barcode);
-          final shop = _model.getShopWith(typedData.shopUID);
-          if (product == null || shop == null) {
-            widget = const SizedBox();
-            break;
-          }
-          widget = VisibilityDetectorPlante(
-              keyStr: 'shop_${shop.osmUID}_product_${product.barcode}',
-              onVisibilityChanged: (visible, _) {
-                if (visible) {
-                  _visibleShops.add(shop);
-                  final news = _model.news.cachedVal;
-                  if (news.isNotEmpty && news.last == cluster) {
-                    _model.maybeLoadNextNews();
-                  }
-                } else {
-                  _visibleShops.remove(shop);
-                }
-              },
-              child: Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: NewsPieceProductAtShopWidget(
-                      product, () => _onProductLocationTap(product))));
+          widget = _createWidgetProductAtShop(cluster);
           break;
       }
       widgets.add(widget);
     }
     return widgets;
+  }
+
+  Widget _createWidgetProductAtShop(NewsCluster cluster) {
+    final typedData =
+        cluster.newsPieces.first.typedData as NewsPieceProductAtShop;
+    final product = _model.getProductWith(typedData.barcode);
+    final shop = _model.getShopWith(typedData.shopUID);
+    if (product == null || shop == null) {
+      return const SizedBox.shrink();
+    }
+    return VisibilityDetectorPlante(
+        keyStr: 'shop_${shop.osmUID}_product_${product.barcode}',
+        onVisibilityChanged: (visible, _) {
+          if (visible) {
+            _visibleShops.add(shop);
+            final news = _model.news.cachedVal;
+            if (news.isNotEmpty && news.last == cluster) {
+              _model.maybeLoadNextNews();
+            }
+          } else {
+            _visibleShops.remove(shop);
+          }
+        },
+        child: Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: NewsPieceProductAtShopWidget(
+                product,
+                cluster,
+                _model.authorAvatarUrl(cluster),
+                _model.authHeaders(),
+                () => _onProductLocationTap(product))));
   }
 
   void _onProductLocationTap(Product product) async {

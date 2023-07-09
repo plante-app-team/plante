@@ -120,9 +120,19 @@ class _FakeResult_0<OK, ERR> extends _i1.SmartFake
         );
 }
 
-class _FakeBackendResponse_1 extends _i1.SmartFake
+class _FakeUri_1 extends _i1.SmartFake implements Uri {
+  _FakeUri_1(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeBackendResponse_2 extends _i1.SmartFake
     implements _i3.BackendResponse {
-  _FakeBackendResponse_1(
+  _FakeBackendResponse_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -131,8 +141,8 @@ class _FakeBackendResponse_1 extends _i1.SmartFake
         );
 }
 
-class _FakeFuture_2<T> extends _i1.SmartFake implements _i4.Future<T> {
-  _FakeFuture_2(
+class _FakeFuture_3<T> extends _i1.SmartFake implements _i4.Future<T> {
+  _FakeFuture_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -141,8 +151,8 @@ class _FakeFuture_2<T> extends _i1.SmartFake implements _i4.Future<T> {
         );
 }
 
-class _FakeLatLngBounds_3 extends _i1.SmartFake implements _i5.LatLngBounds {
-  _FakeLatLngBounds_3(
+class _FakeLatLngBounds_4 extends _i1.SmartFake implements _i5.LatLngBounds {
+  _FakeLatLngBounds_4(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -151,9 +161,9 @@ class _FakeLatLngBounds_3 extends _i1.SmartFake implements _i5.LatLngBounds {
         );
 }
 
-class _FakeScreenCoordinate_4 extends _i1.SmartFake
+class _FakeScreenCoordinate_5 extends _i1.SmartFake
     implements _i5.ScreenCoordinate {
-  _FakeScreenCoordinate_4(
+  _FakeScreenCoordinate_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -162,8 +172,8 @@ class _FakeScreenCoordinate_4 extends _i1.SmartFake
         );
 }
 
-class _FakeLatLng_5 extends _i1.SmartFake implements _i5.LatLng {
-  _FakeLatLng_5(
+class _FakeLatLng_6 extends _i1.SmartFake implements _i5.LatLng {
+  _FakeLatLng_6(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -172,8 +182,8 @@ class _FakeLatLng_5 extends _i1.SmartFake implements _i5.LatLng {
         );
 }
 
-class _FakeSearchResult_6 extends _i1.SmartFake implements _i6.SearchResult {
-  _FakeSearchResult_6(
+class _FakeSearchResult_7 extends _i1.SmartFake implements _i6.SearchResult {
+  _FakeSearchResult_7(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -182,8 +192,8 @@ class _FakeSearchResult_6 extends _i1.SmartFake implements _i6.SearchResult {
         );
 }
 
-class _FakeStatus_7 extends _i1.SmartFake implements _i6.Status {
-  _FakeStatus_7(
+class _FakeStatus_8 extends _i1.SmartFake implements _i6.Status {
+  _FakeStatus_8(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -192,9 +202,9 @@ class _FakeStatus_7 extends _i1.SmartFake implements _i6.Status {
         );
 }
 
-class _FakeOcrIngredientsResult_8 extends _i1.SmartFake
+class _FakeOcrIngredientsResult_9 extends _i1.SmartFake
     implements _i7.OcrIngredientsResult {
-  _FakeOcrIngredientsResult_8(
+  _FakeOcrIngredientsResult_9(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -203,8 +213,8 @@ class _FakeOcrIngredientsResult_8 extends _i1.SmartFake
         );
 }
 
-class _FakeUserLangs_9 extends _i1.SmartFake implements _i8.UserLangs {
-  _FakeUserLangs_9(
+class _FakeUserLangs_10 extends _i1.SmartFake implements _i8.UserLangs {
+  _FakeUserLangs_10(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -424,11 +434,29 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
         )),
       ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  Uri? userAvatarUrl(_i18.UserParams? user) =>
-      (super.noSuchMethod(Invocation.method(
-        #userAvatarUrl,
-        [user],
-      )) as Uri?);
+  Uri userAvatarUrl(
+    String? userId,
+    String? avatarId,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #userAvatarUrl,
+          [
+            userId,
+            avatarId,
+          ],
+        ),
+        returnValue: _FakeUri_1(
+          this,
+          Invocation.method(
+            #userAvatarUrl,
+            [
+              userId,
+              avatarId,
+            ],
+          ),
+        ),
+      ) as Uri);
   @override
   _i4.Future<_i2.Result<List<_i21.UserContribution>, _i19.BackendError>>
       requestUserContributions(
@@ -800,7 +828,7 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
           ],
         ),
         returnValue:
-            _i4.Future<_i3.BackendResponse>.value(_FakeBackendResponse_1(
+            _i4.Future<_i3.BackendResponse>.value(_FakeBackendResponse_2(
           this,
           Invocation.method(
             #customGet,
@@ -848,7 +876,7 @@ class MockBackend extends _i1.Mock implements _i17.Backend {
               ),
               (R v) => _i4.Future<R>.value(v),
             ) ??
-            _FakeFuture_2<R>(
+            _FakeFuture_3<R>(
               this,
               Invocation.method(
                 #customRequest,
@@ -1111,7 +1139,7 @@ class MockGoogleMapController extends _i1.Mock
           #getVisibleRegion,
           [],
         ),
-        returnValue: _i4.Future<_i5.LatLngBounds>.value(_FakeLatLngBounds_3(
+        returnValue: _i4.Future<_i5.LatLngBounds>.value(_FakeLatLngBounds_4(
           this,
           Invocation.method(
             #getVisibleRegion,
@@ -1127,7 +1155,7 @@ class MockGoogleMapController extends _i1.Mock
           [latLng],
         ),
         returnValue:
-            _i4.Future<_i5.ScreenCoordinate>.value(_FakeScreenCoordinate_4(
+            _i4.Future<_i5.ScreenCoordinate>.value(_FakeScreenCoordinate_5(
           this,
           Invocation.method(
             #getScreenCoordinate,
@@ -1142,7 +1170,7 @@ class MockGoogleMapController extends _i1.Mock
           #getLatLng,
           [screenCoordinate],
         ),
-        returnValue: _i4.Future<_i5.LatLng>.value(_FakeLatLng_5(
+        returnValue: _i4.Future<_i5.LatLng>.value(_FakeLatLng_6(
           this,
           Invocation.method(
             #getLatLng,
@@ -1357,7 +1385,7 @@ class MockOffApi extends _i1.Mock implements _i49.OffApi {
           #getProductList,
           [configuration],
         ),
-        returnValue: _i4.Future<_i6.SearchResult>.value(_FakeSearchResult_6(
+        returnValue: _i4.Future<_i6.SearchResult>.value(_FakeSearchResult_7(
           this,
           Invocation.method(
             #getProductList,
@@ -1378,7 +1406,7 @@ class MockOffApi extends _i1.Mock implements _i49.OffApi {
             product,
           ],
         ),
-        returnValue: _i4.Future<_i6.Status>.value(_FakeStatus_7(
+        returnValue: _i4.Future<_i6.Status>.value(_FakeStatus_8(
           this,
           Invocation.method(
             #saveProduct,
@@ -1402,7 +1430,7 @@ class MockOffApi extends _i1.Mock implements _i49.OffApi {
             image,
           ],
         ),
-        returnValue: _i4.Future<_i6.Status>.value(_FakeStatus_7(
+        returnValue: _i4.Future<_i6.Status>.value(_FakeStatus_8(
           this,
           Invocation.method(
             #addProductImage,
@@ -1429,7 +1457,7 @@ class MockOffApi extends _i1.Mock implements _i49.OffApi {
           ],
         ),
         returnValue: _i4.Future<_i7.OcrIngredientsResult>.value(
-            _FakeOcrIngredientsResult_8(
+            _FakeOcrIngredientsResult_9(
           this,
           Invocation.method(
             #extractIngredients,
@@ -1449,7 +1477,7 @@ class MockOffApi extends _i1.Mock implements _i49.OffApi {
           #searchProducts,
           [configuration],
         ),
-        returnValue: _i4.Future<_i6.SearchResult>.value(_FakeSearchResult_6(
+        returnValue: _i4.Future<_i6.SearchResult>.value(_FakeSearchResult_7(
           this,
           Invocation.method(
             #searchProducts,
@@ -2877,7 +2905,7 @@ class MockUserLangsManager extends _i1.Mock implements _i82.UserLangsManager {
           #getUserLangs,
           [],
         ),
-        returnValue: _i4.Future<_i8.UserLangs>.value(_FakeUserLangs_9(
+        returnValue: _i4.Future<_i8.UserLangs>.value(_FakeUserLangs_10(
           this,
           Invocation.method(
             #getUserLangs,

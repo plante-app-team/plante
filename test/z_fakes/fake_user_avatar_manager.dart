@@ -13,6 +13,7 @@ class FakeUserAvatarManager implements UserAvatarManager {
   Uri? _selectedGalleryImage;
   Uri? _lostSelectedGalleryImage;
   Uri? _userAvatar;
+  Uri? _otherUsersAvatar;
   BackendError? _updateUserAvatarError;
   final _observers = <UserAvatarManagerObserver>[];
 
@@ -20,7 +21,9 @@ class FakeUserAvatarManager implements UserAvatarManager {
   var _callsCountRetrieveLostAvatar = 0;
   var _callsUpdateUserAvatar = 0;
 
-  FakeUserAvatarManager(this.userParamsController);
+  FakeUserAvatarManager([FakeUserParamsController? userParamsController])
+      : userParamsController =
+            userParamsController ?? FakeUserParamsController();
 
   // ignore: non_constant_identifier_names
   void setSelectedGalleryImage_testing(Uri? image) =>
@@ -33,6 +36,9 @@ class FakeUserAvatarManager implements UserAvatarManager {
   // ignore: non_constant_identifier_names
   void setUpdateUserAvatarError_testing(BackendError? error) =>
       _updateUserAvatarError = error;
+
+  // ignore: non_constant_identifier_names
+  void setOtherUsersAvatar_testing(Uri? avatar) => _otherUsersAvatar = avatar;
 
   // ignore: non_constant_identifier_names
   int askUserToSelectImageFromGallery_callsCount() => _callsCountSelectAvatar;
@@ -84,6 +90,10 @@ class FakeUserAvatarManager implements UserAvatarManager {
 
   @override
   Future<Uri?> userAvatarUri() async => _userAvatar;
+
+  @override
+  Uri? otherUserAvatarUri(String userId, String userAvatarId) =>
+      _otherUsersAvatar;
 
   @override
   Future<Result<None, BackendError>> deleteUserAvatar() async {

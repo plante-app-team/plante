@@ -78,16 +78,32 @@ void main() {
 
     expect(initialClusters.combineWith(newsPieces2), equals(expectedClusters));
   });
+
+  test('creation time is used from the latest news', () async {
+    final newsPieces = [
+      _createProductAtShopNewsPiece(
+          barcode: '123', creatorId: 'user1', creationTimeSecs: 10),
+      _createProductAtShopNewsPiece(
+          barcode: '123', creatorId: 'user1', creationTimeSecs: 30),
+      _createProductAtShopNewsPiece(
+          barcode: '123', creatorId: 'user1', creationTimeSecs: 20),
+    ];
+
+    final cluster = NewsCluster.clustersFrom(newsPieces).first;
+    expect(cluster.creationTimeSecs, equals(30));
+  });
 }
 
 NewsPiece _createProductAtShopNewsPiece(
-    {required String barcode, required String creatorId}) {
+    {required String barcode,
+    required String creatorId,
+    int creationTimeSecs = 123454}) {
   return NewsPiece((e) => e
     ..serverId = 1
     ..lat = 1.5
     ..lon = 1.6
     ..creatorUserId = creatorId
-    ..creationTimeSecs = 123454
+    ..creationTimeSecs = creationTimeSecs
     ..typeCode = NewsPieceType.PRODUCT_AT_SHOP.persistentCode
     ..data = MapBuilder(
         {'barcode': JsonObject(barcode), 'shop_uid': JsonObject('1:123321')}));

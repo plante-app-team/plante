@@ -48,7 +48,7 @@ class _$MapSearchResultSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -78,7 +78,7 @@ class _$MapSearchResult extends MapSearchResult {
   final BuiltList<OsmRoad>? roads;
 
   factory _$MapSearchResult([void Function(MapSearchResultBuilder)? updates]) =>
-      (new MapSearchResultBuilder()..update(updates)).build();
+      (new MapSearchResultBuilder()..update(updates))._build();
 
   _$MapSearchResult._({this.shops, this.roads}) : super._();
 
@@ -100,12 +100,16 @@ class _$MapSearchResult extends MapSearchResult {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, shops.hashCode), roads.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, shops.hashCode);
+    _$hash = $jc(_$hash, roads.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('MapSearchResult')
+    return (newBuiltValueToStringHelper(r'MapSearchResult')
           ..add('shops', shops)
           ..add('roads', roads))
         .toString();
@@ -149,7 +153,9 @@ class MapSearchResultBuilder
   }
 
   @override
-  _$MapSearchResult build() {
+  MapSearchResult build() => _build();
+
+  _$MapSearchResult _build() {
     _$MapSearchResult _$result;
     try {
       _$result = _$v ??
@@ -164,7 +170,7 @@ class MapSearchResultBuilder
         _roads?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'MapSearchResult', _$failedField, e.toString());
+            r'MapSearchResult', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -173,4 +179,4 @@ class MapSearchResultBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

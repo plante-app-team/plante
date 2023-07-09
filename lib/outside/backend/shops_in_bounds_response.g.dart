@@ -47,7 +47,7 @@ class _$ShopsInBoundsResponseSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -80,14 +80,14 @@ class _$ShopsInBoundsResponse extends ShopsInBoundsResponse {
 
   factory _$ShopsInBoundsResponse(
           [void Function(ShopsInBoundsResponseBuilder)? updates]) =>
-      (new ShopsInBoundsResponseBuilder()..update(updates)).build();
+      (new ShopsInBoundsResponseBuilder()..update(updates))._build();
 
   _$ShopsInBoundsResponse._({required this.shops, required this.barcodes})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        shops, 'ShopsInBoundsResponse', 'shops');
+        shops, r'ShopsInBoundsResponse', 'shops');
     BuiltValueNullFieldError.checkNotNull(
-        barcodes, 'ShopsInBoundsResponse', 'barcodes');
+        barcodes, r'ShopsInBoundsResponse', 'barcodes');
   }
 
   @override
@@ -109,12 +109,16 @@ class _$ShopsInBoundsResponse extends ShopsInBoundsResponse {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, shops.hashCode), barcodes.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, shops.hashCode);
+    _$hash = $jc(_$hash, barcodes.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('ShopsInBoundsResponse')
+    return (newBuiltValueToStringHelper(r'ShopsInBoundsResponse')
           ..add('shops', shops)
           ..add('barcodes', barcodes))
         .toString();
@@ -160,7 +164,9 @@ class ShopsInBoundsResponseBuilder
   }
 
   @override
-  _$ShopsInBoundsResponse build() {
+  ShopsInBoundsResponse build() => _build();
+
+  _$ShopsInBoundsResponse _build() {
     _$ShopsInBoundsResponse _$result;
     try {
       _$result = _$v ??
@@ -175,7 +181,7 @@ class ShopsInBoundsResponseBuilder
         barcodes.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'ShopsInBoundsResponse', _$failedField, e.toString());
+            r'ShopsInBoundsResponse', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -184,4 +190,4 @@ class ShopsInBoundsResponseBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

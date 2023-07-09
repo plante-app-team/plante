@@ -48,13 +48,13 @@ class _$BackendProductsAtShopSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'shop_osm_uid':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(OsmUID)) as OsmUID;
+              specifiedType: const FullType(OsmUID))! as OsmUID;
           break;
         case 'products':
           result.products.replace(serializers.deserialize(value,
@@ -84,7 +84,7 @@ class _$BackendProductsAtShop extends BackendProductsAtShop {
 
   factory _$BackendProductsAtShop(
           [void Function(BackendProductsAtShopBuilder)? updates]) =>
-      (new BackendProductsAtShopBuilder()..update(updates)).build();
+      (new BackendProductsAtShopBuilder()..update(updates))._build();
 
   _$BackendProductsAtShop._(
       {required this.osmUID,
@@ -92,11 +92,11 @@ class _$BackendProductsAtShop extends BackendProductsAtShop {
       required this.productsLastSeenUtc})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        osmUID, 'BackendProductsAtShop', 'osmUID');
+        osmUID, r'BackendProductsAtShop', 'osmUID');
     BuiltValueNullFieldError.checkNotNull(
-        products, 'BackendProductsAtShop', 'products');
+        products, r'BackendProductsAtShop', 'products');
     BuiltValueNullFieldError.checkNotNull(
-        productsLastSeenUtc, 'BackendProductsAtShop', 'productsLastSeenUtc');
+        productsLastSeenUtc, r'BackendProductsAtShop', 'productsLastSeenUtc');
   }
 
   @override
@@ -119,13 +119,17 @@ class _$BackendProductsAtShop extends BackendProductsAtShop {
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, osmUID.hashCode), products.hashCode),
-        productsLastSeenUtc.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, osmUID.hashCode);
+    _$hash = $jc(_$hash, products.hashCode);
+    _$hash = $jc(_$hash, productsLastSeenUtc.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('BackendProductsAtShop')
+    return (newBuiltValueToStringHelper(r'BackendProductsAtShop')
           ..add('osmUID', osmUID)
           ..add('products', products)
           ..add('productsLastSeenUtc', productsLastSeenUtc))
@@ -178,13 +182,15 @@ class BackendProductsAtShopBuilder
   }
 
   @override
-  _$BackendProductsAtShop build() {
+  BackendProductsAtShop build() => _build();
+
+  _$BackendProductsAtShop _build() {
     _$BackendProductsAtShop _$result;
     try {
       _$result = _$v ??
           new _$BackendProductsAtShop._(
               osmUID: BuiltValueNullFieldError.checkNotNull(
-                  osmUID, 'BackendProductsAtShop', 'osmUID'),
+                  osmUID, r'BackendProductsAtShop', 'osmUID'),
               products: products.build(),
               productsLastSeenUtc: productsLastSeenUtc.build());
     } catch (_) {
@@ -196,7 +202,7 @@ class BackendProductsAtShopBuilder
         productsLastSeenUtc.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'BackendProductsAtShop', _$failedField, e.toString());
+            r'BackendProductsAtShop', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -205,4 +211,4 @@ class BackendProductsAtShopBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

@@ -16,18 +16,18 @@ class _$ShopProductRange extends ShopProductRange {
 
   factory _$ShopProductRange(
           [void Function(ShopProductRangeBuilder)? updates]) =>
-      (new ShopProductRangeBuilder()..update(updates)).build();
+      (new ShopProductRangeBuilder()..update(updates))._build();
 
   _$ShopProductRange._(
       {required this.shop,
       required this.products,
       required this.productsLastSeenSecsUtc})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(shop, 'ShopProductRange', 'shop');
+    BuiltValueNullFieldError.checkNotNull(shop, r'ShopProductRange', 'shop');
     BuiltValueNullFieldError.checkNotNull(
-        products, 'ShopProductRange', 'products');
-    BuiltValueNullFieldError.checkNotNull(
-        productsLastSeenSecsUtc, 'ShopProductRange', 'productsLastSeenSecsUtc');
+        products, r'ShopProductRange', 'products');
+    BuiltValueNullFieldError.checkNotNull(productsLastSeenSecsUtc,
+        r'ShopProductRange', 'productsLastSeenSecsUtc');
   }
 
   @override
@@ -49,13 +49,17 @@ class _$ShopProductRange extends ShopProductRange {
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, shop.hashCode), products.hashCode),
-        productsLastSeenSecsUtc.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, shop.hashCode);
+    _$hash = $jc(_$hash, products.hashCode);
+    _$hash = $jc(_$hash, productsLastSeenSecsUtc.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('ShopProductRange')
+    return (newBuiltValueToStringHelper(r'ShopProductRange')
           ..add('shop', shop)
           ..add('products', products)
           ..add('productsLastSeenSecsUtc', productsLastSeenSecsUtc))
@@ -108,7 +112,9 @@ class ShopProductRangeBuilder
   }
 
   @override
-  _$ShopProductRange build() {
+  ShopProductRange build() => _build();
+
+  _$ShopProductRange _build() {
     _$ShopProductRange _$result;
     try {
       _$result = _$v ??
@@ -127,7 +133,7 @@ class ShopProductRangeBuilder
         productsLastSeenSecsUtc.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'ShopProductRange', _$failedField, e.toString());
+            r'ShopProductRange', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -136,4 +142,4 @@ class ShopProductRangeBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

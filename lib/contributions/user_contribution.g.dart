@@ -53,17 +53,17 @@ class _$UserContributionSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'time_utc':
           result.timeSecsUtc = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'type':
           result.typeCode = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'barcode':
           result.barcode = serializers.deserialize(value,
@@ -92,7 +92,7 @@ class _$UserContribution extends UserContribution {
 
   factory _$UserContribution(
           [void Function(UserContributionBuilder)? updates]) =>
-      (new UserContributionBuilder()..update(updates)).build();
+      (new UserContributionBuilder()..update(updates))._build();
 
   _$UserContribution._(
       {required this.timeSecsUtc,
@@ -101,9 +101,9 @@ class _$UserContribution extends UserContribution {
       this.osmUID})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        timeSecsUtc, 'UserContribution', 'timeSecsUtc');
+        timeSecsUtc, r'UserContribution', 'timeSecsUtc');
     BuiltValueNullFieldError.checkNotNull(
-        typeCode, 'UserContribution', 'typeCode');
+        typeCode, r'UserContribution', 'typeCode');
   }
 
   @override
@@ -126,15 +126,18 @@ class _$UserContribution extends UserContribution {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc($jc($jc(0, timeSecsUtc.hashCode), typeCode.hashCode),
-            barcode.hashCode),
-        osmUID.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, timeSecsUtc.hashCode);
+    _$hash = $jc(_$hash, typeCode.hashCode);
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, osmUID.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('UserContribution')
+    return (newBuiltValueToStringHelper(r'UserContribution')
           ..add('timeSecsUtc', timeSecsUtc)
           ..add('typeCode', typeCode)
           ..add('barcode', barcode)
@@ -189,13 +192,15 @@ class UserContributionBuilder
   }
 
   @override
-  _$UserContribution build() {
+  UserContribution build() => _build();
+
+  _$UserContribution _build() {
     final _$result = _$v ??
         new _$UserContribution._(
             timeSecsUtc: BuiltValueNullFieldError.checkNotNull(
-                timeSecsUtc, 'UserContribution', 'timeSecsUtc'),
+                timeSecsUtc, r'UserContribution', 'timeSecsUtc'),
             typeCode: BuiltValueNullFieldError.checkNotNull(
-                typeCode, 'UserContribution', 'typeCode'),
+                typeCode, r'UserContribution', 'typeCode'),
             barcode: barcode,
             osmUID: osmUID);
     replace(_$result);
@@ -203,4 +208,4 @@ class UserContributionBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

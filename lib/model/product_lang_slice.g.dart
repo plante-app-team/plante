@@ -112,7 +112,7 @@ class _$ProductLangSliceSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -122,7 +122,7 @@ class _$ProductLangSliceSerializer
           break;
         case 'barcode':
           result.barcode = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
@@ -213,7 +213,7 @@ class _$ProductLangSlice extends ProductLangSlice {
 
   factory _$ProductLangSlice(
           [void Function(ProductLangSliceBuilder)? updates]) =>
-      (new ProductLangSliceBuilder()..update(updates)).build();
+      (new ProductLangSliceBuilder()..update(updates))._build();
 
   _$ProductLangSlice._(
       {this.lang,
@@ -231,11 +231,11 @@ class _$ProductLangSlice extends ProductLangSlice {
       this.imageIngredients})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        barcode, 'ProductLangSlice', 'barcode');
+        barcode, r'ProductLangSlice', 'barcode');
     BuiltValueNullFieldError.checkNotNull(moderatorVeganChoiceReasonsIds,
-        'ProductLangSlice', 'moderatorVeganChoiceReasonsIds');
+        r'ProductLangSlice', 'moderatorVeganChoiceReasonsIds');
     BuiltValueNullFieldError.checkNotNull(
-        ingredientsAnalyzed, 'ProductLangSlice', 'ingredientsAnalyzed');
+        ingredientsAnalyzed, r'ProductLangSlice', 'ingredientsAnalyzed');
   }
 
   @override
@@ -268,36 +268,27 @@ class _$ProductLangSlice extends ProductLangSlice {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc(
-                                    $jc(
-                                        $jc(
-                                            $jc(
-                                                $jc($jc(0, lang.hashCode),
-                                                    barcode.hashCode),
-                                                veganStatus.hashCode),
-                                            veganStatusSource.hashCode),
-                                        moderatorVeganChoiceReasonsIds
-                                            .hashCode),
-                                    moderatorVeganSourcesText.hashCode),
-                                brands.hashCode),
-                            name.hashCode),
-                        ingredientsText.hashCode),
-                    ingredientsAnalyzed.hashCode),
-                imageFront.hashCode),
-            imageFrontThumb.hashCode),
-        imageIngredients.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, lang.hashCode);
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, veganStatus.hashCode);
+    _$hash = $jc(_$hash, veganStatusSource.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganChoiceReasonsIds.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganSourcesText.hashCode);
+    _$hash = $jc(_$hash, brands.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, ingredientsText.hashCode);
+    _$hash = $jc(_$hash, ingredientsAnalyzed.hashCode);
+    _$hash = $jc(_$hash, imageFront.hashCode);
+    _$hash = $jc(_$hash, imageFrontThumb.hashCode);
+    _$hash = $jc(_$hash, imageIngredients.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('ProductLangSlice')
+    return (newBuiltValueToStringHelper(r'ProductLangSlice')
           ..add('lang', lang)
           ..add('barcode', barcode)
           ..add('veganStatus', veganStatus)
@@ -419,14 +410,16 @@ class ProductLangSliceBuilder
   }
 
   @override
-  _$ProductLangSlice build() {
+  ProductLangSlice build() => _build();
+
+  _$ProductLangSlice _build() {
     _$ProductLangSlice _$result;
     try {
       _$result = _$v ??
           new _$ProductLangSlice._(
               lang: lang,
               barcode: BuiltValueNullFieldError.checkNotNull(
-                  barcode, 'ProductLangSlice', 'barcode'),
+                  barcode, r'ProductLangSlice', 'barcode'),
               veganStatus: veganStatus,
               veganStatusSource: veganStatusSource,
               moderatorVeganChoiceReasonsIds:
@@ -452,7 +445,7 @@ class ProductLangSliceBuilder
         ingredientsAnalyzed.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'ProductLangSlice', _$failedField, e.toString());
+            r'ProductLangSlice', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -461,4 +454,4 @@ class ProductLangSliceBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

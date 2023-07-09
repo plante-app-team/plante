@@ -1154,22 +1154,9 @@ void main() {
     final httpClient = FakeHttpClient();
     final backend = Backend(analytics, await _initUserParams(), httpClient);
 
-    final result = backend.userAvatarUrl(UserParams((e) => e
-      ..backendId = 'userID'
-      ..avatarId = 'avatarID'));
+    final result = backend.userAvatarUrl('userID', 'avatarID');
 
     expect(result.toString(), contains('user_avatar_data/userID/avatarID'));
-  });
-
-  test('no user avatar', () async {
-    final httpClient = FakeHttpClient();
-    final backend = Backend(analytics, await _initUserParams(), httpClient);
-
-    final result = backend.userAvatarUrl(UserParams((e) => e
-      ..backendId = 'userID'
-      ..avatarId = null));
-
-    expect(result, isNull);
   });
 
   test('auth headers', () async {

@@ -45,13 +45,13 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
@@ -59,11 +59,11 @@ class _$OffShopSerializer implements StructuredSerializer<OffShop> {
           break;
         case 'products':
           result.productsCount = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'country':
           result.country = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -83,7 +83,7 @@ class _$OffShop extends OffShop {
   final String country;
 
   factory _$OffShop([void Function(OffShopBuilder)? updates]) =>
-      (new OffShopBuilder()..update(updates)).build();
+      (new OffShopBuilder()..update(updates))._build();
 
   _$OffShop._(
       {required this.id,
@@ -91,10 +91,10 @@ class _$OffShop extends OffShop {
       required this.productsCount,
       required this.country})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id');
+    BuiltValueNullFieldError.checkNotNull(id, r'OffShop', 'id');
     BuiltValueNullFieldError.checkNotNull(
-        productsCount, 'OffShop', 'productsCount');
-    BuiltValueNullFieldError.checkNotNull(country, 'OffShop', 'country');
+        productsCount, r'OffShop', 'productsCount');
+    BuiltValueNullFieldError.checkNotNull(country, r'OffShop', 'country');
   }
 
   @override
@@ -116,14 +116,18 @@ class _$OffShop extends OffShop {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc($jc($jc(0, id.hashCode), name.hashCode), productsCount.hashCode),
-        country.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, productsCount.hashCode);
+    _$hash = $jc(_$hash, country.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('OffShop')
+    return (newBuiltValueToStringHelper(r'OffShop')
           ..add('id', id)
           ..add('name', name)
           ..add('productsCount', productsCount)
@@ -180,18 +184,20 @@ class OffShopBuilder implements Builder<OffShop, OffShopBuilder> {
   }
 
   @override
-  _$OffShop build() {
+  OffShop build() => _build();
+
+  _$OffShop _build() {
     final _$result = _$v ??
         new _$OffShop._(
-            id: BuiltValueNullFieldError.checkNotNull(id, 'OffShop', 'id'),
+            id: BuiltValueNullFieldError.checkNotNull(id, r'OffShop', 'id'),
             name: name,
             productsCount: BuiltValueNullFieldError.checkNotNull(
-                productsCount, 'OffShop', 'productsCount'),
+                productsCount, r'OffShop', 'productsCount'),
             country: BuiltValueNullFieldError.checkNotNull(
-                country, 'OffShop', 'country'));
+                country, r'OffShop', 'country'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

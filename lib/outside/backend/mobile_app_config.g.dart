@@ -39,7 +39,7 @@ class _$MobileAppConfigSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -49,7 +49,7 @@ class _$MobileAppConfigSerializer
           break;
         case 'nominatim_enabled':
           result.nominatimEnabled = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -65,15 +65,15 @@ class _$MobileAppConfig extends MobileAppConfig {
   final bool nominatimEnabled;
 
   factory _$MobileAppConfig([void Function(MobileAppConfigBuilder)? updates]) =>
-      (new MobileAppConfigBuilder()..update(updates)).build();
+      (new MobileAppConfigBuilder()..update(updates))._build();
 
   _$MobileAppConfig._(
       {required this.remoteUserParams, required this.nominatimEnabled})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        remoteUserParams, 'MobileAppConfig', 'remoteUserParams');
+        remoteUserParams, r'MobileAppConfig', 'remoteUserParams');
     BuiltValueNullFieldError.checkNotNull(
-        nominatimEnabled, 'MobileAppConfig', 'nominatimEnabled');
+        nominatimEnabled, r'MobileAppConfig', 'nominatimEnabled');
   }
 
   @override
@@ -94,13 +94,16 @@ class _$MobileAppConfig extends MobileAppConfig {
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc(0, remoteUserParams.hashCode), nominatimEnabled.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, remoteUserParams.hashCode);
+    _$hash = $jc(_$hash, nominatimEnabled.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('MobileAppConfig')
+    return (newBuiltValueToStringHelper(r'MobileAppConfig')
           ..add('remoteUserParams', remoteUserParams)
           ..add('nominatimEnabled', nominatimEnabled))
         .toString();
@@ -146,14 +149,16 @@ class MobileAppConfigBuilder
   }
 
   @override
-  _$MobileAppConfig build() {
+  MobileAppConfig build() => _build();
+
+  _$MobileAppConfig _build() {
     _$MobileAppConfig _$result;
     try {
       _$result = _$v ??
           new _$MobileAppConfig._(
               remoteUserParams: remoteUserParams.build(),
               nominatimEnabled: BuiltValueNullFieldError.checkNotNull(
-                  nominatimEnabled, 'MobileAppConfig', 'nominatimEnabled'));
+                  nominatimEnabled, r'MobileAppConfig', 'nominatimEnabled'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -161,7 +166,7 @@ class MobileAppConfigBuilder
         remoteUserParams.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'MobileAppConfig', _$failedField, e.toString());
+            r'MobileAppConfig', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -170,4 +175,4 @@ class MobileAppConfigBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint
