@@ -96,13 +96,13 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'barcode':
           result.barcode = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
@@ -204,7 +204,7 @@ class _$Product extends Product {
   final BuiltMap<LangCode, BuiltList<Ingredient>> ingredientsAnalyzedLangs;
 
   factory _$Product([void Function(ProductBuilder)? updates]) =>
-      (new ProductBuilder()..update(updates)).build();
+      (new ProductBuilder()..update(updates))._build();
 
   _$Product._(
       {required this.barcode,
@@ -221,22 +221,22 @@ class _$Product extends Product {
       required this.imageIngredientsLangs,
       required this.ingredientsAnalyzedLangs})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(barcode, 'Product', 'barcode');
+    BuiltValueNullFieldError.checkNotNull(barcode, r'Product', 'barcode');
     BuiltValueNullFieldError.checkNotNull(moderatorVeganChoiceReasonsIds,
-        'Product', 'moderatorVeganChoiceReasonsIds');
+        r'Product', 'moderatorVeganChoiceReasonsIds');
     BuiltValueNullFieldError.checkNotNull(
-        langsPrioritized, 'Product', 'langsPrioritized');
-    BuiltValueNullFieldError.checkNotNull(nameLangs, 'Product', 'nameLangs');
+        langsPrioritized, r'Product', 'langsPrioritized');
+    BuiltValueNullFieldError.checkNotNull(nameLangs, r'Product', 'nameLangs');
     BuiltValueNullFieldError.checkNotNull(
-        ingredientsTextLangs, 'Product', 'ingredientsTextLangs');
+        ingredientsTextLangs, r'Product', 'ingredientsTextLangs');
     BuiltValueNullFieldError.checkNotNull(
-        imageFrontLangs, 'Product', 'imageFrontLangs');
+        imageFrontLangs, r'Product', 'imageFrontLangs');
     BuiltValueNullFieldError.checkNotNull(
-        imageFrontThumbLangs, 'Product', 'imageFrontThumbLangs');
+        imageFrontThumbLangs, r'Product', 'imageFrontThumbLangs');
     BuiltValueNullFieldError.checkNotNull(
-        imageIngredientsLangs, 'Product', 'imageIngredientsLangs');
+        imageIngredientsLangs, r'Product', 'imageIngredientsLangs');
     BuiltValueNullFieldError.checkNotNull(
-        ingredientsAnalyzedLangs, 'Product', 'ingredientsAnalyzedLangs');
+        ingredientsAnalyzedLangs, r'Product', 'ingredientsAnalyzedLangs');
   }
 
   @override
@@ -268,36 +268,27 @@ class _$Product extends Product {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc(
-                                    $jc(
-                                        $jc(
-                                            $jc(
-                                                $jc($jc(0, barcode.hashCode),
-                                                    veganStatus.hashCode),
-                                                veganStatusSource.hashCode),
-                                            moderatorVeganChoiceReasonsIds
-                                                .hashCode),
-                                        moderatorVeganSourcesText.hashCode),
-                                    langsPrioritized.hashCode),
-                                brands.hashCode),
-                            nameLangs.hashCode),
-                        ingredientsTextLangs.hashCode),
-                    imageFrontLangs.hashCode),
-                imageFrontThumbLangs.hashCode),
-            imageIngredientsLangs.hashCode),
-        ingredientsAnalyzedLangs.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, veganStatus.hashCode);
+    _$hash = $jc(_$hash, veganStatusSource.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganChoiceReasonsIds.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganSourcesText.hashCode);
+    _$hash = $jc(_$hash, langsPrioritized.hashCode);
+    _$hash = $jc(_$hash, brands.hashCode);
+    _$hash = $jc(_$hash, nameLangs.hashCode);
+    _$hash = $jc(_$hash, ingredientsTextLangs.hashCode);
+    _$hash = $jc(_$hash, imageFrontLangs.hashCode);
+    _$hash = $jc(_$hash, imageFrontThumbLangs.hashCode);
+    _$hash = $jc(_$hash, imageIngredientsLangs.hashCode);
+    _$hash = $jc(_$hash, ingredientsAnalyzedLangs.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Product')
+    return (newBuiltValueToStringHelper(r'Product')
           ..add('barcode', barcode)
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
@@ -431,13 +422,15 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   }
 
   @override
-  _$Product build() {
+  Product build() => _build();
+
+  _$Product _build() {
     _$Product _$result;
     try {
       _$result = _$v ??
           new _$Product._(
               barcode: BuiltValueNullFieldError.checkNotNull(
-                  barcode, 'Product', 'barcode'),
+                  barcode, r'Product', 'barcode'),
               veganStatus: veganStatus,
               veganStatusSource: veganStatusSource,
               moderatorVeganChoiceReasonsIds:
@@ -475,7 +468,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
         ingredientsAnalyzedLangs.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'Product', _$failedField, e.toString());
+            r'Product', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -484,4 +477,4 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

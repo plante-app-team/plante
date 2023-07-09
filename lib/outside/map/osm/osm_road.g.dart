@@ -41,25 +41,25 @@ class _$OsmRoadSerializer implements StructuredSerializer<OsmRoad> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'osmId':
           result.osmId = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'latitude':
           result.latitude = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
         case 'longitude':
           result.longitude = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
       }
     }
@@ -79,7 +79,7 @@ class _$OsmRoad extends OsmRoad {
   final double longitude;
 
   factory _$OsmRoad([void Function(OsmRoadBuilder)? updates]) =>
-      (new OsmRoadBuilder()..update(updates)).build();
+      (new OsmRoadBuilder()..update(updates))._build();
 
   _$OsmRoad._(
       {required this.osmId,
@@ -87,10 +87,10 @@ class _$OsmRoad extends OsmRoad {
       required this.latitude,
       required this.longitude})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(osmId, 'OsmRoad', 'osmId');
-    BuiltValueNullFieldError.checkNotNull(name, 'OsmRoad', 'name');
-    BuiltValueNullFieldError.checkNotNull(latitude, 'OsmRoad', 'latitude');
-    BuiltValueNullFieldError.checkNotNull(longitude, 'OsmRoad', 'longitude');
+    BuiltValueNullFieldError.checkNotNull(osmId, r'OsmRoad', 'osmId');
+    BuiltValueNullFieldError.checkNotNull(name, r'OsmRoad', 'name');
+    BuiltValueNullFieldError.checkNotNull(latitude, r'OsmRoad', 'latitude');
+    BuiltValueNullFieldError.checkNotNull(longitude, r'OsmRoad', 'longitude');
   }
 
   @override
@@ -112,14 +112,18 @@ class _$OsmRoad extends OsmRoad {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc($jc($jc(0, osmId.hashCode), name.hashCode), latitude.hashCode),
-        longitude.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, osmId.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, latitude.hashCode);
+    _$hash = $jc(_$hash, longitude.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('OsmRoad')
+    return (newBuiltValueToStringHelper(r'OsmRoad')
           ..add('osmId', osmId)
           ..add('name', name)
           ..add('latitude', latitude)
@@ -173,20 +177,22 @@ class OsmRoadBuilder implements Builder<OsmRoad, OsmRoadBuilder> {
   }
 
   @override
-  _$OsmRoad build() {
+  OsmRoad build() => _build();
+
+  _$OsmRoad _build() {
     final _$result = _$v ??
         new _$OsmRoad._(
             osmId: BuiltValueNullFieldError.checkNotNull(
-                osmId, 'OsmRoad', 'osmId'),
+                osmId, r'OsmRoad', 'osmId'),
             name:
-                BuiltValueNullFieldError.checkNotNull(name, 'OsmRoad', 'name'),
+                BuiltValueNullFieldError.checkNotNull(name, r'OsmRoad', 'name'),
             latitude: BuiltValueNullFieldError.checkNotNull(
-                latitude, 'OsmRoad', 'latitude'),
+                latitude, r'OsmRoad', 'latitude'),
             longitude: BuiltValueNullFieldError.checkNotNull(
-                longitude, 'OsmRoad', 'longitude'));
+                longitude, r'OsmRoad', 'longitude'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

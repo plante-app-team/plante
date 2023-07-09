@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -13,6 +15,9 @@ abstract class NewsCluster implements Built<NewsCluster, NewsClusterBuilder> {
   BuiltList<NewsPiece> get newsPieces;
 
   NewsPieceType get type => newsPieceTypeFromCode(typeCode);
+  String get authorName => newsPieces.first.creatorUserName;
+  int get creationTimeSecs =>
+      newsPieces.map((np) => np.creationTimeSecs).reduce(max);
 
   factory NewsCluster([void Function(NewsClusterBuilder) updates]) =
       _$NewsCluster;

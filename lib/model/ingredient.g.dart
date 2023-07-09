@@ -39,13 +39,13 @@ class _$IngredientSerializer implements StructuredSerializer<Ingredient> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'veganStatus':
           result.veganStatus = serializers.deserialize(value,
@@ -65,10 +65,10 @@ class _$Ingredient extends Ingredient {
   final VegStatus? veganStatus;
 
   factory _$Ingredient([void Function(IngredientBuilder)? updates]) =>
-      (new IngredientBuilder()..update(updates)).build();
+      (new IngredientBuilder()..update(updates))._build();
 
   _$Ingredient._({required this.name, this.veganStatus}) : super._() {
-    BuiltValueNullFieldError.checkNotNull(name, 'Ingredient', 'name');
+    BuiltValueNullFieldError.checkNotNull(name, r'Ingredient', 'name');
   }
 
   @override
@@ -88,12 +88,16 @@ class _$Ingredient extends Ingredient {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, name.hashCode), veganStatus.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, veganStatus.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Ingredient')
+    return (newBuiltValueToStringHelper(r'Ingredient')
           ..add('name', name)
           ..add('veganStatus', veganStatus))
         .toString();
@@ -135,15 +139,17 @@ class IngredientBuilder implements Builder<Ingredient, IngredientBuilder> {
   }
 
   @override
-  _$Ingredient build() {
+  Ingredient build() => _build();
+
+  _$Ingredient _build() {
     final _$result = _$v ??
         new _$Ingredient._(
             name: BuiltValueNullFieldError.checkNotNull(
-                name, 'Ingredient', 'name'),
+                name, r'Ingredient', 'name'),
             veganStatus: veganStatus);
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

@@ -19,6 +19,10 @@ abstract class NewsPiece implements Built<NewsPiece, NewsPieceBuilder> {
   double get lon;
   @BuiltValueField(wireName: 'creator_user_id')
   String get creatorUserId;
+  @BuiltValueField(wireName: 'creator_user_name')
+  String get creatorUserName;
+  @BuiltValueField(wireName: 'creator_user_avatar_id')
+  String? get creatorUserAvatarId;
   @BuiltValueField(wireName: 'creation_time')
   int get creationTimeSecs;
   @BuiltValueField(wireName: 'type')
@@ -31,8 +35,10 @@ abstract class NewsPiece implements Built<NewsPiece, NewsPieceBuilder> {
   Object get typedData;
 
   @BuiltValueHook(finalizeBuilder: true)
-  static void _sortItems(NewsPieceBuilder b) =>
-      b.typedData = _createTypedData(b.data.build(), b.typeCode!);
+  static void _sortItems(NewsPieceBuilder b) {
+    b.typedData = _createTypedData(b.data.build(), b.typeCode!);
+    b.creatorUserName ??= '';
+  }
 
   static Object _createTypedData(
       BuiltMap<String, JsonObject> data, int typeCode) {

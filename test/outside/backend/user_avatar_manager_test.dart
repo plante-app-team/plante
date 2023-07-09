@@ -34,7 +34,7 @@ void main() {
 
     when(backend.updateUserAvatar(any)).thenAnswer((_) async => Ok(avatarId));
     when(backend.deleteUserAvatar()).thenAnswer((_) async => Ok(None()));
-    when(backend.userAvatarUrl(any)).thenAnswer((_) => avatarUrl);
+    when(backend.userAvatarUrl(any, any)).thenAnswer((_) => avatarUrl);
   });
 
   test('update avatar', () async {
@@ -111,8 +111,33 @@ void main() {
   });
 
   test('user avatar url', () async {
+    await userParamsController.setUserParams(
+        (await userParamsController.getUserParams())!.rebuild((e) => e
+          ..backendId = 'id'
+          ..avatarId = avatarId));
+
     final result = await userAvatarManager.userAvatarUri();
-    verify(backend.userAvatarUrl(userParamsController.cachedUserParams));
+    verify(backend.userAvatarUrl(
+      userParamsController.cachedUserParams!.backendId,
+      userParamsController.cachedUserParams!.avatarId,
+    ));
+    expect(result, equals(avatarUrl));
+  });
+
+  test('user avatar url when user params have no avatar ID', () async {
+    await userParamsController.setUserParams(
+        (await userParamsController.getUserParams())!.rebuild((e) => e
+          ..backendId = 'id'
+          ..avatarId = null));
+
+    final result = await userAvatarManager.userAvatarUri();
+    verifyNever(backend.userAvatarUrl(any, any));
+    expect(result, isNull);
+  });
+
+  test('other user avatar url', () async {
+    final result = userAvatarManager.otherUserAvatarUri('user_id', 'avatar_id');
+    verify(backend.userAvatarUrl('user_id', 'avatar_id'));
     expect(result, equals(avatarUrl));
   });
 

@@ -70,7 +70,7 @@ class _$BackendProductSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -80,7 +80,7 @@ class _$BackendProductSerializer
           break;
         case 'barcode':
           result.barcode = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'vegan_status':
           result.veganStatus = serializers.deserialize(value,
@@ -120,7 +120,7 @@ class _$BackendProduct extends BackendProduct {
   final String? moderatorVeganSourcesText;
 
   factory _$BackendProduct([void Function(BackendProductBuilder)? updates]) =>
-      (new BackendProductBuilder()..update(updates)).build();
+      (new BackendProductBuilder()..update(updates))._build();
 
   _$BackendProduct._(
       {this.serverId,
@@ -130,7 +130,8 @@ class _$BackendProduct extends BackendProduct {
       this.moderatorVeganChoiceReasons,
       this.moderatorVeganSourcesText})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(barcode, 'BackendProduct', 'barcode');
+    BuiltValueNullFieldError.checkNotNull(
+        barcode, r'BackendProduct', 'barcode');
   }
 
   @override
@@ -155,19 +156,20 @@ class _$BackendProduct extends BackendProduct {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc($jc($jc(0, serverId.hashCode), barcode.hashCode),
-                    veganStatus.hashCode),
-                veganStatusSource.hashCode),
-            moderatorVeganChoiceReasons.hashCode),
-        moderatorVeganSourcesText.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, serverId.hashCode);
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, veganStatus.hashCode);
+    _$hash = $jc(_$hash, veganStatusSource.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganChoiceReasons.hashCode);
+    _$hash = $jc(_$hash, moderatorVeganSourcesText.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('BackendProduct')
+    return (newBuiltValueToStringHelper(r'BackendProduct')
           ..add('serverId', serverId)
           ..add('barcode', barcode)
           ..add('veganStatus', veganStatus)
@@ -238,12 +240,14 @@ class BackendProductBuilder
   }
 
   @override
-  _$BackendProduct build() {
+  BackendProduct build() => _build();
+
+  _$BackendProduct _build() {
     final _$result = _$v ??
         new _$BackendProduct._(
             serverId: serverId,
             barcode: BuiltValueNullFieldError.checkNotNull(
-                barcode, 'BackendProduct', 'barcode'),
+                barcode, r'BackendProduct', 'barcode'),
             veganStatus: veganStatus,
             veganStatusSource: veganStatusSource,
             moderatorVeganChoiceReasons: moderatorVeganChoiceReasons,
@@ -253,4 +257,4 @@ class BackendProductBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

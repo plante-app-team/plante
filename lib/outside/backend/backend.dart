@@ -135,12 +135,8 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Uri? userAvatarUrl(UserParams user) {
-    if (user.avatarId == null) {
-      return null;
-    }
-    return _createUrl(
-        'user_avatar_data/${user.backendId}/${user.avatarId}', const {});
+  Uri userAvatarUrl(String userId, String avatarId) {
+    return _createUrl('user_avatar_data/$userId/$avatarId', const {});
   }
 
   Future<Result<List<UserContribution>, BackendError>> requestUserContributions(

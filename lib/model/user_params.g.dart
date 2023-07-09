@@ -92,7 +92,7 @@ class _$UserParamsSerializer implements StructuredSerializer<UserParams> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
@@ -162,7 +162,7 @@ class _$UserParams extends UserParams {
   final BuiltList<String>? langsPrioritized;
 
   factory _$UserParams([void Function(UserParamsBuilder)? updates]) =>
-      (new UserParamsBuilder()..update(updates)).build();
+      (new UserParamsBuilder()..update(updates))._build();
 
   _$UserParams._(
       {this.backendId,
@@ -200,27 +200,23 @@ class _$UserParams extends UserParams {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc(
-                            $jc(
-                                $jc($jc(0, backendId.hashCode),
-                                    backendClientToken.hashCode),
-                                name.hashCode),
-                            selfDescription.hashCode),
-                        avatarId.hashCode),
-                    userGroup.hashCode),
-                googleId.hashCode),
-            appleId.hashCode),
-        langsPrioritized.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, backendId.hashCode);
+    _$hash = $jc(_$hash, backendClientToken.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, selfDescription.hashCode);
+    _$hash = $jc(_$hash, avatarId.hashCode);
+    _$hash = $jc(_$hash, userGroup.hashCode);
+    _$hash = $jc(_$hash, googleId.hashCode);
+    _$hash = $jc(_$hash, appleId.hashCode);
+    _$hash = $jc(_$hash, langsPrioritized.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('UserParams')
+    return (newBuiltValueToStringHelper(r'UserParams')
           ..add('backendId', backendId)
           ..add('backendClientToken', backendClientToken)
           ..add('name', name)
@@ -308,7 +304,9 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   }
 
   @override
-  _$UserParams build() {
+  UserParams build() => _build();
+
+  _$UserParams _build() {
     _$UserParams _$result;
     try {
       _$result = _$v ??
@@ -329,7 +327,7 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
         _langsPrioritized?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'UserParams', _$failedField, e.toString());
+            r'UserParams', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -338,4 +336,4 @@ class UserParamsBuilder implements Builder<UserParams, UserParamsBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

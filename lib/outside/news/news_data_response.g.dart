@@ -40,13 +40,13 @@ class _$NewsDataResponseSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'last_page':
           result.lastPage = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'results':
           result.results.replace(serializers.deserialize(value,
@@ -69,14 +69,14 @@ class _$NewsDataResponse extends NewsDataResponse {
 
   factory _$NewsDataResponse(
           [void Function(NewsDataResponseBuilder)? updates]) =>
-      (new NewsDataResponseBuilder()..update(updates)).build();
+      (new NewsDataResponseBuilder()..update(updates))._build();
 
   _$NewsDataResponse._({required this.lastPage, required this.results})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        lastPage, 'NewsDataResponse', 'lastPage');
+        lastPage, r'NewsDataResponse', 'lastPage');
     BuiltValueNullFieldError.checkNotNull(
-        results, 'NewsDataResponse', 'results');
+        results, r'NewsDataResponse', 'results');
   }
 
   @override
@@ -97,12 +97,16 @@ class _$NewsDataResponse extends NewsDataResponse {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, lastPage.hashCode), results.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, lastPage.hashCode);
+    _$hash = $jc(_$hash, results.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('NewsDataResponse')
+    return (newBuiltValueToStringHelper(r'NewsDataResponse')
           ..add('lastPage', lastPage)
           ..add('results', results))
         .toString();
@@ -146,13 +150,15 @@ class NewsDataResponseBuilder
   }
 
   @override
-  _$NewsDataResponse build() {
+  NewsDataResponse build() => _build();
+
+  _$NewsDataResponse _build() {
     _$NewsDataResponse _$result;
     try {
       _$result = _$v ??
           new _$NewsDataResponse._(
               lastPage: BuiltValueNullFieldError.checkNotNull(
-                  lastPage, 'NewsDataResponse', 'lastPage'),
+                  lastPage, r'NewsDataResponse', 'lastPage'),
               results: results.build());
     } catch (_) {
       late String _$failedField;
@@ -161,7 +167,7 @@ class NewsDataResponseBuilder
         results.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'NewsDataResponse', _$failedField, e.toString());
+            r'NewsDataResponse', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -170,4 +176,4 @@ class NewsDataResponseBuilder
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

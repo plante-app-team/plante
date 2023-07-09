@@ -5,6 +5,7 @@ import 'package:built_value/json_object.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/base/coord_utils.dart';
+import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
@@ -17,6 +18,7 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_element_type.dart';
@@ -28,6 +30,7 @@ import 'package:plante/outside/news/news_feed_manager.dart';
 import 'package:plante/outside/news/news_piece.dart';
 import 'package:plante/outside/news/news_piece_type.dart';
 import 'package:plante/products/products_obtainer.dart';
+import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
@@ -41,8 +44,10 @@ import '../../z_fakes/fake_news_feed_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
+import '../../z_fakes/fake_user_avatar_manager.dart';
 
 void main() {
+  final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
   final initialPos = Coord(lat: 1, lon: 2);
   var lastNewsPieceId = 0;
   var lastShopCoord = 1.0;
@@ -53,6 +58,7 @@ void main() {
   late FakeShopsManager shopsManager;
   late FakeAddressObtainer addressObtainer;
   late LatestCameraPosStorage latestCameraPosStorage;
+  late FakeUserAvatarManager userAvatarManager;
 
   setUp(() async {
     productsObtainer = FakeProductsObtainer();
@@ -61,6 +67,7 @@ void main() {
     addressObtainer = FakeAddressObtainer();
     latestCameraPosStorage =
         LatestCameraPosStorage(FakeSharedPreferences().asHolder());
+    userAvatarManager = FakeUserAvatarManager();
 
     await TestDiRegistry.register((r) {
       r.register<ProductsObtainer>(productsObtainer);
@@ -68,6 +75,7 @@ void main() {
       r.register<NewsFeedManager>(newsFeedManager);
       r.register<AddressObtainer>(addressObtainer);
       r.register<LatestCameraPosStorage>(latestCameraPosStorage);
+      r.register<UserAvatarManager>(userAvatarManager);
     });
 
     await latestCameraPosStorage.set(initialPos);
@@ -131,7 +139,10 @@ void main() {
   }
 
   Future<void> addProductToShop(Product product,
-      {String creatorUserId = 'some_user', Shop? shop}) async {
+      {String creatorUserId = 'some_user',
+      String creatorUserName = 'Bob',
+      Shop? shop,
+      int creationTimeSecs = 123454}) async {
     shop ??=
         createShop('Shop 2', OsmAddress((e) => e.road = 'Seabreeze drive'));
     newsFeedManager.addNewsPiece_testing(NewsPiece((e) => e
@@ -139,7 +150,9 @@ void main() {
       ..lat = shop!.latitude
       ..lon = shop.longitude
       ..creatorUserId = creatorUserId
-      ..creationTimeSecs = 123454
+      ..creatorUserName = creatorUserName
+      ..creatorUserAvatarId = 'avatar_id'
+      ..creationTimeSecs = creationTimeSecs
       ..typeCode = NewsPieceType.PRODUCT_AT_SHOP.persistentCode
       ..data = MapBuilder({
         'barcode': JsonObject(product.barcode),
@@ -547,5 +560,34 @@ void main() {
 
     expect(find.text(context.strings.global_network_error), findsOneWidget);
     expect(find.byType(MapPage), findsNothing);
+  });
+
+  testWidgets('news pieces have user names and avatars',
+      (WidgetTester tester) async {
+    userAvatarManager.setOtherUsersAvatar_testing(imagePath);
+
+    await addProductToShop(createProduct('Product 1'), creatorUserName: 'Bob');
+    await addProductToShop(createProduct('Product 2'),
+        creatorUserName: 'Kelso');
+
+    await tester.superPump(const NewsFeedPage());
+    expect(find.text('Bob'), findsOneWidget);
+    expect(find.text('Kelso'), findsOneWidget);
+    expect(find.byType(UriImagePlante), findsNWidgets(2));
+  });
+
+  testWidgets('news show how long ago they were created',
+      (WidgetTester tester) async {
+    final now = DateTime.now().toUtc();
+    final hourAgo = now.add(const Duration(minutes: -80)).secondsSinceEpoch;
+    final dayAgo = now.add(const Duration(hours: -30)).secondsSinceEpoch;
+    await addProductToShop(createProduct('Product 1'),
+        creationTimeSecs: hourAgo);
+    await addProductToShop(createProduct('Product 2'),
+        creationTimeSecs: dayAgo);
+
+    await tester.superPump(const NewsFeedPage());
+    expect(find.text('1 hour ago'), findsOneWidget);
+    expect(find.text('yesterday'), findsOneWidget);
   });
 }

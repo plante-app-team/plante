@@ -43,17 +43,17 @@ class _$NewsPieceProductAtShopSerializer
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'barcode':
           result.barcode = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'shop_uid':
           result.shopUID = serializers.deserialize(value,
-              specifiedType: const FullType(OsmUID)) as OsmUID;
+              specifiedType: const FullType(OsmUID))! as OsmUID;
           break;
       }
     }
@@ -70,14 +70,14 @@ class _$NewsPieceProductAtShop extends NewsPieceProductAtShop {
 
   factory _$NewsPieceProductAtShop(
           [void Function(NewsPieceProductAtShopBuilder)? updates]) =>
-      (new NewsPieceProductAtShopBuilder()..update(updates)).build();
+      (new NewsPieceProductAtShopBuilder()..update(updates))._build();
 
   _$NewsPieceProductAtShop._({required this.barcode, required this.shopUID})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        barcode, 'NewsPieceProductAtShop', 'barcode');
+        barcode, r'NewsPieceProductAtShop', 'barcode');
     BuiltValueNullFieldError.checkNotNull(
-        shopUID, 'NewsPieceProductAtShop', 'shopUID');
+        shopUID, r'NewsPieceProductAtShop', 'shopUID');
   }
 
   @override
@@ -99,12 +99,16 @@ class _$NewsPieceProductAtShop extends NewsPieceProductAtShop {
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, barcode.hashCode), shopUID.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, shopUID.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('NewsPieceProductAtShop')
+    return (newBuiltValueToStringHelper(r'NewsPieceProductAtShop')
           ..add('barcode', barcode)
           ..add('shopUID', shopUID))
         .toString();
@@ -147,16 +151,18 @@ class NewsPieceProductAtShopBuilder
   }
 
   @override
-  _$NewsPieceProductAtShop build() {
+  NewsPieceProductAtShop build() => _build();
+
+  _$NewsPieceProductAtShop _build() {
     final _$result = _$v ??
         new _$NewsPieceProductAtShop._(
             barcode: BuiltValueNullFieldError.checkNotNull(
-                barcode, 'NewsPieceProductAtShop', 'barcode'),
+                barcode, r'NewsPieceProductAtShop', 'barcode'),
             shopUID: BuiltValueNullFieldError.checkNotNull(
-                shopUID, 'NewsPieceProductAtShop', 'shopUID'));
+                shopUID, r'NewsPieceProductAtShop', 'shopUID'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

@@ -28,6 +28,9 @@ class _$NewsPieceSerializer implements StructuredSerializer<NewsPiece> {
       'creator_user_id',
       serializers.serialize(object.creatorUserId,
           specifiedType: const FullType(String)),
+      'creator_user_name',
+      serializers.serialize(object.creatorUserName,
+          specifiedType: const FullType(String)),
       'creation_time',
       serializers.serialize(object.creationTimeSecs,
           specifiedType: const FullType(int)),
@@ -42,7 +45,14 @@ class _$NewsPieceSerializer implements StructuredSerializer<NewsPiece> {
       serializers.serialize(object.typedData,
           specifiedType: const FullType(Object)),
     ];
-
+    Object? value;
+    value = object.creatorUserAvatarId;
+    if (value != null) {
+      result
+        ..add('creator_user_avatar_id')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
@@ -53,33 +63,41 @@ class _$NewsPieceSerializer implements StructuredSerializer<NewsPiece> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'id':
           result.serverId = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'lat':
           result.lat = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
         case 'lon':
           result.lon = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
         case 'creator_user_id':
           result.creatorUserId = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'creator_user_name':
+          result.creatorUserName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'creator_user_avatar_id':
+          result.creatorUserAvatarId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'creation_time':
           result.creationTimeSecs = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'type':
           result.typeCode = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'data':
           result.data.replace(serializers.deserialize(value,
@@ -109,6 +127,10 @@ class _$NewsPiece extends NewsPiece {
   @override
   final String creatorUserId;
   @override
+  final String creatorUserName;
+  @override
+  final String? creatorUserAvatarId;
+  @override
   final int creationTimeSecs;
   @override
   final int typeCode;
@@ -118,28 +140,32 @@ class _$NewsPiece extends NewsPiece {
   final Object typedData;
 
   factory _$NewsPiece([void Function(NewsPieceBuilder)? updates]) =>
-      (new NewsPieceBuilder()..update(updates)).build();
+      (new NewsPieceBuilder()..update(updates))._build();
 
   _$NewsPiece._(
       {required this.serverId,
       required this.lat,
       required this.lon,
       required this.creatorUserId,
+      required this.creatorUserName,
+      this.creatorUserAvatarId,
       required this.creationTimeSecs,
       required this.typeCode,
       required this.data,
       required this.typedData})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(serverId, 'NewsPiece', 'serverId');
-    BuiltValueNullFieldError.checkNotNull(lat, 'NewsPiece', 'lat');
-    BuiltValueNullFieldError.checkNotNull(lon, 'NewsPiece', 'lon');
+    BuiltValueNullFieldError.checkNotNull(serverId, r'NewsPiece', 'serverId');
+    BuiltValueNullFieldError.checkNotNull(lat, r'NewsPiece', 'lat');
+    BuiltValueNullFieldError.checkNotNull(lon, r'NewsPiece', 'lon');
     BuiltValueNullFieldError.checkNotNull(
-        creatorUserId, 'NewsPiece', 'creatorUserId');
+        creatorUserId, r'NewsPiece', 'creatorUserId');
     BuiltValueNullFieldError.checkNotNull(
-        creationTimeSecs, 'NewsPiece', 'creationTimeSecs');
-    BuiltValueNullFieldError.checkNotNull(typeCode, 'NewsPiece', 'typeCode');
-    BuiltValueNullFieldError.checkNotNull(data, 'NewsPiece', 'data');
-    BuiltValueNullFieldError.checkNotNull(typedData, 'NewsPiece', 'typedData');
+        creatorUserName, r'NewsPiece', 'creatorUserName');
+    BuiltValueNullFieldError.checkNotNull(
+        creationTimeSecs, r'NewsPiece', 'creationTimeSecs');
+    BuiltValueNullFieldError.checkNotNull(typeCode, r'NewsPiece', 'typeCode');
+    BuiltValueNullFieldError.checkNotNull(data, r'NewsPiece', 'data');
+    BuiltValueNullFieldError.checkNotNull(typedData, r'NewsPiece', 'typedData');
   }
 
   @override
@@ -157,6 +183,8 @@ class _$NewsPiece extends NewsPiece {
         lat == other.lat &&
         lon == other.lon &&
         creatorUserId == other.creatorUserId &&
+        creatorUserName == other.creatorUserName &&
+        creatorUserAvatarId == other.creatorUserAvatarId &&
         creationTimeSecs == other.creationTimeSecs &&
         typeCode == other.typeCode &&
         data == other.data &&
@@ -165,27 +193,30 @@ class _$NewsPiece extends NewsPiece {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc($jc($jc(0, serverId.hashCode), lat.hashCode),
-                            lon.hashCode),
-                        creatorUserId.hashCode),
-                    creationTimeSecs.hashCode),
-                typeCode.hashCode),
-            data.hashCode),
-        typedData.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, serverId.hashCode);
+    _$hash = $jc(_$hash, lat.hashCode);
+    _$hash = $jc(_$hash, lon.hashCode);
+    _$hash = $jc(_$hash, creatorUserId.hashCode);
+    _$hash = $jc(_$hash, creatorUserName.hashCode);
+    _$hash = $jc(_$hash, creatorUserAvatarId.hashCode);
+    _$hash = $jc(_$hash, creationTimeSecs.hashCode);
+    _$hash = $jc(_$hash, typeCode.hashCode);
+    _$hash = $jc(_$hash, data.hashCode);
+    _$hash = $jc(_$hash, typedData.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('NewsPiece')
+    return (newBuiltValueToStringHelper(r'NewsPiece')
           ..add('serverId', serverId)
           ..add('lat', lat)
           ..add('lon', lon)
           ..add('creatorUserId', creatorUserId)
+          ..add('creatorUserName', creatorUserName)
+          ..add('creatorUserAvatarId', creatorUserAvatarId)
           ..add('creationTimeSecs', creationTimeSecs)
           ..add('typeCode', typeCode)
           ..add('data', data)
@@ -214,6 +245,16 @@ class NewsPieceBuilder implements Builder<NewsPiece, NewsPieceBuilder> {
   set creatorUserId(String? creatorUserId) =>
       _$this._creatorUserId = creatorUserId;
 
+  String? _creatorUserName;
+  String? get creatorUserName => _$this._creatorUserName;
+  set creatorUserName(String? creatorUserName) =>
+      _$this._creatorUserName = creatorUserName;
+
+  String? _creatorUserAvatarId;
+  String? get creatorUserAvatarId => _$this._creatorUserAvatarId;
+  set creatorUserAvatarId(String? creatorUserAvatarId) =>
+      _$this._creatorUserAvatarId = creatorUserAvatarId;
+
   int? _creationTimeSecs;
   int? get creationTimeSecs => _$this._creationTimeSecs;
   set creationTimeSecs(int? creationTimeSecs) =>
@@ -241,6 +282,8 @@ class NewsPieceBuilder implements Builder<NewsPiece, NewsPieceBuilder> {
       _lat = $v.lat;
       _lon = $v.lon;
       _creatorUserId = $v.creatorUserId;
+      _creatorUserName = $v.creatorUserName;
+      _creatorUserAvatarId = $v.creatorUserAvatarId;
       _creationTimeSecs = $v.creationTimeSecs;
       _typeCode = $v.typeCode;
       _data = $v.data.toBuilder();
@@ -262,27 +305,32 @@ class NewsPieceBuilder implements Builder<NewsPiece, NewsPieceBuilder> {
   }
 
   @override
-  _$NewsPiece build() {
+  NewsPiece build() => _build();
+
+  _$NewsPiece _build() {
     NewsPiece._sortItems(this);
     _$NewsPiece _$result;
     try {
       _$result = _$v ??
           new _$NewsPiece._(
               serverId: BuiltValueNullFieldError.checkNotNull(
-                  serverId, 'NewsPiece', 'serverId'),
+                  serverId, r'NewsPiece', 'serverId'),
               lat: BuiltValueNullFieldError.checkNotNull(
-                  lat, 'NewsPiece', 'lat'),
+                  lat, r'NewsPiece', 'lat'),
               lon: BuiltValueNullFieldError.checkNotNull(
-                  lon, 'NewsPiece', 'lon'),
+                  lon, r'NewsPiece', 'lon'),
               creatorUserId: BuiltValueNullFieldError.checkNotNull(
-                  creatorUserId, 'NewsPiece', 'creatorUserId'),
+                  creatorUserId, r'NewsPiece', 'creatorUserId'),
+              creatorUserName: BuiltValueNullFieldError.checkNotNull(
+                  creatorUserName, r'NewsPiece', 'creatorUserName'),
+              creatorUserAvatarId: creatorUserAvatarId,
               creationTimeSecs: BuiltValueNullFieldError.checkNotNull(
-                  creationTimeSecs, 'NewsPiece', 'creationTimeSecs'),
+                  creationTimeSecs, r'NewsPiece', 'creationTimeSecs'),
               typeCode: BuiltValueNullFieldError.checkNotNull(
-                  typeCode, 'NewsPiece', 'typeCode'),
+                  typeCode, r'NewsPiece', 'typeCode'),
               data: data.build(),
               typedData: BuiltValueNullFieldError.checkNotNull(
-                  typedData, 'NewsPiece', 'typedData'));
+                  typedData, r'NewsPiece', 'typedData'));
     } catch (_) {
       late String _$failedField;
       try {
@@ -290,7 +338,7 @@ class NewsPieceBuilder implements Builder<NewsPiece, NewsPieceBuilder> {
         data.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
-            'NewsPiece', _$failedField, e.toString());
+            r'NewsPiece', _$failedField, e.toString());
       }
       rethrow;
     }
@@ -299,4 +347,4 @@ class NewsPieceBuilder implements Builder<NewsPiece, NewsPieceBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

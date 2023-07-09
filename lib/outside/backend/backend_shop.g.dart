@@ -39,21 +39,21 @@ class _$BackendShopSerializer implements StructuredSerializer<BackendShop> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'osm_uid':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(OsmUID)) as OsmUID;
+              specifiedType: const FullType(OsmUID))! as OsmUID;
           break;
         case 'products_count':
           result.productsCount = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int))! as int;
           break;
         case 'deleted':
           result.deleted = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -71,17 +71,17 @@ class _$BackendShop extends BackendShop {
   final bool deleted;
 
   factory _$BackendShop([void Function(BackendShopBuilder)? updates]) =>
-      (new BackendShopBuilder()..update(updates)).build();
+      (new BackendShopBuilder()..update(updates))._build();
 
   _$BackendShop._(
       {required this.osmUID,
       required this.productsCount,
       required this.deleted})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(osmUID, 'BackendShop', 'osmUID');
+    BuiltValueNullFieldError.checkNotNull(osmUID, r'BackendShop', 'osmUID');
     BuiltValueNullFieldError.checkNotNull(
-        productsCount, 'BackendShop', 'productsCount');
-    BuiltValueNullFieldError.checkNotNull(deleted, 'BackendShop', 'deleted');
+        productsCount, r'BackendShop', 'productsCount');
+    BuiltValueNullFieldError.checkNotNull(deleted, r'BackendShop', 'deleted');
   }
 
   @override
@@ -102,13 +102,17 @@ class _$BackendShop extends BackendShop {
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, osmUID.hashCode), productsCount.hashCode),
-        deleted.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, osmUID.hashCode);
+    _$hash = $jc(_$hash, productsCount.hashCode);
+    _$hash = $jc(_$hash, deleted.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('BackendShop')
+    return (newBuiltValueToStringHelper(r'BackendShop')
           ..add('osmUID', osmUID)
           ..add('productsCount', productsCount)
           ..add('deleted', deleted))
@@ -159,18 +163,20 @@ class BackendShopBuilder implements Builder<BackendShop, BackendShopBuilder> {
   }
 
   @override
-  _$BackendShop build() {
+  BackendShop build() => _build();
+
+  _$BackendShop _build() {
     final _$result = _$v ??
         new _$BackendShop._(
             osmUID: BuiltValueNullFieldError.checkNotNull(
-                osmUID, 'BackendShop', 'osmUID'),
+                osmUID, r'BackendShop', 'osmUID'),
             productsCount: BuiltValueNullFieldError.checkNotNull(
-                productsCount, 'BackendShop', 'productsCount'),
+                productsCount, r'BackendShop', 'productsCount'),
             deleted: BuiltValueNullFieldError.checkNotNull(
-                deleted, 'BackendShop', 'deleted'));
+                deleted, r'BackendShop', 'deleted'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

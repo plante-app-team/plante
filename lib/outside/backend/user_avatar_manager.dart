@@ -81,10 +81,16 @@ class UserAvatarManager {
   /// the future.
   Future<Uri?> userAvatarUri() async {
     final userParams = await _userParamsController.getUserParams();
-    if (userParams == null) {
+    if (userParams == null || userParams.avatarId == null) {
       return null;
     }
-    return _backend.userAvatarUrl(userParams);
+    return _backend.userAvatarUrl(
+        userParams.requireBackendID(), userParams.avatarId!);
+  }
+
+  /// See [userAvatarUri]
+  Uri? otherUserAvatarUri(String userId, String userAvatarId) {
+    return _backend.userAvatarUrl(userId, userAvatarId);
   }
 
   Future<Map<String, String>> userAvatarAuthHeaders() async {

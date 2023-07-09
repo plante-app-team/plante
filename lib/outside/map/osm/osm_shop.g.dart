@@ -69,17 +69,17 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current! as String;
       iterator.moveNext();
       final Object? value = iterator.current;
       switch (key) {
         case 'osmUID':
           result.osmUID = serializers.deserialize(value,
-              specifiedType: const FullType(OsmUID)) as OsmUID;
+              specifiedType: const FullType(OsmUID))! as OsmUID;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String))! as String;
           break;
         case 'type':
           result.type = serializers.deserialize(value,
@@ -87,11 +87,11 @@ class _$OsmShopSerializer implements StructuredSerializer<OsmShop> {
           break;
         case 'latitude':
           result.latitude = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
         case 'longitude':
           result.longitude = serializers.deserialize(value,
-              specifiedType: const FullType(double)) as double;
+              specifiedType: const FullType(double))! as double;
           break;
         case 'city':
           result.city = serializers.deserialize(value,
@@ -131,7 +131,7 @@ class _$OsmShop extends OsmShop {
   final String? houseNumber;
 
   factory _$OsmShop([void Function(OsmShopBuilder)? updates]) =>
-      (new OsmShopBuilder()..update(updates)).build();
+      (new OsmShopBuilder()..update(updates))._build();
 
   _$OsmShop._(
       {required this.osmUID,
@@ -143,10 +143,10 @@ class _$OsmShop extends OsmShop {
       this.road,
       this.houseNumber})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(osmUID, 'OsmShop', 'osmUID');
-    BuiltValueNullFieldError.checkNotNull(name, 'OsmShop', 'name');
-    BuiltValueNullFieldError.checkNotNull(latitude, 'OsmShop', 'latitude');
-    BuiltValueNullFieldError.checkNotNull(longitude, 'OsmShop', 'longitude');
+    BuiltValueNullFieldError.checkNotNull(osmUID, r'OsmShop', 'osmUID');
+    BuiltValueNullFieldError.checkNotNull(name, r'OsmShop', 'name');
+    BuiltValueNullFieldError.checkNotNull(latitude, r'OsmShop', 'latitude');
+    BuiltValueNullFieldError.checkNotNull(longitude, r'OsmShop', 'longitude');
   }
 
   @override
@@ -172,23 +172,22 @@ class _$OsmShop extends OsmShop {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc(
-                $jc(
-                    $jc(
-                        $jc($jc($jc(0, osmUID.hashCode), name.hashCode),
-                            type.hashCode),
-                        latitude.hashCode),
-                    longitude.hashCode),
-                city.hashCode),
-            road.hashCode),
-        houseNumber.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, osmUID.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
+    _$hash = $jc(_$hash, latitude.hashCode);
+    _$hash = $jc(_$hash, longitude.hashCode);
+    _$hash = $jc(_$hash, city.hashCode);
+    _$hash = $jc(_$hash, road.hashCode);
+    _$hash = $jc(_$hash, houseNumber.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('OsmShop')
+    return (newBuiltValueToStringHelper(r'OsmShop')
           ..add('osmUID', osmUID)
           ..add('name', name)
           ..add('type', type)
@@ -266,18 +265,20 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   }
 
   @override
-  _$OsmShop build() {
+  OsmShop build() => _build();
+
+  _$OsmShop _build() {
     final _$result = _$v ??
         new _$OsmShop._(
             osmUID: BuiltValueNullFieldError.checkNotNull(
-                osmUID, 'OsmShop', 'osmUID'),
+                osmUID, r'OsmShop', 'osmUID'),
             name:
-                BuiltValueNullFieldError.checkNotNull(name, 'OsmShop', 'name'),
+                BuiltValueNullFieldError.checkNotNull(name, r'OsmShop', 'name'),
             type: type,
             latitude: BuiltValueNullFieldError.checkNotNull(
-                latitude, 'OsmShop', 'latitude'),
+                latitude, r'OsmShop', 'latitude'),
             longitude: BuiltValueNullFieldError.checkNotNull(
-                longitude, 'OsmShop', 'longitude'),
+                longitude, r'OsmShop', 'longitude'),
             city: city,
             road: road,
             houseNumber: houseNumber);
@@ -286,4 +287,4 @@ class OsmShopBuilder implements Builder<OsmShop, OsmShopBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint
