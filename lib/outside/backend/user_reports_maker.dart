@@ -1,9 +1,10 @@
 import 'package:plante/base/result.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/user_report_data.dart';
 
 mixin UserReportsMakerObserver {
-  void onUserReportMade(String barcode);
+  void onUserReportMade(UserReportData data);
 }
 
 class UserReportsMaker {
@@ -14,9 +15,21 @@ class UserReportsMaker {
 
   Future<Result<None, BackendError>> reportProduct(
       String barcode, String reportText) async {
-    final result = await _backend.sendReport(barcode, reportText);
+    final result = await _backend.sendReport(reportText, barcode: barcode);
     if (result.isOk) {
-      _observers.forEach((o) => o.onUserReportMade(barcode));
+      _observers.forEach(
+          (o) => o.onUserReportMade(ProductReportData(reportText, barcode)));
+    }
+    return result;
+  }
+
+  Future<Result<None, BackendError>> reportNewsPiece(
+      String newsPieceId, String reportText) async {
+    final result =
+        await _backend.sendReport(reportText, newsPieceId: newsPieceId);
+    if (result.isOk) {
+      _observers.forEach((o) =>
+          o.onUserReportMade(NewsPieceReportData(reportText, newsPieceId)));
     }
     return result;
   }

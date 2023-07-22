@@ -63,7 +63,8 @@ Future<T?> _showPopupPlante<T>({
 }) async {
   final targetBox = target.currentContext?.findRenderObject() as RenderBox?;
   if (targetBox == null) {
-    Log.e('showMenuPlante is called when no render box is available');
+    Log.e('showMenuPlante is called when no render box is available. '
+        'Did you forget to actually pass the GlobalKey as a key?');
     return null;
   }
   final targetPosition = targetBox.localToGlobal(Offset.zero);

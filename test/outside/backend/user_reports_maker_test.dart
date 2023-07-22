@@ -1,5 +1,6 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
+import 'package:plante/outside/backend/user_report_data.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:test/test.dart';
 
@@ -12,7 +13,9 @@ void main() {
   setUp(() {
     backend = MockBackend();
     reportsMaker = UserReportsMaker(backend);
-    when(backend.sendReport(any, any)).thenAnswer((_) async => Ok(None()));
+    when(backend.sendReport(any,
+            barcode: anyNamed('barcode'), newsPieceId: anyNamed('newsPieceId')))
+        .thenAnswer((_) async => Ok(None()));
   });
 
   test('report product', () async {
@@ -25,7 +28,8 @@ void main() {
     final result = await reportsMaker.reportProduct('123', 'Naughty product!');
     expect(result.isOk, isTrue);
 
-    verify(backend.sendReport('123', 'Naughty product!'));
+    verify(backend.sendReport('Naughty product!',
+        barcode: '123', newsPieceId: null));
     verifyNoMoreInteractions(backend);
     expect(observer.reportedBarcodes, equals(['123']));
   });
@@ -35,7 +39,7 @@ class _FakeObserver implements UserReportsMakerObserver {
   final reportedBarcodes = <String>[];
 
   @override
-  void onUserReportMade(String barcode) {
-    reportedBarcodes.add(barcode);
+  void onUserReportMade(UserReportData data) {
+    reportedBarcodes.add((data as ProductReportData).barcode);
   }
 }

@@ -14,7 +14,7 @@ import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/ui_value.dart';
 import 'package:plante/ui/product/help_with_veg_status_page.dart';
 import 'package:plante/ui/product/init_product_page.dart';
-import 'package:plante/ui/product/product_report_dialog.dart';
+import 'package:plante/ui/report/report_dialog.dart';
 
 class DisplayProductsPageModel implements UserLangsManagerObserver {
   final Product _initialProduct;
@@ -99,7 +99,7 @@ class DisplayProductsPageModel implements UserLangsManagerObserver {
     showDialog(
       context: context,
       builder: (context) {
-        return ProductReportDialog(
+        return ReportDialog.forProduct(
             barcode: _product.cachedVal.barcode,
             reportsMaker: _userReportsMaker);
       },

@@ -4,22 +4,31 @@ import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/dialog_plante.dart';
 import 'package:plante/ui/base/components/input_field_multiline_plante.dart';
+import 'package:plante/ui/report/report_dialog_behaviour.dart';
 
-class ProductReportDialog extends StatefulWidget {
-  final String barcode;
-  final UserReportsMaker reportsMaker;
-  const ProductReportDialog(
-      {Key? key, required this.barcode, required this.reportsMaker})
-      : super(key: key);
+class ReportDialog extends StatefulWidget {
+  static const MIN_REPORT_LENGTH = 4;
+  final ReportDialogBehaviour behaviour;
+
+  ReportDialog.forProduct(
+      {required String barcode, required UserReportsMaker reportsMaker})
+      : this._(ReportDialogProductBehaviour(barcode, reportsMaker));
+  ReportDialog.forNewsPiece(
+      {required String newsPieceId, required UserReportsMaker reportsMaker})
+      : this._(ReportDialogNewsPieceBehaviour(newsPieceId, reportsMaker));
+
+  const ReportDialog._(this.behaviour, {Key? key}) : super(key: key);
 
   @override
-  _ProductReportDialogState createState() => _ProductReportDialogState();
+  _ReportDialogState createState() => _ReportDialogState();
 }
 
-class _ProductReportDialogState extends State<ProductReportDialog> {
+class _ReportDialogState extends State<ReportDialog> {
   bool _loading = false;
   final _reportTextController = TextEditingController();
-  bool get _reportSendAllowed => _reportTextController.text.trim().length > 3;
+  bool get _reportSendAllowed =>
+      _reportTextController.text.trim().length >=
+      ReportDialog.MIN_REPORT_LENGTH;
 
   @override
   void initState() {
@@ -34,7 +43,7 @@ class _ProductReportDialogState extends State<ProductReportDialog> {
   @override
   Widget build(BuildContext context) {
     return DialogPlante(
-      title: Text(context.strings.product_report_dialog_title),
+      title: Text(widget.behaviour.getReportDialogTitle(context)),
       content: Column(children: [
         if (_loading) const CircularProgressIndicator(),
         InputFieldMultilinePlante(
@@ -52,8 +61,8 @@ class _ProductReportDialogState extends State<ProductReportDialog> {
       _loading = true;
     });
     try {
-      final result = await widget.reportsMaker
-          .reportProduct(widget.barcode, _reportTextController.text);
+      final result =
+          await widget.behaviour.sendReport(_reportTextController.text);
       if (result.isOk) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

@@ -14,7 +14,7 @@ void main() {
     expect(UserContributionType.PRODUCT_EDITED.persistentCode, equals(1));
     expect(
         UserContributionType.PRODUCT_ADDED_TO_SHOP.persistentCode, equals(2));
-    expect(UserContributionType.PRODUCT_REPORTED.persistentCode, equals(3));
+    expect(UserContributionType.REPORT_WAS_MADE.persistentCode, equals(3));
     expect(UserContributionType.SHOP_CREATED.persistentCode, equals(4));
     expect(
         UserContributionType.LEGACY_PRODUCT_EDITED.persistentCode, equals(5));

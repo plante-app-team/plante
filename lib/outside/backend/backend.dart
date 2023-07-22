@@ -210,12 +210,20 @@ class Backend {
     return _noneOrErrorFrom(response);
   }
 
-  Future<Result<None, BackendError>> sendReport(
-      String barcode, String reportText) async {
+  Future<Result<None, BackendError>> sendReport(String reportText,
+      {String? barcode, String? newsPieceId}) async {
+    if (barcode == null && newsPieceId == null) {
+      throw ArgumentError('Nothing to report');
+    }
     _analytics
         .sendEvent('report_sent', {'barcode': barcode, 'report': reportText});
     final params = <String, String>{};
-    params['barcode'] = barcode;
+    if (barcode != null) {
+      params['barcode'] = barcode;
+    }
+    if (newsPieceId != null) {
+      params['newsPieceId'] = newsPieceId;
+    }
     params['text'] = reportText;
     final response = await _backendGet('make_report/', params);
     return _noneOrErrorFrom(response);

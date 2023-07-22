@@ -19,6 +19,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
 import 'package:plante/outside/map/osm/osm_address.dart';
 import 'package:plante/outside/map/osm/osm_element_type.dart';
@@ -45,6 +46,7 @@ import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_shops_manager.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
+import '../../z_fakes/fake_user_reports_maker.dart';
 
 void main() {
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
@@ -59,6 +61,7 @@ void main() {
   late FakeAddressObtainer addressObtainer;
   late LatestCameraPosStorage latestCameraPosStorage;
   late FakeUserAvatarManager userAvatarManager;
+  late FakeUserReportsMaker userReportsMaker;
 
   setUp(() async {
     productsObtainer = FakeProductsObtainer();
@@ -68,6 +71,7 @@ void main() {
     latestCameraPosStorage =
         LatestCameraPosStorage(FakeSharedPreferences().asHolder());
     userAvatarManager = FakeUserAvatarManager();
+    userReportsMaker = FakeUserReportsMaker();
 
     await TestDiRegistry.register((r) {
       r.register<ProductsObtainer>(productsObtainer);
@@ -76,6 +80,7 @@ void main() {
       r.register<AddressObtainer>(addressObtainer);
       r.register<LatestCameraPosStorage>(latestCameraPosStorage);
       r.register<UserAvatarManager>(userAvatarManager);
+      r.register<UserReportsMaker>(userReportsMaker);
     });
 
     await latestCameraPosStorage.set(initialPos);
@@ -589,5 +594,22 @@ void main() {
     await tester.superPump(const NewsFeedPage());
     expect(find.text('1 hour ago'), findsOneWidget);
     expect(find.text('yesterday'), findsOneWidget);
+  });
+
+  testWidgets('report a news piece', (WidgetTester tester) async {
+    await addProductToShop(createProduct('Product 1'));
+    final context = await tester.superPump(const NewsFeedPage());
+
+    await tester.superTap(find.byKey(const Key('news_piece_options_button')));
+    await tester.superTap(
+        find.text(context.strings.news_feed_page_report_news_piece_btn));
+
+    expect(userReportsMaker.getReports_testing(), isEmpty);
+
+    await tester.superEnterText(
+        find.byKey(const Key('report_text')), 'Bad, bad news piece!');
+    await tester.superTap(find.text(context.strings.global_send));
+
+    expect(userReportsMaker.getReports_testing().length, equals(1));
   });
 }

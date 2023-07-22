@@ -6,6 +6,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
+import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_where_product_sold_obtainer.dart';
 import 'package:plante/outside/news/news_cluster.dart';
@@ -27,6 +28,7 @@ import 'package:plante/ui/map/latest_camera_pos_storage.dart';
 import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page_model.dart';
 import 'package:plante/ui/news/news_piece_product_at_shop_widget.dart';
+import 'package:plante/ui/report/report_dialog.dart';
 
 class NewsFeedPage extends PagePlante {
   static const _DEFAULT_NEWS_LIFETIME_SECS = 60 * 6; // 5 minutes
@@ -46,6 +48,7 @@ class NewsFeedPage extends PagePlante {
 }
 
 class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
+  final _reportsMaker = GetIt.I.get<UserReportsMaker>();
   late final _model = NewsFeedPageModel(
     GetIt.I.get<NewsFeedManager>(),
     GetIt.I.get<ProductsObtainer>(),
@@ -194,7 +197,8 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
                 cluster,
                 _model.authorAvatarUrl(cluster),
                 _model.authHeaders(),
-                () => _onProductLocationTap(product))));
+                () => _onProductLocationTap(product),
+                () => _onNewsPieceReportTap(cluster))));
   }
 
   void _onProductLocationTap(Product product) async {
@@ -209,6 +213,20 @@ class _NewsFeedPageState extends PageStatePlante<NewsFeedPage> {
       return;
     }
     _showOnMap(shopsRes.unwrap());
+  }
+
+  void _onNewsPieceReportTap(NewsCluster cluster) {
+    // Let's assume the first news piece of the cluster is reported,
+    // because that's the one that the user has seen
+    final newsPiece = cluster.newsPieces.first;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ReportDialog.forNewsPiece(
+            newsPieceId: newsPiece.serverId.toString(),
+            reportsMaker: _reportsMaker);
+      },
+    );
   }
 
   void _showOnMap(List<Shop> shops) {
