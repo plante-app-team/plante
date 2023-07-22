@@ -1,5 +1,6 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:plante/logging/log.dart';
+import 'package:plante/logging/underlying_analytics.dart';
+import 'package:plante/logging/underlying_analytics_firebase.dart';
 import 'package:plante/ui/main/main_page.dart';
 
 class Analytics {
@@ -9,9 +10,11 @@ class Analytics {
     // to be logged.
     MainPage.PAGE_NAME,
   ];
+  final List<UnderlyingAnalytics> _impls;
   String? _lastPage;
 
-  Analytics();
+  Analytics([List<UnderlyingAnalytics>? impls])
+      : _impls = impls ?? [UnderlyingAnalyticsFirebase()];
 
   void sendEvent(String event, [Map<String, dynamic>? params]) {
     _sendEventImpl(event, params);
@@ -19,7 +22,7 @@ class Analytics {
 
   void _sendEventImpl(String event, [Map<String, dynamic>? params]) async {
     Log.i('Analytics event: $event, $params');
-    await FirebaseAnalytics.instance.logEvent(name: event, parameters: params);
+    _impls.forEach((impl) => impl.sendEvent(event, params));
   }
 
   void onPageShown(String pageName) {
@@ -37,8 +40,9 @@ class Analytics {
     }
     Log.i('Analytics page shown: $pageName');
     _lastPage = pageName;
-    await FirebaseAnalytics.instance.setCurrentScreen(screenName: pageName);
-    await FirebaseAnalytics.instance.logEvent(name: 'page_shown_$pageName');
+    _impls.forEach((impl) => impl
+      ..setCurrentPage(pageName)
+      ..sendEvent('page_shown_$pageName'));
   }
 
   void onPageHidden(String? pageName) {

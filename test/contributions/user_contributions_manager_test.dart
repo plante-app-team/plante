@@ -10,6 +10,7 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
+import 'package:plante/outside/backend/user_report_data.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -132,22 +133,30 @@ void main() {
     expect(contributions.first.osmUID, isNull);
   });
 
-  test('listens to user products reports', () async {
+  test('listens to user reports', () async {
     // First request will load data from the backend
     await userContributionsManager.getContributions();
 
-    userReportsMakerObservers.forEach((o) => o.onUserReportMade('333'));
+    userReportsMakerObservers.forEach(
+        (o) => o.onUserReportMade(ProductReportData('my report', '333')));
+    userReportsMakerObservers.forEach(
+        (o) => o.onUserReportMade(NewsPieceReportData('my report', '123')));
 
     final contributions =
         (await userContributionsManager.getContributions()).unwrap();
-    expect(contributions.length, equals(1));
+    expect(contributions.length, equals(2));
 
-    expect(contributions.first.time.difference(DateTime.now()).inSeconds,
-        lessThanOrEqualTo(1));
-    expect(contributions.first.type,
-        equals(UserContributionType.PRODUCT_REPORTED));
-    expect(contributions.first.barcode, equals('333'));
-    expect(contributions.first.osmUID, isNull);
+    for (final contribution in contributions) {
+      expect(contribution.time.difference(DateTime.now()).inSeconds,
+          lessThanOrEqualTo(1));
+    }
+
+    expect(contributions[0].type, equals(UserContributionType.REPORT_WAS_MADE));
+    expect(contributions[0].barcode, equals('333'));
+    expect(contributions[0].osmUID, isNull);
+    expect(contributions[1].type, equals(UserContributionType.REPORT_WAS_MADE));
+    expect(contributions[1].barcode, isNull);
+    expect(contributions[1].osmUID, isNull);
   });
 
   test('listens to products being added to shops', () async {

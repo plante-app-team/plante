@@ -479,7 +479,8 @@ void main() {
     final backend = Backend(analytics, await _initUserParams(), httpClient);
     httpClient.setResponse('.*make_report.*', ''' { "result": "ok" } ''');
 
-    final result = await backend.sendReport('123', "that's a baaaad product");
+    final result =
+        await backend.sendReport("that's a baaaad product", barcode: '123');
     expect(result.isOk, isTrue);
   });
 
@@ -489,7 +490,7 @@ void main() {
     httpClient.setResponse('.*make_report.*', ''' { "result": "ok" } ''');
 
     expect(analytics.allEvents(), equals([]));
-    await backend.sendReport('123', "that's a baaaad product");
+    await backend.sendReport("that's a baaaad product", barcode: '123');
     expect(analytics.allEvents().length, equals(1));
     expect(
         analytics.firstSentEvent('report_sent').second,
@@ -505,7 +506,8 @@ void main() {
     httpClient.setResponseException(
         '.*make_report.*', const SocketException(''));
 
-    final result = await backend.sendReport('123', "that's a baaaad product");
+    final result =
+        await backend.sendReport("that's a baaaad product", barcode: '123');
     expect(result.unwrapErr().errorKind, BackendErrorKind.NETWORK_ERROR);
   });
 

@@ -7,6 +7,7 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/user_report_data.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/outside/map/shops_manager_types.dart';
@@ -19,7 +20,7 @@ class UserContributionsManager {
     UserContributionType.UNKNOWN,
     UserContributionType.PRODUCT_EDITED,
     UserContributionType.PRODUCT_ADDED_TO_SHOP,
-    UserContributionType.PRODUCT_REPORTED,
+    UserContributionType.REPORT_WAS_MADE,
     UserContributionType.SHOP_CREATED,
     UserContributionType.LEGACY_PRODUCT_EDITED,
   };
@@ -77,13 +78,18 @@ class UserContributionsManager {
         barcode: product.barcode));
   }
 
-  void _onUserReportMade(String barcode) {
+  void _onUserReportMade(UserReportData reportData) {
     if (!_backendContributionsRequest.done) {
       return;
     }
-    _contributions.add(UserContribution.create(
-        UserContributionType.PRODUCT_REPORTED, DateTime.now(),
-        barcode: barcode));
+    final contribution = switch (reportData) {
+      ProductReportData() => UserContribution.create(
+          UserContributionType.REPORT_WAS_MADE, DateTime.now(),
+          barcode: reportData.barcode),
+      NewsPieceReportData() => UserContribution.create(
+          UserContributionType.REPORT_WAS_MADE, DateTime.now()),
+    };
+    _contributions.add(contribution);
   }
 
   void _onShopCreated(Shop shop) {
@@ -113,7 +119,7 @@ class _EverythingObserver
         ShopsManagerListener,
         UserReportsMakerObserver {
   ArgCallback<Product> onProductEditedFn;
-  ArgCallback<String> onUserReportMadeFn;
+  ArgCallback<UserReportData> onUserReportMadeFn;
   ArgCallback<Shop> onShopCreatedFn;
   void Function(Product product, List<Shop> shops) onProductPutToShopsFn;
 
@@ -129,8 +135,8 @@ class _EverythingObserver
   }
 
   @override
-  void onUserReportMade(String barcode) {
-    onUserReportMadeFn.call(barcode);
+  void onUserReportMade(UserReportData reportData) {
+    onUserReportMadeFn.call(reportData);
   }
 
   @override

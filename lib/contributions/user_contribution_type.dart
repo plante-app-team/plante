@@ -2,7 +2,7 @@ enum UserContributionType {
   UNKNOWN,
   PRODUCT_EDITED,
   PRODUCT_ADDED_TO_SHOP,
-  PRODUCT_REPORTED,
+  REPORT_WAS_MADE,
   SHOP_CREATED,
   LEGACY_PRODUCT_EDITED,
 }
@@ -22,7 +22,7 @@ extension UserContributionTypeExt on UserContributionType {
         return 1;
       case UserContributionType.PRODUCT_ADDED_TO_SHOP:
         return 2;
-      case UserContributionType.PRODUCT_REPORTED:
+      case UserContributionType.REPORT_WAS_MADE:
         return 3;
       case UserContributionType.SHOP_CREATED:
         return 4;

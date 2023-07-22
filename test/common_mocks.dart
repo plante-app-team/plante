@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mockito/annotations.dart';
@@ -39,6 +40,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
   BackendObserver,
   ContributedByUserProductsStorage,
   DirectionsManager,
+  FirebaseAnalytics,
   GeolocatorWrapper,
   GoogleAuthorizer,
   GoogleMapController,

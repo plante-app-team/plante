@@ -317,6 +317,7 @@
     "@news_feed_page_label_for_new_product_at_shop": {
         "description": "Label displayed on news pieces about new products added to certain shops (1 news piece = 1 product added to 1 shop)"
     },
+    "news_feed_page_report_news_piece_btn": "Report the news piece",
     "pick_existing_shop_page_title": "There are some stores nearby - maybe the new shop is already among them?",
     "@pick_existing_shop_page_title": {
         "description": "When the user wants to create a new store, we first check if there are any stores nearby, so that the user wouldn't create a duplicate of an existing store. If we find stores nearby, we open a page with a list of these stores, and ask the user if the store they wanted to create is among the stores we've found. The English title is long - hopefully translations to other languages won't be too much longer, because a user's attention span is short and they might not even read long sentences unfortunately."
@@ -333,8 +334,6 @@
     "@products_history_widget_no_history_hint": {
         "description": "A hint which is shown instead of a list of products when the user hasn't scanned any products yet"
     },
-    "product_report_dialog_report_sent": "Report sent",
-    "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
     "profile_page_edit_profile": "Edit profile",
     "@profile_page_edit_profile": {
         "description": "A button in User Profile which initiates user profile editing (changes of name, avatar, ...)"
@@ -574,5 +573,8 @@
     "app_markets_keywords": "Vegan, food, stores, shops, groceries",
     "@app_markets_keywords": {
         "description": "A list of keywords the app specifies on Play Market and Apple Store. The keywords are used to optimize Apple's/Google's search engine - so that when a user would search for 'vegan stores' our app would be found. It's not necessary to do a literal translation of the words, and you can also add words you think the people of your language might use to search for the app."
-    }
+    },
+    "product_report_dialog_report_sent": "Report sent",
+    "product_report_dialog_title": "Please let us know if you think the product information needs to be edited or extended",
+    "news_piece_report_dialog_title": "Please let us know if you think there's something not right with the news piece"
 }
