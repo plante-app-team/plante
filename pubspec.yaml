@@ -152,6 +152,8 @@ flutter:
     - assets/google_icon.svg
     - assets/info_icon.svg
     - assets/list_drag_n_drop.svg
+    - assets/like.svg
+    - assets/like_filled.svg
     - assets/location.svg
     - assets/map_check_mark.svg
     - assets/map_marker_accented.svg

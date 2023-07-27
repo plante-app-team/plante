@@ -25,6 +25,12 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
       serializers.serialize(object.moderatorVeganChoiceReasonsIds,
           specifiedType:
               const FullType(BuiltList, const [const FullType(int)])),
+      'likesCount',
+      serializers.serialize(object.likesCount,
+          specifiedType: const FullType(int)),
+      'likedByMe',
+      serializers.serialize(object.likedByMe,
+          specifiedType: const FullType(bool)),
       'langsPrioritized',
       serializers.serialize(object.langsPrioritized,
           specifiedType:
@@ -124,6 +130,14 @@ class _$ProductSerializer implements StructuredSerializer<Product> {
           result.moderatorVeganSourcesText = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'likesCount':
+          result.likesCount = serializers.deserialize(value,
+              specifiedType: const FullType(int))! as int;
+          break;
+        case 'likedByMe':
+          result.likedByMe = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'langsPrioritized':
           result.langsPrioritized.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
@@ -187,6 +201,10 @@ class _$Product extends Product {
   @override
   final String? moderatorVeganSourcesText;
   @override
+  final int likesCount;
+  @override
+  final bool likedByMe;
+  @override
   final BuiltList<LangCode> langsPrioritized;
   @override
   final BuiltList<String>? brands;
@@ -212,6 +230,8 @@ class _$Product extends Product {
       this.veganStatusSource,
       required this.moderatorVeganChoiceReasonsIds,
       this.moderatorVeganSourcesText,
+      required this.likesCount,
+      required this.likedByMe,
       required this.langsPrioritized,
       this.brands,
       required this.nameLangs,
@@ -224,6 +244,8 @@ class _$Product extends Product {
     BuiltValueNullFieldError.checkNotNull(barcode, r'Product', 'barcode');
     BuiltValueNullFieldError.checkNotNull(moderatorVeganChoiceReasonsIds,
         r'Product', 'moderatorVeganChoiceReasonsIds');
+    BuiltValueNullFieldError.checkNotNull(likesCount, r'Product', 'likesCount');
+    BuiltValueNullFieldError.checkNotNull(likedByMe, r'Product', 'likedByMe');
     BuiltValueNullFieldError.checkNotNull(
         langsPrioritized, r'Product', 'langsPrioritized');
     BuiltValueNullFieldError.checkNotNull(nameLangs, r'Product', 'nameLangs');
@@ -256,6 +278,8 @@ class _$Product extends Product {
         moderatorVeganChoiceReasonsIds ==
             other.moderatorVeganChoiceReasonsIds &&
         moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
+        likesCount == other.likesCount &&
+        likedByMe == other.likedByMe &&
         langsPrioritized == other.langsPrioritized &&
         brands == other.brands &&
         nameLangs == other.nameLangs &&
@@ -274,6 +298,8 @@ class _$Product extends Product {
     _$hash = $jc(_$hash, veganStatusSource.hashCode);
     _$hash = $jc(_$hash, moderatorVeganChoiceReasonsIds.hashCode);
     _$hash = $jc(_$hash, moderatorVeganSourcesText.hashCode);
+    _$hash = $jc(_$hash, likesCount.hashCode);
+    _$hash = $jc(_$hash, likedByMe.hashCode);
     _$hash = $jc(_$hash, langsPrioritized.hashCode);
     _$hash = $jc(_$hash, brands.hashCode);
     _$hash = $jc(_$hash, nameLangs.hashCode);
@@ -295,6 +321,8 @@ class _$Product extends Product {
           ..add(
               'moderatorVeganChoiceReasonsIds', moderatorVeganChoiceReasonsIds)
           ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
+          ..add('likesCount', likesCount)
+          ..add('likedByMe', likedByMe)
           ..add('langsPrioritized', langsPrioritized)
           ..add('brands', brands)
           ..add('nameLangs', nameLangs)
@@ -334,6 +362,14 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   String? get moderatorVeganSourcesText => _$this._moderatorVeganSourcesText;
   set moderatorVeganSourcesText(String? moderatorVeganSourcesText) =>
       _$this._moderatorVeganSourcesText = moderatorVeganSourcesText;
+
+  int? _likesCount;
+  int? get likesCount => _$this._likesCount;
+  set likesCount(int? likesCount) => _$this._likesCount = likesCount;
+
+  bool? _likedByMe;
+  bool? get likedByMe => _$this._likedByMe;
+  set likedByMe(bool? likedByMe) => _$this._likedByMe = likedByMe;
 
   ListBuilder<LangCode>? _langsPrioritized;
   ListBuilder<LangCode> get langsPrioritized =>
@@ -397,6 +433,8 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
       _moderatorVeganChoiceReasonsIds =
           $v.moderatorVeganChoiceReasonsIds.toBuilder();
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
+      _likesCount = $v.likesCount;
+      _likedByMe = $v.likedByMe;
       _langsPrioritized = $v.langsPrioritized.toBuilder();
       _brands = $v.brands?.toBuilder();
       _nameLangs = $v.nameLangs.toBuilder();
@@ -425,6 +463,7 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
   Product build() => _build();
 
   _$Product _build() {
+    Product._defaults(this);
     _$Product _$result;
     try {
       _$result = _$v ??
@@ -436,6 +475,10 @@ class ProductBuilder implements Builder<Product, ProductBuilder> {
               moderatorVeganChoiceReasonsIds:
                   moderatorVeganChoiceReasonsIds.build(),
               moderatorVeganSourcesText: moderatorVeganSourcesText,
+              likesCount: BuiltValueNullFieldError.checkNotNull(
+                  likesCount, r'Product', 'likesCount'),
+              likedByMe: BuiltValueNullFieldError.checkNotNull(
+                  likedByMe, r'Product', 'likedByMe'),
               langsPrioritized: langsPrioritized.build(),
               brands: _brands?.build(),
               nameLangs: nameLangs.build(),

@@ -5,6 +5,7 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/l10n/strings_time_ago.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/outside/news/news_cluster.dart';
+import 'package:plante/ui/base/components/button_icon_text_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/popup/popup_plante.dart';
@@ -20,6 +21,7 @@ class NewsPieceProductAtShopWidget extends StatelessWidget {
   final Future<Map<String, String>> authHeaders;
   final VoidCallback onLocationTap;
   final VoidCallback onReportClick;
+  final VoidCallback onLikeClicked;
   final menuButtonKey = GlobalKey();
   NewsPieceProductAtShopWidget(
       this.product,
@@ -28,6 +30,7 @@ class NewsPieceProductAtShopWidget extends StatelessWidget {
       this.authHeaders,
       this.onLocationTap,
       this.onReportClick,
+      this.onLikeClicked,
       {Key? key})
       : super(key: key);
 
@@ -77,7 +80,16 @@ class NewsPieceProductAtShopWidget extends StatelessWidget {
           SizedBox(
               height: 54,
               child: Row(children: [
-                const Expanded(child: SizedBox.shrink()),
+                Expanded(
+                    child: Row(children: [
+                  const SizedBox(width: 16),
+                  ButtonIconTextPlante(
+                      icon: product.likedByMe
+                          ? SvgPicture.asset('assets/like_filled.svg')
+                          : SvgPicture.asset('assets/like.svg'),
+                      text: product.likesCount.toString(),
+                      onPressed: onLikeClicked)
+                ])),
                 Expanded(
                     child: Align(
                         alignment: Alignment.centerRight,

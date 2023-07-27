@@ -4,6 +4,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:mockito/mockito.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/general_error.dart';
@@ -17,7 +19,10 @@ import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
+import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/likes_cmds.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
 import 'package:plante/outside/map/address_obtainer.dart';
@@ -37,6 +42,7 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 
+import '../../common_mocks.mocks.dart';
 import '../../stateful_stack_for_testing.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
@@ -62,6 +68,7 @@ void main() {
   late LatestCameraPosStorage latestCameraPosStorage;
   late FakeUserAvatarManager userAvatarManager;
   late FakeUserReportsMaker userReportsMaker;
+  late MockBackend backend;
 
   setUp(() async {
     productsObtainer = FakeProductsObtainer();
@@ -84,6 +91,7 @@ void main() {
     });
 
     await latestCameraPosStorage.set(initialPos);
+    backend = GetIt.I.get<Backend>() as MockBackend;
   });
 
   Future<void> scroll(WidgetTester tester, double yDiff) async {
@@ -111,11 +119,13 @@ void main() {
     await scroll(tester, 3000);
   }
 
-  Product createProduct(String name) {
+  Product createProduct(String name, {int likesCount = 0}) {
     lastBarcode += 1;
     final product = ProductLangSlice((e) => e
-      ..barcode = '$lastBarcode'
-      ..name = name).productForTests();
+          ..barcode = '$lastBarcode'
+          ..name = name)
+        .productForTests()
+        .rebuild((e) => e.likesCount = likesCount);
     productsObtainer.addKnownProduct(product);
     return product;
   }
@@ -611,5 +621,52 @@ void main() {
     await tester.superTap(find.text(context.strings.global_send));
 
     expect(userReportsMaker.getReports_testing().length, equals(1));
+  });
+
+  testWidgets('likes', (WidgetTester tester) async {
+    final Result<None, BackendError> result = Ok(None());
+    when(backend.executeCmd(any)).thenAnswer((_) async => result);
+
+    const product1InitialLikes = 111;
+    const product2InitialLikes = 222;
+    final products = [
+      createProduct('Product 1', likesCount: product1InitialLikes),
+      createProduct('Product 2', likesCount: product2InitialLikes),
+    ];
+    for (final product in products) {
+      await addProductToShop(product);
+    }
+
+    await tester.superPump(const NewsFeedPage());
+
+    // Like the first product
+    expect(find.text('${product1InitialLikes + 1}'), findsNothing);
+    await tester.superTap(find.text('$product1InitialLikes'));
+    expect(find.text('${product1InitialLikes + 1}'), findsOneWidget);
+
+    var likeCmd =
+        verify(backend.executeCmd(captureAny)).captured.first as BackendLikeCmd;
+    expect(likeCmd.barcode, equals(products[0].barcode));
+
+    // Like the second product
+    await scrollDown(tester);
+    expect(find.text('${product2InitialLikes + 1}'), findsNothing);
+    await tester.superTap(find.text('$product2InitialLikes'));
+    expect(find.text('${product2InitialLikes + 1}'), findsOneWidget);
+    expect(find.text('$product1InitialLikes'), findsNothing);
+
+    likeCmd =
+        verify(backend.executeCmd(captureAny)).captured.first as BackendLikeCmd;
+    expect(likeCmd.barcode, equals(products[1].barcode));
+
+    // Unlike the second product
+    await scrollDown(tester);
+    expect(find.text('$product2InitialLikes'), findsNothing);
+    await tester.superTap(find.text('${product2InitialLikes + 1}'));
+    expect(find.text('$product2InitialLikes'), findsOneWidget);
+
+    final unlikeCmd = verify(backend.executeCmd(captureAny)).captured.first
+        as BackendUnlikeCmd;
+    expect(unlikeCmd.barcode, equals(products[1].barcode));
   });
 }

@@ -46,11 +46,11 @@ import 'package:plante/model/shop.dart' as _i13;
 import 'package:plante/model/shop_product_range.dart' as _i79;
 import 'package:plante/model/shop_type.dart' as _i80;
 import 'package:plante/model/user_langs.dart' as _i9;
-import 'package:plante/model/user_params.dart' as _i19;
+import 'package:plante/model/user_params.dart' as _i20;
 import 'package:plante/model/user_params_controller.dart' as _i87;
 import 'package:plante/model/veg_status.dart' as _i25;
 import 'package:plante/outside/backend/backend.dart' as _i18;
-import 'package:plante/outside/backend/backend_error.dart' as _i20;
+import 'package:plante/outside/backend/backend_error.dart' as _i19;
 import 'package:plante/outside/backend/backend_product.dart' as _i72;
 import 'package:plante/outside/backend/backend_products_at_shop.dart' as _i28;
 import 'package:plante/outside/backend/backend_response.dart' as _i3;
@@ -366,7 +366,24 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
         returnValue: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
   @override
-  _i4.Future<_i2.Result<_i19.UserParams, _i20.BackendError>> loginOrRegister({
+  _i4.Future<_i2.Result<T, _i19.BackendError>> executeCmd<T>(
+          _i18.BackendCmd<T>? cmd) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #executeCmd,
+          [cmd],
+        ),
+        returnValue: _i4.Future<_i2.Result<T, _i19.BackendError>>.value(
+            _FakeResult_0<T, _i19.BackendError>(
+          this,
+          Invocation.method(
+            #executeCmd,
+            [cmd],
+          ),
+        )),
+      ) as _i4.Future<_i2.Result<T, _i19.BackendError>>);
+  @override
+  _i4.Future<_i2.Result<_i20.UserParams, _i19.BackendError>> loginOrRegister({
     String? googleIdToken,
     String? appleAuthorizationCode,
   }) =>
@@ -380,8 +397,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
           },
         ),
         returnValue:
-            _i4.Future<_i2.Result<_i19.UserParams, _i20.BackendError>>.value(
-                _FakeResult_0<_i19.UserParams, _i20.BackendError>(
+            _i4.Future<_i2.Result<_i20.UserParams, _i19.BackendError>>.value(
+                _FakeResult_0<_i20.UserParams, _i19.BackendError>(
           this,
           Invocation.method(
             #loginOrRegister,
@@ -392,10 +409,10 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i19.UserParams, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i20.UserParams, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<bool, _i20.BackendError>> updateUserParams(
-    _i19.UserParams? userParams, {
+  _i4.Future<_i2.Result<bool, _i19.BackendError>> updateUserParams(
+    _i20.UserParams? userParams, {
     String? backendClientTokenOverride,
   }) =>
       (super.noSuchMethod(
@@ -404,8 +421,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
           [userParams],
           {#backendClientTokenOverride: backendClientTokenOverride},
         ),
-        returnValue: _i4.Future<_i2.Result<bool, _i20.BackendError>>.value(
-            _FakeResult_0<bool, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<bool, _i19.BackendError>>.value(
+            _FakeResult_0<bool, _i19.BackendError>(
           this,
           Invocation.method(
             #updateUserParams,
@@ -413,40 +430,40 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             {#backendClientTokenOverride: backendClientTokenOverride},
           ),
         )),
-      ) as _i4.Future<_i2.Result<bool, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<bool, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<String, _i20.BackendError>> updateUserAvatar(
+  _i4.Future<_i2.Result<String, _i19.BackendError>> updateUserAvatar(
           _i21.Uint8List? avatarBytes) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateUserAvatar,
           [avatarBytes],
         ),
-        returnValue: _i4.Future<_i2.Result<String, _i20.BackendError>>.value(
-            _FakeResult_0<String, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<String, _i19.BackendError>>.value(
+            _FakeResult_0<String, _i19.BackendError>(
           this,
           Invocation.method(
             #updateUserAvatar,
             [avatarBytes],
           ),
         )),
-      ) as _i4.Future<_i2.Result<String, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<String, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> deleteUserAvatar() =>
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> deleteUserAvatar() =>
       (super.noSuchMethod(
         Invocation.method(
           #deleteUserAvatar,
           [],
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #deleteUserAvatar,
             [],
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
   Uri userAvatarUrl(
     String? userId,
@@ -472,7 +489,7 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
         ),
       ) as Uri);
   @override
-  _i4.Future<_i2.Result<List<_i22.UserContribution>, _i20.BackendError>>
+  _i4.Future<_i2.Result<List<_i22.UserContribution>, _i19.BackendError>>
       requestUserContributions(
     int? limit,
     Iterable<_i23.UserContributionType>? types,
@@ -487,8 +504,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                     _i2.Result<List<_i22.UserContribution>,
-                        _i20.BackendError>>.value(
-                _FakeResult_0<List<_i22.UserContribution>, _i20.BackendError>(
+                        _i19.BackendError>>.value(
+                _FakeResult_0<List<_i22.UserContribution>, _i19.BackendError>(
               this,
               Invocation.method(
                 #requestUserContributions,
@@ -499,9 +516,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4.Future<
-              _i2.Result<List<_i22.UserContribution>, _i20.BackendError>>);
+              _i2.Result<List<_i22.UserContribution>, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i24.RequestedProductsResult, _i20.BackendError>>
+  _i4.Future<_i2.Result<_i24.RequestedProductsResult, _i19.BackendError>>
       requestProducts(
     List<String>? barcodes,
     int? page,
@@ -516,8 +533,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                     _i2.Result<_i24.RequestedProductsResult,
-                        _i20.BackendError>>.value(
-                _FakeResult_0<_i24.RequestedProductsResult, _i20.BackendError>(
+                        _i19.BackendError>>.value(
+                _FakeResult_0<_i24.RequestedProductsResult, _i19.BackendError>(
               this,
               Invocation.method(
                 #requestProducts,
@@ -528,9 +545,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4.Future<
-              _i2.Result<_i24.RequestedProductsResult, _i20.BackendError>>);
+              _i2.Result<_i24.RequestedProductsResult, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> createUpdateProduct(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> createUpdateProduct(
     String? barcode, {
     _i25.VegStatus? veganStatus,
     List<_i26.LangCode>? changedLangs,
@@ -544,8 +561,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             #changedLangs: changedLangs,
           },
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #createUpdateProduct,
@@ -556,9 +573,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> sendReport(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> sendReport(
     String? reportText, {
     String? barcode,
     String? newsPieceId,
@@ -572,8 +589,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             #newsPieceId: newsPieceId,
           },
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #sendReport,
@@ -584,43 +601,43 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> sendProductScan(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> sendProductScan(
           String? barcode) =>
       (super.noSuchMethod(
         Invocation.method(
           #sendProductScan,
           [barcode],
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #sendProductScan,
             [barcode],
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i27.MobileAppConfig, _i20.BackendError>>
+  _i4.Future<_i2.Result<_i27.MobileAppConfig, _i19.BackendError>>
       mobileAppConfig() => (super.noSuchMethod(
             Invocation.method(
               #mobileAppConfig,
               [],
             ),
             returnValue: _i4.Future<
-                    _i2.Result<_i27.MobileAppConfig, _i20.BackendError>>.value(
-                _FakeResult_0<_i27.MobileAppConfig, _i20.BackendError>(
+                    _i2.Result<_i27.MobileAppConfig, _i19.BackendError>>.value(
+                _FakeResult_0<_i27.MobileAppConfig, _i19.BackendError>(
               this,
               Invocation.method(
                 #mobileAppConfig,
                 [],
               ),
             )),
-          ) as _i4.Future<_i2.Result<_i27.MobileAppConfig, _i20.BackendError>>);
+          ) as _i4.Future<_i2.Result<_i27.MobileAppConfig, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<List<_i28.BackendProductsAtShop>, _i20.BackendError>>
+  _i4.Future<_i2.Result<List<_i28.BackendProductsAtShop>, _i19.BackendError>>
       requestProductsAtShops(Iterable<_i29.OsmUID>? osmUIDs) =>
           (super.noSuchMethod(
             Invocation.method(
@@ -629,8 +646,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                 _i2.Result<List<_i28.BackendProductsAtShop>,
-                    _i20.BackendError>>.value(_FakeResult_0<
-                List<_i28.BackendProductsAtShop>, _i20.BackendError>(
+                    _i19.BackendError>>.value(_FakeResult_0<
+                List<_i28.BackendProductsAtShop>, _i19.BackendError>(
               this,
               Invocation.method(
                 #requestProductsAtShops,
@@ -638,9 +655,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4.Future<
-              _i2.Result<List<_i28.BackendProductsAtShop>, _i20.BackendError>>);
+              _i2.Result<List<_i28.BackendProductsAtShop>, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<List<_i30.BackendShop>, _i20.BackendError>>
+  _i4.Future<_i2.Result<List<_i30.BackendShop>, _i19.BackendError>>
       requestShopsByOsmUIDs(Iterable<_i29.OsmUID>? osmUIDs) =>
           (super.noSuchMethod(
             Invocation.method(
@@ -649,8 +666,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                     _i2.Result<List<_i30.BackendShop>,
-                        _i20.BackendError>>.value(
-                _FakeResult_0<List<_i30.BackendShop>, _i20.BackendError>(
+                        _i19.BackendError>>.value(
+                _FakeResult_0<List<_i30.BackendShop>, _i19.BackendError>(
               this,
               Invocation.method(
                 #requestShopsByOsmUIDs,
@@ -658,9 +675,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4
-              .Future<_i2.Result<List<_i30.BackendShop>, _i20.BackendError>>);
+              .Future<_i2.Result<List<_i30.BackendShop>, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i31.ShopsInBoundsResponse, _i20.BackendError>>
+  _i4.Future<_i2.Result<_i31.ShopsInBoundsResponse, _i19.BackendError>>
       requestShopsWithin(_i32.CoordsBounds? bounds) => (super.noSuchMethod(
             Invocation.method(
               #requestShopsWithin,
@@ -668,8 +685,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                     _i2.Result<_i31.ShopsInBoundsResponse,
-                        _i20.BackendError>>.value(
-                _FakeResult_0<_i31.ShopsInBoundsResponse, _i20.BackendError>(
+                        _i19.BackendError>>.value(
+                _FakeResult_0<_i31.ShopsInBoundsResponse, _i19.BackendError>(
               this,
               Invocation.method(
                 #requestShopsWithin,
@@ -677,9 +694,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4.Future<
-              _i2.Result<_i31.ShopsInBoundsResponse, _i20.BackendError>>);
+              _i2.Result<_i31.ShopsInBoundsResponse, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i33.ProductPresenceVoteResult, _i20.BackendError>>
+  _i4.Future<_i2.Result<_i33.ProductPresenceVoteResult, _i19.BackendError>>
       productPresenceVote(
     String? barcode,
     _i29.OsmUID? osmUID,
@@ -696,8 +713,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ),
             returnValue: _i4.Future<
                 _i2.Result<_i33.ProductPresenceVoteResult,
-                    _i20.BackendError>>.value(_FakeResult_0<
-                _i33.ProductPresenceVoteResult, _i20.BackendError>(
+                    _i19.BackendError>>.value(_FakeResult_0<
+                _i33.ProductPresenceVoteResult, _i19.BackendError>(
               this,
               Invocation.method(
                 #productPresenceVote,
@@ -709,9 +726,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
               ),
             )),
           ) as _i4.Future<
-              _i2.Result<_i33.ProductPresenceVoteResult, _i20.BackendError>>);
+              _i2.Result<_i33.ProductPresenceVoteResult, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> putProductToShop(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> putProductToShop(
     String? barcode,
     _i13.Shop? shop,
     _i34.ProductAtShopSource? source,
@@ -725,8 +742,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             source,
           ],
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #putProductToShop,
@@ -737,9 +754,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             ],
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i30.BackendShop, _i20.BackendError>> createShop({
+  _i4.Future<_i2.Result<_i30.BackendShop, _i19.BackendError>> createShop({
     required String? name,
     required _i15.Coord? coord,
     required String? type,
@@ -755,8 +772,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
           },
         ),
         returnValue:
-            _i4.Future<_i2.Result<_i30.BackendShop, _i20.BackendError>>.value(
-                _FakeResult_0<_i30.BackendShop, _i20.BackendError>(
+            _i4.Future<_i2.Result<_i30.BackendShop, _i19.BackendError>>.value(
+                _FakeResult_0<_i30.BackendShop, _i19.BackendError>(
           this,
           Invocation.method(
             #createShop,
@@ -768,9 +785,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i30.BackendShop, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i30.BackendShop, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i35.NewsDataResponse, _i20.BackendError>> requestNews(
+  _i4.Future<_i2.Result<_i35.NewsDataResponse, _i19.BackendError>> requestNews(
     _i32.CoordsBounds? bounds, {
     required int? page,
   }) =>
@@ -781,8 +798,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
           {#page: page},
         ),
         returnValue: _i4.Future<
-                _i2.Result<_i35.NewsDataResponse, _i20.BackendError>>.value(
-            _FakeResult_0<_i35.NewsDataResponse, _i20.BackendError>(
+                _i2.Result<_i35.NewsDataResponse, _i19.BackendError>>.value(
+            _FakeResult_0<_i35.NewsDataResponse, _i19.BackendError>(
           this,
           Invocation.method(
             #requestNews,
@@ -790,9 +807,9 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             {#page: page},
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i35.NewsDataResponse, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i35.NewsDataResponse, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> deleteMyUser({
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> deleteMyUser({
     String? googleIdToken,
     String? appleAuthorizationCode,
   }) =>
@@ -805,8 +822,8 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             #appleAuthorizationCode: appleAuthorizationCode,
           },
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #deleteMyUser,
@@ -817,7 +834,7 @@ class MockBackend extends _i1.Mock implements _i18.Backend {
             },
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
   _i4.Future<Map<String, String>> authHeaders(
           {String? backendClientTokenOverride}) =>
@@ -919,7 +936,7 @@ class MockBackendObserver extends _i1.Mock implements _i18.BackendObserver {
   }
 
   @override
-  void onBackendError(_i20.BackendError? error) => super.noSuchMethod(
+  void onBackendError(_i19.BackendError? error) => super.noSuchMethod(
         Invocation.method(
           #onBackendError,
           [error],
@@ -2335,7 +2352,7 @@ class MockMobileAppConfigManager extends _i1.Mock
         returnValue: _i4.Future<void>.value(),
       ) as _i4.Future<void>);
   @override
-  void onUserParamsUpdate(_i19.UserParams? userParams) => super.noSuchMethod(
+  void onUserParamsUpdate(_i20.UserParams? userParams) => super.noSuchMethod(
         Invocation.method(
           #onUserParamsUpdate,
           [userParams],
@@ -3915,16 +3932,16 @@ class MockUserLangsManager extends _i1.Mock implements _i85.UserLangsManager {
         )),
       ) as _i4.Future<_i9.UserLangs>);
   @override
-  _i4.Future<_i2.Result<_i19.UserParams, _i86.UserLangsManagerError>>
+  _i4.Future<_i2.Result<_i20.UserParams, _i86.UserLangsManagerError>>
       setManualUserLangs(List<_i26.LangCode>? userLangs) => (super.noSuchMethod(
             Invocation.method(
               #setManualUserLangs,
               [userLangs],
             ),
             returnValue: _i4.Future<
-                    _i2.Result<_i19.UserParams,
+                    _i2.Result<_i20.UserParams,
                         _i86.UserLangsManagerError>>.value(
-                _FakeResult_0<_i19.UserParams, _i86.UserLangsManagerError>(
+                _FakeResult_0<_i20.UserParams, _i86.UserLangsManagerError>(
               this,
               Invocation.method(
                 #setManualUserLangs,
@@ -3932,7 +3949,7 @@ class MockUserLangsManager extends _i1.Mock implements _i85.UserLangsManager {
               ),
             )),
           ) as _i4
-              .Future<_i2.Result<_i19.UserParams, _i86.UserLangsManagerError>>);
+              .Future<_i2.Result<_i20.UserParams, _i86.UserLangsManagerError>>);
 }
 
 /// A class which mocks [UserLangsManagerObserver].
@@ -3982,15 +3999,15 @@ class MockUserParamsController extends _i1.Mock
         returnValueForMissingStub: null,
       );
   @override
-  _i4.Future<_i19.UserParams?> getUserParams() => (super.noSuchMethod(
+  _i4.Future<_i20.UserParams?> getUserParams() => (super.noSuchMethod(
         Invocation.method(
           #getUserParams,
           [],
         ),
-        returnValue: _i4.Future<_i19.UserParams?>.value(),
-      ) as _i4.Future<_i19.UserParams?>);
+        returnValue: _i4.Future<_i20.UserParams?>.value(),
+      ) as _i4.Future<_i20.UserParams?>);
   @override
-  _i4.Future<void> setUserParams(_i19.UserParams? userParams) =>
+  _i4.Future<void> setUserParams(_i20.UserParams? userParams) =>
       (super.noSuchMethod(
         Invocation.method(
           #setUserParams,
@@ -4010,7 +4027,7 @@ class MockUserReportsMaker extends _i1.Mock implements _i88.UserReportsMaker {
   }
 
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> reportProduct(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> reportProduct(
     String? barcode,
     String? reportText,
   ) =>
@@ -4022,8 +4039,8 @@ class MockUserReportsMaker extends _i1.Mock implements _i88.UserReportsMaker {
             reportText,
           ],
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #reportProduct,
@@ -4033,9 +4050,9 @@ class MockUserReportsMaker extends _i1.Mock implements _i88.UserReportsMaker {
             ],
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
-  _i4.Future<_i2.Result<_i2.None, _i20.BackendError>> reportNewsPiece(
+  _i4.Future<_i2.Result<_i2.None, _i19.BackendError>> reportNewsPiece(
     String? newsPieceId,
     String? reportText,
   ) =>
@@ -4047,8 +4064,8 @@ class MockUserReportsMaker extends _i1.Mock implements _i88.UserReportsMaker {
             reportText,
           ],
         ),
-        returnValue: _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>.value(
-            _FakeResult_0<_i2.None, _i20.BackendError>(
+        returnValue: _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>.value(
+            _FakeResult_0<_i2.None, _i19.BackendError>(
           this,
           Invocation.method(
             #reportNewsPiece,
@@ -4058,7 +4075,7 @@ class MockUserReportsMaker extends _i1.Mock implements _i88.UserReportsMaker {
             ],
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i2.None, _i20.BackendError>>);
+      ) as _i4.Future<_i2.Result<_i2.None, _i19.BackendError>>);
   @override
   void addObserver(_i88.UserReportsMakerObserver? observer) =>
       super.noSuchMethod(

@@ -23,6 +23,17 @@ abstract class BackendProduct
   @BuiltValueField(wireName: 'moderator_vegan_sources_text')
   String? get moderatorVeganSourcesText;
 
+  @BuiltValueField(wireName: 'likes_count')
+  int get likesCount;
+  @BuiltValueField(wireName: 'liked_by_me')
+  bool get likedByMe;
+
+  @BuiltValueHook(finalizeBuilder: true)
+  static void _defaults(BackendProductBuilder b) {
+    b.likesCount ??= 0;
+    b.likedByMe ??= false;
+  }
+
   static BackendProduct? fromJson(Map<String, dynamic> json) {
     return BuildValueHelper.jsonSerializers
         .deserializeWith(BackendProduct.serializer, json);

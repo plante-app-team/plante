@@ -57,7 +57,9 @@ void main() {
     final backendProduct = BackendProduct((v) => v
       ..barcode = '123'
       ..veganStatus = VegStatus.negative.name
-      ..veganStatusSource = VegStatusSource.moderator.name);
+      ..veganStatusSource = VegStatusSource.moderator.name
+      ..likesCount = 100
+      ..likedByMe = true);
     setUpBackendProducts(Ok([backendProduct]));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
@@ -73,7 +75,10 @@ void main() {
           ..imageFront = Uri.parse(offExpectedImageFrontRu)
           ..imageFrontThumb = Uri.parse(offExpectedImageFrontThumbRu)
           ..imageIngredients = Uri.parse(offExpectedImageIngredientsRu))
-        .productForTests();
+        .productForTests()
+        .rebuild((e) => e
+          ..likesCount = 100
+          ..likedByMe = true);
     expect(product, equals(expectedProduct));
   });
 
