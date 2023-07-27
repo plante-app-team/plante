@@ -27,6 +27,9 @@ abstract class Product implements Built<Product, ProductBuilder> {
   BuiltList<int> get moderatorVeganChoiceReasonsIds;
   String? get moderatorVeganSourcesText;
 
+  int get likesCount;
+  bool get likedByMe;
+
   /// Service field to implement single-lang getters
   /// (in [ProductLangsMechanicsExtension]).
   ///
@@ -61,6 +64,12 @@ abstract class Product implements Built<Product, ProductBuilder> {
   Map<String, dynamic> toJson() {
     return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
         as Map<String, dynamic>;
+  }
+
+  @BuiltValueHook(finalizeBuilder: true)
+  static void _defaults(ProductBuilder b) {
+    b.likesCount ??= 0;
+    b.likedByMe ??= false;
   }
 
   factory Product([void Function(ProductBuilder) updates]) = _$Product;

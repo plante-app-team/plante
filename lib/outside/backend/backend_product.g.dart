@@ -23,6 +23,12 @@ class _$BackendProductSerializer
       'barcode',
       serializers.serialize(object.barcode,
           specifiedType: const FullType(String)),
+      'likes_count',
+      serializers.serialize(object.likesCount,
+          specifiedType: const FullType(int)),
+      'liked_by_me',
+      serializers.serialize(object.likedByMe,
+          specifiedType: const FullType(bool)),
     ];
     Object? value;
     value = object.serverId;
@@ -98,6 +104,14 @@ class _$BackendProductSerializer
           result.moderatorVeganSourcesText = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String?;
           break;
+        case 'likes_count':
+          result.likesCount = serializers.deserialize(value,
+              specifiedType: const FullType(int))! as int;
+          break;
+        case 'liked_by_me':
+          result.likedByMe = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
       }
     }
 
@@ -118,6 +132,10 @@ class _$BackendProduct extends BackendProduct {
   final String? moderatorVeganChoiceReasons;
   @override
   final String? moderatorVeganSourcesText;
+  @override
+  final int likesCount;
+  @override
+  final bool likedByMe;
 
   factory _$BackendProduct([void Function(BackendProductBuilder)? updates]) =>
       (new BackendProductBuilder()..update(updates))._build();
@@ -128,10 +146,16 @@ class _$BackendProduct extends BackendProduct {
       this.veganStatus,
       this.veganStatusSource,
       this.moderatorVeganChoiceReasons,
-      this.moderatorVeganSourcesText})
+      this.moderatorVeganSourcesText,
+      required this.likesCount,
+      required this.likedByMe})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         barcode, r'BackendProduct', 'barcode');
+    BuiltValueNullFieldError.checkNotNull(
+        likesCount, r'BackendProduct', 'likesCount');
+    BuiltValueNullFieldError.checkNotNull(
+        likedByMe, r'BackendProduct', 'likedByMe');
   }
 
   @override
@@ -151,7 +175,9 @@ class _$BackendProduct extends BackendProduct {
         veganStatus == other.veganStatus &&
         veganStatusSource == other.veganStatusSource &&
         moderatorVeganChoiceReasons == other.moderatorVeganChoiceReasons &&
-        moderatorVeganSourcesText == other.moderatorVeganSourcesText;
+        moderatorVeganSourcesText == other.moderatorVeganSourcesText &&
+        likesCount == other.likesCount &&
+        likedByMe == other.likedByMe;
   }
 
   @override
@@ -163,6 +189,8 @@ class _$BackendProduct extends BackendProduct {
     _$hash = $jc(_$hash, veganStatusSource.hashCode);
     _$hash = $jc(_$hash, moderatorVeganChoiceReasons.hashCode);
     _$hash = $jc(_$hash, moderatorVeganSourcesText.hashCode);
+    _$hash = $jc(_$hash, likesCount.hashCode);
+    _$hash = $jc(_$hash, likedByMe.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -175,7 +203,9 @@ class _$BackendProduct extends BackendProduct {
           ..add('veganStatus', veganStatus)
           ..add('veganStatusSource', veganStatusSource)
           ..add('moderatorVeganChoiceReasons', moderatorVeganChoiceReasons)
-          ..add('moderatorVeganSourcesText', moderatorVeganSourcesText))
+          ..add('moderatorVeganSourcesText', moderatorVeganSourcesText)
+          ..add('likesCount', likesCount)
+          ..add('likedByMe', likedByMe))
         .toString();
   }
 }
@@ -212,6 +242,14 @@ class BackendProductBuilder
   set moderatorVeganSourcesText(String? moderatorVeganSourcesText) =>
       _$this._moderatorVeganSourcesText = moderatorVeganSourcesText;
 
+  int? _likesCount;
+  int? get likesCount => _$this._likesCount;
+  set likesCount(int? likesCount) => _$this._likesCount = likesCount;
+
+  bool? _likedByMe;
+  bool? get likedByMe => _$this._likedByMe;
+  set likedByMe(bool? likedByMe) => _$this._likedByMe = likedByMe;
+
   BackendProductBuilder();
 
   BackendProductBuilder get _$this {
@@ -223,6 +261,8 @@ class BackendProductBuilder
       _veganStatusSource = $v.veganStatusSource;
       _moderatorVeganChoiceReasons = $v.moderatorVeganChoiceReasons;
       _moderatorVeganSourcesText = $v.moderatorVeganSourcesText;
+      _likesCount = $v.likesCount;
+      _likedByMe = $v.likedByMe;
       _$v = null;
     }
     return this;
@@ -243,6 +283,7 @@ class BackendProductBuilder
   BackendProduct build() => _build();
 
   _$BackendProduct _build() {
+    BackendProduct._defaults(this);
     final _$result = _$v ??
         new _$BackendProduct._(
             serverId: serverId,
@@ -251,7 +292,11 @@ class BackendProductBuilder
             veganStatus: veganStatus,
             veganStatusSource: veganStatusSource,
             moderatorVeganChoiceReasons: moderatorVeganChoiceReasons,
-            moderatorVeganSourcesText: moderatorVeganSourcesText);
+            moderatorVeganSourcesText: moderatorVeganSourcesText,
+            likesCount: BuiltValueNullFieldError.checkNotNull(
+                likesCount, r'BackendProduct', 'likesCount'),
+            likedByMe: BuiltValueNullFieldError.checkNotNull(
+                likedByMe, r'BackendProduct', 'likedByMe'));
     replace(_$result);
     return _$result;
   }

@@ -41,6 +41,35 @@ class BackendObserver {
   void onBackendError(BackendError error) {}
 }
 
+abstract class BackendCmd<T> {
+  late Backend _backend;
+
+  Future<Result<T, BackendError>> execute();
+
+  Future<Result<T, BackendError>> _execute(Backend backend) {
+    _backend = backend;
+    return execute();
+  }
+
+  @protected
+  Future<BackendResponse> backendGet(String path, Map<String, dynamic>? params,
+      {Map<String, String>? headers,
+      String? backendClientTokenOverride,
+      String? body,
+      String? contentType}) async {
+    return await _backend._backendReq(path, params, 'GET',
+        headers: headers,
+        backendClientTokenOverride: backendClientTokenOverride,
+        body: body,
+        contentType: contentType);
+  }
+
+  @protected
+  Result<None, BackendError> noneOrErrorFrom(BackendResponse response) {
+    return _backend._noneOrErrorFrom(response);
+  }
+}
+
 class Backend {
   final Analytics _analytics;
   final UserParamsController _userParamsController;
@@ -56,6 +85,10 @@ class Backend {
   Future<bool> isLoggedIn() async {
     final userParams = await _userParamsController.getUserParams();
     return userParams?.backendClientToken != null;
+  }
+
+  Future<Result<T, BackendError>> executeCmd<T>(BackendCmd<T> cmd) async {
+    return cmd._execute(this);
   }
 
   Future<Result<UserParams, BackendError>> loginOrRegister(

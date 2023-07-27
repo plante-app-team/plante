@@ -6,6 +6,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/cmds/likes_cmds.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -37,7 +38,7 @@ class NewsFeedPageModel {
   late final _lastError = _uiValuesFactory.create<GeneralError?>(null);
   late final _news = _uiValuesFactory.create<List<NewsCluster>>(const []);
 
-  late final _loadedProducts = <String, Product>{};
+  late final _loadedProducts = <String, UIValue<Product?>>{};
   late final _loadedShops = <OsmUID, Shop>{};
 
   var _lastLoadedNewsPage = -1;
@@ -64,7 +65,11 @@ class NewsFeedPageModel {
       this._backend,
       this._uiValuesFactory);
 
-  Product? getProductWith(String barcode) => _loadedProducts[barcode];
+  UIValue<Product?> getProductWith(String barcode) {
+    _loadedProducts[barcode] ??= _uiValuesFactory.create(null);
+    return _loadedProducts[barcode]!;
+  }
+
   Shop? getShopWith(OsmUID uid) => _loadedShops[uid];
   Iterable<Shop> getAllLoadedShops() => _loadedShops.values;
 
@@ -190,7 +195,8 @@ class NewsFeedPageModel {
       return Err(productsRes.unwrapErr().toGeneral());
     }
     for (final product in productsRes.unwrap()) {
-      _loadedProducts[product.barcode] = product;
+      _loadedProducts[product.barcode] ??= _uiValuesFactory.create(null);
+      _loadedProducts[product.barcode]!.setValue(product);
     }
 
     // Obtain shops
@@ -224,5 +230,22 @@ class NewsFeedPageModel {
 
   Future<Map<String, String>> authHeaders() {
     return _backend.authHeaders();
+  }
+
+  Future<void> reverseLikeState(String barcode) async {
+    final product = _loadedProducts[barcode]?.cachedVal;
+    if (product == null) {
+      return;
+    }
+    final liked = !product.likedByMe;
+    _loadedProducts[barcode]!.setValue(product.rebuild((e) => e
+      ..likedByMe = liked
+      ..likesCount = product.likesCount + (liked ? 1 : -1)));
+
+    if (liked) {
+      await _backend.likeProduct(barcode);
+    } else {
+      await _backend.unlikeProduct(barcode);
+    }
   }
 }
