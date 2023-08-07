@@ -10,6 +10,7 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/update_user_params_cmd.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';

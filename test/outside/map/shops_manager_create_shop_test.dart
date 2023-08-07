@@ -1,10 +1,10 @@
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/create_shop_cmd.dart';
+import 'package:plante/outside/backend/cmds/shops_in_bounds_cmd.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
@@ -12,6 +12,7 @@ import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
@@ -20,7 +21,7 @@ import 'shops_manager_test_commons.dart';
 void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
@@ -48,7 +49,7 @@ void main() {
 
   test('shop creation', () async {
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getRequestsMatching_testing('.*'), isEmpty);
 
     // Fetch #1
     final initialShopsRes = await shopsManager.fetchShops(bounds);
@@ -56,22 +57,22 @@ void main() {
     expect(initialShops, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
 
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
 
     // Create a shop
-    verifyNever(backend.createShop(
-        name: anyNamed('name'),
-        coord: anyNamed('coord'),
-        type: anyNamed('type')));
+    expect(backend.getRequestsMatching_testing(CREATE_SHOP_CMD), isEmpty);
     final newShopRes = await shopsManager.createShop(
         name: 'New cool shop',
         coord: Coord(lat: 15, lon: 15),
         type: ShopType.supermarket);
     final newShop = newShopRes.unwrap();
     expect(newShop.name, equals('New cool shop'));
+    expect(
+        backend.getRequestsMatching_testing(CREATE_SHOP_CMD), isNot(isEmpty));
 
     // Fetch #2
     final shopsRes = await shopsManager.fetchShops(bounds);
@@ -87,7 +88,7 @@ void main() {
 
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD), isEmpty);
   });
 
   test('shop creation adds the shop to persistent OSM cache', () async {
@@ -142,11 +143,7 @@ void main() {
     analytics.clearEvents();
 
     // Create a shop failure
-    when(backend.createShop(
-            name: anyNamed('name'),
-            coord: anyNamed('coord'),
-            type: anyNamed('type')))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(CREATE_SHOP_CMD, '', responseCode: 500);
     await shopsManager.createShop(
         name: 'New cool shop',
         coord: Coord(lat: 16, lon: 15),

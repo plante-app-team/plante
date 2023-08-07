@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/shops_in_bounds_cmd.dart';
 import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/fetched_shops.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
@@ -16,12 +18,13 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
   late ShopsManagerBackendWorkerTestCommons commons;
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late MockProductsObtainer productsObtainer;
   late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
@@ -55,7 +58,8 @@ void main() {
     final response = ShopsInBoundsResponse((e) => e
       ..shops.addAll(shopsConverted)
       ..barcodes.addAll(barcodesConverted));
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async => Ok(response));
+    backend.setResponse_testing(
+        SHOPS_IN_BOUNDS_CMD, jsonEncode(response.toJson()));
   }
 
   test('fetchShops with simple bounds without preloaded data', () async {
@@ -206,8 +210,7 @@ void main() {
     setUpShopsResponses(
       osmShops: someOsmShops.values,
     );
-    when(backend.requestShopsWithin(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(SHOPS_IN_BOUNDS_CMD, '', responseCode: 500);
 
     final bounds = CoordsBounds(
       southwest: Coord(lat: 0, lon: 0),

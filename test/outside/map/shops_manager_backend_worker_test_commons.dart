@@ -4,10 +4,11 @@ import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 
 class ShopsManagerBackendWorkerTestCommons {
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late MockProductsObtainer productsObtainer;
 
   final someOsmShops = {
@@ -57,7 +58,7 @@ class ShopsManagerBackendWorkerTestCommons {
     };
 
     osm = MockOsmOverpass();
-    backend = MockBackend();
+    backend = FakeBackend();
     productsObtainer = MockProductsObtainer();
   }
 }

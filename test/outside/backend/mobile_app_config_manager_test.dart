@@ -1,24 +1,24 @@
 import 'dart:async';
+import 'dart:convert';
 
-import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/mobile_app_config_cmd.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
 import 'package:plante/outside/backend/mobile_app_config_manager.dart';
 import 'package:test/test.dart';
 
-import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeUserParamsController userParamsController;
   late FakeSharedPreferences prefs;
 
   setUp(() {
-    backend = MockBackend();
+    backend = FakeBackend();
     userParamsController = FakeUserParamsController();
     prefs = FakeSharedPreferences();
   });
@@ -27,7 +27,8 @@ void main() {
     final remoteConfig = MobileAppConfig((e) => e
       ..remoteUserParams.replace(UserParams((e) => e.backendId = '123'))
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig.toJson()));
     final observer = _FakeObserver();
 
     final mobileAppConfigManager =
@@ -57,7 +58,8 @@ void main() {
     final remoteConfig1 = MobileAppConfig((e) => e
       ..remoteUserParams.replace(UserParams((e) => e.backendId = '123'))
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig1));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig1.toJson()));
 
     // First init
     final mobileAppConfigManager1 =
@@ -68,8 +70,10 @@ void main() {
     // Second init
     // Remote config 2 will be obtained from the backend with a delay
     final remoteConfig2Completer = Completer<MobileAppConfig>();
-    when(backend.mobileAppConfig())
-        .thenAnswer((_) async => Ok(await remoteConfig2Completer.future));
+    backend.setResponseAsyncFunction_testing(
+        MOBILE_APP_CONFIG_CMD,
+        (argument) async =>
+            Ok(jsonEncode((await remoteConfig2Completer.future).toJson())));
 
     final mobileAppConfigManager2 =
         MobileAppConfigManager(backend, userParamsController, prefs.asHolder());
@@ -107,7 +111,8 @@ void main() {
     final remoteConfig1 = MobileAppConfig((e) => e
       ..remoteUserParams.replace(UserParams((e) => e.backendId = '123'))
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig1));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig1.toJson()));
 
     // First init
     final mobileAppConfigManager1 =
@@ -122,8 +127,10 @@ void main() {
     // Second init
     // Remote config 2 will be obtained from the backend with a delay
     final remoteConfig2Completer = Completer<MobileAppConfig>();
-    when(backend.mobileAppConfig())
-        .thenAnswer((_) async => Ok(await remoteConfig2Completer.future));
+    backend.setResponseAsyncFunction_testing(
+        MOBILE_APP_CONFIG_CMD,
+        (argument) async =>
+            Ok(jsonEncode((await remoteConfig2Completer.future).toJson())));
 
     final mobileAppConfigManager2 =
         MobileAppConfigManager(backend, userParamsController, prefs.asHolder());
@@ -153,7 +160,8 @@ void main() {
     final remoteConfig = MobileAppConfig((e) => e
       ..remoteUserParams.replace(UserParams((e) => e.backendId = '123'))
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig.toJson()));
 
     // First init
     final mobileAppConfigManager1 =
@@ -161,7 +169,8 @@ void main() {
     await mobileAppConfigManager1.initFuture;
     await Future.delayed(const Duration(milliseconds: 10));
 
-    clearInteractions(backend);
+    backend.resetRequests_testing();
+    expect(backend.getRequestsMatching_testing(MOBILE_APP_CONFIG_CMD), isEmpty);
 
     // Second init
     final mobileAppConfigManager2 =
@@ -172,7 +181,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Verify the backend was queried
-    verify(backend.mobileAppConfig());
+    expect(backend.getRequestsMatching_testing(MOBILE_APP_CONFIG_CMD),
+        isNot(isEmpty));
     // The config is expected to be the same
     expect(await mobileAppConfigManager2.getConfig(), equals(remoteConfig));
     // Observer expected to be not notified about the
@@ -181,8 +191,7 @@ void main() {
   });
 
   test('backend error on first initialization', () async {
-    when(backend.mobileAppConfig())
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(MOBILE_APP_CONFIG_CMD, '', responseCode: 500);
 
     // First init
     final mobileAppConfigManager =
@@ -197,7 +206,8 @@ void main() {
     final remoteConfig = MobileAppConfig((e) => e
       ..remoteUserParams.replace(UserParams((e) => e.backendId = '123'))
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig.toJson()));
 
     // First init
     final mobileAppConfigManager1 =
@@ -205,9 +215,9 @@ void main() {
     await mobileAppConfigManager1.initFuture;
     await Future.delayed(const Duration(milliseconds: 10));
 
-    clearInteractions(backend);
-    when(backend.mobileAppConfig())
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.reset_testing();
+    expect(backend.getRequestsMatching_testing(MOBILE_APP_CONFIG_CMD), isEmpty);
+    backend.setResponse_testing(MOBILE_APP_CONFIG_CMD, '', responseCode: 500);
 
     // Second init
     final mobileAppConfigManager2 =
@@ -218,7 +228,8 @@ void main() {
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Verify the backend was queried
-    verify(backend.mobileAppConfig());
+    expect(backend.getRequestsMatching_testing(MOBILE_APP_CONFIG_CMD),
+        isNot(isEmpty));
     // The config is expected to be the same
     expect(await mobileAppConfigManager2.getConfig(), equals(remoteConfig));
     // Observer expected to be not notified because there was no
@@ -231,7 +242,8 @@ void main() {
     final remoteConfig = MobileAppConfig((e) => e
       ..remoteUserParams.replace(userParams)
       ..nominatimEnabled = true);
-    when(backend.mobileAppConfig()).thenAnswer((_) async => Ok(remoteConfig));
+    backend.setResponse_testing(
+        MOBILE_APP_CONFIG_CMD, jsonEncode(remoteConfig.toJson()));
     await userParamsController.setUserParams(userParams);
 
     final mobileAppConfigManager =
@@ -255,12 +267,13 @@ void main() {
     expect(observer.lastConfigChangeValue, isNull);
 
     // User params are back!
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     await userParamsController.setUserParams(userParams);
     await Future.delayed(const Duration(milliseconds: 10));
 
     // Backend is queried again
-    verify(backend.mobileAppConfig());
+    expect(backend.getRequestsMatching_testing(MOBILE_APP_CONFIG_CMD),
+        isNot(isEmpty));
     // Ok config, another notification
     expect(await mobileAppConfigManager.getConfig(), equals(remoteConfig));
     expect(observer.notificationsCount, equals(2));

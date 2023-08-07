@@ -11,21 +11,21 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
-import 'package:plante/outside/backend/requested_products_result.dart';
+import 'package:plante/outside/backend/cmds/request_products_cmd.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
 import '../outside/off/off_json_product_images_utils.dart';
+import '../z_fakes/fake_backend.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
   late ProductsManagerTestCommons commons;
   late MockOffApi offApi;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ProductsManager productsManager;
 
   setUp(() async {
@@ -39,8 +39,7 @@ void main() {
     commons.setUpOffProducts(products);
   }
 
-  void setUpBackendProducts(
-      Result<List<BackendProduct>, BackendError> productsRes) {
+  void setUpBackendProducts(Result<List<BackendProduct>, None> productsRes) {
     commons.setUpBackendProducts(productsRes);
   }
 
@@ -188,24 +187,32 @@ void main() {
           ..veganStatusSource = VegStatusSource.moderator.name))
         .toList();
     var zeroBackendPageMet = false; // Plante backend pagination works from 0
-    when(backend.requestProducts(any, any)).thenAnswer((invc) async {
-      final page = invc.positionalArguments[1] as int;
-      if (page == 0) {
+
+    backend.setResponseFunction_testing(REQUEST_PRODUCTS_CMD, (req) {
+      if (req.url.queryParameters['page'] == '0') {
         zeroBackendPageMet = true;
-        return Ok(RequestedProductsResult([
-          backendProducts[0],
-          backendProducts[1],
-          backendProducts[2],
-          backendProducts[3],
-        ], 0, false));
-      } else if (page == 1) {
-        return Ok(RequestedProductsResult([
-          backendProducts[4],
-          backendProducts[5],
-          backendProducts[6],
-        ], 1, true));
+        final result = {
+          'last_page': false,
+          'products': [
+            backendProducts[0].toJson(),
+            backendProducts[1].toJson(),
+            backendProducts[2].toJson(),
+            backendProducts[3].toJson(),
+          ]
+        };
+        return Ok(jsonEncode(result));
+      } else if (req.url.queryParameters['page'] == '1') {
+        final result = {
+          'last_page': true,
+          'products': [
+            backendProducts[4].toJson(),
+            backendProducts[5].toJson(),
+            backendProducts[6].toJson(),
+          ]
+        };
+        return Ok(jsonEncode(result));
       } else {
-        throw Exception("Page 2 should've been the last one");
+        return Err(500);
       }
     });
 
@@ -246,11 +253,10 @@ void main() {
     });
     setUpOffProducts([offProduct]);
 
-    setUpBackendProducts(
-        Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
+    setUpBackendProducts(Err(None()));
 
     final productRes = await productsManager.getProduct('123', [LangCode.ru]);
-    expect(productRes.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
+    expect(productRes.unwrapErr(), equals(ProductsManagerError.OTHER));
   });
 
   test('moderator vegan status choice reasons parsing', () async {
@@ -301,7 +307,10 @@ void main() {
     // Verify received product
     expect(product!.barcode, equals(goodBarcode));
     // Verify good barcode is asked from the backed
-    verify(backend.requestProducts([goodBarcode], any)).called(1);
+    final request =
+        backend.getRequestsMatching_testing(REQUEST_PRODUCTS_CMD).first;
+    final requestedBarcode = request.url.queryParameters['barcodes'];
+    expect(requestedBarcode, equals(goodBarcode));
   });
 
   test('returned products are ordered in the same way as requested barcodes',
@@ -353,6 +362,6 @@ void main() {
     final result = await productsManager.getProducts(const [], [LangCode.en]);
     expect(result.unwrap(), isEmpty);
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
   });
 }

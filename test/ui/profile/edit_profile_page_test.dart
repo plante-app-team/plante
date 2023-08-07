@@ -3,20 +3,19 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/update_user_params_cmd.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/profile/edit_profile_page.dart';
 
-import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
@@ -25,12 +24,12 @@ void main() {
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
   late FakeUserParamsController userParamsController;
   late FakeUserAvatarManager userAvatarManager;
-  late MockBackend backend;
+  late FakeBackend backend;
 
   setUp(() async {
     userParamsController = FakeUserParamsController();
     userAvatarManager = FakeUserAvatarManager(userParamsController);
-    backend = MockBackend();
+    backend = FakeBackend();
 
     await TestDiRegistry.register((r) {
       r.register<UserParamsController>(userParamsController);
@@ -38,7 +37,7 @@ void main() {
       r.register<Backend>(backend);
     });
 
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '{}');
   });
 
   testWidgets('with initial params', (WidgetTester tester) async {
@@ -88,7 +87,8 @@ void main() {
         'Doctor, Doctor, give me a cure');
 
     expect(await userParamsController.getUserParams(), equals(initialParams));
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     expect(find.byType(EditProfilePage), findsOneWidget);
 
     await tester.superTap(find.text(context.strings.global_save));
@@ -99,7 +99,11 @@ void main() {
     // Local user params updated
     expect(await userParamsController.getUserParams(), equals(expectedParams));
     // User params are sent to the backend
-    verify(backend.updateUserParams(expectedParams));
+    final req =
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD).first;
+    expect(req.url.queryParameters['name'], equals(expectedParams.name));
+    expect(req.url.queryParameters['selfDescription'],
+        equals(expectedParams.selfDescription));
     // User avatar IS NOT changed
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
     // The page is closed
@@ -131,7 +135,8 @@ void main() {
     // Local user params are almost same
     expect(await userParamsController.getUserParams(), equals(expectedParams));
     // User params are NOT sent to the backend - user params were not changed
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     // User avatar IS changed
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(1));
     // The page is closed
@@ -150,7 +155,8 @@ void main() {
     // Local user params are not changed
     expect(await userParamsController.getUserParams(), equals(initialParams));
     // User params are not sent to the backend
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     // User avatar is not changed
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
     // The page is closed
@@ -169,7 +175,8 @@ void main() {
     // Local user params are not changed
     expect(await userParamsController.getUserParams(), equals(initialParams));
     // User params are not sent to the backend
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     // User avatar is not changed
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
     // The page is closed
@@ -202,7 +209,8 @@ void main() {
     expect(find.byType(EditProfilePage), findsNothing);
     // Nothing is changed - the page is canceled
     expect(await userParamsController.getUserParams(), equals(initialParams));
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
   });
 
@@ -235,7 +243,8 @@ void main() {
     expect(find.byType(EditProfilePage), findsNothing);
     // Nothing is changed - the page is canceled
     expect(await userParamsController.getUserParams(), equals(initialParams));
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
   });
 
@@ -269,13 +278,13 @@ void main() {
 
     // Nothing is changed - the page is still opened
     expect(await userParamsController.getUserParams(), equals(initialParams));
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     expect(userAvatarManager.callsUpdateUserAvatar_callsCount(), equals(0));
   });
 
   testWidgets('error when saving user params', (WidgetTester tester) async {
-    when(backend.updateUserParams(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '', responseCode: 500);
 
     final initialParams = UserParams((e) => e.name = 'Bob Kelso');
     await userParamsController.setUserParams(initialParams);

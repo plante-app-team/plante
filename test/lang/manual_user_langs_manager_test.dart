@@ -1,29 +1,29 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/lang/manual_user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
 import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/outside/backend/backend_error.dart';
-import 'package:plante/outside/backend/backend_response.dart';
+import 'package:plante/outside/backend/cmds/update_user_params_cmd.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
 import '../z_fakes/fake_analytics.dart';
+import '../z_fakes/fake_backend.dart';
 import '../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late FakeUserParamsController userParamsController;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ManualUserLangsManager userLangsManager;
 
   setUp(() async {
     userParamsController = FakeUserParamsController();
-    backend = MockBackend();
+    backend = FakeBackend();
   });
 
   test('good scenario with set langs', () async {
@@ -112,18 +112,25 @@ void main() {
     userLangsManager =
         ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, jsonEncode({}));
 
     final expectedFinalUserParams = initialUserParams.rebuild((e) =>
         e..langsPrioritized.addAll([LangCode.en.name, LangCode.nl.name]));
 
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
     expect(
         await userParamsController.getUserParams(), equals(initialUserParams));
 
     final res = await userLangsManager.setUserLangs([LangCode.en, LangCode.nl]);
     expect(res.isOk, isTrue);
-    verify(backend.updateUserParams(expectedFinalUserParams));
+
+    final request =
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD).first;
+    expect(request.url.query.contains('langsPrioritized=${LangCode.en.name}'),
+        isTrue);
+    expect(request.url.query.contains('langsPrioritized=${LangCode.nl.name}'),
+        isTrue);
     expect(await userParamsController.getUserParams(),
         equals(expectedFinalUserParams));
   });
@@ -134,9 +141,8 @@ void main() {
     userLangsManager =
         ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Err(
-        BackendError.fromResp(BackendResponse.fromError(
-            const SocketException(''), Uri.tryParse('ya.ru')))));
+    backend.setResponseException_testing(
+        UPDATE_USER_PARAMS_CMD, const SocketException(''));
 
     final res = await userLangsManager.setUserLangs([LangCode.en, LangCode.nl]);
     expect(res.unwrapErr(), equals(UserLangsManagerError.NETWORK));
@@ -152,8 +158,7 @@ void main() {
     userLangsManager =
         ManualUserLangsManager(userParamsController, backend, FakeAnalytics());
 
-    when(backend.updateUserParams(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '', responseCode: 500);
 
     final res = await userLangsManager.setUserLangs([LangCode.en, LangCode.nl]);
     expect(res.unwrapErr(), equals(UserLangsManagerError.OTHER));
@@ -168,7 +173,7 @@ void main() {
     final analytics = FakeAnalytics();
     userLangsManager =
         ManualUserLangsManager(userParamsController, backend, analytics);
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, jsonEncode({}));
 
     expect(analytics.allEvents(), isEmpty);
 

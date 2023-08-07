@@ -30,6 +30,7 @@ import 'package:plante/ui/product/product_page_wrapper.dart';
 import '../../common_mocks.mocks.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_input_products_lang_storage.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
@@ -50,7 +51,7 @@ void main() {
     GetIt.I.registerSingleton<ViewedProductsStorage>(ViewedProductsStorage());
     GetIt.I.registerSingleton<ShopsManager>(MockShopsManager());
     GetIt.I.registerSingleton<PermissionsManager>(MockPermissionsManager());
-    GetIt.I.registerSingleton<Backend>(MockBackend());
+    GetIt.I.registerSingleton<Backend>(FakeBackend());
     GetIt.I.registerSingleton<UserReportsMaker>(MockUserReportsMaker());
     final userLocationManager = MockUserLocationManager();
     when(userLocationManager.lastKnownPositionInstant()).thenReturn(null);

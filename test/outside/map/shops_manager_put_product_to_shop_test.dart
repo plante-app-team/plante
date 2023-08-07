@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/put_product_to_shop_cmd.dart';
+import 'package:plante/outside/backend/cmds/shops_in_bounds_cmd.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -13,13 +16,14 @@ import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_off_geo_helper.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeAnalytics analytics;
   late FakeOffGeoHelper offGeoHelper;
   late ShopsManager shopsManager;
@@ -52,10 +56,11 @@ void main() {
     expect(shops1, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
     // Reset mocks
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
 
     // A range update
     final putRes = await shopsManager.putProductToShops(
@@ -66,7 +71,7 @@ void main() {
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD), isEmpty);
 
     // Ensure +1 product in productsCount
     final shops2 = shopsRes2.unwrap();
@@ -110,8 +115,10 @@ void main() {
     final backendShops = <BackendShop>[];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async =>
-        Ok(commons.createShopsInBoundsResponse(shops: backendShops)));
+    backend.setResponse_testing(
+        SHOPS_IN_BOUNDS_CMD,
+        jsonEncode(
+            commons.createShopsInBoundsResponse(shops: backendShops).toJson()));
     final fullShops = {
       osmShops[0].osmUID: Shop((e) => e..osmShop.replace(osmShops[0])),
     };
@@ -123,10 +130,11 @@ void main() {
     expect(shops1.values.first.backendShop, isNull);
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
     // Reset mocks
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
 
     // A range update
     final putRes = await shopsManager.putProductToShops(
@@ -137,7 +145,7 @@ void main() {
     final shopsRes2 = await shopsManager.fetchShops(bounds);
     // Both backends expected to be NOT touched, cache expected to be used
     verifyNever(osm.fetchShops(bounds: anyNamed('bounds')));
-    verifyNever(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD), isEmpty);
 
     // Ensure a BackendShop is now created even though it didn't exist before
     final shops2 = shopsRes2.unwrap();
@@ -185,8 +193,7 @@ void main() {
     }
 
     // Failure
-    when(backend.putProductToShop(any, any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(PUT_PRODUCT_TO_SHOP_CMD, '', responseCode: 500);
     sourceEventsMap = {
       ProductAtShopSource.MANUAL: 'product_put_to_shop_failure',
       ProductAtShopSource.OFF_SUGGESTION:

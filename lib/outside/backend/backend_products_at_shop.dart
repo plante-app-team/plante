@@ -21,6 +21,11 @@ abstract class BackendProductsAtShop
         .deserializeWith(BackendProductsAtShop.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory BackendProductsAtShop(
           [void Function(BackendProductsAtShopBuilder) updates]) =
       _$BackendProductsAtShop;

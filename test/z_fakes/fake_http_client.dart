@@ -1,18 +1,20 @@
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/result.dart';
 import 'package:plante/outside/http_client.dart';
 
 class FakeHttpClient extends HttpClient {
   late final MockClient _impl;
-  final _responses = <RegExp, ArgResCallback<http.BaseRequest, _Response>>{};
+  final _responses =
+      <RegExp, ArgResCallback<http.BaseRequest, Future<_Response>>>{};
   final _requests = <http.BaseRequest>[];
 
   FakeHttpClient() {
     _impl = MockClient((request) async {
       for (final responsePair in _responses.entries) {
         if (responsePair.key.hasMatch(request.url.toString())) {
-          final response = responsePair.value.call(request);
+          final response = await responsePair.value.call(request);
           if (response.httpResponse != null) {
             return response.httpResponse!;
           } else {
@@ -26,17 +28,28 @@ class FakeHttpClient extends HttpClient {
 
   void setResponse(String regex, String response, {int responseCode = 200}) {
     _responses[RegExp(regex)] =
-        (_) => _Response.ok(http.Response(response, responseCode));
+        (_) async => _Response.ok(http.Response(response, responseCode));
   }
 
   void setResponseFunction(
-      String regex, ArgResCallback<http.BaseRequest, String> fn) {
-    _responses[RegExp(regex)] =
-        (request) => _Response.ok(http.Response(fn.call(request), 200));
+      String regex, ArgResCallback<http.BaseRequest, Result<String, int>> fn) {
+    setResponseAsyncFunction(regex, (req) async => fn.call(req));
+  }
+
+  void setResponseAsyncFunction(String regex,
+      ArgResCallback<http.BaseRequest, Future<Result<String, int>>> fn) {
+    _responses[RegExp(regex)] = (request) async {
+      final resp = await fn.call(request);
+      if (resp.isOk) {
+        return _Response.ok(http.Response(resp.unwrap(), 200));
+      } else {
+        return _Response.ok(http.Response('', resp.unwrapErr()));
+      }
+    };
   }
 
   void setResponseException(String regex, Exception exception) {
-    _responses[RegExp(regex)] = (_) => _Response.err(exception);
+    _responses[RegExp(regex)] = (_) async => _Response.err(exception);
   }
 
   List<http.BaseRequest> getRequestsMatching(String regex) {
@@ -48,6 +61,10 @@ class FakeHttpClient extends HttpClient {
 
   void reset() {
     _responses.clear();
+    _requests.clear();
+  }
+
+  void resetRequests() {
     _requests.clear();
   }
 

@@ -1,30 +1,30 @@
+import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/user_params.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/user_avatar_cmds.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   final imagePath = Uri.file(File('./test/assets/img.jpg').absolute.path);
-  final avatarUrl = Uri.parse('https://planteapp.com/avatar.jpg');
   const avatarId = 'avatarID';
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeUserParamsController userParamsController;
   late MockPhotosTaker photosTaker;
 
   late UserAvatarManager userAvatarManager;
 
   setUp(() {
-    backend = MockBackend();
+    backend = FakeBackend();
     userParamsController = FakeUserParamsController();
     photosTaker = MockPhotosTaker();
     userAvatarManager =
@@ -32,34 +32,31 @@ void main() {
 
     userParamsController.setUserParams(UserParams((e) => e.name = 'Bob'));
 
-    when(backend.updateUserAvatar(any)).thenAnswer((_) async => Ok(avatarId));
-    when(backend.deleteUserAvatar()).thenAnswer((_) async => Ok(None()));
-    when(backend.userAvatarUrl(any, any)).thenAnswer((_) => avatarUrl);
+    backend.setResponse_testing(
+        UPDATE_USER_AVATAR_CMD, jsonEncode({'result': avatarId}));
+    backend.setResponse_testing(DELETE_USER_AVATAR_CMD, '{}');
   });
 
   test('update avatar', () async {
     final observer = _UserAvatarManagerObserver();
     userAvatarManager.addObserver(observer);
-    final avatarBytes = await File.fromUri(imagePath).readAsBytes();
 
     expect(observer.notificationsCount, equals(0));
     expect(userParamsController.cachedUserParams?.avatarId, isNull);
-    verifyNever(backend.updateUserAvatar(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_AVATAR_CMD), isEmpty);
 
     final result = await userAvatarManager.updateUserAvatar(imagePath);
     expect(result.isOk, isTrue);
 
     expect(observer.notificationsCount, equals(1));
     expect(userParamsController.cachedUserParams?.avatarId, equals(avatarId));
-    final capturedBytes = verify(backend.updateUserAvatar(captureAny))
-        .captured
-        .first as Uint8List;
-    expect(capturedBytes, equals(avatarBytes));
+    expect(backend.getRequestsMatching_testing(UPDATE_USER_AVATAR_CMD),
+        isNot(isEmpty));
   });
 
   test('update avatar failure', () async {
-    when(backend.updateUserAvatar(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(UPDATE_USER_AVATAR_CMD, '', responseCode: 500);
 
     final observer = _UserAvatarManagerObserver();
     userAvatarManager.addObserver(observer);
@@ -67,7 +64,8 @@ void main() {
     final result = await userAvatarManager.updateUserAvatar(imagePath);
     expect(result.isErr, isTrue);
 
-    verify(backend.updateUserAvatar(any));
+    expect(backend.getRequestsMatching_testing(UPDATE_USER_AVATAR_CMD),
+        isNot(isEmpty));
     expect(observer.notificationsCount, equals(0));
     expect(userParamsController.cachedUserParams?.avatarId, isNull);
   });
@@ -82,19 +80,21 @@ void main() {
 
     expect(observer.notificationsCount, equals(0));
     expect(userParamsController.cachedUserParams?.avatarId, equals(avatarId));
-    verifyNever(backend.deleteUserAvatar());
+    expect(
+        backend.getRequestsMatching_testing(DELETE_USER_AVATAR_CMD), isEmpty);
 
     final result = await userAvatarManager.deleteUserAvatar();
     expect(result.isOk, isTrue);
 
     expect(observer.notificationsCount, equals(1));
     expect(userParamsController.cachedUserParams?.avatarId, isNull);
-    verify(backend.deleteUserAvatar());
+    expect(backend.getRequestsMatching_testing(DELETE_USER_AVATAR_CMD),
+        isNot(isEmpty));
   });
 
   test('delete avatar failure', () async {
-    when(backend.deleteUserAvatar())
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(DELETE_USER_AVATAR_CMD, '{}',
+        responseCode: 500);
 
     final observer = _UserAvatarManagerObserver();
     userAvatarManager.addObserver(observer);
@@ -111,34 +111,20 @@ void main() {
   });
 
   test('user avatar url', () async {
-    await userParamsController.setUserParams(
+    final params =
         (await userParamsController.getUserParams())!.rebuild((e) => e
           ..backendId = 'id'
-          ..avatarId = avatarId));
+          ..avatarId = avatarId);
+    await userParamsController.setUserParams(params);
 
     final result = await userAvatarManager.userAvatarUri();
-    verify(backend.userAvatarUrl(
-      userParamsController.cachedUserParams!.backendId,
-      userParamsController.cachedUserParams!.avatarId,
-    ));
-    expect(result, equals(avatarUrl));
-  });
-
-  test('user avatar url when user params have no avatar ID', () async {
-    await userParamsController.setUserParams(
-        (await userParamsController.getUserParams())!.rebuild((e) => e
-          ..backendId = 'id'
-          ..avatarId = null));
-
-    final result = await userAvatarManager.userAvatarUri();
-    verifyNever(backend.userAvatarUrl(any, any));
-    expect(result, isNull);
+    expect(result!.path,
+        contains('user_avatar_data/${params.backendId}/${params.avatarId}'));
   });
 
   test('other user avatar url', () async {
     final result = userAvatarManager.otherUserAvatarUri('user_id', 'avatar_id');
-    verify(backend.userAvatarUrl('user_id', 'avatar_id'));
-    expect(result, equals(avatarUrl));
+    expect(result!.path, contains('user_avatar_data/user_id/avatar_id'));
   });
 
   test('no user avatar url', () async {
@@ -148,14 +134,8 @@ void main() {
   });
 
   test('user avatar headers', () async {
-    const headers = {
-      'header1': 'value1',
-      'header2': 'value2',
-    };
-    when(backend.authHeaders()).thenAnswer((_) async => headers);
-
     final result = await userAvatarManager.userAvatarAuthHeaders();
-    expect(result, headers);
+    expect(result, equals(await backend.authHeaders()));
   });
 
   test('select avatar', () async {

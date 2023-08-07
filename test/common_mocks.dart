@@ -36,7 +36,6 @@ import 'package:plante/ui/photos/photos_taker.dart';
 @GenerateMocks([
   AddressObtainer,
   AppleAuthorizer,
-  Backend,
   BackendObserver,
   ContributedByUserProductsStorage,
   DirectionsManager,

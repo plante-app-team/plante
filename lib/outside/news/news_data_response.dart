@@ -18,6 +18,11 @@ abstract class NewsDataResponse
         .deserializeWith(NewsDataResponse.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory NewsDataResponse([void Function(NewsDataResponseBuilder) updates]) =
       _$NewsDataResponse;
   NewsDataResponse._();

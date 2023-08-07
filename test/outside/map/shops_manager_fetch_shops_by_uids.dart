@@ -1,17 +1,19 @@
 import 'package:mockito/mockito.dart';
 import 'package:plante/model/shop.dart';
+import 'package:plante/outside/backend/cmds/shops_by_osm_uids_cmd.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_large_local_cache_impl.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ShopsManager shopsManager;
 
   late Map<OsmUID, Shop> fullShops;
@@ -37,7 +39,7 @@ void main() {
     final result = await shopsManager.fetchShopsByUIDs(fullShops.keys);
     expect(result.unwrap(), equals(fullShops));
 
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
     verifyZeroInteractions(osm);
   });
 
@@ -55,7 +57,8 @@ void main() {
     expect(await cache.getShops(fullShops.keys), equals(fullShops));
 
     // Servers are touched
-    verify(backend.requestShopsByOsmUIDs(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_BY_OSM_UIDS_CMD),
+        isNot(isEmpty));
     verify(osm.fetchShops(
         bounds: anyNamed('bounds'), osmUIDs: anyNamed('osmUIDs')));
   });
@@ -79,7 +82,8 @@ void main() {
     expect(await cache.getShops(fullShops.keys), equals(fullShops));
 
     // Servers are touched
-    verify(backend.requestShopsByOsmUIDs(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_BY_OSM_UIDS_CMD),
+        isNot(isEmpty));
     verify(osm.fetchShops(
         bounds: anyNamed('bounds'), osmUIDs: anyNamed('osmUIDs')));
   });

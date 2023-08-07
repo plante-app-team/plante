@@ -21,6 +21,11 @@ abstract class BackendShop implements Built<BackendShop, BackendShopBuilder> {
         .deserializeWith(BackendShop.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory BackendShop([void Function(BackendShopBuilder) updates]) =
       _$BackendShop;
   BackendShop._();

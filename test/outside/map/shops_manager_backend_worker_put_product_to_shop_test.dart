@@ -1,9 +1,8 @@
-import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/put_product_to_shop_cmd.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -12,11 +11,12 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import 'shops_manager_backend_worker_test_commons.dart';
 
 void main() {
   late ShopsManagerBackendWorkerTestCommons commons;
-  late MockBackend backend;
+  late FakeBackend backend;
   late MockProductsObtainer productsObtainer;
   late ShopsManagerBackendWorker shopsManagerBackendWorker;
 
@@ -51,15 +51,18 @@ void main() {
           ..productsCount = 2)))
     ];
 
-    when(backend.putProductToShop(any, any, any))
-        .thenAnswer((_) async => Ok(None()));
-    verifyNever(backend.putProductToShop(any, any, any));
+    backend.setResponse_testing(PUT_PRODUCT_TO_SHOP_CMD, '{}');
+    expect(
+        backend.getRequestsMatching_testing(PUT_PRODUCT_TO_SHOP_CMD), isEmpty);
 
     final result = await shopsManagerBackendWorker.putProductToShops(
         product, shops, ProductAtShopSource.MANUAL);
     expect(result.isOk, isTrue);
 
-    verify(backend.putProductToShop(any, any, ProductAtShopSource.MANUAL));
+    final request =
+        backend.getRequestsMatching_testing(PUT_PRODUCT_TO_SHOP_CMD).first;
+    expect(request.url.queryParameters['source'],
+        equals(ProductAtShopSource.MANUAL.persistentName));
   });
 
   test('putProductToShops error in the middle', () async {
@@ -95,12 +98,12 @@ void main() {
     ];
 
     var calls = 0;
-    when(backend.putProductToShop(any, any, any)).thenAnswer((_) async {
+    backend.setResponseFunction_testing(PUT_PRODUCT_TO_SHOP_CMD, (req) {
       calls += 1;
       if (calls >= 2) {
-        return Err(BackendError.other());
+        return Err(500);
       }
-      return Ok(None());
+      return Ok('{}');
     });
 
     final result = await shopsManagerBackendWorker.putProductToShops(
@@ -125,8 +128,7 @@ void main() {
           ..productsCount = 2)))
     ];
 
-    when(backend.putProductToShop(any, any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(PUT_PRODUCT_TO_SHOP_CMD, '', responseCode: 500);
 
     final result = await shopsManagerBackendWorker.putProductToShops(
         product, shops, ProductAtShopSource.MANUAL);

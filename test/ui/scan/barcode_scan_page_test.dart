@@ -17,6 +17,7 @@ import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/product_scan_cmd.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -33,6 +34,7 @@ import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_location_manager.dart';
@@ -44,7 +46,7 @@ void main() {
   const validBarcode2 = '1234567890128';
   late MockProductsManager productsManager;
   late FakeProductsObtainer productsObtainer;
-  late MockBackend backend;
+  late FakeBackend backend;
   late MockRouteObserver<ModalRoute<dynamic>> routesObserver;
   late MockPermissionsManager permissionsManager;
   late MockShopsManager shopsManager;
@@ -55,7 +57,7 @@ void main() {
     analytics = FakeAnalytics();
     productsManager = MockProductsManager();
     productsObtainer = FakeProductsObtainer();
-    backend = MockBackend();
+    backend = FakeBackend();
     routesObserver = MockRouteObserver();
     permissionsManager = MockPermissionsManager();
     shopsManager = MockShopsManager();
@@ -79,7 +81,7 @@ void main() {
 
     when(photosTaker.retrieveLostPhoto(any))
         .thenAnswer((realInvocation) async => null);
-    when(backend.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
+    backend.setResponse_testing(PRODUCT_SCAN_CMD, '{}');
     when(permissionsManager.status(any))
         .thenAnswer((_) async => PermissionState.granted);
     when(permissionsManager.request(any))
@@ -320,10 +322,11 @@ void main() {
     final widget = BarcodeScanPage();
     await tester.superPump(widget);
 
-    verifyNever(backend.sendProductScan(any));
+    expect(backend.getRequestsMatching_testing(PRODUCT_SCAN_CMD), isEmpty);
     widget.newScanDataForTesting([_barcode(validBarcode1)]);
     await tester.pumpAndSettle();
-    verify(backend.sendProductScan(any));
+    expect(
+        backend.getRequestsMatching_testing(PRODUCT_SCAN_CMD), isNot(isEmpty));
   });
 
   testWidgets('permission message not shown by default',

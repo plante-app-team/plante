@@ -13,6 +13,8 @@ import 'package:plante/model/product.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
+import 'package:plante/outside/backend/cmds/create_update_product_cmd.dart';
+import 'package:plante/outside/backend/cmds/request_products_cmd.dart';
 import 'package:plante/outside/off/off_api.dart';
 import 'package:plante/outside/off/off_user.dart';
 import 'package:plante/products/products_converter.dart';

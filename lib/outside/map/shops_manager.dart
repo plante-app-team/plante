@@ -53,9 +53,10 @@ class ShopsManager {
 
   /// [largeCache] param is used in the Web Admin project.
   ShopsManager(this._osm, Backend backend, ProductsObtainer productsObtainer,
-      this._analytics, this._osmTerritoriesCacher, this._offGeoHelper,
+      Analytics analytics, this._osmTerritoriesCacher, this._offGeoHelper,
       {ShopsLargeLocalCache? largeCache})
-      : _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
+      : _analytics = analytics,
+        _backendWorker = ShopsManagerBackendWorker(backend, productsObtainer) {
     _territoriesFetcher = ShopsManagerShopsTerritoriesFetcher(
         _backendWorker, _osmTerritoriesCacher);
     _initAsync(largeCache);
@@ -369,6 +370,11 @@ class ShopsManager {
 
   Future<Result<ProductPresenceVoteResult, ShopsManagerError>>
       productPresenceVote(Product product, Shop shop, bool positive) async {
+    _analytics.sendEvent('product_presence_vote', {
+      'barcode': product.barcode,
+      'shop': shop.osmUID.toString(),
+      'vote': positive
+    });
     final result =
         await _backendWorker.productPresenceVote(product, shop, positive);
     if (result.isOk) {

@@ -77,10 +77,10 @@ void initDI() {
   GetIt.I.registerSingleton<AppleAuthorizer>(AppleAuthorizer());
   GetIt.I.registerSingleton<PhotosTaker>(
       PhotosTaker(GetIt.I.get<SharedPreferencesHolder>()));
-  GetIt.I.registerSingleton<Backend>(Backend(GetIt.I.get<Analytics>(),
-      GetIt.I.get<UserParamsController>(), GetIt.I.get<HttpClient>()));
+  GetIt.I.registerSingleton<Backend>(
+      Backend(GetIt.I.get<UserParamsController>(), GetIt.I.get<HttpClient>()));
   GetIt.I.registerSingleton<UserReportsMaker>(
-      UserReportsMaker(GetIt.I.get<Backend>()));
+      UserReportsMaker(GetIt.I.get<Backend>(), GetIt.I.get<Analytics>()));
   GetIt.I.registerSingleton<MobileAppConfigManager>(MobileAppConfigManager(
       GetIt.I.get<Backend>(),
       GetIt.I.get<UserParamsController>(),

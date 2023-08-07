@@ -10,19 +10,19 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
 import '../outside/off/off_json_product_images_utils.dart';
+import '../z_fakes/fake_backend.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
   late ProductsManagerTestCommons commons;
   late MockOffApi offApi;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ProductsManager productsManager;
 
   setUp(() async {
@@ -36,8 +36,7 @@ void main() {
     commons.setUpOffProducts(products);
   }
 
-  void setUpBackendProducts(
-      Result<List<BackendProduct>, BackendError> productsRes) {
+  void setUpBackendProducts(Result<List<BackendProduct>, None> productsRes) {
     commons.setUpBackendProducts(productsRes);
   }
 
@@ -225,9 +224,11 @@ void main() {
     expect(result.isOk, isTrue);
 
     // Verify changed lang
-    verify(backend.createUpdateProduct('123',
-        veganStatus: VegStatus.possible,
-        changedLangs: [LangCode.ru, LangCode.de]));
+    backend.verifyCreateUpdateProductCall(
+      barcode: '123',
+      veganStatus: VegStatus.possible,
+      changedLangs: [LangCode.ru, LangCode.de],
+    );
 
     // Off Product
     final capturedOffProduct = verify(offApi.saveProduct(any, captureAny))
@@ -308,9 +309,11 @@ void main() {
     expect(result.isOk, isTrue);
 
     // Verify changed langs
-    verify(backend.createUpdateProduct(barcode,
-        veganStatus: VegStatus.possible,
-        changedLangs: [LangCode.de, LangCode.en]));
+    backend.verifyCreateUpdateProductCall(
+      barcode: barcode,
+      veganStatus: VegStatus.possible,
+      changedLangs: [LangCode.de, LangCode.en],
+    );
   });
 
   test('changed langs list when not changing any lang params', () async {
@@ -338,7 +341,9 @@ void main() {
     expect(result.isOk, isTrue);
 
     // Verify not changed langs
-    verify(backend.createUpdateProduct(barcode,
-        veganStatus: VegStatus.possible, changedLangs: []));
+    backend.verifyCreateUpdateProductCall(
+      veganStatus: VegStatus.possible,
+      changedLangs: [],
+    );
   });
 }

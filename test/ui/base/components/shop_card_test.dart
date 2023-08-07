@@ -40,6 +40,7 @@ import '../../../common_finders_extension.dart';
 import '../../../common_mocks.mocks.dart';
 import '../../../widget_tester_extension.dart';
 import '../../../z_fakes/fake_analytics.dart';
+import '../../../z_fakes/fake_backend.dart';
 import '../../../z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import '../../../z_fakes/fake_suggested_products_manager.dart';
 import '../../../z_fakes/fake_user_langs_manager.dart';
@@ -49,7 +50,7 @@ void main() {
   late MockShopsManager shopsManager;
   late MockOffShopsManager offShopsManager;
   late FakeUserParamsController userParamsController;
-  late MockBackend backend;
+  late FakeBackend backend;
 
   final shopWithProduct = Shop((e) => e
     ..osmShop.replace(OsmShop((e) => e
@@ -84,7 +85,7 @@ void main() {
     GetIt.I.registerSingleton<ShopsManager>(shopsManager);
     userParamsController = FakeUserParamsController();
     GetIt.I.registerSingleton<UserParamsController>(userParamsController);
-    backend = MockBackend();
+    backend = FakeBackend();
     GetIt.I.registerSingleton<Backend>(backend);
     offShopsManager = MockOffShopsManager();
     when(offShopsManager.findOffShopByName(any, any))

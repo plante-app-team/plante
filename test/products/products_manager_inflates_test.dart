@@ -8,19 +8,20 @@ import 'package:plante/model/lang_code.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
+import 'package:plante/outside/backend/cmds/request_products_cmd.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
 import '../outside/off/off_json_product_images_utils.dart';
+import '../z_fakes/fake_backend.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
   late ProductsManagerTestCommons commons;
   late MockOffApi offApi;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ProductsManager productsManager;
 
   setUp(() async {
@@ -34,8 +35,7 @@ void main() {
     commons.setUpOffProducts(products);
   }
 
-  void setUpBackendProducts(
-      Result<List<BackendProduct>, BackendError> productsRes) {
+  void setUpBackendProducts(Result<List<BackendProduct>, None> productsRes) {
     commons.setUpBackendProducts(productsRes);
   }
 
@@ -74,7 +74,7 @@ void main() {
 
     // We expect the backend to not be touched since
     // we already have a backend product.
-    verifyNever(backend.requestProducts(any, any));
+    expect(backend.getRequestsMatching_testing(REQUEST_PRODUCTS_CMD), isEmpty);
   });
 
   test('inflate many backend products with pagination', () async {
@@ -158,7 +158,7 @@ void main() {
 
     // We expect the backend to not be touched since
     // we already have backend products.
-    verifyNever(backend.requestProducts(any, any));
+    expect(backend.getRequestsMatching_testing(REQUEST_PRODUCTS_CMD), isEmpty);
   });
 
   test('inflate off products', () async {

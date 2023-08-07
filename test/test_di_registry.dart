@@ -38,6 +38,7 @@ import 'package:plante/ui/photos/photos_taker.dart';
 import 'common_mocks.mocks.dart';
 import 'z_fakes/fake_address_obtainer.dart';
 import 'z_fakes/fake_analytics.dart';
+import 'z_fakes/fake_backend.dart';
 import 'z_fakes/fake_caching_user_address_pieces_obtainer.dart';
 import 'z_fakes/fake_input_products_lang_storage.dart';
 import 'z_fakes/fake_products_obtainer.dart';
@@ -156,12 +157,10 @@ class TestDiRegistrar {
     });
 
     _registerProvider<Backend>(() {
-      final instance = MockBackend();
-      when(instance.sendProductScan(any)).thenAnswer((_) async => Ok(None()));
-      when(instance.authHeaders(
-              backendClientTokenOverride:
-                  anyNamed('backendClientTokenOverride')))
-          .thenAnswer((_) async => const {});
+      final userParamsController =
+          _get<UserParamsController>() as FakeUserParamsController;
+      final instance = FakeBackend(userParamsController);
+      instance.setResponse_testing('.*product_scan.*', '{}');
       return instance;
     });
 
