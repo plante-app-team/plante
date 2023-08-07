@@ -1,22 +1,26 @@
+import 'dart:convert';
+
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/date_time_extensions.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
+import 'package:plante/outside/backend/cmds/products_at_shops_cmd.dart';
+import 'package:plante/outside/backend/cmds/put_product_to_shop_cmd.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeProductsObtainer productsObtainer;
   late ShopsManager shopsManager;
 
@@ -53,8 +57,8 @@ void main() {
           rangeBackendProducts[1].barcode: 123457,
         })),
     ];
-    when(backend.requestProductsAtShops(any))
-        .thenAnswer((_) async => Ok(backendProductsAtShops));
+    backend.setResponse_testing(
+        PRODUCTS_AT_SHOPS_CMD, backendProductsAtShops._toJsonResponse());
 
     // First fetch
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
@@ -67,10 +71,11 @@ void main() {
     expect(range1.lastSeenSecs(rangeProducts[1]), equals(123457));
 
     // The first fetch call did send requests
-    verify(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD),
+        isNot(isEmpty));
     expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
 
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     productsObtainer.inflatesBackendProductsCount = 0;
 
     // Second fetch
@@ -79,16 +84,24 @@ void main() {
     expect(range2, equals(range1));
 
     // The second fetch DID NOT send request (it used cache)
-    verifyNever(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD), isEmpty);
     expect(productsObtainer.inflatesBackendProductsCount, equals(0));
 
     // Range update
-    verifyNever(backend.putProductToShop(any, any, any));
+    expect(
+        backend.getRequestsMatching_testing(PUT_PRODUCT_TO_SHOP_CMD), isEmpty);
     final putRes = await shopsManager.putProductToShops(
         rangeProducts[2], [shop], ProductAtShopSource.MANUAL);
     expect(putRes.isOk, isTrue);
-    verify(backend.putProductToShop(
-        rangeProducts[2].barcode, shop, ProductAtShopSource.MANUAL));
+
+    final putProductReq =
+        backend.getRequestsMatching_testing(PUT_PRODUCT_TO_SHOP_CMD).first;
+    expect(putProductReq.url.queryParameters['barcode'],
+        equals(rangeProducts[2].barcode));
+    expect(putProductReq.url.queryParameters['shopOsmUID'],
+        equals(shop.osmUID.toString()));
+    expect(putProductReq.url.queryParameters['source'],
+        equals(ProductAtShopSource.MANUAL.persistentName));
 
     // Third fetch
     final rangeRes3 = await shopsManager.fetchShopProductRange(shop);
@@ -104,7 +117,7 @@ void main() {
     expect(now - range3.lastSeenSecs(rangeProducts[2]), lessThan(10));
 
     // The third fetch DID NOT send request (it used updated cache)
-    verifyNever(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD), isEmpty);
     expect(productsObtainer.inflatesBackendProductsCount, equals(0));
   });
 
@@ -123,19 +136,20 @@ void main() {
           rangeBackendProducts[0].barcode: 123456,
         })),
     ];
-    when(backend.requestProductsAtShops(any))
-        .thenAnswer((_) async => Ok(backendProductsAtShops));
+    backend.setResponse_testing(
+        PRODUCTS_AT_SHOPS_CMD, backendProductsAtShops._toJsonResponse());
 
     // First fetch
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
-    verify(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD),
+        isNot(isEmpty));
     expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
     // And listener was notified about cache update
     verify(listener.onLocalShopsChange());
 
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     clearInteractions(listener);
     productsObtainer.inflatesBackendProductsCount = 0;
 
@@ -144,7 +158,7 @@ void main() {
     final range2 = rangeRes2.unwrap();
     expect(range2, equals(range1));
     // The second fetch DID NOT send request (it used cache)
-    verifyNever(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD), isEmpty);
     expect(productsObtainer.inflatesBackendProductsCount, equals(0));
     // And thus the listener was NOT notified
     verifyNever(listener.onLocalShopsChange());
@@ -169,17 +183,18 @@ void main() {
           rangeBackendProducts[1].barcode: 123457,
         })),
     ];
-    when(backend.requestProductsAtShops(any))
-        .thenAnswer((_) async => Ok(backendProductsAtShops));
+    backend.setResponse_testing(
+        PRODUCTS_AT_SHOPS_CMD, backendProductsAtShops._toJsonResponse());
 
     // First fetch
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
     final range1 = rangeRes1.unwrap();
     // The first fetch call did send requests
-    verify(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD),
+        isNot(isEmpty));
     expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
 
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     productsObtainer.inflatesBackendProductsCount = 0;
 
     // Second fetch
@@ -190,7 +205,17 @@ void main() {
 
     // The second fetch call again DID send requests, because was asked
     // to explicitly
-    verify(backend.requestProductsAtShops(any));
+    expect(backend.getRequestsMatching_testing(PRODUCTS_AT_SHOPS_CMD),
+        isNot(isEmpty));
     expect(productsObtainer.inflatesBackendProductsCount, greaterThan(0));
   });
+}
+
+extension _ListProdutcsAtShop on List<BackendProductsAtShop> {
+  String _toJsonResponse() {
+    final map = {
+      for (final value in this) value.osmUID.toString(): value.toJson()
+    };
+    return jsonEncode({PRODUCTS_AT_SHOPS_CMD_RESULT_FIELD: map});
+  }
 }

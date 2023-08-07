@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:built_collection/built_collection.dart';
+import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/result.dart';
@@ -8,6 +11,10 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/create_shop_cmd.dart';
+import 'package:plante/outside/backend/cmds/put_product_to_shop_cmd.dart';
+import 'package:plante/outside/backend/cmds/shops_by_osm_uids_cmd.dart';
+import 'package:plante/outside/backend/cmds/shops_in_bounds_cmd.dart';
 import 'package:plante/outside/backend/shops_in_bounds_response.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
@@ -17,6 +24,7 @@ import 'package:plante/outside/map/shops_manager.dart';
 
 import '../../common_mocks.mocks.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_mobile_app_config_manager.dart';
 import '../../z_fakes/fake_off_geo_helper.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
@@ -24,7 +32,7 @@ import '../../z_fakes/fake_products_obtainer.dart';
 
 class ShopsManagerTestCommons {
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeProductsObtainer productsObtainer;
   late FakeAnalytics analytics;
   late FakeOsmCacher osmCacher;
@@ -105,15 +113,14 @@ class ShopsManagerTestCommons {
     ];
 
     osm = MockOsmOverpass();
-    backend = MockBackend();
+    backend = FakeBackend();
     productsObtainer = FakeProductsObtainer();
     analytics = FakeAnalytics();
     osmCacher = FakeOsmCacher();
     offGeoHelper = FakeOffGeoHelper();
     shopsManager = await createShopsManager(first: true);
 
-    when(backend.putProductToShop(any, any, any))
-        .thenAnswer((_) async => Ok(None()));
+    backend.setResponse_testing(PUT_PRODUCT_TO_SHOP_CMD, '{}');
     when(osm.fetchShops(
             bounds: anyNamed('bounds'), osmUIDs: anyNamed('osmUIDs')))
         .thenAnswer((invc) async {
@@ -130,11 +137,18 @@ class ShopsManagerTestCommons {
       }
       return Ok(result);
     });
-    when(backend.requestShopsWithin(any)).thenAnswer((invc) async {
+    backend.setResponseFunction_testing(SHOPS_IN_BOUNDS_CMD, (req) {
       final coordsMap = {
         for (final osmShop in osmShops) osmShop.osmUID: osmShop.coord
       };
-      final bounds = invc.positionalArguments[0] as CoordsBounds;
+      final north = double.parse(req.url.queryParameters['north']!);
+      final south = double.parse(req.url.queryParameters['south']!);
+      final west = double.parse(req.url.queryParameters['west']!);
+      final east = double.parse(req.url.queryParameters['east']!);
+      final bounds = CoordsBounds(
+        southwest: Coord(lat: south, lon: west),
+        northeast: Coord(lat: north, lon: east),
+      );
       final result = <BackendShop>[];
       for (final backendShop in backendShops) {
         final coord = coordsMap[backendShop.osmUID];
@@ -142,23 +156,29 @@ class ShopsManagerTestCommons {
           result.add(backendShop);
         }
       }
-      return Ok(createShopsInBoundsResponse(shops: result));
+      return Ok(
+          jsonEncode(createShopsInBoundsResponse(shops: result).toJson()));
     });
-    when(backend.requestShopsByOsmUIDs(any)).thenAnswer((invc) async {
-      final uids = invc.positionalArguments[0] as Iterable<OsmUID>;
-      return Ok(backendShops.where((e) => uids.contains(e.osmUID)).toList());
+
+    backend.setResponseFunction_testing('/$SHOPS_BY_OSM_UIDS_CMD/', (req) {
+      final request = req as http.Request;
+      final uidsStrs = jsonDecode(request.body)['osm_uids'] as List<dynamic>;
+      final uids = uidsStrs.map((e) => OsmUID.parse(e as String));
+      final shops = {
+        for (final shop in backendShops.where((e) => uids.contains(e.osmUID)))
+          shop.osmUID.toString(): shop.toJson()
+      };
+      return Ok(jsonEncode({SHOPS_BY_OSM_UIDS_CMD_RESULT_FIELD: shops}));
     });
 
     productsObtainer.addKnownProducts(rangeProducts);
 
-    when(backend.createShop(
-            name: anyNamed('name'),
-            coord: anyNamed('coord'),
-            type: anyNamed('type')))
-        .thenAnswer((invc) async {
-      final coord = invc.namedArguments[const Symbol('coord')] as Coord;
-      final name = invc.namedArguments[const Symbol('name')] as String;
-      final type = invc.namedArguments[const Symbol('type')] as String;
+    backend.setResponseFunction_testing(CREATE_SHOP_CMD, (req) {
+      final lon = double.parse(req.url.queryParameters['lon']!);
+      final lat = double.parse(req.url.queryParameters['lat']!);
+      final name = req.url.queryParameters['name'];
+      final type = req.url.queryParameters['type'];
+      final coord = Coord(lat: lat, lon: lon);
 
       final backendShop = BackendShop((e) => e
         ..osmUID = OsmUID.parse('1:${randInt(1, 99999)}')
@@ -176,7 +196,7 @@ class ShopsManagerTestCommons {
       fullShops[backendShop.osmUID] = Shop((e) => e
         ..backendShop.replace(backendShop)
         ..osmShop.replace(osmShop));
-      return Ok(backendShop);
+      return Ok(jsonEncode({'osm_uid': backendShop.osmUID.toString()}));
     });
   }
 

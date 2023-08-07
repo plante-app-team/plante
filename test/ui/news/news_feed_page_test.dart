@@ -5,7 +5,6 @@ import 'package:built_value/json_object.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mockito/mockito.dart';
 import 'package:plante/base/coord_utils.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/general_error.dart';
@@ -20,7 +19,6 @@ import 'package:plante/model/shop_type.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
 import 'package:plante/outside/backend/cmds/likes_cmds.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
@@ -42,11 +40,11 @@ import 'package:plante/ui/map/map_page/map_page.dart';
 import 'package:plante/ui/news/news_feed_page.dart';
 import 'package:plante/ui/product/display_product_page.dart';
 
-import '../../common_mocks.mocks.dart';
 import '../../stateful_stack_for_testing.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_address_obtainer.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_news_feed_manager.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import '../../z_fakes/fake_shared_preferences.dart';
@@ -68,7 +66,7 @@ void main() {
   late LatestCameraPosStorage latestCameraPosStorage;
   late FakeUserAvatarManager userAvatarManager;
   late FakeUserReportsMaker userReportsMaker;
-  late MockBackend backend;
+  late FakeBackend backend;
 
   setUp(() async {
     productsObtainer = FakeProductsObtainer();
@@ -91,7 +89,9 @@ void main() {
     });
 
     await latestCameraPosStorage.set(initialPos);
-    backend = GetIt.I.get<Backend>() as MockBackend;
+    backend = GetIt.I.get<Backend>() as FakeBackend;
+    backend.setResponse_testing('/$LIKE_PRODUCT_CMD/', '{}');
+    backend.setResponse_testing('/$UNLIKE_PRODUCT_CMD', '{}');
   });
 
   Future<void> scroll(WidgetTester tester, double yDiff) async {
@@ -624,9 +624,6 @@ void main() {
   });
 
   testWidgets('likes', (WidgetTester tester) async {
-    final Result<None, BackendError> result = Ok(None());
-    when(backend.executeCmd(any)).thenAnswer((_) async => result);
-
     const product1InitialLikes = 111;
     const product2InitialLikes = 222;
     final products = [
@@ -644,9 +641,9 @@ void main() {
     await tester.superTap(find.text('$product1InitialLikes'));
     expect(find.text('${product1InitialLikes + 1}'), findsOneWidget);
 
-    var likeCmd =
-        verify(backend.executeCmd(captureAny)).captured.first as BackendLikeCmd;
-    expect(likeCmd.barcode, equals(products[0].barcode));
+    var req = backend.getRequestsMatching_testing('/$LIKE_PRODUCT_CMD/').first;
+    expect(req.url.queryParameters['barcode'], equals(products[0].barcode));
+    backend.resetRequests_testing();
 
     // Like the second product
     await scrollDown(tester);
@@ -655,9 +652,9 @@ void main() {
     expect(find.text('${product2InitialLikes + 1}'), findsOneWidget);
     expect(find.text('$product1InitialLikes'), findsNothing);
 
-    likeCmd =
-        verify(backend.executeCmd(captureAny)).captured.first as BackendLikeCmd;
-    expect(likeCmd.barcode, equals(products[1].barcode));
+    req = backend.getRequestsMatching_testing('/$LIKE_PRODUCT_CMD/').first;
+    expect(req.url.queryParameters['barcode'], equals(products[1].barcode));
+    backend.resetRequests_testing();
 
     // Unlike the second product
     await scrollDown(tester);
@@ -665,8 +662,7 @@ void main() {
     await tester.superTap(find.text('${product2InitialLikes + 1}'));
     expect(find.text('$product2InitialLikes'), findsOneWidget);
 
-    final unlikeCmd = verify(backend.executeCmd(captureAny)).captured.first
-        as BackendUnlikeCmd;
-    expect(unlikeCmd.barcode, equals(products[1].barcode));
+    req = backend.getRequestsMatching_testing('/$UNLIKE_PRODUCT_CMD/').first;
+    expect(req.url.queryParameters['barcode'], equals(products[1].barcode));
   });
 }

@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/login_cmd.dart';
+import 'package:plante/outside/backend/cmds/update_user_params_cmd.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/apple_user.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
@@ -17,21 +19,22 @@ import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
 import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
   late FakeAnalytics analytics;
   late MockGoogleAuthorizer googleAuthorizer;
   late MockAppleAuthorizer appleAuthorizer;
-  late MockBackend backend;
   late FakeUserParamsController userParamsController;
+  late FakeBackend backend;
 
   setUp(() async {
     googleAuthorizer = MockGoogleAuthorizer();
     appleAuthorizer = MockAppleAuthorizer();
-    backend = MockBackend();
-    analytics = FakeAnalytics();
     userParamsController = FakeUserParamsController();
+    backend = FakeBackend(userParamsController);
+    analytics = FakeAnalytics();
 
     await TestDiRegistry.register((r) {
       r.register<GoogleAuthorizer>(googleAuthorizer);
@@ -41,25 +44,28 @@ void main() {
       r.register<UserParamsController>(userParamsController);
     });
 
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '{}');
   });
 
   testWidgets('Google: successful Google Sign in', (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken')))
-        .thenAnswer((_) async => Ok(UserParams()));
+    backend.setResponse_testing(
+        LOGIN_OR_REGISTER_CMD, jsonEncode(UserParams().toJson()));
 
     expect(analytics.allEvents(), equals([]));
 
     await tester.superPump(const ExternalAuthPage());
 
-    await tester.tap(find.text('Google'));
+    await tester.superTap(find.text('Google'));
 
     // We expect the Google name to be sent to the server
     final expectedParams = UserParams((e) => e.name = 'bob');
     expect(await userParamsController.getUserParams(), equals(expectedParams));
-    verify(backend.updateUserParams(expectedParams));
+    final req =
+        backend.getRequestsMatching_testing(LOGIN_OR_REGISTER_CMD).first;
+    expect(
+        req.url.queryParameters['googleIdToken'], equals(googleUser.idToken));
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('google_auth_start'), isTrue);
@@ -72,9 +78,10 @@ void main() {
 
     await tester.superPump(const ExternalAuthPage());
 
-    await tester.tap(find.text('Google'));
+    await tester.superTap(find.text('Google'));
     expect(await userParamsController.getUserParams(), isNull);
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('google_auth_start'), isTrue);
@@ -85,36 +92,36 @@ void main() {
       (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken')))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(LOGIN_OR_REGISTER_CMD, '', responseCode: 500);
 
     expect(analytics.allEvents(), equals([]));
 
     await tester.superPump(const ExternalAuthPage());
 
-    await tester.tap(find.text('Google'));
+    await tester.superTap(find.text('Google'));
     expect(await userParamsController.getUserParams(), isNull);
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
 
-    expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('google_auth_start'), isTrue);
     expect(analytics.wasEventSent('auth_backend_failure'), isTrue);
+    expect(analytics.allEvents().length, equals(2));
   });
 
   testWidgets('Google: not successful backend params update',
       (WidgetTester tester) async {
     final googleUser = GoogleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(googleAuthorizer.auth()).thenAnswer((_) async => googleUser);
-    when(backend.loginOrRegister(googleIdToken: anyNamed('googleIdToken')))
-        .thenAnswer((_) async => Ok(UserParams()));
-    when(backend.updateUserParams(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(
+        LOGIN_OR_REGISTER_CMD, jsonEncode(UserParams().toJson()));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '', responseCode: 500);
 
     await tester.superPump(const ExternalAuthPage());
 
-    await tester.tap(find.text('Google'));
+    await tester.superTap(find.text('Google'));
     // Params were tried to be updated
-    verify(backend.updateUserParams(any));
+    expect(backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD),
+        isNot(isEmpty));
     // But params were not stored
     expect(await userParamsController.getUserParams(), isNull);
   });
@@ -122,21 +129,23 @@ void main() {
   testWidgets('Apple: successful Apple Sign in', (WidgetTester tester) async {
     final appleUser = AppleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(appleAuthorizer.auth()).thenAnswer((_) async => appleUser);
-    when(backend.loginOrRegister(
-            appleAuthorizationCode: anyNamed('appleAuthorizationCode')))
-        .thenAnswer((_) async => Ok(UserParams()));
+    backend.setResponse_testing(
+        LOGIN_OR_REGISTER_CMD, jsonEncode(UserParams().toJson()));
 
     expect(analytics.allEvents(), equals([]));
 
     final context = await tester.superPump(const ExternalAuthPage());
 
-    await tester
-        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
+    await tester.superTap(
+        find.text(context.strings.external_auth_page_continue_with_apple));
 
     // We expect the Apple name to be sent to the server
     final expectedParams = UserParams((e) => e.name = 'bob');
     expect(await userParamsController.getUserParams(), equals(expectedParams));
-    verify(backend.updateUserParams(expectedParams));
+    final req =
+        backend.getRequestsMatching_testing(LOGIN_OR_REGISTER_CMD).first;
+    expect(req.url.queryParameters['appleAuthorizationCode'],
+        equals(appleUser.authorizationCode));
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('apple_auth_start'), isTrue);
@@ -149,10 +158,11 @@ void main() {
 
     final context = await tester.superPump(const ExternalAuthPage());
 
-    await tester
-        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
+    await tester.superTap(
+        find.text(context.strings.external_auth_page_continue_with_apple));
     expect(await userParamsController.getUserParams(), isNull);
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('apple_auth_start'), isTrue);
@@ -163,18 +173,17 @@ void main() {
       (WidgetTester tester) async {
     final appleUser = AppleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(appleAuthorizer.auth()).thenAnswer((_) async => appleUser);
-    when(backend.loginOrRegister(
-            appleAuthorizationCode: anyNamed('appleAuthorizationCode')))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(LOGIN_OR_REGISTER_CMD, '', responseCode: 500);
 
     expect(analytics.allEvents(), equals([]));
 
     final context = await tester.superPump(const ExternalAuthPage());
 
-    await tester
-        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
+    await tester.superTap(
+        find.text(context.strings.external_auth_page_continue_with_apple));
     expect(await userParamsController.getUserParams(), isNull);
-    verifyNever(backend.updateUserParams(any));
+    expect(
+        backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD), isEmpty);
 
     expect(analytics.allEvents().length, equals(2));
     expect(analytics.wasEventSent('apple_auth_start'), isTrue);
@@ -185,18 +194,17 @@ void main() {
       (WidgetTester tester) async {
     final appleUser = AppleUser('bob', 'bob@bo.net', '123', DateTime.now());
     when(appleAuthorizer.auth()).thenAnswer((_) async => appleUser);
-    when(backend.loginOrRegister(
-            appleAuthorizationCode: anyNamed('appleAuthorizationCode')))
-        .thenAnswer((_) async => Ok(UserParams()));
-    when(backend.updateUserParams(any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(
+        LOGIN_OR_REGISTER_CMD, jsonEncode(UserParams().toJson()));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '', responseCode: 500);
 
     final context = await tester.superPump(const ExternalAuthPage());
 
-    await tester
-        .tap(find.text(context.strings.external_auth_page_continue_with_apple));
+    await tester.superTap(
+        find.text(context.strings.external_auth_page_continue_with_apple));
     // Params were tried to be updated
-    verify(backend.updateUserParams(any));
+    expect(backend.getRequestsMatching_testing(UPDATE_USER_PARAMS_CMD),
+        isNot(isEmpty));
     // But params were not stored
     expect(await userParamsController.getUserParams(), isNull);
   });

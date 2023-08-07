@@ -6,6 +6,7 @@ import 'package:plante/model/shared_preferences_holder.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/cmds/mobile_app_config_cmd.dart';
 import 'package:plante/outside/backend/mobile_app_config.dart';
 
 abstract class MobileAppConfigManagerObserver {

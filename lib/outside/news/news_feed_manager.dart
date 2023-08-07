@@ -3,6 +3,7 @@ import 'package:plante/base/general_error.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/cmds/request_news_cmd.dart';
 import 'package:plante/outside/news/news_piece.dart';
 
 class NewsFeedManager {

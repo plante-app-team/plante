@@ -18,6 +18,11 @@ abstract class ShopsInBoundsResponse
         .deserializeWith(ShopsInBoundsResponse.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory ShopsInBoundsResponse(
           [void Function(ShopsInBoundsResponseBuilder) updates]) =
       _$ShopsInBoundsResponse;

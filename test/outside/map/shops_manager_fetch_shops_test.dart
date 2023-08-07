@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/model/coords_bounds.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_shop.dart';
+import 'package:plante/outside/backend/cmds/shops_in_bounds_cmd.dart';
 import 'package:plante/outside/map/osm/open_street_map.dart';
 import 'package:plante/outside/map/osm/osm_shop.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
@@ -13,13 +15,14 @@ import 'package:plante/outside/map/shops_manager_types.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_osm_cacher.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
   late MockOsmOverpass osm;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeOsmCacher osmCacher;
   late ShopsManager shopsManager;
 
@@ -50,7 +53,7 @@ void main() {
 
   test('shops fetched and then cached', () async {
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
     final listener = MockShopsManagerListener();
     shopsManager.addListener(listener);
 
@@ -60,12 +63,13 @@ void main() {
     expect(shops, equals(fullShops));
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
     // Listener expected to be notified about cache updated
     verify(listener.onLocalShopsChange());
 
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     clearInteractions(listener);
 
     // Fetch #2
@@ -74,7 +78,7 @@ void main() {
     expect(shops2, equals(fullShops));
     // No backends expected to be touched! Cache expected to be used!
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
     // Listener expected to be NOT notified
     verifyZeroInteractions(listener);
   });
@@ -82,13 +86,13 @@ void main() {
   test('shops fetch creates barcodes cache', () async {
     final shops = fullShops.values.toList();
     final uids = shops.map((e) => e.osmUID).toList();
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
-      return Ok(
-          commons.createShopsInBoundsResponse(shops: backendShops, barcodes: {
-        uids[0]: ['123', '345'],
-        uids[1]: ['567', '789'],
-      }));
-    });
+    backend.setResponse_testing(
+        SHOPS_IN_BOUNDS_CMD,
+        jsonEncode(
+            commons.createShopsInBoundsResponse(shops: backendShops, barcodes: {
+          uids[0]: ['123', '345'],
+          uids[1]: ['567', '789'],
+        }).toJson()));
 
     expect(await shopsManager.getBarcodesCacheFor(uids), isEmpty);
     await shopsManager.fetchShops(bounds);
@@ -110,7 +114,7 @@ void main() {
   test('cache behaviour when multiple shops fetches started at the same time',
       () async {
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     // Fetch without await
     final shopsFuture1 = shopsManager.fetchShops(bounds);
@@ -126,22 +130,24 @@ void main() {
     }
     // Both backends expected to be touched exactly once
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
-    verify(backend.requestShopsWithin(any)).called(1);
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD).length,
+        equals(1));
   });
 
   test('shops fetch when cache exists but it is for another area', () async {
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     // Fetch #1
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isOk, isTrue);
     // Both backends expected to be touched
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
 
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
 
     // Fetch #2, another area
     final shopsRes2 = await shopsManager.fetchShops(farBounds);
@@ -149,7 +155,8 @@ void main() {
     // Both backends expected to be touched again!
     // Because the requested area is too far away from the cached one
     verify(osm.fetchShops(bounds: anyNamed('bounds')));
-    verify(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD),
+        isNot(isEmpty));
   });
 
   test('multiple failed shops load attempts and 1 successful', () async {
@@ -164,12 +171,13 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
+    backend.setResponseFunction_testing(SHOPS_IN_BOUNDS_CMD, (req) {
       backendLoadsCount += 1;
       if (backendLoadsCount == 1) {
-        return Err(BackendError.other());
+        return Err(500);
       } else {
-        return Ok(commons.createShopsInBoundsResponse(shops: backendShops));
+        return Ok(jsonEncode(
+            commons.createShopsInBoundsResponse(shops: backendShops).toJson()));
       }
     });
 
@@ -180,16 +188,15 @@ void main() {
     // So the third call will be the final one.
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(3);
     // First call fails, second succeeds.
-    verify(backend.requestShopsWithin(any)).called(2);
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD).length,
+        equals(2));
   });
 
   test('all shops loads failed', () async {
     when(osm.fetchShops(bounds: anyNamed('bounds'))).thenAnswer((_) async {
       return Err(OpenStreetMapError.OTHER);
     });
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
-      return Err(BackendError.other());
-    });
+    backend.setResponse_testing(SHOPS_IN_BOUNDS_CMD, '', responseCode: 500);
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isErr, isTrue);
   });
@@ -206,16 +213,13 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async {
-      return Ok(commons.createShopsInBoundsResponse(shops: backendShops));
-    });
 
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.unwrapErr(), equals(ShopsManagerError.NETWORK_ERROR));
 
     // First call fails with a network errors, other calls don't happen.
     verify(osm.fetchShops(bounds: anyNamed('bounds'))).called(1);
-    verifyNever(backend.requestShopsWithin(any));
+    expect(backend.getRequestsMatching_testing(SHOPS_IN_BOUNDS_CMD), isEmpty);
   });
 
   test('shops fetch: requested bounds sizes', () async {
@@ -233,8 +237,6 @@ void main() {
         return Ok(osmShops);
       }
     });
-    when(backend.requestShopsWithin(any)).thenAnswer(
-        (_) async => Ok(commons.createShopsInBoundsResponse(shops: const [])));
 
     final shopsRes = await shopsManager.fetchShops(bounds);
     expect(shopsRes.isOk, isTrue);
@@ -360,8 +362,10 @@ void main() {
     ];
     when(osm.fetchShops(bounds: anyNamed('bounds')))
         .thenAnswer((_) async => Ok(osmShops));
-    when(backend.requestShopsWithin(any)).thenAnswer((_) async =>
-        Ok(commons.createShopsInBoundsResponse(shops: backendShops)));
+    backend.setResponse_testing(
+        SHOPS_IN_BOUNDS_CMD,
+        jsonEncode(
+            commons.createShopsInBoundsResponse(shops: backendShops).toJson()));
 
     final northeast = Coord(lat: 15, lon: 15);
     final southwest = Coord(lat: 14.999, lon: 14.999);
@@ -390,19 +394,19 @@ void main() {
       'when plante backend returns a shop which is not present in cache '
       'then it is requested from OSM', () async {
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     // Fetch and cache
     var fetchedShopsRes = await shopsManager.fetchShops(bounds);
     clearInteractions(osm);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
     // Ensure shops are cached
     fetchedShopsRes = await shopsManager.fetchShops(bounds);
     var fetchedShops = fetchedShopsRes.unwrap();
     expect(fetchedShops, equals(fullShops));
     // No backends expected to be touched! Cache expected to be used!
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     // Add a shop to backend and to OSM
     final newShopUID = OsmUID.parse('1:123321');
@@ -425,7 +429,7 @@ void main() {
     expect(allCachedOsmShops.map((e) => e.osmUID), isNot(contains(newShopUID)));
     // No backends expected to be touched! Cache expected to be used!
     verifyZeroInteractions(osm);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     // Perform fetch with a new ShopsManager
     final newShopsManager = await commons.createShopsManager();

@@ -39,6 +39,11 @@ abstract class BackendProduct
         .deserializeWith(BackendProduct.serializer, json);
   }
 
+  Map<String, dynamic> toJson() {
+    return BuildValueHelper.jsonSerializers.serializeWith(serializer, this)!
+        as Map<String, dynamic>;
+  }
+
   factory BackendProduct([void Function(BackendProductBuilder) updates]) =
       _$BackendProduct;
   BackendProduct._();

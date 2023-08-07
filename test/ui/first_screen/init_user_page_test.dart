@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/user_langs_manager.dart';
 import 'package:plante/lang/user_langs_manager_error.dart';
@@ -13,13 +11,14 @@ import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/update_user_params_cmd.dart';
 import 'package:plante/outside/backend/user_avatar_manager.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/first_screen/init_user_page.dart';
 
-import '../../common_mocks.mocks.dart';
 import '../../test_di_registry.dart';
 import '../../widget_tester_extension.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_user_avatar_manager.dart';
 import '../../z_fakes/fake_user_langs_manager.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
@@ -28,14 +27,14 @@ void main() {
   const avatarId = FakeUserAvatarManager.DEFAULT_AVATAR_ID;
   late FakeUserParamsController userParamsController;
   late FakeUserLangsManager userLangsManager;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeUserAvatarManager userAvatarManager;
 
   setUp(() async {
     userParamsController = FakeUserParamsController();
     userLangsManager = FakeUserLangsManager([LangCode.en],
         fakeUserParamsController: userParamsController, auto: true);
-    backend = MockBackend();
+    backend = FakeBackend(userParamsController);
     userAvatarManager = FakeUserAvatarManager(userParamsController);
 
     await TestDiRegistry.register((r) {
@@ -45,7 +44,7 @@ void main() {
       r.register<UserAvatarManager>(userAvatarManager);
     });
 
-    when(backend.updateUserParams(any)).thenAnswer((_) async => Ok(true));
+    backend.setResponse_testing(UPDATE_USER_PARAMS_CMD, '{}');
   });
 
   testWidgets('can fill all data and get user params',

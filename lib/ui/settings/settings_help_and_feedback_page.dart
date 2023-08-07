@@ -12,6 +12,7 @@ import 'package:plante/model/user_langs.dart';
 import 'package:plante/model/user_params.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/cmds/delete_my_user_cmd.dart';
 import 'package:plante/outside/identity/apple_authorizer.dart';
 import 'package:plante/outside/identity/google_authorizer.dart';
 import 'package:plante/ui/base/components/circular_progress_indicator_plante.dart';

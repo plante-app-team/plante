@@ -1,6 +1,8 @@
 import 'package:plante/base/result.dart';
+import 'package:plante/logging/analytics.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/report_cmd.dart';
 import 'package:plante/outside/backend/user_report_data.dart';
 
 mixin UserReportsMakerObserver {
@@ -10,8 +12,9 @@ mixin UserReportsMakerObserver {
 class UserReportsMaker {
   final Backend _backend;
   final _observers = <UserReportsMakerObserver>[];
+  final Analytics _analytics;
 
-  UserReportsMaker(this._backend);
+  UserReportsMaker(this._backend, this._analytics);
 
   Future<Result<None, BackendError>> reportProduct(
       String barcode, String reportText) async {
@@ -19,6 +22,8 @@ class UserReportsMaker {
     if (result.isOk) {
       _observers.forEach(
           (o) => o.onUserReportMade(ProductReportData(reportText, barcode)));
+      _analytics
+          .sendEvent('report_sent', {'barcode': barcode, 'report': reportText});
     }
     return result;
   }
@@ -30,6 +35,8 @@ class UserReportsMaker {
     if (result.isOk) {
       _observers.forEach((o) =>
           o.onUserReportMade(NewsPieceReportData(reportText, newsPieceId)));
+      _analytics.sendEvent(
+          'report_sent', {'newsPieceId': newsPieceId, 'report': reportText});
     }
     return result;
   }

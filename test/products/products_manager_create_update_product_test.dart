@@ -8,19 +8,20 @@ import 'package:plante/model/product.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/veg_status.dart';
 import 'package:plante/model/veg_status_source.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
+import 'package:plante/outside/backend/cmds/create_update_product_cmd.dart';
 import 'package:plante/products/products_manager.dart';
 import 'package:plante/products/products_manager_error.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
+import '../z_fakes/fake_backend.dart';
 import 'products_manager_tests_commons.dart';
 
 void main() {
   late ProductsManagerTestCommons commons;
   late MockOffApi offApi;
-  late MockBackend backend;
+  late FakeBackend backend;
   late ProductsManager productsManager;
   late _FakeObserver observer;
 
@@ -41,8 +42,7 @@ void main() {
     commons.ensureProductIsInOFF(product);
   }
 
-  void setUpBackendProducts(
-      Result<List<BackendProduct>, BackendError> productsRes) {
+  void setUpBackendProducts(Result<List<BackendProduct>, None> productsRes) {
     commons.setUpBackendProducts(productsRes);
   }
 
@@ -60,7 +60,7 @@ void main() {
     ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     await productsManager.createUpdateProduct(product);
 
@@ -79,10 +79,8 @@ void main() {
         equals({off.OpenFoodFactsLanguage.RUSSIAN: 'lemon, water'}));
 
     // Backend Product
-    verify(backend.createUpdateProduct('123',
-            veganStatus: VegStatus.negative,
-            changedLangs: anyNamed('changedLangs')))
-        .called(1);
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative, calledTimes: 1);
 
     // Off image front
     final allImages = verify(offApi.addProductImage(any, captureAny)).captured;
@@ -115,7 +113,7 @@ void main() {
     ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     await productsManager.createUpdateProduct(product);
 
@@ -134,10 +132,8 @@ void main() {
         equals({off.OpenFoodFactsLanguage.RUSSIAN: 'lemon, water'}));
 
     // Backend Product
-    verify(backend.createUpdateProduct('123',
-            veganStatus: VegStatus.negative,
-            changedLangs: anyNamed('changedLangs')))
-        .called(1);
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative, calledTimes: 1);
 
     verifyNever(offApi.addProductImage(any, captureAny));
 
@@ -158,7 +154,7 @@ void main() {
     ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     await productsManager.createUpdateProduct(product);
 
@@ -177,10 +173,8 @@ void main() {
         equals({off.OpenFoodFactsLanguage.RUSSIAN: 'lemon, water'}));
 
     // Backend Product
-    verify(backend.createUpdateProduct('123',
-            veganStatus: VegStatus.negative,
-            changedLangs: anyNamed('changedLangs')))
-        .called(1);
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative, calledTimes: 1);
 
     // Off image front
     final allImages = verify(offApi.addProductImage(any, captureAny)).captured;
@@ -210,7 +204,7 @@ void main() {
     ensureProductIsInOFF(product);
 
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     await productsManager.createUpdateProduct(product);
 
@@ -229,10 +223,8 @@ void main() {
         equals({off.OpenFoodFactsLanguage.RUSSIAN: 'lemon, water'}));
 
     // Backend Product
-    verify(backend.createUpdateProduct('123',
-            veganStatus: VegStatus.negative,
-            changedLangs: anyNamed('changedLangs')))
-        .called(1);
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative, calledTimes: 1);
 
     // Off image ingredients
     final allImages = verify(offApi.addProductImage(any, captureAny)).captured;
@@ -308,11 +300,8 @@ void main() {
       ..imageIngredients = Uri.file('/tmp/img2.jpg')).productForTests();
     ensureProductIsInOFF(product);
 
-    when(backend.createUpdateProduct(any,
-            veganStatus: anyNamed('veganStatus'),
-            changedLangs: anyNamed('changedLangs')))
-        .thenAnswer((_) async =>
-            Err(BackendErrorKind.NETWORK_ERROR.toErrorForTesting()));
+    backend.setResponseException_testing(
+        CREATE_UPDATE_PRODUCT_CMD, const SocketException(''));
 
     final result = await productsManager.createUpdateProduct(product);
     expect(result.unwrapErr(), equals(ProductsManagerError.NETWORK_ERROR));
@@ -335,7 +324,7 @@ void main() {
     setUpOffProducts(const []);
 
     verifyZeroInteractions(offApi);
-    verifyZeroInteractions(backend);
+    expect(backend.getAllRequests_testing(), isEmpty);
 
     await productsManager.createUpdateProduct(product);
 
@@ -356,10 +345,8 @@ void main() {
         equals({off.OpenFoodFactsLanguage.RUSSIAN: 'lemon, water'}));
 
     // Backend Product
-    verify(backend.createUpdateProduct('123',
-            veganStatus: VegStatus.negative,
-            changedLangs: anyNamed('changedLangs')))
-        .called(1);
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative, calledTimes: 1);
 
     verifyNever(offApi.addProductImage(any, captureAny));
   });
@@ -429,7 +416,8 @@ void main() {
 
     // Ensure the product was not sent anywhere because it's not changed
     verifyNever(offApi.saveProduct(any, captureAny));
-    verifyNever(backend.createUpdateProduct(any));
+    expect(backend.getRequestsMatching_testing(CREATE_UPDATE_PRODUCT_CMD),
+        isEmpty);
 
     // Observers NOT notified
     expect(observer.editedProducts, isEmpty);
@@ -460,7 +448,8 @@ void main() {
     // Ensure the product was not sent anywhere because only langs priorities
     // are changed
     verifyNever(offApi.saveProduct(any, captureAny));
-    verifyNever(backend.createUpdateProduct(any));
+    expect(backend.getRequestsMatching_testing(CREATE_UPDATE_PRODUCT_CMD),
+        isEmpty);
 
     // Observers NOT notified
     expect(observer.editedProducts, isEmpty);
@@ -487,7 +476,8 @@ void main() {
 
     // Ensure the product was not sent anywhere because it's actually same
     verifyNever(offApi.saveProduct(any, captureAny));
-    verifyNever(backend.createUpdateProduct(any));
+    expect(backend.getRequestsMatching_testing(CREATE_UPDATE_PRODUCT_CMD),
+        isEmpty);
 
     // Observers NOT notified
     expect(observer.editedProducts, isEmpty);
@@ -538,7 +528,8 @@ void main() {
     expect(imageUploadsAttempts[1], equals(off.ImageField.INGREDIENTS));
     // Expect the product was not sent to backend because one of
     // images savings has failed.
-    verifyNever(backend.createUpdateProduct(any));
+    expect(backend.getRequestsMatching_testing(CREATE_UPDATE_PRODUCT_CMD),
+        isEmpty);
 
     // Second attempt
     imageUploadsAttempts.clear();
@@ -552,9 +543,8 @@ void main() {
     // the first attempt has failed.
     expect(imageUploadsAttempts, equals([off.ImageField.INGREDIENTS]));
     // Expect the product WAS sent to backend because now all images are uploaded.
-    verify(backend.createUpdateProduct('123',
-        veganStatus: VegStatus.negative,
-        changedLangs: anyNamed('changedLangs')));
+    backend.verifyCreateUpdateProductCall(
+        barcode: '123', veganStatus: VegStatus.negative);
   });
 }
 

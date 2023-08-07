@@ -1,25 +1,29 @@
+import 'dart:convert';
+
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/date_time_extensions.dart';
-import 'package:plante/base/result.dart';
 import 'package:plante/model/product.dart';
 import 'package:plante/model/shop.dart';
-import 'package:plante/outside/backend/backend_error.dart';
 import 'package:plante/outside/backend/backend_product.dart';
 import 'package:plante/outside/backend/backend_products_at_shop.dart';
-import 'package:plante/outside/backend/product_presence_vote_result.dart';
+import 'package:plante/outside/backend/cmds/product_presence_vote_cmd.dart';
+import 'package:plante/outside/backend/cmds/products_at_shops_cmd.dart';
 import 'package:plante/outside/map/osm/osm_uid.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:test/test.dart';
 
 import '../../common_mocks.mocks.dart';
+import '../../z_fakes/fake_analytics.dart';
+import '../../z_fakes/fake_backend.dart';
 import '../../z_fakes/fake_products_obtainer.dart';
 import 'shops_manager_test_commons.dart';
 
 void main() {
   late ShopsManagerTestCommons commons;
-  late MockBackend backend;
+  late FakeBackend backend;
   late FakeProductsObtainer productsObtainer;
   late ShopsManager shopsManager;
+  late FakeAnalytics analytics;
 
   late Map<OsmUID, Shop> fullShops;
 
@@ -37,6 +41,7 @@ void main() {
     backend = commons.backend;
     productsObtainer = commons.productsObtainer;
     shopsManager = commons.shopsManager;
+    analytics = commons.analytics;
 
     shop = fullShops.values.first;
     // Set up the range
@@ -48,13 +53,13 @@ void main() {
           for (final product in rangeBackendProducts) product.barcode: 123456
         })),
     ];
-    when(backend.requestProductsAtShops(any))
-        .thenAnswer((_) async => Ok(backendProductsAtShops));
+    backend.setResponse_testing(
+        PRODUCTS_AT_SHOPS_CMD, backendProductsAtShops._toJsonResponse());
 
     // Let's put shop's products to cache by doing a fetch
     await shopsManager.fetchShops(commons.bounds);
     await shopsManager.fetchShopProductRange(shop);
-    clearInteractions(backend);
+    backend.resetRequests_testing();
   });
 
   tearDown(() async {
@@ -62,8 +67,8 @@ void main() {
   });
 
   test('positive vote changes last seen time to now', () async {
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
 
     // Verify old time is old
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
@@ -89,8 +94,8 @@ void main() {
   });
 
   test('positive vote does not changes last seen time on errors', () async {
-    when(backend.productPresenceVote(any, any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '',
+        responseCode: 500);
 
     // Memorize old time
     final rangeRes1 = await shopsManager.fetchShopProductRange(shop);
@@ -124,8 +129,8 @@ void main() {
     final initialProductsCount = shopsRes1.unwrap()[shop.osmUID]!.productsCount;
 
     // Vote!
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
     final voteResult =
         await shopsManager.productPresenceVote(newProduct, shop, true);
     expect(voteResult.isOk, isTrue);
@@ -155,8 +160,8 @@ void main() {
     final initialProductsCount = shopsRes1.unwrap()[shop.osmUID]!.productsCount;
 
     // Vote!
-    when(backend.productPresenceVote(any, any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '',
+        responseCode: 500);
     final voteResult =
         await shopsManager.productPresenceVote(newProduct, shop, true);
     expect(voteResult.isErr, isTrue);
@@ -171,8 +176,8 @@ void main() {
 
   test('positive vote adds a barcode to cache if it was not there before',
       () async {
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
 
     final shopsRes = await shopsManager.fetchShops(commons.bounds);
     final uid = shopsRes.unwrap().values.first.osmUID;
@@ -192,8 +197,8 @@ void main() {
 
   test('positive vote does not add a barcode to cache if it is there already',
       () async {
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
 
     final shopsRes = await shopsManager.fetchShops(commons.bounds);
     final uid = shopsRes.unwrap().values.first.osmUID;
@@ -221,8 +226,7 @@ void main() {
     final initialProductsCount = shopsRes1.unwrap()[shop.osmUID]!.productsCount;
 
     // Vote!
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: true)));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": true}');
     final voteResult =
         await shopsManager.productPresenceVote(targetProduct, shop, false);
     expect(voteResult.isOk, isTrue);
@@ -247,8 +251,8 @@ void main() {
     final initialProductsCount = shopsRes1.unwrap()[shop.osmUID]!.productsCount;
 
     // Vote!
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
     final voteResult =
         await shopsManager.productPresenceVote(targetProduct, shop, false);
     expect(voteResult.isOk, isTrue);
@@ -272,8 +276,8 @@ void main() {
     final initialProductsCount = shopsRes1.unwrap()[shop.osmUID]!.productsCount;
 
     // Vote!
-    when(backend.productPresenceVote(any, any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '',
+        responseCode: 500);
     final voteResult =
         await shopsManager.productPresenceVote(targetProduct, shop, false);
     expect(voteResult.isErr, isTrue);
@@ -288,8 +292,7 @@ void main() {
 
   test('negative vote removes a barcode from cache if backend did same',
       () async {
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: true)));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": true}');
 
     final shopsRes = await shopsManager.fetchShops(commons.bounds);
     final uid = shopsRes.unwrap().values.first.osmUID;
@@ -311,8 +314,8 @@ void main() {
 
   test('negative vote does not remove a barcode from cache if backend did not',
       () async {
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
 
     final shopsRes = await shopsManager.fetchShops(commons.bounds);
     final uid = shopsRes.unwrap().values.first.osmUID;
@@ -335,8 +338,8 @@ void main() {
     final listener = MockShopsManagerListener();
     shopsManager.addListener(listener);
 
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: false)));
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
 
     final targetProduct = rangeProducts[0];
 
@@ -358,17 +361,54 @@ void main() {
     verifyZeroInteractions(listener);
 
     // Vote against, once more!
-    when(backend.productPresenceVote(any, any, any)).thenAnswer(
-        (_) async => Ok(ProductPresenceVoteResult(productDeleted: true)));
+    backend.setResponse_testing(PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": true}');
     voteResult =
         await shopsManager.productPresenceVote(targetProduct, shop, false);
     expect(voteResult.isOk, isTrue);
     verify(listener.onLocalShopsChange());
+  });
+
+  test('vote analytics events', () async {
+    backend.setResponse_testing(
+        PRODUCT_PRESENCE_VOTE_CMD, '{"deleted": false}');
+
+    expect(analytics.allEvents(), equals([]));
+
+    final targetProduct = rangeProducts.first;
+    await shopsManager.productPresenceVote(targetProduct, shop, true);
+    expect(analytics.allEvents().length, equals(1));
+    expect(
+        analytics.firstSentEvent('product_presence_vote').second,
+        equals({
+          'barcode': targetProduct.barcode,
+          'shop': shop.osmUID.toString(),
+          'vote': true
+        }));
+    analytics.clearEvents();
+
+    await shopsManager.productPresenceVote(targetProduct, shop, false);
+    expect(analytics.allEvents().length, equals(1));
+    expect(
+        analytics.firstSentEvent('product_presence_vote').second,
+        equals({
+          'barcode': targetProduct.barcode,
+          'shop': shop.osmUID.toString(),
+          'vote': false
+        }));
   });
 }
 
 extension on ShopsManager {
   Future<List<String>?> getBarcodesCacheFor1(OsmUID uid) async {
     return (await getBarcodesCacheFor([uid]))[uid];
+  }
+}
+
+extension _ListProdutcsAtShop on List<BackendProductsAtShop> {
+  String _toJsonResponse() {
+    final map = {
+      for (final value in this) value.osmUID.toString(): value.toJson()
+    };
+    return jsonEncode({PRODUCTS_AT_SHOPS_CMD_RESULT_FIELD: map});
   }
 }

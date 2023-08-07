@@ -13,6 +13,7 @@ import 'package:plante/logging/analytics.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
+import 'package:plante/outside/backend/cmds/product_scan_cmd.dart';
 import 'package:plante/outside/map/shops_manager.dart';
 import 'package:plante/products/products_obtainer.dart';
 import 'package:plante/products/viewed_products_storage.dart';

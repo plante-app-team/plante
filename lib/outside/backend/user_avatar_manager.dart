@@ -9,6 +9,7 @@ import 'package:plante/logging/log.dart';
 import 'package:plante/model/user_params_controller.dart';
 import 'package:plante/outside/backend/backend.dart';
 import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/user_avatar_cmds.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
 import 'package:plante/ui/photos/photo_requester.dart';
 import 'package:plante/ui/photos/photos_taker.dart';

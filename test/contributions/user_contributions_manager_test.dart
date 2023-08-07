@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/date_time_extensions.dart';
 import 'package:plante/base/result.dart';
@@ -8,7 +11,7 @@ import 'package:plante/model/coord.dart';
 import 'package:plante/model/product_lang_slice.dart';
 import 'package:plante/model/shop.dart';
 import 'package:plante/model/shop_type.dart';
-import 'package:plante/outside/backend/backend_error.dart';
+import 'package:plante/outside/backend/cmds/request_contributions_cmd.dart';
 import 'package:plante/outside/backend/product_at_shop_source.dart';
 import 'package:plante/outside/backend/user_report_data.dart';
 import 'package:plante/outside/backend/user_reports_maker.dart';
@@ -18,10 +21,11 @@ import 'package:plante/products/products_manager.dart';
 import 'package:test/test.dart';
 
 import '../common_mocks.mocks.dart';
+import '../z_fakes/fake_backend.dart';
 import '../z_fakes/fake_shops_manager.dart';
 
 void main() {
-  late MockBackend backend;
+  late FakeBackend backend;
   late List<ProductsManagerObserver> productsManagerObservers;
   late MockProductsManager productsManager;
   late List<UserReportsMakerObserver> userReportsMakerObservers;
@@ -33,7 +37,7 @@ void main() {
   late UserContributionsManager userContributionsManager;
 
   setUp(() {
-    backend = MockBackend();
+    backend = FakeBackend();
     productsManager = MockProductsManager();
     shopsManager = FakeShopsManager();
     userReportsMaker = MockUserReportsMaker();
@@ -51,8 +55,8 @@ void main() {
     });
 
     backendContributions = <UserContribution>[];
-    when(backend.requestUserContributions(any, any))
-        .thenAnswer((_) async => Ok(backendContributions));
+    backend.setResponseFunction_testing(USER_CONTRIBUTIONS_CMD,
+        (_) => Ok(jsonEncode({'result': backendContributions})));
 
     userContributionsManager = UserContributionsManager(
         backend, productsManager, shopsManager, userReportsMaker);
@@ -75,35 +79,39 @@ void main() {
 
   test('backend queried only once, by the first getContributions call',
       () async {
-    verifyZeroInteractions(backend);
+    expect(
+        backend.getRequestsMatching_testing(USER_CONTRIBUTIONS_CMD), isEmpty);
 
     expect((await userContributionsManager.getContributions()).isOk, isTrue);
-    verify(backend.requestUserContributions(any, any)).called(1);
+    expect(backend.getRequestsMatching_testing(USER_CONTRIBUTIONS_CMD).length,
+        equals(1));
 
     expect((await userContributionsManager.getContributions()).isOk, isTrue);
-    verifyNever(backend.requestUserContributions(any, any));
+    expect(backend.getRequestsMatching_testing(USER_CONTRIBUTIONS_CMD).length,
+        equals(1));
   });
 
   test('backend queried twice if the first request failed', () async {
-    when(backend.requestUserContributions(any, any))
-        .thenAnswer((_) async => Err(BackendError.other()));
+    backend.setResponseException_testing(
+        USER_CONTRIBUTIONS_CMD, const SocketException(''));
     expect((await userContributionsManager.getContributions()).isErr, isTrue);
 
-    when(backend.requestUserContributions(any, any))
-        .thenAnswer((_) async => Ok(backendContributions));
+    backend.setResponseFunction_testing(USER_CONTRIBUTIONS_CMD,
+        (_) => Ok(jsonEncode({'result': backendContributions})));
     expect((await userContributionsManager.getContributions()).isOk, isTrue);
 
-    verify(backend.requestUserContributions(any, any)).called(2);
+    expect(backend.getRequestsMatching_testing(USER_CONTRIBUTIONS_CMD).length,
+        equals(2));
   });
 
   test('all contribution types are requested from backend', () async {
     await userContributionsManager.getContributions();
-    final requestedContributions =
-        verify(backend.requestUserContributions(any, captureAny)).captured.first
-            as Iterable<UserContributionType>;
 
-    expect(requestedContributions.toSet(),
-        equals(UserContributionType.values.toSet()));
+    final request =
+        backend.getRequestsMatching_testing(USER_CONTRIBUTIONS_CMD).first;
+    for (final type in UserContributionType.values) {
+      request.url.query.contains('contributionsTypes=$type');
+    }
   });
 
   test('all contribution types are supported', () async {
