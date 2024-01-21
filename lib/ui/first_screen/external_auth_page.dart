@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:plante/base/base.dart';
+import 'package:plante/base/device_info.dart';
 import 'package:plante/l10n/strings.dart';
 import 'package:plante/lang/sys_lang_code_holder.dart';
 import 'package:plante/logging/log.dart';
@@ -35,6 +36,7 @@ class ExternalAuthPage extends PagePlante {
 }
 
 class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
+  final _deviceInfoProvider = GetIt.I.get<DeviceInfoProvider>();
   final _googleAuthorizer = GetIt.I.get<GoogleAuthorizer>();
   final _appleAuthorizer = GetIt.I.get<AppleAuthorizer>();
   final _sysLangCodeHolder = GetIt.I.get<SysLangCodeHolder>();
@@ -194,6 +196,7 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
     // Backend login
     final backend = GetIt.I.get<Backend>();
     final loginResult = await backend.loginOrRegister(
+        deviceInfo: await _deviceInfoProvider.get(),
         googleIdToken: googleIdToken,
         appleAuthorizationCode: appleAuthorizationCode);
     if (loginResult.isErr) {

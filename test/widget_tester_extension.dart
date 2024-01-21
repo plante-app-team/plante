@@ -38,27 +38,9 @@ extension WidgetTesterExtension on WidgetTester {
     return _context;
   }
 
-  /// Somehow the DropdownButton widget creates 2 widgets for each of the
-  /// items it has.
-  /// This makes it impossible to click this item with WidgetTester.tap()
-  /// because widgets in those pairs are almost identical.
-  /// This function is a avoiding this problem by finding only the first needed
-  /// widget and clicking it, ignoring all the rest.
+  @Deprecated('Use superTap instead')
   Future<void> superTapDropDownItem(String text) async {
-    var foundFirst = false;
-    await superTap(find.byWidgetPredicate((widget) {
-      if (foundFirst) {
-        return false;
-      }
-      if (widget is! Text) {
-        return false;
-      }
-      final found = widget.data == text;
-      if (found) {
-        foundFirst = true;
-      }
-      return found;
-    }));
+    await superTap(find.text(text));
   }
 
   /// Same as [tap], but also calls [pumpAndSettle].
@@ -102,6 +84,11 @@ extension WidgetTesterExtension on WidgetTester {
     final res = await future;
     await pumpAndSettle();
     return res;
+  }
+
+  Future<void> removeSnackBarOf(BuildContext context) async {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    await pumpAndSettle();
   }
 }
 

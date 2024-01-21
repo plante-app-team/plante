@@ -7,7 +7,7 @@ import 'package:flutter_archive/flutter_archive.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/base/file_system_utils.dart';
 import 'package:plante/logging/log_level.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 const LOGS_DIR_MAX_SIZE = 1024 * 1024 * 10;
 
@@ -85,7 +85,7 @@ class Log {
     } catch (e) {
       Log.e("Couldn't create a zip with logs", ex: e);
     }
-    await Share.shareFiles([logsZip.path]);
+    await Share.shareXFiles([XFile(logsZip.path)]);
   }
 
   static void custom(LogLevel level, String message,

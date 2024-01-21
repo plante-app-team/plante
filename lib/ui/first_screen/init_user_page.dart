@@ -110,6 +110,7 @@ class _InitUserPageState extends PageStatePlante<InitUserPage> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
+        key: const Key('init_user_page'),
         backgroundColor: Colors.white,
         body: SafeArea(
             child: Stack(children: [

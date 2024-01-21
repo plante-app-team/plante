@@ -21,15 +21,29 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def loadEnv() {
+    def envFile = file("../../.env")
+    def env = [:]
+    envFile.eachLine { line ->
+        def parts = line.split('=')
+        if (parts.length == 2) {
+            env[parts[0].trim()] = parts[1].trim()
+        }
+    }
+    return env
+}
+
+def env = loadEnv()
+def googleMapsKey = env['PLANTE_ANDROID_GOOGLE_MAPS_KEY'] ?: ""
+
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-apply from: project(':flutter_config').projectDir.getPath() + "/dotenv.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
+    namespace = "vegancheckteam.plante"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -43,6 +57,7 @@ android {
         versionName flutterVersionName
         // For https://pub.dev/packages/flutter_config
         resValue "string", "build_config_package", "vegancheckteam.plante"
+        resValue "string", "PLANTE_ANDROID_GOOGLE_MAPS_KEY", googleMapsKey
     }
 
     signingConfigs {
@@ -70,6 +85,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 flutter {
@@ -78,6 +97,4 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation platform('com.google.firebase:firebase-bom:28.4.0')
-    implementation 'com.google.firebase:firebase-analytics'
 }

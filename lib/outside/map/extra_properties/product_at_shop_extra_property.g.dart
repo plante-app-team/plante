@@ -20,7 +20,7 @@ class _$ProductAtShopExtraProperty extends ProductAtShopExtraProperty {
 
   factory _$ProductAtShopExtraProperty(
           [void Function(ProductAtShopExtraPropertyBuilder)? updates]) =>
-      (new ProductAtShopExtraPropertyBuilder()..update(updates)).build();
+      (new ProductAtShopExtraPropertyBuilder()..update(updates))._build();
 
   _$ProductAtShopExtraProperty._(
       {this.intVal,
@@ -30,13 +30,13 @@ class _$ProductAtShopExtraProperty extends ProductAtShopExtraProperty {
       required this.osmUID})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
-        barcode, 'ProductAtShopExtraProperty', 'barcode');
+        barcode, r'ProductAtShopExtraProperty', 'barcode');
     BuiltValueNullFieldError.checkNotNull(
-        typeCode, 'ProductAtShopExtraProperty', 'typeCode');
+        typeCode, r'ProductAtShopExtraProperty', 'typeCode');
     BuiltValueNullFieldError.checkNotNull(whenSetSecsSinceEpoch,
-        'ProductAtShopExtraProperty', 'whenSetSecsSinceEpoch');
+        r'ProductAtShopExtraProperty', 'whenSetSecsSinceEpoch');
     BuiltValueNullFieldError.checkNotNull(
-        osmUID, 'ProductAtShopExtraProperty', 'osmUID');
+        osmUID, r'ProductAtShopExtraProperty', 'osmUID');
   }
 
   @override
@@ -61,17 +61,19 @@ class _$ProductAtShopExtraProperty extends ProductAtShopExtraProperty {
 
   @override
   int get hashCode {
-    return $jf($jc(
-        $jc(
-            $jc($jc($jc(0, intVal.hashCode), barcode.hashCode),
-                typeCode.hashCode),
-            whenSetSecsSinceEpoch.hashCode),
-        osmUID.hashCode));
+    var _$hash = 0;
+    _$hash = $jc(_$hash, intVal.hashCode);
+    _$hash = $jc(_$hash, barcode.hashCode);
+    _$hash = $jc(_$hash, typeCode.hashCode);
+    _$hash = $jc(_$hash, whenSetSecsSinceEpoch.hashCode);
+    _$hash = $jc(_$hash, osmUID.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('ProductAtShopExtraProperty')
+    return (newBuiltValueToStringHelper(r'ProductAtShopExtraProperty')
           ..add('intVal', intVal)
           ..add('barcode', barcode)
           ..add('typeCode', typeCode)
@@ -134,23 +136,25 @@ class ProductAtShopExtraPropertyBuilder
   }
 
   @override
-  _$ProductAtShopExtraProperty build() {
+  ProductAtShopExtraProperty build() => _build();
+
+  _$ProductAtShopExtraProperty _build() {
     final _$result = _$v ??
         new _$ProductAtShopExtraProperty._(
             intVal: intVal,
             barcode: BuiltValueNullFieldError.checkNotNull(
-                barcode, 'ProductAtShopExtraProperty', 'barcode'),
+                barcode, r'ProductAtShopExtraProperty', 'barcode'),
             typeCode: BuiltValueNullFieldError.checkNotNull(
-                typeCode, 'ProductAtShopExtraProperty', 'typeCode'),
+                typeCode, r'ProductAtShopExtraProperty', 'typeCode'),
             whenSetSecsSinceEpoch: BuiltValueNullFieldError.checkNotNull(
                 whenSetSecsSinceEpoch,
-                'ProductAtShopExtraProperty',
+                r'ProductAtShopExtraProperty',
                 'whenSetSecsSinceEpoch'),
             osmUID: BuiltValueNullFieldError.checkNotNull(
-                osmUID, 'ProductAtShopExtraProperty', 'osmUID'));
+                osmUID, r'ProductAtShopExtraProperty', 'osmUID'));
     replace(_$result);
     return _$result;
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

@@ -37,6 +37,7 @@ class MapPageModesTestCommons {
   late FakeShopsManager shopsManager;
   late MockUserLocationManager userLocationManager;
   late MockGoogleMapController mapController;
+  late MapPageController mapPageController;
   late FakeSharedPreferences prefs;
   late MockLatestCameraPosStorage latestCameraPosStorage;
   late FakeAnalytics analytics;
@@ -59,6 +60,7 @@ class MapPageModesTestCommons {
     shopsManager = FakeShopsManager();
     userLocationManager = MockUserLocationManager();
     mapController = MockGoogleMapController();
+    mapPageController = MapPageController();
     prefs = FakeSharedPreferences();
     latestCameraPosStorage = MockLatestCameraPosStorage();
     addressObtainer = MockAddressObtainer();
@@ -207,6 +209,7 @@ class MapPageModesTestCommons {
     final widget = MapPage(
         key: key,
         mapControllerForTesting: mapController,
+        controller: mapPageController,
         product: product,
         requestedMode: requestedMode,
         initialSelectedShops: initialSelectedShops);

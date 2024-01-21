@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
+import 'package:plante/base/device_info.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/settings.dart';
 import 'package:plante/contributions/user_contributions_manager.dart';
@@ -57,6 +58,8 @@ void initDI() {
   GetIt.I.registerSingleton<Settings>(
       Settings(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<Analytics>(Analytics());
+  GetIt.I.registerSingleton<DeviceInfoProvider>(
+      DeviceInfoProvider(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<LatestCameraPosStorage>(
       LatestCameraPosStorage(GetIt.I.get<SharedPreferencesHolder>()));
   GetIt.I.registerSingleton<SysLangCodeHolder>(SysLangCodeHolder());

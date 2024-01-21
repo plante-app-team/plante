@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter_config/flutter_config.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:plante/logging/log.dart';
 import 'package:plante/outside/identity/google_user.dart';
@@ -9,11 +9,9 @@ class GoogleAuthorizer {
   Future<GoogleUser?> auth() async {
     final String? clientId;
     if (Platform.isIOS) {
-      clientId = FlutterConfig.get('PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE')
-          ?.toString();
+      clientId = dotenv.env['PLANTE_IOS_GOOGLE_CLOUD_CLIENT_ID_REVERSE'];
     } else {
-      clientId = FlutterConfig.get('PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID')
-          ?.toString();
+      clientId = dotenv.env['PLANTE_ANDROID_GOOGLE_CLOUD_CLIENT_ID'];
     }
     final GoogleSignIn googleSignIn =
         GoogleSignIn(scopes: ['email', 'profile'], clientId: clientId);

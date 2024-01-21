@@ -345,6 +345,8 @@ void main() {
 
     expect(done, isFalse);
     verifyNever(productsManager.createUpdateProduct(any));
+
+    await tester.removeSnackBarOf(context);
     await tester.tap(find.byKey(const Key('done_btn')));
     await tester.pumpAndSettle();
     if (expectedProductResult != null) {
