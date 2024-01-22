@@ -96,7 +96,6 @@ Future<BitmapDescriptor> _getMarkerBitmap(Iterable<Shop> shops,
   }
 }
 
-final _imagePaint = Paint();
 final _textPainter = TextPainter(textDirection: TextDirection.ltr);
 final _assetsCache = <String, ui.Picture>{};
 final _markersCache = <String, Map<int, BitmapDescriptor>>{};
@@ -118,24 +117,20 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
   // Marker image
   var size = 45.0; // SVG original size
   final queryData = MediaQuery.of(context);
-  // toPicture() and toImage() don't seem to be pixel ratio aware,
-  // so we calculate the actual sizes here
   final devicePixelRatio = queryData.devicePixelRatio;
   size = size * devicePixelRatio;
   final ui.Picture picture;
   if (_assetsCache.containsKey(assetName)) {
     picture = _assetsCache[assetName]!;
   } else {
-    final svgString =
-        await DefaultAssetBundle.of(context).loadString(assetName);
-    final svgDrawableRoot = await svg.fromSvgString(svgString, '');
-
-    picture = svgDrawableRoot.toPicture(size: Size(size, size));
-    _assetsCache[assetName] = picture;
+    final pictureInfo = await vg.loadPicture(SvgAssetLoader(assetName), context);
+    _assetsCache[assetName] = pictureInfo.picture;
+    picture = pictureInfo.picture;
   }
 
-  final image = await picture.toImage(size.round(), size.round());
-  canvas.drawImage(image, Offset.zero, _imagePaint);
+  canvas.scale(devicePixelRatio * 1.2);
+  // final image = await picture.toImage(size.round()*3, size.round()*3);
+  canvas.drawPicture(picture);
 
   // Text
   if (shops != 1) {
@@ -143,25 +138,25 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
     _textPainter.text = TextSpan(
         text: text,
         style: textStyle.copyWith(
-            fontSize: textStyle.fontSize! * devicePixelRatio));
+            fontSize: textStyle.fontSize! * 0.85));
     _textPainter.layout();
     // Magic numbers! Figured out manually, might be wrong
     final double xOffset;
     if (shops == 2) {
-      xOffset = 21 * devicePixelRatio;
+      xOffset = 17.15;
     } else if (shops == 4) {
-      xOffset = 20.5 * devicePixelRatio;
+      xOffset = 16.5;
     } else if (shops == 6) {
-      xOffset = 20.75 * devicePixelRatio;
+      xOffset = 16.5;
     } else if (shops == 8) {
-      xOffset = 21 * devicePixelRatio;
+      xOffset = 17;
     } else if (shops > 9) {
-      xOffset = 21 * devicePixelRatio;
+      xOffset = 17.15;
     } else {
-      xOffset = 21.5 * devicePixelRatio;
+      xOffset = 17;
     }
 
-    final yOffset = 11.5 * devicePixelRatio;
+    const yOffset = 9.0;
     _textPainter.paint(
         canvas, Offset(xOffset - _textPainter.width / 2, yOffset));
   }
