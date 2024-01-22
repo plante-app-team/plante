@@ -123,8 +123,8 @@ void main() {
     );
 
     final obtainedBarcodesRes = await obtainer.obtainVeganBarcodesMap([shop2]);
-    expect(obtainedBarcodesRes.unwrap()[shop2.name], isNull);
-    expect(obtainedBarcodesRes.unwrap()[shop1.name], isNull);
+    expect(obtainedBarcodesRes.unwrap()[shop2], isEmpty);
+    expect(obtainedBarcodesRes.unwrap()[shop1], isNull);
   });
 
   test(
@@ -142,13 +142,13 @@ void main() {
     );
 
     var obtainedBarcodesRes = await obtainer.obtainVeganBarcodesMap([shop2]);
-    expect(obtainedBarcodesRes.unwrap()[shop2.name], isNull);
+    expect(obtainedBarcodesRes.unwrap()[shop2], isEmpty);
     // First fetch leads to network operations
     verify(offApi.getBarcodesVeganByLabel(any));
     verify(offApi.getBarcodesVeganByIngredients(any, any));
 
     obtainedBarcodesRes = await obtainer.obtainVeganBarcodesMap([shop2]);
-    expect(obtainedBarcodesRes.unwrap()[shop2.name], isNull);
+    expect(obtainedBarcodesRes.unwrap()[shop2], isEmpty);
     // Second fetch leads to NO network operations even though there were 0
     // barcodes after the first fetch
     verifyNever(offApi.getBarcodesVeganByLabel(any));

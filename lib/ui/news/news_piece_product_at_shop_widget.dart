@@ -9,6 +9,7 @@ import 'package:plante/ui/base/components/button_icon_text_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/menu_item_plante.dart';
 import 'package:plante/ui/base/popup/popup_plante.dart';
+import 'package:plante/ui/base/svg_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/product/product_header_widget.dart';
 import 'package:plante/ui/product/product_page_wrapper.dart';
@@ -159,8 +160,9 @@ class _NewsPieceButton extends StatelessWidget {
             child: InkWell(
                 onTap: onTap,
                 child: Center(
-                    child: Wrap(
-                        children: [SvgPicture.asset(asset, color: color)])))));
+                    child: Wrap(children: [
+                  SvgPicture.asset(asset, colorFilter: color.toColorFilter())
+                ])))));
   }
 }
 

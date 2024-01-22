@@ -1,4 +1,3 @@
-
 import 'package:plante/base/device_info.dart';
 import 'package:test/test.dart';
 

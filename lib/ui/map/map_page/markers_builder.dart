@@ -123,7 +123,8 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
   if (_assetsCache.containsKey(assetName)) {
     picture = _assetsCache[assetName]!;
   } else {
-    final pictureInfo = await vg.loadPicture(SvgAssetLoader(assetName), context);
+    final pictureInfo =
+        await vg.loadPicture(SvgAssetLoader(assetName), context);
     _assetsCache[assetName] = pictureInfo.picture;
     picture = pictureInfo.picture;
   }
@@ -137,8 +138,7 @@ Future<BitmapDescriptor> _bitmapDescriptorFromSvgAsset(BuildContext context,
     final text = shops <= 9 ? '$shops' : '9+';
     _textPainter.text = TextSpan(
         text: text,
-        style: textStyle.copyWith(
-            fontSize: textStyle.fontSize! * 0.85));
+        style: textStyle.copyWith(fontSize: textStyle.fontSize! * 0.85));
     _textPainter.layout();
     // Magic numbers! Figured out manually, might be wrong
     final double xOffset;

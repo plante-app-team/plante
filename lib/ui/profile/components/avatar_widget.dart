@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:plante/base/base.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/uri_image_plante.dart';
+import 'package:plante/ui/base/svg_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
 
@@ -75,7 +76,7 @@ class _AvatarWidgetState extends ConsumerState<AvatarWidget> {
                       child: Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: SvgPicture.asset('assets/add_photo.svg',
-                              color: Colors.white))))),
+                              colorFilter: Colors.white.toColorFilter()))))),
       ]),
     );
   }
