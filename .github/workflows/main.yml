@@ -36,6 +36,10 @@ jobs:
       # we don't want to fail because of bad formatting in submodules
       - name: Checkout submodules (Open Food Facts)
         run: git submodule update --init --recursive
+      - name: Create the .env file so that the flutter analyze cmd would not fail
+        run: |
+          touch .env
+        shell: bash
       - name: Statically analyze the Dart code for any errors
         run: flutter analyze .
       - name: Run pub get   
