@@ -49,80 +49,83 @@ class _ExternalAuthPageState extends PageStatePlante<ExternalAuthPage> {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
             child: Column(children: [
-      Expanded(
-        child: Stack(children: [
-          Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Center(
-                child: SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 24),
+          Expanded(
+            child: Stack(children: [
+              Center(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Center(
+                    child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 24, right: 24),
+                            child: Text(
+                                context
+                                    .strings.external_auth_page_continue_with,
+                                style: TextStyles.headline1)))),
+                const SizedBox(height: 10),
+                Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24),
+                    child: ButtonOutlinedPlante(
+                        onPressed: !_loading ? _onGoogleAuthClicked : null,
+                        child: Stack(children: [
+                          Container(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: SvgPicture.asset(
+                                            'assets/google_icon.svg')),
+                                  ])),
+                          SizedBox(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Center(
+                                  child: Text('Google',
+                                      style: TextStyles.buttonOutlinedEnabled)))
+                        ]))),
+                if (Platform.isIOS || isInTests()) const SizedBox(height: 10),
+                if (Platform.isIOS || isInTests())
+                  Padding(
+                    padding: const EdgeInsets.only(left: 24, right: 24),
+                    child: SignInWithAppleButton(
+                      text: context
+                          .strings.external_auth_page_continue_with_apple,
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      onPressed: !_loading ? _signInWithApple : () {},
+                    ),
+                  ),
+              ])),
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                      padding: const EdgeInsets.only(bottom: 108),
+                      child: InkWell(
+                        onTap: () {
+                          launchUrl(privacyPolicyUrl(_sysLangCodeHolder));
+                        },
                         child: Text(
-                            context.strings.external_auth_page_continue_with,
-                            style: TextStyles.headline1)))),
-            const SizedBox(height: 10),
-            Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24),
-                child: ButtonOutlinedPlante(
-                    onPressed: !_loading ? _onGoogleAuthClicked : null,
-                    child: Stack(children: [
-                      Container(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: SvgPicture.asset(
-                                        'assets/google_icon.svg')),
-                              ])),
-                      SizedBox(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: Center(
-                              child: Text('Google',
-                                  style: TextStyles.buttonOutlinedEnabled)))
-                    ]))),
-            if (Platform.isIOS || isInTests()) const SizedBox(height: 10),
-            if (Platform.isIOS || isInTests())
-              Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24),
-                child: SignInWithAppleButton(
-                  text: context.strings.external_auth_page_continue_with_apple,
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  onPressed: !_loading ? _signInWithApple : () {},
-                ),
-              ),
-          ])),
-          Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                  padding: const EdgeInsets.only(bottom: 108),
-                  child: InkWell(
-                    onTap: () {
-                      launchUrl(privacyPolicyUrl(_sysLangCodeHolder));
-                    },
-                    child: Text(
-                        context.strings.external_auth_page_privacy_policy,
-                        style: TextStyles.normal.copyWith(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline)),
-                  ))),
-          AnimatedSwitcher(
-              duration: DURATION_DEFAULT,
-              child: _loading
-                  ? const LinearProgressIndicatorPlante()
-                  : const SizedBox.shrink()),
-          const InkWell(
-              onTap: Log.startLogsSending,
-              child: SizedBox(width: 50, height: 50)),
-        ]),
-      )
-    ])));
+                            context.strings.external_auth_page_privacy_policy,
+                            style: TextStyles.normal.copyWith(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline)),
+                      ))),
+              AnimatedSwitcher(
+                  duration: DURATION_DEFAULT,
+                  child: _loading
+                      ? const LinearProgressIndicatorPlante()
+                      : const SizedBox.shrink()),
+              const InkWell(
+                  onTap: Log.startLogsSending,
+                  child: SizedBox(width: 50, height: 50)),
+            ]),
+          )
+        ])));
   }
 
   void _signInWithApple() async {
