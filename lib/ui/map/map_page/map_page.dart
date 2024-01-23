@@ -24,6 +24,7 @@ import 'package:plante/ui/base/components/animated_list_simple_plante.dart';
 import 'package:plante/ui/base/components/button_filled_small_plante.dart';
 import 'package:plante/ui/base/components/licence_label.dart';
 import 'package:plante/ui/base/components/visibility_detector_plante.dart';
+import 'package:plante/ui/base/components/will_pop_scope_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/ui_permissions_utils.dart';
@@ -58,6 +59,7 @@ class MapPageController {
   VoidCallback? _startStoreCreation;
   VoidCallback? _switchToDefaultMode;
   ResCallback<bool>? _isViewportLoaded;
+  ResCallback<Future<void>>? _onBackPress;
 
   /// Note: the map will switch to the default mode after store creation
   /// is finished (or canceled).
@@ -71,6 +73,11 @@ class MapPageController {
 
   bool isViewportLoaded() {
     return _isViewportLoaded?.call() ?? false;
+  }
+
+  @visibleForTesting
+  Future<void> onBackPress() async {
+    await _onBackPress?.call();
   }
 }
 
@@ -242,6 +249,7 @@ class _MapPageState extends PageStatePlante<MapPage>
     };
     widget.controller?._isViewportLoaded =
         () => _model.viewPortShopsLoaded.cachedVal;
+    widget.controller?._onBackPress = _onWillPop;
 
     _asyncInit();
     _instances.add(this);
@@ -477,7 +485,7 @@ class _MapPageState extends PageStatePlante<MapPage>
       Align(alignment: Alignment.bottomCenter, child: _progressBar()),
     ]);
 
-    return WillPopScope(
+    return WillPopScopePlante(
         onWillPop: _onWillPop,
         child: Scaffold(
           resizeToAvoidBottomInset: false,

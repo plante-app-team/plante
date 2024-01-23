@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mockito/mockito.dart';
+import 'package:plante/base/device_info.dart';
 import 'package:plante/base/permissions_manager.dart';
 import 'package:plante/base/result.dart';
 import 'package:plante/base/settings.dart';
@@ -87,6 +88,8 @@ class TestDiRegistrar {
     _registerProvider<ShopsManager>(FakeShopsManager.new);
     _registerProvider<SharedPreferencesHolder>(
         () => FakeSharedPreferences().asHolder());
+    _registerProvider<DeviceInfoProvider>(
+        () => DeviceInfoProvider(_get<SharedPreferencesHolder>()));
     _registerProvider<InputProductsLangStorage>(
         () => FakeInputProductsLangStorage.fromCode(LangCode.en));
     _registerProvider<PermissionsManager>(MockPermissionsManager.new);

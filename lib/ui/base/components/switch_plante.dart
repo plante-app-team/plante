@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:plante/ui/base/colors_plante.dart';
+import 'package:plante/ui/base/svg_utils.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 
 typedef SwitchPlanteCallback = void Function(bool leftSelected);
@@ -105,9 +106,9 @@ class _SwitchPlanteState extends State<SwitchPlante>
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       SvgPicture.asset(widget.leftSvgAsset,
-                          color: _colorLeft.value),
+                          colorFilter: _colorLeft.value.toColorFilter()),
                       SvgPicture.asset(widget.rightSvgAsset,
-                          color: _colorRight.value),
+                          colorFilter: _colorRight.value.toColorFilter()),
                     ]);
               },
             )),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plante/l10n/strings.dart';
@@ -269,6 +270,7 @@ void main() {
     // Network is back!
     userLangsManager.savingLangsError = null;
 
+    await tester.removeSnackBarOf(context);
     await tester
         .superTap(find.text(context.strings.init_user_page_done_button_title));
 
@@ -308,6 +310,7 @@ void main() {
     // Backend is ok now!
     userAvatarManager.setUpdateUserAvatarError_testing(null);
 
+    await tester.removeSnackBarOf(context);
     await tester
         .superTap(find.text(context.strings.init_user_page_done_button_title));
 

@@ -75,7 +75,7 @@ class _ImageCropPageState extends PageStatePlante<ImageCropPage> {
   void initState() {
     Log.i('ImageCropPage start');
     super.initState();
-    _initAsync();
+    runOnNextFrame(_initAsync);
   }
 
   void _initAsync() async {

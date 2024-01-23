@@ -142,7 +142,7 @@ void main() {
 
     expect(find.byType(ShopCard), findsOneWidget);
 
-    await tester.pageBack();
+    await widget.controller?.onBackPress();
     await tester.pumpAndSettle();
 
     expect(find.byType(ShopCard), findsNothing);

@@ -144,7 +144,7 @@ class ShopsManager {
         final shopsCache = await slowCache.getShops(ids);
         final shops =
             shopsCache.values.where((shop) => bounds.containsShop(shop));
-        return {for (var shop in shops) shop.osmUID: shop};
+        return {for (final shop in shops) shop.osmUID: shop};
       }
     }
     return null;
@@ -188,7 +188,7 @@ class ShopsManager {
         .map((id) => fetchResult.shops[id]!)
         .where((shop) => bounds.containsShop(shop));
     _notifyListenersAboutChange();
-    return Ok({for (var shop in result) shop.osmUID: shop});
+    return Ok({for (final shop in result) shop.osmUID: shop});
   }
 
   void _ensureAllShopsArePresentInOsmCache(Iterable<Shop> shops) async {

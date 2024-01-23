@@ -128,13 +128,14 @@ class _CreateShopPageState extends PageStatePlante<CreateShopPage> {
                       }))))),
     ]);
     return Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
             child: Stack(children: [
-      content,
-      consumer((ref) => _loading.watch(ref)
-          ? const LinearProgressIndicatorPlante()
-          : const SizedBox()),
-    ])));
+          content,
+          consumer((ref) => _loading.watch(ref)
+              ? const LinearProgressIndicatorPlante()
+              : const SizedBox()),
+        ])));
   }
 
   bool _isInputOk(ShopType? shopType) {

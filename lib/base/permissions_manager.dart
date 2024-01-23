@@ -7,6 +7,7 @@ enum PermissionState {
   restricted,
   limited,
   permanentlyDenied,
+  provisional,
 }
 
 enum PermissionKind { CAMERA, LOCATION }
@@ -52,6 +53,8 @@ extension _PermissionStatus on wrapped.PermissionStatus {
         return PermissionState.limited;
       case wrapped.PermissionStatus.permanentlyDenied:
         return PermissionState.permanentlyDenied;
+      case wrapped.PermissionStatus.provisional:
+        return PermissionState.provisional;
     }
   }
 }

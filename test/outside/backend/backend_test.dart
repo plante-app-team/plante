@@ -6,6 +6,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:mockito/mockito.dart';
 import 'package:plante/base/date_time_extensions.dart';
+import 'package:plante/base/device_info.dart';
 import 'package:plante/contributions/user_contribution.dart';
 import 'package:plante/contributions/user_contribution_type.dart';
 import 'package:plante/model/coord.dart';
@@ -47,6 +48,8 @@ import '../../z_fakes/fake_http_client.dart';
 import '../../z_fakes/fake_user_params_controller.dart';
 
 void main() {
+  final deviceInfo = DeviceInfo('deviceID', 'deviceId', 'deviceVersion');
+
   test('successful login/registration', () async {
     final httpClient = FakeHttpClient();
     final userParamsController = FakeUserParamsController();
@@ -59,7 +62,8 @@ void main() {
       }
     ''');
 
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     final expectedParams = UserParams((v) => v
       ..backendId = '123'
       ..backendClientToken = '321');
@@ -90,7 +94,8 @@ void main() {
     await userParamsController.setUserParams(existingParams);
 
     final backend = Backend(userParamsController, httpClient);
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(result.unwrap(), equals(existingParams));
   });
 
@@ -105,7 +110,8 @@ void main() {
       }
     ''');
 
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind,
         equals(BackendErrorKind.GOOGLE_EMAIL_NOT_VERIFIED));
   });
@@ -115,7 +121,8 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse('.*login_or_register_user.*', '', responseCode: 500);
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -124,7 +131,8 @@ void main() {
     final userParamsController = FakeUserParamsController();
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponse('.*login_or_register_user.*', '{{{{bad bad bad}');
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.INVALID_JSON));
   });
 
@@ -137,7 +145,8 @@ void main() {
         "error": "some_error"
       }
     ''');
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(result.unwrapErr().errorKind, equals(BackendErrorKind.OTHER));
   });
 
@@ -147,7 +156,8 @@ void main() {
     final backend = Backend(userParamsController, httpClient);
     httpClient.setResponseException(
         '.*login_or_register_user.*', const SocketException(''));
-    final result = await backend.loginOrRegister(googleIdToken: 'google ID');
+    final result = await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     expect(
         result.unwrapErr().errorKind, equals(BackendErrorKind.NETWORK_ERROR));
   });
@@ -166,7 +176,8 @@ void main() {
     ''');
 
     verifyNever(observer.onBackendError(any));
-    await backend.loginOrRegister(googleIdToken: 'google ID');
+    await backend.loginOrRegister(
+        deviceInfo: deviceInfo, googleIdToken: 'google ID');
     verify(observer.onBackendError(any));
   });
 

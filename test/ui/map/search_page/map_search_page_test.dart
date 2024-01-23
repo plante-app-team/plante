@@ -1148,7 +1148,7 @@ void main() {
 
 extension _ShopsListExt on Iterable<Shop> {
   Map<OsmUID, Shop> toMap() {
-    return {for (var e in this) e.osmUID: e};
+    return {for (final e in this) e.osmUID: e};
   }
 }
 

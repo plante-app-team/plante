@@ -50,6 +50,7 @@ class _DropdownPlanteState<T> extends State<DropdownPlante<T>> {
               SizedBox(
                   width: double.infinity,
                   child: DropdownButton<T>(
+                    dropdownColor: Colors.white,
                     value: widget.value,
                     underline: const SizedBox.shrink(),
                     icon: const SizedBox.shrink(),

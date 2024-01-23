@@ -9,16 +9,20 @@ const LOGIN_OR_REGISTER_CMD = 'login_or_register_user';
 
 extension BackendExt on Backend {
   Future<Result<UserParams, BackendError>> loginOrRegister(
-          {String? googleIdToken, String? appleAuthorizationCode}) =>
-      executeCmd(
-          _BackendLoginOrRegisterCmd(googleIdToken, appleAuthorizationCode));
+          {required DeviceInfo deviceInfo,
+          String? googleIdToken,
+          String? appleAuthorizationCode}) =>
+      executeCmd(_BackendLoginOrRegisterCmd(
+          deviceInfo, googleIdToken, appleAuthorizationCode));
 }
 
 class _BackendLoginOrRegisterCmd extends BackendCmd<UserParams> {
+  final DeviceInfo deviceInfo;
   final String? googleIdToken;
   final String? appleAuthorizationCode;
 
-  _BackendLoginOrRegisterCmd(this.googleIdToken, this.appleAuthorizationCode);
+  _BackendLoginOrRegisterCmd(
+      this.deviceInfo, this.googleIdToken, this.appleAuthorizationCode);
 
   @override
   Future<Result<UserParams, BackendError>> execute() async {
@@ -27,7 +31,7 @@ class _BackendLoginOrRegisterCmd extends BackendCmd<UserParams> {
       return Ok(existingUserParams);
     }
 
-    final deviceId = (await DeviceInfo.get()).deviceID;
+    final deviceId = deviceInfo.deviceID;
     final queryParams = {
       'deviceId': deviceId,
     };

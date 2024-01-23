@@ -5,9 +5,11 @@ import 'package:plante/l10n/strings.dart';
 import 'package:plante/ui/base/colors_plante.dart';
 import 'package:plante/ui/base/components/bottom_bar_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
+import 'package:plante/ui/base/components/will_pop_scope_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/popup/popup_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
+import 'package:plante/ui/base/svg_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
 import 'package:plante/ui/base/ui_utils.dart';
 import 'package:plante/ui/base/ui_value.dart';
@@ -86,7 +88,7 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
   @override
   Widget buildPage(BuildContext context) {
     return Scaffold(
-        body: WillPopScope(
+        body: WillPopScopePlante(
             onWillPop: () async {
               if (_selectedPage.value == 0) {
                 return true;
@@ -118,9 +120,10 @@ class _MainPageState extends PageStatePlante<MainPage> with RestorationMixin {
               _switchPageTo(pageIndex: index);
             },
             icon: SvgPicture.asset(_pagesIcons[page]!,
-                color: index == _selectedPage.value
-                    ? ColorsPlante.primary
-                    : ColorsPlante.grey));
+                colorFilter: (index == _selectedPage.value
+                        ? ColorsPlante.primary
+                        : ColorsPlante.grey)
+                    .toColorFilter()));
       };
       final children = [
         ...pages1.map(pageToButtons).toList(),
