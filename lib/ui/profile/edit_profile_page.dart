@@ -16,6 +16,7 @@ import 'package:plante/ui/base/components/button_filled_plante.dart';
 import 'package:plante/ui/base/components/fab_plante.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
 import 'package:plante/ui/base/components/linear_progress_indicator_plante.dart';
+import 'package:plante/ui/base/components/will_pop_scope_plante.dart';
 import 'package:plante/ui/base/page_state_plante.dart';
 import 'package:plante/ui/base/snack_bar_utils.dart';
 import 'package:plante/ui/base/text_styles.dart';
@@ -135,7 +136,7 @@ class _EditProfilePageState extends PageStatePlante<EditProfilePage>
 
   @override
   Widget buildPage(BuildContext context) {
-    return WillPopScope(
+    return WillPopScopePlante(
         onWillPop: _onWillPop,
         child: Scaffold(
             backgroundColor: Colors.white,

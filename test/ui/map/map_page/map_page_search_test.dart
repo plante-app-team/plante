@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:plante/model/coord.dart';
 import 'package:plante/outside/map/osm/osm_road.dart';
 import 'package:plante/ui/base/components/shop_card.dart';
+import 'package:plante/ui/base/components/will_pop_scope_plante.dart';
 import 'package:plante/ui/map/components/map_search_bar.dart';
 import 'package:plante/ui/map/map_page/map_page_testing_storage.dart';
 import 'package:plante/ui/map/search_page/map_search_page.dart';
@@ -171,9 +172,9 @@ void main() {
     expect(find.byType(MapSearchPage), findsNothing);
 
     // Back press
-    final popper =
-        find.byType(WillPopScope).evaluate().first.widget as WillPopScope;
-    await popper.onWillPop!.call();
+    final popper = find.byType(WillPopScopePlante).evaluate().first.widget
+        as WillPopScopePlante;
+    await popper.onWillPop.call();
     await tester.pumpAndSettle();
 
     expect(find.byType(MapSearchPage), findsOneWidget);
@@ -189,9 +190,9 @@ void main() {
     // await tester.pumpAndSettle();
 
     // Back press
-    final popper =
-        find.byType(WillPopScope).evaluate().first.widget as WillPopScope;
-    await popper.onWillPop!.call();
+    final popper = find.byType(WillPopScopePlante).evaluate().first.widget
+        as WillPopScopePlante;
+    await popper.onWillPop.call();
     await tester.pumpAndSettle();
 
     // Search results didn't open

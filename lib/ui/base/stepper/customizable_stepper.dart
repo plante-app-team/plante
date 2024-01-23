@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plante/ui/base/components/header_plante.dart';
+import 'package:plante/ui/base/components/will_pop_scope_plante.dart';
 import 'package:plante/ui/base/stepper/_back_button_wrapper.dart';
 import 'package:plante/ui/base/stepper/_indicators_top.dart';
 import 'package:plante/ui/base/stepper/functions.dart';
@@ -105,7 +106,7 @@ class CustomizableStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    return WillPopScopePlante(
         onWillPop: () async {
           if (_controller._activePage == 0) {
             return true;
